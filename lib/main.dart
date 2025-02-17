@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +56,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  BroadcastReceiver receiver = BroadcastReceiver(
+    names: [
+      "com.android.decodewedge.decode_action",
+    ],
+  );
+
   int _counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    receiver.start();
+    receiver.messages.listen((message) {
+      print("1");
+      print(message.data?['com.android.decode.intentwedge.barcode_string']);
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
