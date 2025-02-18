@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import './components/sample_item.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -9,6 +10,28 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  BroadcastReceiver receiver = BroadcastReceiver(
+    names: <String>[
+      "com.android.decodewedge.decode_action",
+    ],
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    receiver.start();
+    receiver.messages.listen((message) {
+      print("接收到了消息");
+      print(message.data?['com.android.decode.intentwedge.barcode_string']);
+    });
+  }
+
+  @override
+  void dispose() {
+    receiver.stop();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done

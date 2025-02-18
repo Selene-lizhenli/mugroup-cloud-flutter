@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class SampleItem extends StatelessWidget {
   const SampleItem({super.key});
@@ -10,12 +8,10 @@ class SampleItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const TDImage(
+        Container(
           width: 100,
           height: 100,
-          imgUrl:
-              "https://s3.woyou.fun:12223/cloud/showroom/sample/2387662/P028525_01_original.jpg",
-          fit: BoxFit.contain,
+          color: Colors.amber,
         ),
         const SizedBox(
           width: 10,
