@@ -1,7 +1,9 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import './components/sample_item.dart';
 
+@RoutePage()
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
