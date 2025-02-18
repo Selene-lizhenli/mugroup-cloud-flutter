@@ -38,6 +38,7 @@ dependencies:
   flutter_broadcasts: ^0.4.0
   tdesign_flutter: ^0.1.8
   auto_route: 9.2.2
+  dio: ^5.8.0+1
 
 dev_dependencies:
   flutter_test:
