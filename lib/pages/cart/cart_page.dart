@@ -1,17 +1,17 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
-import './components/sample_item.dart';
+import 'widgets/sample_item.dart';
 
 @RoutePage()
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class CartPage extends StatefulWidget {
+  const CartPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<CartPage> createState() => _CartPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _CartPageState extends State<CartPage> {
   BroadcastReceiver receiver = BroadcastReceiver(
     names: <String>[
       "com.android.decodewedge.decode_action",
