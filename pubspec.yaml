@@ -43,6 +43,7 @@ dependencies:
   json_annotation: ^4.9.0
   logger: ^2.5.0
   flutter_hooks: ^0.20.5
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
