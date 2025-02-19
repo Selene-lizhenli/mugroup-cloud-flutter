@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class SampleItem extends StatelessWidget {
   final Sample sample;
@@ -47,7 +48,12 @@ class SampleItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("1"),
-                    Text("2"),
+                    TDStepper(
+                      theme: TDStepperTheme.filled,
+                      size: TDStepperSize.small,
+                      value: 0,
+                      min: 0,
+                    ),
                   ],
                 )
               ],
