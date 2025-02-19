@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -8,7 +9,7 @@ void main() {
     final sample =
         await api.get("/samples/1").then((res) => Sample.fromJson(res.data));
 
-    print(sample);
+    logger.d(sample);
   });
 
   test('sample list', () async {
@@ -22,6 +23,6 @@ void main() {
           ),
         );
 
-    print(resp);
+    logger.d(resp);
   });
 }

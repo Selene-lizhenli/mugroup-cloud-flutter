@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'widgets/sample_item.dart';
@@ -23,8 +24,8 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     receiver.start();
     receiver.messages.listen((message) {
-      print("接收到了消息");
-      print(message.data?['com.android.decode.intentwedge.barcode_string']);
+      logger.d("接收到了消息");
+      logger.d(message.data?['com.android.decode.intentwedge.barcode_string']);
     });
   }
 
