@@ -1,7 +1,10 @@
+import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
 
 class SampleItem extends StatelessWidget {
-  const SampleItem({super.key});
+  final Sample sample;
+
+  const SampleItem({super.key, required this.sample});
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +24,15 @@ class SampleItem extends StatelessWidget {
           child: Container(
             height: 100,
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "全网同 4G 全网同 4G 全网同 4G 全网同 4G 全网同 4G 全网同 4G 全网同 4G ",
+                  sample.nameCn ?? "",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("1"),

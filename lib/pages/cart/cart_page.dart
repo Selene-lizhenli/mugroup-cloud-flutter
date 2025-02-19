@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'widgets/sample_item.dart';
@@ -13,8 +15,12 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  List<Sample> samples = [
+    const Sample(nameCn: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+  ];
+
   BroadcastReceiver receiver = BroadcastReceiver(
-    names: <String>[
+    names: [
       "com.android.decodewedge.decode_action",
     ],
   );
@@ -35,14 +41,16 @@ class _CartPageState extends State<CartPage> {
     super.dispose();
   }
 
+  Future fetchData() async {
+    var resp = await getSamples();
+
+    setState(() {
+      samples.addAll(resp.data);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         title: const Text('选样车'),
@@ -57,20 +65,23 @@ class _CartPageState extends State<CartPage> {
             color: Colors.white,
           ),
           padding: const EdgeInsets.all(10),
-          child: ListView(
+          child: ListView.builder(
             shrinkWrap: true,
-            children: [
-              Container(
+            itemCount: samples.length,
+            itemBuilder: (context, index) {
+              return Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: const SampleItem(),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: const SampleItem(),
-              ),
-            ],
+                child: SampleItem(
+                  sample: samples[index],
+                ),
+              );
+            },
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Text("测试"),
+        onPressed: () => fetchData(),
       ),
     );
   }
