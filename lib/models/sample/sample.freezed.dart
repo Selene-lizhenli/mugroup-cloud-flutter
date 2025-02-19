@@ -23,6 +23,7 @@ mixin _$Sample {
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'name_cn')
   String? get nameCn => throw _privateConstructorUsedError;
+  List<Media>? get image => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -34,7 +35,8 @@ abstract class $SampleCopyWith<$Res> {
   factory $SampleCopyWith(Sample value, $Res Function(Sample) then) =
       _$SampleCopyWithImpl<$Res, Sample>;
   @useResult
-  $Res call({int? id, @JsonKey(name: 'name_cn') String? nameCn});
+  $Res call(
+      {int? id, @JsonKey(name: 'name_cn') String? nameCn, List<Media>? image});
 }
 
 /// @nodoc
@@ -52,6 +54,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
   $Res call({
     Object? id = freezed,
     Object? nameCn = freezed,
+    Object? image = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -62,6 +65,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
               as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ) as $Val);
   }
 }
@@ -73,7 +80,8 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       __$$SampleImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id, @JsonKey(name: 'name_cn') String? nameCn});
+  $Res call(
+      {int? id, @JsonKey(name: 'name_cn') String? nameCn, List<Media>? image});
 }
 
 /// @nodoc
@@ -89,6 +97,7 @@ class __$$SampleImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? nameCn = freezed,
+    Object? image = freezed,
   }) {
     return _then(_$SampleImpl(
       id: freezed == id
@@ -99,6 +108,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
               as String?,
+      image: freezed == image
+          ? _value._image
+          : image // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ));
   }
 }
@@ -106,7 +119,11 @@ class __$$SampleImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
-  const _$SampleImpl({this.id, @JsonKey(name: 'name_cn') this.nameCn});
+  const _$SampleImpl(
+      {this.id,
+      @JsonKey(name: 'name_cn') this.nameCn,
+      final List<Media>? image})
+      : _image = image;
 
   factory _$SampleImpl.fromJson(Map<String, dynamic> json) =>
       _$$SampleImplFromJson(json);
@@ -116,10 +133,19 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   @override
   @JsonKey(name: 'name_cn')
   final String? nameCn;
+  final List<Media>? _image;
+  @override
+  List<Media>? get image {
+    final value = _image;
+    if (value == null) return null;
+    if (_image is EqualUnmodifiableListView) return _image;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, nameCn: $nameCn)';
+    return 'Sample(id: $id, nameCn: $nameCn, image: $image)';
   }
 
   @override
@@ -128,7 +154,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
     properties
       ..add(DiagnosticsProperty('type', 'Sample'))
       ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('nameCn', nameCn));
+      ..add(DiagnosticsProperty('nameCn', nameCn))
+      ..add(DiagnosticsProperty('image', image));
   }
 
   @override
@@ -137,12 +164,14 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
         (other.runtimeType == runtimeType &&
             other is _$SampleImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.nameCn, nameCn) || other.nameCn == nameCn));
+            (identical(other.nameCn, nameCn) || other.nameCn == nameCn) &&
+            const DeepCollectionEquality().equals(other._image, _image));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, nameCn);
+  int get hashCode => Object.hash(
+      runtimeType, id, nameCn, const DeepCollectionEquality().hash(_image));
 
   @JsonKey(ignore: true)
   @override
@@ -161,7 +190,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 abstract class _Sample implements Sample {
   const factory _Sample(
       {final int? id,
-      @JsonKey(name: 'name_cn') final String? nameCn}) = _$SampleImpl;
+      @JsonKey(name: 'name_cn') final String? nameCn,
+      final List<Media>? image}) = _$SampleImpl;
 
   factory _Sample.fromJson(Map<String, dynamic> json) = _$SampleImpl.fromJson;
 
@@ -170,6 +200,8 @@ abstract class _Sample implements Sample {
   @override
   @JsonKey(name: 'name_cn')
   String? get nameCn;
+  @override
+  List<Media>? get image;
   @override
   @JsonKey(ignore: true)
   _$$SampleImplCopyWith<_$SampleImpl> get copyWith =>
