@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:bruno/bruno.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/services/sample.dart';
@@ -76,35 +77,49 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: Colors.transparent,
       ),
       backgroundColor: Colors.grey,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            color: Colors.white,
-          ),
-          padding: const EdgeInsets.all(10),
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              var cartItem = items[index];
-
-              return Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: SampleItem(
-                  sample: cartItem.sample,
-                  count: cartItem.count,
-                  onChange: (value) {
-                    setState(() {
-                      cartItem.count = value;
-                    });
-                  },
+      body: Column(
+        children: [
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: items
+                          .map(
+                            (cartItem) => Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: SampleItem(
+                                sample: cartItem.sample,
+                                count: cartItem.count,
+                                onChange: (value) {
+                                  setState(() {
+                                    cartItem.count = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ),
-              );
-            },
+              ],
+            ),
           ),
-        ),
+          BrnBottomButtonPanel(
+            mainButtonName: '主按钮 Normal',
+            mainButtonOnTap: () {
+              BrnToast.show('主按钮被点击', context);
+            },
+          )
+        ],
       ),
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
