@@ -45,6 +45,7 @@ dependencies:
   flutter_hooks: ^0.20.5
   cached_network_image: ^3.4.1
   bruno: ^3.4.3
+  sliver_tools: ^0.2.12
 
 dev_dependencies:
   flutter_test:
