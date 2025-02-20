@@ -72,54 +72,52 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('选样车'),
-        backgroundColor: Colors.transparent,
-      ),
       backgroundColor: Colors.grey,
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.white,
-                    ),
-                    margin: const EdgeInsets.all(10),
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: items
-                          .map(
-                            (cartItem) => Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: SampleItem(
-                                sample: cartItem.sample,
-                                count: cartItem.count,
-                                onChange: (value) {
-                                  setState(() {
-                                    cartItem.count = value;
-                                  });
-                                },
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                      ),
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: items
+                            .map(
+                              (cartItem) => Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: SampleItem(
+                                  sample: cartItem.sample,
+                                  count: cartItem.count,
+                                  onChange: (value) {
+                                    setState(() {
+                                      cartItem.count = value;
+                                    });
+                                  },
+                                ),
                               ),
-                            ),
-                          )
-                          .toList(),
+                            )
+                            .toList(),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          BrnBottomButtonPanel(
-            mainButtonName: '主按钮 Normal',
-            mainButtonOnTap: () {
-              BrnToast.show('主按钮被点击', context);
-            },
-          )
-        ],
+            BrnBottomButtonPanel(
+              mainButtonName: '主按钮 Normal',
+              mainButtonOnTap: () {
+                BrnToast.show('主按钮被点击', context);
+              },
+            )
+          ],
+        ),
       ),
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
