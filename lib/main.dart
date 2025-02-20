@@ -1,7 +1,15 @@
 import 'package:cloud/router/router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // 设置状态栏图标亮度
+    ),
+  );
+
   runApp(MyApp());
 }
 

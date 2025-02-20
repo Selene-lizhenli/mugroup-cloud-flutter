@@ -72,7 +72,7 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
         child: Column(
           children: [
@@ -91,7 +91,8 @@ class _CartPageState extends State<CartPage> {
                         children: items
                             .map(
                               (cartItem) => Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
                                 child: SampleItem(
                                   sample: cartItem.sample,
                                   count: cartItem.count,
