@@ -1,12 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-class SampleItem extends StatelessWidget {
+class SampleItem extends HookWidget {
   final Sample sample;
 
-  const SampleItem({super.key, required this.sample});
+  final int? count;
+
+  final ValueChanged<int>? onChange;
+
+  const SampleItem({
+    super.key,
+    required this.sample,
+    this.count,
+    this.onChange,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +54,16 @@ class SampleItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("1"),
+                    const Text("1"),
                     TDStepper(
                       theme: TDStepperTheme.filled,
                       size: TDStepperSize.small,
-                      value: 0,
-                      min: 0,
+                      value: count,
+                      min: 1,
+                      onChange: onChange,
                     ),
                   ],
                 )

@@ -7,6 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'widgets/sample_item.dart';
 
+class CartItem {
+  final Sample sample;
+  int count;
+
+  CartItem({required this.sample, required this.count});
+
+  @override
+  String toString() {
+    return {"sample": sample, "count": count}.toString();
+  }
+}
+
 @RoutePage()
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -16,8 +28,13 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  List<Sample> samples = [
-    const Sample(nameCn: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+  List<CartItem> items = [
+    CartItem(
+      sample: const Sample(
+        nameCn: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ),
+      count: 1,
+    ),
   ];
 
   BroadcastReceiver receiver = BroadcastReceiver(
@@ -46,7 +63,8 @@ class _CartPageState extends State<CartPage> {
     var resp = await getSamples();
 
     setState(() {
-      samples.addAll(resp.data);
+      items.addAll(
+          resp.data.map((sample) => CartItem(sample: sample, count: 1)));
     });
   }
 
@@ -68,12 +86,20 @@ class _CartPageState extends State<CartPage> {
           padding: const EdgeInsets.all(10),
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: samples.length,
+            itemCount: items.length,
             itemBuilder: (context, index) {
+              var cartItem = items[index];
+
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: SampleItem(
-                  sample: samples[index],
+                  sample: cartItem.sample,
+                  count: cartItem.count,
+                  onChange: (value) {
+                    setState(() {
+                      cartItem.count = value;
+                    });
+                  },
                 ),
               );
             },
@@ -83,7 +109,10 @@ class _CartPageState extends State<CartPage> {
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
         child: const Text("测试"),
-        onPressed: () => fetchData(),
+        onPressed: () {
+          logger.d(items.toString());
+          fetchData();
+        },
       ),
     );
   }
