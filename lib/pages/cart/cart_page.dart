@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:bruno/bruno.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/wigets.dart';
@@ -113,7 +114,19 @@ class _CartPageState extends State<CartPage> {
             ),
             BrnBottomButtonPanel(
               mainButtonName: '主按钮 Normal',
-              mainButtonOnTap: () {
+              mainButtonOnTap: () async {
+                await api.get("api/tenant/test");
+
+                if (!context.mounted) return;
+
+                BrnToast.show('主按钮被点击', context);
+              },
+              secondaryButtonName: "获取当前用户",
+              secondaryButtonOnTap: () async {
+                var user = await api.get("api/tenant/user");
+
+                if (!context.mounted) return;
+
                 BrnToast.show('主按钮被点击', context);
               },
             )

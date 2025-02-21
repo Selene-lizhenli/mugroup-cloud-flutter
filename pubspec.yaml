@@ -46,6 +46,8 @@ dependencies:
   cached_network_image: ^3.4.1
   bruno: ^3.4.3
   sliver_tools: ^0.2.12
+  dio_cookie_manager: ^3.2.0
+  cookie_jar: ^4.0.8
 
 dev_dependencies:
   flutter_test:
