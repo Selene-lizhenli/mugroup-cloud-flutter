@@ -30,14 +30,7 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  List<CartItem> items = [
-    CartItem(
-      sample: const Sample(
-        nameCn: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      ),
-      count: 1,
-    ),
-  ];
+  List<CartItem> items = [];
 
   BroadcastReceiver receiver = BroadcastReceiver(
     names: [
@@ -88,25 +81,29 @@ class _CartPageState extends State<CartPage> {
                       ),
                       margin: const EdgeInsets.all(10),
                       padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: items
-                            .map(
-                              (cartItem) => Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: SampleItem(
-                                  sample: cartItem.sample,
-                                  count: cartItem.count,
-                                  onChange: (value) {
-                                    setState(() {
-                                      cartItem.count = value;
-                                    });
-                                  },
-                                ),
-                              ),
+                      child: items.isEmpty
+                          ? const Center(
+                              child: Text("选样车空咯，请扫码添加"),
                             )
-                            .toList(),
-                      ),
+                          : Column(
+                              children: items
+                                  .map(
+                                    (cartItem) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                      child: SampleItem(
+                                        sample: cartItem.sample,
+                                        count: cartItem.count,
+                                        onChange: (value) {
+                                          setState(() {
+                                            cartItem.count = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
                     ),
                   ),
                 ],
