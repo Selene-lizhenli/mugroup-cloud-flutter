@@ -9,6 +9,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: const SafeArea(
+        child: Text("首页"),
+      ),
       bottomNavigationBar: AppTabbar(),
     );
   }
