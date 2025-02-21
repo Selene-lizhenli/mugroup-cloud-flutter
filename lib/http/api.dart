@@ -1,3 +1,4 @@
+import 'package:cloud/app/app.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -12,4 +13,10 @@ final api = Dio(
       'origin': "https://cloud.mugroup.com"
     },
   ),
-)..interceptors.add(CookieManager(CookieJar()));
+)..interceptors.add(
+    CookieManager(
+      PersistCookieJar(
+        storage: FileStorage(app.temporaryDirectory.path),
+      ),
+    ),
+  );

@@ -119,7 +119,7 @@ class _CartPageState extends State<CartPage> {
 
                 if (!context.mounted) return;
 
-                BrnToast.show('主按钮被点击', context);
+                BrnToast.show('模拟登录成功！', context);
               },
               secondaryButtonName: "获取当前用户",
               secondaryButtonOnTap: () async {
