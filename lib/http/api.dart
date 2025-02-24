@@ -1,8 +1,8 @@
 import 'package:cloud/app/app.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 final api = Dio(
   BaseOptions(
@@ -27,8 +27,7 @@ final api = Dio(
       final response = error.response;
       if (response?.statusCode != null && response!.statusCode! >= 300) {
         final messaage = response.data['message'] ?? "未知错误";
-        logger.d(messaage);
-        // TODO: 错误提示
+        EasyLoading.showError(messaage);
       }
 
       return handler.next(error);
