@@ -12,6 +12,7 @@ import 'package:auto_route/auto_route.dart' as _i4;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/home/home_page.dart' as _i2;
 import 'package:cloud/pages/login/login_page.dart' as _i3;
+import 'package:flutter/material.dart' as _i5;
 
 /// generated route for
 /// [_i1.CartPage]
@@ -53,10 +54,17 @@ class HomeRoute extends _i4.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.LoginPage]
-class LoginRoute extends _i4.PageRouteInfo<void> {
-  const LoginRoute({List<_i4.PageRouteInfo>? children})
-      : super(
+class LoginRoute extends _i4.PageRouteInfo<LoginRouteArgs> {
+  LoginRoute({
+    _i5.Key? key,
+    void Function()? onLogin,
+    List<_i4.PageRouteInfo>? children,
+  }) : super(
           LoginRoute.name,
+          args: LoginRouteArgs(
+            key: key,
+            onLogin: onLogin,
+          ),
           initialChildren: children,
         );
 
@@ -65,7 +73,28 @@ class LoginRoute extends _i4.PageRouteInfo<void> {
   static _i4.PageInfo page = _i4.PageInfo(
     name,
     builder: (data) {
-      return const _i3.LoginPage();
+      final args =
+          data.argsAs<LoginRouteArgs>(orElse: () => const LoginRouteArgs());
+      return _i3.LoginPage(
+        key: args.key,
+        onLogin: args.onLogin,
+      );
     },
   );
+}
+
+class LoginRouteArgs {
+  const LoginRouteArgs({
+    this.key,
+    this.onLogin,
+  });
+
+  final _i5.Key? key;
+
+  final void Function()? onLogin;
+
+  @override
+  String toString() {
+    return 'LoginRouteArgs{key: $key, onLogin: $onLogin}';
+  }
 }
