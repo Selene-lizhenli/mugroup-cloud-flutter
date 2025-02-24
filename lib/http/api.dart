@@ -1,4 +1,5 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -13,10 +14,23 @@ final api = Dio(
       'origin': "https://cloud.mugroup.com"
     },
   ),
-)..interceptors.add(
+)
+  ..interceptors.add(
     CookieManager(
       PersistCookieJar(
         storage: FileStorage(app.temporaryDirectory.path),
       ),
     ),
-  );
+  )
+  ..interceptors.add(InterceptorsWrapper(
+    onError: (error, handler) {
+      final response = error.response;
+      if (response?.statusCode != null && response!.statusCode! >= 300) {
+        final messaage = response.data['message'] ?? "未知错误";
+        logger.d(messaage);
+        // TODO: 错误提示
+      }
+
+      return handler.next(error);
+    },
+  ));
