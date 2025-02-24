@@ -120,7 +120,7 @@ class _CartPageState extends State<CartPage> {
               },
               secondaryButtonName: "获取当前用户",
               secondaryButtonOnTap: () async {
-                var user = await api.get("api/tenant/user");
+                await api.get("api/tenant/user");
 
                 if (!context.mounted) return;
 

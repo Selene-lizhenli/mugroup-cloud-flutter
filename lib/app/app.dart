@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
+import 'package:cloud/services/tenant.dart';
 import 'package:path_provider/path_provider.dart';
 
 class App {
@@ -15,8 +16,7 @@ class App {
 
   Future<User?> fetchUser() async {
     logger.d("获取用户");
-    // TODO：模拟登录
-    _user = const User(id: 1);
+    _user = await fetchCurrentUser();
 
     return _user;
   }
