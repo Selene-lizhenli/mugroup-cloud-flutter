@@ -31,7 +31,7 @@ class LoginPage extends HookWidget {
               height: 5,
             ),
             QrImageView(
-              data: 'https://cloud.mugroup.com/login?code=12323',
+              data: 'https://cloud.mugroup.com/qrcodes?code=12323',
               version: QrVersions.auto,
               size: 200.0,
               backgroundColor: Colors.white,
