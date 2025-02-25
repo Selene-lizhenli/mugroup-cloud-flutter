@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
+import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,6 +17,8 @@ class LoginPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final qrcode = useState<Qrcode?>(null);
+
     final afterLogin = useCallback(() {
       if (onLogin != null) {
         onLogin!();
@@ -45,12 +48,18 @@ class LoginPage extends HookWidget {
             const SizedBox(
               height: 5,
             ),
-            QrImageView(
-              data: 'https://cloud.mugroup.com/qrcodes?code=12323',
-              version: QrVersions.auto,
-              size: 200.0,
-              backgroundColor: Colors.white,
-            ),
+            qrcode.value != null
+                ? QrImageView(
+                    data: 'https://cloud.mugroup.com/qrcodes/1',
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    backgroundColor: Colors.white,
+                  )
+                : Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.black,
+                  ),
             const SizedBox(
               height: 5,
             ),
