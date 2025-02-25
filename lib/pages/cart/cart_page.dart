@@ -116,13 +116,16 @@ class _CartPageState extends State<CartPage> {
                   items[0].count++;
                 });
               },
-              secondaryButtonName: "获取当前用户",
+              secondaryButtonName: "借样",
               secondaryButtonOnTap: () async {
-                await api.get("api/tenant/user");
+                final data = items
+                    .map((item) =>
+                        {"sample_it": item.sample.id, "count": item.count})
+                    .toList();
 
-                if (!context.mounted) return;
-
-                BrnToast.show('主按钮被点击', context);
+                // 生成报价单
+                await api.post("api/tenant/was/xxx", data: data);
+                logger.d(data);
               },
             )
           ],
