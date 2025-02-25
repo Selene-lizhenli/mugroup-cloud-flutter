@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:flant/components/stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class SampleItem extends HookWidget {
   final Sample sample;
@@ -57,13 +57,16 @@ class SampleItem extends HookWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("1"),
-                    TDStepper(
-                      theme: TDStepperTheme.filled,
-                      size: TDStepperSize.small,
+                    Text("$count"),
+                    FlanStepper(
                       value: count,
-                      min: 1,
-                      onChange: onChange,
+                      onChange: (v, _) {
+                        if (v is int) {
+                          onChange?.call(v);
+                        } else {
+                          onChange?.call(int.parse(v.toString()));
+                        }
+                      },
                     ),
                   ],
                 )

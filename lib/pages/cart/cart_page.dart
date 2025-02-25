@@ -110,13 +110,11 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
             BrnBottomButtonPanel(
-              mainButtonName: '主按钮 Normal',
+              mainButtonName: '数量模拟',
               mainButtonOnTap: () async {
-                await api.get("api/tenant/test");
-
-                if (!context.mounted) return;
-
-                BrnToast.show('模拟登录成功！', context);
+                setState(() {
+                  items[0].count++;
+                });
               },
               secondaryButtonName: "获取当前用户",
               secondaryButtonOnTap: () async {
