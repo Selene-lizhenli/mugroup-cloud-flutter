@@ -10,7 +10,7 @@ class AppTabbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var router = context.router;
-    const routes = [HomeRoute(), CartRoute()];
+    const routes = [HomeRoute(), CartRoute(), MyRoute()];
 
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
@@ -22,6 +22,7 @@ class AppTabbar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
         BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "选样车"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
       ],
     );
   }
