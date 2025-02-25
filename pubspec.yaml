@@ -52,6 +52,9 @@ dependencies:
   qr_flutter: ^4.1.0
   flutter_easyloading: ^3.0.5
   collection: ^1.18.0
+  flant:
+    git: git@github.com:edram/flant.git
+    # path: ../flant
 
 dev_dependencies:
   flutter_test:
@@ -95,17 +98,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Iconfont
+      fonts:
+        - asset: assets/fonts/Iconfont.ttf
+          style: normal
+          weight: 400
+    - family: flanIcon
+      fonts:
+        - asset: assets/fonts/vant_icon.ttf
+          style: normal
+          weight: 400
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
