@@ -24,6 +24,10 @@ class App {
   Future<User?> get user async {
     return _user ?? fetchUser();
   }
+
+  void logout() {
+    app._user = null;
+  }
 }
 
 final app = App();

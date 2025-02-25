@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/widgets/app_tabbar/app_tabbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +13,20 @@ class MyPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const SafeArea(
+      body: SafeArea(
         child: Column(
           children: [
-            ListTile(
+            const ListTile(
               title: Text('设置'),
               leading: Icon(CupertinoIcons.person_alt),
               trailing: Icon(Icons.keyboard_arrow_right_rounded),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await api.post("api/logout");
+                app.logout();
+              },
+              child: const Text("退出登录"),
             ),
           ],
         ),
