@@ -1,8 +1,13 @@
 import 'package:cloud/app/app.dart';
+import 'package:collection/collection.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+final cookieJar = PersistCookieJar(
+  storage: FileStorage(app.temporaryDirectory.path),
+);
 
 final api = Dio(
   BaseOptions(
@@ -17,12 +22,19 @@ final api = Dio(
 )
   ..interceptors.add(
     CookieManager(
-      PersistCookieJar(
-        storage: FileStorage(app.temporaryDirectory.path),
-      ),
+      cookieJar,
     ),
   )
   ..interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) async {
+      var cookies = await cookieJar.loadForRequest(options.uri);
+      var csrfToken = cookies.firstWhereOrNull((c) => c.name == 'XSRF-TOKEN')?.value;
+
+      if (csrfToken != null) {
+        options.headers['X-XSRF-TOKEN'] = Uri.decodeComponent(csrfToken);
+      }
+      handler.next(options);
+    },
     onError: (error, handler) {
       final response = error.response;
       if (response?.statusCode != null && response!.statusCode! >= 300) {
