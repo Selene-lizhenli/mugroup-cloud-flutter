@@ -7,8 +7,8 @@ class AuthNotifier extends ChangeNotifier {
 
   bool get isLogged => user != null;
 
-  void setUser(User? _user) {
-    user = _user;
+  void setUser(User? commingUser) {
+    user = commingUser;
     notifyListeners();
   }
 

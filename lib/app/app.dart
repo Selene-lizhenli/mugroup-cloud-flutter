@@ -16,11 +16,13 @@ class App {
   }
 
   Future<User?> fetchUser() async {
-    return fetchCurrentUser();
+    authNotifier.setUser(await fetchCurrentUser());
+
+    return authNotifier.user;
   }
 
   Future<User?> get user async {
-    return authNotifier.user ??= await fetchUser();
+    return authNotifier.user ?? await fetchUser();
   }
 }
 

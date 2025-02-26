@@ -1,17 +1,19 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/widgets/app_tabbar/app_tabbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
-class MyPage extends HookWidget {
+class MyPage extends HookConsumerWidget {
   const MyPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
@@ -21,21 +23,22 @@ class MyPage extends HookWidget {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(20),
               color: Colors.white,
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    '姓名',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    "${user?.id}",
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     '工号: 00001',
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     '部门: 信息部',
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
@@ -55,7 +58,7 @@ class MyPage extends HookWidget {
               child: ElevatedButton(
                   onPressed: () async {
                     await api.post("api/logout");
-                    app.logout();
+                    authNotifier.logout();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
