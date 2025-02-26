@@ -23,8 +23,14 @@ mixin _$Qrcode {
   int? get id => throw _privateConstructorUsedError;
   String? get type => throw _privateConstructorUsedError;
   String? get code => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'expired_at')
   String? get expiredAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'used_at')
+  String? get usedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user')
+  User? get user => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -40,7 +46,12 @@ abstract class $QrcodeCopyWith<$Res> {
       {int? id,
       String? type,
       String? code,
-      @JsonKey(name: 'expired_at') String? expiredAt});
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'expired_at') String? expiredAt,
+      @JsonKey(name: 'used_at') String? usedAt,
+      @JsonKey(name: 'user') User? user});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -59,7 +70,10 @@ class _$QrcodeCopyWithImpl<$Res, $Val extends Qrcode>
     Object? id = freezed,
     Object? type = freezed,
     Object? code = freezed,
+    Object? userId = freezed,
     Object? expiredAt = freezed,
+    Object? usedAt = freezed,
+    Object? user = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -74,11 +88,35 @@ class _$QrcodeCopyWithImpl<$Res, $Val extends Qrcode>
           ? _value.code
           : code // ignore: cast_nullable_to_non_nullable
               as String?,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
       expiredAt: freezed == expiredAt
           ? _value.expiredAt
           : expiredAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      usedAt: freezed == usedAt
+          ? _value.usedAt
+          : usedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -93,7 +131,13 @@ abstract class _$$QrcodeImplCopyWith<$Res> implements $QrcodeCopyWith<$Res> {
       {int? id,
       String? type,
       String? code,
-      @JsonKey(name: 'expired_at') String? expiredAt});
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'expired_at') String? expiredAt,
+      @JsonKey(name: 'used_at') String? usedAt,
+      @JsonKey(name: 'user') User? user});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -110,7 +154,10 @@ class __$$QrcodeImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? type = freezed,
     Object? code = freezed,
+    Object? userId = freezed,
     Object? expiredAt = freezed,
+    Object? usedAt = freezed,
+    Object? user = freezed,
   }) {
     return _then(_$QrcodeImpl(
       id: freezed == id
@@ -125,10 +172,22 @@ class __$$QrcodeImplCopyWithImpl<$Res>
           ? _value.code
           : code // ignore: cast_nullable_to_non_nullable
               as String?,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
       expiredAt: freezed == expiredAt
           ? _value.expiredAt
           : expiredAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      usedAt: freezed == usedAt
+          ? _value.usedAt
+          : usedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
     ));
   }
 }
@@ -140,7 +199,10 @@ class _$QrcodeImpl implements _Qrcode {
       {this.id,
       this.type,
       this.code,
-      @JsonKey(name: 'expired_at') this.expiredAt});
+      @JsonKey(name: 'user_id') this.userId,
+      @JsonKey(name: 'expired_at') this.expiredAt,
+      @JsonKey(name: 'used_at') this.usedAt,
+      @JsonKey(name: 'user') this.user});
 
   factory _$QrcodeImpl.fromJson(Map<String, dynamic> json) =>
       _$$QrcodeImplFromJson(json);
@@ -152,12 +214,21 @@ class _$QrcodeImpl implements _Qrcode {
   @override
   final String? code;
   @override
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  @override
   @JsonKey(name: 'expired_at')
   final String? expiredAt;
+  @override
+  @JsonKey(name: 'used_at')
+  final String? usedAt;
+  @override
+  @JsonKey(name: 'user')
+  final User? user;
 
   @override
   String toString() {
-    return 'Qrcode(id: $id, type: $type, code: $code, expiredAt: $expiredAt)';
+    return 'Qrcode(id: $id, type: $type, code: $code, userId: $userId, expiredAt: $expiredAt, usedAt: $usedAt, user: $user)';
   }
 
   @override
@@ -168,13 +239,17 @@ class _$QrcodeImpl implements _Qrcode {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.code, code) || other.code == code) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.expiredAt, expiredAt) ||
-                other.expiredAt == expiredAt));
+                other.expiredAt == expiredAt) &&
+            (identical(other.usedAt, usedAt) || other.usedAt == usedAt) &&
+            (identical(other.user, user) || other.user == user));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, code, expiredAt);
+  int get hashCode =>
+      Object.hash(runtimeType, id, type, code, userId, expiredAt, usedAt, user);
 
   @JsonKey(ignore: true)
   @override
@@ -195,7 +270,10 @@ abstract class _Qrcode implements Qrcode {
       {final int? id,
       final String? type,
       final String? code,
-      @JsonKey(name: 'expired_at') final String? expiredAt}) = _$QrcodeImpl;
+      @JsonKey(name: 'user_id') final String? userId,
+      @JsonKey(name: 'expired_at') final String? expiredAt,
+      @JsonKey(name: 'used_at') final String? usedAt,
+      @JsonKey(name: 'user') final User? user}) = _$QrcodeImpl;
 
   factory _Qrcode.fromJson(Map<String, dynamic> json) = _$QrcodeImpl.fromJson;
 
@@ -206,8 +284,17 @@ abstract class _Qrcode implements Qrcode {
   @override
   String? get code;
   @override
+  @JsonKey(name: 'user_id')
+  String? get userId;
+  @override
   @JsonKey(name: 'expired_at')
   String? get expiredAt;
+  @override
+  @JsonKey(name: 'used_at')
+  String? get usedAt;
+  @override
+  @JsonKey(name: 'user')
+  User? get user;
   @override
   @JsonKey(ignore: true)
   _$$QrcodeImplCopyWith<_$QrcodeImpl> get copyWith =>
