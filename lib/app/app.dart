@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,25 +11,16 @@ class App {
 
   final container = ProviderContainer();
 
-  User? _user;
-
   Future bootstrap() async {
     temporaryDirectory = await getTemporaryDirectory();
   }
 
   Future<User?> fetchUser() async {
-    logger.d("获取用户");
-    _user = await fetchCurrentUser();
-
-    return _user;
+    return fetchCurrentUser();
   }
 
   Future<User?> get user async {
-    return _user ?? fetchUser();
-  }
-
-  void logout() {
-    app._user = null;
+    return authNotifier.user ??= await fetchUser();
   }
 }
 
