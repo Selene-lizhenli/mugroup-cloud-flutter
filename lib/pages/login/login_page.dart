@@ -48,6 +48,12 @@ class LoginPage extends HookWidget {
         final resp =
             await api.get("api/tenant/login/qrcodes/${qrcode.value!.id}/show");
         qrcode.value = Qrcode.fromJson(resp.data);
+
+        //登录后跳转
+        if (qrcode.value?.usedAt != null) {
+          afterLogin();
+        }
+
         logger.d("轮询,$qrcode");
         try {
           final expirationTime =
@@ -74,7 +80,7 @@ class LoginPage extends HookWidget {
             const SizedBox(
               height: 5,
             ),
-            qrcode.value != null
+            qrcode.value!.userId == null
                 ? QrImageView(
                     data:
                         'https://cloud.mugroup.com/qrcodes/${qrcode.value!.id}',
@@ -83,17 +89,38 @@ class LoginPage extends HookWidget {
                     backgroundColor: Colors.white,
                   )
                 : Container(
-                    width: 100,
+                    width: 200,
                     height: 100,
-                    color: Colors.black,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            qrcode.value!.user?.name ?? '未知用户',
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 16),
+                          ),
+                          Text(
+                            qrcode.value!.user?.jobNumber ?? '无工号',
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
             const SizedBox(
               height: 5,
             ),
-            const Text(
-              "请使用企业微信扫码登录",
-              style: TextStyle(color: Color(0xFF707070), fontSize: 10),
-            ),
+            qrcode.value!.userId == null
+                ? const Text(
+                    "请使用企业微信扫码登录",
+                    style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+                  )
+                : const Text(
+                    "请在手机上确认登录",
+                    style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+                  ),
             TextButton(
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
