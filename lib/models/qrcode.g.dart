@@ -10,6 +10,7 @@ _$QrcodeImpl _$$QrcodeImplFromJson(Map<String, dynamic> json) => _$QrcodeImpl(
       id: (json['id'] as num?)?.toInt(),
       type: json['type'] as String?,
       code: json['code'] as String?,
+      expiredAt: json['expired_at'] as String?,
     );
 
 Map<String, dynamic> _$$QrcodeImplToJson(_$QrcodeImpl instance) =>
@@ -17,4 +18,5 @@ Map<String, dynamic> _$$QrcodeImplToJson(_$QrcodeImpl instance) =>
       'id': instance.id,
       'type': instance.type,
       'code': instance.code,
+      'expired_at': instance.expiredAt,
     };
