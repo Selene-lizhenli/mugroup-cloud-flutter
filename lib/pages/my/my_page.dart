@@ -38,9 +38,9 @@ class MyPage extends HookConsumerWidget {
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '部门: 信息部',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  Text(
+                    '部门: ${user?.department?.name}',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 ],
               ),

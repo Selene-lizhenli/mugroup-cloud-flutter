@@ -1,3 +1,4 @@
+import 'package:cloud/models/department.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user.freezed.dart';
@@ -9,6 +10,7 @@ abstract class User with _$User {
     int? id,
     String? name,
     @JsonKey(name: 'job_number') String? jobNumber,
+    Department? department,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
