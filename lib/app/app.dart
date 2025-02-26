@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/services/tenant.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 class App {
   late final Directory temporaryDirectory;
+
+  final container = ProviderContainer();
 
   User? _user;
 
