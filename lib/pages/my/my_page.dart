@@ -28,14 +28,14 @@ class MyPage extends HookConsumerWidget {
                 children: [
                   const SizedBox(height: 16),
                   Text(
-                    "${user?.id}",
+                    "${user?.name}",
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '工号: 00001',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  Text(
+                    '工号: ${user?.jobNumber}',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
                   const Text(

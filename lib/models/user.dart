@@ -7,6 +7,8 @@ part 'user.g.dart';
 abstract class User with _$User {
   const factory User({
     int? id,
+    String? name,
+    @JsonKey(name: 'job_number') String? jobNumber,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
