@@ -96,7 +96,7 @@ class LoginPage extends HookWidget {
             TextButton(
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
-                await api.post("api/tenant/login/qrcodes/use/8");
+                await api.get("api/tenant/test");
 
                 afterLogin();
               },
