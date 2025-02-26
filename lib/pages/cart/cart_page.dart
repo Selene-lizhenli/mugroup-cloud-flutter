@@ -118,13 +118,18 @@ class _CartPageState extends State<CartPage> {
               },
               secondaryButtonName: "借样",
               secondaryButtonOnTap: () async {
-                final data = items
+                final productData = items
                     .map((item) =>
-                        {"sample_it": item.sample.id, "count": item.count})
+                        {"model_id": item.sample.id, "inout_qty": item.count})
                     .toList();
-
+                final data = {
+                  "borrower_id": 2, // 借样人ID
+                  "warehouse_id": 1, // 仓库ID
+                  "remark": "备注",
+                  "products": productData
+                };
                 // 生成报价单
-                await api.post("api/tenant/was/xxx", data: data);
+                await api.post("api/tenant/wms/stock/borrows", data: data);
                 logger.d(data);
               },
             )
