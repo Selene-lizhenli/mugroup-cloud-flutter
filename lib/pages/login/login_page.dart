@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
@@ -97,7 +98,7 @@ class LoginPage extends HookWidget {
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
                 await api.get("api/tenant/test");
-
+                await app.user;
                 afterLogin();
               },
               child: const Text("模拟登录"),
