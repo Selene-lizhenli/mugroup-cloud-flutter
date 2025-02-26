@@ -3,7 +3,7 @@ import 'package:cloud/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,21 +17,21 @@ Future<void> main() async {
     ),
   );
 
-  runApp(ProviderScope(
+  runApp(const ProviderScope(
     child: MyApp(),
   ));
 }
 
-class MyApp extends StatelessWidget {
-  final _appRouter = AppRouter();
-
-  MyApp({super.key});
+class MyApp extends HookConsumerWidget {
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appRouter = AppRouter(ref: ref);
+
     return MaterialApp.router(
-      routerConfig: _appRouter.config(),
+      routerConfig: appRouter.config(),
       builder: EasyLoading.init(),
     );
   }
