@@ -21,6 +21,10 @@ User _$UserFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$User {
   int? get id => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'job_number')
+  String? get jobNumber => throw _privateConstructorUsedError;
+  Department? get department => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -32,7 +36,13 @@ abstract class $UserCopyWith<$Res> {
   factory $UserCopyWith(User value, $Res Function(User) then) =
       _$UserCopyWithImpl<$Res, User>;
   @useResult
-  $Res call({int? id});
+  $Res call(
+      {int? id,
+      String? name,
+      @JsonKey(name: 'job_number') String? jobNumber,
+      Department? department});
+
+  $DepartmentCopyWith<$Res>? get department;
 }
 
 /// @nodoc
@@ -49,12 +59,27 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   @override
   $Res call({
     Object? id = freezed,
+    Object? name = freezed,
+    Object? jobNumber = freezed,
+    Object? department = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jobNumber: freezed == jobNumber
+          ? _value.jobNumber
+          : jobNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      department: freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as Department?,
     ) as $Val);
   }
 
@@ -78,7 +103,14 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id});
+  $Res call(
+      {int? id,
+      String? name,
+      @JsonKey(name: 'job_number') String? jobNumber,
+      Department? department});
+
+  @override
+  $DepartmentCopyWith<$Res>? get department;
 }
 
 /// @nodoc
@@ -92,12 +124,27 @@ class __$$UserImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? name = freezed,
+    Object? jobNumber = freezed,
+    Object? department = freezed,
   }) {
     return _then(_$UserImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jobNumber: freezed == jobNumber
+          ? _value.jobNumber
+          : jobNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      department: freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as Department?,
     ));
   }
 }
@@ -105,17 +152,28 @@ class __$$UserImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UserImpl implements _User {
-  const _$UserImpl({this.id});
+  const _$UserImpl(
+      {this.id,
+      this.name,
+      @JsonKey(name: 'job_number') this.jobNumber,
+      this.department});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
 
   @override
   final int? id;
+  @override
+  final String? name;
+  @override
+  @JsonKey(name: 'job_number')
+  final String? jobNumber;
+  @override
+  final Department? department;
 
   @override
   String toString() {
-    return 'User(id: $id)';
+    return 'User(id: $id, name: $name, jobNumber: $jobNumber, department: $department)';
   }
 
   @override
@@ -123,12 +181,17 @@ class _$UserImpl implements _User {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserImpl &&
-            (identical(other.id, id) || other.id == id));
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.jobNumber, jobNumber) ||
+                other.jobNumber == jobNumber) &&
+            (identical(other.department, department) ||
+                other.department == department));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id);
+  int get hashCode => Object.hash(runtimeType, id, name, jobNumber, department);
 
   @JsonKey(ignore: true)
   @override
@@ -145,12 +208,23 @@ class _$UserImpl implements _User {
 }
 
 abstract class _User implements User {
-  const factory _User({final int? id}) = _$UserImpl;
+  const factory _User(
+      {final int? id,
+      final String? name,
+      @JsonKey(name: 'job_number') final String? jobNumber,
+      final Department? department}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
   int? get id;
+  @override
+  String? get name;
+  @override
+  @JsonKey(name: 'job_number')
+  String? get jobNumber;
+  @override
+  Department? get department;
   @override
   @JsonKey(ignore: true)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>
