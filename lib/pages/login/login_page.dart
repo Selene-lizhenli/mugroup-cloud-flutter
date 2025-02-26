@@ -31,9 +31,34 @@ class LoginPage extends HookWidget {
     }, [onLogin]);
 
     useEffect(() {
-      final timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      Future fetchQrcode() async {
+        try {
+          final resp = await api.post("api/tenant/login/qrcodes");
+          qrcode.value = Qrcode.fromJson(resp.data);
+        } catch (e) {
+          logger.e('获取QR码失败：$e');
+        }
+      }
+
+      fetchQrcode();
+
+      final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
         // TODO: 轮询
-        logger.d("测试");
+        final resp =
+            await api.get("api/tenant/login/qrcodes/${qrcode.value!.id}/show");
+        qrcode.value = Qrcode.fromJson(resp.data);
+        logger.d("轮询,$qrcode");
+        try {
+          final expirationTime =
+              DateTime.tryParse(qrcode.value!.expiredAt ?? '')?.toLocal();
+          if (expirationTime == null ||
+              DateTime.now().isAfter(expirationTime)) {
+            logger.d("二维码已过期，获取新二维码...");
+            await fetchQrcode();
+          }
+        } catch (e) {
+          logger.e("轮询时出错: $e");
+        }
       });
 
       return timer.cancel;
@@ -50,7 +75,8 @@ class LoginPage extends HookWidget {
             ),
             qrcode.value != null
                 ? QrImageView(
-                    data: 'https://cloud.mugroup.com/qrcodes/1',
+                    data:
+                        'https://cloud.mugroup.com/qrcodes/${qrcode.value!.id}',
                     version: QrVersions.auto,
                     size: 200.0,
                     backgroundColor: Colors.white,
@@ -70,7 +96,7 @@ class LoginPage extends HookWidget {
             TextButton(
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
-                await api.get("api/tenant/test");
+                await api.post("api/tenant/login/qrcodes/use/8");
 
                 afterLogin();
               },
