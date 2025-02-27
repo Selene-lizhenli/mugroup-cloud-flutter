@@ -1,8 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:bruno/bruno.dart';
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flutter/material.dart';
@@ -109,30 +108,9 @@ class _CartPageState extends State<CartPage> {
                 ],
               ),
             ),
-            BrnBottomButtonPanel(
-              mainButtonName: '数量模拟',
-              mainButtonOnTap: () async {
-                setState(() {
-                  items[0].count++;
-                });
-              },
-              secondaryButtonName: "借样",
-              secondaryButtonOnTap: () async {
-                final productData = items
-                    .map((item) =>
-                        {"model_id": item.sample.id, "inout_qty": item.count})
-                    .toList();
-                final data = {
-                  "borrower_id": 2, // 借样人ID
-                  "warehouse_id": 1, // 仓库ID
-                  "remark": "备注",
-                  "products": productData
-                };
-                // 生成报价单
-                await api.post("api/tenant/wms/stock/borrows", data: data);
-                logger.d(data);
-              },
-            )
+            TotalRecord(
+              items: items,
+            ),
           ],
         ),
       ),
