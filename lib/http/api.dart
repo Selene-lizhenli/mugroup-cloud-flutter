@@ -28,7 +28,8 @@ final api = Dio(
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       var cookies = await cookieJar.loadForRequest(options.uri);
-      var csrfToken = cookies.firstWhereOrNull((c) => c.name == 'XSRF-TOKEN')?.value;
+      var csrfToken =
+          cookies.firstWhereOrNull((c) => c.name == 'XSRF-TOKEN')?.value;
 
       if (csrfToken != null) {
         options.headers['X-XSRF-TOKEN'] = Uri.decodeComponent(csrfToken);
@@ -37,10 +38,18 @@ final api = Dio(
     },
     onError: (error, handler) {
       final response = error.response;
-      if (response?.statusCode != null && response!.statusCode! >= 300) {
-        final messaage = response.data['message'] ?? "未知错误";
-        EasyLoading.showError(messaage);
-      }
+
+      do {
+        if (response?.statusCode != null && response!.statusCode! >= 300) {
+          final messaage = response.data['message'] ?? "未知错误";
+          EasyLoading.showError(messaage);
+          break;
+        }
+
+        if (error.message != null) {
+          EasyLoading.showError(error.message!);
+        }
+      } while (false);
 
       return handler.next(error);
     },
