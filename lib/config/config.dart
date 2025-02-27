@@ -5,7 +5,7 @@ part 'config.g.dart';
 @Envied(requireEnvFile: true)
 abstract class Config {
   @EnviedField(varName: 'API_URL')
-  static const String apiUrl = _Env.apiUrl;
+  static const String apiUrl = _Config.apiUrl;
   @EnviedField(varName: 'WEB_URL')
-  static const String webUrl = _Env.webUrl;
+  static const String webUrl = _Config.webUrl;
 }
