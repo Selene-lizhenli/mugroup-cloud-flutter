@@ -58,6 +58,7 @@ dependencies:
   riverpod_annotation: ^2.6.1
   hooks_riverpod: ^2.6.1
   flutter_launcher_icons: ^0.14.3
+  envied: ^1.1.1
     # path: ../flant
 
 dev_dependencies:
@@ -77,6 +78,7 @@ dev_dependencies:
   riverpod_generator: ^2.4.0
   custom_lint: ^0.6.4
   riverpod_lint: ^2.3.10
+  envied_generator: ^1.1.1
 
 flutter_launcher_icons:
   android: true
