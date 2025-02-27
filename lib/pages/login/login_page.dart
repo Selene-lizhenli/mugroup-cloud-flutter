@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
+import 'package:cloud/config/config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
@@ -121,7 +122,7 @@ class LoginPage extends HookWidget {
             else
               QrImageView(
                 data:
-                    'https://cloud.mugroup.com/login/qrcodes/${qrcodeState.value!.id}',
+                    '${Config.webUrl}login/qrcodes/${qrcodeState.value!.id}',
                 version: QrVersions.auto,
                 size: 200.0,
                 backgroundColor: Colors.white,
