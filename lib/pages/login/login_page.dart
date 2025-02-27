@@ -18,7 +18,7 @@ class LoginPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final qrcode = useState<Qrcode?>(null);
+    final qrcodeState = useState<Qrcode?>(null);
 
     final afterLogin = useCallback(() {
       if (onLogin != null) {
@@ -35,7 +35,7 @@ class LoginPage extends HookWidget {
       Future fetchQrcode() async {
         try {
           final resp = await api.post("api/tenant/login/qrcodes");
-          qrcode.value = Qrcode.fromJson(resp.data);
+          qrcodeState.value = Qrcode.fromJson(resp.data);
         } catch (e) {
           logger.e('获取QR码失败：$e');
         }
@@ -44,20 +44,25 @@ class LoginPage extends HookWidget {
       fetchQrcode();
 
       final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
-        // TODO: 轮询
+        if (qrcodeState.value == null) {
+          return;
+        }
+
+        final qrcode = qrcodeState.value!;
+
         final resp =
-            await api.get("api/tenant/login/qrcodes/${qrcode.value!.id}/show");
-        qrcode.value = Qrcode.fromJson(resp.data);
+            await api.get("api/tenant/login/qrcodes/${qrcode.id}/show");
+        qrcodeState.value = Qrcode.fromJson(resp.data);
 
         //登录后跳转
-        if (qrcode.value?.usedAt != null) {
+        if (qrcodeState.value?.usedAt != null) {
           afterLogin();
         }
 
-        logger.d("轮询,$qrcode");
+        logger.d("轮询,$qrcodeState");
         try {
           final expirationTime =
-              DateTime.tryParse(qrcode.value!.expiredAt ?? '')?.toLocal();
+              DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
           if (expirationTime == null ||
               DateTime.now().isAfter(expirationTime)) {
             logger.d("二维码已过期，获取新二维码...");
@@ -71,6 +76,9 @@ class LoginPage extends HookWidget {
       return timer.cancel;
     }, []);
 
+    final qrcode = qrcodeState.value;
+    double qrcodeSize = 100;
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -80,47 +88,65 @@ class LoginPage extends HookWidget {
             const SizedBox(
               height: 5,
             ),
-            qrcode.value!.userId == null
-                ? QrImageView(
-                    data:
-                        'https://cloud.mugroup.com/qrcodes/${qrcode.value!.id}',
-                    version: QrVersions.auto,
-                    size: 200.0,
-                    backgroundColor: Colors.white,
-                  )
-                : Container(
-                    width: 200,
-                    height: 100,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            qrcode.value!.user?.name ?? '未知用户',
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 16),
-                          ),
-                          Text(
-                            qrcode.value!.user?.jobNumber ?? '无工号',
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-            const SizedBox(
-              height: 5,
-            ),
-            qrcode.value!.userId == null
-                ? const Text(
-                    "请使用企业微信扫码登录",
-                    style: TextStyle(color: Color(0xFF707070), fontSize: 10),
-                  )
-                : const Text(
-                    "请在手机上确认登录",
-                    style: TextStyle(color: Color(0xFF707070), fontSize: 10),
-                  ),
+            // 请求二维码
+            if (qrcode == null)
+              Container(
+                width: qrcodeSize,
+                height: qrcodeSize,
+                color: Colors.black,
+              )
+
+            // 二维码过期
+            else if (false) ...[Text("过期1"), Text("过期1")]
+
+            // 二维码被扫, 展示扫码者信息
+            else if (true)
+              Text("扫码")
+
+            // 默认展示已有二维码
+            else
+              Text("123"),
+            // qrcodeState.value!.userId == null
+            //     ? QrImageView(
+            //         data:
+            //             'https://cloud.mugroup.com/qrcodes/${qrcodeState.value!.id}',
+            //         version: QrVersions.auto,
+            //         size: 200.0,
+            //         backgroundColor: Colors.white,
+            //       )
+            //     : Container(
+            //         width: 200,
+            //         height: 100,
+            //         child: Center(
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.center,
+            //             children: [
+            //               Text(
+            //                 qrcodeState.value!.user?.name ?? '未知用户',
+            //                 style: const TextStyle(
+            //                     color: Colors.red, fontSize: 16),
+            //               ),
+            //               Text(
+            //                 qrcodeState.value!.user?.jobNumber ?? '无工号',
+            //                 style: const TextStyle(
+            //                     color: Colors.red, fontSize: 14),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            // const SizedBox(
+            //   height: 5,
+            // ),
+            // qrcodeState.value?.userId == null
+            //     ? const Text(
+            //         "请使用企业微信扫码登录",
+            //         style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+            //       )
+            //     : const Text(
+            //         "请在手机上确认登录",
+            //         style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+            //       ),
             TextButton(
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
