@@ -77,7 +77,7 @@ class LoginPage extends HookWidget {
     }, []);
 
     final qrcode = qrcodeState.value;
-    double qrcodeSize = 100;
+    double qrcodeSize = 200;
 
     return Scaffold(
       body: Center(
@@ -93,60 +93,52 @@ class LoginPage extends HookWidget {
               Container(
                 width: qrcodeSize,
                 height: qrcodeSize,
-                color: Colors.black,
+                color: Colors.white,
               )
-
-            // 二维码过期
-            else if (false) ...[Text("过期1"), Text("过期1")]
-
             // 二维码被扫, 展示扫码者信息
-            else if (true)
-              Text("扫码")
-
+            else if (qrcode.userId != null)
+              SizedBox(
+                width: 200,
+                height: 200,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        qrcodeState.value!.user?.name ?? '未知用户',
+                        style: const TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                      const SizedBox(height: 8), // 添加间距
+                      Text(
+                        qrcodeState.value!.user?.jobNumber ?? '无工号',
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             // 默认展示已有二维码
             else
-              Text("123"),
-            // qrcodeState.value!.userId == null
-            //     ? QrImageView(
-            //         data:
-            //             'https://cloud.mugroup.com/qrcodes/${qrcodeState.value!.id}',
-            //         version: QrVersions.auto,
-            //         size: 200.0,
-            //         backgroundColor: Colors.white,
-            //       )
-            //     : Container(
-            //         width: 200,
-            //         height: 100,
-            //         child: Center(
-            //           child: Column(
-            //             mainAxisAlignment: MainAxisAlignment.center,
-            //             children: [
-            //               Text(
-            //                 qrcodeState.value!.user?.name ?? '未知用户',
-            //                 style: const TextStyle(
-            //                     color: Colors.red, fontSize: 16),
-            //               ),
-            //               Text(
-            //                 qrcodeState.value!.user?.jobNumber ?? '无工号',
-            //                 style: const TextStyle(
-            //                     color: Colors.red, fontSize: 14),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ),
-            // const SizedBox(
-            //   height: 5,
-            // ),
-            // qrcodeState.value?.userId == null
-            //     ? const Text(
-            //         "请使用企业微信扫码登录",
-            //         style: TextStyle(color: Color(0xFF707070), fontSize: 10),
-            //       )
-            //     : const Text(
-            //         "请在手机上确认登录",
-            //         style: TextStyle(color: Color(0xFF707070), fontSize: 10),
-            //       ),
+              QrImageView(
+                data:
+                    'https://cloud.mugroup.com/login/qrcodes/${qrcodeState.value!.id}',
+                version: QrVersions.auto,
+                size: 200.0,
+                backgroundColor: Colors.white,
+              ),
+            const SizedBox(
+              height: 5,
+            ),
+            if (qrcode?.userId != null)
+              const Text(
+                "请在手机上确认登录",
+                style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+              )
+            else
+              const Text(
+                "请使用企业微信扫码登录",
+                style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+              ),
             TextButton(
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
