@@ -11,11 +11,12 @@ class AppTabbar extends StatelessWidget {
   Widget build(BuildContext context) {
     var router = context.router;
     const routes = [HomeRoute(), CartRoute(), MyRoute()];
+    final currentIndex =
+        routes.indexWhere((item) => item.routeName == router.current.name);
 
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      currentIndex:
-          routes.indexWhere((item) => item.routeName == router.current.name),
+      currentIndex: currentIndex < 0 ? 0 : currentIndex,
       onTap: (value) {
         router.replace(routes[value]);
       },
