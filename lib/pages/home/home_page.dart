@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/providers/count_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,8 +20,12 @@ class HomePage extends HookConsumerWidget {
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
         child: Text("${ref.watch(counterProvider)}"),
-        onPressed: () {
-          ref.read(counterProvider.notifier).increment();
+        onPressed: () async {
+          // ref.read(counterProvider.notifier).increment();
+          final wmswarehouse = await context.router
+              .push<Warehouse>(const SelectWmsWarehouseRoute());
+
+          logger.d(wmswarehouse);
         },
       ),
     );

@@ -19,6 +19,13 @@ class AppRouter extends RootStackRouter {
       ),
       AutoRoute(page: LoginRoute.page, path: "/login"),
       AutoRoute(page: MyRoute.page, path: "/my", guards: [AuthGuard()]),
+
+      // selectors
+      AutoRoute(
+        page: SelectWmsWarehouseRoute.page,
+        path: "/selectors/wms/warehouse",
+        guards: [AuthGuard()],
+      ),
     ];
   }
 }
