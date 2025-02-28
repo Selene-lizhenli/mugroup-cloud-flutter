@@ -45,10 +45,14 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
                 Column(
                   children: warehouses.value
                           ?.map(
-                            (warehouseItem) => WarehouseCard(
-                              child: WarehouseItem(
-                                warehouse: warehouseItem,
+                            (warehouseItem) => InkWell(
+                              child: WarehouseCard(
+                                child: WarehouseItem(
+                                  warehouse: warehouseItem,
+                                ),
                               ),
+                              onTap: () =>
+                                  {context.router.maybePop(warehouseItem)},
                             ),
                           )
                           .toList() ??
