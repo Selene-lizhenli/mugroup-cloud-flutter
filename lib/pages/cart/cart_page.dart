@@ -126,8 +126,6 @@ class _CartPageState extends ConsumerState<CartPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
         title: InkWell(
           onTap: () => selectCart(),
           child: Row(
@@ -148,7 +146,6 @@ class _CartPageState extends ConsumerState<CartPage> {
           ),
         ),
       ),
-      backgroundColor: const Color(0xFFF6F6F6),
       body: Column(
         children: [
           Expanded(

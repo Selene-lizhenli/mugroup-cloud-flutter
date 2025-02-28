@@ -38,6 +38,23 @@ class MyApp extends StatelessWidget {
       routerConfig: _appRouter.config(
         reevaluateListenable: authNotifier,
       ),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
+        // scaffoldBackgroundColor: Colors.black,
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF355EBF),
+        ),
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF3F4F6),
+          centerTitle: true,
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 18),
+          scrolledUnderElevation: 0,
+          elevation: 0,
+        ),
+      ),
       builder: EasyLoading.init(),
     );
   }

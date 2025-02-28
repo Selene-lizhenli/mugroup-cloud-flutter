@@ -17,6 +17,7 @@ class HomePage extends HookConsumerWidget {
       body: const SafeArea(
         child: Text("首页"),
       ),
+      appBar: AppBar(),
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
         child: Text("${ref.watch(counterProvider)}"),

@@ -15,7 +15,9 @@ class MyPage extends HookConsumerWidget {
     final user = ref.watch(userProvider).user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      appBar: AppBar(
+        title: const Text("我"),
+      ),
       body: SafeArea(
         child: Column(
           children: [
