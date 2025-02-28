@@ -54,10 +54,19 @@ class SampleItem extends HookWidget {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
+                Text(
+                  sample.productNo ?? "",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("$count"),
+                    Text(
+                      sample.purchaseCost ?? "",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                     FlanStepper(
                       value: count,
                       onChange: (v, _) {
