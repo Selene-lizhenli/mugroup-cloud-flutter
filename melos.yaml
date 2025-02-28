@@ -1,0 +1,7 @@
+name: one
+
+packages:
+  - .
+
+scripts:
+  test: echo "hello"

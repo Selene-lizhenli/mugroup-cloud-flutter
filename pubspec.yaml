@@ -79,6 +79,7 @@ dev_dependencies:
   custom_lint: ^0.6.4
   riverpod_lint: ^2.3.10
   envied_generator: ^1.1.1
+  melos: ^6.0.0
 
 flutter_launcher_icons:
   android: true
