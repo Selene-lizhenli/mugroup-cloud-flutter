@@ -13,6 +13,7 @@ import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'widgets/sample_item.dart';
 
 class CartItem {
@@ -163,16 +164,14 @@ class _CartPageState extends ConsumerState<CartPage> {
                         InkWell(
                           child: const SampleCard(
                             child: Center(
-                              child: Text('请选择需要的选样车'),
+                              child: Text(
+                                '请选择需要的选样车',
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
                             ),
                           ),
                           onTap: () => selectCart(),
-                        )
-                      else if (items.isEmpty)
-                        SampleCard(
-                          child: Center(
-                            child: Text("${cart.value!.name}空咯，请扫码添加"),
-                          ),
                         )
                       else
                         SliverPadding(
@@ -211,7 +210,8 @@ class _CartPageState extends ConsumerState<CartPage> {
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 10),
                                           child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
                                               Text(warehouse.value == null
                                                   ? "请选择仓库"
@@ -225,26 +225,39 @@ class _CartPageState extends ConsumerState<CartPage> {
                                     ),
                                     SliverClip(
                                       child: MultiSliver(
-                                        children: items
-                                            .map(
-                                              (cartItem) => Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal: 10,
-                                                ),
-                                                child: SampleItem(
-                                                  sample: cartItem.sample,
-                                                  count: cartItem.count,
-                                                  onChange: (value) {
-                                                    setState(() {
-                                                      cartItem.count = value;
-                                                    });
-                                                  },
+                                        children: [
+                                          if (items.isEmpty)
+                                            Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 10),
+                                                child: Text(
+                                                  "${cart.value!.name}空咯，请扫码添加",
+                                                  style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 12),
                                                 ),
                                               ),
-                                            )
-                                            .toList(),
+                                            ),
+                                          ...items.map(
+                                            (cartItem) => Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal: 10,
+                                              ),
+                                              child: SampleItem(
+                                                sample: cartItem.sample,
+                                                count: cartItem.count,
+                                                onChange: (value) {
+                                                  setState(() {
+                                                    cartItem.count = value;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     )
                                   ],
