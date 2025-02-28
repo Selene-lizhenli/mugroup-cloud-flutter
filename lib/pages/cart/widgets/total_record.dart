@@ -28,19 +28,35 @@ class TotalRecord extends HookConsumerWidget {
       color: Colors.white,
       child: Row(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("全选"),
-          ),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("已选: $totalCount"),
-                Text("合计: ${totalPrice.toStringAsFixed(2)}"),
-              ],
-            ),
-          ),
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Text("已选: $totalCount 件"),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Row(
+                            children: [
+                              const Text("合计: "),
+                              Text(
+                                  style: const TextStyle(
+                                    fontSize: 24.0,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  totalPrice.toStringAsFixed(2))
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ))),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
