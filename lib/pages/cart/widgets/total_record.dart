@@ -11,18 +11,33 @@ class TotalRecord extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    double totalPrice = items?.fold(0.0, (previousValue, item) {
+          // 尝试将 purchaseCost 从 String 转换为 double
+          double cost = double.tryParse(item.sample.purchaseCost ?? '0') ?? 0.0;
+          return previousValue! + (cost * item.count);
+        }) ??
+        0.0;
+
+    int totalCount = items?.fold(0, (previousValue, item) {
+          return previousValue! + item.count;
+        }) ??
+        0;
+
     return Container(
       height: 60,
       color: Colors.white,
       child: Row(
         children: [
-          const Text("全选"),
-          const Expanded(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("全选"),
+          ),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("12"),
-                Text("2"),
+                Text("已选: $totalCount"),
+                Text("合计: ${totalPrice.toStringAsFixed(2)}"),
               ],
             ),
           ),
