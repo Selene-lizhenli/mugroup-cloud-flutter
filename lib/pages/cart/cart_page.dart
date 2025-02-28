@@ -90,19 +90,23 @@ class _CartPageState extends ConsumerState<CartPage> {
     super.dispose();
   }
 
-  Future fetchData() async {
-    var resp = await getSamples();
-
-    setState(() {
-      items.addAll(
-          resp.data.map((sample) => CartItem(sample: sample, count: 1)));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final carts = [Cart(CartType.borrow), Cart(CartType.inout)];
     final cart = useState<Cart?>(null);
+
+    Future fetchData() async {
+      if (cart.value == null) {
+        return;
+      }
+
+      var resp = await getSamples();
+
+      setState(() {
+        items.addAll(
+            resp.data.map((sample) => CartItem(sample: sample, count: 1)));
+      });
+    }
 
     selectCart() {
       showFlanActionSheet(
@@ -198,9 +202,10 @@ class _CartPageState extends ConsumerState<CartPage> {
               );
             }(),
           ),
-          TotalRecord(
-            items: items,
-          ),
+          if (items.isNotEmpty)
+            TotalRecord(
+              items: items,
+            ),
         ],
       ),
       bottomNavigationBar: AppTabbar(),
