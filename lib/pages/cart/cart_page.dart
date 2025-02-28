@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/wigets.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'widgets/sample_item.dart';
 
 class CartItem {
@@ -152,29 +154,26 @@ class _CartPageState extends ConsumerState<CartPage> {
             child: () {
               return CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: Colors.white,
-                        ),
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(10),
-                        child: (() {
-                          if (cart.value == null) {
-                            return InkWell(
-                              child: const Center(
-                                child: Text('请选择需要的选样车'),
-                              ),
-                              onTap: () => selectCart(),
-                            );
-                          } else if (items.isEmpty) {
-                            return Center(
-                              child: Text("${cart.value!.name}空咯，请扫码添加"),
-                            );
-                          }
-
-                          return Column(
+                  MultiSliver(
+                    children: [
+                      if (cart.value == null)
+                        InkWell(
+                          child: const SampleCard(
+                            child: Center(
+                              child: Text('请选择需要的选样车'),
+                            ),
+                          ),
+                          onTap: () => selectCart(),
+                        )
+                      else if (items.isEmpty)
+                        SampleCard(
+                          child: Center(
+                            child: Text("${cart.value!.name}空咯，请扫码添加"),
+                          ),
+                        )
+                      else
+                        SampleCard(
+                          child: Column(
                             children: items
                                 .map(
                                   (cartItem) => Container(
@@ -192,8 +191,9 @@ class _CartPageState extends ConsumerState<CartPage> {
                                   ),
                                 )
                                 .toList(),
-                          );
-                        })()),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               );
