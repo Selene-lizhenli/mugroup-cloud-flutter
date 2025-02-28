@@ -63,10 +63,12 @@ class SampleItem extends HookWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      sample.purchaseCost ?? "",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
+                        sample.purchaseCost != null
+                            ? '¥${sample.purchaseCost}'
+                            : "",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(color: Colors.red)),
                     FlanStepper(
                       value: count,
                       onChange: (v, _) {
