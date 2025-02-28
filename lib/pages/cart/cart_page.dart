@@ -4,8 +4,11 @@ import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/wigets.dart';
+import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'widgets/sample_item.dart';
 
 class CartItem {
@@ -20,15 +23,49 @@ class CartItem {
   }
 }
 
+enum CartType {
+  /// 借样
+  borrow,
+
+  /// 手动盘点
+  inout,
+}
+
+class Cart {
+  final CartType type;
+
+  Cart(this.type);
+
+  String get name {
+    if (type == CartType.borrow) {
+      return "借样选样车";
+    }
+
+    if (type == CartType.inout) {
+      return "手动盘点";
+    }
+
+    return "选样车";
+  }
+
+  bool get disabled {
+    if (type == CartType.borrow) {
+      return false;
+    }
+
+    return true;
+  }
+}
+
 @RoutePage()
-class CartPage extends StatefulWidget {
+class CartPage extends StatefulHookConsumerWidget {
   const CartPage({super.key});
 
   @override
-  State<CartPage> createState() => _CartPageState();
+  ConsumerState<CartPage> createState() => _CartPageState();
 }
 
-class _CartPageState extends State<CartPage> {
+class _CartPageState extends ConsumerState<CartPage> {
   List<CartItem> items = [];
 
   BroadcastReceiver receiver = BroadcastReceiver(
@@ -64,55 +101,107 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final carts = [Cart(CartType.borrow), Cart(CartType.inout)];
+    final cart = useState<Cart?>(null);
+
+    selectCart() {
+      showFlanActionSheet(
+        context,
+        description: "请选择一辆选样车",
+        cancelText: "我再想想",
+        actions: carts
+            .map((cart) =>
+                FlanActionSheetAction(name: cart.name, disabled: cart.disabled))
+            .toList(),
+        closeOnClickAction: true,
+        onSelect: (action, index) {
+          cart.value = carts[index];
+        },
+      );
+    }
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        title: InkWell(
+          onTap: () => selectCart(),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.ideographic,
+            children: [
+              Text(cart.value != null ? cart.value!.name : '请选择选样车'),
+              if (cart.value != null)
+                const SizedBox(
+                  width: 5,
+                ),
+              if (items.isNotEmpty)
+                Text(
+                  "(${items.length})",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+            ],
+          ),
+        ),
+      ),
       backgroundColor: const Color(0xFFF6F6F6),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: CustomScrollView(
+      body: Column(
+        children: [
+          Expanded(
+            child: () {
+              return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
                     child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.white,
-                      ),
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(10),
-                      child: items.isEmpty
-                          ? const Center(
-                              child: Text("选样车空咯，请扫码添加"),
-                            )
-                          : Column(
-                              children: items
-                                  .map(
-                                    (cartItem) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                      child: SampleItem(
-                                        sample: cartItem.sample,
-                                        count: cartItem.count,
-                                        onChange: (value) {
-                                          setState(() {
-                                            cartItem.count = value;
-                                          });
-                                        },
-                                      ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.white,
+                        ),
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        child: (() {
+                          if (cart.value == null) {
+                            return InkWell(
+                              child: const Center(
+                                child: Text('请选择需要的选样车'),
+                              ),
+                              onTap: () => selectCart(),
+                            );
+                          } else if (items.isEmpty) {
+                            return Center(
+                              child: Text("${cart.value!.name}空咯，请扫码添加"),
+                            );
+                          }
+
+                          return Column(
+                            children: items
+                                .map(
+                                  (cartItem) => Container(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: SampleItem(
+                                      sample: cartItem.sample,
+                                      count: cartItem.count,
+                                      onChange: (value) {
+                                        setState(() {
+                                          cartItem.count = value;
+                                        });
+                                      },
                                     ),
-                                  )
-                                  .toList(),
-                            ),
-                    ),
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        })()),
                   ),
                 ],
-              ),
-            ),
-            TotalRecord(
-              items: items,
-            ),
-          ],
-        ),
+              );
+            }(),
+          ),
+          TotalRecord(
+            items: items,
+          ),
+        ],
       ),
       bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
