@@ -23,6 +23,10 @@ mixin _$Sample {
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'name_cn')
   String? get nameCn => throw _privateConstructorUsedError;
+  @JsonKey(name: 'product_no')
+  String? get productNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'purchase_cost')
+  String? get purchaseCost => throw _privateConstructorUsedError;
   List<Media>? get image => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -36,7 +40,11 @@ abstract class $SampleCopyWith<$Res> {
       _$SampleCopyWithImpl<$Res, Sample>;
   @useResult
   $Res call(
-      {int? id, @JsonKey(name: 'name_cn') String? nameCn, List<Media>? image});
+      {int? id,
+      @JsonKey(name: 'name_cn') String? nameCn,
+      @JsonKey(name: 'product_no') String? productNo,
+      @JsonKey(name: 'purchase_cost') String? purchaseCost,
+      List<Media>? image});
 }
 
 /// @nodoc
@@ -54,6 +62,8 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
   $Res call({
     Object? id = freezed,
     Object? nameCn = freezed,
+    Object? productNo = freezed,
+    Object? purchaseCost = freezed,
     Object? image = freezed,
   }) {
     return _then(_value.copyWith(
@@ -64,6 +74,14 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productNo: freezed == productNo
+          ? _value.productNo
+          : productNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      purchaseCost: freezed == purchaseCost
+          ? _value.purchaseCost
+          : purchaseCost // ignore: cast_nullable_to_non_nullable
               as String?,
       image: freezed == image
           ? _value.image
@@ -81,7 +99,11 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int? id, @JsonKey(name: 'name_cn') String? nameCn, List<Media>? image});
+      {int? id,
+      @JsonKey(name: 'name_cn') String? nameCn,
+      @JsonKey(name: 'product_no') String? productNo,
+      @JsonKey(name: 'purchase_cost') String? purchaseCost,
+      List<Media>? image});
 }
 
 /// @nodoc
@@ -97,6 +119,8 @@ class __$$SampleImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? nameCn = freezed,
+    Object? productNo = freezed,
+    Object? purchaseCost = freezed,
     Object? image = freezed,
   }) {
     return _then(_$SampleImpl(
@@ -107,6 +131,14 @@ class __$$SampleImplCopyWithImpl<$Res>
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productNo: freezed == productNo
+          ? _value.productNo
+          : productNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      purchaseCost: freezed == purchaseCost
+          ? _value.purchaseCost
+          : purchaseCost // ignore: cast_nullable_to_non_nullable
               as String?,
       image: freezed == image
           ? _value._image
@@ -122,6 +154,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   const _$SampleImpl(
       {this.id,
       @JsonKey(name: 'name_cn') this.nameCn,
+      @JsonKey(name: 'product_no') this.productNo,
+      @JsonKey(name: 'purchase_cost') this.purchaseCost,
       final List<Media>? image})
       : _image = image;
 
@@ -133,6 +167,12 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   @override
   @JsonKey(name: 'name_cn')
   final String? nameCn;
+  @override
+  @JsonKey(name: 'product_no')
+  final String? productNo;
+  @override
+  @JsonKey(name: 'purchase_cost')
+  final String? purchaseCost;
   final List<Media>? _image;
   @override
   List<Media>? get image {
@@ -145,7 +185,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, nameCn: $nameCn, image: $image)';
+    return 'Sample(id: $id, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, image: $image)';
   }
 
   @override
@@ -155,6 +195,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
       ..add(DiagnosticsProperty('type', 'Sample'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('nameCn', nameCn))
+      ..add(DiagnosticsProperty('productNo', productNo))
+      ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
       ..add(DiagnosticsProperty('image', image));
   }
 
@@ -165,13 +207,17 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
             other is _$SampleImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.nameCn, nameCn) || other.nameCn == nameCn) &&
+            (identical(other.productNo, productNo) ||
+                other.productNo == productNo) &&
+            (identical(other.purchaseCost, purchaseCost) ||
+                other.purchaseCost == purchaseCost) &&
             const DeepCollectionEquality().equals(other._image, _image));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, nameCn, const DeepCollectionEquality().hash(_image));
+  int get hashCode => Object.hash(runtimeType, id, nameCn, productNo,
+      purchaseCost, const DeepCollectionEquality().hash(_image));
 
   @JsonKey(ignore: true)
   @override
@@ -191,6 +237,8 @@ abstract class _Sample implements Sample {
   const factory _Sample(
       {final int? id,
       @JsonKey(name: 'name_cn') final String? nameCn,
+      @JsonKey(name: 'product_no') final String? productNo,
+      @JsonKey(name: 'purchase_cost') final String? purchaseCost,
       final List<Media>? image}) = _$SampleImpl;
 
   factory _Sample.fromJson(Map<String, dynamic> json) = _$SampleImpl.fromJson;
@@ -200,6 +248,12 @@ abstract class _Sample implements Sample {
   @override
   @JsonKey(name: 'name_cn')
   String? get nameCn;
+  @override
+  @JsonKey(name: 'product_no')
+  String? get productNo;
+  @override
+  @JsonKey(name: 'purchase_cost')
+  String? get purchaseCost;
   @override
   List<Media>? get image;
   @override

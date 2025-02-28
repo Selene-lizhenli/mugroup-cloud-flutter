@@ -10,6 +10,8 @@ abstract class Sample with _$Sample {
   const factory Sample({
     int? id,
     @JsonKey(name: 'name_cn') String? nameCn,
+    @JsonKey(name: 'product_no') String? productNo,
+    @JsonKey(name: 'purchase_cost') String? purchaseCost,
     List<Media>? image,
   }) = _Sample;
 
