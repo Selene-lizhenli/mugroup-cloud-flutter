@@ -100,19 +100,19 @@ class LoginPage extends HookWidget {
             else if (qrcode.userId != null)
               SizedBox(
                 width: 200,
-                height: 200,
+                height: 100,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         qrcodeState.value!.user?.name ?? '未知用户',
-                        style: const TextStyle(color: Colors.red, fontSize: 16),
+                        style: const TextStyle(color: Colors.blue, fontSize: 16),
                       ),
-                      const SizedBox(height: 8), // 添加间距
+                      const SizedBox(height: 18), // 添加间距
                       Text(
                         qrcodeState.value!.user?.jobNumber ?? '无工号',
-                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                        style: const TextStyle(color: Colors.blue, fontSize: 14),
                       ),
                     ],
                   ),
