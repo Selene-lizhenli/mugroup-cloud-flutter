@@ -3,5 +3,9 @@ name: one
 packages:
   - .
 
+ide:
+  intellij:
+    enabled: false
+
 scripts:
   test: echo "hello"
