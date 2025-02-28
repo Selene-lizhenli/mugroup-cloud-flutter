@@ -13,7 +13,6 @@ import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'widgets/sample_item.dart';
 
 class CartItem {

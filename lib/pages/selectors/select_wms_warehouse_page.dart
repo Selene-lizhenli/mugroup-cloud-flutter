@@ -23,51 +23,43 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
       }
 
       fetchWarehouses();
-      return null;
     }, []);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        title: const Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.ideographic,
-            children: [
-              Text('请选择仓库'),
-            ]),
+        title: const Text('仓库列表'),
       ),
       body: SafeArea(
           child: Column(
         children: [
           Expanded(
-            child: CustomScrollView(slivers: [
-              MultiSliver(children: [
-                Column(
-                  children: warehouses.value
-                          ?.map(
-                            (warehouseItem) => InkWell(
-                              child: WarehouseCard(
-                                child: WarehouseItem(
-                                  warehouse: warehouseItem,
+            child: CustomScrollView(
+              slivers: [
+                MultiSliver(children: [
+                  Column(
+                    children: warehouses.value
+                            ?.map(
+                              (warehouseItem) => InkWell(
+                                child: WarehouseCard(
+                                  child: WarehouseItem(
+                                    warehouse: warehouseItem,
+                                  ),
                                 ),
+                                onTap: () =>
+                                    {context.router.maybePop(warehouseItem)},
                               ),
-                              onTap: () =>
-                                  {context.router.maybePop(warehouseItem)},
-                            ),
-                          )
-                          .toList() ??
-                      [],
-                )
-              ])
-            ]),
+                            )
+                            .toList() ??
+                        [],
+                  )
+                ])
+              ],
+            ),
           ),
         ],
       )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.router.maybePop(const Warehouse(id: 1, name: "仓库"));
-        },
-      ),
     );
   }
 }
