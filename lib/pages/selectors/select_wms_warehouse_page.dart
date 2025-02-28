@@ -4,6 +4,7 @@ import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import 'widgets/warehouse_item.dart';
 
@@ -39,8 +40,8 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
         children: [
           Expanded(
             child: CustomScrollView(slivers: [
-              SliverToBoxAdapter(
-                child: Column(
+              MultiSliver(children: [
+                Column(
                   children: warehouses.value
                           ?.map(
                             (warehouseItem) => Container(
@@ -52,8 +53,8 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
                           )
                           .toList() ??
                       [],
-                ),
-              )
+                )
+              ])
             ]),
           ),
         ],
