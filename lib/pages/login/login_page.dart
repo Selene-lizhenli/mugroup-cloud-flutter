@@ -144,7 +144,7 @@ class LoginPage extends HookWidget {
               onPressed: () async {
                 // 模拟登录，请在自己的环境中增加下面路由设置登录
                 await api.get("api/tenant/test");
-                await app.user;
+                await app.fetchUser();
                 afterLogin();
               },
               child: const Text("模拟登录"),
