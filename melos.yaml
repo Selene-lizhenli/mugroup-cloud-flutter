@@ -8,4 +8,8 @@ ide:
     enabled: false
 
 scripts:
-  test: echo "hello"
+  clean: dart run build_runner clean
+  # 准本开发的环境
+  prepare:dev: dart run melos clean && dart run build_runner build --delete-conflicting-outputs
+  # 准备 cloud 的环境
+  prepare:cloud: dart run melos clean && dart run build_runner build --define=envied_generator:envied=path=.env.cloud --delete-conflicting-outputs
