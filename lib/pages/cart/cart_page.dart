@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -96,6 +98,7 @@ class _CartPageState extends ConsumerState<CartPage> {
   Widget build(BuildContext context) {
     final carts = [Cart(CartType.borrow), Cart(CartType.inout)];
     final cart = useState<Cart?>(null);
+    final warehouse = useState<Warehouse?>(null);
 
     Future fetchData() async {
       if (cart.value == null) {
@@ -191,24 +194,57 @@ class _CartPageState extends ConsumerState<CartPage> {
                               SliverClip(
                                 child: MultiSliver(
                                   children: [
-                                    const SliverPinnedHeader(
-                                      child: Text("TODO: 样品间"),
+                                    const SizedBox(
+                                      height: 10,
                                     ),
-                                    ...items.map(
-                                      (cartItem) => Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                          horizontal: 10,
+                                    SliverPinnedHeader(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          final selectedWarehouse =
+                                              await context.router.push<
+                                                      Warehouse>(
+                                                  const SelectWmsWarehouseRoute());
+
+                                          warehouse.value = selectedWarehouse;
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5, horizontal: 10),
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(warehouse.value == null
+                                                  ? "请选择仓库"
+                                                  : warehouse.value!.name ??
+                                                      "未设置仓库名称"),
+                                              const Icon(Icons.chevron_right)
+                                            ],
+                                          ),
                                         ),
-                                        child: SampleItem(
-                                          sample: cartItem.sample,
-                                          count: cartItem.count,
-                                          onChange: (value) {
-                                            setState(() {
-                                              cartItem.count = value;
-                                            });
-                                          },
-                                        ),
+                                      ),
+                                    ),
+                                    SliverClip(
+                                      child: MultiSliver(
+                                        children: items
+                                            .map(
+                                              (cartItem) => Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 8,
+                                                  horizontal: 10,
+                                                ),
+                                                child: SampleItem(
+                                                  sample: cartItem.sample,
+                                                  count: cartItem.count,
+                                                  onChange: (value) {
+                                                    setState(() {
+                                                      cartItem.count = value;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                       ),
                                     )
                                   ],
