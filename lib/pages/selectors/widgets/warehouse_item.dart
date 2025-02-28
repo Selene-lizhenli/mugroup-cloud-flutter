@@ -24,16 +24,24 @@ class WarehouseItem extends HookWidget {
         Expanded(
           flex: 1,
           child: Container(
-            height: 100,
+            height: 80,
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                   warehouse.name ?? "",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
+                ),
+                Text(
+                  warehouse.address ?? "",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ],
             ),
