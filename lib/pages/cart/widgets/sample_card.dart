@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SampleCard extends HookConsumerWidget {
-  final Widget child;
+  final Widget? child;
 
-  const SampleCard({super.key, required this.child});
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+
+  const SampleCard({super.key, this.child, this.margin, this.padding});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -13,8 +16,8 @@ class SampleCard extends HookConsumerWidget {
         borderRadius: BorderRadius.circular(10.0),
         color: Colors.white,
       ),
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.all(10),
+      margin: margin ?? const EdgeInsets.all(10),
+      padding: padding ?? const EdgeInsets.all(10),
       child: child,
     );
   }

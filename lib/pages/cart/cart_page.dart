@@ -172,25 +172,49 @@ class _CartPageState extends ConsumerState<CartPage> {
                           ),
                         )
                       else
-                        SampleCard(
-                          child: Column(
-                            children: items
-                                .map(
-                                  (cartItem) => Container(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: SampleItem(
-                                      sample: cartItem.sample,
-                                      count: cartItem.count,
-                                      onChange: (value) {
-                                        setState(() {
-                                          cartItem.count = value;
-                                        });
-                                      },
+                        SliverPadding(
+                          padding: const EdgeInsets.only(
+                            bottom: 10,
+                            left: 10,
+                            right: 10,
+                          ),
+                          sliver: SliverStack(
+                            insetOnOverlap: true,
+                            children: [
+                              const SliverPositioned.fill(
+                                top: 0,
+                                child: SampleCard(
+                                  margin: EdgeInsets.zero,
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                              SliverClip(
+                                child: MultiSliver(
+                                  children: [
+                                    const SliverPinnedHeader(
+                                      child: Text("TODO: 样品间"),
                                     ),
-                                  ),
-                                )
-                                .toList(),
+                                    ...items.map(
+                                      (cartItem) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                          horizontal: 10,
+                                        ),
+                                        child: SampleItem(
+                                          sample: cartItem.sample,
+                                          count: cartItem.count,
+                                          onChange: (value) {
+                                            setState(() {
+                                              cartItem.count = value;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                     ],
