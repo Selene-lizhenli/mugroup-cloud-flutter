@@ -122,7 +122,7 @@ class LoginPage extends HookWidget {
             else
               QrImageView(
                 data:
-                    '${Config.webUrl}login/qrcodes/${qrcodeState.value!.id}',
+                    '${Config.webUrl}login/qrcode/${qrcodeState.value!.id}',
                 version: QrVersions.auto,
                 size: 200.0,
                 backgroundColor: Colors.white,
