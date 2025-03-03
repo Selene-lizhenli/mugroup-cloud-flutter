@@ -40,12 +40,16 @@ class MyApp extends StatelessWidget {
       ),
       theme: ThemeData(
         useMaterial3: true,
+        actionIconTheme: ActionIconThemeData(
+          backButtonIconBuilder: (BuildContext context) {
+            return const Icon(Icons.arrow_back_ios_new_rounded);
+          },
+        ),
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF355EBF),
         ),
-
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6),
           centerTitle: true,
