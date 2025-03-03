@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
-import 'package:cloud/pages/selectors/widgets/user_card.dart';
-import 'package:cloud/pages/selectors/widgets/user_item.dart';
+import 'package:cloud/pages/selectors/select_user/widgets/user_card.dart';
+import 'package:cloud/pages/selectors/select_user/widgets/user_item.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
