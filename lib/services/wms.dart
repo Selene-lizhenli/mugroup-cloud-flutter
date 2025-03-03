@@ -14,8 +14,11 @@ Future<ApiResponse<List<Warehouse>>> getWarehouses() async {
       );
 }
 
-Future<ApiResponse<List<Borrow>>> getBorrows() async {
-  return api.get("api/tenant/wms/stock/borrows").then(
+Future<ApiResponse<List<Borrow>>> getBorrows(
+    {Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/wms/stock/borrows", queryParameters: queryParameters)
+      .then(
         (res) => ApiResponse<List<Borrow>>.fromJson(
           res.data,
           (data) {

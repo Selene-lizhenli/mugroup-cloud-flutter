@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
@@ -17,20 +20,28 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final borrows = useState<List<Borrow>?>([]);
-    useEffect(() {
-      Future fetchBorrows() async {
-        EasyLoading.show(status: '加载中...');
-        try {
-          final resp = await getBorrows();
-          borrows.value = resp.data;
-        } finally {
-          EasyLoading.dismiss();
-        }
-      }
+    final search = useState<String?>(null);
 
-      fetchBorrows();
-      return null;
-    }, []);
+    Future fetchBorrows(String? orderNo) async {
+      EasyLoading.show(status: '加载中...');
+      try {
+        logger.d("搜索");
+        final resp = await getBorrows(queryParameters: {"order_no": orderNo});
+        borrows.value = resp.data;
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }
+
+    useEffect(() {
+      final timer = Timer(const Duration(milliseconds: 300), () {
+        fetchBorrows(search.value);
+      });
+
+      return () {
+        timer.cancel();
+      };
+    }, [search.value]);
 
     return Scaffold(
       appBar: AppBar(
@@ -41,6 +52,15 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
       body: SafeArea(
           child: Column(
         children: [
+          TextField(
+            decoration: const InputDecoration(
+              labelText: '搜索',
+              prefixIcon: Icon(Icons.search),
+            ),
+            onChanged: (value) {
+              search.value = value;
+            },
+          ),
           Expanded(
             child: CustomScrollView(
               slivers: [
