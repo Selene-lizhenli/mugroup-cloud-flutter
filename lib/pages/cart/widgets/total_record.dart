@@ -1,13 +1,18 @@
-import 'package:cloud/helper/helper.dart';
-import 'package:cloud/http/api.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/cart_page.dart';
+import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TotalRecord extends HookConsumerWidget {
   final List<CartItem>? items;
+  final Cart? cart;
+  final Warehouse? warehouse;
+  final Borrow? borrow;
 
-  const TotalRecord({super.key, this.items});
+  const TotalRecord(
+      {super.key, this.items, this.cart, this.warehouse, this.borrow});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,18 +70,34 @@ class TotalRecord extends HookConsumerWidget {
             child: TextButton(
                 onPressed: () async {
                   final productData = items
-                      ?.map((item) =>
-                          {"model_id": item.sample.id, "inout_qty": item.count})
+                      ?.map((item) => {
+                            "product_id": item.sample.id,
+                            "inout_qty": item.count
+                          })
                       .toList();
-                  final data = {
-                    "borrower_id": 2, // 借样人ID
-                    "warehouse_id": 1, // 仓库ID
-                    "remark": "备注",
-                    "products": productData
-                  };
-                  // 生成报价单
-                  await api.post("api/tenant/wms/stock/borrows", data: data);
-                  logger.d(data);
+                  EasyLoading.show(status: '加载中...');
+                  try {
+                    if (cart?.type == CartType.borrowIn) {
+                      final data = {
+                        "remark": "备注",
+                        "return_items": productData
+                      };
+                      await borrowIn(borrow!.id!, data);
+                      EasyLoading.showSuccess("还样成功!");
+                    }
+                    if (cart?.type == CartType.borrow) {
+                      final data = {
+                        "borrower_id": 2, // 借样人ID
+                        "warehouse_id": warehouse!.id!,
+                        "remark": "备注",
+                        "products": productData
+                      };
+                      await storeBorrow(data);
+                      EasyLoading.showSuccess("借样成功!");
+                    }
+                  } finally {
+                    EasyLoading.dismiss();
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -88,9 +109,9 @@ class TotalRecord extends HookConsumerWidget {
                   ),
                   elevation: 5, // 设置按钮的阴影效果
                 ),
-                child: const Text(
-                  '借样',
-                  style: TextStyle(
+                child: Text(
+                  cart?.type == CartType.borrowIn ? "还样" : "借样",
+                  style: const TextStyle(
                     fontSize: 16.0, // 设置字体大小
                     fontWeight: FontWeight.bold, // 设置字体粗细
                   ),

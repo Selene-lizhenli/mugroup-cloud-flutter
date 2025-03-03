@@ -375,6 +375,9 @@ class _CartPageState extends ConsumerState<CartPage> {
           if (items.isNotEmpty)
             TotalRecord(
               items: items,
+              cart: cart.value,
+              warehouse: warehouse.value,
+              borrow: borrow.value,
             ),
         ],
       ),
