@@ -10,6 +10,7 @@ import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'widgets/sample_item.dart';
@@ -278,20 +279,45 @@ class _CartPageState extends ConsumerState<CartPage> {
                                               ),
                                             ),
                                           ...items.map(
-                                            (cartItem) => Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 8,
-                                                horizontal: 10,
+                                            (cartItem) => Slidable(
+                                              endActionPane: ActionPane(
+                                                extentRatio: 0.25,
+                                                motion: const ScrollMotion(),
+                                                children: [
+                                                  SlidableAction(
+                                                    onPressed: (context) {
+                                                      setState(() {
+                                                        items.removeWhere(
+                                                            (item) =>
+                                                                item.sample
+                                                                    .id ==
+                                                                cartItem
+                                                                    .sample.id);
+                                                      });
+                                                    },
+                                                    backgroundColor: Colors.red,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    icon: Icons.delete,
+                                                    label: '移除',
+                                                  ),
+                                                ],
                                               ),
-                                              child: SampleItem(
-                                                sample: cartItem.sample,
-                                                count: cartItem.count,
-                                                onChange: (value) {
-                                                  setState(() {
-                                                    cartItem.count = value;
-                                                  });
-                                                },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 8,
+                                                  horizontal: 10,
+                                                ),
+                                                child: SampleItem(
+                                                  sample: cartItem.sample,
+                                                  count: cartItem.count,
+                                                  onChange: (value) {
+                                                    setState(() {
+                                                      cartItem.count = value;
+                                                    });
+                                                  },
+                                                ),
                                               ),
                                             ),
                                           )
