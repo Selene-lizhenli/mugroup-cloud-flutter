@@ -3,6 +3,7 @@ import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/selectors/widgets/warehouse_card.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -18,8 +19,13 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
     final warehouses = useState<List<Warehouse>?>([]);
     useEffect(() {
       Future fetchWarehouses() async {
-        final resp = await getWarehouses();
-        warehouses.value = resp.data;
+        EasyLoading.show(status: '加载中...');
+        try {
+          final resp = await getWarehouses();
+          warehouses.value = resp.data;
+        } finally {
+          EasyLoading.dismiss();
+        }
       }
 
       fetchWarehouses();
