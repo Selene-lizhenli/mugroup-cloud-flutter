@@ -31,6 +31,9 @@ enum CartType {
   /// 借样
   borrow,
 
+  /// 还样
+  borrowIn,
+
   /// 手动盘点
   inout,
 }
@@ -45,6 +48,10 @@ class Cart {
       return "借样选样车";
     }
 
+    if (type == CartType.borrowIn) {
+      return "还样选样车";
+    }
+
     if (type == CartType.inout) {
       return "手动盘点";
     }
@@ -54,6 +61,10 @@ class Cart {
 
   bool get disabled {
     if (type == CartType.borrow) {
+      return false;
+    }
+
+    if (type == CartType.borrowIn) {
       return false;
     }
 
@@ -96,9 +107,64 @@ class _CartPageState extends ConsumerState<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    final carts = [Cart(CartType.borrow), Cart(CartType.inout)];
+    final carts = [
+      Cart(CartType.borrow),
+      Cart(CartType.borrowIn),
+      Cart(CartType.inout)
+    ];
     final cart = useState<Cart?>(null);
     final warehouse = useState<Warehouse?>(null);
+    final borrow = useState<Borrow?>(null);
+
+    final header = useMemoized(() {
+      if (cart.value?.type == CartType.borrow) {
+        return GestureDetector(
+          onTap: () async {
+            final selectedWarehouse = await context.router
+                .push<Warehouse>(const SelectWmsWarehouseRoute());
+
+            warehouse.value = selectedWarehouse;
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(warehouse.value == null
+                    ? "请选择仓库"
+                    : warehouse.value!.name ?? "未设置仓库名称"),
+                const Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+        );
+      }
+
+      if (cart.value?.type == CartType.borrowIn) {
+        return GestureDetector(
+          onTap: () async {
+            final selectedBorrow =
+                await context.router.push<Borrow>(const SelectWmsBorrowRoute());
+
+            borrow.value = selectedBorrow;
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(borrow.value == null
+                    ? "请选择借样单"
+                    : borrow.value!.orderNo ?? "未设置借样单"),
+                const Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+        );
+      }
+
+      return GestureDetector();
+    }, [cart.value, warehouse.value, borrow.value]);
 
     Future fetchData() async {
       if (cart.value == null) {
@@ -195,33 +261,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    SliverPinnedHeader(
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          final selectedWarehouse =
-                                              await context.router.push<
-                                                      Warehouse>(
-                                                  const SelectWmsWarehouseRoute());
-
-                                          warehouse.value = selectedWarehouse;
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 5, horizontal: 10),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text(warehouse.value == null
-                                                  ? "请选择仓库"
-                                                  : warehouse.value!.name ??
-                                                      "未设置仓库名称"),
-                                              const Icon(Icons.chevron_right)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    SliverPinnedHeader(child: header),
                                     SliverClip(
                                       child: MultiSliver(
                                         children: [
