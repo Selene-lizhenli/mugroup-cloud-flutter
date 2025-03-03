@@ -14,7 +14,7 @@ import 'package:cloud/pages/home/home_page.dart' as _i2;
 import 'package:cloud/pages/layout.dart' as _i3;
 import 'package:cloud/pages/login/login_page.dart' as _i4;
 import 'package:cloud/pages/my/my_page.dart' as _i5;
-import 'package:cloud/pages/selectors/select_user_page.dart' as _i6;
+import 'package:cloud/pages/selectors/select_user/select_user_page.dart' as _i6;
 import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.dart'
     as _i7;
 import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
