@@ -15,8 +15,10 @@ import 'package:cloud/pages/layout.dart' as _i3;
 import 'package:cloud/pages/login/login_page.dart' as _i4;
 import 'package:cloud/pages/my/my_page.dart' as _i5;
 import 'package:cloud/pages/selectors/select_user_page.dart' as _i6;
-import 'package:cloud/pages/selectors/select_wms_borrow_page.dart' as _i7;
-import 'package:cloud/pages/selectors/select_wms_warehouse_page.dart' as _i8;
+import 'package:cloud/pages/selectors/select_wms_borrow_page/select_wms_borrow_page.dart'
+    as _i7;
+import 'package:cloud/pages/selectors/select_wms_warehouse_page/select_wms_warehouse_page.dart'
+    as _i8;
 import 'package:flutter/material.dart' as _i10;
 
 /// generated route for
