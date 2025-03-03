@@ -1,8 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
-import 'package:cloud/models/wms.dart';
-import 'package:cloud/providers/count_provider.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -13,19 +9,20 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: const SafeArea(
-        child: Text("首页"),
-      ),
-      appBar: AppBar(),
-      floatingActionButton: FloatingActionButton(
-        child: Text("${ref.watch(counterProvider)}"),
-        onPressed: () async {
-          // ref.read(counterProvider.notifier).increment();
-          final wmswarehouse = await context.router
-              .push<Warehouse>(const SelectWmsWarehouseRoute());
-
-          logger.d(wmswarehouse);
-        },
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(5.0),
+            ),
+          ),
+          child: const Text(
+            "敬请期待",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
       ),
     );
   }
