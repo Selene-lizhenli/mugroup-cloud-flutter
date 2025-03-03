@@ -6,7 +6,6 @@ import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
-import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
