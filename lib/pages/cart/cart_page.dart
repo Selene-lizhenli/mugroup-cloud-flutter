@@ -317,7 +317,6 @@ class _CartPageState extends ConsumerState<CartPage> {
             ),
         ],
       ),
-      bottomNavigationBar: AppTabbar(),
       floatingActionButton: FloatingActionButton(
         child: const Text("测试"),
         onPressed: () {

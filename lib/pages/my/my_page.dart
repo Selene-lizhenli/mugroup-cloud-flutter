@@ -78,7 +78,6 @@ class MyPage extends HookConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: AppTabbar(),
     );
   }
 }
