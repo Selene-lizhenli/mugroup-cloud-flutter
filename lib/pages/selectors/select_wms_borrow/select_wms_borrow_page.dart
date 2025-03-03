@@ -36,7 +36,7 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        title: const Text('报价单列表'),
+        title: const Text('借样单列表'),
       ),
       body: SafeArea(
           child: Column(
