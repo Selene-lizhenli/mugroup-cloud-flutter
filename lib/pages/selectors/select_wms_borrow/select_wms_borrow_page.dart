@@ -16,13 +16,13 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wborrows = useState<List<Borrow>?>([]);
+    final borrows = useState<List<Borrow>?>([]);
     useEffect(() {
       Future fetchBorrows() async {
         EasyLoading.show(status: '加载中...');
         try {
           final resp = await getBorrows();
-          wborrows.value = resp.data;
+          borrows.value = resp.data;
         } finally {
           EasyLoading.dismiss();
         }
@@ -46,7 +46,7 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
               slivers: [
                 MultiSliver(children: [
                   Column(
-                    children: wborrows.value
+                    children: borrows.value
                             ?.map(
                               (borrowItem) => InkWell(
                                 child: BorrowCard(
