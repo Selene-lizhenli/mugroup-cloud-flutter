@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+final searchTextProvider = StateProvider<String>((ref) => '');
+
 class SearchAppTabbar extends HookConsumerWidget {
   SearchAppTabbar({super.key});
 
   final textController = useTextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    textController.addListener(() {
-      print("当前输入框内容: ${textController.text}");
-    });
+    useEffect(() {
+      textController.addListener(() {
+        ref.read(searchTextProvider.notifier).state = textController.text;
+      });
+      return null;
+    }, [textController]);
 
     return SizedBox(
       width: double.infinity,
@@ -73,6 +78,7 @@ class SearchAppTabbar extends HookConsumerWidget {
             onTap: () {
               textController.clear();
               FocusScope.of(context).unfocus();
+              ref.read(searchTextProvider.notifier).state = '';
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),

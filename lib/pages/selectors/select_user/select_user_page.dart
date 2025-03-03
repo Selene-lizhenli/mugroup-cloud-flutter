@@ -16,14 +16,16 @@ class SelectUserPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final users = useState<List<User>?>([]);
 
+    final searchText = ref.watch(searchTextProvider);
+
     useEffect(() {
       Future fetchUsers() async {
-        final resp = await fetchCurrentUsers();
+        final resp = await fetchCurrentUsers(query: searchText);
         users.value = resp;
       }
 
       fetchUsers();
-    }, []);
+    }, [searchText]);
 
     return Scaffold(
       appBar: AppBar(
