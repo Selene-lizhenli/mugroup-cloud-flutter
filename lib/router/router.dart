@@ -26,6 +26,12 @@ class AppRouter extends RootStackRouter {
         path: "/selectors/wms/warehouse",
         guards: [AuthGuard()],
       ),
+
+      AutoRoute(
+        page: SelectUserRoute.page,
+        path: "/selectors/user",
+        guards: [AuthGuard()],
+      ),
     ];
   }
 }
