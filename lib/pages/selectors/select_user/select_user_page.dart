@@ -3,6 +3,7 @@ import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/selectors/select_user/widgets/user_card.dart';
 import 'package:cloud/pages/selectors/select_user/widgets/user_item.dart';
 import 'package:cloud/services/tenant.dart';
+import 'package:cloud/widgets/search_app_tabbar/search_app_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -26,7 +27,7 @@ class SelectUserPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户选择'),
+        title: SearchAppTabbar(),
       ),
       body: SafeArea(
         child: Column(children: [
