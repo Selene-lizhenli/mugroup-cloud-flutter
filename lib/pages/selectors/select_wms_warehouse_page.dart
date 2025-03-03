@@ -23,6 +23,7 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
       }
 
       fetchWarehouses();
+      return null;
     }, []);
 
     return Scaffold(
