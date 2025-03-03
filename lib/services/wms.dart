@@ -28,3 +28,14 @@ Future<ApiResponse<List<Borrow>>> getBorrows(
         ),
       );
 }
+
+Future<Borrow> storeBorrow(Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/wms/stock/borrows", data: data)
+      .then((res) => Borrow.fromJson(res.data));
+}
+
+Future borrowIn(int borrowId, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/borrows/$borrowId/borrow_in",
+      data: data);
+}
