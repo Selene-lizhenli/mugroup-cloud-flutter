@@ -78,6 +78,10 @@ class TotalRecord extends HookConsumerWidget {
                   EasyLoading.show(status: '加载中...');
                   try {
                     if (cart?.type == CartType.borrowIn) {
+                      if (borrow == null) {
+                        EasyLoading.showInfo("请先选择借样单!");
+                        return;
+                      }
                       final data = {
                         "remark": "备注",
                         "return_items": productData
@@ -86,6 +90,10 @@ class TotalRecord extends HookConsumerWidget {
                       EasyLoading.showSuccess("还样成功!");
                     }
                     if (cart?.type == CartType.borrow) {
+                      if (warehouse == null) {
+                        EasyLoading.showInfo("请先选择仓库!");
+                        return;
+                      }
                       final data = {
                         "borrower_id": 2, // 借样人ID
                         "warehouse_id": warehouse!.id!,
