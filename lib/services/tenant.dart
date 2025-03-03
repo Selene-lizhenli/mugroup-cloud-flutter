@@ -10,3 +10,14 @@ Future<User?> fetchCurrentUser() async {
     return null;
   }
 }
+
+Future<List<User>?> fetchCurrentUsers() async {
+  try {
+    final res = await api.get('api/tenant/users');
+    return (res.data['data'] as List)
+        .map((e) => User.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } catch (e) {
+    return [];
+  }
+}

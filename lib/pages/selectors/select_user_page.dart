@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/selectors/widgets/user_card.dart';
 import 'package:cloud/pages/selectors/widgets/user_item.dart';
+import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,6 +14,15 @@ class SelectUserPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final users = useState<List<User>?>([]);
+
+    useEffect(() {
+      Future fetchUsers() async {
+        final resp = await fetchCurrentUsers();
+        users.value = resp;
+      }
+
+      fetchUsers();
+    }, []);
 
     return Scaffold(
       appBar: AppBar(
