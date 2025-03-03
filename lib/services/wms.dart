@@ -13,3 +13,15 @@ Future<ApiResponse<List<Warehouse>>> getWarehouses() async {
         ),
       );
 }
+
+Future<ApiResponse<List<Borrow>>> getBorrows() async {
+  return api.get("api/tenant/wms/stock/borrows").then(
+        (res) => ApiResponse<List<Borrow>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(Borrow.fromJson).toList();
+          },
+        ),
+      );
+}
