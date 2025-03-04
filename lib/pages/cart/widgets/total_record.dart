@@ -274,6 +274,18 @@ class TotalRecord extends HookConsumerWidget {
                       EasyLoading.dismiss();
                     }
                   }
+
+                  // 调拨入库
+                  if (cart?.type == CartType.transferIn) {
+                    try {
+                      EasyLoading.show(status: '加载中...');
+                      final data = {"items": productData};
+                      await transferIn(transfer!.id!, data);
+                      EasyLoading.showSuccess("调拨入库成功!");
+                    } finally {
+                      EasyLoading.dismiss();
+                    }
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
