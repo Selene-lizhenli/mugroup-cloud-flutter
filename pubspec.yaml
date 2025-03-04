@@ -63,6 +63,7 @@ dependencies:
   intl: ^0.18.1
   package_info_plus: 4.2.0
   version: ^3.0.2
+  flutter_app_update: ^3.2.2
     # path: ../flant
 
 dev_dependencies:

@@ -10,7 +10,7 @@ final cookieJar = PersistCookieJar(
   storage: FileStorage(app.temporaryDirectory.path),
 );
 
-final api = Dio(
+final silentApi = Dio(
   BaseOptions(
     // baseUrl: 'https://apifoxmock.com/m1/5861176-5547581-default',
     baseUrl: Config.apiUrl,
@@ -20,12 +20,13 @@ final api = Dio(
       'origin': "https://cloud.mugroup.com"
     },
   ),
-)
-  ..interceptors.add(
+)..interceptors.add(
     CookieManager(
       cookieJar,
     ),
-  )
+  );
+
+final api = silentApi.clone()
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       var cookies = await cookieJar.loadForRequest(options.uri);
