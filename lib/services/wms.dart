@@ -39,3 +39,19 @@ Future borrowIn(int borrowId, Map<String, dynamic>? data) async {
   return api.post("api/tenant/wms/stock/borrows/$borrowId/borrow_in",
       data: data);
 }
+
+Future<Transfer> fetchTransferByOrederNo(String orderNo) async {
+  return api
+      .get("api/tenant/wms/stock/transfers/order_no/$orderNo")
+      .then((res) => Transfer.fromJson(res.data));
+}
+
+Future addTransferItems(int transferId, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/transfers/$transferId/add_items",
+      data: data);
+}
+
+Future transferIn(int transferId, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/transfers/$transferId/transfer_in",
+      data: data);
+}
