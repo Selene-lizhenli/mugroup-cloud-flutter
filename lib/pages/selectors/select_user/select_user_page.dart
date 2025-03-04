@@ -18,14 +18,17 @@ class SelectUserPage extends HookConsumerWidget {
 
     final searchText = ref.watch(searchTextProvider);
 
-    useEffect(() {
-      Future fetchUsers() async {
-        final resp = await fetchCurrentUsers(query: searchText);
-        users.value = resp;
-      }
+    final debouncedInput =
+        useDebounced(searchText, const Duration(milliseconds: 500));
 
-      fetchUsers();
-    }, [searchText]);
+    Future fetchUsers(String? query) async {
+      final resp = await fetchCurrentUsers(query: query);
+      users.value = resp;
+    }
+
+    useEffect(() {
+      fetchUsers(debouncedInput);
+    }, [debouncedInput]);
 
     return Scaffold(
       appBar: AppBar(
