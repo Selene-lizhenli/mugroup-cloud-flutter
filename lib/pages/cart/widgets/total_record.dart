@@ -38,115 +38,140 @@ class TotalRecord extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          return Dialog(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Text(
-                        "确认",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          const Text("借样人:"),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              final selectedUser = await context.router
-                                  .push<User>(const SelectUserRoute());
-
-                              user.value = selectedUser;
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                              child: Text(user.value == null
-                                  ? "请选择用户"
-                                  : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})"),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          const Text("备注:"),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            child: TextField(
-                              controller: remarkController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("取消"),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              if (user.value == null) {
-                                EasyLoading.showInfo("请先选择用户!");
-                                return;
-                              }
-                              final productData = items
-                                  ?.map((item) => {
-                                        "product_id": item.sample.id,
-                                        "inout_qty": item.count
-                                      })
-                                  .toList();
-                              final data = {
-                                "borrower_id": user.value!.id, // 借样人ID
-                                "warehouse_id": warehouse!.id,
-                                "remark": remarkController.text,
-                                "products": productData
-                              };
-                              try {
-                                EasyLoading.show(status: '加载中...');
-                                await storeBorrow(data);
-                                EasyLoading.showSuccess("借样成功!");
-                                user.value = null;
-                                remarkController.clear();
-                                if (context.mounted) {
-                                  Navigator.of(context).pop();
-                                }
-                              } finally {
-                                EasyLoading.dismiss();
-                              }
-                            },
-                            child: const Text("提交"),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
             ),
+            title: const Text(
+              "确认借样",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "借样人",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final selectedUser = await context.router
+                        .push<User>(const SelectUserRoute());
+                    user.value = selectedUser;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.value == null
+                                ? "请选择用户"
+                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: user.value == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.keyboard_arrow_right,
+                            color: Colors.grey), // 添加右侧箭头
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "备注",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: remarkController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: "请输入备注",
+                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (user.value == null) {
+                    EasyLoading.showInfo("请先选择用户!");
+                    return;
+                  }
+                  final productData = items
+                      ?.map((item) => {
+                            "product_id": item.sample.id,
+                            "inout_qty": item.count,
+                          })
+                      .toList();
+                  final data = {
+                    "borrower_id": user.value!.id,
+                    "warehouse_id": warehouse!.id,
+                    "remark": remarkController.text,
+                    "products": productData
+                  };
+                  try {
+                    EasyLoading.show(status: '加载中...');
+                    await storeBorrow(data);
+                    EasyLoading.showSuccess("借样成功!");
+                    user.value = null;
+                    remarkController.clear();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  } finally {
+                    EasyLoading.dismiss();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           );
         },
       );
