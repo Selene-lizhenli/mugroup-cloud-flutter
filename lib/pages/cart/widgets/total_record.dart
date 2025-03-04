@@ -1,8 +1,12 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/cart_page.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TotalRecord extends HookConsumerWidget {
@@ -16,6 +20,8 @@ class TotalRecord extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = useState<User?>(null);
+    final remarkController = useTextEditingController();
     double totalPrice = items?.fold(0.0, (previousValue, item) {
           // 尝试将 purchaseCost 从 String 转换为 double
           double cost = double.tryParse(item.sample.purchaseCost ?? '0') ?? 0.0;
@@ -27,6 +33,124 @@ class TotalRecord extends HookConsumerWidget {
           return previousValue! + item.count;
         }) ??
         0;
+
+    void borrowDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Text(
+                        "确认",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          const Text("借样人:"),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final selectedUser = await context.router
+                                  .push<User>(const SelectUserRoute());
+
+                              user.value = selectedUser;
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: Text(user.value == null
+                                  ? "请选择用户"
+                                  : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})"),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          const Text("备注:"),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: TextField(
+                              controller: remarkController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("取消"),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              if (user.value == null) {
+                                EasyLoading.showInfo("请先选择用户!");
+                                return;
+                              }
+                              final productData = items
+                                  ?.map((item) => {
+                                        "product_id": item.sample.id,
+                                        "inout_qty": item.count
+                                      })
+                                  .toList();
+                              final data = {
+                                "borrower_id": user.value!.id, // 借样人ID
+                                "warehouse_id": warehouse!.id,
+                                "remark": remarkController.text,
+                                "products": productData
+                              };
+                              try {
+                                EasyLoading.show(status: '加载中...');
+                                await storeBorrow(data);
+                                EasyLoading.showSuccess("借样成功!");
+                                user.value = null;
+                                remarkController.clear();
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              } finally {
+                                EasyLoading.dismiss();
+                              }
+                            },
+                            child: const Text("提交"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
 
     return Container(
       height: 60,
@@ -75,25 +199,15 @@ class TotalRecord extends HookConsumerWidget {
                       EasyLoading.showInfo("请先选择仓库!");
                       return;
                     }
-                    _borrowDialog(context);
-                    // final productData = items
-                    //     ?.map((item) => {
-                    //           "product_id": item.sample.id,
-                    //           "inout_qty": item.count
-                    //         })
-                    //     .toList();
-                    // final data = {
-                    //   "borrower_id": 2, // 借样人ID
-                    //   "warehouse_id": warehouse!.id!,
-                    //   "remark": "备注",
-                    //   "products": productData
-                    // };
-                    // await storeBorrow(data);
-                    // EasyLoading.showSuccess("借样成功!");
+                    borrowDialog(context);
                   }
 
                   // 还样
                   if (cart?.type == CartType.borrowIn) {
+                    if (borrow == null) {
+                      EasyLoading.showInfo("请先选择借样单!");
+                      return;
+                    }
                     final productData = items
                         ?.map((item) => {
                               "product_id": item.sample.id,
@@ -101,10 +215,6 @@ class TotalRecord extends HookConsumerWidget {
                             })
                         .toList();
                     try {
-                      if (borrow == null) {
-                        EasyLoading.showInfo("请先选择借样单!");
-                        return;
-                      }
                       EasyLoading.show(status: '加载中...');
                       final data = {"return_items": productData};
                       await borrowIn(borrow!.id!, data);
@@ -134,47 +244,6 @@ class TotalRecord extends HookConsumerWidget {
           )
         ],
       ),
-    );
-  }
-
-  void _borrowDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const Dialog(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: SizedBox(
-              height: 200,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "确认",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text("用户选择"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text("备注输入"),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
