@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
