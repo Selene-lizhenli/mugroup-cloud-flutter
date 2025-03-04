@@ -9,6 +9,7 @@ import 'package:cloud/services/sample.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -119,10 +120,6 @@ class _CartPageState extends ConsumerState<CartPage> {
   void initState() {
     super.initState();
     receiver.start();
-    receiver.messages.listen((message) {
-      logger.d("接收到了消息");
-      logger.d(message.data?['com.android.decode.intentwedge.barcode_string']);
-    });
   }
 
   @override
@@ -149,6 +146,24 @@ class _CartPageState extends ConsumerState<CartPage> {
     final inoutWarehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
+    final barcode = useState<String?>(null);
+
+    void addItem(List<CartItem> items, Sample sample) {
+      bool exists = items.any((item) => item.sample == sample);
+
+      if (exists) {
+        for (CartItem item in items) {
+          if (item.sample == sample) {
+            setState(() {
+              item.count = item.count + 1;
+            });
+            break;
+          }
+        }
+      } else {
+        items.add(CartItem(sample: sample, count: 1));
+      }
+    }
 
     final header = useMemoized(() {
       if (cart.value?.type == CartType.borrowOut) {
@@ -270,6 +285,47 @@ class _CartPageState extends ConsumerState<CartPage> {
       );
     }
 
+    receiver.messages.listen((message) async {
+      var barcodeString =
+          message.data?["com.android.decode.intentwedge.barcode_string"];
+      if (barcodeString == null) {
+        return;
+      }
+      barcodeString = barcodeString.trim();
+      barcode.value = barcodeString;
+    });
+
+    final debouncedBarcode =
+        useDebounced(barcode.value, const Duration(milliseconds: 200));
+
+    useEffect(() {
+      if (debouncedBarcode == null) {
+        return;
+      }
+
+      if (isUrl(debouncedBarcode)) {
+        return;
+      }
+
+      getSample() async {
+        try {
+          EasyLoading.show(status: '加载中...');
+          var sample = await getSampleByBarcode(debouncedBarcode);
+
+          if (sample == null) {
+            EasyLoading.showInfo("库中未找到该样品!");
+          }
+          addItem(items, sample!);
+          barcode.value = null;
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+
+      getSample();
+      return null;
+    }, [debouncedBarcode]);
+
     return Scaffold(
       appBar: AppBar(
         title: InkWell(
@@ -390,9 +446,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                                                   sample: cartItem.sample,
                                                   count: cartItem.count,
                                                   onChange: (value) {
-                                                    setState(() {
-                                                      cartItem.count = value;
-                                                    });
+                                                    cartItem.count = value;
                                                   },
                                                 ),
                                               ),
