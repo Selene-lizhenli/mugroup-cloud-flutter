@@ -304,6 +304,7 @@ class _CartPageState extends ConsumerState<CartPage> {
       }
 
       if (isUrl(debouncedBarcode)) {
+        EasyLoading.showError("不支持该条码!");
         return;
       }
 
@@ -314,6 +315,7 @@ class _CartPageState extends ConsumerState<CartPage> {
 
           if (sample == null) {
             EasyLoading.showInfo("库中未找到该样品!");
+            return;
           }
           addItem(items, sample!);
           barcode.value = null;
