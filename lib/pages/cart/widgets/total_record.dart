@@ -14,12 +14,25 @@ class TotalRecord extends HookConsumerWidget {
   final Cart? cart;
   final Warehouse? warehouse;
   final Borrow? borrow;
+  final Transfer? transfer;
 
   const TotalRecord(
-      {super.key, this.items, this.cart, this.warehouse, this.borrow});
+      {super.key,
+      this.items,
+      this.cart,
+      this.warehouse,
+      this.borrow,
+      this.transfer});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Map<CartType, String> buttonText = {
+      CartType.borrowOut: "借样",
+      CartType.borrowIn: "还样",
+      CartType.transferIn: "调拨",
+      CartType.transferOut: "调拨",
+      CartType.inout: "盘点"
+    };
     final user = useState<User?>(null);
     final remarkController = useTextEditingController();
     double totalPrice = items?.fold(0.0, (previousValue, item) {
@@ -227,23 +240,36 @@ class TotalRecord extends HookConsumerWidget {
                     borrowDialog(context);
                   }
 
+                  final productData = items
+                      ?.map((item) => {
+                            "product_id": item.sample.id,
+                            "inout_qty": item.count
+                          })
+                      .toList();
+
                   // 还样
                   if (cart?.type == CartType.borrowIn) {
                     if (borrow == null) {
                       EasyLoading.showInfo("请先选择借样单!");
                       return;
                     }
-                    final productData = items
-                        ?.map((item) => {
-                              "product_id": item.sample.id,
-                              "inout_qty": item.count
-                            })
-                        .toList();
                     try {
                       EasyLoading.show(status: '加载中...');
                       final data = {"return_items": productData};
                       await borrowIn(borrow!.id!, data);
                       EasyLoading.showSuccess("还样成功!");
+                    } finally {
+                      EasyLoading.dismiss();
+                    }
+                  }
+
+                  // 调拨出库
+                  if (cart?.type == CartType.transferOut) {
+                    try {
+                      EasyLoading.show(status: '加载中...');
+                      final data = {"items": productData};
+                      await addTransferItems(transfer!.id!, data);
+                      EasyLoading.showSuccess("调拨出库成功!");
                     } finally {
                       EasyLoading.dismiss();
                     }
@@ -260,7 +286,7 @@ class TotalRecord extends HookConsumerWidget {
                   elevation: 5, // 设置按钮的阴影效果
                 ),
                 child: Text(
-                  cart?.type == CartType.borrowIn ? "还样" : "借样",
+                  buttonText[cart?.type] ?? "确认",
                   style: const TextStyle(
                     fontSize: 16.0, // 设置字体大小
                     fontWeight: FontWeight.bold, // 设置字体粗细
