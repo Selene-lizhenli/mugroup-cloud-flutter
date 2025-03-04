@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:version/version.dart';
 
 @RoutePage()
 class Layout extends StatefulHookConsumerWidget {
@@ -14,7 +16,19 @@ class Layout extends StatefulHookConsumerWidget {
 class _LayoutState extends ConsumerState<Layout> {
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
+    final checkVersion = useCallback(() async {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String testVersion = '1.0.0';
+
+      Version currentVersion = Version.parse(packageInfo.version);
+      Version latestVersion = Version.parse(testVersion);
+
+      bool needUpgrade = latestVersion > currentVersion;
+
+      if (!needUpgrade) {
+        return;
+      }
+
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         showDialog(
           context: context,
@@ -34,9 +48,13 @@ class _LayoutState extends ConsumerState<Layout> {
           },
         );
       });
+    }, []);
+
+    useEffect(() {
+      checkVersion();
 
       return null;
-    }, []);
+    }, [checkVersion]);
 
     return AutoTabsRouter(
       builder: (context, child) {
