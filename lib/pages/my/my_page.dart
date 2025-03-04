@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -49,30 +50,32 @@ class MyPage extends HookConsumerWidget {
             const SizedBox(height: 8),
             const ListTile(
               tileColor: Colors.white,
-              title: Text('设置'),
+              textColor: Colors.grey,
+              iconColor: Colors.grey,
+              title: Text('设置(建设中)'),
               leading: Icon(CupertinoIcons.gear_alt_fill),
               trailing: Icon(Icons.keyboard_arrow_right_rounded),
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                  onPressed: () async {
-                    await api.post("api/logout");
-                    authNotifier.logout();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.white,
-                    elevation: 0,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
+            ListTile(
+              tileColor: Colors.white,
+              title: const Center(child: Text('退出登录')),
+              onTap: () {
+                showFlanActionSheet(
+                  context,
+                  cancelText: "取消",
+                  actions: [
+                    FlanActionSheetAction(
+                      name: '退出登录',
+                      callback: (action) async {
+                        await api.post("api/logout");
+                        authNotifier.logout();
+                      },
                     ),
-                  ),
-                  child: const Text(
-                    '退出登录',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  )),
+                  ],
+                  closeOnClickAction: true,
+                );
+              },
             ),
           ],
         ),
