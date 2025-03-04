@@ -136,10 +136,14 @@ class _CartPageState extends ConsumerState<CartPage> {
     final carts = [
       Cart(CartType.borrowOut),
       Cart(CartType.borrowIn),
-      Cart(CartType.transferOut),
-      Cart(CartType.transferIn),
       Cart(CartType.inout)
     ];
+
+    final transferCarts = [
+      Cart(CartType.transferOut),
+      Cart(CartType.transferIn)
+    ];
+
     final cart = useState<Cart?>(null);
     final borrowWarehouse = useState<Warehouse?>(null);
     final inoutWarehouse = useState<Warehouse?>(null);
@@ -250,12 +254,12 @@ class _CartPageState extends ConsumerState<CartPage> {
       });
     }
 
-    selectCart() {
+    void selectCart(List<Cart> selectCarts) {
       showFlanActionSheet(
         context,
         description: "请选择一辆选样车",
         cancelText: "我再想想",
-        actions: carts
+        actions: selectCarts
             .map((cart) =>
                 FlanActionSheetAction(name: cart.name, disabled: cart.disabled))
             .toList(),
@@ -269,7 +273,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     return Scaffold(
       appBar: AppBar(
         title: InkWell(
-          onTap: () => selectCart(),
+          onTap: () => selectCart(carts),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.ideographic,
@@ -307,7 +311,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                               ),
                             ),
                           ),
-                          onTap: () => selectCart(),
+                          onTap: () => selectCart(carts),
                         )
                       else if (cart.value?.type == CartType.inout)
                         const Text('即将是手动盘点内容')
