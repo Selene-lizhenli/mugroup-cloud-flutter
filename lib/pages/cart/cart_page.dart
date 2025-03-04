@@ -34,6 +34,12 @@ enum CartType {
   /// 还样
   borrowIn,
 
+  /// 调拨出库
+  transferOut,
+
+  /// 调拨入库
+  transferIn,
+
   /// 手动盘点
   inout,
 }
@@ -52,6 +58,14 @@ class Cart {
       return "还样选样车";
     }
 
+    if (type == CartType.transferOut) {
+      return "调拨出库选样车";
+    }
+
+    if (type == CartType.transferIn) {
+      return "调拨入库选样车";
+    }
+
     if (type == CartType.inout) {
       return "手动盘点";
     }
@@ -65,6 +79,14 @@ class Cart {
     }
 
     if (type == CartType.borrowIn) {
+      return false;
+    }
+
+    if (type == CartType.transferOut) {
+      return false;
+    }
+
+    if (type == CartType.transferIn) {
       return false;
     }
 
@@ -110,11 +132,14 @@ class _CartPageState extends ConsumerState<CartPage> {
     final carts = [
       Cart(CartType.borrow),
       Cart(CartType.borrowIn),
+      Cart(CartType.transferOut),
+      Cart(CartType.transferIn),
       Cart(CartType.inout)
     ];
     final cart = useState<Cart?>(null);
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
+    final transfer = useState<Transfer?>(null);
 
     final header = useMemoized(() {
       if (cart.value?.type == CartType.borrow) {
@@ -155,7 +180,25 @@ class _CartPageState extends ConsumerState<CartPage> {
               children: [
                 Text(borrow.value == null
                     ? "请选择借样单"
-                    : borrow.value!.orderNo ?? "未设置借样单"),
+                    : borrow.value!.orderNo ?? "未设置借样单号"),
+                const Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+        );
+      }
+
+      if (cart.value?.type == CartType.transferOut ||
+          cart.value?.type == CartType.transferIn) {
+        return GestureDetector(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(transfer.value == null
+                    ? "请扫描调拨单二维码"
+                    : borrow.value!.orderNo ?? "未设置调拨单号"),
                 const Icon(Icons.chevron_right)
               ],
             ),
