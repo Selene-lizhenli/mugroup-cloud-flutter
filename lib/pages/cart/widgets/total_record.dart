@@ -69,42 +69,49 @@ class TotalRecord extends HookConsumerWidget {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
                 onPressed: () async {
-                  final productData = items
-                      ?.map((item) => {
-                            "product_id": item.sample.id,
-                            "inout_qty": item.count
-                          })
-                      .toList();
-                  EasyLoading.show(status: '加载中...');
-                  try {
-                    if (cart?.type == CartType.borrowIn) {
+                  // 借样
+                  if (cart?.type == CartType.borrow) {
+                    if (warehouse == null) {
+                      EasyLoading.showInfo("请先选择仓库!");
+                      return;
+                    }
+                    _borrowDialog(context);
+                    // final productData = items
+                    //     ?.map((item) => {
+                    //           "product_id": item.sample.id,
+                    //           "inout_qty": item.count
+                    //         })
+                    //     .toList();
+                    // final data = {
+                    //   "borrower_id": 2, // 借样人ID
+                    //   "warehouse_id": warehouse!.id!,
+                    //   "remark": "备注",
+                    //   "products": productData
+                    // };
+                    // await storeBorrow(data);
+                    // EasyLoading.showSuccess("借样成功!");
+                  }
+
+                  // 还样
+                  if (cart?.type == CartType.borrowIn) {
+                    final productData = items
+                        ?.map((item) => {
+                              "product_id": item.sample.id,
+                              "inout_qty": item.count
+                            })
+                        .toList();
+                    try {
                       if (borrow == null) {
                         EasyLoading.showInfo("请先选择借样单!");
                         return;
                       }
-                      final data = {
-                        "remark": "备注",
-                        "return_items": productData
-                      };
+                      EasyLoading.show(status: '加载中...');
+                      final data = {"return_items": productData};
                       await borrowIn(borrow!.id!, data);
                       EasyLoading.showSuccess("还样成功!");
+                    } finally {
+                      EasyLoading.dismiss();
                     }
-                    if (cart?.type == CartType.borrow) {
-                      if (warehouse == null) {
-                        EasyLoading.showInfo("请先选择仓库!");
-                        return;
-                      }
-                      final data = {
-                        "borrower_id": 2, // 借样人ID
-                        "warehouse_id": warehouse!.id!,
-                        "remark": "备注",
-                        "products": productData
-                      };
-                      await storeBorrow(data);
-                      EasyLoading.showSuccess("借样成功!");
-                    }
-                  } finally {
-                    EasyLoading.dismiss();
                   }
                 },
                 style: TextButton.styleFrom(
@@ -127,6 +134,47 @@ class TotalRecord extends HookConsumerWidget {
           )
         ],
       ),
+    );
+  }
+
+  void _borrowDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SizedBox(
+              height: 200,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "确认",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text("用户选择"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text("备注输入"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

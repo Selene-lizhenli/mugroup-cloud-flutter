@@ -116,7 +116,6 @@ class _CartPageState extends ConsumerState<CartPage> {
     final cart = useState<Cart?>(null);
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
-    final user = useState<User?>(null);
 
     final header = useMemoized(() {
       if (cart.value?.type == CartType.borrow) {
@@ -167,29 +166,6 @@ class _CartPageState extends ConsumerState<CartPage> {
 
       return GestureDetector();
     }, [cart.value, warehouse.value, borrow.value]);
-
-    final headeRight = useMemoized(() {
-      return GestureDetector(
-        onTap: () async {
-          final selectedUser =
-              await context.router.push<User>(const SelectUserRoute());
-
-          user.value = selectedUser;
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(Icons.chevron_left),
-              Text(user.value == null
-                  ? "请选择用户"
-                  : "${user.value!.name} (${user.value!.department?.name})"),
-            ],
-          ),
-        ),
-      );
-    }, [user.value]);
 
     Future fetchData() async {
       if (cart.value == null) {
@@ -286,18 +262,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    SliverPinnedHeader(
-                                        child: Row(
-                                      children: [
-                                        header,
-                                        const Expanded(child: Row()),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                          child: headeRight,
-                                        )
-                                      ],
-                                    )),
+                                    SliverPinnedHeader(child: header),
                                     SliverClip(
                                       child: MultiSliver(
                                         children: [
