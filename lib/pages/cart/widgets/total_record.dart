@@ -219,7 +219,7 @@ class TotalRecord extends HookConsumerWidget {
             child: TextButton(
                 onPressed: () async {
                   // 借样
-                  if (cart?.type == CartType.borrow) {
+                  if (cart?.type == CartType.borrowOut) {
                     if (warehouse == null) {
                       EasyLoading.showInfo("请先选择仓库!");
                       return;

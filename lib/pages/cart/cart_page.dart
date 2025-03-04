@@ -29,7 +29,7 @@ class CartItem {
 
 enum CartType {
   /// 借样
-  borrow,
+  borrowOut,
 
   /// 还样
   borrowIn,
@@ -50,7 +50,7 @@ class Cart {
   Cart(this.type);
 
   String get name {
-    if (type == CartType.borrow) {
+    if (type == CartType.borrowOut) {
       return "借样选样车";
     }
 
@@ -74,7 +74,7 @@ class Cart {
   }
 
   bool get disabled {
-    if (type == CartType.borrow) {
+    if (type == CartType.borrowOut) {
       return false;
     }
 
@@ -130,7 +130,7 @@ class _CartPageState extends ConsumerState<CartPage> {
   @override
   Widget build(BuildContext context) {
     final carts = [
-      Cart(CartType.borrow),
+      Cart(CartType.borrowOut),
       Cart(CartType.borrowIn),
       Cart(CartType.transferOut),
       Cart(CartType.transferIn),
@@ -142,7 +142,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     final transfer = useState<Transfer?>(null);
 
     final header = useMemoized(() {
-      if (cart.value?.type == CartType.borrow) {
+      if (cart.value?.type == CartType.borrowOut) {
         return GestureDetector(
           onTap: () async {
             final selectedWarehouse = await context.router
