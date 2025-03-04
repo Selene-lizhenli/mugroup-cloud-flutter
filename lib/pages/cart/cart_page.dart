@@ -146,7 +146,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     final inoutWarehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
-    final barcode = useState<String?>(null);
+    final sampleBarcode = useState<String?>(null);
 
     void addItem(List<CartItem> items, Sample sample) {
       bool exists = items.any((item) => item.sample == sample);
@@ -292,33 +292,31 @@ class _CartPageState extends ConsumerState<CartPage> {
         return;
       }
       barcodeString = barcodeString.trim();
-      barcode.value = barcodeString;
-    });
-
-    final debouncedBarcode =
-        useDebounced(barcode.value, const Duration(milliseconds: 200));
-
-    useEffect(() {
-      if (debouncedBarcode == null) {
-        return;
-      }
-
-      if (isUrl(debouncedBarcode)) {
+      if (isUrl(barcodeString)) {
         EasyLoading.showError("不支持该条码!");
         return;
       }
+      sampleBarcode.value = barcodeString;
+    });
 
+    final debouncedSampleBarcode =
+        useDebounced(sampleBarcode.value, const Duration(milliseconds: 200));
+
+    useEffect(() {
+      if (debouncedSampleBarcode == null) {
+        return;
+      }
       getSample() async {
         try {
           EasyLoading.show(status: '加载中...');
-          var sample = await getSampleByBarcode(debouncedBarcode);
+          var sample = await getSampleByBarcode(debouncedSampleBarcode);
 
           if (sample == null) {
             EasyLoading.showInfo("库中未找到该样品!");
             return;
           }
-          addItem(items, sample!);
-          barcode.value = null;
+          addItem(items, sample);
+          sampleBarcode.value = null;
         } finally {
           EasyLoading.dismiss();
         }
@@ -326,7 +324,7 @@ class _CartPageState extends ConsumerState<CartPage> {
 
       getSample();
       return null;
-    }, [debouncedBarcode]);
+    }, [debouncedSampleBarcode]);
 
     return Scaffold(
       appBar: AppBar(
