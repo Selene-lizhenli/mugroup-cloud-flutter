@@ -90,6 +90,10 @@ class Cart {
       return false;
     }
 
+    if (type == CartType.inout) {
+      return false;
+    }
+
     return true;
   }
 }
@@ -137,7 +141,8 @@ class _CartPageState extends ConsumerState<CartPage> {
       Cart(CartType.inout)
     ];
     final cart = useState<Cart?>(null);
-    final warehouse = useState<Warehouse?>(null);
+    final borrowWarehouse = useState<Warehouse?>(null);
+    final inoutWarehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
 
@@ -148,16 +153,16 @@ class _CartPageState extends ConsumerState<CartPage> {
             final selectedWarehouse = await context.router
                 .push<Warehouse>(const SelectWmsWarehouseRoute());
 
-            warehouse.value = selectedWarehouse;
+            borrowWarehouse.value = selectedWarehouse;
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(warehouse.value == null
+                Text(borrowWarehouse.value == null
                     ? "请选择仓库"
-                    : warehouse.value!.name ?? "未设置仓库名称"),
+                    : borrowWarehouse.value!.name ?? "未设置仓库名称"),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -206,8 +211,31 @@ class _CartPageState extends ConsumerState<CartPage> {
         );
       }
 
+      if (cart.value?.type == CartType.inout) {
+        return GestureDetector(
+          onTap: () async {
+            final selectedWarehouse = await context.router
+                .push<Warehouse>(const SelectWmsWarehouseRoute());
+
+            inoutWarehouse.value = selectedWarehouse;
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(inoutWarehouse.value == null
+                    ? "请选择仓库"
+                    : inoutWarehouse.value!.name ?? "未设置仓库名称"),
+                const Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+        );
+      }
+
       return GestureDetector();
-    }, [cart.value, warehouse.value, borrow.value]);
+    }, [cart.value, borrowWarehouse.value, borrow.value, inoutWarehouse.value]);
 
     Future fetchData() async {
       if (cart.value == null) {
@@ -281,6 +309,8 @@ class _CartPageState extends ConsumerState<CartPage> {
                           ),
                           onTap: () => selectCart(),
                         )
+                      else if (cart.value?.type == CartType.inout)
+                        const Text('即将是手动盘点内容')
                       else
                         SliverPadding(
                           padding: const EdgeInsets.only(
@@ -380,12 +410,15 @@ class _CartPageState extends ConsumerState<CartPage> {
             }(),
           ),
           if (items.isNotEmpty)
-            TotalRecord(
-              items: items,
-              cart: cart.value,
-              warehouse: warehouse.value,
-              borrow: borrow.value,
-            ),
+            if (cart.value?.type == CartType.inout)
+              const Text('盘点操作tabbar')
+            else
+              TotalRecord(
+                items: items,
+                cart: cart.value,
+                warehouse: borrowWarehouse.value,
+                borrow: borrow.value,
+              ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
