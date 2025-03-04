@@ -98,7 +98,7 @@ class TotalRecord extends HookConsumerWidget {
                 const SizedBox(height: 8),
                 TextField(
                   controller: remarkController,
-                  maxLines: 3,
+                  maxLines: 2,
                   decoration: InputDecoration(
                     hintText: "请输入备注",
                     hintStyle: TextStyle(color: Colors.grey.shade500),
