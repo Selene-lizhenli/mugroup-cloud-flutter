@@ -22,7 +22,8 @@ class SelectUserPage extends HookConsumerWidget {
         useDebounced(searchText, const Duration(milliseconds: 500));
 
     Future fetchUsers(String? query) async {
-      final resp = await fetchCurrentUsers(query: query);
+      final resp =
+          await fetchCurrentUsers(queryParameters: {"keywords": query});
       users.value = resp;
     }
 
