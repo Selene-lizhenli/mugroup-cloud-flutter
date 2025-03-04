@@ -40,10 +40,15 @@ Future borrowIn(int borrowId, Map<String, dynamic>? data) async {
       data: data);
 }
 
-Future<Transfer> fetchTransferByOrederNo(String orderNo) async {
+Future<Transfer?> fetchTransferByOrederNo(String orderNo) async {
   return api
       .get("api/tenant/wms/stock/transfers/order_no/$orderNo")
-      .then((res) => Transfer.fromJson(res.data));
+      .then((res) {
+    if (res.data == null) {
+      return null;
+    }
+    return Transfer.fromJson(res.data);
+  });
 }
 
 Future addTransferItems(int transferId, Map<String, dynamic>? data) async {

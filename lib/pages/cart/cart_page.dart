@@ -6,6 +6,7 @@ import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:cloud/services/wms.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
@@ -147,6 +148,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
     final sampleBarcode = useState<String?>(null);
+    final transferOrderNo = useState<String?>(null);
 
     void addItem(List<CartItem> items, Sample sample) {
       bool exists = items.any((item) => item.sample == sample);
@@ -222,7 +224,7 @@ class _CartPageState extends ConsumerState<CartPage> {
               children: [
                 Text(transfer.value == null
                     ? "请扫描调拨单二维码"
-                    : borrow.value!.orderNo ?? "未设置调拨单号"),
+                    : transfer.value!.orderNo ?? "未设置调拨单号"),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -280,7 +282,8 @@ class _CartPageState extends ConsumerState<CartPage> {
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {
-          cart.value = carts[index];
+          cart.value = selectCarts[index];
+          logger.d(cart.value?.type);
         },
       );
     }
@@ -293,6 +296,20 @@ class _CartPageState extends ConsumerState<CartPage> {
       }
       barcodeString = barcodeString.trim();
       if (isUrl(barcodeString)) {
+        RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
+
+        /// 解析结果为调拨单
+        if (transferExp.hasMatch(barcodeString)) {
+          RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
+          Match? match = transferOrderNoExp.firstMatch(barcodeString);
+          if (match == null) {
+            EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
+            return;
+          }
+          transferOrderNo.value = match.group(0);
+          return;
+        }
+
         EasyLoading.showError("不支持该条码!");
         return;
       }
@@ -300,7 +317,9 @@ class _CartPageState extends ConsumerState<CartPage> {
     });
 
     final debouncedSampleBarcode =
-        useDebounced(sampleBarcode.value, const Duration(milliseconds: 200));
+        useDebounced(sampleBarcode.value, const Duration(milliseconds: 300));
+    final debouncedTransferOrderNo =
+        useDebounced(transferOrderNo.value, const Duration(milliseconds: 300));
 
     useEffect(() {
       if (debouncedSampleBarcode == null) {
@@ -325,6 +344,33 @@ class _CartPageState extends ConsumerState<CartPage> {
       getSample();
       return null;
     }, [debouncedSampleBarcode]);
+
+    useEffect(() {
+      if (debouncedTransferOrderNo == null) {
+        return;
+      }
+      getTransfer() async {
+        try {
+          EasyLoading.show(status: '加载中...');
+          var transfer1 =
+              await fetchTransferByOrederNo(debouncedTransferOrderNo);
+
+          if (transfer1 == null) {
+            EasyLoading.showInfo("系统中未找到该调拨单!");
+            return;
+          }
+          transfer.value = transfer1;
+          logger.d(transfer.value);
+          selectCart(transferCarts);
+          transferOrderNo.value = null;
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+
+      getTransfer();
+      return null;
+    }, [debouncedTransferOrderNo]);
 
     return Scaffold(
       appBar: AppBar(
