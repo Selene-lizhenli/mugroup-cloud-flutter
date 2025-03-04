@@ -57,6 +57,7 @@ class LoginPage extends HookWidget {
 
         //登录后跳转
         if (qrcodeState.value?.usedAt != null) {
+          await app.fetchUser();
           afterLogin();
         }
 
@@ -107,12 +108,14 @@ class LoginPage extends HookWidget {
                     children: [
                       Text(
                         qrcodeState.value!.user?.name ?? '未知用户',
-                        style: const TextStyle(color: Colors.blue, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.blue, fontSize: 16),
                       ),
                       const SizedBox(height: 18), // 添加间距
                       Text(
                         qrcodeState.value!.user?.jobNumber ?? '无工号',
-                        style: const TextStyle(color: Colors.blue, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.blue, fontSize: 14),
                       ),
                     ],
                   ),
@@ -121,8 +124,7 @@ class LoginPage extends HookWidget {
             // 默认展示已有二维码
             else
               QrImageView(
-                data:
-                    '${Config.webUrl}login/qrcode/${qrcodeState.value!.id}',
+                data: '${Config.webUrl}login/qrcode/${qrcodeState.value!.id}',
                 version: QrVersions.auto,
                 size: 200.0,
                 backgroundColor: Colors.white,
