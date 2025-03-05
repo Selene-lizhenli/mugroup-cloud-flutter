@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
@@ -125,6 +126,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
+    final user = useState<User?>(null);
 
     final addItemByBarcode = useCallback((String barcode) async {
       bool exists = items.any((item) => item.sample.barcode == barcode);
@@ -317,6 +319,194 @@ class _CartPageState extends ConsumerState<CartPage> {
       };
     }, [addItemByBarcode]);
 
+    void borrowDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: const Text(
+              "确认借样",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "借样人",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final selectedUser = await context.router
+                        .push<User>(const SelectUserRoute());
+                    user.value = selectedUser;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.value == null
+                                ? "请选择用户"
+                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: user.value == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.keyboard_arrow_right,
+                            color: Colors.grey), // 添加右侧箭头
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (user.value == null) {
+                    EasyLoading.showInfo("请先选择用户!");
+                    return;
+                  }
+                  final productData = items
+                      .map((item) => {
+                            "product_id": item.sample.id,
+                            "inout_qty": item.count,
+                          })
+                      .toList();
+                  final data = {
+                    "borrower_id": user.value?.id,
+                    "warehouse_id": warehouse.value?.id,
+                    "products": productData
+                  };
+                  try {
+                    EasyLoading.show(status: '加载中...');
+                    await storeBorrow(data);
+                    EasyLoading.showSuccess("借样成功!");
+                    user.value = null;
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  } finally {
+                    EasyLoading.dismiss();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    void onPressed() async {
+      // 借样
+      if (cart.value?.type == CartType.borrowOut) {
+        if (warehouse.value == null) {
+          EasyLoading.showInfo("请先选择仓库!");
+          return;
+        }
+        borrowDialog(context);
+      }
+
+      final productData = items
+          .map(
+              (item) => {"product_id": item.sample.id, "inout_qty": item.count})
+          .toList();
+
+      // 还样
+      if (cart.value?.type == CartType.borrowIn) {
+        if (borrow.value == null) {
+          EasyLoading.showInfo("请先选择借样单!");
+          return;
+        }
+        try {
+          EasyLoading.show(status: '加载中...');
+          final data = {"return_items": productData};
+          await borrowIn(borrow.value!.id!, data);
+          EasyLoading.showSuccess("还样成功!");
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+
+      // 调拨出库
+      if (cart.value?.type == CartType.transferOut) {
+        if (transfer.value == null) {
+          EasyLoading.showInfo("请先扫描调拨单号!");
+          return;
+        }
+        try {
+          EasyLoading.show(status: '加载中...');
+          final data = {"items": productData};
+          await addTransferItems(transfer.value!.id!, data);
+          EasyLoading.showSuccess("调拨出库成功!");
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+
+      // 调拨入库
+      if (cart.value?.type == CartType.transferIn) {
+        if (transfer.value == null) {
+          EasyLoading.showInfo("请先扫描调拨单号!");
+          return;
+        }
+        try {
+          EasyLoading.show(status: '加载中...');
+          final data = {"items": productData};
+          await transferIn(transfer.value!.id!, data);
+          EasyLoading.showSuccess("调拨入库成功!");
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+
+      //盘点
+      if (cart.value?.type == CartType.inout) {
+        if (warehouse.value == null) {
+          EasyLoading.showInfo("请先选择仓库!");
+          return;
+        }
+        if (context.mounted) {
+          context.router
+              .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: InkWell(
@@ -467,9 +657,7 @@ class _CartPageState extends ConsumerState<CartPage> {
             TotalRecord(
               items: items,
               cart: cart.value,
-              warehouse: warehouse.value,
-              borrow: borrow.value,
-              transfer: transfer.value,
+              onPressed: onPressed,
             ),
         ],
       ),
