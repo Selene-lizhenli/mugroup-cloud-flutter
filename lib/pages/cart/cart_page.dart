@@ -116,19 +116,15 @@ class _CartPageState extends ConsumerState<CartPage> {
     final carts = [
       Cart(CartType.borrowOut),
       Cart(CartType.borrowIn),
-      Cart(CartType.inout)
-    ];
-
-    final transferCarts = [
       Cart(CartType.transferOut),
-      Cart(CartType.transferIn)
+      Cart(CartType.transferIn),
+      Cart(CartType.inout)
     ];
 
     final cart = useState<Cart?>(null);
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
-    final transferOrderNo = useState<String?>(null);
 
     final addItemByBarcode = useCallback((String barcode) async {
       bool exists = items.any((item) => item.sample.barcode == barcode);
@@ -154,6 +150,25 @@ class _CartPageState extends ConsumerState<CartPage> {
         setState(() {
           items.add(CartItem(sample: sample, count: 1));
         });
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }, []);
+
+    final setTranferByOrderNo = useCallback((String orderNo) async {
+      if (transfer.value?.orderNo == orderNo) {
+        EasyLoading.showInfo("已选中该调拨单!");
+        return;
+      }
+      try {
+        EasyLoading.show(status: '加载中...');
+        var transfer1 = await fetchTransferByOrederNo(orderNo);
+
+        if (transfer1 == null) {
+          EasyLoading.showInfo("系统中未找到该调拨单!");
+          return;
+        }
+        transfer.value = transfer1;
       } finally {
         EasyLoading.dismiss();
       }
@@ -226,7 +241,7 @@ class _CartPageState extends ConsumerState<CartPage> {
       }
 
       return GestureDetector();
-    }, [cart.value, warehouse.value, borrow.value]);
+    }, [cart.value, warehouse.value, borrow.value, transfer.value]);
 
     Future fetchData() async {
       if (cart.value == null) {
@@ -268,7 +283,6 @@ class _CartPageState extends ConsumerState<CartPage> {
       final sub = receiver.messages.listen((message) async {
         var barcodeString =
             message.data?["com.android.decode.intentwedge.barcode_string"];
-        logger.d(barcodeString);
         if (barcodeString == null) {
           return;
         }
@@ -284,11 +298,10 @@ class _CartPageState extends ConsumerState<CartPage> {
               EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
               return;
             }
-            transferOrderNo.value = match.group(0);
-            // 处理流转选样车
+            var orderNo = match.group(0)!;
+            setTranferByOrderNo(orderNo);
             return;
           }
-
           EasyLoading.showError("不支持该条码!");
           return;
         } else {
