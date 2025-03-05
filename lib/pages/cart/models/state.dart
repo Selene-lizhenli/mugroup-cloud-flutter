@@ -20,10 +20,10 @@ enum CartType {
   inout,
 }
 
-@freezed
+@unfreezed
 abstract class CartItem with _$CartItem {
-  const factory CartItem({
-    required Sample sample,
+  factory CartItem({
+    required final Sample sample,
     required int count,
   }) = _CartItem;
 }

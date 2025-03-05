@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$CartItem {
   Sample get sample => throw _privateConstructorUsedError;
   int get count => throw _privateConstructorUsedError;
+  set count(int value) => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $CartItemCopyWith<CartItem> get copyWith =>
@@ -115,29 +116,17 @@ class __$$CartItemImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$CartItemImpl implements _CartItem {
-  const _$CartItemImpl({required this.sample, required this.count});
+  _$CartItemImpl({required this.sample, required this.count});
 
   @override
   final Sample sample;
   @override
-  final int count;
+  int count;
 
   @override
   String toString() {
     return 'CartItem(sample: $sample, count: $count)';
   }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CartItemImpl &&
-            (identical(other.sample, sample) || other.sample == sample) &&
-            (identical(other.count, count) || other.count == count));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, sample, count);
 
   @JsonKey(ignore: true)
   @override
@@ -147,14 +136,14 @@ class _$CartItemImpl implements _CartItem {
 }
 
 abstract class _CartItem implements CartItem {
-  const factory _CartItem(
-      {required final Sample sample,
-      required final int count}) = _$CartItemImpl;
+  factory _CartItem({required final Sample sample, required int count}) =
+      _$CartItemImpl;
 
   @override
   Sample get sample;
   @override
   int get count;
+  set count(int value);
   @override
   @JsonKey(ignore: true)
   _$$CartItemImplCopyWith<_$CartItemImpl> get copyWith =>

@@ -621,7 +621,8 @@ class CartPage extends HookConsumerWidget {
                                                     }
 
                                                     // TODO: api
-                                                    // xxx.addSample(cartItem.sample, 1);
+                                                    xx.setSample(
+                                                        cartItem.sample, value);
                                                   },
                                                 ),
                                               ),
