@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/wms/inventory.dart';
 import 'package:cloud/models/wms/inventoryItem.dart';
 import 'package:cloud/models/wms/warehouse.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_card.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_item.dart';
+import 'package:cloud/pages/confirm/widgets/confirm_tabbar.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -21,7 +23,7 @@ class ConfirmPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inventoryItems = useState<List<InventoryItem>?>(null);
+    final inventory = useState<Inventory?>(null);
 
     useEffect(() {
       getInventories() async {
@@ -39,7 +41,7 @@ class ConfirmPage extends HookConsumerWidget {
           };
           var resp = await storeInventory(data);
 
-          inventoryItems.value = resp.items;
+          inventory.value = resp;
           print(resp);
         } finally {
           EasyLoading.dismiss();
@@ -62,7 +64,7 @@ class ConfirmPage extends HookConsumerWidget {
               MultiSliver(children: [
                 Column(
                   children: items?.map((item) {
-                        final matchedInventoryItem = inventoryItems.value
+                        final matchedInventoryItem = inventory.value?.items
                             ?.firstWhere(
                                 (inventoryItem) =>
                                     inventoryItem.productId == item.sample.id,
@@ -88,7 +90,7 @@ class ConfirmPage extends HookConsumerWidget {
               ])
             ],
           )),
-          // const ConfirmTabbar(inventory);
+          ConfirmTabbar(inventory: inventory.value),
         ],
       )),
     );

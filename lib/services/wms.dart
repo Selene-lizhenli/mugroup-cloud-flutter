@@ -73,6 +73,6 @@ Future<Inventory> storeInventory(Map<String, dynamic>? data) async {
 
 Future confirmInventory(int inventoryId) async {
   return api.post(
-    "api/tenant/wms/stock/inventoies/$inventoryId/confirm",
+    "api/tenant/wms/stock/inventories/$inventoryId/confirm",
   );
 }
