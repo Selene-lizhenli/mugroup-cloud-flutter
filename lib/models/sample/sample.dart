@@ -9,6 +9,7 @@ part 'sample.g.dart';
 abstract class Sample with _$Sample {
   const factory Sample({
     int? id,
+    String? barcode,
     @JsonKey(name: 'name_cn') String? nameCn,
     @JsonKey(name: 'product_no') String? productNo,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,

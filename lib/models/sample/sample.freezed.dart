@@ -21,6 +21,7 @@ Sample _$SampleFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Sample {
   int? get id => throw _privateConstructorUsedError;
+  String? get barcode => throw _privateConstructorUsedError;
   @JsonKey(name: 'name_cn')
   String? get nameCn => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_no')
@@ -41,6 +42,7 @@ abstract class $SampleCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      String? barcode,
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
@@ -61,6 +63,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
   @override
   $Res call({
     Object? id = freezed,
+    Object? barcode = freezed,
     Object? nameCn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
@@ -71,6 +74,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      barcode: freezed == barcode
+          ? _value.barcode
+          : barcode // ignore: cast_nullable_to_non_nullable
+              as String?,
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
@@ -100,6 +107,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      String? barcode,
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
@@ -118,6 +126,7 @@ class __$$SampleImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? barcode = freezed,
     Object? nameCn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
@@ -128,6 +137,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      barcode: freezed == barcode
+          ? _value.barcode
+          : barcode // ignore: cast_nullable_to_non_nullable
+              as String?,
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
@@ -153,6 +166,7 @@ class __$$SampleImplCopyWithImpl<$Res>
 class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   const _$SampleImpl(
       {this.id,
+      this.barcode,
       @JsonKey(name: 'name_cn') this.nameCn,
       @JsonKey(name: 'product_no') this.productNo,
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
@@ -164,6 +178,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 
   @override
   final int? id;
+  @override
+  final String? barcode;
   @override
   @JsonKey(name: 'name_cn')
   final String? nameCn;
@@ -185,7 +201,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, image: $image)';
   }
 
   @override
@@ -194,6 +210,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
     properties
       ..add(DiagnosticsProperty('type', 'Sample'))
       ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('barcode', barcode))
       ..add(DiagnosticsProperty('nameCn', nameCn))
       ..add(DiagnosticsProperty('productNo', productNo))
       ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
@@ -206,6 +223,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
         (other.runtimeType == runtimeType &&
             other is _$SampleImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.barcode, barcode) || other.barcode == barcode) &&
             (identical(other.nameCn, nameCn) || other.nameCn == nameCn) &&
             (identical(other.productNo, productNo) ||
                 other.productNo == productNo) &&
@@ -216,7 +234,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, nameCn, productNo,
+  int get hashCode => Object.hash(runtimeType, id, barcode, nameCn, productNo,
       purchaseCost, const DeepCollectionEquality().hash(_image));
 
   @JsonKey(ignore: true)
@@ -236,6 +254,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 abstract class _Sample implements Sample {
   const factory _Sample(
       {final int? id,
+      final String? barcode,
       @JsonKey(name: 'name_cn') final String? nameCn,
       @JsonKey(name: 'product_no') final String? productNo,
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
@@ -245,6 +264,8 @@ abstract class _Sample implements Sample {
 
   @override
   int? get id;
+  @override
+  String? get barcode;
   @override
   @JsonKey(name: 'name_cn')
   String? get nameCn;
