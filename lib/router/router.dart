@@ -32,6 +32,7 @@ class AppRouter extends RootStackRouter {
       ),
 
       AutoRoute(page: LoginRoute.page, path: "/login"),
+      AutoRoute(page: ScanRoute.page, path: "/scan"),
 
       // selectors
       AutoRoute(

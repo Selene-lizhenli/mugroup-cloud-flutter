@@ -442,7 +442,12 @@ class CartPage extends HookConsumerWidget {
             },
             menuChildren: [
               MenuItemButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final codes = await context.router
+                      .push<List<String>>(const ScanRoute());
+
+                  // TODO:
+                },
                 child: const Row(
                   children: [
                     Icon(Icons.camera_alt),
