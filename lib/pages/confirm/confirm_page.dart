@@ -3,6 +3,7 @@ import 'package:cloud/models/wms/warehouse.dart';
 import 'package:cloud/pages/cart/cart_page.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_card.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_item.dart';
+import 'package:cloud/pages/confirm/widgets/confirm_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -40,7 +41,8 @@ class ConfirmPage extends HookConsumerWidget {
                 )
               ])
             ],
-          ))
+          )),
+          const ConfirmTabbar()
         ],
       )),
     );
