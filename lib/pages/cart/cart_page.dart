@@ -524,6 +524,35 @@ class CartPage extends HookConsumerWidget {
             ],
           ),
         ),
+        actions: [
+          MenuAnchor(
+            builder: (BuildContext context, MenuController controller,
+                Widget? child) {
+              return IconButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                icon: const Icon(Icons.add_circle_outline),
+              );
+            },
+            menuChildren: [
+              MenuItemButton(
+                onPressed: () {},
+                child: const Row(
+                  children: [
+                    Icon(Icons.camera_alt),
+                    SizedBox(width: 8),
+                    Text('扫一扫'),
+                  ],
+                ),
+              )
+            ],
+          )
+        ],
       ),
       body: Column(
         children: [
