@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'inventoryItems.dart';
+part of 'inventoryItem.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$InventoryItemsImpl _$$InventoryItemsImplFromJson(Map<String, dynamic> json) =>
-    _$InventoryItemsImpl(
+_$InventoryItemImpl _$$InventoryItemImplFromJson(Map<String, dynamic> json) =>
+    _$InventoryItemImpl(
       id: (json['id'] as num?)?.toInt(),
       inventoryId: (json['inventory_id'] as num?)?.toInt(),
       productId: (json['product_id'] as num?)?.toInt(),
@@ -15,8 +15,7 @@ _$InventoryItemsImpl _$$InventoryItemsImplFromJson(Map<String, dynamic> json) =>
       newQty: (json['new_qty'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$InventoryItemsImplToJson(
-        _$InventoryItemsImpl instance) =>
+Map<String, dynamic> _$$InventoryItemImplToJson(_$InventoryItemImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'inventory_id': instance.inventoryId,

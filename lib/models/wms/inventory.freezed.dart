@@ -26,7 +26,8 @@ mixin _$Inventory {
   String? get orderNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   int? get userId => throw _privateConstructorUsedError;
-  InventoryItems? get items => throw _privateConstructorUsedError;
+  @JsonKey(name: 'items')
+  List<InventoryItem>? get items => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -44,9 +45,7 @@ abstract class $InventoryCopyWith<$Res> {
       String? status,
       @JsonKey(name: 'order_no') String? orderNo,
       @JsonKey(name: 'user_id') int? userId,
-      InventoryItems? items});
-
-  $InventoryItemsCopyWith<$Res>? get items;
+      @JsonKey(name: 'items') List<InventoryItem>? items});
 }
 
 /// @nodoc
@@ -88,20 +87,8 @@ class _$InventoryCopyWithImpl<$Res, $Val extends Inventory>
       items: freezed == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
-              as InventoryItems?,
+              as List<InventoryItem>?,
     ) as $Val);
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $InventoryItemsCopyWith<$Res>? get items {
-    if (_value.items == null) {
-      return null;
-    }
-
-    return $InventoryItemsCopyWith<$Res>(_value.items!, (value) {
-      return _then(_value.copyWith(items: value) as $Val);
-    });
   }
 }
 
@@ -118,10 +105,7 @@ abstract class _$$InventoryImplCopyWith<$Res>
       String? status,
       @JsonKey(name: 'order_no') String? orderNo,
       @JsonKey(name: 'user_id') int? userId,
-      InventoryItems? items});
-
-  @override
-  $InventoryItemsCopyWith<$Res>? get items;
+      @JsonKey(name: 'items') List<InventoryItem>? items});
 }
 
 /// @nodoc
@@ -159,9 +143,9 @@ class __$$InventoryImplCopyWithImpl<$Res>
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
       items: freezed == items
-          ? _value.items
+          ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
-              as InventoryItems?,
+              as List<InventoryItem>?,
     ));
   }
 }
@@ -174,7 +158,8 @@ class _$InventoryImpl implements _Inventory {
       this.status,
       @JsonKey(name: 'order_no') this.orderNo,
       @JsonKey(name: 'user_id') this.userId,
-      this.items});
+      @JsonKey(name: 'items') final List<InventoryItem>? items})
+      : _items = items;
 
   factory _$InventoryImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryImplFromJson(json);
@@ -189,8 +174,16 @@ class _$InventoryImpl implements _Inventory {
   @override
   @JsonKey(name: 'user_id')
   final int? userId;
+  final List<InventoryItem>? _items;
   @override
-  final InventoryItems? items;
+  @JsonKey(name: 'items')
+  List<InventoryItem>? get items {
+    final value = _items;
+    if (value == null) return null;
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
@@ -206,13 +199,13 @@ class _$InventoryImpl implements _Inventory {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.orderNo, orderNo) || other.orderNo == orderNo) &&
             (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.items, items) || other.items == items));
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, status, orderNo, userId, items);
+  int get hashCode => Object.hash(runtimeType, id, status, orderNo, userId,
+      const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
@@ -230,11 +223,12 @@ class _$InventoryImpl implements _Inventory {
 
 abstract class _Inventory implements Inventory {
   const factory _Inventory(
-      {final int? id,
-      final String? status,
-      @JsonKey(name: 'order_no') final String? orderNo,
-      @JsonKey(name: 'user_id') final int? userId,
-      final InventoryItems? items}) = _$InventoryImpl;
+          {final int? id,
+          final String? status,
+          @JsonKey(name: 'order_no') final String? orderNo,
+          @JsonKey(name: 'user_id') final int? userId,
+          @JsonKey(name: 'items') final List<InventoryItem>? items}) =
+      _$InventoryImpl;
 
   factory _Inventory.fromJson(Map<String, dynamic> json) =
       _$InventoryImpl.fromJson;
@@ -250,7 +244,8 @@ abstract class _Inventory implements Inventory {
   @JsonKey(name: 'user_id')
   int? get userId;
   @override
-  InventoryItems? get items;
+  @JsonKey(name: 'items')
+  List<InventoryItem>? get items;
   @override
   @JsonKey(ignore: true)
   _$$InventoryImplCopyWith<_$InventoryImpl> get copyWith =>

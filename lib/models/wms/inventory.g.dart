@@ -12,9 +12,9 @@ _$InventoryImpl _$$InventoryImplFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String?,
       orderNo: json['order_no'] as String?,
       userId: (json['user_id'] as num?)?.toInt(),
-      items: json['items'] == null
-          ? null
-          : InventoryItems.fromJson(json['items'] as Map<String, dynamic>),
+      items: (json['items'] as List<dynamic>?)
+          ?.map((e) => InventoryItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$InventoryImplToJson(_$InventoryImpl instance) =>

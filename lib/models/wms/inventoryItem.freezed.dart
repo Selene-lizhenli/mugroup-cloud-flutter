@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'inventoryItems.dart';
+part of 'inventoryItem.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,12 +14,12 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-InventoryItems _$InventoryItemsFromJson(Map<String, dynamic> json) {
-  return _InventoryItems.fromJson(json);
+InventoryItem _$InventoryItemFromJson(Map<String, dynamic> json) {
+  return _InventoryItem.fromJson(json);
 }
 
 /// @nodoc
-mixin _$InventoryItems {
+mixin _$InventoryItem {
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'inventory_id')
   int? get inventoryId => throw _privateConstructorUsedError;
@@ -32,15 +32,15 @@ mixin _$InventoryItems {
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $InventoryItemsCopyWith<InventoryItems> get copyWith =>
+  $InventoryItemCopyWith<InventoryItem> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $InventoryItemsCopyWith<$Res> {
-  factory $InventoryItemsCopyWith(
-          InventoryItems value, $Res Function(InventoryItems) then) =
-      _$InventoryItemsCopyWithImpl<$Res, InventoryItems>;
+abstract class $InventoryItemCopyWith<$Res> {
+  factory $InventoryItemCopyWith(
+          InventoryItem value, $Res Function(InventoryItem) then) =
+      _$InventoryItemCopyWithImpl<$Res, InventoryItem>;
   @useResult
   $Res call(
       {int? id,
@@ -51,9 +51,9 @@ abstract class $InventoryItemsCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$InventoryItemsCopyWithImpl<$Res, $Val extends InventoryItems>
-    implements $InventoryItemsCopyWith<$Res> {
-  _$InventoryItemsCopyWithImpl(this._value, this._then);
+class _$InventoryItemCopyWithImpl<$Res, $Val extends InventoryItem>
+    implements $InventoryItemCopyWith<$Res> {
+  _$InventoryItemCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -95,11 +95,11 @@ class _$InventoryItemsCopyWithImpl<$Res, $Val extends InventoryItems>
 }
 
 /// @nodoc
-abstract class _$$InventoryItemsImplCopyWith<$Res>
-    implements $InventoryItemsCopyWith<$Res> {
-  factory _$$InventoryItemsImplCopyWith(_$InventoryItemsImpl value,
-          $Res Function(_$InventoryItemsImpl) then) =
-      __$$InventoryItemsImplCopyWithImpl<$Res>;
+abstract class _$$InventoryItemImplCopyWith<$Res>
+    implements $InventoryItemCopyWith<$Res> {
+  factory _$$InventoryItemImplCopyWith(
+          _$InventoryItemImpl value, $Res Function(_$InventoryItemImpl) then) =
+      __$$InventoryItemImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -111,11 +111,11 @@ abstract class _$$InventoryItemsImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$InventoryItemsImplCopyWithImpl<$Res>
-    extends _$InventoryItemsCopyWithImpl<$Res, _$InventoryItemsImpl>
-    implements _$$InventoryItemsImplCopyWith<$Res> {
-  __$$InventoryItemsImplCopyWithImpl(
-      _$InventoryItemsImpl _value, $Res Function(_$InventoryItemsImpl) _then)
+class __$$InventoryItemImplCopyWithImpl<$Res>
+    extends _$InventoryItemCopyWithImpl<$Res, _$InventoryItemImpl>
+    implements _$$InventoryItemImplCopyWith<$Res> {
+  __$$InventoryItemImplCopyWithImpl(
+      _$InventoryItemImpl _value, $Res Function(_$InventoryItemImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -127,7 +127,7 @@ class __$$InventoryItemsImplCopyWithImpl<$Res>
     Object? previousQty = freezed,
     Object? newQty = freezed,
   }) {
-    return _then(_$InventoryItemsImpl(
+    return _then(_$InventoryItemImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -154,16 +154,16 @@ class __$$InventoryItemsImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$InventoryItemsImpl implements _InventoryItems {
-  const _$InventoryItemsImpl(
+class _$InventoryItemImpl implements _InventoryItem {
+  const _$InventoryItemImpl(
       {this.id,
       @JsonKey(name: 'inventory_id') this.inventoryId,
       @JsonKey(name: 'product_id') this.productId,
       @JsonKey(name: 'previous_qty') this.previousQty,
       @JsonKey(name: 'new_qty') this.newQty});
 
-  factory _$InventoryItemsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$InventoryItemsImplFromJson(json);
+  factory _$InventoryItemImpl.fromJson(Map<String, dynamic> json) =>
+      _$$InventoryItemImplFromJson(json);
 
   @override
   final int? id;
@@ -182,14 +182,14 @@ class _$InventoryItemsImpl implements _InventoryItems {
 
   @override
   String toString() {
-    return 'InventoryItems(id: $id, inventoryId: $inventoryId, productId: $productId, previousQty: $previousQty, newQty: $newQty)';
+    return 'InventoryItem(id: $id, inventoryId: $inventoryId, productId: $productId, previousQty: $previousQty, newQty: $newQty)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$InventoryItemsImpl &&
+            other is _$InventoryItemImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.inventoryId, inventoryId) ||
                 other.inventoryId == inventoryId) &&
@@ -208,28 +208,27 @@ class _$InventoryItemsImpl implements _InventoryItems {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$InventoryItemsImplCopyWith<_$InventoryItemsImpl> get copyWith =>
-      __$$InventoryItemsImplCopyWithImpl<_$InventoryItemsImpl>(
-          this, _$identity);
+  _$$InventoryItemImplCopyWith<_$InventoryItemImpl> get copyWith =>
+      __$$InventoryItemImplCopyWithImpl<_$InventoryItemImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventoryItemsImplToJson(
+    return _$$InventoryItemImplToJson(
       this,
     );
   }
 }
 
-abstract class _InventoryItems implements InventoryItems {
-  const factory _InventoryItems(
+abstract class _InventoryItem implements InventoryItem {
+  const factory _InventoryItem(
       {final int? id,
       @JsonKey(name: 'inventory_id') final int? inventoryId,
       @JsonKey(name: 'product_id') final int? productId,
       @JsonKey(name: 'previous_qty') final int? previousQty,
-      @JsonKey(name: 'new_qty') final int? newQty}) = _$InventoryItemsImpl;
+      @JsonKey(name: 'new_qty') final int? newQty}) = _$InventoryItemImpl;
 
-  factory _InventoryItems.fromJson(Map<String, dynamic> json) =
-      _$InventoryItemsImpl.fromJson;
+  factory _InventoryItem.fromJson(Map<String, dynamic> json) =
+      _$InventoryItemImpl.fromJson;
 
   @override
   int? get id;
@@ -247,6 +246,6 @@ abstract class _InventoryItems implements InventoryItems {
   int? get newQty;
   @override
   @JsonKey(ignore: true)
-  _$$InventoryItemsImplCopyWith<_$InventoryItemsImpl> get copyWith =>
+  _$$InventoryItemImplCopyWith<_$InventoryItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
