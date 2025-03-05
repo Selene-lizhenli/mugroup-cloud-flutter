@@ -10,7 +10,7 @@ class ConfirmItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     var cover = item?.sample.image?.elementAtOrNull(0)?.thumbUrl;
-    
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -21,10 +21,11 @@ class ConfirmItem extends HookWidget {
                 fit: BoxFit.contain,
                 imageUrl: cover,
               )
-            : Container(
+            : Image.asset(
+                'assets/noImage.png',
                 width: 100,
                 height: 100,
-                color: Colors.amber,
+                fit: BoxFit.contain,
               ),
         const SizedBox(
           width: 10,
