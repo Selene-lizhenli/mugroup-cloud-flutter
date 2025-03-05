@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
@@ -19,89 +19,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'widgets/sample_item.dart';
 
-class CartItem {
-  final Sample sample;
-  int count;
-
-  CartItem({required this.sample, required this.count});
-
-  @override
-  String toString() {
-    return {"sample": sample, "count": count}.toString();
-  }
-}
-
-enum CartType {
-  /// 借样
-  borrowOut,
-
-  /// 还样
-  borrowIn,
-
-  /// 调拨出库
-  transferOut,
-
-  /// 调拨入库
-  transferIn,
-
-  /// 手动盘点
-  inout,
-}
-
-class Cart {
-  final CartType type;
-
-  Cart(this.type);
-
-  String get name {
-    if (type == CartType.borrowOut) {
-      return "借样选样车";
-    }
-
-    if (type == CartType.borrowIn) {
-      return "还样选样车";
-    }
-
-    if (type == CartType.transferOut) {
-      return "调拨出库选样车";
-    }
-
-    if (type == CartType.transferIn) {
-      return "调拨入库选样车";
-    }
-
-    if (type == CartType.inout) {
-      return "手动盘点";
-    }
-
-    return "选样车";
-  }
-
-  bool get disabled {
-    if (type == CartType.borrowOut) {
-      return false;
-    }
-
-    if (type == CartType.borrowIn) {
-      return false;
-    }
-
-    if (type == CartType.transferOut) {
-      return false;
-    }
-
-    if (type == CartType.transferIn) {
-      return false;
-    }
-
-    if (type == CartType.inout) {
-      return false;
-    }
-
-    return true;
-  }
-}
-
 @RoutePage()
 class CartPage extends HookConsumerWidget {
   const CartPage({super.key});
@@ -112,16 +29,10 @@ class CartPage extends HookConsumerWidget {
     final xx = ref.read(cartProvider.notifier);
 
     final items = state.items;
+    final carts = state.carts;
+    final cartType = state.type;
+    final cartName = state.cartName;
 
-    final carts = [
-      Cart(CartType.borrowOut),
-      Cart(CartType.borrowIn),
-      Cart(CartType.transferOut),
-      Cart(CartType.transferIn),
-      Cart(CartType.inout)
-    ];
-
-    final cart = useState<Cart?>(null);
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
@@ -176,8 +87,7 @@ class CartPage extends HookConsumerWidget {
     }, []);
 
     final header = useMemoized(() {
-      if (cart.value?.type == CartType.borrowOut ||
-          cart.value?.type == CartType.inout) {
+      if (cartType == CartType.borrowOut || cartType == CartType.inout) {
         return GestureDetector(
           onTap: () async {
             final selectedWarehouse = await context.router
@@ -200,7 +110,7 @@ class CartPage extends HookConsumerWidget {
         );
       }
 
-      if (cart.value?.type == CartType.borrowIn) {
+      if (cartType == CartType.borrowIn) {
         return GestureDetector(
           onTap: () async {
             final selectedBorrow =
@@ -223,8 +133,7 @@ class CartPage extends HookConsumerWidget {
         );
       }
 
-      if (cart.value?.type == CartType.transferOut ||
-          cart.value?.type == CartType.transferIn) {
+      if (cartType == CartType.transferOut || cartType == CartType.transferIn) {
         return GestureDetector(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -242,10 +151,10 @@ class CartPage extends HookConsumerWidget {
       }
 
       return GestureDetector();
-    }, [cart.value, warehouse.value, borrow.value, transfer.value]);
+    }, [cartType, warehouse.value, borrow.value, transfer.value]);
 
     Future fetchData() async {
-      if (cart.value == null) {
+      if (cartType == null) {
         return;
       }
 
@@ -254,19 +163,17 @@ class CartPage extends HookConsumerWidget {
       xx.addSample(resp.data[0], 1);
     }
 
-    void selectCart(List<Cart> selectCarts) {
+    void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
         context,
         description: "请选择一辆选样车",
         cancelText: "我再想想",
         actions: selectCarts
-            .map((cart) =>
-                FlanActionSheetAction(name: cart.name, disabled: cart.disabled))
+            .map((cart) => FlanActionSheetAction(name: cart.name))
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {
-          cart.value = selectCarts[index];
-          logger.d(cart.value?.type);
+          xx.type = selectCarts[index].type;
         },
       );
     }
@@ -429,7 +336,7 @@ class CartPage extends HookConsumerWidget {
 
     void onPressed() async {
       // 借样
-      if (cart.value?.type == CartType.borrowOut) {
+      if (cartType == CartType.borrowOut) {
         if (warehouse.value == null) {
           EasyLoading.showInfo("请先选择仓库!");
           return;
@@ -443,7 +350,7 @@ class CartPage extends HookConsumerWidget {
           .toList();
 
       // 还样
-      if (cart.value?.type == CartType.borrowIn) {
+      if (cartType == CartType.borrowIn) {
         if (borrow.value == null) {
           EasyLoading.showInfo("请先选择借样单!");
           return;
@@ -459,7 +366,7 @@ class CartPage extends HookConsumerWidget {
       }
 
       // 调拨出库
-      if (cart.value?.type == CartType.transferOut) {
+      if (cartType == CartType.transferOut) {
         if (transfer.value == null) {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
@@ -475,7 +382,7 @@ class CartPage extends HookConsumerWidget {
       }
 
       // 调拨入库
-      if (cart.value?.type == CartType.transferIn) {
+      if (cartType == CartType.transferIn) {
         if (transfer.value == null) {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
@@ -491,7 +398,7 @@ class CartPage extends HookConsumerWidget {
       }
 
       //盘点
-      if (cart.value?.type == CartType.inout) {
+      if (cartType == CartType.inout) {
         if (warehouse.value == null) {
           EasyLoading.showInfo("请先选择仓库!");
           return;
@@ -511,8 +418,8 @@ class CartPage extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.ideographic,
             children: [
-              Text(cart.value != null ? cart.value!.name : '请选择选样车'),
-              if (cart.value != null)
+              Text(cartType != null ? cartName! : '请选择选样车'),
+              if (cartType != null)
                 const SizedBox(
                   width: 5,
                 ),
@@ -562,7 +469,7 @@ class CartPage extends HookConsumerWidget {
                 slivers: [
                   MultiSliver(
                     children: [
-                      if (cart.value == null)
+                      if (cartType == null)
                         InkWell(
                           child: const SampleCard(
                             child: Center(
@@ -608,7 +515,7 @@ class CartPage extends HookConsumerWidget {
                                                 padding: const EdgeInsets.only(
                                                     bottom: 10),
                                                 child: Text(
-                                                  "${cart.value!.name}空咯，请扫码添加",
+                                                  "$cartName空咯，请扫码添加",
                                                   style: const TextStyle(
                                                       color: Colors.grey,
                                                       fontSize: 12),
@@ -674,8 +581,6 @@ class CartPage extends HookConsumerWidget {
           ),
           if (items.isNotEmpty)
             TotalRecord(
-              // items: items,
-              cart: cart.value,
               onPressed: onPressed,
             ),
         ],

@@ -1,16 +1,20 @@
-import 'package:cloud/pages/cart/cart_page.dart';
+import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TotalRecord extends HookConsumerWidget {
-  final List<CartItem>? items;
-  final Cart? cart;
   final void Function()? onPressed;
 
-  const TotalRecord({super.key, this.items, this.cart, this.onPressed});
+  const TotalRecord({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(cartProvider);
+
+    final items = state.items;
+    final cartType = state.type;
+
     Map<CartType, String> buttonText = {
       CartType.borrowOut: "借样",
       CartType.borrowIn: "还样",
@@ -19,14 +23,14 @@ class TotalRecord extends HookConsumerWidget {
       CartType.inout: "盘点"
     };
 
-    double totalPrice = items?.fold(0.0, (previousValue, item) {
+    double totalPrice = items.fold(0.0, (previousValue, item) {
           // 尝试将 purchaseCost 从 String 转换为 double
           double cost = double.tryParse(item.sample.purchaseCost ?? '0') ?? 0.0;
           return previousValue! + (cost * item.count);
         }) ??
         0.0;
 
-    int totalCount = items?.fold(0, (previousValue, item) {
+    int totalCount = items.fold(0, (previousValue, item) {
           return previousValue! + item.count;
         }) ??
         0;
@@ -83,7 +87,7 @@ class TotalRecord extends HookConsumerWidget {
                   elevation: 5, // 设置按钮的阴影效果
                 ),
                 child: Text(
-                  buttonText[cart?.type] ?? "确认",
+                  buttonText[cartType] ?? "确认",
                   style: const TextStyle(
                     fontSize: 16.0, // 设置字体大小
                     fontWeight: FontWeight.bold, // 设置字体粗细

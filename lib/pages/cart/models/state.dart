@@ -20,6 +20,36 @@ enum CartType {
   inout,
 }
 
+class CartSelect {
+  final CartType type;
+
+  CartSelect(this.type);
+
+  String get name {
+    if (type == CartType.borrowOut) {
+      return "借样选样车";
+    }
+
+    if (type == CartType.borrowIn) {
+      return "还样选样车";
+    }
+
+    if (type == CartType.transferOut) {
+      return "调拨出库选样车";
+    }
+
+    if (type == CartType.transferIn) {
+      return "调拨入库选样车";
+    }
+
+    if (type == CartType.inout) {
+      return "手动盘点";
+    }
+
+    return "选样车";
+  }
+}
+
 @unfreezed
 abstract class CartItem with _$CartItem {
   factory CartItem({
@@ -32,6 +62,8 @@ abstract class CartItem with _$CartItem {
 abstract class State with _$State {
   const factory State({
     required List<CartItem> items,
+    required List<CartSelect> carts,
     CartType? type,
+    String? cartName,
   }) = _State;
 }

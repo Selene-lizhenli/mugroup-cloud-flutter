@@ -153,7 +153,9 @@ abstract class _CartItem implements CartItem {
 /// @nodoc
 mixin _$State {
   List<CartItem> get items => throw _privateConstructorUsedError;
+  List<CartSelect> get carts => throw _privateConstructorUsedError;
   CartType? get type => throw _privateConstructorUsedError;
+  String? get cartName => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $StateCopyWith<State> get copyWith => throw _privateConstructorUsedError;
@@ -164,7 +166,11 @@ abstract class $StateCopyWith<$Res> {
   factory $StateCopyWith(State value, $Res Function(State) then) =
       _$StateCopyWithImpl<$Res, State>;
   @useResult
-  $Res call({List<CartItem> items, CartType? type});
+  $Res call(
+      {List<CartItem> items,
+      List<CartSelect> carts,
+      CartType? type,
+      String? cartName});
 }
 
 /// @nodoc
@@ -181,17 +187,27 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
   @override
   $Res call({
     Object? items = null,
+    Object? carts = null,
     Object? type = freezed,
+    Object? cartName = freezed,
   }) {
     return _then(_value.copyWith(
       items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CartItem>,
+      carts: null == carts
+          ? _value.carts
+          : carts // ignore: cast_nullable_to_non_nullable
+              as List<CartSelect>,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as CartType?,
+      cartName: freezed == cartName
+          ? _value.cartName
+          : cartName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -203,7 +219,11 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
       __$$StateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<CartItem> items, CartType? type});
+  $Res call(
+      {List<CartItem> items,
+      List<CartSelect> carts,
+      CartType? type,
+      String? cartName});
 }
 
 /// @nodoc
@@ -218,17 +238,27 @@ class __$$StateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? items = null,
+    Object? carts = null,
     Object? type = freezed,
+    Object? cartName = freezed,
   }) {
     return _then(_$StateImpl(
       items: null == items
           ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CartItem>,
+      carts: null == carts
+          ? _value._carts
+          : carts // ignore: cast_nullable_to_non_nullable
+              as List<CartSelect>,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as CartType?,
+      cartName: freezed == cartName
+          ? _value.cartName
+          : cartName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -236,8 +266,13 @@ class __$$StateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$StateImpl implements _State {
-  const _$StateImpl({required final List<CartItem> items, this.type})
-      : _items = items;
+  const _$StateImpl(
+      {required final List<CartItem> items,
+      required final List<CartSelect> carts,
+      this.type,
+      this.cartName})
+      : _items = items,
+        _carts = carts;
 
   final List<CartItem> _items;
   @override
@@ -247,12 +282,22 @@ class _$StateImpl implements _State {
     return EqualUnmodifiableListView(_items);
   }
 
+  final List<CartSelect> _carts;
+  @override
+  List<CartSelect> get carts {
+    if (_carts is EqualUnmodifiableListView) return _carts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_carts);
+  }
+
   @override
   final CartType? type;
+  @override
+  final String? cartName;
 
   @override
   String toString() {
-    return 'State(items: $items, type: $type)';
+    return 'State(items: $items, carts: $carts, type: $type, cartName: $cartName)';
   }
 
   @override
@@ -261,12 +306,19 @@ class _$StateImpl implements _State {
         (other.runtimeType == runtimeType &&
             other is _$StateImpl &&
             const DeepCollectionEquality().equals(other._items, _items) &&
-            (identical(other.type, type) || other.type == type));
+            const DeepCollectionEquality().equals(other._carts, _carts) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.cartName, cartName) ||
+                other.cartName == cartName));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_items), type);
+      runtimeType,
+      const DeepCollectionEquality().hash(_items),
+      const DeepCollectionEquality().hash(_carts),
+      type,
+      cartName);
 
   @JsonKey(ignore: true)
   @override
@@ -278,12 +330,18 @@ class _$StateImpl implements _State {
 abstract class _State implements State {
   const factory _State(
       {required final List<CartItem> items,
-      final CartType? type}) = _$StateImpl;
+      required final List<CartSelect> carts,
+      final CartType? type,
+      final String? cartName}) = _$StateImpl;
 
   @override
   List<CartItem> get items;
   @override
+  List<CartSelect> get carts;
+  @override
   CartType? get type;
+  @override
+  String? get cartName;
   @override
   @JsonKey(ignore: true)
   _$$StateImplCopyWith<_$StateImpl> get copyWith =>
