@@ -103,35 +103,35 @@ class TotalRecord extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  "备注",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: remarkController,
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    hintText: "请输入备注",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade400),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Colors.blue, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                  ),
-                ),
+                // const SizedBox(height: 10),
+                // const Text(
+                //   "备注",
+                //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                // ),
+                // const SizedBox(height: 8),
+                // TextField(
+                //   controller: remarkController,
+                //   maxLines: 1,
+                //   decoration: InputDecoration(
+                //     hintText: "请输入备注",
+                //     hintStyle: TextStyle(color: Colors.grey.shade500),
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide(color: Colors.grey.shade400),
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide(color: Colors.grey.shade300),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide:
+                //           const BorderSide(color: Colors.blue, width: 2),
+                //     ),
+                //     contentPadding: const EdgeInsets.symmetric(
+                //         horizontal: 12, vertical: 12),
+                //   ),
+                // ),
               ],
             ),
             actions: [
