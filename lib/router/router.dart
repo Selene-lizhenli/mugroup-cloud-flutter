@@ -51,6 +51,12 @@ class AppRouter extends RootStackRouter {
         path: "/selectors/wms/borrow",
         guards: [AuthGuard()],
       ),
+
+      AutoRoute(
+        page: ConfirmRoute.page,
+        path: "/confirm",
+        guards: [AuthGuard()],
+      ),
     ];
   }
 }

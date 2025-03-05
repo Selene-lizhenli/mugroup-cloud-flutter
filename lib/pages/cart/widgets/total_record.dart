@@ -286,6 +286,16 @@ class TotalRecord extends HookConsumerWidget {
                       EasyLoading.dismiss();
                     }
                   }
+
+                  //盘点
+                  if (cart?.type == CartType.inout) {
+                    if (warehouse == null) {
+                      EasyLoading.showInfo("请先选择仓库!");
+                      return;
+                    }
+                    context.router.push(
+                        ConfirmRoute(items: (items), warehouse: warehouse));
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
