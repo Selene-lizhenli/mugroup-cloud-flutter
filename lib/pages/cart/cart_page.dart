@@ -130,41 +130,34 @@ class _CartPageState extends ConsumerState<CartPage> {
     final transfer = useState<Transfer?>(null);
     final transferOrderNo = useState<String?>(null);
 
-    final addItem = useCallback((Sample sample) {
-      bool exists = items.any((item) => item.sample == sample);
+    final addItemByBarcode = useCallback((String barcode) async {
+      bool exists = items.any((item) => item.sample.barcode == barcode);
 
       if (exists) {
         for (CartItem item in items) {
-          if (item.sample == sample) {
+          if (item.sample.barcode == barcode) {
             setState(() {
               item.count = item.count + 1;
             });
-            break;
+            return;
           }
         }
-      } else {
-        setState(() {
-          items.add(CartItem(sample: sample, count: 1));
-        });
       }
-    }, [items]);
 
-    final addItemByBarcode = useCallback((String barcode) async {
       try {
-        // TODO: 查找是否已存在
         EasyLoading.show(status: '加载中...');
         var sample = await getSampleByBarcode(barcode);
-
         if (sample == null) {
           EasyLoading.showInfo("库中未找到该样品!");
           return;
         }
-
-        addItem(sample);
+        setState(() {
+          items.add(CartItem(sample: sample, count: 1));
+        });
       } finally {
         EasyLoading.dismiss();
       }
-    }, [addItem]);
+    }, []);
 
     final header = useMemoized(() {
       if (cart.value?.type == CartType.borrowOut ||
