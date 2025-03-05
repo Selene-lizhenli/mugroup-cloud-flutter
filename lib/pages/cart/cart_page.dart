@@ -494,6 +494,7 @@ class _CartPageState extends ConsumerState<CartPage> {
               cart: cart.value,
               warehouse: warehouse.value,
               borrow: borrow.value,
+              transfer: transfer.value,
             ),
         ],
       ),
