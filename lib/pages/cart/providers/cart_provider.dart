@@ -46,7 +46,8 @@ class Cart extends _$Cart {
   CartItem? getItemBySample(Sample sample) {
     return state.items.firstWhereOrNull((item) =>
         item.sample.id == sample.id ||
-        item.sample.productNo == sample.productNo);
+        item.sample.productNo == sample.productNo ||
+        item.sample.barcode == sample.barcode);
   }
 
   void addSample(Sample sample, int step) {

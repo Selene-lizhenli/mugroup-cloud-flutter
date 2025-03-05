@@ -17,6 +17,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import '../../models/sample/sample.dart';
 import 'widgets/sample_item.dart';
 
 @RoutePage()
@@ -39,17 +40,12 @@ class CartPage extends HookConsumerWidget {
     final user = useState<User?>(null);
 
     final addItemByBarcode = useCallback((String barcode) async {
-      bool exists = items.any((item) => item.sample.barcode == barcode);
+      final Sample sample = Sample(barcode: barcode);
+      var item = xx.getItemBySample(sample);
 
-      if (exists) {
-        // for (CartItem item in items) {
-        //   if (item.sample.barcode == barcode) {
-        //     setState(() {
-        //       item.count = item.count + 1;
-        //     });
-        //     return;
-        //   }
-        // }
+      if (item != null) {
+        xx.addSample(sample, 1);
+        return;
       }
 
       try {
@@ -59,9 +55,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("库中未找到该样品!");
           return;
         }
-        // setState(() {
-        //   items.add(CartItem(sample: sample, count: 1));
-        // });
+        xx.setSample(sample, 1);
       } finally {
         EasyLoading.dismiss();
       }
