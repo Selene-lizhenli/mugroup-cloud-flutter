@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/models/wms/inventoryItem.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -6,10 +7,39 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class ConfirmItem extends HookWidget {
   final CartItem? item;
 
-  const ConfirmItem({super.key, this.item});
+  final InventoryItem? inventoryItem;
+
+  const ConfirmItem({
+    super.key,
+    this.item,
+    this.inventoryItem,
+  });
+
   @override
   Widget build(BuildContext context) {
     var cover = item?.sample.image?.elementAtOrNull(0)?.thumbUrl;
+
+    final inventoryQty = inventoryItem?.previousQty ?? 0;
+    final newQty = inventoryItem?.newQty ?? 0;
+
+    final prompt = inventoryQty > newQty
+        ? '出库'
+        : inventoryQty < newQty
+            ? '入库'
+            : '不操作';
+
+    Color promptColor = Colors.grey;
+    String qtySymbol = '';
+    if (prompt == '出库') {
+      promptColor = Colors.green;
+      qtySymbol = '-';
+    } else if (prompt == '入库') {
+      promptColor = Colors.blue;
+      qtySymbol = '+';
+    } else if (prompt == '不操作') {
+      promptColor = Colors.grey;
+      qtySymbol = '';
+    }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,9 +82,9 @@ class ConfirmItem extends HookWidget {
                       const SizedBox(
                         width: 15,
                       ),
-                      const Text(
-                        "出库",
-                        style: TextStyle(color: Colors.green, fontSize: 18),
+                      Text(
+                        prompt,
+                        style: TextStyle(color: promptColor, fontSize: 18),
                       ),
                     ],
                   ),
@@ -66,14 +96,14 @@ class ConfirmItem extends HookWidget {
                   Row(
                     children: [
                       const Text('库存数量:'),
-                      const Text('20'),
-                      const Expanded(
+                      Text('$inventoryQty'),
+                      Expanded(
                           child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '-19',
-                            style: TextStyle(color: Colors.green, fontSize: 18),
+                            '$qtySymbol${(inventoryQty - newQty).abs()}',
+                            style: TextStyle(color: promptColor, fontSize: 18),
                           )
                         ],
                       )),

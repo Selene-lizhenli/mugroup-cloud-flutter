@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/wms/inventory.dart';
+import 'package:cloud/models/wms/inventoryItem.dart';
 import 'package:cloud/models/wms/warehouse.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_card.dart';
@@ -21,7 +21,7 @@ class ConfirmPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inventories = useState<List<Inventory>?>(null);
+    final inventoryItems = useState<List<InventoryItem>?>(null);
 
     useEffect(() {
       getInventories() async {
@@ -39,6 +39,7 @@ class ConfirmPage extends HookConsumerWidget {
           };
           var resp = await storeInventory(data);
 
+          inventoryItems.value = resp.items;
           print(resp);
         } finally {
           EasyLoading.dismiss();
@@ -60,13 +61,28 @@ class ConfirmPage extends HookConsumerWidget {
             slivers: [
               MultiSliver(children: [
                 Column(
-                  children: items
-                          ?.map((item) => InkWell(
-                                child: ConfirmCard(
-                                  child: ConfirmItem(item: item),
-                                ),
-                              ))
-                          .toList() ??
+                  children: items?.map((item) {
+                        final matchedInventoryItem = inventoryItems.value
+                            ?.firstWhere(
+                                (inventoryItem) =>
+                                    inventoryItem.productId == item.sample.id,
+                                orElse: () => const InventoryItem(
+                                      id: 0,
+                                      inventoryId: 0,
+                                      productId: 0,
+                                      previousQty: 0,
+                                      newQty: 0,
+                                    ));
+
+                        return InkWell(
+                          child: ConfirmCard(
+                            child: ConfirmItem(
+                              item: item,
+                              inventoryItem: matchedInventoryItem,
+                            ),
+                          ),
+                        );
+                      }).toList() ??
                       [],
                 )
               ])
