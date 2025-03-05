@@ -3,6 +3,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/total_record.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -102,18 +103,16 @@ class Cart {
 }
 
 @RoutePage()
-class CartPage extends StatefulHookConsumerWidget {
+class CartPage extends HookConsumerWidget {
   const CartPage({super.key});
 
   @override
-  ConsumerState<CartPage> createState() => _CartPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(cartProvider);
+    final xx = ref.read(cartProvider.notifier);
 
-class _CartPageState extends ConsumerState<CartPage> {
-  List<CartItem> items = [];
+    final items = state.items;
 
-  @override
-  Widget build(BuildContext context) {
     final carts = [
       Cart(CartType.borrowOut),
       Cart(CartType.borrowIn),
@@ -132,14 +131,14 @@ class _CartPageState extends ConsumerState<CartPage> {
       bool exists = items.any((item) => item.sample.barcode == barcode);
 
       if (exists) {
-        for (CartItem item in items) {
-          if (item.sample.barcode == barcode) {
-            setState(() {
-              item.count = item.count + 1;
-            });
-            return;
-          }
-        }
+        // for (CartItem item in items) {
+        //   if (item.sample.barcode == barcode) {
+        //     setState(() {
+        //       item.count = item.count + 1;
+        //     });
+        //     return;
+        //   }
+        // }
       }
 
       try {
@@ -149,9 +148,9 @@ class _CartPageState extends ConsumerState<CartPage> {
           EasyLoading.showInfo("库中未找到该样品!");
           return;
         }
-        setState(() {
-          items.add(CartItem(sample: sample, count: 1));
-        });
+        // setState(() {
+        //   items.add(CartItem(sample: sample, count: 1));
+        // });
       } finally {
         EasyLoading.dismiss();
       }
@@ -252,10 +251,7 @@ class _CartPageState extends ConsumerState<CartPage> {
 
       var resp = await getSamples();
 
-      setState(() {
-        items.addAll(
-            resp.data.map((sample) => CartItem(sample: sample, count: 1)));
-      });
+      xx.addSample(resp.data[0], 1);
     }
 
     void selectCart(List<Cart> selectCarts) {
@@ -501,8 +497,8 @@ class _CartPageState extends ConsumerState<CartPage> {
           return;
         }
         if (context.mounted) {
-          context.router
-              .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
+          // context.router
+          //     .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
         }
       }
     }
@@ -598,14 +594,8 @@ class _CartPageState extends ConsumerState<CartPage> {
                                                 children: [
                                                   SlidableAction(
                                                     onPressed: (context) {
-                                                      setState(() {
-                                                        items.removeWhere(
-                                                            (item) =>
-                                                                item.sample
-                                                                    .id ==
-                                                                cartItem
-                                                                    .sample.id);
-                                                      });
+                                                      xx.removeSample(
+                                                          cartItem.sample);
                                                     },
                                                     backgroundColor: Colors.red,
                                                     foregroundColor:
@@ -630,9 +620,8 @@ class _CartPageState extends ConsumerState<CartPage> {
                                                       return;
                                                     }
 
-                                                    setState(() {
-                                                      cartItem.count = value;
-                                                    });
+                                                    // TODO: api
+                                                    // xxx.addSample(cartItem.sample, 1);
                                                   },
                                                 ),
                                               ),
@@ -655,7 +644,7 @@ class _CartPageState extends ConsumerState<CartPage> {
           ),
           if (items.isNotEmpty)
             TotalRecord(
-              items: items,
+              // items: items,
               cart: cart.value,
               onPressed: onPressed,
             ),
