@@ -1,6 +1,7 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/inventory.dart';
 
 Future<ApiResponse<List<Warehouse>>> getWarehouses() async {
   return api.get("api/tenant/wms/warehouses").then(
@@ -59,4 +60,16 @@ Future addTransferItems(int transferId, Map<String, dynamic>? data) async {
 Future transferIn(int transferId, Map<String, dynamic>? data) async {
   return api.post("api/tenant/wms/stock/transfers/$transferId/transfer_in",
       data: data);
+}
+
+Future<Inventory> storeInventory(Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/wms/stock/inventories", data: data)
+      .then((res) => Inventory.fromJson(res.data));
+}
+
+Future confirmInventory(int inventoryId) async {
+  return api.post(
+    "api/tenant/wms/stock/inventoies/$inventoryId/confirm",
+  );
 }
