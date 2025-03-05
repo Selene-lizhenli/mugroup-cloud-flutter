@@ -111,24 +111,6 @@ class CartPage extends StatefulHookConsumerWidget {
 class _CartPageState extends ConsumerState<CartPage> {
   List<CartItem> items = [];
 
-  BroadcastReceiver receiver = BroadcastReceiver(
-    names: [
-      "com.android.decodewedge.decode_action",
-    ],
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    receiver.start();
-  }
-
-  @override
-  void dispose() {
-    receiver.stop();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final carts = [
@@ -146,10 +128,9 @@ class _CartPageState extends ConsumerState<CartPage> {
     final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
-    final sampleBarcode = useState<String?>(null);
     final transferOrderNo = useState<String?>(null);
 
-    void addItem(List<CartItem> items, Sample sample) {
+    final addItem = useCallback((Sample sample) {
       bool exists = items.any((item) => item.sample == sample);
 
       if (exists) {
@@ -162,9 +143,28 @@ class _CartPageState extends ConsumerState<CartPage> {
           }
         }
       } else {
-        items.add(CartItem(sample: sample, count: 1));
+        setState(() {
+          items.add(CartItem(sample: sample, count: 1));
+        });
       }
-    }
+    }, [items]);
+
+    final addItemByBarcode = useCallback((String barcode) async {
+      try {
+        // TODO: 查找是否已存在
+        EasyLoading.show(status: '加载中...');
+        var sample = await getSampleByBarcode(barcode);
+
+        if (sample == null) {
+          EasyLoading.showInfo("库中未找到该样品!");
+          return;
+        }
+
+        addItem(sample);
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }, [addItem]);
 
     final header = useMemoized(() {
       if (cart.value?.type == CartType.borrowOut ||
@@ -265,89 +265,51 @@ class _CartPageState extends ConsumerState<CartPage> {
       );
     }
 
-    receiver.messages.listen((message) async {
-      var barcodeString =
-          message.data?["com.android.decode.intentwedge.barcode_string"];
-      if (barcodeString == null) {
-        return;
-      }
-      barcodeString = barcodeString.trim();
-      if (isUrl(barcodeString)) {
-        RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
+    useEffect(() {
+      BroadcastReceiver receiver = BroadcastReceiver(
+        names: [
+          "com.android.decodewedge.decode_action",
+        ],
+      );
 
-        /// 解析结果为调拨单
-        if (transferExp.hasMatch(barcodeString)) {
-          RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
-          Match? match = transferOrderNoExp.firstMatch(barcodeString);
-          if (match == null) {
-            EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
-            return;
-          }
-          transferOrderNo.value = match.group(0);
+      final sub = receiver.messages.listen((message) async {
+        var barcodeString =
+            message.data?["com.android.decode.intentwedge.barcode_string"];
+        logger.d(barcodeString);
+        if (barcodeString == null) {
           return;
         }
+        barcodeString = barcodeString.trim();
+        if (isUrl(barcodeString)) {
+          RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
 
-        EasyLoading.showError("不支持该条码!");
-        return;
-      }
-      sampleBarcode.value = barcodeString;
-    });
-
-    final debouncedSampleBarcode =
-        useDebounced(sampleBarcode.value, const Duration(milliseconds: 300));
-    final debouncedTransferOrderNo =
-        useDebounced(transferOrderNo.value, const Duration(milliseconds: 300));
-
-    useEffect(() {
-      if (debouncedSampleBarcode == null) {
-        return;
-      }
-      getSample() async {
-        try {
-          EasyLoading.show(status: '加载中...');
-          var sample = await getSampleByBarcode(debouncedSampleBarcode);
-
-          if (sample == null) {
-            EasyLoading.showInfo("库中未找到该样品!");
+          /// 解析结果为调拨单
+          if (transferExp.hasMatch(barcodeString)) {
+            RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
+            Match? match = transferOrderNoExp.firstMatch(barcodeString);
+            if (match == null) {
+              EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
+              return;
+            }
+            transferOrderNo.value = match.group(0);
+            // 处理流转选样车
             return;
           }
-          addItem(items, sample);
-          sampleBarcode.value = null;
-        } finally {
-          EasyLoading.dismiss();
+
+          EasyLoading.showError("不支持该条码!");
+          return;
+        } else {
+          // 处理样品
+          addItemByBarcode(barcodeString);
         }
-      }
+      });
 
-      getSample();
-      return null;
-    }, [debouncedSampleBarcode]);
-
-    useEffect(() {
-      if (debouncedTransferOrderNo == null) {
-        return;
-      }
-      getTransfer() async {
-        try {
-          EasyLoading.show(status: '加载中...');
-          var transfer1 =
-              await fetchTransferByOrederNo(debouncedTransferOrderNo);
-
-          if (transfer1 == null) {
-            EasyLoading.showInfo("系统中未找到该调拨单!");
-            return;
-          }
-          transfer.value = transfer1;
-          logger.d(transfer.value);
-          selectCart(transferCarts);
-          transferOrderNo.value = null;
-        } finally {
-          EasyLoading.dismiss();
-        }
-      }
-
-      getTransfer();
-      return null;
-    }, [debouncedTransferOrderNo]);
+      receiver.start();
+      return () {
+        sub.cancel();
+        receiver.stop();
+      };
+    }, [addItemByBarcode]);
 
     return Scaffold(
       appBar: AppBar(
@@ -467,7 +429,14 @@ class _CartPageState extends ConsumerState<CartPage> {
                                                   sample: cartItem.sample,
                                                   count: cartItem.count,
                                                   onChange: (value) {
-                                                    cartItem.count = value;
+                                                    if (cartItem.count ==
+                                                        value) {
+                                                      return;
+                                                    }
+
+                                                    setState(() {
+                                                      cartItem.count = value;
+                                                    });
                                                   },
                                                 ),
                                               ),
