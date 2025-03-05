@@ -398,8 +398,8 @@ class CartPage extends HookConsumerWidget {
           return;
         }
         if (context.mounted) {
-          // context.router
-          //     .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
+          context.router
+              .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
         }
       }
     }
