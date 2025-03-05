@@ -9,8 +9,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i10;
-import 'package:cloud/models/wms/warehouse.dart' as _i11;
+import 'package:cloud/models/wms/warehouse.dart' as _i12;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
+import 'package:cloud/pages/cart/models/state.dart' as _i11;
 import 'package:cloud/pages/confirm/confirm_page.dart' as _i2;
 import 'package:cloud/pages/home/home_page.dart' as _i3;
 import 'package:cloud/pages/layout.dart' as _i4;
@@ -21,7 +22,7 @@ import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.d
     as _i8;
 import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
     as _i9;
-import 'package:flutter/material.dart' as _i12;
+import 'package:flutter/material.dart' as _i13;
 
 /// generated route for
 /// [_i1.CartPage]
@@ -46,9 +47,9 @@ class CartRoute extends _i10.PageRouteInfo<void> {
 /// [_i2.ConfirmPage]
 class ConfirmRoute extends _i10.PageRouteInfo<ConfirmRouteArgs> {
   ConfirmRoute({
-    required List<_i1.CartItem>? items,
-    required _i11.Warehouse? warehouse,
-    _i12.Key? key,
+    required List<_i11.CartItem>? items,
+    required _i12.Warehouse? warehouse,
+    _i13.Key? key,
     List<_i10.PageRouteInfo>? children,
   }) : super(
           ConfirmRoute.name,
@@ -82,11 +83,11 @@ class ConfirmRouteArgs {
     this.key,
   });
 
-  final List<_i1.CartItem>? items;
+  final List<_i11.CartItem>? items;
 
-  final _i11.Warehouse? warehouse;
+  final _i12.Warehouse? warehouse;
 
-  final _i12.Key? key;
+  final _i13.Key? key;
 
   @override
   String toString() {
@@ -136,7 +137,7 @@ class Layout extends _i10.PageRouteInfo<void> {
 /// [_i5.LoginPage]
 class LoginRoute extends _i10.PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
-    _i12.Key? key,
+    _i13.Key? key,
     void Function()? onLogin,
     List<_i10.PageRouteInfo>? children,
   }) : super(
@@ -169,7 +170,7 @@ class LoginRouteArgs {
     this.onLogin,
   });
 
-  final _i12.Key? key;
+  final _i13.Key? key;
 
   final void Function()? onLogin;
 
