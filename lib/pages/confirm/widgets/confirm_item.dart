@@ -12,7 +12,8 @@ class ConfirmItem extends HookWidget {
     var cover = item?.sample.image?.elementAtOrNull(0)?.thumbUrl;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         cover != null
             ? CachedNetworkImage(
@@ -31,20 +32,58 @@ class ConfirmItem extends HookWidget {
           width: 10,
         ),
         Expanded(
-          flex: 1,
-          child: Container(
-            height: 80,
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${item?.sample.id}'),
-                Text('${item?.count}'),
-              ],
-            ),
-          ),
-        ),
+            flex: 1,
+            child: Container(
+              height: 100,
+              padding: const EdgeInsets.all(4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item?.sample.nameCn ?? "",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      const Text(
+                        "出库",
+                        style: TextStyle(color: Colors.green, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    item?.sample.productNo ?? "",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Row(
+                    children: [
+                      const Text('库存数量:'),
+                      const Text('20'),
+                      const Expanded(
+                          child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '-19',
+                            style: TextStyle(color: Colors.green, fontSize: 18),
+                          )
+                        ],
+                      )),
+                      const Text('x'),
+                      Text('${item?.count}'),
+                    ],
+                  ),
+                ],
+              ),
+            )),
       ],
     );
   }
