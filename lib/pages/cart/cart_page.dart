@@ -92,6 +92,10 @@ class Cart {
       return false;
     }
 
+    if (type == CartType.inout) {
+      return false;
+    }
+
     return true;
   }
 }
@@ -163,7 +167,8 @@ class _CartPageState extends ConsumerState<CartPage> {
     }
 
     final header = useMemoized(() {
-      if (cart.value?.type == CartType.borrowOut) {
+      if (cart.value?.type == CartType.borrowOut ||
+          cart.value?.type == CartType.inout) {
         return GestureDetector(
           onTap: () async {
             final selectedWarehouse = await context.router
