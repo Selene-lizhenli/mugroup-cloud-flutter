@@ -1,4 +1,6 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/user.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'state.freezed.dart';
@@ -63,6 +65,10 @@ abstract class State with _$State {
   const factory State({
     required List<CartItem> items,
     required List<CartSelect> carts,
+    Warehouse? warehouse,
+    Borrow? borrow,
+    Transfer? transfer,
+    User? user,
     CartType? type,
     String? cartName,
   }) = _State;

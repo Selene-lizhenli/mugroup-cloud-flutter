@@ -1,4 +1,6 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/user.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:collection/collection.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -41,6 +43,22 @@ class Cart extends _$Cart {
     }
 
     state = state.copyWith(type: type, cartName: cartName);
+  }
+
+  set warehouse(Warehouse? warehouse) {
+    state = state.copyWith(warehouse: warehouse);
+  }
+
+  set borrow(Borrow? borrow) {
+    state = state.copyWith(borrow: borrow);
+  }
+
+  set transfer(Transfer? transfer) {
+    state = state.copyWith(transfer: transfer);
+  }
+
+  set user(User? user) {
+    state = state.copyWith(user: user);
   }
 
   CartItem? getItemBySample(Sample sample) {

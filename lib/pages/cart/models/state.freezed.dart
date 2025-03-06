@@ -154,6 +154,10 @@ abstract class _CartItem implements CartItem {
 mixin _$State {
   List<CartItem> get items => throw _privateConstructorUsedError;
   List<CartSelect> get carts => throw _privateConstructorUsedError;
+  Warehouse? get warehouse => throw _privateConstructorUsedError;
+  Borrow? get borrow => throw _privateConstructorUsedError;
+  Transfer? get transfer => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
   CartType? get type => throw _privateConstructorUsedError;
   String? get cartName => throw _privateConstructorUsedError;
 
@@ -169,8 +173,17 @@ abstract class $StateCopyWith<$Res> {
   $Res call(
       {List<CartItem> items,
       List<CartSelect> carts,
+      Warehouse? warehouse,
+      Borrow? borrow,
+      Transfer? transfer,
+      User? user,
       CartType? type,
       String? cartName});
+
+  $WarehouseCopyWith<$Res>? get warehouse;
+  $BorrowCopyWith<$Res>? get borrow;
+  $TransferCopyWith<$Res>? get transfer;
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -188,6 +201,10 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
   $Res call({
     Object? items = null,
     Object? carts = null,
+    Object? warehouse = freezed,
+    Object? borrow = freezed,
+    Object? transfer = freezed,
+    Object? user = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
   }) {
@@ -200,6 +217,22 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.carts
           : carts // ignore: cast_nullable_to_non_nullable
               as List<CartSelect>,
+      warehouse: freezed == warehouse
+          ? _value.warehouse
+          : warehouse // ignore: cast_nullable_to_non_nullable
+              as Warehouse?,
+      borrow: freezed == borrow
+          ? _value.borrow
+          : borrow // ignore: cast_nullable_to_non_nullable
+              as Borrow?,
+      transfer: freezed == transfer
+          ? _value.transfer
+          : transfer // ignore: cast_nullable_to_non_nullable
+              as Transfer?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -209,6 +242,54 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           : cartName // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WarehouseCopyWith<$Res>? get warehouse {
+    if (_value.warehouse == null) {
+      return null;
+    }
+
+    return $WarehouseCopyWith<$Res>(_value.warehouse!, (value) {
+      return _then(_value.copyWith(warehouse: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $BorrowCopyWith<$Res>? get borrow {
+    if (_value.borrow == null) {
+      return null;
+    }
+
+    return $BorrowCopyWith<$Res>(_value.borrow!, (value) {
+      return _then(_value.copyWith(borrow: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $TransferCopyWith<$Res>? get transfer {
+    if (_value.transfer == null) {
+      return null;
+    }
+
+    return $TransferCopyWith<$Res>(_value.transfer!, (value) {
+      return _then(_value.copyWith(transfer: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -222,8 +303,21 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
   $Res call(
       {List<CartItem> items,
       List<CartSelect> carts,
+      Warehouse? warehouse,
+      Borrow? borrow,
+      Transfer? transfer,
+      User? user,
       CartType? type,
       String? cartName});
+
+  @override
+  $WarehouseCopyWith<$Res>? get warehouse;
+  @override
+  $BorrowCopyWith<$Res>? get borrow;
+  @override
+  $TransferCopyWith<$Res>? get transfer;
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -239,6 +333,10 @@ class __$$StateImplCopyWithImpl<$Res>
   $Res call({
     Object? items = null,
     Object? carts = null,
+    Object? warehouse = freezed,
+    Object? borrow = freezed,
+    Object? transfer = freezed,
+    Object? user = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
   }) {
@@ -251,6 +349,22 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value._carts
           : carts // ignore: cast_nullable_to_non_nullable
               as List<CartSelect>,
+      warehouse: freezed == warehouse
+          ? _value.warehouse
+          : warehouse // ignore: cast_nullable_to_non_nullable
+              as Warehouse?,
+      borrow: freezed == borrow
+          ? _value.borrow
+          : borrow // ignore: cast_nullable_to_non_nullable
+              as Borrow?,
+      transfer: freezed == transfer
+          ? _value.transfer
+          : transfer // ignore: cast_nullable_to_non_nullable
+              as Transfer?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -269,6 +383,10 @@ class _$StateImpl implements _State {
   const _$StateImpl(
       {required final List<CartItem> items,
       required final List<CartSelect> carts,
+      this.warehouse,
+      this.borrow,
+      this.transfer,
+      this.user,
       this.type,
       this.cartName})
       : _items = items,
@@ -291,13 +409,21 @@ class _$StateImpl implements _State {
   }
 
   @override
+  final Warehouse? warehouse;
+  @override
+  final Borrow? borrow;
+  @override
+  final Transfer? transfer;
+  @override
+  final User? user;
+  @override
   final CartType? type;
   @override
   final String? cartName;
 
   @override
   String toString() {
-    return 'State(items: $items, carts: $carts, type: $type, cartName: $cartName)';
+    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, user: $user, type: $type, cartName: $cartName)';
   }
 
   @override
@@ -307,6 +433,12 @@ class _$StateImpl implements _State {
             other is _$StateImpl &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             const DeepCollectionEquality().equals(other._carts, _carts) &&
+            (identical(other.warehouse, warehouse) ||
+                other.warehouse == warehouse) &&
+            (identical(other.borrow, borrow) || other.borrow == borrow) &&
+            (identical(other.transfer, transfer) ||
+                other.transfer == transfer) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.cartName, cartName) ||
                 other.cartName == cartName));
@@ -317,6 +449,10 @@ class _$StateImpl implements _State {
       runtimeType,
       const DeepCollectionEquality().hash(_items),
       const DeepCollectionEquality().hash(_carts),
+      warehouse,
+      borrow,
+      transfer,
+      user,
       type,
       cartName);
 
@@ -331,6 +467,10 @@ abstract class _State implements State {
   const factory _State(
       {required final List<CartItem> items,
       required final List<CartSelect> carts,
+      final Warehouse? warehouse,
+      final Borrow? borrow,
+      final Transfer? transfer,
+      final User? user,
       final CartType? type,
       final String? cartName}) = _$StateImpl;
 
@@ -338,6 +478,14 @@ abstract class _State implements State {
   List<CartItem> get items;
   @override
   List<CartSelect> get carts;
+  @override
+  Warehouse? get warehouse;
+  @override
+  Borrow? get borrow;
+  @override
+  Transfer? get transfer;
+  @override
+  User? get user;
   @override
   CartType? get type;
   @override
