@@ -280,6 +280,7 @@ class CartPage extends HookConsumerWidget {
                       .map((item) => {
                             "product_id": item.sample.id,
                             "inout_qty": item.count,
+                            "product_no": item.sample.productNo
                           })
                       .toList();
                   final data = {
@@ -327,8 +328,11 @@ class CartPage extends HookConsumerWidget {
       }
 
       final productData = items
-          .map(
-              (item) => {"product_id": item.sample.id, "inout_qty": item.count})
+          .map((item) => {
+                "product_id": item.sample.id,
+                "inout_qty": item.count,
+                "product_no": item.sample.productNo
+              })
           .toList();
 
       // 还样
