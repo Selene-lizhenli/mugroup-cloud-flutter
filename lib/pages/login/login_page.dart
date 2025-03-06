@@ -34,7 +34,7 @@ class LoginPage extends HookWidget {
 
     useEffect(() {
       Future fetchQrcode() async {
-        final resp = await api.post("api/tenant/login/qrcodesa");
+        final resp = await api.post("api/tenant/login/qrcodes");
         qrcodeState.value = Qrcode.fromJson(resp.data);
       }
 
