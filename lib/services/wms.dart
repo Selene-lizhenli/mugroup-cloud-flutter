@@ -65,9 +65,6 @@ Future transferIn(int transferId, Map<String, dynamic>? data) async {
 Future<Inventory> storeInventory(Map<String, dynamic>? data) async {
   final response =
       await api.post("api/tenant/wms/stock/inventories", data: data);
-
-  print(response.data['data']);
-
   return Inventory.fromJson(response.data['data']);
 }
 

@@ -42,7 +42,6 @@ class ConfirmPage extends HookConsumerWidget {
           var resp = await storeInventory(data);
 
           inventory.value = resp;
-          print(resp);
         } finally {
           EasyLoading.dismiss();
         }

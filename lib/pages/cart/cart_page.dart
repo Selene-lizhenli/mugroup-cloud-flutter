@@ -150,16 +150,6 @@ class CartPage extends HookConsumerWidget {
       return GestureDetector();
     }, [cartType, warehouse.value, borrow.value, transfer.value]);
 
-    Future fetchData() async {
-      if (cartType == null) {
-        return;
-      }
-
-      var resp = await getSamples();
-
-      xx.addSample(resp.data[0], 1);
-    }
-
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
         context,
@@ -557,8 +547,6 @@ class CartPage extends HookConsumerWidget {
                                                         value) {
                                                       return;
                                                     }
-
-                                                    // TODO: api
                                                     xx.setSample(
                                                         cartItem.sample, value);
                                                   },
