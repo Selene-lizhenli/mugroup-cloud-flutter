@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms/inventory.dart';
-import 'package:cloud/models/wms/inventoryItem.dart';
+import 'package:cloud/models/wms/inventory_item.dart';
 import 'package:cloud/models/wms/warehouse.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/confirm/widgets/confirm_card.dart';

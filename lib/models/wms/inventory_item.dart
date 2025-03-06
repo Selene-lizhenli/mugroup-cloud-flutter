@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'inventoryItem.freezed.dart';
-part 'inventoryItem.g.dart';
+part 'inventory_item.freezed.dart';
+part 'inventory_item.g.dart';
 
 @freezed
 abstract class InventoryItem with _$InventoryItem {

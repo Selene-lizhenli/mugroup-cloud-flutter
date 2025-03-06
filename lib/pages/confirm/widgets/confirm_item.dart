@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud/models/wms/inventoryItem.dart';
+import 'package:cloud/models/wms/inventory_item.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

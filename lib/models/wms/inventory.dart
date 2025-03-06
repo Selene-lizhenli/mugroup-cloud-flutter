@@ -1,4 +1,4 @@
-import 'package:cloud/models/wms/inventoryItem.dart';
+import 'package:cloud/models/wms/inventory_item.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'inventory.freezed.dart';
