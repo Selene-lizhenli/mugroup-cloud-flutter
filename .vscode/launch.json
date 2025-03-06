@@ -12,6 +12,12 @@
                 "--dart-define=APP_ENV=dev",
                 "--verbose",
             ],
+        },
+        {
+            "name": "release",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
         }
     ]
 }
