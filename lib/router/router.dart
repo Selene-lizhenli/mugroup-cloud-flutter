@@ -55,7 +55,7 @@ class AppRouter extends RootStackRouter {
 
       AutoRoute(
         page: ConfirmRoute.page,
-        path: "/confirm",
+        path: "/cart/confirm",
         guards: [AuthGuard()],
       ),
     ];
