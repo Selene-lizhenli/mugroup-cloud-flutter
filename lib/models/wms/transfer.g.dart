@@ -35,7 +35,7 @@ Map<String, dynamic> _$$TransferImplToJson(_$TransferImpl instance) =>
     };
 
 const _$TransferStatusEnumMap = {
-  TransferStatus.drift: 'drift',
+  TransferStatus.draft: 'draft',
   TransferStatus.finished: 'finished',
   TransferStatus.processing: 'processing',
   TransferStatus.cancelled: 'cancelled',

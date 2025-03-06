@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'transfer.freezed.dart';
 part 'transfer.g.dart';
 
-enum TransferStatus { drift, finished, processing, cancelled }
+enum TransferStatus { draft, finished, processing, cancelled }
 
 @freezed
 class Transfer with _$Transfer {
