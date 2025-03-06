@@ -60,11 +60,11 @@ dependencies:
   envied: ^1.1.1
   flutter_slidable: ^3.1.2
   intl: ^0.18.1
-  package_info_plus: 4.2.0
+  package_info_plus: ^8.3.0
   version: ^3.0.2
   flutter_app_update: ^3.2.2
   rxdart: ^0.27.7
-  mobile_scanner: 3.5.7
+  mobile_scanner: ^6.0.7
     # path: ../flant
 
 dev_dependencies:
