@@ -36,7 +36,8 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
-    final user = state.user;
+
+    final user = useState<User?>(null);
 
     final addItemByBarcode = useCallback((String barcode) async {
       final Sample sample = Sample(barcode: barcode);
@@ -229,7 +230,7 @@ class CartPage extends HookConsumerWidget {
                   onTap: () async {
                     final selectedUser = await context.router
                         .push<User>(const SelectUserRoute());
-                    xx.user = selectedUser;
+                    user.value = selectedUser;
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -243,12 +244,12 @@ class CartPage extends HookConsumerWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            user == null
+                            user.value == null
                                 ? "请选择用户"
-                                : "${user.name} (${user.department?.name ?? '暂无部门'})",
+                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
                             style: TextStyle(
                               fontSize: 16,
-                              color: user == null
+                              color: user.value == null
                                   ? Colors.grey.shade600
                                   : Colors.black87,
                             ),
@@ -272,7 +273,7 @@ class CartPage extends HookConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  if (user == null) {
+                  if (user.value == null) {
                     EasyLoading.showInfo("请先选择用户!");
                     return;
                   }
@@ -284,7 +285,7 @@ class CartPage extends HookConsumerWidget {
                           })
                       .toList();
                   final data = {
-                    "borrower_id": user.id,
+                    "borrower_id": user.value?.id,
                     "warehouse_id": warehouse?.id,
                     "products": productData
                   };
@@ -293,6 +294,7 @@ class CartPage extends HookConsumerWidget {
                     await storeBorrow(data);
                     EasyLoading.showSuccess("借样成功!");
                     xx.clear();
+                    user.value = null;
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
