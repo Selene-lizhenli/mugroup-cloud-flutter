@@ -24,13 +24,10 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
 
     Future fetchBorrows(String? orderNo) async {
       EasyLoading.show(status: '加载中...');
-      try {
-        logger.d("搜索");
-        final resp = await getBorrows(queryParameters: {"order_no": orderNo});
-        borrows.value = resp.data;
-      } finally {
-        EasyLoading.dismiss();
-      }
+      logger.d("搜索");
+      final resp = await getBorrows(queryParameters: {"order_no": orderNo});
+      EasyLoading.dismiss();
+      borrows.value = resp.data;
     }
 
     useEffect(() {

@@ -34,12 +34,8 @@ class LoginPage extends HookWidget {
 
     useEffect(() {
       Future fetchQrcode() async {
-        try {
-          final resp = await api.post("api/tenant/login/qrcodes");
-          qrcodeState.value = Qrcode.fromJson(resp.data);
-        } catch (e) {
-          logger.e('获取QR码失败：$e');
-        }
+        final resp = await api.post("api/tenant/login/qrcodesa");
+        qrcodeState.value = Qrcode.fromJson(resp.data);
       }
 
       fetchQrcode();
@@ -62,16 +58,12 @@ class LoginPage extends HookWidget {
         }
 
         logger.d("轮询,$qrcodeState");
-        try {
-          final expirationTime =
-              DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
-          if (expirationTime == null ||
-              DateTime.now().isAfter(expirationTime)) {
-            logger.d("二维码已过期，获取新二维码...");
-            await fetchQrcode();
-          }
-        } catch (e) {
-          logger.e("轮询时出错: $e");
+
+        final expirationTime =
+            DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
+        if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
+          logger.d("二维码已过期，获取新二维码...");
+          await fetchQrcode();
         }
       });
 

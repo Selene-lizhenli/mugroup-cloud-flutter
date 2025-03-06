@@ -20,12 +20,9 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
     useEffect(() {
       Future fetchWarehouses() async {
         EasyLoading.show(status: '加载中...');
-        try {
-          final resp = await getWarehouses();
-          warehouses.value = resp.data;
-        } finally {
-          EasyLoading.dismiss();
-        }
+        final resp = await getWarehouses();
+        EasyLoading.dismiss();
+        warehouses.value = resp.data;
       }
 
       fetchWarehouses();
