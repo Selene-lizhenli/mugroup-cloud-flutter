@@ -1,19 +1,12 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/wms/inventory.dart';
-import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ConfirmTabbar extends HookConsumerWidget {
-  final Inventory? inventory;
+  final Function()? onPressed;
 
-  const ConfirmTabbar({super.key, this.inventory});
+  const ConfirmTabbar({super.key, this.onPressed});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final xx = ref.read(cartProvider.notifier);
     return Container(
       height: 60,
       color: Colors.white,
@@ -26,17 +19,7 @@ class ConfirmTabbar extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
-                onPressed: () async {
-                  if (inventory != null) {
-                    EasyLoading.show(status: '加载中...');
-                    await confirmInventory(inventory!.id!);
-                    EasyLoading.showSuccess("手动盘点成功!");
-                    xx.clear();
-                  }
-                  if (context.mounted) {
-                    context.router.push(const CartRoute());
-                  }
-                },
+                onPressed: onPressed,
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.blue, // 设置按钮文字颜色

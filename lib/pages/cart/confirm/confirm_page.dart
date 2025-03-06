@@ -6,6 +6,7 @@ import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_card.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_item.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_tabbar.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -39,7 +40,7 @@ class ConfirmPage extends HookConsumerWidget {
                     .toList() ??
                 []
           };
-          var resp = await storeInventory(data);
+          var resp = await previewInventory(data);
 
           inventory.value = resp;
         } finally {
@@ -50,6 +51,27 @@ class ConfirmPage extends HookConsumerWidget {
       getInventories();
       return null;
     }, []);
+
+    void onPressed() async {
+      if (inventory.value != null) {
+        EasyLoading.show(status: '加载中...');
+        final data = {
+          "warehouse_id": warehouse?.id,
+          "items": items
+                  ?.map((item) => {
+                        "product_id": item.sample.id,
+                        "new_qty": item.count,
+                      })
+                  .toList() ??
+              []
+        };
+        await confirmInventory(data);
+        EasyLoading.showSuccess("手动盘点成功!");
+      }
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -90,7 +112,7 @@ class ConfirmPage extends HookConsumerWidget {
               ])
             ],
           )),
-          ConfirmTabbar(inventory: inventory.value),
+          ConfirmTabbar(onPressed: onPressed),
         ],
       )),
     );
