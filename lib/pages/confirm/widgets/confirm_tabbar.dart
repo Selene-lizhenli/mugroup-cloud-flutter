@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms/inventory.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -17,7 +19,7 @@ class ConfirmTabbar extends HookConsumerWidget {
         children: [
           const Expanded(
               child: Column(
-            children: [Text('wixi')],
+            children: [Text('')],
           )),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -27,6 +29,9 @@ class ConfirmTabbar extends HookConsumerWidget {
                     EasyLoading.show(status: '加载中...');
                     await confirmInventory(inventory!.id!);
                     EasyLoading.showSuccess("手动盘点成功!");
+                  }
+                  if (context.mounted) {
+                    context.router.push(const CartRoute());
                   }
                 },
                 style: TextButton.styleFrom(
