@@ -6,7 +6,7 @@ import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_card.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_item.dart';
 import 'package:cloud/pages/cart/confirm/widgets/confirm_tabbar.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -25,6 +25,7 @@ class ConfirmPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventory = useState<Inventory?>(null);
+    final xx = ref.read(cartProvider.notifier);
 
     useEffect(() {
       getInventories() async {
@@ -67,6 +68,7 @@ class ConfirmPage extends HookConsumerWidget {
         };
         await confirmInventory(data);
         EasyLoading.showSuccess("手动盘点成功!");
+        xx.clear();
       }
       if (context.mounted) {
         Navigator.of(context).pop();
