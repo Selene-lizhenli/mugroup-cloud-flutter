@@ -34,9 +34,9 @@ class CartPage extends HookConsumerWidget {
     final cartType = state.type;
     final cartName = state.cartName;
     final warehouse = state.warehouse;
+    final borrow = state.borrow;
+    final transfer = state.transfer;
 
-    final borrow = useState<Borrow?>(null);
-    final transfer = useState<Transfer?>(null);
     final user = useState<User?>(null);
 
     final addItemByBarcode = useCallback((String barcode) async {
@@ -65,7 +65,7 @@ class CartPage extends HookConsumerWidget {
     }, []);
 
     final setTranferByOrderNo = useCallback((String orderNo) async {
-      if (transfer.value?.orderNo == orderNo) {
+      if (transfer?.orderNo == orderNo) {
         EasyLoading.showInfo("已选中该调拨单!");
         return;
       }
@@ -77,7 +77,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("系统中未找到该调拨单!");
           return;
         }
-        transfer.value = transfer1;
+        xx.transfer = transfer1;
       } finally {
         EasyLoading.dismiss();
       }
@@ -111,16 +111,14 @@ class CartPage extends HookConsumerWidget {
             final selectedBorrow =
                 await context.router.push<Borrow>(const SelectWmsBorrowRoute());
 
-            borrow.value = selectedBorrow;
+            xx.borrow = selectedBorrow;
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(borrow.value == null
-                    ? "请选择借样单"
-                    : borrow.value!.orderNo ?? "未设置借样单号"),
+                Text(borrow == null ? "请选择借样单" : borrow.orderNo ?? "未设置借样单号"),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -135,9 +133,9 @@ class CartPage extends HookConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(transfer.value == null
+                Text(transfer == null
                     ? "请扫描调拨单二维码"
-                    : transfer.value!.orderNo ?? "未设置调拨单号"),
+                    : transfer.orderNo ?? "未设置调拨单号"),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -146,7 +144,7 @@ class CartPage extends HookConsumerWidget {
       }
 
       return GestureDetector();
-    }, [cartType, warehouse, borrow.value, transfer.value]);
+    }, [cartType, warehouse, borrow, transfer]);
 
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
@@ -336,14 +334,14 @@ class CartPage extends HookConsumerWidget {
 
       // 还样
       if (cartType == CartType.borrowIn) {
-        if (borrow.value == null) {
+        if (borrow == null) {
           EasyLoading.showInfo("请先选择借样单!");
           return;
         }
         try {
           EasyLoading.show(status: '加载中...');
           final data = {"return_items": productData};
-          await borrowIn(borrow.value!.id!, data);
+          await borrowIn(borrow.id!, data);
           EasyLoading.showSuccess("还样成功!");
         } finally {
           EasyLoading.dismiss();
@@ -352,14 +350,14 @@ class CartPage extends HookConsumerWidget {
 
       // 调拨出库
       if (cartType == CartType.transferOut) {
-        if (transfer.value == null) {
+        if (transfer == null) {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
         }
         try {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
-          await addTransferItems(transfer.value!.id!, data);
+          await addTransferItems(transfer.id!, data);
           EasyLoading.showSuccess("调拨出库成功!");
         } finally {
           EasyLoading.dismiss();
@@ -368,14 +366,14 @@ class CartPage extends HookConsumerWidget {
 
       // 调拨入库
       if (cartType == CartType.transferIn) {
-        if (transfer.value == null) {
+        if (transfer == null) {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
         }
         try {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
-          await transferIn(transfer.value!.id!, data);
+          await transferIn(transfer.id!, data);
           EasyLoading.showSuccess("调拨入库成功!");
         } finally {
           EasyLoading.dismiss();
