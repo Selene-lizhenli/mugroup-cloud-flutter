@@ -50,12 +50,15 @@ class CartPage extends HookConsumerWidget {
 
       try {
         EasyLoading.show(status: '加载中...');
-        var sample = await getSampleByBarcode(barcode);
-        if (sample == null) {
+        var samples = await getSamples(queryParameters: {"barcode": barcode})
+            .then((res) => res.data);
+        if (samples.isEmpty) {
           EasyLoading.showInfo("库中未找到该样品!");
           return;
         }
-        xx.setSample(sample, 1);
+        for (var item in samples) {
+          xx.setSample(item, 1);
+        }
       } finally {
         EasyLoading.dismiss();
       }

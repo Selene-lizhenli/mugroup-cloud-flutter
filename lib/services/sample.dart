@@ -2,8 +2,11 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/sample.dart';
 
-Future<ApiResponse<List<Sample>>> getSamples() async {
-  return api.get("api/tenant/showroom/samples").then(
+Future<ApiResponse<List<Sample>>> getSamples(
+    {Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/showroom/samples", queryParameters: queryParameters)
+      .then(
         (res) => ApiResponse<List<Sample>>.fromJson(
           res.data,
           (data) {
