@@ -78,6 +78,7 @@ class CartPage extends HookConsumerWidget {
           return;
         }
         xx.transfer = transfer1;
+        EasyLoading.showSuccess("成功读取调拨单$orderNo");
       } finally {
         EasyLoading.dismiss();
       }
