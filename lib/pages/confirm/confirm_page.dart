@@ -48,6 +48,7 @@ class ConfirmPage extends HookConsumerWidget {
       }
 
       getInventories();
+      return null;
     }, []);
 
     return Scaffold(
