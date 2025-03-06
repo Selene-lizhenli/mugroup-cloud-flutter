@@ -438,8 +438,33 @@ class CartPage extends HookConsumerWidget {
                 onPressed: () async {
                   final codes = await context.router
                       .push<List<String>>(const ScanRoute());
+                  if (codes == null) {
+                    EasyLoading.showError("未识别到有效信息!");
+                    return;
+                  }
+                  for (var item in codes) {
+                    if (isUrl(item)) {
+                      RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
 
-                  // TODO:
+                      /// 解析结果为调拨单
+                      if (transferExp.hasMatch(item)) {
+                        RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
+                        Match? match = transferOrderNoExp.firstMatch(item);
+                        if (match == null) {
+                          EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
+                          return;
+                        }
+                        var orderNo = match.group(0)!;
+                        setTranferByOrderNo(orderNo);
+                        return;
+                      }
+                      EasyLoading.showError("不支持该条码!");
+                      return;
+                    } else {
+                      // 处理样品
+                      addItemByBarcode(item);
+                    }
+                  }
                 },
                 child: const Row(
                   children: [
