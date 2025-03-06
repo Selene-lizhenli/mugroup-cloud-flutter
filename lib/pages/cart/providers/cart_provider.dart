@@ -61,6 +61,16 @@ class Cart extends _$Cart {
     state = state.copyWith(user: user);
   }
 
+  void clear() {
+    state = state.copyWith(
+      items: [],
+      warehouse: null,
+      borrow: null,
+      transfer: null,
+      user: null,
+    );
+  }
+
   CartItem? getItemBySample(Sample sample) {
     return state.items.firstWhereOrNull((item) =>
         item.sample.id == sample.id ||

@@ -291,7 +291,7 @@ class CartPage extends HookConsumerWidget {
                     EasyLoading.show(status: '加载中...');
                     await storeBorrow(data);
                     EasyLoading.showSuccess("借样成功!");
-                    xx.user = null;
+                    xx.clear();
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -342,6 +342,7 @@ class CartPage extends HookConsumerWidget {
           final data = {"return_items": productData};
           await borrowIn(borrow.id!, data);
           EasyLoading.showSuccess("还样成功!");
+          xx.clear();
         } finally {
           EasyLoading.dismiss();
         }
@@ -357,6 +358,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
           await addTransferItems(transfer.id!, data);
+          xx.clear();
           EasyLoading.showSuccess("调拨出库成功!");
         } finally {
           EasyLoading.dismiss();
@@ -373,6 +375,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
           await transferIn(transfer.id!, data);
+          xx.clear();
           EasyLoading.showSuccess("调拨入库成功!");
         } finally {
           EasyLoading.dismiss();

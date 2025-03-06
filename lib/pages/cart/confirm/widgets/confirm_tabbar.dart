@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms/inventory.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class ConfirmTabbar extends HookConsumerWidget {
   const ConfirmTabbar({super.key, this.inventory});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final xx = ref.read(cartProvider.notifier);
     return Container(
       height: 60,
       color: Colors.white,
@@ -29,6 +31,7 @@ class ConfirmTabbar extends HookConsumerWidget {
                     EasyLoading.show(status: '加载中...');
                     await confirmInventory(inventory!.id!);
                     EasyLoading.showSuccess("手动盘点成功!");
+                    xx.clear();
                   }
                   if (context.mounted) {
                     context.router.push(const CartRoute());
