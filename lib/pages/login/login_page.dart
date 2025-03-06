@@ -134,15 +134,6 @@ class LoginPage extends HookWidget {
                 "请使用企业微信扫码登录",
                 style: TextStyle(color: Color(0xFF707070), fontSize: 10),
               ),
-            TextButton(
-              onPressed: () async {
-                // 模拟登录，请在自己的环境中增加下面路由设置登录
-                await api.get("api/tenant/test");
-                await app.fetchUser();
-                afterLogin();
-              },
-              child: const Text("模拟登录"),
-            ),
           ],
         ),
       ),
