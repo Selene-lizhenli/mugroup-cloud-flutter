@@ -587,13 +587,6 @@ class CartPage extends HookConsumerWidget {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Text("测试"),
-        onPressed: () {
-          logger.d(items.toString());
-          fetchData();
-        },
-      ),
     );
   }
 }
