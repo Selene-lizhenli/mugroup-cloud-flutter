@@ -33,8 +33,8 @@ class CartPage extends HookConsumerWidget {
     final carts = state.carts;
     final cartType = state.type;
     final cartName = state.cartName;
+    final warehouse = state.warehouse;
 
-    final warehouse = useState<Warehouse?>(null);
     final borrow = useState<Borrow?>(null);
     final transfer = useState<Transfer?>(null);
     final user = useState<User?>(null);
@@ -90,16 +90,14 @@ class CartPage extends HookConsumerWidget {
             final selectedWarehouse = await context.router
                 .push<Warehouse>(const SelectWmsWarehouseRoute());
 
-            warehouse.value = selectedWarehouse;
+            xx.warehouse = selectedWarehouse;
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(warehouse.value == null
-                    ? "请选择仓库"
-                    : warehouse.value!.name ?? "未设置仓库名称"),
+                Text(warehouse == null ? "请选择仓库" : warehouse.name ?? "未设置仓库名称"),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -148,7 +146,7 @@ class CartPage extends HookConsumerWidget {
       }
 
       return GestureDetector();
-    }, [cartType, warehouse.value, borrow.value, transfer.value]);
+    }, [cartType, warehouse, borrow.value, transfer.value]);
 
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
@@ -289,7 +287,7 @@ class CartPage extends HookConsumerWidget {
                       .toList();
                   final data = {
                     "borrower_id": user.value?.id,
-                    "warehouse_id": warehouse.value?.id,
+                    "warehouse_id": warehouse?.id,
                     "products": productData
                   };
                   try {
@@ -324,7 +322,7 @@ class CartPage extends HookConsumerWidget {
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
-        if (warehouse.value == null) {
+        if (warehouse == null) {
           EasyLoading.showInfo("请先选择仓库!");
           return;
         }
@@ -386,13 +384,13 @@ class CartPage extends HookConsumerWidget {
 
       //盘点
       if (cartType == CartType.inout) {
-        if (warehouse.value == null) {
+        if (warehouse == null) {
           EasyLoading.showInfo("请先选择仓库!");
           return;
         }
         if (context.mounted) {
           context.router
-              .push(ConfirmRoute(items: (items), warehouse: warehouse.value));
+              .push(ConfirmRoute(items: (items), warehouse: warehouse));
         }
       }
     }
