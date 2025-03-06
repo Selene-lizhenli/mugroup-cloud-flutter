@@ -444,7 +444,6 @@ class CartPage extends HookConsumerWidget {
                   final codes = await context.router
                       .push<List<String>>(const ScanRoute());
                   if (codes == null) {
-                    EasyLoading.showError("未识别到有效信息!");
                     return;
                   }
                   for (var item in codes) {
