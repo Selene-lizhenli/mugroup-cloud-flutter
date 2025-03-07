@@ -23,9 +23,9 @@ mixin _$Transfer {
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'order_no')
   String? get orderNo => throw _privateConstructorUsedError;
-  @JsonKey(name: 'out_warehouse')
+  @JsonKey(name: 'outWarehouse')
   Warehouse? get outWarehouse => throw _privateConstructorUsedError;
-  @JsonKey(name: 'in_warehouse')
+  @JsonKey(name: 'inWarehouse')
   Warehouse? get inWarehouse => throw _privateConstructorUsedError;
   User? get creator => throw _privateConstructorUsedError;
   TransferStatus? get status => throw _privateConstructorUsedError;
@@ -49,8 +49,8 @@ abstract class $TransferCopyWith<$Res> {
   $Res call(
       {int? id,
       @JsonKey(name: 'order_no') String? orderNo,
-      @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
-      @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
+      @JsonKey(name: 'outWarehouse') Warehouse? outWarehouse,
+      @JsonKey(name: 'inWarehouse') Warehouse? inWarehouse,
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
@@ -173,8 +173,8 @@ abstract class _$$TransferImplCopyWith<$Res>
   $Res call(
       {int? id,
       @JsonKey(name: 'order_no') String? orderNo,
-      @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
-      @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
+      @JsonKey(name: 'outWarehouse') Warehouse? outWarehouse,
+      @JsonKey(name: 'inWarehouse') Warehouse? inWarehouse,
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
@@ -257,8 +257,8 @@ class _$TransferImpl implements _Transfer {
   _$TransferImpl(
       {this.id,
       @JsonKey(name: 'order_no') this.orderNo,
-      @JsonKey(name: 'out_warehouse') this.outWarehouse,
-      @JsonKey(name: 'in_warehouse') this.inWarehouse,
+      @JsonKey(name: 'outWarehouse') this.outWarehouse,
+      @JsonKey(name: 'inWarehouse') this.inWarehouse,
       this.creator,
       this.status,
       @JsonKey(name: 'transfer_at') this.transferAt,
@@ -275,10 +275,10 @@ class _$TransferImpl implements _Transfer {
   @JsonKey(name: 'order_no')
   final String? orderNo;
   @override
-  @JsonKey(name: 'out_warehouse')
+  @JsonKey(name: 'outWarehouse')
   final Warehouse? outWarehouse;
   @override
-  @JsonKey(name: 'in_warehouse')
+  @JsonKey(name: 'inWarehouse')
   final Warehouse? inWarehouse;
   @override
   final User? creator;
@@ -356,8 +356,8 @@ abstract class _Transfer implements Transfer {
   factory _Transfer(
           {final int? id,
           @JsonKey(name: 'order_no') final String? orderNo,
-          @JsonKey(name: 'out_warehouse') final Warehouse? outWarehouse,
-          @JsonKey(name: 'in_warehouse') final Warehouse? inWarehouse,
+          @JsonKey(name: 'outWarehouse') final Warehouse? outWarehouse,
+          @JsonKey(name: 'inWarehouse') final Warehouse? inWarehouse,
           final User? creator,
           final TransferStatus? status,
           @JsonKey(name: 'transfer_at') final DateTime? transferAt,
@@ -374,10 +374,10 @@ abstract class _Transfer implements Transfer {
   @JsonKey(name: 'order_no')
   String? get orderNo;
   @override
-  @JsonKey(name: 'out_warehouse')
+  @JsonKey(name: 'outWarehouse')
   Warehouse? get outWarehouse;
   @override
-  @JsonKey(name: 'in_warehouse')
+  @JsonKey(name: 'inWarehouse')
   Warehouse? get inWarehouse;
   @override
   User? get creator;

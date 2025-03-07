@@ -13,8 +13,8 @@ class Transfer with _$Transfer {
   factory Transfer({
     int? id,
     @JsonKey(name: 'order_no') String? orderNo,
-    @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
-    @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
+    @JsonKey(name: 'outWarehouse') Warehouse? outWarehouse,
+    @JsonKey(name: 'inWarehouse') Warehouse? inWarehouse,
     User? creator,
     TransferStatus? status,
     @JsonKey(name: 'transfer_at') DateTime? transferAt,

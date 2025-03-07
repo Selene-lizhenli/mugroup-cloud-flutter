@@ -10,12 +10,12 @@ _$TransferImpl _$$TransferImplFromJson(Map<String, dynamic> json) =>
     _$TransferImpl(
       id: (json['id'] as num?)?.toInt(),
       orderNo: json['order_no'] as String?,
-      outWarehouse: json['out_warehouse'] == null
+      outWarehouse: json['outWarehouse'] == null
           ? null
-          : Warehouse.fromJson(json['out_warehouse'] as Map<String, dynamic>),
-      inWarehouse: json['in_warehouse'] == null
+          : Warehouse.fromJson(json['outWarehouse'] as Map<String, dynamic>),
+      inWarehouse: json['inWarehouse'] == null
           ? null
-          : Warehouse.fromJson(json['in_warehouse'] as Map<String, dynamic>),
+          : Warehouse.fromJson(json['inWarehouse'] as Map<String, dynamic>),
       creator: json['creator'] == null
           ? null
           : User.fromJson(json['creator'] as Map<String, dynamic>),
@@ -33,8 +33,8 @@ Map<String, dynamic> _$$TransferImplToJson(_$TransferImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'order_no': instance.orderNo,
-      'out_warehouse': instance.outWarehouse,
-      'in_warehouse': instance.inWarehouse,
+      'outWarehouse': instance.outWarehouse,
+      'inWarehouse': instance.inWarehouse,
       'creator': instance.creator,
       'status': _$TransferStatusEnumMap[instance.status],
       'transfer_at': instance.transferAt?.toIso8601String(),
