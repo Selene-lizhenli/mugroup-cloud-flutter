@@ -1,8 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -85,7 +88,33 @@ class WmsTransferPage extends HookConsumerWidget {
               ),
             ],
           )),
-          WmsTransferOperateBar(onPressed: onPressed)
+          WmsTransferOperateBar(
+            status: transfer.value?.status,
+            addTransferItems: () {
+              final cart = ref.read(cartProvider.notifier);
+              cart.transfer = transfer.value;
+              cart.type = CartType.transferOut;
+              context.pushRoute(const CartRoute());
+            },
+            transferOut: () async {
+              EasyLoading.show(status: '加载中...');
+              await transferOut(transfer.value!.id!);
+              transfer.value = await fetchTransferByOrederNo(code);
+              EasyLoading.dismiss();
+            },
+            transferIn: () {
+              final cart = ref.read(cartProvider.notifier);
+              cart.transfer = transfer.value;
+              cart.type = CartType.transferIn;
+              context.pushRoute(const CartRoute());
+            },
+            transferInAll: () async {
+              EasyLoading.show(status: '加载中...');
+              await transferInAll(transfer.value!.id!);
+              transfer.value = await fetchTransferByOrederNo(code);
+              EasyLoading.dismiss();
+            },
+          )
         ],
       )),
     );
