@@ -1,4 +1,5 @@
 import 'package:cloud/models/user.dart';
+import 'package:cloud/models/wms/transfer_item.dart';
 import 'package:cloud/models/wms/warehouse.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -18,6 +19,7 @@ class Transfer with _$Transfer {
     TransferStatus? status,
     @JsonKey(name: 'transfer_at') DateTime? transferAt,
     String? remark,
+    @JsonKey(name: 'items') List<TransferItem>? items,
   }) = _Transfer;
 
   factory Transfer.fromJson(Map<String, dynamic> json) =>

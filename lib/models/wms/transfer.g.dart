@@ -24,6 +24,9 @@ _$TransferImpl _$$TransferImplFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['transfer_at'] as String),
       remark: json['remark'] as String?,
+      items: (json['items'] as List<dynamic>?)
+          ?.map((e) => TransferItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$TransferImplToJson(_$TransferImpl instance) =>
@@ -36,6 +39,7 @@ Map<String, dynamic> _$$TransferImplToJson(_$TransferImpl instance) =>
       'status': _$TransferStatusEnumMap[instance.status],
       'transfer_at': instance.transferAt?.toIso8601String(),
       'remark': instance.remark,
+      'items': instance.items,
     };
 
 const _$TransferStatusEnumMap = {

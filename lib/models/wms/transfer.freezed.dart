@@ -32,6 +32,8 @@ mixin _$Transfer {
   @JsonKey(name: 'transfer_at')
   DateTime? get transferAt => throw _privateConstructorUsedError;
   String? get remark => throw _privateConstructorUsedError;
+  @JsonKey(name: 'items')
+  List<TransferItem>? get items => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -52,7 +54,8 @@ abstract class $TransferCopyWith<$Res> {
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
-      String? remark});
+      String? remark,
+      @JsonKey(name: 'items') List<TransferItem>? items});
 
   $WarehouseCopyWith<$Res>? get outWarehouse;
   $WarehouseCopyWith<$Res>? get inWarehouse;
@@ -80,6 +83,7 @@ class _$TransferCopyWithImpl<$Res, $Val extends Transfer>
     Object? status = freezed,
     Object? transferAt = freezed,
     Object? remark = freezed,
+    Object? items = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -114,6 +118,10 @@ class _$TransferCopyWithImpl<$Res, $Val extends Transfer>
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
               as String?,
+      items: freezed == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<TransferItem>?,
     ) as $Val);
   }
 
@@ -170,7 +178,8 @@ abstract class _$$TransferImplCopyWith<$Res>
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
-      String? remark});
+      String? remark,
+      @JsonKey(name: 'items') List<TransferItem>? items});
 
   @override
   $WarehouseCopyWith<$Res>? get outWarehouse;
@@ -199,6 +208,7 @@ class __$$TransferImplCopyWithImpl<$Res>
     Object? status = freezed,
     Object? transferAt = freezed,
     Object? remark = freezed,
+    Object? items = freezed,
   }) {
     return _then(_$TransferImpl(
       id: freezed == id
@@ -233,6 +243,10 @@ class __$$TransferImplCopyWithImpl<$Res>
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
               as String?,
+      items: freezed == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<TransferItem>?,
     ));
   }
 }
@@ -248,7 +262,9 @@ class _$TransferImpl implements _Transfer {
       this.creator,
       this.status,
       @JsonKey(name: 'transfer_at') this.transferAt,
-      this.remark});
+      this.remark,
+      @JsonKey(name: 'items') final List<TransferItem>? items})
+      : _items = items;
 
   factory _$TransferImpl.fromJson(Map<String, dynamic> json) =>
       _$$TransferImplFromJson(json);
@@ -273,10 +289,20 @@ class _$TransferImpl implements _Transfer {
   final DateTime? transferAt;
   @override
   final String? remark;
+  final List<TransferItem>? _items;
+  @override
+  @JsonKey(name: 'items')
+  List<TransferItem>? get items {
+    final value = _items;
+    if (value == null) return null;
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'Transfer(id: $id, orderNo: $orderNo, outWarehouse: $outWarehouse, inWarehouse: $inWarehouse, creator: $creator, status: $status, transferAt: $transferAt, remark: $remark)';
+    return 'Transfer(id: $id, orderNo: $orderNo, outWarehouse: $outWarehouse, inWarehouse: $inWarehouse, creator: $creator, status: $status, transferAt: $transferAt, remark: $remark, items: $items)';
   }
 
   @override
@@ -294,13 +320,23 @@ class _$TransferImpl implements _Transfer {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.transferAt, transferAt) ||
                 other.transferAt == transferAt) &&
-            (identical(other.remark, remark) || other.remark == remark));
+            (identical(other.remark, remark) || other.remark == remark) &&
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, orderNo, outWarehouse,
-      inWarehouse, creator, status, transferAt, remark);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      orderNo,
+      outWarehouse,
+      inWarehouse,
+      creator,
+      status,
+      transferAt,
+      remark,
+      const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
@@ -318,14 +354,16 @@ class _$TransferImpl implements _Transfer {
 
 abstract class _Transfer implements Transfer {
   factory _Transfer(
-      {final int? id,
-      @JsonKey(name: 'order_no') final String? orderNo,
-      @JsonKey(name: 'out_warehouse') final Warehouse? outWarehouse,
-      @JsonKey(name: 'in_warehouse') final Warehouse? inWarehouse,
-      final User? creator,
-      final TransferStatus? status,
-      @JsonKey(name: 'transfer_at') final DateTime? transferAt,
-      final String? remark}) = _$TransferImpl;
+          {final int? id,
+          @JsonKey(name: 'order_no') final String? orderNo,
+          @JsonKey(name: 'out_warehouse') final Warehouse? outWarehouse,
+          @JsonKey(name: 'in_warehouse') final Warehouse? inWarehouse,
+          final User? creator,
+          final TransferStatus? status,
+          @JsonKey(name: 'transfer_at') final DateTime? transferAt,
+          final String? remark,
+          @JsonKey(name: 'items') final List<TransferItem>? items}) =
+      _$TransferImpl;
 
   factory _Transfer.fromJson(Map<String, dynamic> json) =
       _$TransferImpl.fromJson;
@@ -350,6 +388,9 @@ abstract class _Transfer implements Transfer {
   DateTime? get transferAt;
   @override
   String? get remark;
+  @override
+  @JsonKey(name: 'items')
+  List<TransferItem>? get items;
   @override
   @JsonKey(ignore: true)
   _$$TransferImplCopyWith<_$TransferImpl> get copyWith =>
