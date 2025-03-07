@@ -5,7 +5,7 @@ import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
-import 'package:cloud/pages/cart/widgets/total_record.dart';
+import 'package:cloud/pages/cart/widgets/operate_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
@@ -599,7 +599,7 @@ class CartPage extends HookConsumerWidget {
             }(),
           ),
           if (items.isNotEmpty)
-            TotalRecord(
+            OperateBar(
               onPressed: onPressed,
             ),
         ],

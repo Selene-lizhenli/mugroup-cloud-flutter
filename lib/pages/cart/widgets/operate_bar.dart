@@ -3,10 +3,10 @@ import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class TotalRecord extends HookConsumerWidget {
+class OperateBar extends HookConsumerWidget {
   final void Function()? onPressed;
 
-  const TotalRecord({super.key, this.onPressed});
+  const OperateBar({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
