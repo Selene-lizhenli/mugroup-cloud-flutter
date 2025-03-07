@@ -25,12 +25,6 @@ class HomePage extends HookConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Text("测试"),
-        onPressed: () {
-          context.pushRoute(WmsTransferRoute(code: 'SF202503070012'));
-        },
-      ),
     );
   }
 }
