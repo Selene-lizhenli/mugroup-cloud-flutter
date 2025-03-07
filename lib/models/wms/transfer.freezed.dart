@@ -24,9 +24,9 @@ mixin _$Transfer {
   @JsonKey(name: 'order_no')
   String? get orderNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'out_warehouse')
-  String? get outWarehouse => throw _privateConstructorUsedError;
+  Warehouse? get outWarehouse => throw _privateConstructorUsedError;
   @JsonKey(name: 'in_warehouse')
-  String? get inWarehouse => throw _privateConstructorUsedError;
+  Warehouse? get inWarehouse => throw _privateConstructorUsedError;
   User? get creator => throw _privateConstructorUsedError;
   TransferStatus? get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'transfer_at')
@@ -47,13 +47,15 @@ abstract class $TransferCopyWith<$Res> {
   $Res call(
       {int? id,
       @JsonKey(name: 'order_no') String? orderNo,
-      @JsonKey(name: 'out_warehouse') String? outWarehouse,
-      @JsonKey(name: 'in_warehouse') String? inWarehouse,
+      @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
+      @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
       String? remark});
 
+  $WarehouseCopyWith<$Res>? get outWarehouse;
+  $WarehouseCopyWith<$Res>? get inWarehouse;
   $UserCopyWith<$Res>? get creator;
 }
 
@@ -91,11 +93,11 @@ class _$TransferCopyWithImpl<$Res, $Val extends Transfer>
       outWarehouse: freezed == outWarehouse
           ? _value.outWarehouse
           : outWarehouse // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Warehouse?,
       inWarehouse: freezed == inWarehouse
           ? _value.inWarehouse
           : inWarehouse // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Warehouse?,
       creator: freezed == creator
           ? _value.creator
           : creator // ignore: cast_nullable_to_non_nullable
@@ -113,6 +115,30 @@ class _$TransferCopyWithImpl<$Res, $Val extends Transfer>
           : remark // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WarehouseCopyWith<$Res>? get outWarehouse {
+    if (_value.outWarehouse == null) {
+      return null;
+    }
+
+    return $WarehouseCopyWith<$Res>(_value.outWarehouse!, (value) {
+      return _then(_value.copyWith(outWarehouse: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WarehouseCopyWith<$Res>? get inWarehouse {
+    if (_value.inWarehouse == null) {
+      return null;
+    }
+
+    return $WarehouseCopyWith<$Res>(_value.inWarehouse!, (value) {
+      return _then(_value.copyWith(inWarehouse: value) as $Val);
+    });
   }
 
   @override
@@ -139,13 +165,17 @@ abstract class _$$TransferImplCopyWith<$Res>
   $Res call(
       {int? id,
       @JsonKey(name: 'order_no') String? orderNo,
-      @JsonKey(name: 'out_warehouse') String? outWarehouse,
-      @JsonKey(name: 'in_warehouse') String? inWarehouse,
+      @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
+      @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
       User? creator,
       TransferStatus? status,
       @JsonKey(name: 'transfer_at') DateTime? transferAt,
       String? remark});
 
+  @override
+  $WarehouseCopyWith<$Res>? get outWarehouse;
+  @override
+  $WarehouseCopyWith<$Res>? get inWarehouse;
   @override
   $UserCopyWith<$Res>? get creator;
 }
@@ -182,11 +212,11 @@ class __$$TransferImplCopyWithImpl<$Res>
       outWarehouse: freezed == outWarehouse
           ? _value.outWarehouse
           : outWarehouse // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Warehouse?,
       inWarehouse: freezed == inWarehouse
           ? _value.inWarehouse
           : inWarehouse // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Warehouse?,
       creator: freezed == creator
           ? _value.creator
           : creator // ignore: cast_nullable_to_non_nullable
@@ -230,10 +260,10 @@ class _$TransferImpl implements _Transfer {
   final String? orderNo;
   @override
   @JsonKey(name: 'out_warehouse')
-  final String? outWarehouse;
+  final Warehouse? outWarehouse;
   @override
   @JsonKey(name: 'in_warehouse')
-  final String? inWarehouse;
+  final Warehouse? inWarehouse;
   @override
   final User? creator;
   @override
@@ -290,8 +320,8 @@ abstract class _Transfer implements Transfer {
   factory _Transfer(
       {final int? id,
       @JsonKey(name: 'order_no') final String? orderNo,
-      @JsonKey(name: 'out_warehouse') final String? outWarehouse,
-      @JsonKey(name: 'in_warehouse') final String? inWarehouse,
+      @JsonKey(name: 'out_warehouse') final Warehouse? outWarehouse,
+      @JsonKey(name: 'in_warehouse') final Warehouse? inWarehouse,
       final User? creator,
       final TransferStatus? status,
       @JsonKey(name: 'transfer_at') final DateTime? transferAt,
@@ -307,10 +337,10 @@ abstract class _Transfer implements Transfer {
   String? get orderNo;
   @override
   @JsonKey(name: 'out_warehouse')
-  String? get outWarehouse;
+  Warehouse? get outWarehouse;
   @override
   @JsonKey(name: 'in_warehouse')
-  String? get inWarehouse;
+  Warehouse? get inWarehouse;
   @override
   User? get creator;
   @override

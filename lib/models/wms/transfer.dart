@@ -1,4 +1,5 @@
 import 'package:cloud/models/user.dart';
+import 'package:cloud/models/wms/warehouse.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'transfer.freezed.dart';
@@ -11,8 +12,8 @@ class Transfer with _$Transfer {
   factory Transfer({
     int? id,
     @JsonKey(name: 'order_no') String? orderNo,
-    @JsonKey(name: 'out_warehouse') String? outWarehouse,
-    @JsonKey(name: 'in_warehouse') String? inWarehouse,
+    @JsonKey(name: 'out_warehouse') Warehouse? outWarehouse,
+    @JsonKey(name: 'in_warehouse') Warehouse? inWarehouse,
     User? creator,
     TransferStatus? status,
     @JsonKey(name: 'transfer_at') DateTime? transferAt,
