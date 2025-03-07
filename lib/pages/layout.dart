@@ -1,23 +1,44 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/controllers/scan_controller.dart';
 import 'package:cloud/http/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
+import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:version/version.dart';
 
 @RoutePage()
-class Layout extends StatefulHookConsumerWidget {
+class Layout extends HookConsumerWidget {
   const Layout({super.key});
 
   @override
-  ConsumerState<Layout> createState() => _LayoutState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      BroadcastReceiver receiver = BroadcastReceiver(
+        names: [
+          "com.android.decodewedge.decode_action",
+        ],
+      );
 
-class _LayoutState extends ConsumerState<Layout> {
-  @override
-  Widget build(BuildContext context) {
+      final sub = receiver.messages.listen((message) async {
+        var barcodeString =
+            message.data?["com.android.decode.intentwedge.barcode_string"];
+        if (barcodeString == null) {
+          return;
+        }
+
+        scanConroller.add(barcodeString.toString().trim());
+      });
+
+      receiver.start();
+      return () {
+        sub.cancel();
+        receiver.stop();
+      };
+    }, []);
+
     final checkVersion = useCallback(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final checkResp = await silentApi

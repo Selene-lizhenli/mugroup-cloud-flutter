@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/controllers/scan_controller.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
@@ -11,7 +12,6 @@ import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -163,48 +163,14 @@ class CartPage extends HookConsumerWidget {
     }
 
     useEffect(() {
-      BroadcastReceiver receiver = BroadcastReceiver(
-        names: [
-          "com.android.decodewedge.decode_action",
-        ],
-      );
-
-      final sub = receiver.messages.listen((message) async {
-        var barcodeString =
-            message.data?["com.android.decode.intentwedge.barcode_string"];
-        if (barcodeString == null) {
-          return;
-        }
-        barcodeString = barcodeString.trim();
-        if (isUrl(barcodeString)) {
-          RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
-
-          /// 解析结果为调拨单
-          if (transferExp.hasMatch(barcodeString)) {
-            RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
-            Match? match = transferOrderNoExp.firstMatch(barcodeString);
-            if (match == null) {
-              EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
-              return;
-            }
-            var orderNo = match.group(0)!;
-            setTranferByOrderNo(orderNo);
-            return;
-          }
-          EasyLoading.showError("不支持该条码!");
-          return;
-        } else {
-          // 处理样品
-          addItemByBarcode(barcodeString);
-        }
+      final sub = scanConroller.stream.listen((message) async {
+        addItemByBarcode(message);
       });
 
-      receiver.start();
       return () {
         sub.cancel();
-        receiver.stop();
       };
-    }, [addItemByBarcode]);
+    }, []);
 
     void borrowDialog(BuildContext context) {
       showDialog(
