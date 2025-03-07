@@ -22,15 +22,11 @@ class WmsTransferPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transfer = useState<Transfer?>(null);
     Map<TransferStatus, String> statusMap = {
-      TransferStatus.draft: "待生效",
+      TransferStatus.draft: "待出库",
       TransferStatus.processing: "运输中",
       TransferStatus.finished: "调拨完成",
       TransferStatus.cancelled: "已取消",
     };
-
-    void onPressed() {
-      context.pushRoute(const CartRoute());
-    }
 
     useEffect(() {
       transferFetch() async {
