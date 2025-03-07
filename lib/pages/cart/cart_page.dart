@@ -27,7 +27,7 @@ class CartPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(cartProvider);
-    final xx = ref.read(cartProvider.notifier);
+    final cart = ref.read(cartProvider.notifier);
 
     final items = state.items;
     final carts = state.carts;
@@ -41,10 +41,10 @@ class CartPage extends HookConsumerWidget {
 
     final addItemByBarcode = useCallback((String barcode) async {
       final Sample sample = Sample(barcode: barcode);
-      var item = xx.getItemBySample(sample);
+      var item = cart.getItemBySample(sample);
 
       if (item != null) {
-        xx.addSample(sample, 1);
+        cart.addSample(sample, 1);
         return;
       }
 
@@ -57,7 +57,7 @@ class CartPage extends HookConsumerWidget {
           return;
         }
         for (var item in samples) {
-          xx.setSample(item, 1);
+          cart.setSample(item, 1);
         }
       } finally {
         EasyLoading.dismiss();
@@ -77,7 +77,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("系统中未找到该调拨单!");
           return;
         }
-        xx.transfer = transfer1;
+        cart.transfer = transfer1;
         EasyLoading.showSuccess("成功读取调拨单$orderNo");
       } finally {
         EasyLoading.dismiss();
@@ -91,7 +91,7 @@ class CartPage extends HookConsumerWidget {
             final selectedWarehouse = await context.router
                 .push<Warehouse>(const SelectWmsWarehouseRoute());
 
-            xx.warehouse = selectedWarehouse;
+            cart.warehouse = selectedWarehouse;
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -112,7 +112,7 @@ class CartPage extends HookConsumerWidget {
             final selectedBorrow =
                 await context.router.push<Borrow>(const SelectWmsBorrowRoute());
 
-            xx.borrow = selectedBorrow;
+            cart.borrow = selectedBorrow;
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -153,11 +153,11 @@ class CartPage extends HookConsumerWidget {
         description: "请选择一辆选样车",
         cancelText: "我再想想",
         actions: selectCarts
-            .map((cart) => FlanActionSheetAction(name: cart.name))
+            .map((select) => FlanActionSheetAction(name: select.name))
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {
-          xx.type = selectCarts[index].type;
+          cart.type = selectCarts[index].type;
         },
       );
     }
@@ -260,7 +260,7 @@ class CartPage extends HookConsumerWidget {
                     EasyLoading.show(status: '加载中...');
                     await storeBorrow(data);
                     EasyLoading.showSuccess("借样成功!");
-                    xx.clear();
+                    cart.clear();
                     user.value = null;
                     if (context.mounted) {
                       Navigator.of(context).pop();
@@ -315,7 +315,7 @@ class CartPage extends HookConsumerWidget {
           final data = {"return_items": productData};
           await borrowIn(borrow.id!, data);
           EasyLoading.showSuccess("还样成功!");
-          xx.clear();
+          cart.clear();
         } finally {
           EasyLoading.dismiss();
         }
@@ -331,7 +331,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
           await addTransferItems(transfer.id!, data);
-          xx.clear();
+          cart.clear();
           EasyLoading.showSuccess("调拨出库成功!");
         } finally {
           EasyLoading.dismiss();
@@ -348,7 +348,7 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.show(status: '加载中...');
           final data = {"items": productData};
           await transferIn(transfer.id!, data);
-          xx.clear();
+          cart.clear();
           EasyLoading.showSuccess("调拨入库成功!");
         } finally {
           EasyLoading.dismiss();
@@ -517,7 +517,7 @@ class CartPage extends HookConsumerWidget {
                                                 children: [
                                                   SlidableAction(
                                                     onPressed: (context) {
-                                                      xx.removeSample(
+                                                      cart.removeSample(
                                                           cartItem.sample);
                                                     },
                                                     backgroundColor: Colors.red,
@@ -542,7 +542,7 @@ class CartPage extends HookConsumerWidget {
                                                         value) {
                                                       return;
                                                     }
-                                                    xx.setSample(
+                                                    cart.setSample(
                                                         cartItem.sample, value);
                                                   },
                                                 ),
