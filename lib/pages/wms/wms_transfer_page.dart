@@ -100,7 +100,7 @@ class WmsTransferPage extends HookConsumerWidget {
               EasyLoading.show(status: '加载中...');
               await transferOut(transfer.value!.id!);
               transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.dismiss();
+              EasyLoading.showSuccess("出库成功!");
             },
             transferIn: () {
               final cart = ref.read(cartProvider.notifier);
@@ -112,7 +112,7 @@ class WmsTransferPage extends HookConsumerWidget {
               EasyLoading.show(status: '加载中...');
               await transferInAll(transfer.value!.id!);
               transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.dismiss();
+              EasyLoading.showSuccess("整箱入库成功!");
             },
           )
         ],
