@@ -30,10 +30,7 @@ class OperateBar extends HookConsumerWidget {
         }) ??
         0.0;
 
-    int totalCount = items.fold(0, (previousValue, item) {
-          return previousValue! + item.count;
-        }) ??
-        0;
+    int totalCount = items.length;
 
     return Container(
       height: 60,
