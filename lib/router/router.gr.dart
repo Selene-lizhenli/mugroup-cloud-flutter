@@ -8,11 +8,11 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i11;
-import 'package:cloud/models/wms/warehouse.dart' as _i13;
+import 'package:auto_route/auto_route.dart' as _i12;
+import 'package:cloud/models/wms/warehouse.dart' as _i14;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
-import 'package:cloud/pages/cart/models/state.dart' as _i12;
+import 'package:cloud/pages/cart/models/state.dart' as _i13;
 import 'package:cloud/pages/home/home_page.dart' as _i3;
 import 'package:cloud/pages/layout.dart' as _i4;
 import 'package:cloud/pages/login/login_page.dart' as _i5;
@@ -23,12 +23,13 @@ import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.d
     as _i9;
 import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
     as _i10;
-import 'package:flutter/material.dart' as _i14;
+import 'package:cloud/pages/transfer/transfer_page.dart' as _i11;
+import 'package:flutter/material.dart' as _i15;
 
 /// generated route for
 /// [_i1.CartPage]
-class CartRoute extends _i11.PageRouteInfo<void> {
-  const CartRoute({List<_i11.PageRouteInfo>? children})
+class CartRoute extends _i12.PageRouteInfo<void> {
+  const CartRoute({List<_i12.PageRouteInfo>? children})
       : super(
           CartRoute.name,
           initialChildren: children,
@@ -36,7 +37,7 @@ class CartRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'CartRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i1.CartPage();
@@ -46,12 +47,12 @@ class CartRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.ConfirmPage]
-class ConfirmRoute extends _i11.PageRouteInfo<ConfirmRouteArgs> {
+class ConfirmRoute extends _i12.PageRouteInfo<ConfirmRouteArgs> {
   ConfirmRoute({
-    required List<_i12.CartItem>? items,
-    required _i13.Warehouse? warehouse,
-    _i14.Key? key,
-    List<_i11.PageRouteInfo>? children,
+    required List<_i13.CartItem>? items,
+    required _i14.Warehouse? warehouse,
+    _i15.Key? key,
+    List<_i12.PageRouteInfo>? children,
   }) : super(
           ConfirmRoute.name,
           args: ConfirmRouteArgs(
@@ -64,7 +65,7 @@ class ConfirmRoute extends _i11.PageRouteInfo<ConfirmRouteArgs> {
 
   static const String name = 'ConfirmRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ConfirmRouteArgs>();
@@ -84,11 +85,11 @@ class ConfirmRouteArgs {
     this.key,
   });
 
-  final List<_i12.CartItem>? items;
+  final List<_i13.CartItem>? items;
 
-  final _i13.Warehouse? warehouse;
+  final _i14.Warehouse? warehouse;
 
-  final _i14.Key? key;
+  final _i15.Key? key;
 
   @override
   String toString() {
@@ -98,8 +99,8 @@ class ConfirmRouteArgs {
 
 /// generated route for
 /// [_i3.HomePage]
-class HomeRoute extends _i11.PageRouteInfo<void> {
-  const HomeRoute({List<_i11.PageRouteInfo>? children})
+class HomeRoute extends _i12.PageRouteInfo<void> {
+  const HomeRoute({List<_i12.PageRouteInfo>? children})
       : super(
           HomeRoute.name,
           initialChildren: children,
@@ -107,7 +108,7 @@ class HomeRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'HomeRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i3.HomePage();
@@ -117,8 +118,8 @@ class HomeRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.Layout]
-class Layout extends _i11.PageRouteInfo<void> {
-  const Layout({List<_i11.PageRouteInfo>? children})
+class Layout extends _i12.PageRouteInfo<void> {
+  const Layout({List<_i12.PageRouteInfo>? children})
       : super(
           Layout.name,
           initialChildren: children,
@@ -126,7 +127,7 @@ class Layout extends _i11.PageRouteInfo<void> {
 
   static const String name = 'Layout';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i4.Layout();
@@ -136,11 +137,11 @@ class Layout extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.LoginPage]
-class LoginRoute extends _i11.PageRouteInfo<LoginRouteArgs> {
+class LoginRoute extends _i12.PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
-    _i14.Key? key,
+    _i15.Key? key,
     void Function()? onLogin,
-    List<_i11.PageRouteInfo>? children,
+    List<_i12.PageRouteInfo>? children,
   }) : super(
           LoginRoute.name,
           args: LoginRouteArgs(
@@ -152,7 +153,7 @@ class LoginRoute extends _i11.PageRouteInfo<LoginRouteArgs> {
 
   static const String name = 'LoginRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       final args =
@@ -171,7 +172,7 @@ class LoginRouteArgs {
     this.onLogin,
   });
 
-  final _i14.Key? key;
+  final _i15.Key? key;
 
   final void Function()? onLogin;
 
@@ -183,8 +184,8 @@ class LoginRouteArgs {
 
 /// generated route for
 /// [_i6.MyPage]
-class MyRoute extends _i11.PageRouteInfo<void> {
-  const MyRoute({List<_i11.PageRouteInfo>? children})
+class MyRoute extends _i12.PageRouteInfo<void> {
+  const MyRoute({List<_i12.PageRouteInfo>? children})
       : super(
           MyRoute.name,
           initialChildren: children,
@@ -192,7 +193,7 @@ class MyRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'MyRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i6.MyPage();
@@ -202,8 +203,8 @@ class MyRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i7.ScanPage]
-class ScanRoute extends _i11.PageRouteInfo<void> {
-  const ScanRoute({List<_i11.PageRouteInfo>? children})
+class ScanRoute extends _i12.PageRouteInfo<void> {
+  const ScanRoute({List<_i12.PageRouteInfo>? children})
       : super(
           ScanRoute.name,
           initialChildren: children,
@@ -211,7 +212,7 @@ class ScanRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'ScanRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i7.ScanPage();
@@ -221,8 +222,8 @@ class ScanRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i8.SelectUserPage]
-class SelectUserRoute extends _i11.PageRouteInfo<void> {
-  const SelectUserRoute({List<_i11.PageRouteInfo>? children})
+class SelectUserRoute extends _i12.PageRouteInfo<void> {
+  const SelectUserRoute({List<_i12.PageRouteInfo>? children})
       : super(
           SelectUserRoute.name,
           initialChildren: children,
@@ -230,7 +231,7 @@ class SelectUserRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'SelectUserRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i8.SelectUserPage();
@@ -240,8 +241,8 @@ class SelectUserRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i9.SelectWmsBorrowPage]
-class SelectWmsBorrowRoute extends _i11.PageRouteInfo<void> {
-  const SelectWmsBorrowRoute({List<_i11.PageRouteInfo>? children})
+class SelectWmsBorrowRoute extends _i12.PageRouteInfo<void> {
+  const SelectWmsBorrowRoute({List<_i12.PageRouteInfo>? children})
       : super(
           SelectWmsBorrowRoute.name,
           initialChildren: children,
@@ -249,7 +250,7 @@ class SelectWmsBorrowRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'SelectWmsBorrowRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i9.SelectWmsBorrowPage();
@@ -259,8 +260,8 @@ class SelectWmsBorrowRoute extends _i11.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i10.SelectWmsWarehousePage]
-class SelectWmsWarehouseRoute extends _i11.PageRouteInfo<void> {
-  const SelectWmsWarehouseRoute({List<_i11.PageRouteInfo>? children})
+class SelectWmsWarehouseRoute extends _i12.PageRouteInfo<void> {
+  const SelectWmsWarehouseRoute({List<_i12.PageRouteInfo>? children})
       : super(
           SelectWmsWarehouseRoute.name,
           initialChildren: children,
@@ -268,10 +269,29 @@ class SelectWmsWarehouseRoute extends _i11.PageRouteInfo<void> {
 
   static const String name = 'SelectWmsWarehouseRoute';
 
-  static _i11.PageInfo page = _i11.PageInfo(
+  static _i12.PageInfo page = _i12.PageInfo(
     name,
     builder: (data) {
       return const _i10.SelectWmsWarehousePage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i11.TransferPage]
+class TransferRoute extends _i12.PageRouteInfo<void> {
+  const TransferRoute({List<_i12.PageRouteInfo>? children})
+      : super(
+          TransferRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'TransferRoute';
+
+  static _i12.PageInfo page = _i12.PageInfo(
+    name,
+    builder: (data) {
+      return const _i11.TransferPage();
     },
   );
 }
