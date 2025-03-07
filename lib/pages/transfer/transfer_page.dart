@@ -48,19 +48,31 @@ class TransferPage extends HookConsumerWidget {
             children: [
               TransferTextCard(
                 title: "调拨单号",
-                lable: transfer.orderNo,
+                lable: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                      child: Text(
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          transfer.orderNo ?? ""),
+                    ),
+
+                    /// TODO: 优化状态显示效果
+                    Text('(${statusMap[transfer.status]})')
+                  ],
+                ),
               ),
               TransferTextCard(
                 title: "出库方",
-                lable: transfer.outWarehouse?.name,
+                lable: Text(
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    transfer.outWarehouse?.name ?? ""),
               ),
               TransferTextCard(
                 title: '入库方',
-                lable: transfer.inWarehouse?.name,
-              ),
-              TransferTextCard(
-                title: '状态',
-                lable: statusMap[transfer.status],
+                lable: Text(
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    transfer.inWarehouse?.name ?? ""),
               ),
             ],
           )),

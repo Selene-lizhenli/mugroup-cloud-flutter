@@ -3,13 +3,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TransferTextCard extends HookConsumerWidget {
   final String title;
-  final String? lable;
+  final Widget lable;
 
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
 
   const TransferTextCard(
-      {super.key, required this.title, this.lable, this.margin, this.padding});
+      {super.key,
+      required this.title,
+      required this.lable,
+      this.margin,
+      this.padding});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,11 +40,7 @@ class TransferTextCard extends HookConsumerWidget {
                   ],
                 ),
               )),
-          Text(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-              lable ?? ""),
+          lable,
         ],
       ),
     );
