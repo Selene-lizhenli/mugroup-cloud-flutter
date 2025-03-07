@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class OperateBar extends HookConsumerWidget {
+class WmsTransferOperateBar extends HookConsumerWidget {
   final void Function()? onPressed;
 
-  const OperateBar({super.key, this.onPressed});
+  const WmsTransferOperateBar({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

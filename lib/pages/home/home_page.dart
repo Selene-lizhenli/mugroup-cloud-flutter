@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -23,6 +24,12 @@ class HomePage extends HookConsumerWidget {
             style: TextStyle(color: Colors.grey),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Text("测试"),
+        onPressed: () {
+          context.pushRoute(WmsTransferRoute(code: 'SF202503070012'));
+        },
       ),
     );
   }

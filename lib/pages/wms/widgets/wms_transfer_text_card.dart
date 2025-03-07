@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class TransferTextCard extends HookConsumerWidget {
+class WmsTransferTextCard extends HookConsumerWidget {
   final String title;
   final Widget lable;
 
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
 
-  const TransferTextCard(
+  const WmsTransferTextCard(
       {super.key,
       required this.title,
       required this.lable,

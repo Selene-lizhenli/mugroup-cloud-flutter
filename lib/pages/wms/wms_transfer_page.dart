@@ -4,8 +4,8 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'widgets/operate_bar.dart';
-import 'widgets/transfer_text_card.dart';
+import 'widgets/wms_transfrt_operate_bar.dart';
+import 'widgets/wms_transfer_text_card.dart';
 
 @RoutePage()
 class WmsTransferPage extends HookConsumerWidget {
@@ -49,7 +49,7 @@ class WmsTransferPage extends HookConsumerWidget {
           Expanded(
               child: Column(
             children: [
-              TransferTextCard(
+              WmsTransferTextCard(
                 title: "调拨单号",
                 lable: Row(
                   children: [
@@ -65,13 +65,13 @@ class WmsTransferPage extends HookConsumerWidget {
                   ],
                 ),
               ),
-              TransferTextCard(
+              WmsTransferTextCard(
                 title: "出库方",
                 lable: Text(
                     style: const TextStyle(fontWeight: FontWeight.w600),
                     transfer.outWarehouse?.name ?? ""),
               ),
-              TransferTextCard(
+              WmsTransferTextCard(
                 title: '入库方',
                 lable: Text(
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -79,7 +79,7 @@ class WmsTransferPage extends HookConsumerWidget {
               ),
             ],
           )),
-          OperateBar(onPressed: onPressed)
+          WmsTransferOperateBar(onPressed: onPressed)
         ],
       )),
     );
