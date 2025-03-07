@@ -62,6 +62,14 @@ Future transferIn(int transferId, Map<String, dynamic>? data) async {
       data: data);
 }
 
+Future transferInAll(int transferId) async {
+  return api.post("api/tenant/wms/stock/transfers/$transferId/transfer_in_all");
+}
+
+Future transferOut(int transferId) async {
+  return api.post("api/tenant/wms/stock/transfers/$transferId/transfer_out");
+}
+
 Future<Inventory> previewInventory(Map<String, dynamic>? data) async {
   final response = await api
       .post("api/tenant/wms/stock/inventories/inout/preview", data: data);
