@@ -105,34 +105,33 @@ class WmsTransferPage extends HookConsumerWidget {
                 ],
               ),
             ),
-            if (transfer.value?.status != TransferStatus.finished)
-              WmsTransferOperateBar(
-                status: transfer.value?.status,
-                addTransferItems: () {
-                  final cart = ref.read(cartProvider.notifier);
-                  cart.transfer = transfer.value;
-                  cart.type = CartType.transferOut;
-                  context.pushRoute(const CartRoute());
-                },
-                transferOut: () async {
-                  EasyLoading.show(status: '加载中...');
-                  await transferOut(transfer.value!.id!);
-                  transfer.value = await fetchTransferByOrederNo(code);
-                  EasyLoading.showSuccess("出库成功!");
-                },
-                transferIn: () {
-                  final cart = ref.read(cartProvider.notifier);
-                  cart.transfer = transfer.value;
-                  cart.type = CartType.transferIn;
-                  context.pushRoute(const CartRoute());
-                },
-                transferInAll: () async {
-                  EasyLoading.show(status: '加载中...');
-                  await transferInAll(transfer.value!.id!);
-                  transfer.value = await fetchTransferByOrederNo(code);
-                  EasyLoading.showSuccess("整箱入库成功!");
-                },
-              ),
+            WmsTransferOperateBar(
+              status: transfer.value?.status,
+              addTransferItems: () {
+                final cart = ref.read(cartProvider.notifier);
+                cart.transfer = transfer.value;
+                cart.type = CartType.transferOut;
+                context.pushRoute(const CartRoute());
+              },
+              transferOut: () async {
+                EasyLoading.show(status: '加载中...');
+                await transferOut(transfer.value!.id!);
+                transfer.value = await fetchTransferByOrederNo(code);
+                EasyLoading.showSuccess("出库成功!");
+              },
+              transferIn: () {
+                final cart = ref.read(cartProvider.notifier);
+                cart.transfer = transfer.value;
+                cart.type = CartType.transferIn;
+                context.pushRoute(const CartRoute());
+              },
+              transferInAll: () async {
+                EasyLoading.show(status: '加载中...');
+                await transferInAll(transfer.value!.id!);
+                transfer.value = await fetchTransferByOrederNo(code);
+                EasyLoading.showSuccess("整箱入库成功!");
+              },
+            ),
           ],
         ),
       ),

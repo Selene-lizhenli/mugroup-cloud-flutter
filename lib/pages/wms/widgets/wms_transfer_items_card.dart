@@ -33,9 +33,28 @@ class WmsTransferItemsCard extends HookConsumerWidget {
                 const SizedBox(
                   width: 10,
                 ),
-                Text('${transferItem?.inQty}'),
-                const Text('/'),
-                Text('${transferItem?.outQty}')
+                Text(
+                  '${transferItem?.inQty}',
+                  style: const TextStyle(
+                    color: Colors.blue, // 设置颜色
+                    fontSize: 18, // 加大字体
+                    fontWeight: FontWeight.bold, // 可选，设置加粗
+                  ),
+                ),
+                const Text(
+                  '/',
+                  style: TextStyle(
+                    fontSize: 18, // 同样加大字体
+                  ),
+                ),
+                Text(
+                  '${transferItem?.outQty}',
+                  style: const TextStyle(
+                    color: Color(0xFF84868B), // 设置不同的颜色
+                    fontSize: 18, // 加大字体
+                    fontWeight: FontWeight.bold, // 可选，设置加粗
+                  ),
+                ),
               ]),
               const SizedBox(
                 height: 10,
