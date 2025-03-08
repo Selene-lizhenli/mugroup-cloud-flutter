@@ -21,7 +21,7 @@ class WmsTransferOperateBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
-      height: 60,
+      height: 80,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -36,7 +36,7 @@ class WmsTransferOperateBar extends HookConsumerWidget {
                   backgroundColor: Colors.green[700], // 设置背景颜色
                   foregroundColor: Colors.white, // 设置文字颜色
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8), // 设置内边距
+                      horizontal: 16, vertical: 16), // 设置内边距
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8), // 圆角
                   ),
@@ -56,7 +56,7 @@ class WmsTransferOperateBar extends HookConsumerWidget {
                   backgroundColor: Colors.blue[700], // 设置背景颜色
                   foregroundColor: Colors.white, // 设置文字颜色
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8), // 设置内边距
+                      horizontal: 16, vertical: 16), // 设置内边距
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8), // 圆角
                   ),
