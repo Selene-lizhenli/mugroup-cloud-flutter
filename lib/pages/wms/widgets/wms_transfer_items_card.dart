@@ -11,111 +11,114 @@ class WmsTransferItemsCard extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var cover = transferItem!.product?.image?.elementAtOrNull(0)?.thumbUrl;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: Colors.white,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(children: [
-              Expanded(
-                  child: Text(
-                '${transferItem?.product?.nameCn}',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              )),
-              const SizedBox(
-                width: 10,
-              ),
-              Text('${transferItem?.inQty}'),
-              const Text('/'),
-              Text('${transferItem?.outQty}')
-            ]),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                cover != null
-                    ? CachedNetworkImage(
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
-                        imageUrl: cover,
-                      )
-                    : Image.asset(
-                        'assets/noImage.png',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
-                      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          color: Colors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(children: [
+                Expanded(
+                    child: Text(
+                  '${transferItem?.product?.nameCn}',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                )),
                 const SizedBox(
                   width: 10,
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    height: 100,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              "条形码：",
-                              style: TextStyle(),
-                            ),
-                            Text(
-                              "${transferItem?.product?.barcode}",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ],
+                Text('${transferItem?.inQty}'),
+                const Text('/'),
+                Text('${transferItem?.outQty}')
+              ]),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  cover != null
+                      ? CachedNetworkImage(
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
+                          imageUrl: cover,
+                        )
+                      : Image.asset(
+                          'assets/noImage.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
                         ),
-                        Row(
-                          children: [
-                            const Text(
-                              "产品编码：",
-                            ),
-                            Text(
-                              '${transferItem?.product?.productNo}',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Text(
-                              "采购单价：",
-                            ),
-                            Text(
-                              '￥${transferItem?.product?.purchaseCost}',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            )
-                          ],
-                        ),
-                      ],
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 100,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                "条形码：",
+                                style: TextStyle(),
+                              ),
+                              Text(
+                                "${transferItem?.product?.barcode}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "产品编码：",
+                              ),
+                              Text(
+                                '${transferItem?.product?.productNo}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "采购单价：",
+                              ),
+                              Text(
+                                '￥${transferItem?.product?.purchaseCost}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

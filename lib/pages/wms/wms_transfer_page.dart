@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/pages/wms/widgets/wms_transfer_items_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
@@ -39,80 +40,102 @@ class WmsTransferPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-          title: const InkWell(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.ideographic,
+        title: const Text('调拨单详情'),
+      ),
+      body: SafeArea(
+        child: Column(
           children: [
-            Text('调拨单详情'),
+            // 固定在顶部的订单信息
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WmsTransferTextCard(
+                  title: "调拨单号",
+                  lable: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Text(
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          transfer.value?.orderNo ?? "",
+                        ),
+                      ),
+                      Text('(${statusMap[transfer.value?.status]})'),
+                    ],
+                  ),
+                ),
+                WmsTransferTextCard(
+                  title: "出库方",
+                  lable: Text(
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      transfer.value?.outWarehouse?.name ?? ""),
+                ),
+                WmsTransferTextCard(
+                  title: '入库方',
+                  lable: Text(
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      transfer.value?.inWarehouse?.name ?? ""),
+                ),
+                const Padding(
+                  padding:
+                      EdgeInsets.only(top: 20, left: 8, bottom: 8, right: 8),
+                  child: Text(
+                    '产品信息',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+
+            // 让产品列表滚动
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  // 滚动的产品列表
+                  if (transfer.value?.items != null)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return WmsTransferItemsCard(
+                              transfer.value!.items![index]);
+                        },
+                        childCount: transfer.value!.items!.length,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (transfer.value?.status != TransferStatus.finished)
+              WmsTransferOperateBar(
+                status: transfer.value?.status,
+                addTransferItems: () {
+                  final cart = ref.read(cartProvider.notifier);
+                  cart.transfer = transfer.value;
+                  cart.type = CartType.transferOut;
+                  context.pushRoute(const CartRoute());
+                },
+                transferOut: () async {
+                  EasyLoading.show(status: '加载中...');
+                  await transferOut(transfer.value!.id!);
+                  transfer.value = await fetchTransferByOrederNo(code);
+                  EasyLoading.showSuccess("出库成功!");
+                },
+                transferIn: () {
+                  final cart = ref.read(cartProvider.notifier);
+                  cart.transfer = transfer.value;
+                  cart.type = CartType.transferIn;
+                  context.pushRoute(const CartRoute());
+                },
+                transferInAll: () async {
+                  EasyLoading.show(status: '加载中...');
+                  await transferInAll(transfer.value!.id!);
+                  transfer.value = await fetchTransferByOrederNo(code);
+                  EasyLoading.showSuccess("整箱入库成功!");
+                },
+              ),
           ],
         ),
-      )),
-      body: SafeArea(
-          child: Column(
-        children: [
-          Expanded(
-              child: Column(
-            children: [
-              WmsTransferTextCard(
-                title: "调拨单号",
-                lable: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                      child: Text(
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                          transfer.value?.orderNo ?? ""),
-                    ),
-
-                    /// TODO: 优化状态显示效果
-                    Text('(${statusMap[transfer.value?.status]})')
-                  ],
-                ),
-              ),
-              WmsTransferTextCard(
-                title: "出库方",
-                lable: Text(
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                    transfer.value?.outWarehouse?.name ?? ""),
-              ),
-              WmsTransferTextCard(
-                title: '入库方',
-                lable: Text(
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                    transfer.value?.inWarehouse?.name ?? ""),
-              ),
-            ],
-          )),
-          WmsTransferOperateBar(
-            status: transfer.value?.status,
-            addTransferItems: () {
-              final cart = ref.read(cartProvider.notifier);
-              cart.transfer = transfer.value;
-              cart.type = CartType.transferOut;
-              context.pushRoute(const CartRoute());
-            },
-            transferOut: () async {
-              EasyLoading.show(status: '加载中...');
-              await transferOut(transfer.value!.id!);
-              transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.showSuccess("出库成功!");
-            },
-            transferIn: () {
-              final cart = ref.read(cartProvider.notifier);
-              cart.transfer = transfer.value;
-              cart.type = CartType.transferIn;
-              context.pushRoute(const CartRoute());
-            },
-            transferInAll: () async {
-              EasyLoading.show(status: '加载中...');
-              await transferInAll(transfer.value!.id!);
-              transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.showSuccess("整箱入库成功!");
-            },
-          )
-        ],
-      )),
+      ),
     );
   }
 }
