@@ -27,30 +27,45 @@ class WmsTransferOperateBar extends HookConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (status == TransferStatus.draft)
-              TextButton(
-                  onPressed: addTransferItems,
-                  child: const Text(
-                    "添加",
-                  )),
-            if (status == TransferStatus.draft)
-              TextButton(
-                  onPressed: transferOut,
-                  child: const Text(
-                    "确认出库",
-                  )),
-            if (status == TransferStatus.processing)
-              TextButton(
-                  onPressed: transferIn,
-                  child: const Text(
-                    "入库",
-                  )),
-            if (status == TransferStatus.processing)
-              TextButton(
-                  onPressed: transferInAll,
-                  child: const Text(
-                    "整箱入库",
-                  ))
+            Expanded(
+              child: TextButton(
+                onPressed: status == TransferStatus.draft
+                    ? addTransferItems
+                    : transferIn,
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green[700], // 设置背景颜色
+                  foregroundColor: Colors.white, // 设置文字颜色
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8), // 设置内边距
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // 圆角
+                  ),
+                ),
+                child: Text(
+                  status == TransferStatus.draft ? '添加' : '入库',
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextButton(
+                onPressed: status == TransferStatus.draft
+                    ? transferOut
+                    : transferInAll,
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blue[700], // 设置背景颜色
+                  foregroundColor: Colors.white, // 设置文字颜色
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8), // 设置内边距
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // 圆角
+                  ),
+                ),
+                child: Text(
+                  status == TransferStatus.draft ? '确认出库' : '整箱入库',
+                ),
+              ),
+            ),
           ],
         ),
       ),
