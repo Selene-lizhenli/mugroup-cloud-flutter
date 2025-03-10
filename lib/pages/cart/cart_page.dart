@@ -418,13 +418,12 @@ class CartPage extends HookConsumerWidget {
                       final match = transferExp.firstMatch(item);
 
                       /// 解析结果为调拨单
-                      /// 解析结果为调拨单
                       if (match != null) {
                         final orderNo = match.group(1)!;
                         if (context.mounted) {
                           context.router.push(WmsTransferRoute(code: orderNo));
+                          return;
                         }
-                        return;
                       }
                       EasyLoading.showError("不支持该条码!");
                       return;
