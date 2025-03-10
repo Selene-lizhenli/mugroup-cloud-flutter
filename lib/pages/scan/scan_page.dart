@@ -14,6 +14,9 @@ class ScanPage extends HookConsumerWidget {
         title: const Text("扫一扫"),
       ),
       body: MobileScanner(
+        controller: MobileScannerController(
+          detectionSpeed: DetectionSpeed.noDuplicates,
+        ),
         onDetect: (barcodes) {
           final codes = <String>[];
 
