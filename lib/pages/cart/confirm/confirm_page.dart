@@ -29,24 +29,20 @@ class ConfirmPage extends HookConsumerWidget {
 
     useEffect(() {
       getInventories() async {
-        try {
-          EasyLoading.show(status: '加载中...');
-          final data = {
-            "warehouse_id": warehouse?.id,
-            "items": items
-                    ?.map((item) => {
-                          "product_id": item.sample.id,
-                          "new_qty": item.count,
-                        })
-                    .toList() ??
-                []
-          };
-          var resp = await previewInventory(data);
-
-          inventory.value = resp;
-        } finally {
-          EasyLoading.dismiss();
-        }
+        EasyLoading.show(status: '加载中...');
+        final data = {
+          "warehouse_id": warehouse?.id,
+          "items": items
+                  ?.map((item) => {
+                        "product_id": item.sample.id,
+                        "new_qty": item.count,
+                      })
+                  .toList() ??
+              []
+        };
+        var resp = await previewInventory(data);
+        EasyLoading.dismiss();
+        inventory.value = resp;
       }
 
       getInventories();

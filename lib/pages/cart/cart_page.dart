@@ -48,19 +48,16 @@ class CartPage extends HookConsumerWidget {
         return;
       }
 
-      try {
-        EasyLoading.show(status: '加载中...');
-        var samples = await getSamples(queryParameters: {"barcode": barcode})
-            .then((res) => res.data);
-        if (samples.isEmpty) {
-          EasyLoading.showInfo("库中未找到该样品!");
-          return;
-        }
-        for (var item in samples) {
-          cart.setSample(item, 1);
-        }
-      } finally {
-        EasyLoading.dismiss();
+      EasyLoading.show(status: '加载中...');
+      var samples = await getSamples(queryParameters: {"barcode": barcode})
+          .then((res) => res.data);
+      EasyLoading.dismiss();
+      if (samples.isEmpty) {
+        EasyLoading.showInfo("库中未找到该样品!");
+        return;
+      }
+      for (var item in samples) {
+        cart.setSample(item, 1);
       }
     }, []);
 
@@ -238,17 +235,13 @@ class CartPage extends HookConsumerWidget {
                     "warehouse_id": warehouse?.id,
                     "products": productData
                   };
-                  try {
-                    EasyLoading.show(status: '加载中...');
-                    await storeBorrow(data);
-                    EasyLoading.showSuccess("借样成功!");
-                    cart.clear();
-                    user.value = null;
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  } finally {
-                    EasyLoading.dismiss();
+                  EasyLoading.show(status: '加载中...');
+                  await storeBorrow(data);
+                  EasyLoading.showSuccess("借样成功!");
+                  cart.clear();
+                  user.value = null;
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -292,15 +285,11 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("请先选择借样单!");
           return;
         }
-        try {
-          EasyLoading.show(status: '加载中...');
-          final data = {"return_items": productData};
-          await borrowIn(borrow.id!, data);
-          EasyLoading.showSuccess("还样成功!");
-          cart.clear();
-        } finally {
-          EasyLoading.dismiss();
-        }
+        EasyLoading.show(status: '加载中...');
+        final data = {"return_items": productData};
+        await borrowIn(borrow.id!, data);
+        EasyLoading.showSuccess("还样成功!");
+        cart.clear();
       }
 
       // 调拨出库
@@ -309,15 +298,11 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
         }
-        try {
-          EasyLoading.show(status: '加载中...');
-          final data = {"items": productData};
-          await addTransferItems(transfer.id!, data);
-          cart.clear();
-          EasyLoading.showSuccess("调拨出库成功!");
-        } finally {
-          EasyLoading.dismiss();
-        }
+        EasyLoading.show(status: '加载中...');
+        final data = {"items": productData};
+        await addTransferItems(transfer.id!, data);
+        cart.clear();
+        EasyLoading.showSuccess("调拨出库成功!");
       }
 
       // 调拨入库
@@ -326,15 +311,11 @@ class CartPage extends HookConsumerWidget {
           EasyLoading.showInfo("请先扫描调拨单号!");
           return;
         }
-        try {
-          EasyLoading.show(status: '加载中...');
-          final data = {"items": productData};
-          await transferIn(transfer.id!, data);
-          cart.clear();
-          EasyLoading.showSuccess("调拨入库成功!");
-        } finally {
-          EasyLoading.dismiss();
-        }
+        EasyLoading.show(status: '加载中...');
+        final data = {"items": productData};
+        await transferIn(transfer.id!, data);
+        cart.clear();
+        EasyLoading.showSuccess("调拨入库成功!");
       }
 
       //盘点
