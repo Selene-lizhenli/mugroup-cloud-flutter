@@ -1,5 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
+import 'package:cloud/models/sample/quotation.dart';
 import 'package:cloud/models/sample/sample.dart';
 
 Future<ApiResponse<List<Sample>>> getSamples(
@@ -24,6 +25,17 @@ Future<Sample?> getSampleByBarcode(String barcode) async {
         return null;
       }
       return Sample.fromJson(res.data);
+    },
+  );
+}
+
+Future<Quotation?> storeShowroomQuotation(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/quotations", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Quotation.fromJson(res.data);
     },
   );
 }

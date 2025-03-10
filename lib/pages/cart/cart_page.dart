@@ -348,6 +348,16 @@ class CartPage extends HookConsumerWidget {
               .push(ConfirmRoute(items: (items), warehouse: warehouse));
         }
       }
+
+      //创建报价单
+      if (cartType == CartType.quotation) {
+        EasyLoading.show(status: '加载中...');
+        final sampleIds = items.map((item) => item.sample.id).toList();
+        final quotation =
+            await storeShowroomQuotation({"sample_ids": sampleIds});
+        logger.d(quotation);
+        EasyLoading.showSuccess('创建报价单成功!');
+      }
     }
 
     return Scaffold(
