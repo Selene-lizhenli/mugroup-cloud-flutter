@@ -18,8 +18,8 @@ class OperateBar extends HookConsumerWidget {
     Map<CartType, String> buttonText = {
       CartType.borrowOut: "借样",
       CartType.borrowIn: "还样",
-      CartType.transferIn: "调拨",
-      CartType.transferOut: "调拨",
+      CartType.transferIn: "调入",
+      CartType.transferOut: "调出",
       CartType.inout: "盘点"
     };
 
