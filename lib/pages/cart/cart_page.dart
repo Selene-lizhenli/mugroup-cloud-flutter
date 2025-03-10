@@ -64,26 +64,6 @@ class CartPage extends HookConsumerWidget {
       }
     }, []);
 
-    final setTranferByOrderNo = useCallback((String orderNo) async {
-      if (transfer?.orderNo == orderNo) {
-        EasyLoading.showInfo("已选中该调拨单!");
-        return;
-      }
-      try {
-        EasyLoading.show(status: '加载中...');
-        var transfer1 = await fetchTransferByOrederNo(orderNo);
-
-        if (transfer1 == null) {
-          EasyLoading.showInfo("系统中未找到该调拨单!");
-          return;
-        }
-        cart.transfer = transfer1;
-        EasyLoading.showSuccess("成功读取调拨单$orderNo");
-      } finally {
-        EasyLoading.dismiss();
-      }
-    }, []);
-
     final header = useMemoized(() {
       if (cartType == CartType.borrowOut || cartType == CartType.inout) {
         return GestureDetector(
