@@ -5,7 +5,6 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
-import 'package:flutter_broadcasts/flutter_broadcasts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -18,11 +17,9 @@ class Layout extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      BroadcastReceiver receiver = BroadcastReceiver(
-        names: [
-          "com.android.decodewedge.decode_action",
-        ],
-      );
+      if (receiver.isListening) {
+        return null;
+      }
 
       final sub = receiver.messages.listen((message) async {
         var barcodeString =
