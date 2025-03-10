@@ -414,18 +414,16 @@ class CartPage extends HookConsumerWidget {
                   }
                   for (var item in codes) {
                     if (isUrl(item)) {
-                      RegExp transferExp = RegExp(r'wms/transfer/SF\d{12}');
+                      RegExp transferExp = RegExp(r'wms/transfer/(.*)');
+                      final match = transferExp.firstMatch(item);
 
                       /// 解析结果为调拨单
-                      if (transferExp.hasMatch(item)) {
-                        RegExp transferOrderNoExp = RegExp(r'SF\d{12}');
-                        Match? match = transferOrderNoExp.firstMatch(item);
-                        if (match == null) {
-                          EasyLoading.showError("未匹配到正确的调拨单号,请检查二维码");
-                          return;
+                      /// 解析结果为调拨单
+                      if (match != null) {
+                        final orderNo = match.group(1)!;
+                        if (context.mounted) {
+                          context.router.push(WmsTransferRoute(code: orderNo));
                         }
-                        var orderNo = match.group(0)!;
-                        setTranferByOrderNo(orderNo);
                         return;
                       }
                       EasyLoading.showError("不支持该条码!");
