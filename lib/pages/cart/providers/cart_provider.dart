@@ -14,8 +14,6 @@ class Cart extends _$Cart {
     return State(items: [], carts: [
       CartSelect(CartType.borrowOut),
       CartSelect(CartType.borrowIn),
-      CartSelect(CartType.transferOut),
-      CartSelect(CartType.transferIn),
       CartSelect(CartType.inout)
     ]);
   }
