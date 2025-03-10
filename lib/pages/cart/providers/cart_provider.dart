@@ -19,28 +19,7 @@ class Cart extends _$Cart {
   }
 
   set type(CartType type) {
-    var cartName = "选样车";
-    if (type == CartType.borrowOut) {
-      cartName = "借样选样车";
-    }
-
-    if (type == CartType.borrowIn) {
-      cartName = "还样选样车";
-    }
-
-    if (type == CartType.transferOut) {
-      cartName = "调拨出库选样车";
-    }
-
-    if (type == CartType.transferIn) {
-      cartName = "调拨入库选样车";
-    }
-
-    if (type == CartType.inout) {
-      cartName = "手动盘点";
-    }
-
-    state = state.copyWith(type: type, cartName: cartName);
+    state = state.copyWith(type: type, cartName: cartNames[type] ?? "选样车");
   }
 
   set warehouse(Warehouse? warehouse) {

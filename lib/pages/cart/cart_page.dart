@@ -133,7 +133,7 @@ class CartPage extends HookConsumerWidget {
         description: "请选择一辆选样车",
         cancelText: "我再想想",
         actions: selectCarts
-            .map((select) => FlanActionSheetAction(name: select.name))
+            .map((select) => FlanActionSheetAction(name: select.cartName))
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {

@@ -20,35 +20,27 @@ enum CartType {
 
   /// 手动盘点
   inout,
+
+  /// 报价单
+  quotation,
 }
+
+Map<CartType, String> cartNames = {
+  CartType.borrowOut: "借样选样车",
+  CartType.borrowIn: "还样选样车",
+  CartType.transferOut: "调拨出库选样车",
+  CartType.transferIn: "调拨入库选样车",
+  CartType.inout: "手动盘点选样车",
+  CartType.quotation: "报价单选样车",
+};
 
 class CartSelect {
   final CartType type;
 
   CartSelect(this.type);
 
-  String get name {
-    if (type == CartType.borrowOut) {
-      return "借样选样车";
-    }
-
-    if (type == CartType.borrowIn) {
-      return "还样选样车";
-    }
-
-    if (type == CartType.transferOut) {
-      return "调拨出库选样车";
-    }
-
-    if (type == CartType.transferIn) {
-      return "调拨入库选样车";
-    }
-
-    if (type == CartType.inout) {
-      return "手动盘点";
-    }
-
-    return "选样车";
+  String get cartName {
+    return cartNames[type] ?? "选样车";
   }
 }
 
