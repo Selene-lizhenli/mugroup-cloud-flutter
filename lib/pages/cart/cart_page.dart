@@ -124,7 +124,9 @@ class CartPage extends HookConsumerWidget {
         );
       }
 
-      return GestureDetector();
+      return GestureDetector(
+        child: const SizedBox(),
+      );
     }, [cartType, warehouse, borrow, transfer]);
 
     void selectCart(List<CartSelect> selectCarts) {

@@ -14,7 +14,8 @@ class Cart extends _$Cart {
     return State(items: [], carts: [
       CartSelect(CartType.borrowOut),
       CartSelect(CartType.borrowIn),
-      CartSelect(CartType.inout)
+      CartSelect(CartType.quotation),
+      CartSelect(CartType.inout),
     ]);
   }
 

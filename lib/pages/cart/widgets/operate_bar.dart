@@ -20,7 +20,8 @@ class OperateBar extends HookConsumerWidget {
       CartType.borrowIn: "还样",
       CartType.transferIn: "调入",
       CartType.transferOut: "调出",
-      CartType.inout: "盘点"
+      CartType.quotation: "报价",
+      CartType.inout: "盘点",
     };
 
     double totalPrice = items.fold(0.0, (previousValue, item) {
