@@ -49,7 +49,7 @@ class Layout extends HookConsumerWidget {
           return;
         }
 
-        scanConroller.add(barcodeString);
+        scanController.add(barcodeString);
       });
 
       receiver.start();

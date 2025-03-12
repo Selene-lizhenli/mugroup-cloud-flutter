@@ -7,4 +7,4 @@ BroadcastReceiver receiver = BroadcastReceiver(
   ],
 );
 
-final scanConroller = BehaviorSubject<String>();
+final scanController = BehaviorSubject<String>();
