@@ -39,6 +39,41 @@ class WmsTransferPage extends HookConsumerWidget {
       return null;
     }, []);
 
+    void confirmTransferOut(BuildContext context) {
+      if (transfer.value!.items!.isEmpty) {
+        EasyLoading.showError("无可出库的物品");
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("确认出库"),
+            content: const Text("你确定要进行出库操作吗？"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("取消"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  EasyLoading.show(status: '加载中...');
+                  await transferOut(transfer.value!.id!);
+                  transfer.value = await fetchTransferByOrederNo(code);
+                  EasyLoading.showSuccess("出库成功!");
+                },
+                child: const Text("确认"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('调拨单详情'),
@@ -123,10 +158,7 @@ class WmsTransferPage extends HookConsumerWidget {
               context.pushRoute(const CartRoute());
             },
             transferOut: () async {
-              EasyLoading.show(status: '加载中...');
-              await transferOut(transfer.value!.id!);
-              transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.showSuccess("出库成功!");
+              confirmTransferOut(context);
             },
             transferIn: () {
               final cart = ref.read(cartProvider.notifier);
