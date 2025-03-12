@@ -78,9 +78,12 @@ class LoginPage extends HookWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("云链"),
+            const Text(
+              "云链",
+              style: TextStyle(fontSize: 18),
+            ),
             const SizedBox(
-              height: 5,
+              height: 10,
             ),
             // 请求二维码
             if (qrcode == null)
@@ -92,7 +95,7 @@ class LoginPage extends HookWidget {
             // 二维码被扫, 展示扫码者信息
             else if (qrcode.userId != null)
               SizedBox(
-                width: 200,
+                width: 220,
                 height: 100,
                 child: Center(
                   child: Column(
@@ -118,21 +121,21 @@ class LoginPage extends HookWidget {
               QrImageView(
                 data: '${Config.webUrl}login/qrcode/${qrcodeState.value!.id}',
                 version: QrVersions.auto,
-                size: 200.0,
+                size: 220.0,
                 backgroundColor: Colors.white,
               ),
             const SizedBox(
-              height: 5,
+              height: 20,
             ),
             if (qrcode?.userId != null)
               const Text(
                 "请在手机上确认登录",
-                style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+                style: TextStyle(color: Color(0xFF707070), fontSize: 14),
               )
             else
               const Text(
                 "请使用企业微信扫码登录",
-                style: TextStyle(color: Color(0xFF707070), fontSize: 10),
+                style: TextStyle(color: Color(0xFF707070), fontSize: 14),
               ),
           ],
         ),
