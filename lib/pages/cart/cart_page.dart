@@ -142,6 +142,10 @@ class CartPage extends HookConsumerWidget {
     }
 
     useEffect(() {
+      if (scanConroller.hasListener) {
+        return null;
+      }
+
       final sub = scanConroller.stream.listen((message) async {
         addItemByBarcode(message);
       });
