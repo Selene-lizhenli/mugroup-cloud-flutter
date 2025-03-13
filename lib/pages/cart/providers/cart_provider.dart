@@ -21,8 +21,8 @@ class Cart extends _$Cart {
       carts: [
         CartSelect(CartType.borrowOut),
         CartSelect(CartType.borrowIn),
-        CartSelect(CartType.quotation),
         CartSelect(CartType.inout),
+        CartSelect(CartType.quotation),
       ],
     );
 
