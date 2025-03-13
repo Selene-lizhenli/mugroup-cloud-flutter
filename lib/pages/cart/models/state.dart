@@ -4,6 +4,7 @@ import 'package:cloud/models/wms.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'state.freezed.dart';
+part 'state.g.dart';
 
 enum CartType {
   /// 借样
@@ -34,10 +35,24 @@ Map<CartType, String> cartNames = {
   CartType.quotation: "报价单选样车",
 };
 
-class CartSelect {
-  final CartType type;
+// class CartSelect {
+//   final CartType type;
 
-  CartSelect(this.type);
+//   CartSelect(this.type);
+
+//   String get cartName {
+//     return cartNames[type] ?? "选样车";
+//   }
+// }
+
+@freezed
+abstract class CartSelect with _$CartSelect {
+  const CartSelect._();
+
+  const factory CartSelect(CartType type) = _CartSelect;
+
+  factory CartSelect.fromJson(Map<String, Object?> json) =>
+      _$CartSelectFromJson(json);
 
   String get cartName {
     return cartNames[type] ?? "选样车";
@@ -50,6 +65,9 @@ abstract class CartItem with _$CartItem {
     required final Sample sample,
     required int count,
   }) = _CartItem;
+
+  factory CartItem.fromJson(Map<String, Object?> json) =>
+      _$CartItemFromJson(json);
 }
 
 @freezed
@@ -64,4 +82,6 @@ abstract class State with _$State {
     CartType? type,
     String? cartName,
   }) = _State;
+
+  factory State.fromJson(Map<String, Object?> json) => _$StateFromJson(json);
 }
