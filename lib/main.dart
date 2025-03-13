@@ -1,6 +1,7 @@
 import 'package:cloud/app/app.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -17,6 +18,17 @@ Future<void> main() async {
       statusBarIconBrightness: Brightness.dark, // 设置状态栏图标亮度
     ),
   );
+
+  EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
+        dragText: '下拉刷新',
+        armedText: '释放开始',
+        readyText: '刷新中...',
+        processingText: '刷新中...',
+        processedText: '成功了',
+        noMoreText: '没有更多',
+        failedText: '失败了',
+        messageText: '最后更新于 %T',
+      );
 
   runApp(
     UncontrolledProviderScope(

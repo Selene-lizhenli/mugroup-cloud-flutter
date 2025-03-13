@@ -66,6 +66,7 @@ dependencies:
   rxdart: ^0.27.7
   mobile_scanner: ^6.0.7
   shared_preferences: ^2.3.3
+  easy_refresh: ^3.4.0
     # path: ../flant
 
 dev_dependencies:

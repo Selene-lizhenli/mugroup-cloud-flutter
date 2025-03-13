@@ -5,6 +5,7 @@ import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/wms/widgets/wms_transfer_items_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/wms.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -30,11 +31,11 @@ class WmsTransferPage extends HookConsumerWidget {
       TransferStatus.cancelled: "已取消",
     };
 
-    useEffect(() {
-      transferFetch() async {
-        transfer.value = await fetchTransferByOrederNo(code);
-      }
+    final transferFetch = useCallback(() async {
+      transfer.value = await fetchTransferByOrederNo(code);
+    }, []);
 
+    useEffect(() {
       transferFetch();
       return null;
     }, []);
@@ -82,71 +83,78 @@ class WmsTransferPage extends HookConsumerWidget {
         children: [
           // 让产品列表滚动
           Expanded(
-            child: CustomScrollView(
-              slivers: [
-                MultiSliver(
-                  children: [
-                    // 固定在顶部的订单信息
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        WmsTransferTextCard(
-                          title: "调拨单号",
-                          lable: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                                child: Text(
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
-                                  transfer.value?.orderNo ?? "",
+            child: EasyRefresh(
+              onRefresh: () async {
+                await transferFetch();
+              },
+              child: CustomScrollView(
+                slivers: [
+                  MultiSliver(
+                    children: [
+                      // 固定在顶部的订单信息
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          WmsTransferTextCard(
+                            title: "调拨单号",
+                            lable: Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                                  child: Text(
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600),
+                                    transfer.value?.orderNo ?? "",
+                                  ),
                                 ),
-                              ),
-                              if (transfer.value != null)
-                                Text('(${statusMap[transfer.value?.status]})'),
-                            ],
+                                if (transfer.value != null)
+                                  Text(
+                                      '(${statusMap[transfer.value?.status]})'),
+                              ],
+                            ),
                           ),
-                        ),
-                        WmsTransferTextCard(
-                          title: "出库方",
-                          lable: Text(
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              transfer.value?.outWarehouse?.name ?? ""),
-                        ),
-                        WmsTransferTextCard(
-                          title: '入库方',
-                          lable: Text(
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              transfer.value?.inWarehouse?.name ?? ""),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(
-                              top: 20, left: 8, bottom: 8, right: 8),
-                          child: Text(
-                            '产品信息',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          WmsTransferTextCard(
+                            title: "出库方",
+                            lable: Text(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600),
+                                transfer.value?.outWarehouse?.name ?? ""),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // 滚动的产品列表
-                if (transfer.value?.items != null)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return WmsTransferItemsCard(
-                            transfer.value!.items![index]);
-                      },
-                      childCount: transfer.value!.items!.length,
-                    ),
+                          WmsTransferTextCard(
+                            title: '入库方',
+                            lable: Text(
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600),
+                                transfer.value?.inWarehouse?.name ?? ""),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(
+                                top: 20, left: 8, bottom: 8, right: 8),
+                            child: Text(
+                              '产品信息',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-              ],
+
+                  // 滚动的产品列表
+                  if (transfer.value?.items != null)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return WmsTransferItemsCard(
+                              transfer.value!.items![index]);
+                        },
+                        childCount: transfer.value!.items!.length,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
           WmsTransferOperateBar(
