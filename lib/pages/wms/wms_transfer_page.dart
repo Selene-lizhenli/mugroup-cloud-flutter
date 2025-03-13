@@ -65,7 +65,44 @@ class WmsTransferPage extends HookConsumerWidget {
                   EasyLoading.show(status: '加载中...');
                   await transferOut(transfer.value!.id!);
                   transfer.value = await fetchTransferByOrederNo(code);
+                  transferFetch();
                   EasyLoading.showSuccess("出库成功!");
+                },
+                child: const Text("确认"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    void confirmTransferInAll(BuildContext context) {
+      if (transfer.value!.items!.isEmpty) {
+        EasyLoading.showError("无可整箱入库的物品");
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("确认整箱入库"),
+            content: const Text("你确定要进行整箱入库操作吗？"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("取消"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  EasyLoading.show(status: '加载中...');
+                  await transferInAll(transfer.value!.id!);
+                  transfer.value = await fetchTransferByOrederNo(code);
+                  transferFetch();
+                  EasyLoading.showSuccess("整箱入库成功!");
                 },
                 child: const Text("确认"),
               ),
@@ -175,10 +212,7 @@ class WmsTransferPage extends HookConsumerWidget {
               context.pushRoute(const CartRoute());
             },
             transferInAll: () async {
-              EasyLoading.show(status: '加载中...');
-              await transferInAll(transfer.value!.id!);
-              transfer.value = await fetchTransferByOrederNo(code);
-              EasyLoading.showSuccess("整箱入库成功!");
+              confirmTransferInAll(context);
             },
           ),
         ],
