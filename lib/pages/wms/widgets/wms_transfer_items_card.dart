@@ -93,13 +93,14 @@ class WmsTransferItemsCard extends HookConsumerWidget {
                                 "条形码：",
                                 style: TextStyle(),
                               ),
-                              Text(
-                                "${transferItem?.product?.barcode}",
+                              Expanded(
+                                  child: Text(
+                                transferItem?.product?.barcode ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500),
-                              ),
+                              )),
                             ],
                           ),
                           Row(
@@ -107,13 +108,14 @@ class WmsTransferItemsCard extends HookConsumerWidget {
                               const Text(
                                 "产品编码：",
                               ),
-                              Text(
-                                '${transferItem?.product?.productNo}',
+                              Expanded(
+                                  child: Text(
+                                transferItem?.product?.productNo ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500),
-                              )
+                              ))
                             ],
                           ),
                           Row(
@@ -121,13 +123,16 @@ class WmsTransferItemsCard extends HookConsumerWidget {
                               const Text(
                                 "采购单价：",
                               ),
-                              Text(
-                                '￥${transferItem?.product?.purchaseCost}',
+                              Expanded(
+                                  child: Text(
+                                transferItem?.product?.purchaseCost != null
+                                    ? '￥${transferItem!.product!.purchaseCost}'
+                                    : '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500),
-                              )
+                              ))
                             ],
                           ),
                         ],
