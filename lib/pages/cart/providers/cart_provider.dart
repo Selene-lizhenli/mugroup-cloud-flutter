@@ -96,7 +96,7 @@ class Cart extends _$Cart {
     if (item != null) {
       item.count = item.count + step;
     } else {
-      items.add(CartItem(sample: sample, count: step));
+      items.insert(0, CartItem(sample: sample, count: step));
     }
 
     state = state.copyWith(items: items);
@@ -115,7 +115,7 @@ class Cart extends _$Cart {
     if (item != null) {
       item.count = count;
     } else {
-      items.add(CartItem(sample: sample, count: count));
+      items.insert(0, CartItem(sample: sample, count: count));
     }
 
     state = state.copyWith(items: items);
