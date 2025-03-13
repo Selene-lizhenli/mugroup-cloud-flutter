@@ -21,7 +21,7 @@ class WmsTransferOperateBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
-      height: 80,
+      height: status == TransferStatus.finished ? 0 : 80,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
