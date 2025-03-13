@@ -57,7 +57,7 @@ class CartPage extends HookConsumerWidget {
         return;
       }
       for (var item in samples) {
-        cart.setSample(item, 1);
+        cart.addSample(item, 1);
       }
     }, []);
 
