@@ -339,9 +339,8 @@ class CartPage extends HookConsumerWidget {
       if (cartType == CartType.quotation) {
         EasyLoading.show(status: '加载中...');
         final sampleIds = items.map((item) => item.sample.id).toList();
-        final quotation =
-            await storeShowroomQuotation({"sample_ids": sampleIds});
-        logger.d(quotation);
+        await storeShowroomQuotation({"sample_ids": sampleIds});
+        cart.clear();
         EasyLoading.showSuccess('创建报价单成功!');
       }
     }
