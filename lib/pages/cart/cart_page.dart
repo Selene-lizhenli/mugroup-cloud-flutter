@@ -232,8 +232,6 @@ class CartPage extends HookConsumerWidget {
                           context,
                           visible: true,
                           onConfirm: (value) {
-                            // TODO: 移除 cart
-                            cart.selectedDate = value;
                             setState(() {
                               selectedDate = value;
                             });

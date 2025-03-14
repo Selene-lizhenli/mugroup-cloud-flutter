@@ -1,5 +1,4 @@
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -78,10 +77,8 @@ abstract class State with _$State {
     Warehouse? warehouse,
     Borrow? borrow,
     Transfer? transfer,
-    User? user,
     CartType? type,
     String? cartName,
-    List<int>? selectedDate,
   }) = _State;
 
   factory State.fromJson(Map<String, Object?> json) => _$StateFromJson(json);

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:cloud/app/app.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:collection/collection.dart';
@@ -39,7 +38,6 @@ class Cart extends _$Cart {
         transfer: cacheState.transfer,
         type: cacheState.type,
         warehouse: cacheState.warehouse,
-        user: cacheState.user,
       );
     }
 
@@ -66,24 +64,12 @@ class Cart extends _$Cart {
     save();
   }
 
-  set user(User? user) {
-    state = state.copyWith(user: user);
-    save();
-  }
-
-  set selectedDate(List<int>? selectedDate) {
-    state = state.copyWith(selectedDate: selectedDate);
-    save();
-  }
-
   void clear() {
     state = state.copyWith(
       items: [],
       warehouse: null,
       borrow: null,
       transfer: null,
-      user: null,
-      selectedDate: null,
     );
     app.prefs.remove(cacheKey);
   }

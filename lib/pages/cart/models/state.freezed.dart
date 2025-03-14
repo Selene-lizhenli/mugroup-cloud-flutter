@@ -316,10 +316,8 @@ mixin _$State {
   Warehouse? get warehouse => throw _privateConstructorUsedError;
   Borrow? get borrow => throw _privateConstructorUsedError;
   Transfer? get transfer => throw _privateConstructorUsedError;
-  User? get user => throw _privateConstructorUsedError;
   CartType? get type => throw _privateConstructorUsedError;
   String? get cartName => throw _privateConstructorUsedError;
-  List<int>? get selectedDate => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -337,15 +335,12 @@ abstract class $StateCopyWith<$Res> {
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
-      User? user,
       CartType? type,
-      String? cartName,
-      List<int>? selectedDate});
+      String? cartName});
 
   $WarehouseCopyWith<$Res>? get warehouse;
   $BorrowCopyWith<$Res>? get borrow;
   $TransferCopyWith<$Res>? get transfer;
-  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -366,10 +361,8 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
-    Object? user = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
-    Object? selectedDate = freezed,
   }) {
     return _then(_value.copyWith(
       items: null == items
@@ -392,10 +385,6 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.transfer
           : transfer // ignore: cast_nullable_to_non_nullable
               as Transfer?,
-      user: freezed == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as User?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -404,10 +393,6 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.cartName
           : cartName // ignore: cast_nullable_to_non_nullable
               as String?,
-      selectedDate: freezed == selectedDate
-          ? _value.selectedDate
-          : selectedDate // ignore: cast_nullable_to_non_nullable
-              as List<int>?,
     ) as $Val);
   }
 
@@ -446,18 +431,6 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
       return _then(_value.copyWith(transfer: value) as $Val);
     });
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $UserCopyWith<$Res>? get user {
-    if (_value.user == null) {
-      return null;
-    }
-
-    return $UserCopyWith<$Res>(_value.user!, (value) {
-      return _then(_value.copyWith(user: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -473,10 +446,8 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
-      User? user,
       CartType? type,
-      String? cartName,
-      List<int>? selectedDate});
+      String? cartName});
 
   @override
   $WarehouseCopyWith<$Res>? get warehouse;
@@ -484,8 +455,6 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
   $BorrowCopyWith<$Res>? get borrow;
   @override
   $TransferCopyWith<$Res>? get transfer;
-  @override
-  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -504,10 +473,8 @@ class __$$StateImplCopyWithImpl<$Res>
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
-    Object? user = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
-    Object? selectedDate = freezed,
   }) {
     return _then(_$StateImpl(
       items: null == items
@@ -530,10 +497,6 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value.transfer
           : transfer // ignore: cast_nullable_to_non_nullable
               as Transfer?,
-      user: freezed == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as User?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -542,10 +505,6 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value.cartName
           : cartName // ignore: cast_nullable_to_non_nullable
               as String?,
-      selectedDate: freezed == selectedDate
-          ? _value._selectedDate
-          : selectedDate // ignore: cast_nullable_to_non_nullable
-              as List<int>?,
     ));
   }
 }
@@ -559,13 +518,10 @@ class _$StateImpl implements _State {
       this.warehouse,
       this.borrow,
       this.transfer,
-      this.user,
       this.type,
-      this.cartName,
-      final List<int>? selectedDate})
+      this.cartName})
       : _items = items,
-        _carts = carts,
-        _selectedDate = selectedDate;
+        _carts = carts;
 
   factory _$StateImpl.fromJson(Map<String, dynamic> json) =>
       _$$StateImplFromJson(json);
@@ -593,24 +549,13 @@ class _$StateImpl implements _State {
   @override
   final Transfer? transfer;
   @override
-  final User? user;
-  @override
   final CartType? type;
   @override
   final String? cartName;
-  final List<int>? _selectedDate;
-  @override
-  List<int>? get selectedDate {
-    final value = _selectedDate;
-    if (value == null) return null;
-    if (_selectedDate is EqualUnmodifiableListView) return _selectedDate;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
 
   @override
   String toString() {
-    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, user: $user, type: $type, cartName: $cartName, selectedDate: $selectedDate)';
+    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, type: $type, cartName: $cartName)';
   }
 
   @override
@@ -625,12 +570,9 @@ class _$StateImpl implements _State {
             (identical(other.borrow, borrow) || other.borrow == borrow) &&
             (identical(other.transfer, transfer) ||
                 other.transfer == transfer) &&
-            (identical(other.user, user) || other.user == user) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.cartName, cartName) ||
-                other.cartName == cartName) &&
-            const DeepCollectionEquality()
-                .equals(other._selectedDate, _selectedDate));
+                other.cartName == cartName));
   }
 
   @JsonKey(ignore: true)
@@ -642,10 +584,8 @@ class _$StateImpl implements _State {
       warehouse,
       borrow,
       transfer,
-      user,
       type,
-      cartName,
-      const DeepCollectionEquality().hash(_selectedDate));
+      cartName);
 
   @JsonKey(ignore: true)
   @override
@@ -668,10 +608,8 @@ abstract class _State implements State {
       final Warehouse? warehouse,
       final Borrow? borrow,
       final Transfer? transfer,
-      final User? user,
       final CartType? type,
-      final String? cartName,
-      final List<int>? selectedDate}) = _$StateImpl;
+      final String? cartName}) = _$StateImpl;
 
   factory _State.fromJson(Map<String, dynamic> json) = _$StateImpl.fromJson;
 
@@ -686,13 +624,9 @@ abstract class _State implements State {
   @override
   Transfer? get transfer;
   @override
-  User? get user;
-  @override
   CartType? get type;
   @override
   String? get cartName;
-  @override
-  List<int>? get selectedDate;
   @override
   @JsonKey(ignore: true)
   _$$StateImplCopyWith<_$StateImpl> get copyWith =>

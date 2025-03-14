@@ -53,14 +53,8 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
       transfer: json['transfer'] == null
           ? null
           : Transfer.fromJson(json['transfer'] as Map<String, dynamic>),
-      user: json['user'] == null
-          ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
       type: $enumDecodeNullable(_$CartTypeEnumMap, json['type']),
       cartName: json['cartName'] as String?,
-      selectedDate: (json['selectedDate'] as List<dynamic>?)
-          ?.map((e) => (e as num).toInt())
-          .toList(),
     );
 
 Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
@@ -70,8 +64,6 @@ Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
       'warehouse': instance.warehouse,
       'borrow': instance.borrow,
       'transfer': instance.transfer,
-      'user': instance.user,
       'type': _$CartTypeEnumMap[instance.type],
       'cartName': instance.cartName,
-      'selectedDate': instance.selectedDate,
     };
