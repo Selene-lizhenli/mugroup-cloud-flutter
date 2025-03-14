@@ -160,7 +160,12 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          List<int>? selectedDate;
+          List<int>? selectedDate = [
+            DateTime.now()
+                    .add(const Duration(days: 7))
+                    .microsecondsSinceEpoch ~/
+                1000
+          ];
 
           return StatefulBuilder(
             builder: (context, setState) {
