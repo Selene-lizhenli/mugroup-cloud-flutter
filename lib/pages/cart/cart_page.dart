@@ -265,6 +265,107 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void quotationDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: const Text(
+              "确认创建报价单",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "外销员",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final selectedUser = await context.router
+                        .push<User>(const SelectUserRoute());
+                    user.value = selectedUser;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.value == null
+                                ? "请选择用户"
+                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: user.value == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.keyboard_arrow_right,
+                            color: Colors.grey), // 添加右侧箭头
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (user.value == null) {
+                    EasyLoading.showInfo("请先选择用户!");
+                    return;
+                  }
+                  EasyLoading.show(status: '加载中...');
+                  final sampleIds =
+                      items.map((item) => item.sample.id).toList();
+                  await storeShowroomQuotation(
+                      {"sample_ids": sampleIds, "user_id": user.value?.id});
+                  EasyLoading.showSuccess('创建报价单成功!');
+                  cart.clear();
+                  user.value = null;
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -273,6 +374,11 @@ class CartPage extends HookConsumerWidget {
           return;
         }
         borrowDialog(context);
+      }
+
+      //创建报价单
+      if (cartType == CartType.quotation) {
+        quotationDialog(context);
       }
 
       final productData = items
@@ -333,15 +439,6 @@ class CartPage extends HookConsumerWidget {
           context.router
               .push(ConfirmRoute(items: (items), warehouse: warehouse));
         }
-      }
-
-      //创建报价单
-      if (cartType == CartType.quotation) {
-        EasyLoading.show(status: '加载中...');
-        final sampleIds = items.map((item) => item.sample.id).toList();
-        await storeShowroomQuotation({"sample_ids": sampleIds});
-        cart.clear();
-        EasyLoading.showSuccess('创建报价单成功!');
       }
     }
 
