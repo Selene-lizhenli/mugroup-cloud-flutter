@@ -14,9 +14,9 @@ import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 import '../../models/sample/sample.dart';
 import 'widgets/sample_item.dart';
 
@@ -36,6 +36,7 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
+    final selectedDate = state.selectedDate;
 
     final user = useState<User?>(null);
 
@@ -165,7 +166,7 @@ class CartPage extends HookConsumerWidget {
             ),
             title: const Text(
               "确认借样",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -173,7 +174,7 @@ class CartPage extends HookConsumerWidget {
               children: [
                 const Text(
                   "借样人",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -198,7 +199,7 @@ class CartPage extends HookConsumerWidget {
                                 ? "请选择用户"
                                 : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: user.value == null
                                   ? Colors.grey.shade600
                                   : Colors.black87,
@@ -211,11 +212,55 @@ class CartPage extends HookConsumerWidget {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  "预计归还时间",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => {
+                    TDCalendarPopup(
+                      context,
+                      visible: true,
+                      onConfirm: (value) {
+                        cart.selectedDate = value;
+                      },
+                      child: TDCalendar(
+                        title: '请选择日期',
+                        value: selectedDate,
+                      ),
+                    ),
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          selectedDate == null
+                              ? '请选择日期'
+                              : '${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).day}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
                 child: const Text(
                   "取消",
                   style: TextStyle(color: Colors.grey),
@@ -275,7 +320,7 @@ class CartPage extends HookConsumerWidget {
             ),
             title: const Text(
               "确认创建报价单",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -283,7 +328,7 @@ class CartPage extends HookConsumerWidget {
               children: [
                 const Text(
                   "外销员",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -308,7 +353,7 @@ class CartPage extends HookConsumerWidget {
                                 ? "请选择用户"
                                 : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: user.value == null
                                   ? Colors.grey.shade600
                                   : Colors.black87,
