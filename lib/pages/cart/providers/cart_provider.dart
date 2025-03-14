@@ -71,6 +71,11 @@ class Cart extends _$Cart {
     save();
   }
 
+  set selectedDate(List<int>? selectedDate) {
+    state = state.copyWith(selectedDate: selectedDate);
+    save();
+  }
+
   void clear() {
     state = state.copyWith(
       items: [],
@@ -78,6 +83,7 @@ class Cart extends _$Cart {
       borrow: null,
       transfer: null,
       user: null,
+      selectedDate: null,
     );
     app.prefs.remove(cacheKey);
   }

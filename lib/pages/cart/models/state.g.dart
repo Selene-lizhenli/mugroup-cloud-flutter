@@ -58,6 +58,9 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
           : User.fromJson(json['user'] as Map<String, dynamic>),
       type: $enumDecodeNullable(_$CartTypeEnumMap, json['type']),
       cartName: json['cartName'] as String?,
+      selectedDate: (json['selectedDate'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
@@ -70,4 +73,5 @@ Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
       'user': instance.user,
       'type': _$CartTypeEnumMap[instance.type],
       'cartName': instance.cartName,
+      'selectedDate': instance.selectedDate,
     };

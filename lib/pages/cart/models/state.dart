@@ -81,6 +81,7 @@ abstract class State with _$State {
     User? user,
     CartType? type,
     String? cartName,
+    List<int>? selectedDate,
   }) = _State;
 
   factory State.fromJson(Map<String, Object?> json) => _$StateFromJson(json);
