@@ -20,8 +20,8 @@ class SampleItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cover = sample.image?.elementAtOrNull(0)?.thumbUrl;
-
+    var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
+        sample.image?.elementAtOrNull(0)?.url;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
