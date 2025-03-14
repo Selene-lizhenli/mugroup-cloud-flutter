@@ -36,7 +36,7 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
-    final selectedDate = state.selectedDate;
+    // final selectedDate = state.selectedDate;
 
     final user = useState<User?>(null);
 
@@ -160,151 +160,163 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            title: const Text(
-              "确认借样",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "借样人",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          List<int>? selectedDate = state.selectedDate;
+
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
                 ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    final selectedUser = await context.router
-                        .push<User>(const SelectUserRoute());
-                    user.value = selectedUser;
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade100,
+                title: const Text(
+                  "确认借样",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "借样人",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            user.value == null
-                                ? "请选择用户"
-                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: user.value == null
-                                  ? Colors.grey.shade600
-                                  : Colors.black87,
-                            ),
-                          ),
-                        ),
-                        const Icon(Icons.keyboard_arrow_right,
-                            color: Colors.grey), // 添加右侧箭头
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text(
-                  "预计归还时间",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () => {
-                    TDCalendarPopup(
-                      context,
-                      visible: true,
-                      onConfirm: (value) {
-                        cart.selectedDate = value;
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final selectedUser = await context.router
+                            .push<User>(const SelectUserRoute());
+                        user.value = selectedUser;
                       },
-                      child: TDCalendar(
-                        title: '请选择日期',
-                        value: selectedDate,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade400),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey.shade100,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                user.value == null
+                                    ? "请选择用户"
+                                    : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: user.value == null
+                                      ? Colors.grey.shade600
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ),
+                            const Icon(Icons.keyboard_arrow_right,
+                                color: Colors.grey), // 添加右侧箭头
+                          ],
+                        ),
                       ),
                     ),
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade100,
+                    const SizedBox(
+                      height: 10,
                     ),
-                    child: Row(
-                      children: [
-                        Text(
-                          selectedDate == null
-                              ? '请选择日期'
-                              : '${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate[0]).day}',
-                          style: const TextStyle(fontSize: 14),
+                    const Text(
+                      "预计归还时间",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => {
+                        TDCalendarPopup(
+                          context,
+                          visible: true,
+                          onConfirm: (value) {
+                            // TODO: 移除 cart
+                            cart.selectedDate = value;
+                            setState(() {
+                              selectedDate = value;
+                            });
+                          },
+                          child: TDCalendar(
+                            title: '请选择日期',
+                            value: selectedDate,
+                          ),
                         ),
-                      ],
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade400),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey.shade100,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              selectedDate == null
+                                  ? '请选择日期'
+                                  : '${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).day}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "取消",
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text(
-                  "取消",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (user.value == null) {
-                    EasyLoading.showInfo("请先选择用户!");
-                    return;
-                  }
-                  final productData = items
-                      .map((item) => {
-                            "product_id": item.sample.id,
-                            "inout_qty": item.count,
-                            "product_no": item.sample.productNo
-                          })
-                      .toList();
-                  final data = {
-                    "borrower_id": user.value?.id,
-                    "warehouse_id": warehouse?.id,
-                    "products": productData
-                  };
-                  EasyLoading.show(status: '加载中...');
-                  await storeBorrow(data);
-                  EasyLoading.showSuccess("借样成功!");
-                  cart.clear();
-                  user.value = null;
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (user.value == null) {
+                        EasyLoading.showInfo("请先选择用户!");
+                        return;
+                      }
+                      final productData = items
+                          .map((item) => {
+                                "product_id": item.sample.id,
+                                "inout_qty": item.count,
+                                "product_no": item.sample.productNo
+                              })
+                          .toList();
+                      final data = {
+                        "borrower_id": user.value?.id,
+                        "warehouse_id": warehouse?.id,
+                        "products": productData
+                      };
+                      EasyLoading.show(status: '加载中...');
+                      await storeBorrow(data);
+                      EasyLoading.showSuccess("借样成功!");
+                      cart.clear();
+                      user.value = null;
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "提交",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  "提交",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           );
         },
       );
