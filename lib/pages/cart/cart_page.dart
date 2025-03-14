@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 import '../../models/sample/sample.dart';
@@ -36,7 +37,6 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
-    // final selectedDate = state.selectedDate;
 
     final user = useState<User?>(null);
 
@@ -160,7 +160,7 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          List<int>? selectedDate = state.selectedDate;
+          List<int>? selectedDate;
 
           return StatefulBuilder(
             builder: (context, setState) {
@@ -282,6 +282,10 @@ class CartPage extends HookConsumerWidget {
                         EasyLoading.showInfo("请先选择用户!");
                         return;
                       }
+                      if (selectedDate == null) {
+                        EasyLoading.showInfo("请先选择预计归还时间!");
+                        return;
+                      }
                       final productData = items
                           .map((item) => {
                                 "product_id": item.sample.id,
@@ -292,7 +296,11 @@ class CartPage extends HookConsumerWidget {
                       final data = {
                         "borrower_id": user.value?.id,
                         "warehouse_id": warehouse?.id,
-                        "products": productData
+                        "products": productData,
+                        "expected_returned_at":
+                            DateFormat("yyyy-MM-dd HH:mm:ss").format(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    selectedDate![0])),
                       };
                       EasyLoading.show(status: '加载中...');
                       await storeBorrow(data);
