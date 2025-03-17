@@ -22,10 +22,10 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
     final borrows = useState<List<Borrow>?>([]);
     final search = useState<String?>(null);
 
-    Future fetchBorrows(String? orderNo) async {
+    Future fetchBorrows(String? search) async {
       EasyLoading.show(status: '加载中...');
       logger.d("搜索");
-      final resp = await getBorrows(queryParameters: {"order_no": orderNo});
+      final resp = await getBorrows(queryParameters: {"search": search});
       EasyLoading.dismiss();
       borrows.value = resp.data;
     }
@@ -51,7 +51,7 @@ class SelectWmsBorrowPage extends HookConsumerWidget {
         children: [
           TextField(
             decoration: const InputDecoration(
-              labelText: '搜索',
+              labelText: '搜索(姓名/工号/借样单号)',
               prefixIcon: Icon(Icons.search),
             ),
             onChanged: (value) {
