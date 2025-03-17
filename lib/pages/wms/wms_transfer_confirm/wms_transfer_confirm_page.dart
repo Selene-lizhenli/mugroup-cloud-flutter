@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/models/state.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/providers/transfer_confirm_provider.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfer_confirm_card.dart';
@@ -67,6 +68,12 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                                 inQty: item.inQty,
                                 outQty: item.outQty,
                                 count: item.count,
+                                onChange: (value) {
+                                  if (item.count == value) {
+                                    return;
+                                  }
+                                  notifier.setProduct(item.product, value);
+                                },
                               ),
                             ),
                           ),

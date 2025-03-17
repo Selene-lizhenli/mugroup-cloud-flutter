@@ -32,14 +32,14 @@ class TransferConfirmProvider extends _$TransferConfirmProvider {
         item.product.barcode == product.barcode);
   }
 
-  void addProduct(Sample product, int step) {
+  void setProduct(Sample product, int count) {
     final item = getItemByProduct(product);
     final items = [...state.items];
 
     if (item != null) {
-      item.count = item.count + step;
+      item.count = count;
     } else {
-      items.insert(0, TransferConfirmItem(product: product, count: step));
+      items.insert(0, TransferConfirmItem(product: product, count: count));
     }
 
     state = state.copyWith(items: items);
