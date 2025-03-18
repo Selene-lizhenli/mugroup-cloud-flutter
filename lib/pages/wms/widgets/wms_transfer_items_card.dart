@@ -59,86 +59,114 @@ class WmsTransferItemsCard extends HookConsumerWidget {
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Column(
                 children: [
-                  cover != null
-                      ? CachedNetworkImage(
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.contain,
-                          imageUrl: cover,
-                        )
-                      : Image.asset(
-                          'assets/noImage.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      height: 100,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "条形码：",
-                                style: TextStyle(),
-                              ),
-                              Expanded(
-                                  child: Text(
-                                transferItem?.product?.barcode ?? '',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500),
-                              )),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "产品编码：",
-                              ),
-                              Expanded(
-                                  child: Text(
-                                transferItem?.product?.productNo ?? '',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500),
-                              ))
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "采购单价：",
-                              ),
-                              Expanded(
-                                  child: Text(
-                                transferItem?.product?.purchaseCost != null
-                                    ? '￥${transferItem!.product!.purchaseCost}'
-                                    : '',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500),
-                              ))
-                            ],
-                          ),
-                        ],
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      cover != null
+                          ? CachedNetworkImage(
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.contain,
+                              imageUrl: cover,
+                            )
+                          : Image.asset(
+                              'assets/noImage.png',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.contain,
+                            ),
+                      const SizedBox(
+                        width: 10,
                       ),
-                    ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          height: 100,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    "条形码：",
+                                    style: TextStyle(),
+                                  ),
+                                  Expanded(
+                                      child: Text(
+                                    transferItem?.product?.barcode ?? '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    "产品编码：",
+                                  ),
+                                  Expanded(
+                                      child: Text(
+                                    transferItem?.product?.productNo ?? '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ))
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    "采购单价：",
+                                  ),
+                                  Expanded(
+                                      child: Text(
+                                    transferItem?.product?.purchaseCost != null
+                                        ? '￥${transferItem!.product!.purchaseCost}'
+                                        : '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  if (transferItem?.notes != null)
+                    Row(
+                      textBaseline: TextBaseline.alphabetic,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      children: [
+                        const Text(
+                          "差异原因: ",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red),
+                        ),
+                        Expanded(
+                            child: Text(
+                          transferItem!.notes!,
+                          maxLines: 3,
+                          style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red),
+                        ))
+                      ],
+                    ),
                 ],
               )
             ],
