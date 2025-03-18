@@ -115,7 +115,20 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                 }
               },
               onConfirm: () async {
-                logger.d(items);
+                final errorItem = items
+                    .where((item) =>
+                        (item.count < (item.outQty ?? 0) - (item.inQty ?? 0)) &&
+                        item.notes == null &&
+                        item.checked == true)
+                    .toList();
+                logger.d(errorItem);
+                if (errorItem.isNotEmpty) {
+                  final productNos = errorItem
+                      .map((item) => item.product.productNo ?? '')
+                      .join(',');
+                  EasyLoading.showError("产品[$productNos]请填写差异说明!");
+                  return;
+                }
                 final data = {
                   "items": items
                       .where((item) => item.checked == true)
