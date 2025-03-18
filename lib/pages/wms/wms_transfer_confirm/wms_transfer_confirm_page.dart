@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/models/state.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/providers/transfer_confirm_provider.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfer_confirm_card.dart';
@@ -55,8 +56,9 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                 slivers: [
                   MultiSliver(
                     children: [
-                      ...items.map(
-                        (item) => Slidable(
+                      ...items.map((item) {
+                        final notesController = TextEditingController();
+                        return Slidable(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -65,7 +67,7 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                             child: WmsTransferConfirmCard(
                               child: WmsTransferConfirmItem(
                                 item: item,
-                                onChange: (value) {
+                                onCountChange: (value) {
                                   if (item.count == value) {
                                     return;
                                   }
@@ -74,11 +76,19 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                                 onCheckBoxChanged: (checked) {
                                   notifier.check(item.product, checked);
                                 },
+                                onNotesChanged: (notes) {
+                                  notesController.text = notes;
+                                  notifier.setNotes(item.product, notes);
+                                },
+                                onNotesClearTap: () {
+                                  notesController.clear();
+                                  notifier.setNotes(item.product, null);
+                                },
                               ),
                             ),
                           ),
-                        ),
-                      )
+                        );
+                      })
                     ],
                   )
                 ],
@@ -86,18 +96,20 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
             ),
           ),
           WmsTransferConfirmOperateBar(
-            checked:
-                items.isNotEmpty && items.every((item) => item.checked == true),
-            selectAll: (checked) {
-              final allChecked = items.isNotEmpty &&
-                  items.every((item) => item.checked == true);
-              if (!allChecked) {
-                notifier.checkAll(true);
-              } else {
-                notifier.checkAll(false);
-              }
-            },
-          ),
+              checked: items.isNotEmpty &&
+                  items.every((item) => item.checked == true),
+              selectAll: (checked) {
+                final allChecked = items.isNotEmpty &&
+                    items.every((item) => item.checked == true);
+                if (!allChecked) {
+                  notifier.checkAll(true);
+                } else {
+                  notifier.checkAll(false);
+                }
+              },
+              onConfirm: () {
+                logger.d(items);
+              }),
         ],
       ),
     );
