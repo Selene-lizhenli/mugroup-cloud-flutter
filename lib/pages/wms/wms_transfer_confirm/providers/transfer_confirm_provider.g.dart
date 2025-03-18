@@ -7,7 +7,7 @@ part of 'transfer_confirm_provider.dart';
 // **************************************************************************
 
 String _$transferConfirmProviderHash() =>
-    r'efadf13c90bec5c143ee3ea6ff5e8eb2cc4f7db9';
+    r'74fa78b49170882df15e0d32de4a059adda05814';
 
 /// See also [TransferConfirmProvider].
 @ProviderFor(TransferConfirmProvider)

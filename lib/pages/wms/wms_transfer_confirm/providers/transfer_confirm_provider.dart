@@ -52,4 +52,13 @@ class TransferConfirmProvider extends _$TransferConfirmProvider {
 
     state = state.copyWith(items: items);
   }
+
+  void checkAll(bool checked) {
+    final items = [...state.items];
+    for (var item in items) {
+      item.checked = checked;
+    }
+
+    state = state.copyWith(items: items);
+  }
 }

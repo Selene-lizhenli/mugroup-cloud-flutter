@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/models/state.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/providers/transfer_confirm_provider.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfer_confirm_card.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfer_confirm_item.dart';
+import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfrt_confirm_operate_bar.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +84,19 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                 ],
               ),
             ),
+          ),
+          WmsTransferConfirmOperateBar(
+            checked:
+                items.isNotEmpty && items.every((item) => item.checked == true),
+            selectAll: (checked) {
+              final allChecked = items.isNotEmpty &&
+                  items.every((item) => item.checked == true);
+              if (!allChecked) {
+                notifier.checkAll(true);
+              } else {
+                notifier.checkAll(false);
+              }
+            },
           ),
         ],
       ),
