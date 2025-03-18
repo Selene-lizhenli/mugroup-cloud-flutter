@@ -71,10 +71,16 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                                   if (item.count == value) {
                                     return;
                                   }
+
+                                  if (value == item.outQty) {
+                                    notifier.setNotes(item.product, null);
+                                  }
+
                                   notifier.setProduct(item.product, value);
                                 },
                                 onCheckBoxChanged: (checked) {
                                   notifier.check(item.product, checked);
+                                  notifier.setNotes(item.product, null);
                                 },
                                 onNotesChanged: (notes) {
                                   notesController.text = notes;
