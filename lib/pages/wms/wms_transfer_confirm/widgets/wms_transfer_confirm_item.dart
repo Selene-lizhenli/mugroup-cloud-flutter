@@ -172,7 +172,8 @@ class WmsTransferConfirmItem extends HookWidget {
             ),
           ],
         ),
-        if (item.count < (item.outQty ?? 0) && (item.checked ?? false))
+        if (item.count < ((item.outQty ?? 0) - (item.inQty ?? 0)) &&
+            (item.checked ?? false))
           TDInput(
             leftLabel: '差异说明',
             backgroundColor: Colors.white,
