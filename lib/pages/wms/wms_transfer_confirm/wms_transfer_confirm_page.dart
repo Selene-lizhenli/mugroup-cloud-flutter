@@ -64,10 +64,7 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                             ),
                             child: WmsTransferConfirmCard(
                               child: WmsTransferConfirmItem(
-                                product: item.product,
-                                inQty: item.inQty,
-                                outQty: item.outQty,
-                                count: item.count,
+                                item: item,
                                 onChange: (value) {
                                   if (item.count == value) {
                                     return;
