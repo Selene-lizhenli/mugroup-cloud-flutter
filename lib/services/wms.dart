@@ -79,3 +79,7 @@ Future<Inventory> previewInventory(Map<String, dynamic>? data) async {
 Future confirmInventory(Map<String, dynamic>? data) async {
   return api.post("api/tenant/wms/stock/inventories/inout/confirm", data: data);
 }
+
+Future confirmTransferIn(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/transfers/$id/confirm", data: data);
+}
