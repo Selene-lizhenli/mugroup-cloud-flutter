@@ -5,13 +5,13 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 class WmsTransferConfirmOperateBar extends HookConsumerWidget {
   final bool checked;
   final void Function(bool)? selectAll;
-  final void Function()? transferIn;
+  final void Function()? onConfirm;
 
   const WmsTransferConfirmOperateBar({
     super.key,
     required this.checked,
     this.selectAll,
-    this.transferIn,
+    this.onConfirm,
   });
 
   @override
@@ -35,7 +35,7 @@ class WmsTransferConfirmOperateBar extends HookConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
               child: TextButton(
-                  onPressed: transferIn,
+                  onPressed: onConfirm,
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.blue[700],
                     foregroundColor: Colors.white,
