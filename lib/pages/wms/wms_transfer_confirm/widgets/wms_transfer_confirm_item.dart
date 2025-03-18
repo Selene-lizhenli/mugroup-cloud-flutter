@@ -8,10 +8,11 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 class WmsTransferConfirmItem extends HookWidget {
   final TransferConfirmItem item;
   final ValueChanged<int>? onChange;
-
+  final Function(bool)? onCheckBoxChanged;
   const WmsTransferConfirmItem({
     super.key,
     required this.item,
+    this.onCheckBoxChanged,
     this.onChange,
   });
 
@@ -19,17 +20,12 @@ class WmsTransferConfirmItem extends HookWidget {
   Widget build(BuildContext context) {
     var cover = item.product.image?.elementAtOrNull(0)?.thumbUrl ??
         item.product.image?.elementAtOrNull(0)?.url;
-    return Row(
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-          child: TDCheckbox(
-            style: TDCheckboxStyle.square,
-            checked: false,
-          ),
-        ),
-        Expanded(
-          child: Column(
+    return TDCheckbox(
+        cardMode: true,
+        onCheckBoxChanged: onCheckBoxChanged,
+        checked: item.checked ?? false,
+        customContentBuilder: (context, checked, str) {
+          return Column(
             children: [
               Row(children: [
                 Expanded(
@@ -158,9 +154,7 @@ class WmsTransferConfirmItem extends HookWidget {
                 ],
               ),
             ],
-          ),
-        ),
-      ],
-    );
+          );
+        });
   }
 }

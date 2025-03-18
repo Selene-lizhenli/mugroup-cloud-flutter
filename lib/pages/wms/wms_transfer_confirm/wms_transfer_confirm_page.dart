@@ -71,6 +71,9 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                                   }
                                   notifier.setProduct(item.product, value);
                                 },
+                                onCheckBoxChanged: (checked) {
+                                  notifier.check(item.product, checked);
+                                },
                               ),
                             ),
                           ),
