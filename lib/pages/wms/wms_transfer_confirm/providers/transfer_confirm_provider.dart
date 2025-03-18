@@ -45,17 +45,11 @@ class TransferConfirmProvider extends _$TransferConfirmProvider {
     state = state.copyWith(items: items);
   }
 
-  void check(
-    Sample product,
-  ) {
+  void check(Sample product, bool checked) {
     final item = getItemByProduct(product);
     final items = [...state.items];
+    item?.checked = checked;
 
-    if (item?.checked == null) {
-      item?.checked = true;
-    } else {
-      item?.checked = !item.checked!;
-    }
     state = state.copyWith(items: items);
   }
 }
