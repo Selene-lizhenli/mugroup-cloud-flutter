@@ -80,10 +80,6 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                                   notesController.text = notes;
                                   notifier.setNotes(item.product, notes);
                                 },
-                                onNotesClearTap: () {
-                                  notesController.clear();
-                                  notifier.setNotes(item.product, null);
-                                },
                               ),
                             ),
                           ),

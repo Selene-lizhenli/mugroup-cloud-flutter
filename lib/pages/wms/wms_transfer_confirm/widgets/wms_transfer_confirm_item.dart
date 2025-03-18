@@ -11,7 +11,6 @@ class WmsTransferConfirmItem extends HookWidget {
   final ValueChanged<int>? onCountChange;
   final Function(bool)? onCheckBoxChanged;
   final Function(String)? onNotesChanged;
-  final Function()? onNotesClearTap;
   const WmsTransferConfirmItem({
     super.key,
     required this.item,
@@ -19,7 +18,6 @@ class WmsTransferConfirmItem extends HookWidget {
     this.onCheckBoxChanged,
     this.onCountChange,
     this.onNotesChanged,
-    this.onNotesClearTap,
   });
 
   @override
@@ -181,7 +179,8 @@ class WmsTransferConfirmItem extends HookWidget {
             hintText: '请输入差异说明',
             controller: notesController,
             onChanged: onNotesChanged,
-            onClearTap: onNotesClearTap,
+            showBottomDivider: false,
+            required: true,
           ),
       ],
     );
