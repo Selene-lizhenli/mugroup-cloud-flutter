@@ -29,6 +29,8 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
       final transfer = await fetchTransferByOrederNo(code);
       notifier.transfer = transfer;
       notifier.items = transfer!.items!
+          .where((item) =>
+              (item.inQty ?? 0) < (item.outQty ?? 0) && item.notes == null)
           .map((item) => TransferConfirmItem(
               id: item.id,
               product: item.product!,
