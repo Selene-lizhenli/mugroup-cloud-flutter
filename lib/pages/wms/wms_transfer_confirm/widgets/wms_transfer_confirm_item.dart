@@ -147,8 +147,8 @@ class WmsTransferConfirmItem extends HookWidget {
                                       style:
                                           const TextStyle(color: Colors.red)),
                                   FlanStepper(
-                                    max: item.outQty ?? 0,
-                                    min: item.inQty ?? 0,
+                                    max: (item.outQty ?? 0) - (item.inQty ?? 0),
+                                    min: 0,
                                     value: item.count,
                                     onChange: (v, _) {
                                       if (v is int) {

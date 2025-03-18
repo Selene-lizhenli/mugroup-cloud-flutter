@@ -8,6 +8,7 @@ import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfrt_confir
 import 'package:cloud/services/wms.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -22,16 +23,18 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
     final state = ref.watch(transferConfirmProviderProvider);
     final notifier = ref.read(transferConfirmProviderProvider.notifier);
     final items = state.items;
+    final transfer = state.transfer;
 
     final transferFetch = useCallback(() async {
       final transfer = await fetchTransferByOrederNo(code);
+      notifier.transfer = transfer;
       notifier.items = transfer!.items!
           .map((item) => TransferConfirmItem(
               id: item.id,
               product: item.product!,
               inQty: item.inQty,
               outQty: item.outQty,
-              count: item.outQty ?? 0))
+              count: (item.outQty ?? 0) - (item.inQty ?? 0)))
           .toList();
     }, []);
 
@@ -109,8 +112,22 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                   notifier.checkAll(false);
                 }
               },
-              onConfirm: () {
+              onConfirm: () async {
                 logger.d(items);
+                final data = {
+                  "items": items
+                      .where((item) => item.checked == true)
+                      .map((item) => {
+                            'product_id': item.product.id,
+                            'in_qty': item.count,
+                            'notes': item.notes,
+                          })
+                      .toList()
+                };
+                EasyLoading.show(status: '加载中...');
+                await confirmTransferIn(transfer!.id!, data);
+                EasyLoading.showSuccess("入库成功!");
+                await transferFetch();
               }),
         ],
       ),
