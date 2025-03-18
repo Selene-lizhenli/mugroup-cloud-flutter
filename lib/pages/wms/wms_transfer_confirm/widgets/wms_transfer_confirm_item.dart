@@ -20,12 +20,17 @@ class WmsTransferConfirmItem extends HookWidget {
   Widget build(BuildContext context) {
     var cover = item.product.image?.elementAtOrNull(0)?.thumbUrl ??
         item.product.image?.elementAtOrNull(0)?.url;
-    return TDCheckbox(
-        cardMode: true,
-        onCheckBoxChanged: onCheckBoxChanged,
-        checked: item.checked ?? false,
-        customContentBuilder: (context, checked, str) {
-          return Column(
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+          child: TDCheckbox(
+            checked: item.checked ?? false,
+            onCheckBoxChanged: onCheckBoxChanged,
+          ),
+        ),
+        Expanded(
+          child: Column(
             children: [
               Row(children: [
                 Expanded(
@@ -154,7 +159,9 @@ class WmsTransferConfirmItem extends HookWidget {
                 ],
               ),
             ],
-          );
-        });
+          ),
+        ),
+      ],
+    );
   }
 }
