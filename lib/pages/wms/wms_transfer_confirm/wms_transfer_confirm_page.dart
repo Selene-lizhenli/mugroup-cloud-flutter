@@ -129,7 +129,9 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                 EasyLoading.show(status: '加载中...');
                 await confirmTransferIn(transfer!.id!, data);
                 EasyLoading.showSuccess("入库成功!");
-                await transferFetch();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
               }),
         ],
       ),
