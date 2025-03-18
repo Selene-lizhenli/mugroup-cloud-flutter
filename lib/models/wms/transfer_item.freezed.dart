@@ -26,6 +26,7 @@ mixin _$TransferItem {
   int? get inQty => throw _privateConstructorUsedError;
   @JsonKey(name: 'out_qty')
   int? get outQty => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +44,8 @@ abstract class $TransferItemCopyWith<$Res> {
       {int? id,
       Sample? product,
       @JsonKey(name: 'in_qty') int? inQty,
-      @JsonKey(name: 'out_qty') int? outQty});
+      @JsonKey(name: 'out_qty') int? outQty,
+      String? notes});
 
   $SampleCopyWith<$Res>? get product;
 }
@@ -65,6 +67,7 @@ class _$TransferItemCopyWithImpl<$Res, $Val extends TransferItem>
     Object? product = freezed,
     Object? inQty = freezed,
     Object? outQty = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -83,6 +86,10 @@ class _$TransferItemCopyWithImpl<$Res, $Val extends TransferItem>
           ? _value.outQty
           : outQty // ignore: cast_nullable_to_non_nullable
               as int?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -111,7 +118,8 @@ abstract class _$$TransferItemImplCopyWith<$Res>
       {int? id,
       Sample? product,
       @JsonKey(name: 'in_qty') int? inQty,
-      @JsonKey(name: 'out_qty') int? outQty});
+      @JsonKey(name: 'out_qty') int? outQty,
+      String? notes});
 
   @override
   $SampleCopyWith<$Res>? get product;
@@ -132,6 +140,7 @@ class __$$TransferItemImplCopyWithImpl<$Res>
     Object? product = freezed,
     Object? inQty = freezed,
     Object? outQty = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_$TransferItemImpl(
       freezed == id
@@ -150,6 +159,10 @@ class __$$TransferItemImplCopyWithImpl<$Res>
           ? _value.outQty
           : outQty // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -158,7 +171,7 @@ class __$$TransferItemImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TransferItemImpl implements _TransferItem {
   _$TransferItemImpl(this.id, this.product, @JsonKey(name: 'in_qty') this.inQty,
-      @JsonKey(name: 'out_qty') this.outQty);
+      @JsonKey(name: 'out_qty') this.outQty, this.notes);
 
   factory _$TransferItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$TransferItemImplFromJson(json);
@@ -173,10 +186,12 @@ class _$TransferItemImpl implements _TransferItem {
   @override
   @JsonKey(name: 'out_qty')
   final int? outQty;
+  @override
+  final String? notes;
 
   @override
   String toString() {
-    return 'TransferItem(id: $id, product: $product, inQty: $inQty, outQty: $outQty)';
+    return 'TransferItem(id: $id, product: $product, inQty: $inQty, outQty: $outQty, notes: $notes)';
   }
 
   @override
@@ -187,12 +202,14 @@ class _$TransferItemImpl implements _TransferItem {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.product, product) || other.product == product) &&
             (identical(other.inQty, inQty) || other.inQty == inQty) &&
-            (identical(other.outQty, outQty) || other.outQty == outQty));
+            (identical(other.outQty, outQty) || other.outQty == outQty) &&
+            (identical(other.notes, notes) || other.notes == notes));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, product, inQty, outQty);
+  int get hashCode =>
+      Object.hash(runtimeType, id, product, inQty, outQty, notes);
 
   @JsonKey(ignore: true)
   @override
@@ -213,7 +230,8 @@ abstract class _TransferItem implements TransferItem {
       final int? id,
       final Sample? product,
       @JsonKey(name: 'in_qty') final int? inQty,
-      @JsonKey(name: 'out_qty') final int? outQty) = _$TransferItemImpl;
+      @JsonKey(name: 'out_qty') final int? outQty,
+      final String? notes) = _$TransferItemImpl;
 
   factory _TransferItem.fromJson(Map<String, dynamic> json) =
       _$TransferItemImpl.fromJson;
@@ -228,6 +246,8 @@ abstract class _TransferItem implements TransferItem {
   @override
   @JsonKey(name: 'out_qty')
   int? get outQty;
+  @override
+  String? get notes;
   @override
   @JsonKey(ignore: true)
   _$$TransferItemImplCopyWith<_$TransferItemImpl> get copyWith =>

@@ -14,6 +14,7 @@ _$TransferItemImpl _$$TransferItemImplFromJson(Map<String, dynamic> json) =>
           : Sample.fromJson(json['product'] as Map<String, dynamic>),
       (json['in_qty'] as num?)?.toInt(),
       (json['out_qty'] as num?)?.toInt(),
+      json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$TransferItemImplToJson(_$TransferItemImpl instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$TransferItemImplToJson(_$TransferItemImpl instance) =>
       'product': instance.product,
       'in_qty': instance.inQty,
       'out_qty': instance.outQty,
+      'notes': instance.notes,
     };

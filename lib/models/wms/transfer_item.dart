@@ -11,6 +11,7 @@ class TransferItem with _$TransferItem {
     Sample? product,
     @JsonKey(name: 'in_qty') int? inQty,
     @JsonKey(name: 'out_qty') int? outQty,
+    String? notes,
   ) = _TransferItem;
 
   factory TransferItem.fromJson(Map<String, dynamic> json) =>
