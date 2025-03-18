@@ -1,4 +1,5 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/models/state.dart';
 import 'package:collection/collection.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,6 +20,10 @@ class TransferConfirmProvider extends _$TransferConfirmProvider {
     state = state.copyWith(
       items: [],
     );
+  }
+
+  set transfer(Transfer? transfer) {
+    state = state.copyWith(transfer: transfer);
   }
 
   set items(List<TransferConfirmItem> items) {

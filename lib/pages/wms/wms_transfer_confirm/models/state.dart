@@ -1,4 +1,5 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'state.freezed.dart';
@@ -23,6 +24,7 @@ abstract class TransferConfirmItem with _$TransferConfirmItem {
 @freezed
 abstract class State with _$State {
   const factory State({
+    Transfer? transfer,
     required List<TransferConfirmItem> items,
   }) = _State;
 

@@ -300,6 +300,7 @@ State _$StateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$State {
+  Transfer? get transfer => throw _privateConstructorUsedError;
   List<TransferConfirmItem> get items => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -312,7 +313,9 @@ abstract class $StateCopyWith<$Res> {
   factory $StateCopyWith(State value, $Res Function(State) then) =
       _$StateCopyWithImpl<$Res, State>;
   @useResult
-  $Res call({List<TransferConfirmItem> items});
+  $Res call({Transfer? transfer, List<TransferConfirmItem> items});
+
+  $TransferCopyWith<$Res>? get transfer;
 }
 
 /// @nodoc
@@ -328,14 +331,31 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? transfer = freezed,
     Object? items = null,
   }) {
     return _then(_value.copyWith(
+      transfer: freezed == transfer
+          ? _value.transfer
+          : transfer // ignore: cast_nullable_to_non_nullable
+              as Transfer?,
       items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<TransferConfirmItem>,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $TransferCopyWith<$Res>? get transfer {
+    if (_value.transfer == null) {
+      return null;
+    }
+
+    return $TransferCopyWith<$Res>(_value.transfer!, (value) {
+      return _then(_value.copyWith(transfer: value) as $Val);
+    });
   }
 }
 
@@ -346,7 +366,10 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
       __$$StateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<TransferConfirmItem> items});
+  $Res call({Transfer? transfer, List<TransferConfirmItem> items});
+
+  @override
+  $TransferCopyWith<$Res>? get transfer;
 }
 
 /// @nodoc
@@ -360,9 +383,14 @@ class __$$StateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? transfer = freezed,
     Object? items = null,
   }) {
     return _then(_$StateImpl(
+      transfer: freezed == transfer
+          ? _value.transfer
+          : transfer // ignore: cast_nullable_to_non_nullable
+              as Transfer?,
       items: null == items
           ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
@@ -374,12 +402,15 @@ class __$$StateImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$StateImpl implements _State {
-  const _$StateImpl({required final List<TransferConfirmItem> items})
+  const _$StateImpl(
+      {this.transfer, required final List<TransferConfirmItem> items})
       : _items = items;
 
   factory _$StateImpl.fromJson(Map<String, dynamic> json) =>
       _$$StateImplFromJson(json);
 
+  @override
+  final Transfer? transfer;
   final List<TransferConfirmItem> _items;
   @override
   List<TransferConfirmItem> get items {
@@ -390,7 +421,7 @@ class _$StateImpl implements _State {
 
   @override
   String toString() {
-    return 'State(items: $items)';
+    return 'State(transfer: $transfer, items: $items)';
   }
 
   @override
@@ -398,13 +429,15 @@ class _$StateImpl implements _State {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$StateImpl &&
+            (identical(other.transfer, transfer) ||
+                other.transfer == transfer) &&
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
+  int get hashCode => Object.hash(
+      runtimeType, transfer, const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
@@ -421,11 +454,14 @@ class _$StateImpl implements _State {
 }
 
 abstract class _State implements State {
-  const factory _State({required final List<TransferConfirmItem> items}) =
-      _$StateImpl;
+  const factory _State(
+      {final Transfer? transfer,
+      required final List<TransferConfirmItem> items}) = _$StateImpl;
 
   factory _State.fromJson(Map<String, dynamic> json) = _$StateImpl.fromJson;
 
+  @override
+  Transfer? get transfer;
   @override
   List<TransferConfirmItem> get items;
   @override

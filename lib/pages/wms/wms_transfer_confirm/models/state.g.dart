@@ -31,6 +31,9 @@ Map<String, dynamic> _$$TransferConfirmItemImplToJson(
     };
 
 _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
+      transfer: json['transfer'] == null
+          ? null
+          : Transfer.fromJson(json['transfer'] as Map<String, dynamic>),
       items: (json['items'] as List<dynamic>)
           .map((e) => TransferConfirmItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -38,5 +41,6 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
 
 Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
     <String, dynamic>{
+      'transfer': instance.transfer,
       'items': instance.items,
     };
