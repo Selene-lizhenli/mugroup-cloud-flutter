@@ -45,6 +45,15 @@ class TransferConfirmProvider extends _$TransferConfirmProvider {
     state = state.copyWith(items: items);
   }
 
+  void setNotes(Sample product, String notes) {
+    final item = getItemByProduct(product);
+    final items = [...state.items];
+
+    item?.notes = notes;
+
+    state = state.copyWith(items: items);
+  }
+
   void check(Sample product, bool checked) {
     final item = getItemByProduct(product);
     final items = [...state.items];

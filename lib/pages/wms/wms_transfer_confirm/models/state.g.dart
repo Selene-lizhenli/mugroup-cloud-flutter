@@ -15,6 +15,7 @@ _$TransferConfirmItemImpl _$$TransferConfirmItemImplFromJson(
       outQty: (json['out_qty'] as num?)?.toInt(),
       count: (json['count'] as num).toInt(),
       checked: json['checked'] as bool?,
+      notes: json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$TransferConfirmItemImplToJson(
@@ -26,6 +27,7 @@ Map<String, dynamic> _$$TransferConfirmItemImplToJson(
       'out_qty': instance.outQty,
       'count': instance.count,
       'checked': instance.checked,
+      'notes': instance.notes,
     };
 
 _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(

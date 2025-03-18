@@ -13,6 +13,7 @@ abstract class TransferConfirmItem with _$TransferConfirmItem {
     @JsonKey(name: 'out_qty') int? outQty,
     required int count,
     bool? checked,
+    String? notes,
   }) = _TransferConfirmItem;
 
   factory TransferConfirmItem.fromJson(Map<String, Object?> json) =>

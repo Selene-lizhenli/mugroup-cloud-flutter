@@ -36,6 +36,8 @@ mixin _$TransferConfirmItem {
   set count(int value) => throw _privateConstructorUsedError;
   bool? get checked => throw _privateConstructorUsedError;
   set checked(bool? value) => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
+  set notes(String? value) => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -55,7 +57,8 @@ abstract class $TransferConfirmItemCopyWith<$Res> {
       @JsonKey(name: 'in_qty') int? inQty,
       @JsonKey(name: 'out_qty') int? outQty,
       int count,
-      bool? checked});
+      bool? checked,
+      String? notes});
 
   $SampleCopyWith<$Res> get product;
 }
@@ -79,6 +82,7 @@ class _$TransferConfirmItemCopyWithImpl<$Res, $Val extends TransferConfirmItem>
     Object? outQty = freezed,
     Object? count = null,
     Object? checked = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -105,6 +109,10 @@ class _$TransferConfirmItemCopyWithImpl<$Res, $Val extends TransferConfirmItem>
           ? _value.checked
           : checked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -131,7 +139,8 @@ abstract class _$$TransferConfirmItemImplCopyWith<$Res>
       @JsonKey(name: 'in_qty') int? inQty,
       @JsonKey(name: 'out_qty') int? outQty,
       int count,
-      bool? checked});
+      bool? checked,
+      String? notes});
 
   @override
   $SampleCopyWith<$Res> get product;
@@ -154,6 +163,7 @@ class __$$TransferConfirmItemImplCopyWithImpl<$Res>
     Object? outQty = freezed,
     Object? count = null,
     Object? checked = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_$TransferConfirmItemImpl(
       id: freezed == id
@@ -180,6 +190,10 @@ class __$$TransferConfirmItemImplCopyWithImpl<$Res>
           ? _value.checked
           : checked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -193,7 +207,8 @@ class _$TransferConfirmItemImpl implements _TransferConfirmItem {
       @JsonKey(name: 'in_qty') this.inQty,
       @JsonKey(name: 'out_qty') this.outQty,
       required this.count,
-      this.checked});
+      this.checked,
+      this.notes});
 
   factory _$TransferConfirmItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$TransferConfirmItemImplFromJson(json);
@@ -212,10 +227,12 @@ class _$TransferConfirmItemImpl implements _TransferConfirmItem {
   int count;
   @override
   bool? checked;
+  @override
+  String? notes;
 
   @override
   String toString() {
-    return 'TransferConfirmItem(id: $id, product: $product, inQty: $inQty, outQty: $outQty, count: $count, checked: $checked)';
+    return 'TransferConfirmItem(id: $id, product: $product, inQty: $inQty, outQty: $outQty, count: $count, checked: $checked, notes: $notes)';
   }
 
   @JsonKey(ignore: true)
@@ -240,7 +257,8 @@ abstract class _TransferConfirmItem implements TransferConfirmItem {
       @JsonKey(name: 'in_qty') int? inQty,
       @JsonKey(name: 'out_qty') int? outQty,
       required int count,
-      bool? checked}) = _$TransferConfirmItemImpl;
+      bool? checked,
+      String? notes}) = _$TransferConfirmItemImpl;
 
   factory _TransferConfirmItem.fromJson(Map<String, dynamic> json) =
       _$TransferConfirmItemImpl.fromJson;
@@ -267,6 +285,9 @@ abstract class _TransferConfirmItem implements TransferConfirmItem {
   @override
   bool? get checked;
   set checked(bool? value);
+  @override
+  String? get notes;
+  set notes(String? value);
   @override
   @JsonKey(ignore: true)
   _$$TransferConfirmItemImplCopyWith<_$TransferConfirmItemImpl> get copyWith =>
