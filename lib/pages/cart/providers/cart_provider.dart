@@ -64,6 +64,11 @@ class Cart extends _$Cart {
     save();
   }
 
+  set quotationInfo(QuotationInfo? quotationInfo) {
+    state = state.copyWith(quotationInfo: quotationInfo);
+    save();
+  }
+
   void clear() {
     state = state.copyWith(
       items: [],

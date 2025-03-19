@@ -151,6 +151,180 @@ abstract class _CartSelect extends CartSelect {
       throw _privateConstructorUsedError;
 }
 
+QuotationInfo _$QuotationInfoFromJson(Map<String, dynamic> json) {
+  return _QuotationInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$QuotationInfo {
+  String? get curreny => throw _privateConstructorUsedError;
+  double? get exchange => throw _privateConstructorUsedError;
+  double? get commissionRate => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $QuotationInfoCopyWith<QuotationInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $QuotationInfoCopyWith<$Res> {
+  factory $QuotationInfoCopyWith(
+          QuotationInfo value, $Res Function(QuotationInfo) then) =
+      _$QuotationInfoCopyWithImpl<$Res, QuotationInfo>;
+  @useResult
+  $Res call({String? curreny, double? exchange, double? commissionRate});
+}
+
+/// @nodoc
+class _$QuotationInfoCopyWithImpl<$Res, $Val extends QuotationInfo>
+    implements $QuotationInfoCopyWith<$Res> {
+  _$QuotationInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? curreny = freezed,
+    Object? exchange = freezed,
+    Object? commissionRate = freezed,
+  }) {
+    return _then(_value.copyWith(
+      curreny: freezed == curreny
+          ? _value.curreny
+          : curreny // ignore: cast_nullable_to_non_nullable
+              as String?,
+      exchange: freezed == exchange
+          ? _value.exchange
+          : exchange // ignore: cast_nullable_to_non_nullable
+              as double?,
+      commissionRate: freezed == commissionRate
+          ? _value.commissionRate
+          : commissionRate // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$QuotationInfoImplCopyWith<$Res>
+    implements $QuotationInfoCopyWith<$Res> {
+  factory _$$QuotationInfoImplCopyWith(
+          _$QuotationInfoImpl value, $Res Function(_$QuotationInfoImpl) then) =
+      __$$QuotationInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? curreny, double? exchange, double? commissionRate});
+}
+
+/// @nodoc
+class __$$QuotationInfoImplCopyWithImpl<$Res>
+    extends _$QuotationInfoCopyWithImpl<$Res, _$QuotationInfoImpl>
+    implements _$$QuotationInfoImplCopyWith<$Res> {
+  __$$QuotationInfoImplCopyWithImpl(
+      _$QuotationInfoImpl _value, $Res Function(_$QuotationInfoImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? curreny = freezed,
+    Object? exchange = freezed,
+    Object? commissionRate = freezed,
+  }) {
+    return _then(_$QuotationInfoImpl(
+      freezed == curreny
+          ? _value.curreny
+          : curreny // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == exchange
+          ? _value.exchange
+          : exchange // ignore: cast_nullable_to_non_nullable
+              as double?,
+      freezed == commissionRate
+          ? _value.commissionRate
+          : commissionRate // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$QuotationInfoImpl extends _QuotationInfo {
+  const _$QuotationInfoImpl(this.curreny, this.exchange, this.commissionRate)
+      : super._();
+
+  factory _$QuotationInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$QuotationInfoImplFromJson(json);
+
+  @override
+  final String? curreny;
+  @override
+  final double? exchange;
+  @override
+  final double? commissionRate;
+
+  @override
+  String toString() {
+    return 'QuotationInfo(curreny: $curreny, exchange: $exchange, commissionRate: $commissionRate)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$QuotationInfoImpl &&
+            (identical(other.curreny, curreny) || other.curreny == curreny) &&
+            (identical(other.exchange, exchange) ||
+                other.exchange == exchange) &&
+            (identical(other.commissionRate, commissionRate) ||
+                other.commissionRate == commissionRate));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, curreny, exchange, commissionRate);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$QuotationInfoImplCopyWith<_$QuotationInfoImpl> get copyWith =>
+      __$$QuotationInfoImplCopyWithImpl<_$QuotationInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$QuotationInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _QuotationInfo extends QuotationInfo {
+  const factory _QuotationInfo(final String? curreny, final double? exchange,
+      final double? commissionRate) = _$QuotationInfoImpl;
+  const _QuotationInfo._() : super._();
+
+  factory _QuotationInfo.fromJson(Map<String, dynamic> json) =
+      _$QuotationInfoImpl.fromJson;
+
+  @override
+  String? get curreny;
+  @override
+  double? get exchange;
+  @override
+  double? get commissionRate;
+  @override
+  @JsonKey(ignore: true)
+  _$$QuotationInfoImplCopyWith<_$QuotationInfoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 CartItem _$CartItemFromJson(Map<String, dynamic> json) {
   return _CartItem.fromJson(json);
 }
@@ -318,6 +492,7 @@ mixin _$State {
   Transfer? get transfer => throw _privateConstructorUsedError;
   CartType? get type => throw _privateConstructorUsedError;
   String? get cartName => throw _privateConstructorUsedError;
+  QuotationInfo? get quotationInfo => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -336,11 +511,13 @@ abstract class $StateCopyWith<$Res> {
       Borrow? borrow,
       Transfer? transfer,
       CartType? type,
-      String? cartName});
+      String? cartName,
+      QuotationInfo? quotationInfo});
 
   $WarehouseCopyWith<$Res>? get warehouse;
   $BorrowCopyWith<$Res>? get borrow;
   $TransferCopyWith<$Res>? get transfer;
+  $QuotationInfoCopyWith<$Res>? get quotationInfo;
 }
 
 /// @nodoc
@@ -363,6 +540,7 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
     Object? transfer = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
+    Object? quotationInfo = freezed,
   }) {
     return _then(_value.copyWith(
       items: null == items
@@ -393,6 +571,10 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.cartName
           : cartName // ignore: cast_nullable_to_non_nullable
               as String?,
+      quotationInfo: freezed == quotationInfo
+          ? _value.quotationInfo
+          : quotationInfo // ignore: cast_nullable_to_non_nullable
+              as QuotationInfo?,
     ) as $Val);
   }
 
@@ -431,6 +613,18 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
       return _then(_value.copyWith(transfer: value) as $Val);
     });
   }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $QuotationInfoCopyWith<$Res>? get quotationInfo {
+    if (_value.quotationInfo == null) {
+      return null;
+    }
+
+    return $QuotationInfoCopyWith<$Res>(_value.quotationInfo!, (value) {
+      return _then(_value.copyWith(quotationInfo: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -447,7 +641,8 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
       Borrow? borrow,
       Transfer? transfer,
       CartType? type,
-      String? cartName});
+      String? cartName,
+      QuotationInfo? quotationInfo});
 
   @override
   $WarehouseCopyWith<$Res>? get warehouse;
@@ -455,6 +650,8 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
   $BorrowCopyWith<$Res>? get borrow;
   @override
   $TransferCopyWith<$Res>? get transfer;
+  @override
+  $QuotationInfoCopyWith<$Res>? get quotationInfo;
 }
 
 /// @nodoc
@@ -475,6 +672,7 @@ class __$$StateImplCopyWithImpl<$Res>
     Object? transfer = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
+    Object? quotationInfo = freezed,
   }) {
     return _then(_$StateImpl(
       items: null == items
@@ -505,6 +703,10 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value.cartName
           : cartName // ignore: cast_nullable_to_non_nullable
               as String?,
+      quotationInfo: freezed == quotationInfo
+          ? _value.quotationInfo
+          : quotationInfo // ignore: cast_nullable_to_non_nullable
+              as QuotationInfo?,
     ));
   }
 }
@@ -519,7 +721,8 @@ class _$StateImpl implements _State {
       this.borrow,
       this.transfer,
       this.type,
-      this.cartName})
+      this.cartName,
+      this.quotationInfo})
       : _items = items,
         _carts = carts;
 
@@ -552,10 +755,12 @@ class _$StateImpl implements _State {
   final CartType? type;
   @override
   final String? cartName;
+  @override
+  final QuotationInfo? quotationInfo;
 
   @override
   String toString() {
-    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, type: $type, cartName: $cartName)';
+    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, type: $type, cartName: $cartName, quotationInfo: $quotationInfo)';
   }
 
   @override
@@ -572,7 +777,9 @@ class _$StateImpl implements _State {
                 other.transfer == transfer) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.cartName, cartName) ||
-                other.cartName == cartName));
+                other.cartName == cartName) &&
+            (identical(other.quotationInfo, quotationInfo) ||
+                other.quotationInfo == quotationInfo));
   }
 
   @JsonKey(ignore: true)
@@ -585,7 +792,8 @@ class _$StateImpl implements _State {
       borrow,
       transfer,
       type,
-      cartName);
+      cartName,
+      quotationInfo);
 
   @JsonKey(ignore: true)
   @override
@@ -609,7 +817,8 @@ abstract class _State implements State {
       final Borrow? borrow,
       final Transfer? transfer,
       final CartType? type,
-      final String? cartName}) = _$StateImpl;
+      final String? cartName,
+      final QuotationInfo? quotationInfo}) = _$StateImpl;
 
   factory _State.fromJson(Map<String, dynamic> json) = _$StateImpl.fromJson;
 
@@ -627,6 +836,8 @@ abstract class _State implements State {
   CartType? get type;
   @override
   String? get cartName;
+  @override
+  QuotationInfo? get quotationInfo;
   @override
   @JsonKey(ignore: true)
   _$$StateImplCopyWith<_$StateImpl> get copyWith =>

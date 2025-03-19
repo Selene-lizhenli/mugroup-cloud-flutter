@@ -58,6 +58,17 @@ abstract class CartSelect with _$CartSelect {
   }
 }
 
+@freezed
+abstract class QuotationInfo with _$QuotationInfo {
+  const QuotationInfo._();
+  const factory QuotationInfo(
+          String? curreny, double? exchange, double? commissionRate) =
+      _QuotationInfo;
+
+  factory QuotationInfo.fromJson(Map<String, Object?> json) =>
+      _$QuotationInfoFromJson(json);
+}
+
 @unfreezed
 abstract class CartItem with _$CartItem {
   factory CartItem({
@@ -79,6 +90,7 @@ abstract class State with _$State {
     Transfer? transfer,
     CartType? type,
     String? cartName,
+    QuotationInfo? quotationInfo,
   }) = _State;
 
   factory State.fromJson(Map<String, Object?> json) => _$StateFromJson(json);

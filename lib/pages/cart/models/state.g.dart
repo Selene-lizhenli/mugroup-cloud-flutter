@@ -25,6 +25,20 @@ const _$CartTypeEnumMap = {
   CartType.quotation: 'quotation',
 };
 
+_$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>
+    _$QuotationInfoImpl(
+      json['curreny'] as String?,
+      (json['exchange'] as num?)?.toDouble(),
+      (json['commissionRate'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$$QuotationInfoImplToJson(_$QuotationInfoImpl instance) =>
+    <String, dynamic>{
+      'curreny': instance.curreny,
+      'exchange': instance.exchange,
+      'commissionRate': instance.commissionRate,
+    };
+
 _$CartItemImpl _$$CartItemImplFromJson(Map<String, dynamic> json) =>
     _$CartItemImpl(
       sample: Sample.fromJson(json['sample'] as Map<String, dynamic>),
@@ -55,6 +69,10 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
           : Transfer.fromJson(json['transfer'] as Map<String, dynamic>),
       type: $enumDecodeNullable(_$CartTypeEnumMap, json['type']),
       cartName: json['cartName'] as String?,
+      quotationInfo: json['quotationInfo'] == null
+          ? null
+          : QuotationInfo.fromJson(
+              json['quotationInfo'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
@@ -66,4 +84,5 @@ Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
       'transfer': instance.transfer,
       'type': _$CartTypeEnumMap[instance.type],
       'cartName': instance.cartName,
+      'quotationInfo': instance.quotationInfo,
     };
