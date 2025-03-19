@@ -119,7 +119,7 @@ class Cart extends _$Cart {
     save();
   }
 
-  void setSamplePrice(Sample sample, String price) {
+  void setSamplePrice(Sample sample, String? price) {
     final item = getItemBySample(sample);
     final items = [...state.items];
 
