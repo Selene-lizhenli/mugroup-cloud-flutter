@@ -16,6 +16,20 @@ class QuotationItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    double? price;
+    Map<String, String> symbols = {
+      "CNY": "¥",
+      "USD": "\$",
+      "EUR": "€",
+      "GBP": "£",
+    };
+    final symbol = symbols[quotationInfo?.curreny] ?? "¥";
+    if (sample.purchaseCost != null) {
+      price = double.parse(sample.purchaseCost!) /
+          (quotationInfo?.exchange ?? 1) *
+          (1 + ((quotationInfo?.commissionRate ?? 0) * 0.01));
+    }
+
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
         sample.image?.elementAtOrNull(0)?.url;
     return Row(
@@ -61,7 +75,7 @@ class QuotationItem extends HookWidget {
                   children: [
                     Text(
                         sample.purchaseCost != null
-                            ? '¥${sample.purchaseCost}'
+                            ? '$symbol ${price?.toStringAsFixed(2)}'
                             : "",
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
