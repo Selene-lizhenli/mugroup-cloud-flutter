@@ -197,6 +197,7 @@ class CartPage extends HookConsumerWidget {
                 ),
                 content: SizedBox(
                   height: 270,
+                  width: 300,
                   child: CustomScrollView(slivers: [
                     MultiSliver(
                       children: [
@@ -540,6 +541,7 @@ class CartPage extends HookConsumerWidget {
               ),
               content: SizedBox(
                 height: 270,
+                width: 300,
                 child: CustomScrollView(slivers: [
                   MultiSliver(
                     children: [
