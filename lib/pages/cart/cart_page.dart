@@ -490,10 +490,19 @@ class CartPage extends HookConsumerWidget {
                     return;
                   }
                   EasyLoading.show(status: '加载中...');
-                  final sampleIds =
-                      items.map((item) => item.sample.id).toList();
-                  await storeShowroomQuotation(
-                      {"sample_ids": sampleIds, "user_id": user.value?.id});
+                  final data = {
+                    "sample_items": items
+                        .map((item) => {
+                              "sample_id": item.sample.id,
+                              "price": item.price,
+                            })
+                        .toList(),
+                    "user_id": user.value?.id,
+                    "curreny": quotationInfo?.curreny,
+                    "exchange": quotationInfo?.exchange,
+                    "commission_rate": quotationInfo?.commissionRate,
+                  };
+                  await storeShowroomQuotation(data);
                   EasyLoading.showSuccess('创建报价单成功!');
                   cart.clear();
                   user.value = null;
