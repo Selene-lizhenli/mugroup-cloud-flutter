@@ -1016,9 +1016,21 @@ class CartPage extends HookConsumerWidget {
                                           ...items.map(
                                             (cartItem) => Slidable(
                                               endActionPane: ActionPane(
-                                                extentRatio: 0.25,
+                                                extentRatio: 0.5,
                                                 motion: const ScrollMotion(),
                                                 children: [
+                                                  SlidableAction(
+                                                    onPressed: (context) {
+                                                      setPriceDialog(
+                                                          context, cartItem);
+                                                    },
+                                                    backgroundColor:
+                                                        Colors.blue,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    icon: Icons.attach_money,
+                                                    label: '调价',
+                                                  ),
                                                   SlidableAction(
                                                     onPressed: (context) {
                                                       cart.removeSample(
@@ -1058,11 +1070,6 @@ class CartPage extends HookConsumerWidget {
                                                         price: cartItem.price,
                                                         quotationInfo:
                                                             quotationInfo,
-                                                        setPrice: () {
-                                                          setPriceDialog(
-                                                              context,
-                                                              cartItem);
-                                                        },
                                                       ),
                                               ),
                                             ),

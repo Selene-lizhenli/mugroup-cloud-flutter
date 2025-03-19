@@ -8,13 +8,11 @@ class QuotationItem extends HookWidget {
   final Sample sample;
   final String? price;
   final QuotationInfo? quotationInfo;
-  final Function? setPrice;
   const QuotationItem({
     super.key,
     required this.sample,
     this.price,
     this.quotationInfo,
-    this.setPrice,
   });
 
   @override
@@ -57,7 +55,7 @@ class QuotationItem extends HookWidget {
         Expanded(
           flex: 1,
           child: Container(
-            height: 105,
+            height: 100,
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,13 +81,6 @@ class QuotationItem extends HookWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: const TextStyle(color: Colors.red)),
-                    TextButton(
-                        onPressed: () {
-                          if (setPrice != null) {
-                            setPrice!();
-                          }
-                        },
-                        child: const Text("调价"))
                   ],
                 )
               ],
