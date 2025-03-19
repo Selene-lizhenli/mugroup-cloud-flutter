@@ -38,6 +38,7 @@ class Cart extends _$Cart {
         transfer: cacheState.transfer,
         type: cacheState.type,
         warehouse: cacheState.warehouse,
+        quotationInfo: cacheState.quotationInfo,
       );
     }
 
