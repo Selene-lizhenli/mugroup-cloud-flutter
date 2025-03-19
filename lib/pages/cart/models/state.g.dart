@@ -43,12 +43,14 @@ _$CartItemImpl _$$CartItemImplFromJson(Map<String, dynamic> json) =>
     _$CartItemImpl(
       sample: Sample.fromJson(json['sample'] as Map<String, dynamic>),
       count: (json['count'] as num).toInt(),
+      price: json['price'] as String?,
     );
 
 Map<String, dynamic> _$$CartItemImplToJson(_$CartItemImpl instance) =>
     <String, dynamic>{
       'sample': instance.sample,
       'count': instance.count,
+      'price': instance.price,
     };
 
 _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(

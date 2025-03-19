@@ -334,6 +334,8 @@ mixin _$CartItem {
   Sample get sample => throw _privateConstructorUsedError;
   int get count => throw _privateConstructorUsedError;
   set count(int value) => throw _privateConstructorUsedError;
+  String? get price => throw _privateConstructorUsedError;
+  set price(String? value) => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -346,7 +348,7 @@ abstract class $CartItemCopyWith<$Res> {
   factory $CartItemCopyWith(CartItem value, $Res Function(CartItem) then) =
       _$CartItemCopyWithImpl<$Res, CartItem>;
   @useResult
-  $Res call({Sample sample, int count});
+  $Res call({Sample sample, int count, String? price});
 
   $SampleCopyWith<$Res> get sample;
 }
@@ -366,6 +368,7 @@ class _$CartItemCopyWithImpl<$Res, $Val extends CartItem>
   $Res call({
     Object? sample = null,
     Object? count = null,
+    Object? price = freezed,
   }) {
     return _then(_value.copyWith(
       sample: null == sample
@@ -376,6 +379,10 @@ class _$CartItemCopyWithImpl<$Res, $Val extends CartItem>
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
               as int,
+      price: freezed == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -396,7 +403,7 @@ abstract class _$$CartItemImplCopyWith<$Res>
       __$$CartItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Sample sample, int count});
+  $Res call({Sample sample, int count, String? price});
 
   @override
   $SampleCopyWith<$Res> get sample;
@@ -415,6 +422,7 @@ class __$$CartItemImplCopyWithImpl<$Res>
   $Res call({
     Object? sample = null,
     Object? count = null,
+    Object? price = freezed,
   }) {
     return _then(_$CartItemImpl(
       sample: null == sample
@@ -425,6 +433,10 @@ class __$$CartItemImplCopyWithImpl<$Res>
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
               as int,
+      price: freezed == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -432,7 +444,7 @@ class __$$CartItemImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$CartItemImpl implements _CartItem {
-  _$CartItemImpl({required this.sample, required this.count});
+  _$CartItemImpl({required this.sample, required this.count, this.price});
 
   factory _$CartItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$CartItemImplFromJson(json);
@@ -441,10 +453,12 @@ class _$CartItemImpl implements _CartItem {
   final Sample sample;
   @override
   int count;
+  @override
+  String? price;
 
   @override
   String toString() {
-    return 'CartItem(sample: $sample, count: $count)';
+    return 'CartItem(sample: $sample, count: $count, price: $price)';
   }
 
   @JsonKey(ignore: true)
@@ -462,8 +476,10 @@ class _$CartItemImpl implements _CartItem {
 }
 
 abstract class _CartItem implements CartItem {
-  factory _CartItem({required final Sample sample, required int count}) =
-      _$CartItemImpl;
+  factory _CartItem(
+      {required final Sample sample,
+      required int count,
+      String? price}) = _$CartItemImpl;
 
   factory _CartItem.fromJson(Map<String, dynamic> json) =
       _$CartItemImpl.fromJson;
@@ -473,6 +489,9 @@ abstract class _CartItem implements CartItem {
   @override
   int get count;
   set count(int value);
+  @override
+  String? get price;
+  set price(String? value);
   @override
   @JsonKey(ignore: true)
   _$$CartItemImplCopyWith<_$CartItemImpl> get copyWith =>

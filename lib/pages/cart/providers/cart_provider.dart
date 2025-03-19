@@ -119,6 +119,18 @@ class Cart extends _$Cart {
     save();
   }
 
+  void setSamplePrice(Sample sample, String price) {
+    final item = getItemBySample(sample);
+    final items = [...state.items];
+
+    if (item != null) {
+      item.price = price;
+    }
+
+    state = state.copyWith(items: items);
+    save();
+  }
+
   void removeSample(Sample sample) {
     final items =
         state.items.where((element) => element.sample.id != sample.id);

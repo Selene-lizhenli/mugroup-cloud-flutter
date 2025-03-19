@@ -74,6 +74,7 @@ abstract class CartItem with _$CartItem {
   factory CartItem({
     required final Sample sample,
     required int count,
+    String? price,
   }) = _CartItem;
 
   factory CartItem.fromJson(Map<String, Object?> json) =>
