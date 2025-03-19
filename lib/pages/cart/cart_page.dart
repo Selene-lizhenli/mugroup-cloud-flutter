@@ -12,6 +12,7 @@ import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -37,6 +38,7 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
+    final quotationInfo = state.quotationInfo;
 
     final user = useState<User?>(null);
 
@@ -45,6 +47,13 @@ class CartPage extends HookConsumerWidget {
       const FlanActionSheetAction(name: "客户选中，核价报价用"),
       const FlanActionSheetAction(name: "展会使用"),
       const FlanActionSheetAction(name: "其他")
+    ];
+
+    final currencies = [
+      const FlanActionSheetAction(name: "CNY"),
+      const FlanActionSheetAction(name: "USD"),
+      const FlanActionSheetAction(name: "EUR"),
+      const FlanActionSheetAction(name: "GBP")
     ];
 
     final addItemByBarcode = useCallback((String barcode) async {
@@ -507,6 +516,187 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void quotationInfoDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          String? currency = quotationInfo?.curreny;
+          final exchangeController = TextEditingController();
+          final commissionRateController = TextEditingController();
+
+          exchangeController.text = quotationInfo?.exchange?.toString() ?? "";
+          commissionRateController.text =
+              quotationInfo?.commissionRate?.toString() ?? "";
+
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              title: const Text(
+                "报价单信息",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                height: 270,
+                child: CustomScrollView(slivers: [
+                  MultiSliver(
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "报价币种",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () {
+                              showFlanActionSheet(
+                                context,
+                                description: "请选择报价币种",
+                                cancelText: "我再想想",
+                                actions: currencies,
+                                closeOnClickAction: true,
+                                onSelect: (action, index) {
+                                  currency = currencies[index].name;
+                                  setState(() {});
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 14),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey.shade100,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      currency ?? "请选择报价币种",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: currency == null
+                                            ? Colors.grey.shade600
+                                            : Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  const Icon(Icons.keyboard_arrow_right,
+                                      color: Colors.grey), // 添加右侧箭头
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "汇率",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade400),
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: TextField(
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                              controller: exchangeController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "佣金比率(%)",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade400),
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: TextField(
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                              controller: commissionRateController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    "取消",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    cart.quotationInfo = null;
+                    double? exchange = double.tryParse(exchangeController.text);
+                    double? commissionRate =
+                        double.tryParse(commissionRateController.text);
+                    cart.quotationInfo =
+                        QuotationInfo(currency, exchange, commissionRate);
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "提交",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          });
+        },
+      );
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -605,6 +795,12 @@ class CartPage extends HookConsumerWidget {
           ),
         ),
         actions: [
+          if (cartType == CartType.quotation)
+            IconButton(
+                onPressed: () {
+                  quotationInfoDialog(context);
+                },
+                icon: const Icon(Icons.settings_outlined)),
           MenuAnchor(
             builder: (BuildContext context, MenuController controller,
                 Widget? child) {
