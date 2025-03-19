@@ -185,153 +185,158 @@ class CartPage extends HookConsumerWidget {
                   "确认借样",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                content: CustomScrollView(slivers: [
-                  MultiSliver(
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "借样人",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () async {
-                              final selectedUser = await context.router
-                                  .push<User>(const SelectUserRoute());
-                              user.value = selectedUser;
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      user.value == null
-                                          ? "请选择用户"
-                                          : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: user.value == null
-                                            ? Colors.grey.shade600
-                                            : Colors.black87,
+                content: SizedBox(
+                  height: 270,
+                  child: CustomScrollView(slivers: [
+                    MultiSliver(
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "借样人",
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: () async {
+                                final selectedUser = await context.router
+                                    .push<User>(const SelectUserRoute());
+                                user.value = selectedUser;
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade100,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        user.value == null
+                                            ? "请选择用户"
+                                            : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: user.value == null
+                                              ? Colors.grey.shade600
+                                              : Colors.black87,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const Icon(Icons.keyboard_arrow_right,
-                                      color: Colors.grey), // 添加右侧箭头
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "借样原因",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () {
-                              showFlanActionSheet(
-                                context,
-                                description: "请选择借样原因",
-                                cancelText: "我再想想",
-                                actions: borrowReasons,
-                                closeOnClickAction: true,
-                                onSelect: (action, index) {
-                                  borrowReason = borrowReasons[index].name;
-                                  setState(() {});
-                                },
-                              );
-                              ;
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      borrowReason ?? "请选择借样原因",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: borrowReason == null
-                                            ? Colors.grey.shade600
-                                            : Colors.black87,
-                                      ),
-                                    ),
-                                  ),
-                                  const Icon(Icons.keyboard_arrow_right,
-                                      color: Colors.grey), // 添加右侧箭头
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text(
-                            "预计归还时间",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () => {
-                              TDCalendarPopup(
-                                context,
-                                visible: true,
-                                onConfirm: (value) {
-                                  setState(() {
-                                    selectedDate = value;
-                                  });
-                                },
-                                child: TDCalendar(
-                                  title: '请选择日期',
-                                  value: selectedDate,
+                                    const Icon(Icons.keyboard_arrow_right,
+                                        color: Colors.grey), // 添加右侧箭头
+                                  ],
                                 ),
                               ),
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    selectedDate == null
-                                        ? '请选择日期'
-                                        : '${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).day}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "借样原因",
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: () {
+                                showFlanActionSheet(
+                                  context,
+                                  description: "请选择借样原因",
+                                  cancelText: "我再想想",
+                                  actions: borrowReasons,
+                                  closeOnClickAction: true,
+                                  onSelect: (action, index) {
+                                    borrowReason = borrowReasons[index].name;
+                                    setState(() {});
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade100,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        borrowReason ?? "请选择借样原因",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: borrowReason == null
+                                              ? Colors.grey.shade600
+                                              : Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(Icons.keyboard_arrow_right,
+                                        color: Colors.grey), // 添加右侧箭头
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ]),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text(
+                              "预计归还时间",
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: () => {
+                                TDCalendarPopup(
+                                  context,
+                                  visible: true,
+                                  onConfirm: (value) {
+                                    setState(() {
+                                      selectedDate = value;
+                                    });
+                                  },
+                                  child: TDCalendar(
+                                    title: '请选择日期',
+                                    value: selectedDate,
+                                  ),
+                                ),
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade100,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      selectedDate == null
+                                          ? '请选择日期'
+                                          : '${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).day}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ]),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
