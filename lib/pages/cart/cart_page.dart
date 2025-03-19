@@ -1044,33 +1044,53 @@ class CartPage extends HookConsumerWidget {
                                                   ),
                                                 ],
                                               ),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal: 10,
-                                                ),
-                                                child: cartType !=
-                                                        CartType.quotation
-                                                    ? SampleItem(
-                                                        sample: cartItem.sample,
-                                                        count: cartItem.count,
-                                                        onChange: (value) {
-                                                          if (cartItem.count ==
-                                                              value) {
-                                                            return;
-                                                          }
-                                                          cart.setSample(
-                                                              cartItem.sample,
-                                                              value);
-                                                        },
-                                                      )
-                                                    : QuotationItem(
-                                                        sample: cartItem.sample,
-                                                        price: cartItem.price,
-                                                        quotationInfo:
-                                                            quotationInfo,
-                                                      ),
+                                              child: Stack(
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      vertical: 8,
+                                                      horizontal: 10,
+                                                    ),
+                                                    child: cartType !=
+                                                            CartType.quotation
+                                                        ? SampleItem(
+                                                            sample:
+                                                                cartItem.sample,
+                                                            count:
+                                                                cartItem.count,
+                                                            onChange: (value) {
+                                                              if (cartItem
+                                                                      .count ==
+                                                                  value) {
+                                                                return;
+                                                              }
+                                                              cart.setSample(
+                                                                  cartItem
+                                                                      .sample,
+                                                                  value);
+                                                            },
+                                                          )
+                                                        : QuotationItem(
+                                                            sample:
+                                                                cartItem.sample,
+                                                            price:
+                                                                cartItem.price,
+                                                            quotationInfo:
+                                                                quotationInfo,
+                                                          ),
+                                                  ),
+                                                  if (cartType ==
+                                                          CartType.quotation &&
+                                                      cartItem.price != null)
+                                                    const TDBadge(
+                                                      TDBadgeType.subscript,
+                                                      padding:
+                                                          EdgeInsets.all(4),
+                                                      message: '改',
+                                                    ),
+                                                ],
                                               ),
                                             ),
                                           )
