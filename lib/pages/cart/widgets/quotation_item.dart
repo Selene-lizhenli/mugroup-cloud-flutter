@@ -1,21 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:flant/components/stepper.dart';
+import 'package:cloud/pages/cart/models/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class SampleItem extends HookWidget {
+class QuotationItem extends HookWidget {
   final Sample sample;
-
-  final int? count;
-
-  final ValueChanged<int>? onChange;
-
-  const SampleItem({
+  final QuotationInfo? quotationInfo;
+  const QuotationItem({
     super.key,
     required this.sample,
-    this.count,
-    this.onChange,
+    this.quotationInfo,
   });
 
   @override
@@ -70,16 +66,11 @@ class SampleItem extends HookWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: const TextStyle(color: Colors.red)),
-                    FlanStepper(
-                      value: count,
-                      onChange: (v, _) {
-                        if (v is int) {
-                          onChange?.call(v);
-                        } else {
-                          onChange?.call(int.parse(v.toString()));
-                        }
-                      },
-                    ),
+                    TextButton(
+                        onPressed: () {
+                          logger.d("调价");
+                        },
+                        child: const Text("调价"))
                   ],
                 )
               ],
