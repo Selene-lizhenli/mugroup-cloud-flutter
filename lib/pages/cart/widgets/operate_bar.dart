@@ -53,19 +53,24 @@ class OperateBar extends HookConsumerWidget {
                           const SizedBox(
                             width: 5,
                           ),
-                          const Text("合计: "),
-                          const Text(
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w400),
-                              '¥'),
-                          Text(
-                              style: const TextStyle(
-                                fontSize: 24.0,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              totalPrice.toStringAsFixed(2))
+                          if (cartType != CartType.quotation)
+                            Row(
+                              children: [
+                                const Text("合计: "),
+                                const Text(
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.w400),
+                                    '¥'),
+                                Text(
+                                    style: const TextStyle(
+                                      fontSize: 24.0,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    totalPrice.toStringAsFixed(2)),
+                              ],
+                            ),
                         ],
                       ),
                     ],
