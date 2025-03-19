@@ -1016,21 +1016,26 @@ class CartPage extends HookConsumerWidget {
                                           ...items.map(
                                             (cartItem) => Slidable(
                                               endActionPane: ActionPane(
-                                                extentRatio: 0.5,
+                                                extentRatio: cartType ==
+                                                        CartType.quotation
+                                                    ? 0.5
+                                                    : 0.25,
                                                 motion: const ScrollMotion(),
                                                 children: [
-                                                  SlidableAction(
-                                                    onPressed: (context) {
-                                                      setPriceDialog(
-                                                          context, cartItem);
-                                                    },
-                                                    backgroundColor:
-                                                        Colors.blue,
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    icon: Icons.attach_money,
-                                                    label: '调价',
-                                                  ),
+                                                  if (cartType ==
+                                                      CartType.quotation)
+                                                    SlidableAction(
+                                                      onPressed: (context) {
+                                                        setPriceDialog(
+                                                            context, cartItem);
+                                                      },
+                                                      backgroundColor:
+                                                          Colors.blue,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      icon: Icons.attach_money,
+                                                      label: '调价',
+                                                    ),
                                                   SlidableAction(
                                                     onPressed: (context) {
                                                       cart.removeSample(
