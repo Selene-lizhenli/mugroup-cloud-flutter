@@ -5,6 +5,7 @@ import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/pages/cart/widgets/quotation_item.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/operate_bar.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -697,6 +698,90 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void setPriceDialog(BuildContext context, CartItem item) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          final priceController = TextEditingController();
+          priceController.text = item.price ?? "";
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: const Text(
+              "调价",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "价格",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade100,
+                  ),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                    ),
+                    controller: priceController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (priceController.text == "") {
+                    cart.setSamplePrice(item.sample, null);
+                  } else {
+                    cart.setSamplePrice(item.sample, priceController.text);
+                  }
+
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -942,18 +1027,32 @@ class CartPage extends HookConsumerWidget {
                                                   vertical: 8,
                                                   horizontal: 10,
                                                 ),
-                                                child: SampleItem(
-                                                  sample: cartItem.sample,
-                                                  count: cartItem.count,
-                                                  onChange: (value) {
-                                                    if (cartItem.count ==
-                                                        value) {
-                                                      return;
-                                                    }
-                                                    cart.setSample(
-                                                        cartItem.sample, value);
-                                                  },
-                                                ),
+                                                child: cartType !=
+                                                        CartType.quotation
+                                                    ? SampleItem(
+                                                        sample: cartItem.sample,
+                                                        count: cartItem.count,
+                                                        onChange: (value) {
+                                                          if (cartItem.count ==
+                                                              value) {
+                                                            return;
+                                                          }
+                                                          cart.setSample(
+                                                              cartItem.sample,
+                                                              value);
+                                                        },
+                                                      )
+                                                    : QuotationItem(
+                                                        sample: cartItem.sample,
+                                                        price: cartItem.price,
+                                                        quotationInfo:
+                                                            quotationInfo,
+                                                        setPrice: () {
+                                                          setPriceDialog(
+                                                              context,
+                                                              cartItem);
+                                                        },
+                                                      ),
                                               ),
                                             ),
                                           )
