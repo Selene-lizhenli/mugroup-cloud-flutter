@@ -43,6 +43,8 @@ class CartPage extends HookConsumerWidget {
 
     final user = useState<User?>(null);
 
+    final TextEditingController barcodeTextController = TextEditingController();
+
     final borrowReasons = [
       const FlanActionSheetAction(name: "客户会议用"),
       const FlanActionSheetAction(name: "客户选中，核价报价用"),
@@ -793,6 +795,83 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void handBarcodeDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: const Text(
+              "填写产品条码",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "产品条码",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: barcodeTextController,
+                  decoration: InputDecoration(
+                    hintText: "请输入产品条码",
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  barcodeTextController.clear();
+                },
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final input = barcodeTextController.text.trim();
+                  if (input.isEmpty) {
+                    EasyLoading.showInfo("请输入产品条码!");
+                    return;
+                  }
+
+                  addItemByBarcode(input);
+                  barcodeTextController.clear();
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -945,6 +1024,18 @@ class CartPage extends HookConsumerWidget {
                     Icon(Icons.camera_alt),
                     SizedBox(width: 8),
                     Text('扫一扫'),
+                  ],
+                ),
+              ),
+              MenuItemButton(
+                onPressed: () async {
+                  handBarcodeDialog(context);
+                },
+                child: const Row(
+                  children: [
+                    Icon(Icons.edit),
+                    SizedBox(width: 8),
+                    Text('手填条码'),
                   ],
                 ),
               )
