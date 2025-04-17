@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/transfer_item.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/wms/widgets/wms_transfer_items_card.dart';
@@ -23,7 +24,13 @@ class WmsTransferPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scrollController = useScrollController();
     final transfer = useState<Transfer?>(null);
+    final transferItems = useState<List<TransferItem>?>([]);
+    final isLoading = useState<bool>(false);
+    final currentPage = useState<int>(1);
+    final totalPage = useState<int>(1);
+
     Map<TransferStatus, String> statusMap = {
       TransferStatus.draft: "待出库",
       TransferStatus.processing: "运输中",
@@ -32,13 +39,41 @@ class WmsTransferPage extends HookConsumerWidget {
     };
 
     final scrollController = useScrollController();
+    void loadData() async {
+      if (isLoading.value) return;
+      EasyLoading.show(status: '加载中...');
+      isLoading.value = true;
+      await Future.delayed(const Duration(seconds: 2), () async {
+        if (currentPage.value <= totalPage.value) {
+          final res = await getTransferItems(
+              id: transfer.value!.id!,
+              queryParameters: {'pageSize': 20, 'page': currentPage.value});
+          totalPage.value = res.meta!.pagination!.total;
+          transferItems.value = [...?transferItems.value, ...res.data];
+          currentPage.value++;
+        }
+        isLoading.value = false;
+      });
+      EasyLoading.dismiss();
+    }
 
     final transferFetch = useCallback(() async {
       transfer.value = await fetchTransferByOrederNo(code);
+      transferItems.value = [];
+      currentPage.value = 1;
+      totalPage.value = 1;
+      loadData();
     }, []);
 
     useEffect(() {
       transferFetch();
+      loadData();
+      scrollController.addListener(() {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 100) {
+          loadData();
+        }
+      });
       return null;
     }, []);
 
@@ -156,14 +191,14 @@ class WmsTransferPage extends HookConsumerWidget {
                   ),
 
                   // 滚动的产品列表
-                  if (transfer.value?.items != null)
+                  if (transferItems.value != null)
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           return WmsTransferItemsCard(
-                              transfer.value!.items![index]);
+                              transferItems.value![index]);
                         },
-                        childCount: transfer.value!.items!.length,
+                        childCount: transferItems.value!.length,
                       ),
                     ),
                 ],
