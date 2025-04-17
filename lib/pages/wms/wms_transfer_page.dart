@@ -31,6 +31,8 @@ class WmsTransferPage extends HookConsumerWidget {
       TransferStatus.cancelled: "已取消",
     };
 
+    final scrollController = useScrollController();
+
     final transferFetch = useCallback(() async {
       transfer.value = await fetchTransferByOrederNo(code);
     }, []);
@@ -78,7 +80,16 @@ class WmsTransferPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('调拨单详情'),
+        title: GestureDetector(
+          onDoubleTap: () {
+            scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+          child: const Text('调拨单详情'),
+        ),
       ),
       body: Column(
         children: [
@@ -89,6 +100,7 @@ class WmsTransferPage extends HookConsumerWidget {
                 await transferFetch();
               },
               child: CustomScrollView(
+                controller: scrollController,
                 slivers: [
                   MultiSliver(
                     children: [
