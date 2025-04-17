@@ -432,6 +432,8 @@ Pagination _$PaginationFromJson(Map<String, dynamic> json) {
 mixin _$Pagination {
   int get total => throw _privateConstructorUsedError;
   int get count => throw _privateConstructorUsedError;
+  @JsonKey(name: 'total_pages')
+  int get totalPages => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -445,7 +447,8 @@ abstract class $PaginationCopyWith<$Res> {
           Pagination value, $Res Function(Pagination) then) =
       _$PaginationCopyWithImpl<$Res, Pagination>;
   @useResult
-  $Res call({int total, int count});
+  $Res call(
+      {int total, int count, @JsonKey(name: 'total_pages') int totalPages});
 }
 
 /// @nodoc
@@ -463,6 +466,7 @@ class _$PaginationCopyWithImpl<$Res, $Val extends Pagination>
   $Res call({
     Object? total = null,
     Object? count = null,
+    Object? totalPages = null,
   }) {
     return _then(_value.copyWith(
       total: null == total
@@ -472,6 +476,10 @@ class _$PaginationCopyWithImpl<$Res, $Val extends Pagination>
       count: null == count
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalPages: null == totalPages
+          ? _value.totalPages
+          : totalPages // ignore: cast_nullable_to_non_nullable
               as int,
     ) as $Val);
   }
@@ -485,7 +493,8 @@ abstract class _$$PaginationImplCopyWith<$Res>
       __$$PaginationImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int total, int count});
+  $Res call(
+      {int total, int count, @JsonKey(name: 'total_pages') int totalPages});
 }
 
 /// @nodoc
@@ -501,6 +510,7 @@ class __$$PaginationImplCopyWithImpl<$Res>
   $Res call({
     Object? total = null,
     Object? count = null,
+    Object? totalPages = null,
   }) {
     return _then(_$PaginationImpl(
       total: null == total
@@ -511,6 +521,10 @@ class __$$PaginationImplCopyWithImpl<$Res>
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
               as int,
+      totalPages: null == totalPages
+          ? _value.totalPages
+          : totalPages // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -518,7 +532,10 @@ class __$$PaginationImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PaginationImpl implements _Pagination {
-  _$PaginationImpl({required this.total, required this.count});
+  _$PaginationImpl(
+      {required this.total,
+      required this.count,
+      @JsonKey(name: 'total_pages') required this.totalPages});
 
   factory _$PaginationImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationImplFromJson(json);
@@ -527,10 +544,13 @@ class _$PaginationImpl implements _Pagination {
   final int total;
   @override
   final int count;
+  @override
+  @JsonKey(name: 'total_pages')
+  final int totalPages;
 
   @override
   String toString() {
-    return 'Pagination(total: $total, count: $count)';
+    return 'Pagination(total: $total, count: $count, totalPages: $totalPages)';
   }
 
   @override
@@ -539,12 +559,14 @@ class _$PaginationImpl implements _Pagination {
         (other.runtimeType == runtimeType &&
             other is _$PaginationImpl &&
             (identical(other.total, total) || other.total == total) &&
-            (identical(other.count, count) || other.count == count));
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, total, count);
+  int get hashCode => Object.hash(runtimeType, total, count, totalPages);
 
   @JsonKey(ignore: true)
   @override
@@ -561,7 +583,10 @@ class _$PaginationImpl implements _Pagination {
 }
 
 abstract class _Pagination implements Pagination {
-  factory _Pagination({required final int total, required final int count}) =
+  factory _Pagination(
+          {required final int total,
+          required final int count,
+          @JsonKey(name: 'total_pages') required final int totalPages}) =
       _$PaginationImpl;
 
   factory _Pagination.fromJson(Map<String, dynamic> json) =
@@ -571,6 +596,9 @@ abstract class _Pagination implements Pagination {
   int get total;
   @override
   int get count;
+  @override
+  @JsonKey(name: 'total_pages')
+  int get totalPages;
   @override
   @JsonKey(ignore: true)
   _$$PaginationImplCopyWith<_$PaginationImpl> get copyWith =>

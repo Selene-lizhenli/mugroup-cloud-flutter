@@ -41,10 +41,12 @@ _$PaginationImpl _$$PaginationImplFromJson(Map<String, dynamic> json) =>
     _$PaginationImpl(
       total: (json['total'] as num).toInt(),
       count: (json['count'] as num).toInt(),
+      totalPages: (json['total_pages'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$PaginationImplToJson(_$PaginationImpl instance) =>
     <String, dynamic>{
       'total': instance.total,
       'count': instance.count,
+      'total_pages': instance.totalPages,
     };

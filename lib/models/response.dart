@@ -26,6 +26,7 @@ class Pagination with _$Pagination {
   factory Pagination({
     required int total,
     required int count,
+    @JsonKey(name: 'total_pages') required int totalPages,
   }) = _Pagination;
 
   factory Pagination.fromJson(Map<String, dynamic> json) =>
