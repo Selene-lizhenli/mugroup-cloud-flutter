@@ -77,12 +77,8 @@ class WmsTransferPage extends HookConsumerWidget {
 
     final searchKeyword = useState('');
 
-    final debouncedInput =
-        useDebounced(searchKeyword, const Duration(milliseconds: 500));
-
-    final transferFetch = useCallback(([String? search]) async {
-      transfer.value = await fetchTransferByOrederNo(code,
-          queryParameters: {"search": search});
+    final transferFetch = useCallback(() async {
+      transfer.value = await fetchTransferByOrederNo(code);
       transferItems.value = [];
       currentPage.value = 1;
       totalPages.value = 1;
@@ -98,12 +94,8 @@ class WmsTransferPage extends HookConsumerWidget {
           loadData();
         }
       });
-      if (debouncedInput?.value.isEmpty ?? true) {
-        transferFetch();
-      } else {}
-      transferFetch(debouncedInput?.value);
       return null;
-    }, [debouncedInput?.value]);
+    }, []);
 
     void confirmTransferOut(BuildContext context) {
       if (transfer.value!.items!.isEmpty) {
