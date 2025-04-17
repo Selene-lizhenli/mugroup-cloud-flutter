@@ -16,6 +16,27 @@ import 'package:sliver_tools/sliver_tools.dart';
 import 'widgets/wms_transfrt_operate_bar.dart';
 import 'widgets/wms_transfer_text_card.dart';
 
+class LoadMoreView extends StatelessWidget {
+  const LoadMoreView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(18.0),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(),
+            Padding(padding: EdgeInsets.all(10)),
+            Text('加载中...')
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 @RoutePage()
 class WmsTransferPage extends HookConsumerWidget {
   final String code;
@@ -29,7 +50,7 @@ class WmsTransferPage extends HookConsumerWidget {
     final transferItems = useState<List<TransferItem>?>([]);
     final isLoading = useState<bool>(false);
     final currentPage = useState<int>(1);
-    final totalPage = useState<int>(1);
+    final totalPages = useState<int>(1);
 
     Map<TransferStatus, String> statusMap = {
       TransferStatus.draft: "待出库",
@@ -40,20 +61,18 @@ class WmsTransferPage extends HookConsumerWidget {
 
     void loadData() async {
       if (isLoading.value) return;
-      EasyLoading.show(status: '加载中...');
       isLoading.value = true;
       await Future.delayed(const Duration(seconds: 2), () async {
-        if (currentPage.value <= totalPage.value) {
+        if (currentPage.value <= totalPages.value) {
           final res = await getTransferItems(
               id: transfer.value!.id!,
               queryParameters: {'pageSize': 20, 'page': currentPage.value});
-          totalPage.value = res.meta!.pagination!.total;
+          totalPages.value = res.meta!.pagination!.totalPages;
           transferItems.value = [...?transferItems.value, ...res.data];
           currentPage.value++;
         }
         isLoading.value = false;
       });
-      EasyLoading.dismiss();
     }
 
     final searchKeyword = useState('');
@@ -66,7 +85,7 @@ class WmsTransferPage extends HookConsumerWidget {
           queryParameters: {"search": search});
       transferItems.value = [];
       currentPage.value = 1;
-      totalPage.value = 1;
+      totalPages.value = 1;
       loadData();
     }, []);
 
@@ -218,18 +237,24 @@ class WmsTransferPage extends HookConsumerWidget {
                               ],
                             ),
                           ),
+                          if (transferItems.value!.isEmpty && isLoading.value)
+                            const LoadMoreView(),
                         ],
                       ),
                     ],
                   ),
-
                   // 滚动的产品列表
                   if (transferItems.value != null)
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          return WmsTransferItemsCard(
-                              transferItems.value![index]);
+                          if (index == transferItems.value!.length - 1 &&
+                              currentPage.value < totalPages.value) {
+                            return const LoadMoreView();
+                          } else {
+                            return WmsTransferItemsCard(
+                                transferItems.value![index]);
+                          }
                         },
                         childCount: transferItems.value!.length,
                       ),
