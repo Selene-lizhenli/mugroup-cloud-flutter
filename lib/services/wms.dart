@@ -2,6 +2,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/inventory.dart';
+import 'package:cloud/models/wms/transfer_item.dart';
 
 Future<ApiResponse<List<Warehouse>>> getWarehouses() async {
   return api.get("api/tenant/wms/warehouses").then(
@@ -50,6 +51,22 @@ Future<Transfer?> fetchTransferByOrederNo(String orderNo) async {
     }
     return Transfer.fromJson(res.data);
   });
+}
+
+Future<ApiResponse<List<TransferItem>>> getTransferItems(
+    {required int id, Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/wms/stock/transfers/$id/items",
+          queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<TransferItem>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(TransferItem.fromJson).toList();
+          },
+        ),
+      );
 }
 
 Future addTransferItems(int transferId, Map<String, dynamic>? data) async {
