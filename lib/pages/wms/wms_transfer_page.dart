@@ -38,7 +38,6 @@ class WmsTransferPage extends HookConsumerWidget {
       TransferStatus.cancelled: "已取消",
     };
 
-    final scrollController = useScrollController();
     void loadData() async {
       if (isLoading.value) return;
       EasyLoading.show(status: '加载中...');
