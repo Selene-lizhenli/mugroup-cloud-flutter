@@ -56,8 +56,14 @@ class WmsTransferPage extends HookConsumerWidget {
       EasyLoading.dismiss();
     }
 
-    final transferFetch = useCallback(() async {
-      transfer.value = await fetchTransferByOrederNo(code);
+    final searchKeyword = useState('');
+
+    final debouncedInput =
+        useDebounced(searchKeyword, const Duration(milliseconds: 500));
+
+    final transferFetch = useCallback(([String? search]) async {
+      transfer.value = await fetchTransferByOrederNo(code,
+          queryParameters: {"search": search});
       transferItems.value = [];
       currentPage.value = 1;
       totalPage.value = 1;
@@ -73,8 +79,12 @@ class WmsTransferPage extends HookConsumerWidget {
           loadData();
         }
       });
+      if (debouncedInput?.value.isEmpty ?? true) {
+        transferFetch();
+      } else {}
+      transferFetch(debouncedInput?.value);
       return null;
-    }, []);
+    }, [debouncedInput?.value]);
 
     void confirmTransferOut(BuildContext context) {
       if (transfer.value!.items!.isEmpty) {
@@ -175,13 +185,37 @@ class WmsTransferPage extends HookConsumerWidget {
                                     fontWeight: FontWeight.w600),
                                 transfer.value?.inWarehouse?.name ?? ""),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.only(
-                                top: 20, left: 8, bottom: 8, right: 8),
-                            child: Text(
-                              '产品信息',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 10),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  '产品信息',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: TextField(
+                                    onChanged: (value) =>
+                                        searchKeyword.value = value.trim(),
+                                    decoration: InputDecoration(
+                                      hintText: '搜索产品名/条码/编码',
+                                      prefixIcon:
+                                          const Icon(Icons.search, size: 20),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 0),
+                                      isDense: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],

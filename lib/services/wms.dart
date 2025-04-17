@@ -42,9 +42,11 @@ Future borrowIn(int borrowId, Map<String, dynamic>? data) async {
       data: data);
 }
 
-Future<Transfer?> fetchTransferByOrederNo(String orderNo) async {
+Future<Transfer?> fetchTransferByOrederNo(String orderNo,
+    {Map<String, dynamic>? queryParameters}) async {
   return api
-      .get("api/tenant/wms/stock/transfers/order_no/$orderNo")
+      .get("api/tenant/wms/stock/transfers/order_no/$orderNo",
+          queryParameters: queryParameters)
       .then((res) {
     if (res.data == null) {
       return null;
