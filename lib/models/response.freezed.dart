@@ -22,19 +22,20 @@ ApiResponse<T> _$ApiResponseFromJson<T>(
 /// @nodoc
 mixin _$ApiResponse<T> {
   T get data => throw _privateConstructorUsedError;
+  Meta? get meta => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T data) data,
+    required TResult Function(T data, Meta? meta) data,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(T data)? data,
+    TResult? Function(T data, Meta? meta)? data,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T data)? data,
+    TResult Function(T data, Meta? meta)? data,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -67,7 +68,9 @@ abstract class $ApiResponseCopyWith<T, $Res> {
           ApiResponse<T> value, $Res Function(ApiResponse<T>) then) =
       _$ApiResponseCopyWithImpl<T, $Res, ApiResponse<T>>;
   @useResult
-  $Res call({T data});
+  $Res call({T data, Meta? meta});
+
+  $MetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -84,13 +87,30 @@ class _$ApiResponseCopyWithImpl<T, $Res, $Val extends ApiResponse<T>>
   @override
   $Res call({
     Object? data = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_value.copyWith(
       data: freezed == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
               as T,
+      meta: freezed == meta
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as Meta?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $MetaCopyWith<$Res>? get meta {
+    if (_value.meta == null) {
+      return null;
+    }
+
+    return $MetaCopyWith<$Res>(_value.meta!, (value) {
+      return _then(_value.copyWith(meta: value) as $Val);
+    });
   }
 }
 
@@ -102,7 +122,10 @@ abstract class _$$ApiResponseDataImplCopyWith<T, $Res>
       __$$ApiResponseDataImplCopyWithImpl<T, $Res>;
   @override
   @useResult
-  $Res call({T data});
+  $Res call({T data, Meta? meta});
+
+  @override
+  $MetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -117,12 +140,17 @@ class __$$ApiResponseDataImplCopyWithImpl<T, $Res>
   @override
   $Res call({
     Object? data = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_$ApiResponseDataImpl<T>(
       freezed == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
               as T,
+      freezed == meta
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as Meta?,
     ));
   }
 }
@@ -130,7 +158,7 @@ class __$$ApiResponseDataImplCopyWithImpl<T, $Res>
 /// @nodoc
 @JsonSerializable(genericArgumentFactories: true)
 class _$ApiResponseDataImpl<T> implements ApiResponseData<T> {
-  const _$ApiResponseDataImpl(this.data);
+  const _$ApiResponseDataImpl(this.data, this.meta);
 
   factory _$ApiResponseDataImpl.fromJson(
           Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
@@ -138,10 +166,12 @@ class _$ApiResponseDataImpl<T> implements ApiResponseData<T> {
 
   @override
   final T data;
+  @override
+  final Meta? meta;
 
   @override
   String toString() {
-    return 'ApiResponse<$T>.data(data: $data)';
+    return 'ApiResponse<$T>.data(data: $data, meta: $meta)';
   }
 
   @override
@@ -149,13 +179,14 @@ class _$ApiResponseDataImpl<T> implements ApiResponseData<T> {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiResponseDataImpl<T> &&
-            const DeepCollectionEquality().equals(other.data, data));
+            const DeepCollectionEquality().equals(other.data, data) &&
+            (identical(other.meta, meta) || other.meta == meta));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(data));
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(data), meta);
 
   @JsonKey(ignore: true)
   @override
@@ -167,27 +198,27 @@ class _$ApiResponseDataImpl<T> implements ApiResponseData<T> {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T data) data,
+    required TResult Function(T data, Meta? meta) data,
   }) {
-    return data(this.data);
+    return data(this.data, meta);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(T data)? data,
+    TResult? Function(T data, Meta? meta)? data,
   }) {
-    return data?.call(this.data);
+    return data?.call(this.data, meta);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T data)? data,
+    TResult Function(T data, Meta? meta)? data,
     required TResult orElse(),
   }) {
     if (data != null) {
-      return data(this.data);
+      return data(this.data, meta);
     }
     return orElse();
   }
@@ -227,7 +258,8 @@ class _$ApiResponseDataImpl<T> implements ApiResponseData<T> {
 }
 
 abstract class ApiResponseData<T> implements ApiResponse<T> {
-  const factory ApiResponseData(final T data) = _$ApiResponseDataImpl<T>;
+  const factory ApiResponseData(final T data, final Meta? meta) =
+      _$ApiResponseDataImpl<T>;
 
   factory ApiResponseData.fromJson(
           Map<String, dynamic> json, T Function(Object?) fromJsonT) =
@@ -236,7 +268,311 @@ abstract class ApiResponseData<T> implements ApiResponse<T> {
   @override
   T get data;
   @override
+  Meta? get meta;
+  @override
   @JsonKey(ignore: true)
   _$$ApiResponseDataImplCopyWith<T, _$ApiResponseDataImpl<T>> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+Meta _$MetaFromJson(Map<String, dynamic> json) {
+  return _Meta.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Meta {
+  Pagination? get pagination => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MetaCopyWith<Meta> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MetaCopyWith<$Res> {
+  factory $MetaCopyWith(Meta value, $Res Function(Meta) then) =
+      _$MetaCopyWithImpl<$Res, Meta>;
+  @useResult
+  $Res call({Pagination? pagination});
+
+  $PaginationCopyWith<$Res>? get pagination;
+}
+
+/// @nodoc
+class _$MetaCopyWithImpl<$Res, $Val extends Meta>
+    implements $MetaCopyWith<$Res> {
+  _$MetaCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? pagination = freezed,
+  }) {
+    return _then(_value.copyWith(
+      pagination: freezed == pagination
+          ? _value.pagination
+          : pagination // ignore: cast_nullable_to_non_nullable
+              as Pagination?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $PaginationCopyWith<$Res>? get pagination {
+    if (_value.pagination == null) {
+      return null;
+    }
+
+    return $PaginationCopyWith<$Res>(_value.pagination!, (value) {
+      return _then(_value.copyWith(pagination: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$MetaImplCopyWith<$Res> implements $MetaCopyWith<$Res> {
+  factory _$$MetaImplCopyWith(
+          _$MetaImpl value, $Res Function(_$MetaImpl) then) =
+      __$$MetaImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({Pagination? pagination});
+
+  @override
+  $PaginationCopyWith<$Res>? get pagination;
+}
+
+/// @nodoc
+class __$$MetaImplCopyWithImpl<$Res>
+    extends _$MetaCopyWithImpl<$Res, _$MetaImpl>
+    implements _$$MetaImplCopyWith<$Res> {
+  __$$MetaImplCopyWithImpl(_$MetaImpl _value, $Res Function(_$MetaImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? pagination = freezed,
+  }) {
+    return _then(_$MetaImpl(
+      pagination: freezed == pagination
+          ? _value.pagination
+          : pagination // ignore: cast_nullable_to_non_nullable
+              as Pagination?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MetaImpl implements _Meta {
+  _$MetaImpl({this.pagination});
+
+  factory _$MetaImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MetaImplFromJson(json);
+
+  @override
+  final Pagination? pagination;
+
+  @override
+  String toString() {
+    return 'Meta(pagination: $pagination)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MetaImpl &&
+            (identical(other.pagination, pagination) ||
+                other.pagination == pagination));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, pagination);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MetaImplCopyWith<_$MetaImpl> get copyWith =>
+      __$$MetaImplCopyWithImpl<_$MetaImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MetaImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Meta implements Meta {
+  factory _Meta({final Pagination? pagination}) = _$MetaImpl;
+
+  factory _Meta.fromJson(Map<String, dynamic> json) = _$MetaImpl.fromJson;
+
+  @override
+  Pagination? get pagination;
+  @override
+  @JsonKey(ignore: true)
+  _$$MetaImplCopyWith<_$MetaImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+Pagination _$PaginationFromJson(Map<String, dynamic> json) {
+  return _Pagination.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Pagination {
+  int get total => throw _privateConstructorUsedError;
+  int get count => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PaginationCopyWith<Pagination> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PaginationCopyWith<$Res> {
+  factory $PaginationCopyWith(
+          Pagination value, $Res Function(Pagination) then) =
+      _$PaginationCopyWithImpl<$Res, Pagination>;
+  @useResult
+  $Res call({int total, int count});
+}
+
+/// @nodoc
+class _$PaginationCopyWithImpl<$Res, $Val extends Pagination>
+    implements $PaginationCopyWith<$Res> {
+  _$PaginationCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = null,
+    Object? count = null,
+  }) {
+    return _then(_value.copyWith(
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PaginationImplCopyWith<$Res>
+    implements $PaginationCopyWith<$Res> {
+  factory _$$PaginationImplCopyWith(
+          _$PaginationImpl value, $Res Function(_$PaginationImpl) then) =
+      __$$PaginationImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int total, int count});
+}
+
+/// @nodoc
+class __$$PaginationImplCopyWithImpl<$Res>
+    extends _$PaginationCopyWithImpl<$Res, _$PaginationImpl>
+    implements _$$PaginationImplCopyWith<$Res> {
+  __$$PaginationImplCopyWithImpl(
+      _$PaginationImpl _value, $Res Function(_$PaginationImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = null,
+    Object? count = null,
+  }) {
+    return _then(_$PaginationImpl(
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PaginationImpl implements _Pagination {
+  _$PaginationImpl({required this.total, required this.count});
+
+  factory _$PaginationImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PaginationImplFromJson(json);
+
+  @override
+  final int total;
+  @override
+  final int count;
+
+  @override
+  String toString() {
+    return 'Pagination(total: $total, count: $count)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PaginationImpl &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.count, count) || other.count == count));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, total, count);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PaginationImplCopyWith<_$PaginationImpl> get copyWith =>
+      __$$PaginationImplCopyWithImpl<_$PaginationImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PaginationImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Pagination implements Pagination {
+  factory _Pagination({required final int total, required final int count}) =
+      _$PaginationImpl;
+
+  factory _Pagination.fromJson(Map<String, dynamic> json) =
+      _$PaginationImpl.fromJson;
+
+  @override
+  int get total;
+  @override
+  int get count;
+  @override
+  @JsonKey(ignore: true)
+  _$$PaginationImplCopyWith<_$PaginationImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
