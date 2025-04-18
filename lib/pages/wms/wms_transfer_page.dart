@@ -51,6 +51,10 @@ class WmsTransferPage extends HookConsumerWidget {
     final isLoading = useState<bool>(false);
     final currentPage = useState<int>(1);
     final totalPages = useState<int>(1);
+    final searchKeyword = useState<String>('');
+
+    final debouncedInput =
+        useDebounced(searchKeyword.value, const Duration(milliseconds: 500));
 
     Map<TransferStatus, String> statusMap = {
       TransferStatus.draft: "待出库",
@@ -66,7 +70,12 @@ class WmsTransferPage extends HookConsumerWidget {
         if (currentPage.value <= totalPages.value) {
           final res = await getTransferItems(
               id: transfer.value!.id!,
-              queryParameters: {'pageSize': 20, 'page': currentPage.value});
+              queryParameters: {
+                'pageSize': 20,
+                'page': currentPage.value,
+                'search': debouncedInput
+              });
+
           totalPages.value = res.meta!.pagination!.totalPages;
           transferItems.value = [...?transferItems.value, ...res.data];
           currentPage.value++;
@@ -74,8 +83,6 @@ class WmsTransferPage extends HookConsumerWidget {
         isLoading.value = false;
       });
     }
-
-    final searchKeyword = useState('');
 
     final transferFetch = useCallback(() async {
       transfer.value = await fetchTransferByOrederNo(code);
@@ -96,6 +103,14 @@ class WmsTransferPage extends HookConsumerWidget {
       });
       return null;
     }, []);
+
+    useEffect(() {
+      transferItems.value = [];
+      currentPage.value = 1;
+      totalPages.value = 1;
+      loadData();
+      return null;
+    }, [debouncedInput]);
 
     void confirmTransferOut(BuildContext context) {
       if (transfer.value!.items!.isEmpty) {
@@ -210,8 +225,9 @@ class WmsTransferPage extends HookConsumerWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: TextField(
-                                    onChanged: (value) =>
-                                        searchKeyword.value = value.trim(),
+                                    onChanged: (value) => {
+                                      searchKeyword.value = value,
+                                    },
                                     decoration: InputDecoration(
                                       hintText: '搜索产品名/条码/编码',
                                       prefixIcon:
