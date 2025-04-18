@@ -52,6 +52,7 @@ class WmsTransferPage extends HookConsumerWidget {
     final currentPage = useState<int>(1);
     final totalPages = useState<int>(1);
     final searchKeyword = useState<String>('');
+    final searchController = useTextEditingController();
 
     final debouncedInput =
         useDebounced(searchKeyword.value, const Duration(milliseconds: 500));
@@ -167,6 +168,8 @@ class WmsTransferPage extends HookConsumerWidget {
           Expanded(
             child: EasyRefresh(
               onRefresh: () async {
+                searchKeyword.value = '';
+                searchController.clear();
                 await transferFetch();
               },
               child: CustomScrollView(
@@ -225,6 +228,7 @@ class WmsTransferPage extends HookConsumerWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: TextField(
+                                    controller: searchController,
                                     onChanged: (value) => {
                                       searchKeyword.value = value,
                                     },
