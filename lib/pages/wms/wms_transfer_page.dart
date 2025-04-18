@@ -64,7 +64,7 @@ class WmsTransferPage extends HookConsumerWidget {
     };
 
     void loadData() async {
-      if (isLoading.value) return;
+      if (transfer.value == null || transfer.value!.id == null) return;
       isLoading.value = true;
       await Future.delayed(const Duration(seconds: 2), () async {
         if (currentPage.value <= totalPages.value) {
