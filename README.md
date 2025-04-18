@@ -10,3 +10,7 @@ A new Flutter project.
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 ```
+直接运行env.cloud
+```sh
+dart run melos prepare:cloud
+```
