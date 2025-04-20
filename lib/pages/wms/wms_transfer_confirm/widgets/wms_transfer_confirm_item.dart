@@ -30,7 +30,7 @@ class WmsTransferConfirmItem extends HookWidget {
         Row(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 1, 0),
               child: TDCheckbox(
                 checked: item.checked ?? false,
                 onCheckBoxChanged: onCheckBoxChanged,

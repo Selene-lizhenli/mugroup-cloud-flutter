@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/models/state.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/providers/transfer_confirm_provider.dart';
 import 'package:cloud/pages/wms/wms_transfer_confirm/widgets/wms_transfer_confirm_card.dart';
@@ -21,12 +22,15 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(transferConfirmProviderProvider);
     final notifier = ref.read(transferConfirmProviderProvider.notifier);
+    EasyRefreshController controller = useEasyRefreshController();
+
     final items = state.items;
 
     final transferFetch = useCallback(() async {
       final res = await getTransferItems(id: id, queryParameters: {
         'pageSize': 2000,
         'page': 1,
+        'diff': true,
       });
 
       notifier.items = res.data
@@ -50,6 +54,7 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
           // 让产品列表滚动
           Expanded(
             child: EasyRefresh(
+              controller: controller,
               refreshOnStart: true,
               onRefresh: () async {
                 await transferFetch();
@@ -143,9 +148,8 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                 EasyLoading.show(status: '加载中...');
                 await confirmTransferIn(id, data);
                 EasyLoading.showSuccess("入库成功!");
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
+
+                controller.callRefresh();
               }),
         ],
       ),
