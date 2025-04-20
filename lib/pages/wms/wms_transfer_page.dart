@@ -16,27 +16,6 @@ import 'package:sliver_tools/sliver_tools.dart';
 import 'widgets/wms_transfrt_operate_bar.dart';
 import 'widgets/wms_transfer_text_card.dart';
 
-class LoadMoreView extends StatelessWidget {
-  const LoadMoreView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(18.0),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CircularProgressIndicator(),
-            Padding(padding: EdgeInsets.all(10)),
-            Text('加载中...')
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 @RoutePage()
 class WmsTransferPage extends HookConsumerWidget {
   final String code;
@@ -47,10 +26,9 @@ class WmsTransferPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = useScrollController();
     final transfer = useState<Transfer?>(null);
-    final transferItems = useState<List<TransferItem>?>([]);
-    final isLoading = useState<bool>(false);
+    final transferItems = useState<List<TransferItem>>([]);
     final currentPage = useState<int>(1);
-    final totalPages = useState<int>(1);
+    final pageSize = useState<int>(200);
     final searchKeyword = useState<String>('');
 
     final debouncedInput =
@@ -63,54 +41,23 @@ class WmsTransferPage extends HookConsumerWidget {
       TransferStatus.cancelled: "已取消",
     };
 
-    void loadData() async {
-      if (transfer.value == null || transfer.value!.id == null) return;
-      isLoading.value = true;
-      await Future.delayed(const Duration(seconds: 2), () async {
-        if (currentPage.value <= totalPages.value) {
-          final res = await getTransferItems(
-              id: transfer.value!.id!,
-              queryParameters: {
-                'pageSize': 20,
-                'page': currentPage.value,
-                'search': debouncedInput
-              });
+    loadData({int page = 1}) async {
+      if (transfer.value == null || transfer.value!.id == null) {
+        return [] as List<TransferItem>;
+      }
 
-          totalPages.value = res.meta!.pagination!.totalPages;
-          transferItems.value = [...?transferItems.value, ...res.data];
-          currentPage.value++;
-        }
-        isLoading.value = false;
-      });
+      final res = await getTransferItems(
+          id: transfer.value!.id!,
+          queryParameters: {
+            'pageSize': pageSize.value,
+            'page': page,
+            'search': debouncedInput
+          });
+
+      transferItems.value = [...transferItems.value, ...res.data];
+
+      return res.data;
     }
-
-    final transferFetch = useCallback(() async {
-      transfer.value = await fetchTransferByOrederNo(code);
-      transferItems.value = [];
-      currentPage.value = 1;
-      totalPages.value = 1;
-      loadData();
-    }, []);
-
-    useEffect(() {
-      transferFetch();
-      loadData();
-      scrollController.addListener(() {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 100) {
-          loadData();
-        }
-      });
-      return null;
-    }, []);
-
-    useEffect(() {
-      transferItems.value = [];
-      currentPage.value = 1;
-      totalPages.value = 1;
-      loadData();
-      return null;
-    }, [debouncedInput]);
 
     void confirmTransferOut(BuildContext context) {
       if (transfer.value!.items!.isEmpty) {
@@ -137,7 +84,6 @@ class WmsTransferPage extends HookConsumerWidget {
                   EasyLoading.show(status: '加载中...');
                   await transferOut(transfer.value!.id!);
                   transfer.value = await fetchTransferByOrederNo(code);
-                  transferFetch();
                   EasyLoading.showSuccess("出库成功!");
                 },
                 child: const Text("确认"),
@@ -158,7 +104,7 @@ class WmsTransferPage extends HookConsumerWidget {
               curve: Curves.easeInOut,
             );
           },
-          child: const Text('调拨单详情'),
+          child: Text('调拨单详情${transferItems.value.length}'),
         ),
       ),
       body: Column(
@@ -166,8 +112,21 @@ class WmsTransferPage extends HookConsumerWidget {
           // 让产品列表滚动
           Expanded(
             child: EasyRefresh(
+              refreshOnStart: true,
               onRefresh: () async {
-                await transferFetch();
+                currentPage.value = 1;
+                transferItems.value = [];
+                transfer.value = await fetchTransferByOrederNo(code);
+                loadData(page: currentPage.value);
+              },
+              onLoad: () async {
+                final result = await loadData(page: currentPage.value + 1);
+
+                if (result.length >= pageSize.value) {
+                  currentPage.value++;
+                } else {
+                  return IndicatorResult.noMore;
+                }
               },
               child: CustomScrollView(
                 controller: scrollController,
@@ -245,28 +204,19 @@ class WmsTransferPage extends HookConsumerWidget {
                               ],
                             ),
                           ),
-                          if (transferItems.value!.isEmpty && isLoading.value)
-                            const LoadMoreView(),
                         ],
                       ),
                     ],
                   ),
                   // 滚动的产品列表
-                  if (transferItems.value != null)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if (index == transferItems.value!.length - 1 &&
-                              currentPage.value < totalPages.value) {
-                            return const LoadMoreView();
-                          } else {
-                            return WmsTransferItemsCard(
-                                transferItems.value![index]);
-                          }
-                        },
-                        childCount: transferItems.value!.length,
-                      ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return WmsTransferItemsCard(transferItems.value[index]);
+                      },
+                      childCount: transferItems.value.length,
                     ),
+                  ),
                 ],
               ),
             ),
