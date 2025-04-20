@@ -4,12 +4,14 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class WmsTransferConfirmOperateBar extends HookConsumerWidget {
   final bool checked;
+  final int checkNum;
   final void Function(bool)? selectAll;
   final void Function()? onConfirm;
 
   const WmsTransferConfirmOperateBar({
     super.key,
     required this.checked,
+    required this.checkNum,
     this.selectAll,
     this.onConfirm,
   });
@@ -17,16 +19,14 @@ class WmsTransferConfirmOperateBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
-      height: 60,
       child: Padding(
         padding: const EdgeInsets.all(6.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(
-              width: 120,
+            Expanded(
               child: TDCheckbox(
-                title: "全选",
+                title: "全选($checkNum)",
                 checked: checked,
                 onCheckBoxChanged: selectAll,
                 backgroundColor: const Color(0xFFF3F4F6),

@@ -29,8 +29,6 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
       final transfer = await fetchTransferByOrederNo(code);
       notifier.transfer = transfer;
       notifier.items = transfer!.items!
-          .where((item) =>
-              (item.inQty ?? 0) < (item.outQty ?? 0) && item.notes == null)
           .map((item) => TransferConfirmItem(
               id: item.id,
               product: item.product!,
@@ -38,11 +36,6 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
               outQty: item.outQty,
               count: (item.outQty ?? 0) - (item.inQty ?? 0)))
           .toList();
-    }, []);
-
-    useEffect(() {
-      transferFetch();
-      return null;
     }, []);
 
     return Scaffold(
@@ -54,15 +47,18 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
           // 让产品列表滚动
           Expanded(
             child: EasyRefresh(
+              refreshOnStart: true,
               onRefresh: () async {
                 await transferFetch();
               },
               child: CustomScrollView(
                 slivers: [
-                  MultiSliver(
-                    children: [
-                      ...items.map((item) {
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
                         final notesController = TextEditingController();
+                        final item = items[index];
+
                         return Slidable(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -95,9 +91,10 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                             ),
                           ),
                         );
-                      })
-                    ],
-                  )
+                      },
+                      childCount: items.length,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -105,6 +102,7 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
           WmsTransferConfirmOperateBar(
               checked: items.isNotEmpty &&
                   items.every((item) => item.checked == true),
+              checkNum: items.where((it) => it.checked ?? false).length,
               selectAll: (checked) {
                 final allChecked = items.isNotEmpty &&
                     items.every((item) => item.checked == true);
