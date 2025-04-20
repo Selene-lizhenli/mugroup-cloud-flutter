@@ -28,7 +28,7 @@ class WmsTransferPage extends HookConsumerWidget {
     final transfer = useState<Transfer?>(null);
     final transferItems = useState<List<TransferItem>>([]);
     final currentPage = useState<int>(1);
-    final pageSize = useState<int>(200);
+    final pageSize = useState<int>(20);
     final searchKeyword = useState<String>('');
 
     final debouncedInput =
@@ -41,7 +41,7 @@ class WmsTransferPage extends HookConsumerWidget {
       TransferStatus.cancelled: "已取消",
     };
 
-    loadData({int page = 1}) async {
+    loadData({int page = 1, String? search}) async {
       if (transfer.value == null || transfer.value!.id == null) {
         return [] as List<TransferItem>;
       }
@@ -51,7 +51,7 @@ class WmsTransferPage extends HookConsumerWidget {
           queryParameters: {
             'pageSize': pageSize.value,
             'page': page,
-            'search': debouncedInput
+            'search': search ?? ""
           });
 
       transferItems.value = [...transferItems.value, ...res.data];
@@ -94,6 +94,13 @@ class WmsTransferPage extends HookConsumerWidget {
       );
     }
 
+    useEffect(() {
+      transferItems.value = [];
+      currentPage.value = 1;
+      loadData(page: 1, search: debouncedInput);
+      return null;
+    }, [debouncedInput]);
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -104,7 +111,7 @@ class WmsTransferPage extends HookConsumerWidget {
               curve: Curves.easeInOut,
             );
           },
-          child: Text('调拨单详情${transferItems.value.length}'),
+          child: const Text('调拨单详情'),
         ),
       ),
       body: Column(
@@ -117,10 +124,16 @@ class WmsTransferPage extends HookConsumerWidget {
                 currentPage.value = 1;
                 transferItems.value = [];
                 transfer.value = await fetchTransferByOrederNo(code);
-                loadData(page: currentPage.value);
+                loadData(
+                  page: currentPage.value,
+                  search: debouncedInput,
+                );
               },
               onLoad: () async {
-                final result = await loadData(page: currentPage.value + 1);
+                final result = await loadData(
+                  page: currentPage.value + 1,
+                  search: debouncedInput,
+                );
 
                 if (result.length >= pageSize.value) {
                   currentPage.value++;
