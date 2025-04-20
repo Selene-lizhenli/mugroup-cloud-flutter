@@ -285,15 +285,15 @@ class WmsTransferConfirmRoute
     extends _i13.PageRouteInfo<WmsTransferConfirmRouteArgs> {
   WmsTransferConfirmRoute({
     _i16.Key? key,
-    required String code,
+    required int id,
     List<_i13.PageRouteInfo>? children,
   }) : super(
           WmsTransferConfirmRoute.name,
           args: WmsTransferConfirmRouteArgs(
             key: key,
-            code: code,
+            id: id,
           ),
-          rawPathParams: {'code': code},
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -305,10 +305,10 @@ class WmsTransferConfirmRoute
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WmsTransferConfirmRouteArgs>(
           orElse: () =>
-              WmsTransferConfirmRouteArgs(code: pathParams.getString('code')));
+              WmsTransferConfirmRouteArgs(id: pathParams.getInt('id')));
       return _i11.WmsTransferConfirmPage(
         key: args.key,
-        code: args.code,
+        id: args.id,
       );
     },
   );
@@ -317,16 +317,16 @@ class WmsTransferConfirmRoute
 class WmsTransferConfirmRouteArgs {
   const WmsTransferConfirmRouteArgs({
     this.key,
-    required this.code,
+    required this.id,
   });
 
   final _i16.Key? key;
 
-  final String code;
+  final int id;
 
   @override
   String toString() {
-    return 'WmsTransferConfirmRouteArgs{key: $key, code: $code}';
+    return 'WmsTransferConfirmRouteArgs{key: $key, id: $id}';
   }
 }
 

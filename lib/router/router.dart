@@ -33,7 +33,7 @@ class AppRouter extends RootStackRouter {
 
       AutoRoute(page: LoginRoute.page, path: "/login"),
       AutoRoute(page: ScanRoute.page, path: "/scan"),
-      AutoRoute(page: WmsTransferRoute.page, path: "/wms/transfer/:code"),
+      AutoRoute(page: WmsTransferRoute.page, path: "/wms/transfer/:id"),
       AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),

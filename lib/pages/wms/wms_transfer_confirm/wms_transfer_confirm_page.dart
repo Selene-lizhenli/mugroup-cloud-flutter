@@ -11,30 +11,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 @RoutePage()
 class WmsTransferConfirmPage extends HookConsumerWidget {
-  final String code;
-  const WmsTransferConfirmPage({super.key, @pathParam required this.code});
+  final int id;
+  const WmsTransferConfirmPage({super.key, @pathParam required this.id});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(transferConfirmProviderProvider);
     final notifier = ref.read(transferConfirmProviderProvider.notifier);
     final items = state.items;
-    final transfer = state.transfer;
 
     final transferFetch = useCallback(() async {
-      final transfer = await fetchTransferByOrederNo(code);
-      notifier.transfer = transfer;
-      notifier.items = transfer!.items!
-          .map((item) => TransferConfirmItem(
-              id: item.id,
-              product: item.product!,
-              inQty: item.inQty,
-              outQty: item.outQty,
-              count: (item.outQty ?? 0) - (item.inQty ?? 0)))
+      final res = await getTransferItems(id: id, queryParameters: {
+        'pageSize': 2000,
+        'page': 1,
+      });
+
+      notifier.items = res.data
+          .map(
+            (item) => TransferConfirmItem(
+                id: item.id,
+                product: item.product!,
+                inQty: item.inQty,
+                outQty: item.outQty,
+                count: (item.outQty ?? 0) - (item.inQty ?? 0)),
+          )
           .toList();
     }, []);
 
@@ -138,7 +141,7 @@ class WmsTransferConfirmPage extends HookConsumerWidget {
                       .toList()
                 };
                 EasyLoading.show(status: '加载中...');
-                await confirmTransferIn(transfer!.id!, data);
+                await confirmTransferIn(id, data);
                 EasyLoading.showSuccess("入库成功!");
                 if (context.mounted) {
                   Navigator.of(context).pop();

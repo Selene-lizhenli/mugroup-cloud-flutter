@@ -289,7 +289,10 @@ class WmsTransferPage extends HookConsumerWidget {
               context.pushRoute(const CartRoute());
             },
             transferInAll: () async {
-              context.pushRoute(WmsTransferConfirmRoute(code: code));
+              if (transfer.value != null) {
+                context.pushRoute(
+                    WmsTransferConfirmRoute(id: transfer.value!.id!));
+              }
             },
           ),
         ],
