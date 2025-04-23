@@ -1103,93 +1103,115 @@ class CartPage extends HookConsumerWidget {
                                                       fontSize: 12),
                                                 ),
                                               ),
-                                            ),
-                                          ...items.map(
-                                            (cartItem) => Slidable(
-                                              endActionPane: ActionPane(
-                                                extentRatio: cartType ==
-                                                        CartType.quotation
-                                                    ? 0.5
-                                                    : 0.25,
-                                                motion: const ScrollMotion(),
-                                                children: [
-                                                  if (cartType ==
-                                                      CartType.quotation)
-                                                    SlidableAction(
-                                                      onPressed: (context) {
-                                                        setPriceDialog(
-                                                            context, cartItem);
-                                                      },
-                                                      backgroundColor:
-                                                          Colors.blue,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      icon: Icons.attach_money,
-                                                      label: '调价',
-                                                    ),
-                                                  SlidableAction(
-                                                    onPressed: (context) {
-                                                      cart.removeSample(
-                                                          cartItem.sample);
-                                                    },
-                                                    backgroundColor: Colors.red,
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    icon: Icons.delete,
-                                                    label: '移除',
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      vertical: 8,
-                                                      horizontal: 10,
-                                                    ),
-                                                    child: cartType !=
-                                                            CartType.quotation
-                                                        ? SampleItem(
-                                                            sample:
-                                                                cartItem.sample,
-                                                            count:
-                                                                cartItem.count,
-                                                            onChange: (value) {
-                                                              if (cartItem
-                                                                      .count ==
-                                                                  value) {
-                                                                return;
-                                                              }
-                                                              cart.setSample(
-                                                                  cartItem
-                                                                      .sample,
-                                                                  value);
+                                            )
+                                          else
+                                            SliverList(
+                                              delegate:
+                                                  SliverChildBuilderDelegate(
+                                                (context, index) {
+                                                  final cartItem = items[index];
+                                                  return Slidable(
+                                                    endActionPane: ActionPane(
+                                                      extentRatio: cartType ==
+                                                              CartType.quotation
+                                                          ? 0.5
+                                                          : 0.25,
+                                                      motion:
+                                                          const ScrollMotion(),
+                                                      children: [
+                                                        if (cartType ==
+                                                            CartType.quotation)
+                                                          SlidableAction(
+                                                            onPressed:
+                                                                (context) {
+                                                              setPriceDialog(
+                                                                  context,
+                                                                  cartItem);
                                                             },
-                                                          )
-                                                        : QuotationItem(
-                                                            sample:
-                                                                cartItem.sample,
-                                                            price:
-                                                                cartItem.price,
-                                                            quotationInfo:
-                                                                quotationInfo,
+                                                            backgroundColor:
+                                                                Colors.blue,
+                                                            foregroundColor:
+                                                                Colors.white,
+                                                            icon: Icons
+                                                                .attach_money,
+                                                            label: '调价',
                                                           ),
-                                                  ),
-                                                  if (cartType ==
-                                                          CartType.quotation &&
-                                                      cartItem.price != null)
-                                                    const TDBadge(
-                                                      TDBadgeType.subscript,
-                                                      padding:
-                                                          EdgeInsets.all(4),
-                                                      message: '改',
+                                                        SlidableAction(
+                                                          onPressed: (context) {
+                                                            cart.removeSample(
+                                                                cartItem
+                                                                    .sample);
+                                                          },
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          icon: Icons.delete,
+                                                          label: '移除',
+                                                        ),
+                                                      ],
                                                     ),
-                                                ],
+                                                    child: Stack(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            vertical: 8,
+                                                            horizontal: 10,
+                                                          ),
+                                                          child: cartType !=
+                                                                  CartType
+                                                                      .quotation
+                                                              ? SampleItem(
+                                                                  sample: cartItem
+                                                                      .sample,
+                                                                  count: cartItem
+                                                                      .count,
+                                                                  onChange:
+                                                                      (value) {
+                                                                    if (cartItem
+                                                                            .count ==
+                                                                        value) {
+                                                                      return;
+                                                                    }
+                                                                    cart.setSample(
+                                                                        cartItem
+                                                                            .sample,
+                                                                        value);
+                                                                  },
+                                                                )
+                                                              : QuotationItem(
+                                                                  sample: cartItem
+                                                                      .sample,
+                                                                  price: cartItem
+                                                                      .price,
+                                                                  quotationInfo:
+                                                                      quotationInfo,
+                                                                ),
+                                                        ),
+                                                        if (cartType ==
+                                                                CartType
+                                                                    .quotation &&
+                                                            cartItem.price !=
+                                                                null)
+                                                          const TDBadge(
+                                                            TDBadgeType
+                                                                .subscript,
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    4),
+                                                            message: '改',
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                                childCount: items.length,
                                               ),
                                             ),
-                                          )
                                         ],
                                       ),
                                     )
