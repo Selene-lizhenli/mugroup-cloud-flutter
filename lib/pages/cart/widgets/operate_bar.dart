@@ -51,7 +51,7 @@ class OperateBar extends HookConsumerWidget {
                         children: [
                           Text("已选: $totalCount 件"),
                           const SizedBox(
-                            width: 5,
+                            width: 1,
                           ),
                           if (cartType != CartType.quotation)
                             Row(
@@ -64,7 +64,7 @@ class OperateBar extends HookConsumerWidget {
                                     '¥'),
                                 Text(
                                     style: const TextStyle(
-                                      fontSize: 24.0,
+                                      fontSize: 20,
                                       color: Colors.red,
                                       fontWeight: FontWeight.w400,
                                     ),
