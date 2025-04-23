@@ -79,37 +79,41 @@ class ConfirmPage extends HookConsumerWidget {
           child: Column(
         children: [
           Expanded(
-              child: CustomScrollView(
-            slivers: [
-              MultiSliver(children: [
-                Column(
-                  children: items?.map((item) {
-                        final matchedInventoryItem = inventory.value?.items
-                            ?.firstWhere(
-                                (inventoryItem) =>
-                                    inventoryItem.productId == item.sample.id,
-                                orElse: () => const InventoryItem(
-                                      id: 0,
-                                      inventoryId: 0,
-                                      productId: 0,
-                                      previousQty: 0,
-                                      newQty: 0,
-                                    ));
+            child: CustomScrollView(
+              slivers: [
+                MultiSliver(children: [
+                  if (items?.isNotEmpty ?? false)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = items![index];
 
-                        return InkWell(
-                          child: ConfirmCard(
+                          final matchedInventoryItem = inventory.value?.items
+                              ?.firstWhere(
+                                  (inventoryItem) =>
+                                      inventoryItem.productId == item.sample.id,
+                                  orElse: () => const InventoryItem(
+                                        id: 0,
+                                        inventoryId: 0,
+                                        productId: 0,
+                                        previousQty: 0,
+                                        newQty: 0,
+                                      ));
+
+                          return ConfirmCard(
                             child: ConfirmItem(
                               item: item,
                               inventoryItem: matchedInventoryItem,
                             ),
-                          ),
-                        );
-                      }).toList() ??
-                      [],
-                )
-              ])
-            ],
-          )),
+                          );
+                        },
+                        childCount: items!.length,
+                      ),
+                    ),
+                ])
+              ],
+            ),
+          ),
           ConfirmTabbar(onPressed: onPressed),
         ],
       )),
