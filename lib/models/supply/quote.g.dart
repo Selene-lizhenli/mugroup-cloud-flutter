@@ -12,8 +12,8 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
           ? null
           : Supplier.fromJson(json['supplier'] as Map<String, dynamic>),
       json['packing'] as String?,
-      (json['outer_capacity'] as num?)?.toDouble(),
-      (json['outer_volume'] as num?)?.toDouble(),
+      json['outer_capacity'] as String?,
+      json['outer_volume'] as String?,
       json['chuhuo_at'] == null
           ? null
           : DateTime.parse(json['chuhuo_at'] as String),

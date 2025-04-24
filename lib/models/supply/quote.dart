@@ -10,8 +10,8 @@ class Quote with _$Quote {
     int? id,
     Supplier? supplier,
     String? packing,
-    @JsonKey(name: 'outer_capacity') double? outerCapacity,
-    @JsonKey(name: 'outer_volume') double? outerVolume,
+    @JsonKey(name: 'outer_capacity') String? outerCapacity,
+    @JsonKey(name: 'outer_volume') String? outerVolume,
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
     @JsonKey(name: 'sample_location') String? sampleLocation,
   ) = _Quote;

@@ -24,9 +24,9 @@ mixin _$Quote {
   Supplier? get supplier => throw _privateConstructorUsedError;
   String? get packing => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_capacity')
-  double? get outerCapacity => throw _privateConstructorUsedError;
+  String? get outerCapacity => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_volume')
-  double? get outerVolume => throw _privateConstructorUsedError;
+  String? get outerVolume => throw _privateConstructorUsedError;
   @JsonKey(name: 'chuhuo_at')
   DateTime? get chuhuoAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_location')
@@ -46,8 +46,8 @@ abstract class $QuoteCopyWith<$Res> {
       {int? id,
       Supplier? supplier,
       String? packing,
-      @JsonKey(name: 'outer_capacity') double? outerCapacity,
-      @JsonKey(name: 'outer_volume') double? outerVolume,
+      @JsonKey(name: 'outer_capacity') String? outerCapacity,
+      @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
       @JsonKey(name: 'sample_location') String? sampleLocation});
 
@@ -91,11 +91,11 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       outerCapacity: freezed == outerCapacity
           ? _value.outerCapacity
           : outerCapacity // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       outerVolume: freezed == outerVolume
           ? _value.outerVolume
           : outerVolume // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       chuhuoAt: freezed == chuhuoAt
           ? _value.chuhuoAt
           : chuhuoAt // ignore: cast_nullable_to_non_nullable
@@ -131,8 +131,8 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       {int? id,
       Supplier? supplier,
       String? packing,
-      @JsonKey(name: 'outer_capacity') double? outerCapacity,
-      @JsonKey(name: 'outer_volume') double? outerVolume,
+      @JsonKey(name: 'outer_capacity') String? outerCapacity,
+      @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
       @JsonKey(name: 'sample_location') String? sampleLocation});
 
@@ -175,11 +175,11 @@ class __$$QuoteImplCopyWithImpl<$Res>
       freezed == outerCapacity
           ? _value.outerCapacity
           : outerCapacity // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       freezed == outerVolume
           ? _value.outerVolume
           : outerVolume // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       freezed == chuhuoAt
           ? _value.chuhuoAt
           : chuhuoAt // ignore: cast_nullable_to_non_nullable
@@ -215,10 +215,10 @@ class _$QuoteImpl implements _Quote {
   final String? packing;
   @override
   @JsonKey(name: 'outer_capacity')
-  final double? outerCapacity;
+  final String? outerCapacity;
   @override
   @JsonKey(name: 'outer_volume')
-  final double? outerVolume;
+  final String? outerVolume;
   @override
   @JsonKey(name: 'chuhuo_at')
   final DateTime? chuhuoAt;
@@ -274,8 +274,8 @@ abstract class _Quote implements Quote {
           final int? id,
           final Supplier? supplier,
           final String? packing,
-          @JsonKey(name: 'outer_capacity') final double? outerCapacity,
-          @JsonKey(name: 'outer_volume') final double? outerVolume,
+          @JsonKey(name: 'outer_capacity') final String? outerCapacity,
+          @JsonKey(name: 'outer_volume') final String? outerVolume,
           @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
           @JsonKey(name: 'sample_location') final String? sampleLocation) =
       _$QuoteImpl;
@@ -290,10 +290,10 @@ abstract class _Quote implements Quote {
   String? get packing;
   @override
   @JsonKey(name: 'outer_capacity')
-  double? get outerCapacity;
+  String? get outerCapacity;
   @override
   @JsonKey(name: 'outer_volume')
-  double? get outerVolume;
+  String? get outerVolume;
   @override
   @JsonKey(name: 'chuhuo_at')
   DateTime? get chuhuoAt;
