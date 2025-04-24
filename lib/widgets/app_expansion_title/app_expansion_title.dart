@@ -58,8 +58,7 @@ class _AppExpansionTileState extends State<AppExpansionTile>
         InkWell(
           onTap: _toggleExpansion,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
             child: Row(
               children: [
                 Expanded(child: widget.title),
