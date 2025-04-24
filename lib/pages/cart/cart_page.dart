@@ -5,7 +5,6 @@ import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/pages/cart/widgets/quotation_item.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/operate_bar.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -1156,42 +1155,36 @@ class CartPage extends HookConsumerWidget {
                                                           Alignment.topRight,
                                                       children: [
                                                         Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            vertical: 8,
-                                                            horizontal: 10,
-                                                          ),
-                                                          child: cartType !=
-                                                                  CartType
-                                                                      .quotation
-                                                              ? SampleItem(
-                                                                  sample: cartItem
-                                                                      .sample,
-                                                                  count: cartItem
-                                                                      .count,
-                                                                  onChange:
-                                                                      (value) {
-                                                                    if (cartItem
-                                                                            .count ==
-                                                                        value) {
-                                                                      return;
-                                                                    }
-                                                                    cart.setSample(
-                                                                        cartItem
-                                                                            .sample,
-                                                                        value);
-                                                                  },
-                                                                )
-                                                              : QuotationItem(
-                                                                  sample: cartItem
-                                                                      .sample,
-                                                                  price: cartItem
-                                                                      .price,
-                                                                  quotationInfo:
-                                                                      quotationInfo,
-                                                                ),
-                                                        ),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                              vertical: 8,
+                                                              horizontal: 10,
+                                                            ),
+                                                            child: SampleItem(
+                                                              sample: cartItem
+                                                                  .sample,
+                                                              price: cartItem
+                                                                  .price,
+                                                              quotationInfo:
+                                                                  quotationInfo,
+                                                              cartType:
+                                                                  cartType,
+                                                              count: cartItem
+                                                                  .count,
+                                                              onChange:
+                                                                  (value) {
+                                                                if (cartItem
+                                                                        .count ==
+                                                                    value) {
+                                                                  return;
+                                                                }
+                                                                cart.setSample(
+                                                                    cartItem
+                                                                        .sample,
+                                                                    value);
+                                                              },
+                                                            )),
                                                         if (cartType ==
                                                                 CartType
                                                                     .quotation &&
