@@ -4,12 +4,14 @@ class AppExpansionTile extends StatefulWidget {
   final Widget title;
   final Widget child;
   final Widget? subtitle;
+  final VoidCallback? onForward;
 
   const AppExpansionTile({
     super.key,
     required this.title,
     required this.child,
     this.subtitle,
+    this.onForward,
   });
 
   @override
@@ -39,6 +41,7 @@ class _AppExpansionTileState extends State<AppExpansionTile>
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
         _controller.forward();
+        widget.onForward?.call();
       } else {
         _controller.reverse();
       }
