@@ -28,6 +28,7 @@ mixin _$Sample {
   String? get productNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost => throw _privateConstructorUsedError;
+  String? get spec => throw _privateConstructorUsedError;
   List<Media>? get image => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,6 +47,7 @@ abstract class $SampleCopyWith<$Res> {
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
+      String? spec,
       List<Media>? image});
 }
 
@@ -67,6 +69,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? nameCn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
+    Object? spec = freezed,
     Object? image = freezed,
   }) {
     return _then(_value.copyWith(
@@ -90,6 +93,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.purchaseCost
           : purchaseCost // ignore: cast_nullable_to_non_nullable
               as String?,
+      spec: freezed == spec
+          ? _value.spec
+          : spec // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -111,6 +118,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
+      String? spec,
       List<Media>? image});
 }
 
@@ -130,6 +138,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? nameCn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
+    Object? spec = freezed,
     Object? image = freezed,
   }) {
     return _then(_$SampleImpl(
@@ -153,6 +162,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.purchaseCost
           : purchaseCost // ignore: cast_nullable_to_non_nullable
               as String?,
+      spec: freezed == spec
+          ? _value.spec
+          : spec // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _value._image
           : image // ignore: cast_nullable_to_non_nullable
@@ -170,6 +183,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
       @JsonKey(name: 'name_cn') this.nameCn,
       @JsonKey(name: 'product_no') this.productNo,
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
+      this.spec,
       final List<Media>? image})
       : _image = image;
 
@@ -189,6 +203,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   @override
   @JsonKey(name: 'purchase_cost')
   final String? purchaseCost;
+  @override
+  final String? spec;
   final List<Media>? _image;
   @override
   List<Media>? get image {
@@ -201,7 +217,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, spec: $spec, image: $image)';
   }
 
   @override
@@ -214,6 +230,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
       ..add(DiagnosticsProperty('nameCn', nameCn))
       ..add(DiagnosticsProperty('productNo', productNo))
       ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
+      ..add(DiagnosticsProperty('spec', spec))
       ..add(DiagnosticsProperty('image', image));
   }
 
@@ -229,13 +246,14 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
                 other.productNo == productNo) &&
             (identical(other.purchaseCost, purchaseCost) ||
                 other.purchaseCost == purchaseCost) &&
+            (identical(other.spec, spec) || other.spec == spec) &&
             const DeepCollectionEquality().equals(other._image, _image));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, barcode, nameCn, productNo,
-      purchaseCost, const DeepCollectionEquality().hash(_image));
+      purchaseCost, spec, const DeepCollectionEquality().hash(_image));
 
   @JsonKey(ignore: true)
   @override
@@ -258,6 +276,7 @@ abstract class _Sample implements Sample {
       @JsonKey(name: 'name_cn') final String? nameCn,
       @JsonKey(name: 'product_no') final String? productNo,
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
+      final String? spec,
       final List<Media>? image}) = _$SampleImpl;
 
   factory _Sample.fromJson(Map<String, dynamic> json) = _$SampleImpl.fromJson;
@@ -275,6 +294,8 @@ abstract class _Sample implements Sample {
   @override
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost;
+  @override
+  String? get spec;
   @override
   List<Media>? get image;
   @override
