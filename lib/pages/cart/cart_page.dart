@@ -31,6 +31,8 @@ class CartPage extends HookConsumerWidget {
     final state = ref.watch(cartProvider);
     final cart = ref.read(cartProvider.notifier);
 
+    final barcodeTextController = useTextEditingController();
+
     final items = state.items;
     final carts = state.carts;
     final cartType = state.type;
@@ -41,8 +43,6 @@ class CartPage extends HookConsumerWidget {
     final quotationInfo = state.quotationInfo;
 
     final user = useState<User?>(null);
-
-    final TextEditingController barcodeTextController = TextEditingController();
 
     final borrowReasons = [
       const FlanActionSheetAction(name: "客户会议用"),
@@ -1110,7 +1110,8 @@ class CartPage extends HookConsumerWidget {
                                                 (context, index) {
                                                   final cartItem = items[index];
                                                   return Slidable(
-                                                    key: ValueKey(cartItem.sample.productNo),
+                                                    key: ValueKey(cartItem
+                                                        .sample.productNo),
                                                     endActionPane: ActionPane(
                                                       extentRatio: cartType ==
                                                               CartType.quotation
