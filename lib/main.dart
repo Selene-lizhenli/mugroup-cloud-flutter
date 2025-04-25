@@ -1,6 +1,5 @@
 import 'package:cloud/app/app.dart';
 import 'package:cloud/providers/app_provider.dart';
-import 'package:cloud/router/router.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,21 +32,20 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(
       container: app.container,
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final _appRouter = AppRouter();
 
-  MyApp({super.key});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: _appRouter.config(
+      routerConfig: app.router.config(
         reevaluateListenable: authNotifier,
       ),
       theme: ThemeData(
