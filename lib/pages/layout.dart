@@ -1,8 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/controllers/scan_controller.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,49 +13,6 @@ class Layout extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useEffect(() {
-      if (receiver.isListening) {
-        return null;
-      }
-
-      final sub = receiver.messages.listen((message) async {
-        var barcodeString =
-            message.data?["com.android.decode.intentwedge.barcode_string"];
-        if (barcodeString == null) {
-          return;
-        }
-
-        barcodeString = barcodeString.toString().trim();
-
-        if (isUrl(barcodeString)) {
-          // 判断是否是调拨单
-          if (true) {
-            RegExp transferExp = RegExp(r'wms/transfer/(.*)');
-            final match = transferExp.firstMatch(barcodeString);
-
-            /// 解析结果为调拨单
-            if (match != null) {
-              final orderNo = match.group(1)!;
-
-              context.router.push(WmsTransferRoute(code: orderNo));
-              return;
-            }
-          }
-
-          // 默认不处理
-          return;
-        }
-
-        scanController.add(barcodeString);
-      });
-
-      receiver.start();
-      return () {
-        sub.cancel();
-        receiver.stop();
-      };
-    }, []);
-
     final checkVersion = useCallback(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final checkResp = await silentApi

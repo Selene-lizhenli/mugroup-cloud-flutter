@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/controllers/scan_controller.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
@@ -19,7 +18,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
-import '../../models/sample/sample.dart';
 import 'widgets/sample_item.dart';
 
 @RoutePage()
@@ -57,28 +55,6 @@ class CartPage extends HookConsumerWidget {
       const FlanActionSheetAction(name: "EUR"),
       const FlanActionSheetAction(name: "GBP")
     ];
-
-    final addItemByBarcode = useCallback((String barcode) async {
-      final Sample sample = Sample(barcode: barcode);
-      var item = cart.getItemBySample(sample);
-
-      if (item != null) {
-        cart.addSample(sample, 1);
-        return;
-      }
-
-      EasyLoading.show(status: '加载中...');
-      var samples = await getSamples(queryParameters: {"barcode": barcode})
-          .then((res) => res.data);
-      EasyLoading.dismiss();
-      if (samples.isEmpty) {
-        EasyLoading.showInfo("库中未找到该样品!");
-        return;
-      }
-      for (var item in samples) {
-        cart.addSample(item, 1);
-      }
-    }, []);
 
     final header = useMemoized(() {
       if (cartType == CartType.borrowOut || cartType == CartType.inout) {
@@ -159,20 +135,6 @@ class CartPage extends HookConsumerWidget {
         },
       );
     }
-
-    useEffect(() {
-      if (scanController.hasListener) {
-        return null;
-      }
-
-      final sub = scanController.stream.listen((message) async {
-        addItemByBarcode(message);
-      });
-
-      return () {
-        sub.cancel();
-      };
-    }, []);
 
     void borrowDialog(BuildContext context) {
       showDialog(
@@ -850,7 +812,7 @@ class CartPage extends HookConsumerWidget {
                     return;
                   }
 
-                  addItemByBarcode(input);
+                  cart.addItemByBarcode(input);
                   barcodeTextController.clear();
                   Navigator.of(context).pop();
                 },
@@ -1014,7 +976,7 @@ class CartPage extends HookConsumerWidget {
                       return;
                     } else {
                       // 处理样品
-                      addItemByBarcode(item);
+                      cart.addItemByBarcode(item);
                     }
                   }
                 },

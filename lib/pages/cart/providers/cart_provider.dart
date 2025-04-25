@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/providers/scan_provider.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cart_provider.g.dart';
@@ -15,6 +19,20 @@ const cacheKey = "cart_v1";
 class Cart extends _$Cart {
   @override
   State build() {
+    logger.d("购物车 初始化");
+    ref.onDispose(() {
+      logger.d("购物车 dispos 拉");
+    });
+
+    ref.listen(
+      scanProvider,
+      (previous, next) {
+        for (var barcode in next) {
+          addItemByBarcode(barcode);
+        }
+      },
+    );
+
     const defaultState = State(
       items: [],
       carts: [
@@ -53,6 +71,28 @@ class Cart extends _$Cart {
   set warehouse(Warehouse? warehouse) {
     state = state.copyWith(warehouse: warehouse);
     save();
+  }
+
+  void addItemByBarcode(String barcode) async {
+    final Sample sample = Sample(barcode: barcode);
+    var item = getItemBySample(sample);
+
+    if (item != null) {
+      addSample(sample, 1);
+      return;
+    }
+
+    EasyLoading.show(status: '加载中...');
+    var samples = await getSamples(queryParameters: {"barcode": barcode})
+        .then((res) => res.data);
+    EasyLoading.dismiss();
+    if (samples.isEmpty) {
+      EasyLoading.showInfo("库中未找到该样品!");
+      return;
+    }
+    for (var item in samples) {
+      addSample(item, 1);
+    }
   }
 
   set borrow(Borrow? borrow) {
