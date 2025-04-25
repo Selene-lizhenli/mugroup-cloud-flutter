@@ -15,27 +15,33 @@ class QuoteItem extends HookWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('地区: ${item?.sampleLocation}'),
-              Text('体积: ${item?.outerVolume}'),
-              Text('包装: ${item?.packing}'),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('地区: ${item?.sampleLocation ?? ''}'),
+                  Text('体积: ${item?.outerVolume ?? ''}'),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      '出货日期: ${item?.chuhuoAt != null ? DateFormat('yyyy-MM-dd').format(item!.chuhuoAt!) : ''}'),
+                  Text('装箱量: ${item?.outerCapacity ?? ''}'),
+                ],
+              ),
             ],
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('出货日期: ${DateFormat('yyyy-MM-dd').format(item!.chuhuoAt!)}'),
-              Text('装箱量: ${item?.outerCapacity}'),
-            ],
-          ),
+          Text('包装: ${item?.packing ?? ''}'),
         ],
       ),
     );
