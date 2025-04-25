@@ -26,8 +26,16 @@ class QuoteItem extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('地区: ${item?.sampleLocation ?? ''}'),
-                  Text('体积: ${item?.outerVolume ?? ''}'),
+                  Text(
+                    '地区: ${item?.sampleLocation ?? ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Text(
+                    '体积: ${item?.outerVolume ?? ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ],
               ),
               Column(
@@ -35,13 +43,24 @@ class QuoteItem extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      '出货日期: ${item?.chuhuoAt != null ? DateFormat('yyyy-MM-dd').format(item!.chuhuoAt!) : ''}'),
-                  Text('装箱量: ${item?.outerCapacity ?? ''}'),
+                    '出货日期: ${item?.chuhuoAt != null ? DateFormat('yyyy-MM-dd').format(item!.chuhuoAt!) : ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Text(
+                    '装箱量: ${item?.outerCapacity ?? ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ],
               ),
             ],
           ),
-          Text('包装: ${item?.packing ?? ''}'),
+          Text(
+            '包装: ${item?.packing ?? ''}',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
     );
