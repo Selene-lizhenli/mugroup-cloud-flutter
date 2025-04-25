@@ -1110,6 +1110,7 @@ class CartPage extends HookConsumerWidget {
                                                 (context, index) {
                                                   final cartItem = items[index];
                                                   return Slidable(
+                                                    key: ValueKey(cartItem.sample.productNo),
                                                     endActionPane: ActionPane(
                                                       extentRatio: cartType ==
                                                               CartType.quotation
