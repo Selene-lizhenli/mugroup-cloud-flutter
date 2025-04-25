@@ -58,6 +58,17 @@ class SampleItem extends HookWidget {
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
         sample.image?.elementAtOrNull(0)?.url;
 
+    final request = useCallback((int sampleId) async {
+      try {
+        loading.value = true;
+        final resp =
+            await getSupplyQuotes(queryParameters: {"sample_id": sampleId});
+        quotes.value = resp.data;
+      } finally {
+        loading.value = false;
+      }
+    }, []);
+
     return AppExpansionTile(
       title: Text(
         sample.nameCn ?? "",
@@ -65,14 +76,7 @@ class SampleItem extends HookWidget {
         maxLines: 1,
       ),
       onForward: () async {
-        try {
-          loading.value = true;
-          final resp =
-              await getSupplyQuotes(queryParameters: {"sample_id": sample.id});
-          quotes.value = resp.data;
-        } finally {
-          loading.value = false;
-        }
+        request(sample.id!);
       },
       subtitle: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
