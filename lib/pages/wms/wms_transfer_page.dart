@@ -43,7 +43,7 @@ class WmsTransferPage extends HookConsumerWidget {
 
     loadData({int page = 1, String? search}) async {
       if (transfer.value == null || transfer.value!.id == null) {
-        return [] as List<TransferItem>;
+        return <TransferItem>[];
       }
 
       final res = await getTransferItems(
