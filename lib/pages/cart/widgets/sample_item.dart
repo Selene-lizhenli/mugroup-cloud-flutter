@@ -152,9 +152,9 @@ class SampleItem extends HookWidget {
                   children: [
                     QuoteItem(item: quotes.value![index]),
                     if (index < quotes.value!.length - 1)
-                      const Divider(
+                      Divider(
                         height: 1.0,
-                        color: Colors.grey,
+                        color: Colors.grey[200],
                       ),
                   ],
                 );
