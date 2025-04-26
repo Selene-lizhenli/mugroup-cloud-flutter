@@ -28,7 +28,7 @@ class Scan extends _$Scan {
     FlutterDataWedge dw = FlutterDataWedge(profileName: "云链");
     StreamSubscription onScanSubscription =
         dw.onScanResult.listen((ScanResult result) {
-      _handle(result.data);
+      _handle(result.data.trim());
     });
 
     final sub = receiver.messages.listen((message) async {
