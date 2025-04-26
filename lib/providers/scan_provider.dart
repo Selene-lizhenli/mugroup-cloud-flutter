@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter_broadcasts/flutter_broadcasts.dart';
+import 'package:flutter_datawedge/flutter_datawedge.dart';
+import 'package:flutter_datawedge/models/scan_result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'scan_provider.g.dart';
@@ -21,6 +25,11 @@ class Scan extends _$Scan {
         "com.android.decodewedge.decode_action",
       ],
     );
+    FlutterDataWedge dw = FlutterDataWedge(profileName: "云链");
+    StreamSubscription onScanSubscription =
+        dw.onScanResult.listen((ScanResult result) {
+      _handle(result.data);
+    });
 
     final sub = receiver.messages.listen((message) async {
       String? scanString =
@@ -31,26 +40,7 @@ class Scan extends _$Scan {
 
       String barcodeString = scanString.toString().trim();
 
-      if (isUrl(barcodeString)) {
-        // 判断是否是调拨单
-        if (true) {
-          RegExp transferExp = RegExp(r'wms/transfer/(.*)');
-          final match = transferExp.firstMatch(barcodeString);
-
-          /// 解析结果为调拨单
-          if (match != null) {
-            final orderNo = match.group(1)!;
-
-            app.router.push(WmsTransferRoute(code: orderNo));
-            return;
-          }
-        }
-
-        // 默认不处理
-        return;
-      }
-
-      state = [barcodeString];
+      _handle(barcodeString);
     });
 
     ref.onDispose(() {
@@ -58,9 +48,33 @@ class Scan extends _$Scan {
 
       sub.cancel();
       receiver.stop();
+      onScanSubscription.cancel();
     });
 
     receiver.start();
     return <String>[];
+  }
+
+  _handle(String barcodeString) {
+    if (isUrl(barcodeString)) {
+      // 判断是否是调拨单
+      if (true) {
+        RegExp transferExp = RegExp(r'wms/transfer/(.*)');
+        final match = transferExp.firstMatch(barcodeString);
+
+        /// 解析结果为调拨单
+        if (match != null) {
+          final orderNo = match.group(1)!;
+
+          app.router.push(WmsTransferRoute(code: orderNo));
+          return;
+        }
+      }
+
+      // 默认不处理
+      return;
+    }
+
+    state = [barcodeString];
   }
 }
