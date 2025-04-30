@@ -11,6 +11,15 @@ class QuoteItem extends HookWidget {
     this.item,
   });
 
+  String formatBeijingTime(DateTime? time) {
+    if (time == null) return '';
+
+    // 如果是 UTC 时间，则手动加 8 小时作为北京时间
+    final beijingTime = time.isUtc ? time.add(const Duration(hours: 8)) : time;
+
+    return DateFormat('yyyy-MM-dd').format(beijingTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,7 +52,7 @@ class QuoteItem extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '出货日期: ${item?.chuhuoAt != null ? DateFormat('yyyy-MM-dd').format(item!.chuhuoAt!) : ''}',
+                    '出货日期: ${formatBeijingTime(item?.chuhuoAt)}',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
