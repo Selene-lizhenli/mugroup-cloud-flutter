@@ -45,6 +45,11 @@ class QuoteItem extends HookWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
+                  Text(
+                    '记录人员: ${item?.recordUser ?? ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ],
               ),
               Column(
@@ -61,19 +66,14 @@ class QuoteItem extends HookWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
+                  Text(
+                    '包装: ${item?.packing ?? ''}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ],
               ),
             ],
-          ),
-          Text(
-            '记录人员: ${item?.recordUser ?? ''}',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-          Text(
-            '包装: ${item?.packing ?? ''}',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
           ),
         ],
       ),
