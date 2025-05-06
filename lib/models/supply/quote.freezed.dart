@@ -31,6 +31,8 @@ mixin _$Quote {
   DateTime? get chuhuoAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_location')
   String? get sampleLocation => throw _privateConstructorUsedError;
+  @JsonKey(name: 'record_user')
+  String? get recordUser => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -49,7 +51,8 @@ abstract class $QuoteCopyWith<$Res> {
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
-      @JsonKey(name: 'sample_location') String? sampleLocation});
+      @JsonKey(name: 'sample_location') String? sampleLocation,
+      @JsonKey(name: 'record_user') String? recordUser});
 
   $SupplierCopyWith<$Res>? get supplier;
 }
@@ -74,6 +77,7 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
     Object? outerVolume = freezed,
     Object? chuhuoAt = freezed,
     Object? sampleLocation = freezed,
+    Object? recordUser = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -103,6 +107,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       sampleLocation: freezed == sampleLocation
           ? _value.sampleLocation
           : sampleLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
+      recordUser: freezed == recordUser
+          ? _value.recordUser
+          : recordUser // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -134,7 +142,8 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
-      @JsonKey(name: 'sample_location') String? sampleLocation});
+      @JsonKey(name: 'sample_location') String? sampleLocation,
+      @JsonKey(name: 'record_user') String? recordUser});
 
   @override
   $SupplierCopyWith<$Res>? get supplier;
@@ -158,6 +167,7 @@ class __$$QuoteImplCopyWithImpl<$Res>
     Object? outerVolume = freezed,
     Object? chuhuoAt = freezed,
     Object? sampleLocation = freezed,
+    Object? recordUser = freezed,
   }) {
     return _then(_$QuoteImpl(
       freezed == id
@@ -188,6 +198,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
           ? _value.sampleLocation
           : sampleLocation // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == recordUser
+          ? _value.recordUser
+          : recordUser // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -202,7 +216,8 @@ class _$QuoteImpl implements _Quote {
       @JsonKey(name: 'outer_capacity') this.outerCapacity,
       @JsonKey(name: 'outer_volume') this.outerVolume,
       @JsonKey(name: 'chuhuo_at') this.chuhuoAt,
-      @JsonKey(name: 'sample_location') this.sampleLocation);
+      @JsonKey(name: 'sample_location') this.sampleLocation,
+      @JsonKey(name: 'record_user') this.recordUser);
 
   factory _$QuoteImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuoteImplFromJson(json);
@@ -225,10 +240,13 @@ class _$QuoteImpl implements _Quote {
   @override
   @JsonKey(name: 'sample_location')
   final String? sampleLocation;
+  @override
+  @JsonKey(name: 'record_user')
+  final String? recordUser;
 
   @override
   String toString() {
-    return 'Quote(id: $id, supplier: $supplier, packing: $packing, outerCapacity: $outerCapacity, outerVolume: $outerVolume, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation)';
+    return 'Quote(id: $id, supplier: $supplier, packing: $packing, outerCapacity: $outerCapacity, outerVolume: $outerVolume, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser)';
   }
 
   @override
@@ -247,13 +265,15 @@ class _$QuoteImpl implements _Quote {
             (identical(other.chuhuoAt, chuhuoAt) ||
                 other.chuhuoAt == chuhuoAt) &&
             (identical(other.sampleLocation, sampleLocation) ||
-                other.sampleLocation == sampleLocation));
+                other.sampleLocation == sampleLocation) &&
+            (identical(other.recordUser, recordUser) ||
+                other.recordUser == recordUser));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, supplier, packing,
-      outerCapacity, outerVolume, chuhuoAt, sampleLocation);
+      outerCapacity, outerVolume, chuhuoAt, sampleLocation, recordUser);
 
   @JsonKey(ignore: true)
   @override
@@ -271,14 +291,14 @@ class _$QuoteImpl implements _Quote {
 
 abstract class _Quote implements Quote {
   factory _Quote(
-          final int? id,
-          final Supplier? supplier,
-          final String? packing,
-          @JsonKey(name: 'outer_capacity') final String? outerCapacity,
-          @JsonKey(name: 'outer_volume') final String? outerVolume,
-          @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
-          @JsonKey(name: 'sample_location') final String? sampleLocation) =
-      _$QuoteImpl;
+      final int? id,
+      final Supplier? supplier,
+      final String? packing,
+      @JsonKey(name: 'outer_capacity') final String? outerCapacity,
+      @JsonKey(name: 'outer_volume') final String? outerVolume,
+      @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
+      @JsonKey(name: 'sample_location') final String? sampleLocation,
+      @JsonKey(name: 'record_user') final String? recordUser) = _$QuoteImpl;
 
   factory _Quote.fromJson(Map<String, dynamic> json) = _$QuoteImpl.fromJson;
 
@@ -300,6 +320,9 @@ abstract class _Quote implements Quote {
   @override
   @JsonKey(name: 'sample_location')
   String? get sampleLocation;
+  @override
+  @JsonKey(name: 'record_user')
+  String? get recordUser;
   @override
   @JsonKey(ignore: true)
   _$$QuoteImplCopyWith<_$QuoteImpl> get copyWith =>

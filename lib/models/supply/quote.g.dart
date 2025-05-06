@@ -18,6 +18,7 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
           ? null
           : DateTime.parse(json['chuhuo_at'] as String),
       json['sample_location'] as String?,
+      json['record_user'] as String?,
     );
 
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
@@ -29,4 +30,5 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'outer_volume': instance.outerVolume,
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),
       'sample_location': instance.sampleLocation,
+      'record_user': instance.recordUser,
     };
