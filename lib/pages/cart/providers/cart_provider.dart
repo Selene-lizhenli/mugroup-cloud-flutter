@@ -130,6 +130,8 @@ class Cart extends _$Cart {
     final items = [...state.items];
 
     if (item != null) {
+      items.remove(item);
+      items.insert(0, item);
       item.count = item.count + step;
     } else {
       items.insert(0, CartItem(sample: sample, count: step));
