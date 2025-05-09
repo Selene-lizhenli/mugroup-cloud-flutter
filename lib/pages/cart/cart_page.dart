@@ -833,6 +833,74 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void transferDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          final text = cartType == CartType.transferIn ? "调入" : "调出";
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: Text(
+              "确认$text",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final productData = items
+                      .map((item) => {
+                            "product_id": item.sample.id,
+                            "inout_qty": item.count,
+                            "product_no": item.sample.productNo,
+                            "barcode": item.sample.barcode
+                          })
+                      .toList();
+                  final data = {"items": productData};
+
+                  EasyLoading.show(status: '加载中...');
+
+                  if (cartType == CartType.transferOut) {
+                    await addTransferItems(transfer!.id!, data);
+                    EasyLoading.showSuccess("调拨出库成功!");
+                  }
+
+                  if (cartType == CartType.transferIn) {
+                    await transferIn(transfer!.id!, data);
+                    EasyLoading.showSuccess("调拨入库成功!");
+                  }
+
+                  cart.clear();
+
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "确认",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -846,6 +914,15 @@ class CartPage extends HookConsumerWidget {
       //创建报价单
       if (cartType == CartType.quotation) {
         quotationDialog(context);
+      }
+
+      // 调拨出/入库
+      if (cartType == CartType.transferOut || cartType == CartType.transferIn) {
+        if (transfer == null) {
+          EasyLoading.showInfo("请先扫描调拨单号!");
+          return;
+        }
+        transferDialog(context);
       }
 
       final productData = items
@@ -868,32 +945,6 @@ class CartPage extends HookConsumerWidget {
         await borrowIn(borrow.id!, data);
         EasyLoading.showSuccess("还样成功!");
         cart.clear();
-      }
-
-      // 调拨出库
-      if (cartType == CartType.transferOut) {
-        if (transfer == null) {
-          EasyLoading.showInfo("请先扫描调拨单号!");
-          return;
-        }
-        EasyLoading.show(status: '加载中...');
-        final data = {"items": productData};
-        await addTransferItems(transfer.id!, data);
-        cart.clear();
-        EasyLoading.showSuccess("调拨出库成功!");
-      }
-
-      // 调拨入库
-      if (cartType == CartType.transferIn) {
-        if (transfer == null) {
-          EasyLoading.showInfo("请先扫描调拨单号!");
-          return;
-        }
-        EasyLoading.show(status: '加载中...');
-        final data = {"items": productData};
-        await transferIn(transfer.id!, data);
-        cart.clear();
-        EasyLoading.showSuccess("调拨入库成功!");
       }
 
       //盘点
