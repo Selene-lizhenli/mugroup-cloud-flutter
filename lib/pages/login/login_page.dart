@@ -6,20 +6,24 @@ import 'package:cloud/config/config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 @RoutePage()
-class LoginPage extends HookWidget {
+class LoginPage extends HookConsumerWidget {
   final void Function()? onLogin;
 
   const LoginPage({super.key, this.onLogin});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final qrcodeState = useState<Qrcode?>(null);
+    final core = ref.watch(coreProvider).value!;
+    final tenant = core.currentTenant;
 
     final afterLogin = useCallback(() {
       if (onLogin != null) {
@@ -33,42 +37,43 @@ class LoginPage extends HookWidget {
     }, [onLogin]);
 
     useEffect(() {
-      Future fetchQrcode() async {
-        final resp = await api.post("api/tenant/login/qrcodes");
-        qrcodeState.value = Qrcode.fromJson(resp.data);
-      }
+      logger.d(tenant);
+      // Future fetchQrcode() async {
+      //   final resp = await api.post("api/tenant/login/qrcodes");
+      //   qrcodeState.value = Qrcode.fromJson(resp.data);
+      // }
 
-      fetchQrcode();
+      // fetchQrcode();
 
-      final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
-        if (qrcodeState.value == null) {
-          return;
-        }
+      // final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
+      //   if (qrcodeState.value == null) {
+      //     return;
+      //   }
 
-        final qrcode = qrcodeState.value!;
+      //   final qrcode = qrcodeState.value!;
 
-        final resp =
-            await api.get("api/tenant/login/qrcodes/${qrcode.id}/show");
-        qrcodeState.value = Qrcode.fromJson(resp.data);
+      //   final resp =
+      //       await api.get("api/tenant/login/qrcodes/${qrcode.id}/show");
+      //   qrcodeState.value = Qrcode.fromJson(resp.data);
 
-        //登录后跳转
-        if (qrcodeState.value?.usedAt != null) {
-          await app.fetchUser();
-          afterLogin();
-        }
+      //   //登录后跳转
+      //   if (qrcodeState.value?.usedAt != null) {
+      //     await app.fetchUser();
+      //     afterLogin();
+      //   }
 
-        logger.d("轮询,$qrcodeState");
+      //   logger.d("轮询,$qrcodeState");
 
-        final expirationTime =
-            DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
-        if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
-          logger.d("二维码已过期，获取新二维码...");
-          await fetchQrcode();
-        }
-      });
+      //   final expirationTime =
+      //       DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
+      //   if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
+      //     logger.d("二维码已过期，获取新二维码...");
+      //     await fetchQrcode();
+      //   }
+      // });
 
-      return timer.cancel;
-    }, []);
+      // return timer.cancel;
+    }, [tenant]);
 
     final qrcode = qrcodeState.value;
     double qrcodeSize = 200;
@@ -78,8 +83,8 @@ class LoginPage extends HookWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "云链",
+            Text(
+              tenant == null ? "请在底部选在租户后操作" : tenant.title ?? "",
               style: TextStyle(fontSize: 18),
             ),
             const SizedBox(

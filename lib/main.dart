@@ -1,13 +1,16 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await app.bootstrap();
 
@@ -29,6 +32,7 @@ Future<void> main() async {
         messageText: '最后更新于 %T',
       );
 
+  await app.loadCoreProvider();
   runApp(
     UncontrolledProviderScope(
       container: app.container,
@@ -36,11 +40,10 @@ Future<void> main() async {
     ),
   );
 
-  await app.fetchTenants();
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   // This widget is the root of your application.

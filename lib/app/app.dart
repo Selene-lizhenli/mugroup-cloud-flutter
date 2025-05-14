@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:cloud/helper/helper.dart';
-import 'package:cloud/http/core.dart';
+import 'package:cloud/models/cloud.dart';
 import 'package:cloud/models/core.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,13 +27,8 @@ class App {
     prefs = await SharedPreferences.getInstance();
   }
 
-  Future fetchTenants() async {
-    final resp = await coreApi.get("/api/core/tenants");
-    final list =
-        (resp.data as List).map((e) => e as Map<String, dynamic>).toList();
-
-    tenants = list.map((e) => Tenant.fromJson(e)).toList();
-    logger.d(tenants);
+  Future<Cloud> loadCoreProvider() {
+    return container.read(coreProvider.future);
   }
 
   Future<User?> fetchUser() async {
