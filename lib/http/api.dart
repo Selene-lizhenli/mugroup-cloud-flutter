@@ -1,5 +1,6 @@
 import 'package:cloud/app/app.dart';
 import 'package:cloud/config/config.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:collection/collection.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
@@ -13,22 +14,17 @@ final cookieJar = PersistCookieJar(
 final silentApi = Dio(
   BaseOptions(
     // baseUrl: 'https://apifoxmock.com/m1/5861176-5547581-default',
-    baseUrl: Config.apiUrl,
-    connectTimeout: const Duration(seconds: 5),
+    // baseUrl: Config.apiUrl,
+    connectTimeout: const Duration(seconds: 120),
     headers: {
       Headers.acceptHeader: 'application/json',
-      'origin': "https://cloud.mugroup.com"
     },
   ),
-)..interceptors.add(
-    CookieManager(
-      cookieJar,
-    ),
-  );
-
-final api = silentApi.clone()
+)
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
+      options.baseUrl = Config.apiUrl;
+      options.headers['origin'] = options.uri.origin;
       var cookies = await cookieJar.loadForRequest(options.uri);
       var csrfToken =
           cookies.firstWhereOrNull((c) => c.name == 'XSRF-TOKEN')?.value;
@@ -36,6 +32,19 @@ final api = silentApi.clone()
       if (csrfToken != null) {
         options.headers['X-XSRF-TOKEN'] = Uri.decodeComponent(csrfToken);
       }
+      handler.next(options);
+    },
+    onError: (error, handler) {
+      return handler.next(error);
+    },
+  ))
+  ..interceptors.add(CookieManager(
+    cookieJar,
+  ));
+
+final api = silentApi.clone()
+  ..interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) async {
       handler.next(options);
     },
     onError: (error, handler) {
