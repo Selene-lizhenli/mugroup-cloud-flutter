@@ -67,8 +67,8 @@ dependencies:
   mobile_scanner: ^6.0.7
   shared_preferences: ^2.3.3
   easy_refresh: ^3.4.0
-  flutter_datawedge:
-    1.2.0
+  flutter_datawedge: 1.2.0
+  flutter_native_splash: ^2.4.1
     # path: ../flant
 
 dev_dependencies:
