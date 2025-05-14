@@ -8,6 +8,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,8 +23,9 @@ class LoginPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final qrcodeState = useState<Qrcode?>(null);
-    final core = ref.watch(coreProvider).value!;
-    final tenant = core.currentTenant;
+    final cloud = ref.watch(coreProvider).value!;
+    final core = ref.read(coreProvider.notifier);
+    final tenant = cloud.currentTenant;
 
     final afterLogin = useCallback(() {
       if (onLogin != null) {
@@ -38,41 +40,41 @@ class LoginPage extends HookConsumerWidget {
 
     useEffect(() {
       logger.d(tenant);
-      // Future fetchQrcode() async {
-      //   final resp = await api.post("api/tenant/login/qrcodes");
-      //   qrcodeState.value = Qrcode.fromJson(resp.data);
-      // }
+      Future fetchQrcode() async {
+        final resp = await api.post("api/tenant/login/qrcodes");
+        qrcodeState.value = Qrcode.fromJson(resp.data);
+      }
 
-      // fetchQrcode();
+      fetchQrcode();
 
-      // final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
-      //   if (qrcodeState.value == null) {
-      //     return;
-      //   }
+      final timer = Timer.periodic(const Duration(seconds: 1), (_) async {
+        if (qrcodeState.value == null) {
+          return;
+        }
 
-      //   final qrcode = qrcodeState.value!;
+        final qrcode = qrcodeState.value!;
 
-      //   final resp =
-      //       await api.get("api/tenant/login/qrcodes/${qrcode.id}/show");
-      //   qrcodeState.value = Qrcode.fromJson(resp.data);
+        final resp =
+            await api.get("api/tenant/login/qrcodes/${qrcode.id}/show");
+        qrcodeState.value = Qrcode.fromJson(resp.data);
 
-      //   //登录后跳转
-      //   if (qrcodeState.value?.usedAt != null) {
-      //     await app.fetchUser();
-      //     afterLogin();
-      //   }
+        //登录后跳转
+        if (qrcodeState.value?.usedAt != null) {
+          await app.fetchUser();
+          afterLogin();
+        }
 
-      //   logger.d("轮询,$qrcodeState");
+        logger.d("轮询,$qrcodeState");
 
-      //   final expirationTime =
-      //       DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
-      //   if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
-      //     logger.d("二维码已过期，获取新二维码...");
-      //     await fetchQrcode();
-      //   }
-      // });
+        final expirationTime =
+            DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
+        if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
+          logger.d("二维码已过期，获取新二维码...");
+          await fetchQrcode();
+        }
+      });
 
-      // return timer.cancel;
+      return timer.cancel;
     }, [tenant]);
 
     final qrcode = qrcodeState.value;
@@ -85,7 +87,7 @@ class LoginPage extends HookConsumerWidget {
           children: [
             Text(
               tenant == null ? "请在底部选在租户后操作" : tenant.title ?? "",
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(
               height: 10,
@@ -141,6 +143,36 @@ class LoginPage extends HookConsumerWidget {
               const Text(
                 "请使用企业微信扫码登录",
                 style: TextStyle(color: Color(0xFF707070), fontSize: 14),
+              ),
+
+            if (cloud.tenants.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: InkWell(
+                  onTap: () {
+                    showFlanActionSheet(
+                      context,
+                      cancelText: "取消",
+                      actions: [
+                        for (final tenant in cloud.tenants)
+                          FlanActionSheetAction(
+                            name: tenant.title ?? "未命名租户(${tenant.id})",
+                            callback: (action) async {
+                              core.setCurrentTenantId(tenant.id);
+                            },
+                          ),
+                      ],
+                      closeOnClickAction: true,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: const Text(
+                      '切换租户',
+                      style: TextStyle(fontSize: 16, color: Colors.blue),
+                    ),
+                  ),
+                ),
               ),
           ],
         ),

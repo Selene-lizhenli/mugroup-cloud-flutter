@@ -24,4 +24,13 @@ class Core extends _$Core {
     // Load initial todo list from the remote repository
     return _fetch();
   }
+
+  void setCurrentTenantId(int? currentTenant) {
+    final current = state.value;
+    if (current == null) return;
+
+    final updated = current.copyWith(currentTenantId: currentTenant);
+
+    state = AsyncData(updated);
+  }
 }
