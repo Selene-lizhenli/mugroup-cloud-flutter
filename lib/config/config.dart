@@ -8,4 +8,6 @@ abstract class Config {
   static const String apiUrl = _Config.apiUrl;
   @EnviedField(varName: 'WEB_URL')
   static const String webUrl = _Config.webUrl;
+  @EnviedField(varName: 'CORE_API_URL')
+  static const String coreApiUrl = _Config.coreApiUrl;
 }

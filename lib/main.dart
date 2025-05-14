@@ -35,6 +35,8 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+
+  await app.fetchTenants();
 }
 
 class MyApp extends StatelessWidget {

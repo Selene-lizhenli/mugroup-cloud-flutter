@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/core.dart';
+import 'package:cloud/models/core.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.dart';
@@ -13,6 +16,8 @@ class App {
 
   late final SharedPreferences prefs;
 
+  late List<Tenant> tenants;
+
   final container = ProviderContainer();
 
   final router = AppRouter();
@@ -20,6 +25,15 @@ class App {
   Future bootstrap() async {
     temporaryDirectory = await getTemporaryDirectory();
     prefs = await SharedPreferences.getInstance();
+  }
+
+  Future fetchTenants() async {
+    final resp = await coreApi.get("/api/core/tenants");
+    final list =
+        (resp.data as List).map((e) => e as Map<String, dynamic>).toList();
+
+    tenants = list.map((e) => Tenant.fromJson(e)).toList();
+    logger.d(tenants);
   }
 
   Future<User?> fetchUser() async {
