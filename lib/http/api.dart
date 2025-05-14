@@ -1,5 +1,5 @@
 import 'package:cloud/app/app.dart';
-import 'package:cloud/config/config.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:collection/collection.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
@@ -12,8 +12,6 @@ final cookieJar = PersistCookieJar(
 
 final silentApi = Dio(
   BaseOptions(
-    // baseUrl: 'https://apifoxmock.com/m1/5861176-5547581-default',
-    // baseUrl: Config.apiUrl,
     connectTimeout: const Duration(seconds: 120),
     headers: {
       Headers.acceptHeader: 'application/json',
@@ -22,7 +20,13 @@ final silentApi = Dio(
 )
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
-      options.baseUrl = Config.apiUrl;
+      final core = app.container.read(coreProvider).value;
+      final tenant = core?.currentTenant;
+      final baseUrl = tenant?.baseUrl;
+
+      if (baseUrl != null) {
+        options.baseUrl = baseUrl;
+      }
       options.headers['origin'] = options.uri.origin;
       var cookies = await cookieJar.loadForRequest(options.uri);
       var csrfToken =

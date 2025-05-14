@@ -22,6 +22,8 @@ Tenant _$TenantFromJson(Map<String, dynamic> json) {
 mixin _$Tenant {
   int? get id => throw _privateConstructorUsedError;
   String? get title => throw _privateConstructorUsedError;
+  @JsonKey(name: 'base_url')
+  String? get baseUrl => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -33,7 +35,8 @@ abstract class $TenantCopyWith<$Res> {
   factory $TenantCopyWith(Tenant value, $Res Function(Tenant) then) =
       _$TenantCopyWithImpl<$Res, Tenant>;
   @useResult
-  $Res call({int? id, String? title});
+  $Res call(
+      {int? id, String? title, @JsonKey(name: 'base_url') String? baseUrl});
 }
 
 /// @nodoc
@@ -51,6 +54,7 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? baseUrl = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -60,6 +64,10 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
       title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      baseUrl: freezed == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -72,7 +80,8 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
       __$$TenantImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id, String? title});
+  $Res call(
+      {int? id, String? title, @JsonKey(name: 'base_url') String? baseUrl});
 }
 
 /// @nodoc
@@ -88,6 +97,7 @@ class __$$TenantImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? baseUrl = freezed,
   }) {
     return _then(_$TenantImpl(
       id: freezed == id
@@ -98,6 +108,10 @@ class __$$TenantImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
+      baseUrl: freezed == baseUrl
+          ? _value.baseUrl
+          : baseUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -105,7 +119,7 @@ class __$$TenantImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TenantImpl implements _Tenant {
-  _$TenantImpl({this.id, this.title});
+  _$TenantImpl({this.id, this.title, @JsonKey(name: 'base_url') this.baseUrl});
 
   factory _$TenantImpl.fromJson(Map<String, dynamic> json) =>
       _$$TenantImplFromJson(json);
@@ -114,10 +128,13 @@ class _$TenantImpl implements _Tenant {
   final int? id;
   @override
   final String? title;
+  @override
+  @JsonKey(name: 'base_url')
+  final String? baseUrl;
 
   @override
   String toString() {
-    return 'Tenant(id: $id, title: $title)';
+    return 'Tenant(id: $id, title: $title, baseUrl: $baseUrl)';
   }
 
   @override
@@ -126,12 +143,13 @@ class _$TenantImpl implements _Tenant {
         (other.runtimeType == runtimeType &&
             other is _$TenantImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.title, title) || other.title == title));
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title);
+  int get hashCode => Object.hash(runtimeType, id, title, baseUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -148,7 +166,10 @@ class _$TenantImpl implements _Tenant {
 }
 
 abstract class _Tenant implements Tenant {
-  factory _Tenant({final int? id, final String? title}) = _$TenantImpl;
+  factory _Tenant(
+      {final int? id,
+      final String? title,
+      @JsonKey(name: 'base_url') final String? baseUrl}) = _$TenantImpl;
 
   factory _Tenant.fromJson(Map<String, dynamic> json) = _$TenantImpl.fromJson;
 
@@ -156,6 +177,9 @@ abstract class _Tenant implements Tenant {
   int? get id;
   @override
   String? get title;
+  @override
+  @JsonKey(name: 'base_url')
+  String? get baseUrl;
   @override
   @JsonKey(ignore: true)
   _$$TenantImplCopyWith<_$TenantImpl> get copyWith =>

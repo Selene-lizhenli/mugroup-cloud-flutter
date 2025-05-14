@@ -40,7 +40,9 @@ class LoginPage extends HookConsumerWidget {
 
     useEffect(() {
       logger.d(tenant);
+      qrcodeState.value = null;
       Future fetchQrcode() async {
+        await api.get("api/csrf-cookie");
         final resp = await api.post("api/tenant/login/qrcodes");
         qrcodeState.value = Qrcode.fromJson(resp.data);
       }
