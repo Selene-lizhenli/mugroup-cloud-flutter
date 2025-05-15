@@ -87,6 +87,10 @@ class Layout extends HookConsumerWidget {
                 app.container.refresh(cartProvider);
               }
 
+              if (item.label == "我的") {
+                app.fetchUser();
+              }
+
               context.tabsRouter.setActiveIndex(index);
             },
             items: items,
