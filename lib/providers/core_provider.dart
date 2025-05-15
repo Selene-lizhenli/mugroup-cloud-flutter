@@ -1,3 +1,4 @@
+import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/core.dart';
 import 'package:cloud/models/cloud.dart';
@@ -5,6 +6,8 @@ import 'package:cloud/models/core.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'core_provider.g.dart';
+
+const cacheCurrentTenantIdKey = "currentTenant";
 
 @Riverpod(keepAlive: true)
 class Core extends _$Core {
@@ -16,7 +19,10 @@ class Core extends _$Core {
     final tenants = list.map((e) => Tenant.fromJson(e)).toList();
     logger.d(tenants);
 
-    return Cloud(tenants: tenants);
+    return Cloud(
+      tenants: tenants,
+      currentTenantId: app.prefs.getInt(cacheCurrentTenantIdKey),
+    );
   }
 
   @override
@@ -32,5 +38,8 @@ class Core extends _$Core {
     final updated = current.copyWith(currentTenantId: currentTenant);
 
     state = AsyncData(updated);
+    if (currentTenant != null) {
+      app.prefs.setInt(cacheCurrentTenantIdKey, currentTenant);
+    }
   }
 }

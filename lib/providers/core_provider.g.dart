@@ -6,7 +6,7 @@ part of 'core_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$coreHash() => r'aa92fe94a309aa356f2dd14234452b667ed40337';
+String _$coreHash() => r'd08db9b9f44684ce0a009d1ed4a75e43f2b45315';
 
 /// See also [Core].
 @ProviderFor(Core)

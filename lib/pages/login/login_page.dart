@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
-import 'package:cloud/config/config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
@@ -39,8 +38,8 @@ class LoginPage extends HookConsumerWidget {
     }, [onLogin]);
 
     useEffect(() {
-      logger.d(tenant);
       qrcodeState.value = null;
+      logger.d(tenant);
       Future fetchQrcode() async {
         await api.get("api/csrf-cookie");
         final resp = await api.post("api/tenant/login/qrcodes");
@@ -66,7 +65,7 @@ class LoginPage extends HookConsumerWidget {
           afterLogin();
         }
 
-        logger.d("轮询,$qrcodeState");
+        logger.d("轮询,${qrcodeState.value?.id}");
 
         final expirationTime =
             DateTime.tryParse(qrcodeState.value!.expiredAt ?? '')?.toLocal();
@@ -80,7 +79,7 @@ class LoginPage extends HookConsumerWidget {
     }, [tenant]);
 
     final qrcode = qrcodeState.value;
-    double qrcodeSize = 200;
+    double qrcodeSize = 220;
 
     return Scaffold(
       body: Center(
@@ -95,7 +94,7 @@ class LoginPage extends HookConsumerWidget {
               height: 10,
             ),
             // 请求二维码
-            if (qrcode == null)
+            if (qrcode == null || tenant == null)
               Container(
                 width: qrcodeSize,
                 height: qrcodeSize,
@@ -128,7 +127,7 @@ class LoginPage extends HookConsumerWidget {
             // 默认展示已有二维码
             else
               QrImageView(
-                data: '${Config.webUrl}login/qrcode/${qrcodeState.value!.id}',
+                data: '${tenant.baseUrl}login/qrcode/${qrcodeState.value!.id}',
                 version: QrVersions.auto,
                 size: 220.0,
                 backgroundColor: Colors.white,
