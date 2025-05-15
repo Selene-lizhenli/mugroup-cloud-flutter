@@ -8,10 +8,12 @@ import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class App {
+  late String fullVersion;
   late final Directory temporaryDirectory;
 
   late final SharedPreferences prefs;
@@ -25,6 +27,10 @@ class App {
   Future bootstrap() async {
     temporaryDirectory = await getTemporaryDirectory();
     prefs = await SharedPreferences.getInstance();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    fullVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
   }
 
   Future<Cloud> loadCoreProvider() {

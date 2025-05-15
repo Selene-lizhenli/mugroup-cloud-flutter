@@ -1,8 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flant/components/action_sheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,18 +17,16 @@ class MyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider).user;
+    final cloud = ref.watch(coreProvider).value!;
     final cart = ref.read(cartProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("我"),
-      ),
       body: SafeArea(
         child: ListView(
           children: [
             Container(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +73,13 @@ class MyPage extends HookConsumerWidget {
                   closeOnClickAction: true,
                 );
               },
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              tileColor: Colors.white,
+              title: Text(
+                  '${cloud.currentTenant?.title ?? ""} (${app.fullVersion})'),
+              leading: const Icon(CupertinoIcons.info),
             ),
             const SizedBox(height: 8),
             ListTile(
