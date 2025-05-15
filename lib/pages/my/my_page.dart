@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:flant/components/action_sheet.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -19,7 +20,7 @@ class MyPage extends HookConsumerWidget {
         title: const Text("我"),
       ),
       body: SafeArea(
-        child: Column(
+        child: ListView(
           children: [
             Container(
               alignment: Alignment.centerLeft,
@@ -48,13 +49,28 @@ class MyPage extends HookConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
-            const ListTile(
+            ListTile(
               tileColor: Colors.white,
-              textColor: Colors.grey,
-              iconColor: Colors.grey,
-              title: Text('设置(建设中)'),
-              leading: Icon(CupertinoIcons.gear_alt_fill),
-              trailing: Icon(Icons.keyboard_arrow_right_rounded),
+              title: const Text('清空缓存'),
+              leading: const Icon(Icons.cleaning_services),
+              onTap: () {
+                showFlanActionSheet(
+                  context,
+                  cancelText: "取消",
+                  actions: [
+                    FlanActionSheetAction(
+                      name: '清空所有缓存',
+                      callback: (action) async {
+                        app.prefs.clear();
+                        EasyLoading.showSuccess("清理成功");
+                      },
+                    ),
+                  ],
+                  closeable: false,
+                  safeAreaInsetBottom: true,
+                  closeOnClickAction: true,
+                );
+              },
             ),
             const SizedBox(height: 8),
             ListTile(

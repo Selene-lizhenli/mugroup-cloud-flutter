@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -64,6 +66,13 @@ class Layout extends HookConsumerWidget {
       return null;
     }, [checkVersion]);
 
+    final items = [
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
+      const BottomNavigationBarItem(
+          icon: Icon(Icons.shopping_cart), label: "选样车"),
+      const BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
+    ];
+
     return AutoTabsRouter(
       builder: (context, child) {
         return Scaffold(
@@ -71,13 +80,16 @@ class Layout extends HookConsumerWidget {
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: context.tabsRouter.activeIndex,
-            onTap: context.tabsRouter.setActiveIndex,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.shopping_cart), label: "选样车"),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
-            ],
+            onTap: (index) {
+              final item = items[index];
+
+              if (item.label == "选样车") {
+                app.container.refresh(cartProvider);
+              }
+
+              context.tabsRouter.setActiveIndex(index);
+            },
+            items: items,
           ),
         );
       },
