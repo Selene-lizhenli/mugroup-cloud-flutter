@@ -5,6 +5,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:collection/collection.dart';
@@ -13,12 +14,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cart_provider.g.dart';
 
-const cacheKey = "cart_v1";
+var cacheKey = "cart_v1";
 
 @riverpod
 class Cart extends _$Cart {
   @override
   State build() {
+    final cloud = ref.watch(coreProvider).value!;
     logger.d("购物车 初始化");
     ref.onDispose(() {
       logger.d("购物车 dispos 拉");
@@ -42,6 +44,12 @@ class Cart extends _$Cart {
         CartSelect(CartType.quotation),
       ],
     );
+
+    if (cloud.currentTenant?.id == 6) {
+      cacheKey = "cart_v1";
+    } else if (cloud.currentTenant?.id != null) {
+      cacheKey = "tenant${cloud.currentTenant!.id!}_cart_v1";
+    }
 
     final cache = app.prefs.getString(cacheKey);
     if (cache != null) {

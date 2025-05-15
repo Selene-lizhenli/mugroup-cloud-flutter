@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ class MyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider).user;
+    final cart = ref.read(cartProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,9 +60,9 @@ class MyPage extends HookConsumerWidget {
                   cancelText: "取消",
                   actions: [
                     FlanActionSheetAction(
-                      name: '清空所有缓存',
+                      name: '清空选样车缓存',
                       callback: (action) async {
-                        app.prefs.clear();
+                        cart.clear();
                         EasyLoading.showSuccess("清理成功");
                       },
                     ),
