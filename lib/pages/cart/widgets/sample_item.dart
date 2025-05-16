@@ -116,6 +116,12 @@ class SampleItem extends HookWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
+                  if (sample.pageNo != null && sample.pageNo != "-")
+                    Text(
+                      "样本页码: ${sample.pageNo}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
