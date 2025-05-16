@@ -12,6 +12,7 @@ _$SampleImpl _$$SampleImplFromJson(Map<String, dynamic> json) => _$SampleImpl(
       nameCn: json['name_cn'] as String?,
       productNo: json['product_no'] as String?,
       purchaseCost: json['purchase_cost'] as String?,
+      pageNo: json['page_no'] as String?,
       spec: json['spec'] as String?,
       image: (json['image'] as List<dynamic>?)
           ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
@@ -25,6 +26,7 @@ Map<String, dynamic> _$$SampleImplToJson(_$SampleImpl instance) =>
       'name_cn': instance.nameCn,
       'product_no': instance.productNo,
       'purchase_cost': instance.purchaseCost,
+      'page_no': instance.pageNo,
       'spec': instance.spec,
       'image': instance.image,
     };

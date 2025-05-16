@@ -13,6 +13,7 @@ abstract class Sample with _$Sample {
     @JsonKey(name: 'name_cn') String? nameCn,
     @JsonKey(name: 'product_no') String? productNo,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
+    @JsonKey(name: 'page_no') String? pageNo,
     String? spec,
     List<Media>? image,
   }) = _Sample;
