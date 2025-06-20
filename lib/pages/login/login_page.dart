@@ -1,13 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-final supportLoginWays = ["account", "wxwork"];
 
 @RoutePage()
 class LoginPage extends HookConsumerWidget {
@@ -94,20 +93,45 @@ class LoginPage extends HookConsumerWidget {
 
                 // 登录方式
                 if (restEnableLoginWays.value.isNotEmpty) ...[
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: FlanDivider(
+                      child: Text(style: TextStyle(fontSize: 12), "其他登录方式"),
+                    ),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      for (var item in restEnableLoginWays.value)
+                      for (var (index, item)
+                          in restEnableLoginWays.value.indexed) ...[
+                        if (index != 0)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            color: Colors.grey,
+                            height: 20,
+                            width: 1,
+                          ),
                         GestureDetector(
                           onTap: () {
                             loginWay.value = item;
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            color: Colors.blue,
-                            child: Center(child: Text(item)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
+                            child: Center(
+                              child: Text(
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
+                                ),
+                                getLableByLoginWay(item),
+                              ),
+                            ),
                           ),
                         )
+                      ]
                     ],
                   )
                 ]
