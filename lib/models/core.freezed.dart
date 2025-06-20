@@ -22,6 +22,8 @@ Tenant _$TenantFromJson(Map<String, dynamic> json) {
 mixin _$Tenant {
   int? get id => throw _privateConstructorUsedError;
   String? get title => throw _privateConstructorUsedError;
+  @JsonKey(name: 'login_ways')
+  List<String>? get loginWays => throw _privateConstructorUsedError;
   @JsonKey(name: 'base_url')
   String? get baseUrl => throw _privateConstructorUsedError;
 
@@ -36,7 +38,10 @@ abstract class $TenantCopyWith<$Res> {
       _$TenantCopyWithImpl<$Res, Tenant>;
   @useResult
   $Res call(
-      {int? id, String? title, @JsonKey(name: 'base_url') String? baseUrl});
+      {int? id,
+      String? title,
+      @JsonKey(name: 'login_ways') List<String>? loginWays,
+      @JsonKey(name: 'base_url') String? baseUrl});
 }
 
 /// @nodoc
@@ -54,6 +59,7 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? loginWays = freezed,
     Object? baseUrl = freezed,
   }) {
     return _then(_value.copyWith(
@@ -65,6 +71,10 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
+      loginWays: freezed == loginWays
+          ? _value.loginWays
+          : loginWays // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       baseUrl: freezed == baseUrl
           ? _value.baseUrl
           : baseUrl // ignore: cast_nullable_to_non_nullable
@@ -81,7 +91,10 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int? id, String? title, @JsonKey(name: 'base_url') String? baseUrl});
+      {int? id,
+      String? title,
+      @JsonKey(name: 'login_ways') List<String>? loginWays,
+      @JsonKey(name: 'base_url') String? baseUrl});
 }
 
 /// @nodoc
@@ -97,6 +110,7 @@ class __$$TenantImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? loginWays = freezed,
     Object? baseUrl = freezed,
   }) {
     return _then(_$TenantImpl(
@@ -108,6 +122,10 @@ class __$$TenantImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
+      loginWays: freezed == loginWays
+          ? _value._loginWays
+          : loginWays // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       baseUrl: freezed == baseUrl
           ? _value.baseUrl
           : baseUrl // ignore: cast_nullable_to_non_nullable
@@ -119,7 +137,12 @@ class __$$TenantImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TenantImpl implements _Tenant {
-  _$TenantImpl({this.id, this.title, @JsonKey(name: 'base_url') this.baseUrl});
+  _$TenantImpl(
+      {this.id,
+      this.title,
+      @JsonKey(name: 'login_ways') final List<String>? loginWays,
+      @JsonKey(name: 'base_url') this.baseUrl})
+      : _loginWays = loginWays;
 
   factory _$TenantImpl.fromJson(Map<String, dynamic> json) =>
       _$$TenantImplFromJson(json);
@@ -128,13 +151,24 @@ class _$TenantImpl implements _Tenant {
   final int? id;
   @override
   final String? title;
+  final List<String>? _loginWays;
+  @override
+  @JsonKey(name: 'login_ways')
+  List<String>? get loginWays {
+    final value = _loginWays;
+    if (value == null) return null;
+    if (_loginWays is EqualUnmodifiableListView) return _loginWays;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'base_url')
   final String? baseUrl;
 
   @override
   String toString() {
-    return 'Tenant(id: $id, title: $title, baseUrl: $baseUrl)';
+    return 'Tenant(id: $id, title: $title, loginWays: $loginWays, baseUrl: $baseUrl)';
   }
 
   @override
@@ -144,12 +178,15 @@ class _$TenantImpl implements _Tenant {
             other is _$TenantImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality()
+                .equals(other._loginWays, _loginWays) &&
             (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, baseUrl);
+  int get hashCode => Object.hash(runtimeType, id, title,
+      const DeepCollectionEquality().hash(_loginWays), baseUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -169,6 +206,7 @@ abstract class _Tenant implements Tenant {
   factory _Tenant(
       {final int? id,
       final String? title,
+      @JsonKey(name: 'login_ways') final List<String>? loginWays,
       @JsonKey(name: 'base_url') final String? baseUrl}) = _$TenantImpl;
 
   factory _Tenant.fromJson(Map<String, dynamic> json) = _$TenantImpl.fromJson;
@@ -177,6 +215,9 @@ abstract class _Tenant implements Tenant {
   int? get id;
   @override
   String? get title;
+  @override
+  @JsonKey(name: 'login_ways')
+  List<String>? get loginWays;
   @override
   @JsonKey(name: 'base_url')
   String? get baseUrl;

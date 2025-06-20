@@ -8,6 +8,7 @@ abstract class Tenant with _$Tenant {
   factory Tenant({
     int? id,
     String? title,
+    @JsonKey(name: 'login_ways') List<String>? loginWays,
     @JsonKey(name: 'base_url') String? baseUrl,
   }) = _Tenant;
 
