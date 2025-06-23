@@ -30,7 +30,9 @@ class LoginWay extends HookConsumerWidget {
         qrcodeTimer.value!.cancel();
       }
 
-      qrcode.value = null;
+      if (context.mounted) {
+        qrcode.value = null;
+      }
     }, []);
 
     final fetchQrcode = useCallback(() async {
@@ -50,7 +52,7 @@ class LoginWay extends HookConsumerWidget {
 
       await innerFetchQrcode();
 
-      qrcodeTimer.value = Timer.periodic(const Duration(seconds: 5), (_) async {
+      qrcodeTimer.value = Timer.periodic(const Duration(seconds: 1), (_) async {
         logger.d("定时");
         if (qrcode.value == null) {
           return;
@@ -60,6 +62,7 @@ class LoginWay extends HookConsumerWidget {
 
         final resp = await api.get("api/tenant/login/qrcodes/${code.id}/show");
         final result = Qrcode.fromJson(resp.data);
+        qrcode.value = result;
         if (result.usedAt != null) {
           logger.d("登录成功");
           onQrcodeUsed?.call();
@@ -163,6 +166,37 @@ class LoginWay extends HookConsumerWidget {
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
                           ),
+                        ),
+                      ),
+                    )
+                  else if (qrcode.value?.userId != null)
+                    SizedBox(
+                      width: 220,
+                      height: 220,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              qrcode.value!.user?.name ?? '未知用户',
+                              style: const TextStyle(
+                                  color: Colors.blue, fontSize: 16),
+                            ),
+                            const SizedBox(height: 18), // 添加间距
+                            Text(
+                              qrcode.value!.user?.jobNumber ?? '',
+                              style: const TextStyle(
+                                  color: Colors.blue, fontSize: 14),
+                            ),
+                            const SizedBox(
+                              height: 18,
+                            ),
+                            const Text(
+                              "请在手机上点击确认",
+                              style: TextStyle(
+                                  color: Color(0xFF707070), fontSize: 14),
+                            )
+                          ],
                         ),
                       ),
                     )

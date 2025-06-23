@@ -19,8 +19,12 @@ class MyPage extends HookConsumerWidget {
     final user = ref.watch(userProvider).user;
     final cloud = ref.watch(coreProvider).value!;
     final cart = ref.read(cartProvider.notifier);
+    final tenant = cloud.currentTenant;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(tenant?.title ?? ""),
+      ),
       body: SafeArea(
         child: ListView(
           children: [
