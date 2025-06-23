@@ -105,7 +105,7 @@ class LoginPage extends HookConsumerWidget {
                 if (loginWay.value != null)
                   LoginWay(
                     loginWay: loginWay.value!,
-                    onQrcodeUsed: () async {
+                    onLogined: () async {
                       await app.fetchUser();
                       afterLogin();
                     },

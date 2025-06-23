@@ -12,13 +12,16 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class LoginWay extends HookConsumerWidget {
   final String loginWay;
-  final void Function()? onQrcodeUsed;
+  final void Function()? onLogined;
 
-  const LoginWay({super.key, required this.loginWay, this.onQrcodeUsed});
+  const LoginWay({super.key, required this.loginWay, this.onLogined});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cloud = ref.watch(coreProvider).value!;
     final tenant = cloud.currentTenant;
+
+    final accountController = useTextEditingController();
+    final passwordController = useTextEditingController();
 
     final qrcodeTimer = useRef<Timer?>(null);
     final qrcodeLoading = useState(false);
@@ -65,7 +68,7 @@ class LoginWay extends HookConsumerWidget {
         qrcode.value = result;
         if (result.usedAt != null) {
           logger.d("登录成功");
-          onQrcodeUsed?.call();
+          onLogined?.call();
         }
 
         final expirationTime = DateTime.tryParse(result.expiredAt!)?.toLocal();
@@ -75,6 +78,25 @@ class LoginWay extends HookConsumerWidget {
         }
       });
     }, [clearQrcode]);
+
+    final handleAccountLogin = useCallback(() async {
+      final account = accountController.text;
+      final password = passwordController.text;
+
+      if (account == '' || password == '') {
+        return;
+      }
+
+      await api.get("api/csrf-cookie");
+
+      await api.post("api/login", data: {
+        "type": "account",
+        "email": account,
+        "password": password,
+      });
+
+      onLogined?.call();
+    }, []);
 
     useEffect(() {
       if (loginWay == "wxwork") {
@@ -109,6 +131,7 @@ class LoginWay extends HookConsumerWidget {
               height: 50,
             ),
             TextField(
+              controller: accountController,
               style: const TextStyle(
                 fontSize: 12,
               ),
@@ -129,6 +152,8 @@ class LoginWay extends HookConsumerWidget {
               ),
             ),
             TextField(
+              controller: passwordController,
+              obscureText: true,
               style: const TextStyle(
                 fontSize: 12,
               ),
@@ -227,7 +252,7 @@ class LoginWay extends HookConsumerWidget {
               width: double.infinity,
               margin: const EdgeInsets.only(top: 25),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: handleAccountLogin,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
