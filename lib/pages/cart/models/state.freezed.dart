@@ -509,6 +509,7 @@ mixin _$State {
   Warehouse? get warehouse => throw _privateConstructorUsedError;
   Borrow? get borrow => throw _privateConstructorUsedError;
   Transfer? get transfer => throw _privateConstructorUsedError;
+  Delivery? get delivery => throw _privateConstructorUsedError;
   CartType? get type => throw _privateConstructorUsedError;
   String? get cartName => throw _privateConstructorUsedError;
   QuotationInfo? get quotationInfo => throw _privateConstructorUsedError;
@@ -529,6 +530,7 @@ abstract class $StateCopyWith<$Res> {
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
+      Delivery? delivery,
       CartType? type,
       String? cartName,
       QuotationInfo? quotationInfo});
@@ -536,6 +538,7 @@ abstract class $StateCopyWith<$Res> {
   $WarehouseCopyWith<$Res>? get warehouse;
   $BorrowCopyWith<$Res>? get borrow;
   $TransferCopyWith<$Res>? get transfer;
+  $DeliveryCopyWith<$Res>? get delivery;
   $QuotationInfoCopyWith<$Res>? get quotationInfo;
 }
 
@@ -557,6 +560,7 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
+    Object? delivery = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
     Object? quotationInfo = freezed,
@@ -582,6 +586,10 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.transfer
           : transfer // ignore: cast_nullable_to_non_nullable
               as Transfer?,
+      delivery: freezed == delivery
+          ? _value.delivery
+          : delivery // ignore: cast_nullable_to_non_nullable
+              as Delivery?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -635,6 +643,18 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
 
   @override
   @pragma('vm:prefer-inline')
+  $DeliveryCopyWith<$Res>? get delivery {
+    if (_value.delivery == null) {
+      return null;
+    }
+
+    return $DeliveryCopyWith<$Res>(_value.delivery!, (value) {
+      return _then(_value.copyWith(delivery: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
   $QuotationInfoCopyWith<$Res>? get quotationInfo {
     if (_value.quotationInfo == null) {
       return null;
@@ -659,6 +679,7 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
+      Delivery? delivery,
       CartType? type,
       String? cartName,
       QuotationInfo? quotationInfo});
@@ -669,6 +690,8 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
   $BorrowCopyWith<$Res>? get borrow;
   @override
   $TransferCopyWith<$Res>? get transfer;
+  @override
+  $DeliveryCopyWith<$Res>? get delivery;
   @override
   $QuotationInfoCopyWith<$Res>? get quotationInfo;
 }
@@ -689,6 +712,7 @@ class __$$StateImplCopyWithImpl<$Res>
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
+    Object? delivery = freezed,
     Object? type = freezed,
     Object? cartName = freezed,
     Object? quotationInfo = freezed,
@@ -714,6 +738,10 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value.transfer
           : transfer // ignore: cast_nullable_to_non_nullable
               as Transfer?,
+      delivery: freezed == delivery
+          ? _value.delivery
+          : delivery // ignore: cast_nullable_to_non_nullable
+              as Delivery?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -739,6 +767,7 @@ class _$StateImpl implements _State {
       this.warehouse,
       this.borrow,
       this.transfer,
+      this.delivery,
       this.type,
       this.cartName,
       this.quotationInfo})
@@ -771,6 +800,8 @@ class _$StateImpl implements _State {
   @override
   final Transfer? transfer;
   @override
+  final Delivery? delivery;
+  @override
   final CartType? type;
   @override
   final String? cartName;
@@ -779,7 +810,7 @@ class _$StateImpl implements _State {
 
   @override
   String toString() {
-    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, type: $type, cartName: $cartName, quotationInfo: $quotationInfo)';
+    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, delivery: $delivery, type: $type, cartName: $cartName, quotationInfo: $quotationInfo)';
   }
 
   @override
@@ -794,6 +825,8 @@ class _$StateImpl implements _State {
             (identical(other.borrow, borrow) || other.borrow == borrow) &&
             (identical(other.transfer, transfer) ||
                 other.transfer == transfer) &&
+            (identical(other.delivery, delivery) ||
+                other.delivery == delivery) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.cartName, cartName) ||
                 other.cartName == cartName) &&
@@ -810,6 +843,7 @@ class _$StateImpl implements _State {
       warehouse,
       borrow,
       transfer,
+      delivery,
       type,
       cartName,
       quotationInfo);
@@ -835,6 +869,7 @@ abstract class _State implements State {
       final Warehouse? warehouse,
       final Borrow? borrow,
       final Transfer? transfer,
+      final Delivery? delivery,
       final CartType? type,
       final String? cartName,
       final QuotationInfo? quotationInfo}) = _$StateImpl;
@@ -851,6 +886,8 @@ abstract class _State implements State {
   Borrow? get borrow;
   @override
   Transfer? get transfer;
+  @override
+  Delivery? get delivery;
   @override
   CartType? get type;
   @override

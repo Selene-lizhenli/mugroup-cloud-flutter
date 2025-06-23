@@ -1,5 +1,6 @@
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/delivery.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'state.freezed.dart';
@@ -23,6 +24,9 @@ enum CartType {
 
   /// 报价单
   quotation,
+
+  /// 出货
+  deliveryOut,
 }
 
 Map<CartType, String> cartNames = {
@@ -32,6 +36,7 @@ Map<CartType, String> cartNames = {
   CartType.transferIn: "调拨入库选样车",
   CartType.inout: "手动盘点选样车",
   CartType.quotation: "报价单选样车",
+  CartType.deliveryOut: '出货选样车',
 };
 
 // class CartSelect {
@@ -89,6 +94,7 @@ abstract class State with _$State {
     Warehouse? warehouse,
     Borrow? borrow,
     Transfer? transfer,
+    Delivery? delivery,
     CartType? type,
     String? cartName,
     QuotationInfo? quotationInfo,

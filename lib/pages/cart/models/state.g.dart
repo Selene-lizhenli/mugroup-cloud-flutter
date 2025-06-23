@@ -23,6 +23,7 @@ const _$CartTypeEnumMap = {
   CartType.transferIn: 'transferIn',
   CartType.inout: 'inout',
   CartType.quotation: 'quotation',
+  CartType.deliveryOut: 'deliveryOut',
 };
 
 _$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>
@@ -69,6 +70,9 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
       transfer: json['transfer'] == null
           ? null
           : Transfer.fromJson(json['transfer'] as Map<String, dynamic>),
+      delivery: json['delivery'] == null
+          ? null
+          : Delivery.fromJson(json['delivery'] as Map<String, dynamic>),
       type: $enumDecodeNullable(_$CartTypeEnumMap, json['type']),
       cartName: json['cartName'] as String?,
       quotationInfo: json['quotationInfo'] == null
@@ -84,6 +88,7 @@ Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
       'warehouse': instance.warehouse,
       'borrow': instance.borrow,
       'transfer': instance.transfer,
+      'delivery': instance.delivery,
       'type': _$CartTypeEnumMap[instance.type],
       'cartName': instance.cartName,
       'quotationInfo': instance.quotationInfo,

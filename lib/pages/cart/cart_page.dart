@@ -38,6 +38,7 @@ class CartPage extends HookConsumerWidget {
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
+    final delivery = state.delivery;
     final quotationInfo = state.quotationInfo;
 
     final user = useState<User?>(null);
@@ -116,6 +117,22 @@ class CartPage extends HookConsumerWidget {
         );
       }
 
+      if (cartType == CartType.deliveryOut) {
+        return GestureDetector(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(delivery == null
+                    ? "请扫描出货单二维码"
+                    : delivery.orderNo ?? "未设置出货单号"),
+                const Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+        );
+      }
       return GestureDetector(
         child: const SizedBox(),
       );
@@ -901,6 +918,69 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void deliveryDialog(BuildContext context) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            final text = cartType == CartType.deliveryOut ? "出货" : "未知";
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              title: Text(
+                "确认$text",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    "取消",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final productData = items
+                        .map((item) => {
+                              "product_id": item.sample.id,
+                              "inout_qty": item.count,
+                              "product_no": item.sample.productNo,
+                              "barcode": item.sample.barcode
+                            })
+                        .toList();
+                    final data = {"items": productData};
+
+                    EasyLoading.show(status: '加载中...');
+
+                    if (cartType == CartType.deliveryOut) {
+                      await addDeliveryItems(delivery!.id!, data);
+                      EasyLoading.showSuccess("出货成功!");
+                    }
+
+                    cart.clear();
+
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "确认",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          });
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -923,6 +1003,15 @@ class CartPage extends HookConsumerWidget {
           return;
         }
         transferDialog(context);
+      }
+
+      //出货
+      if (cartType == CartType.deliveryOut) {
+        if (delivery == null) {
+          EasyLoading.showInfo("请先扫描出货单号!");
+          return;
+        }
+        deliveryDialog(context);
       }
 
       final productData = items

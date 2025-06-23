@@ -104,3 +104,8 @@ Future confirmInventory(Map<String, dynamic>? data) async {
 Future confirmTransferIn(int id, Map<String, dynamic>? data) async {
   return api.post("api/tenant/wms/stock/transfers/$id/confirm", data: data);
 }
+
+Future addDeliveryItems(int deliveryId, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/deliveries/$deliveryId/add_items",
+      data: data);
+}
