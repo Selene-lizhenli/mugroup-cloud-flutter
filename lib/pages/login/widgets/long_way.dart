@@ -1,4 +1,10 @@
+import 'dart:async';
+
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/api.dart';
+import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/pages/login/shared.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,11 +12,82 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class LoginWay extends HookConsumerWidget {
   final String loginWay;
+  final void Function()? onQrcodeUsed;
 
-  const LoginWay({super.key, required this.loginWay});
+  const LoginWay({super.key, required this.loginWay, this.onQrcodeUsed});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cloud = ref.watch(coreProvider).value!;
+    final tenant = cloud.currentTenant;
+
+    final qrcodeTimer = useRef<Timer?>(null);
     final qrcodeLoading = useState(false);
+    final qrcode = useState<Qrcode?>(null);
+
+    final clearQrcode = useCallback(() {
+      logger.d("clearQrcode");
+      if (qrcodeTimer.value != null) {
+        qrcodeTimer.value!.cancel();
+      }
+
+      qrcode.value = null;
+    }, []);
+
+    final fetchQrcode = useCallback(() async {
+      clearQrcode();
+      logger.d("获取二维码");
+
+      Future innerFetchQrcode() async {
+        qrcodeLoading.value = true;
+        qrcode.value = null;
+
+        await api.get("api/csrf-cookie");
+        final resp = await api.post("api/tenant/login/qrcodes");
+
+        qrcode.value = Qrcode.fromJson(resp.data);
+        qrcodeLoading.value = false;
+      }
+
+      await innerFetchQrcode();
+
+      qrcodeTimer.value = Timer.periodic(const Duration(seconds: 5), (_) async {
+        logger.d("定时");
+        if (qrcode.value == null) {
+          return;
+        }
+
+        final code = qrcode.value!;
+
+        final resp = await api.get("api/tenant/login/qrcodes/${code.id}/show");
+        final result = Qrcode.fromJson(resp.data);
+        if (result.usedAt != null) {
+          logger.d("登录成功");
+          onQrcodeUsed?.call();
+        }
+
+        final expirationTime = DateTime.tryParse(result.expiredAt!)?.toLocal();
+        if (expirationTime == null || DateTime.now().isAfter(expirationTime)) {
+          logger.d("二维码已过期，获取新二维码...");
+          await innerFetchQrcode();
+        }
+      });
+    }, [clearQrcode]);
+
+    useEffect(() {
+      if (loginWay == "wxwork") {
+        fetchQrcode();
+      } else {
+        clearQrcode();
+      }
+
+      return clearQrcode;
+    }, [tenant, loginWay]);
+
+    if (tenant == null) {
+      return const SizedBox.shrink();
+    }
+
+    logger.d("${tenant.baseUrl}login/qrcode/${qrcode.value?.id}");
 
     return Container(
       width: double.infinity,
@@ -70,7 +147,7 @@ class LoginWay extends HookConsumerWidget {
             ),
           ],
 
-          // TODO: 企业扫码登录
+          // 企业扫码登录
           if (loginWay == "wxwork") ...[
             Center(
               child: Column(
@@ -89,11 +166,12 @@ class LoginWay extends HookConsumerWidget {
                         ),
                       ),
                     )
-                  else
+                  else if (qrcode.value != null)
                     Column(
                       children: [
                         QrImageView(
-                          data: '12123',
+                          data:
+                              '${tenant.baseUrl}login/qrcode/${qrcode.value!.id}',
                           version: QrVersions.auto,
                           size: 220.0,
                           backgroundColor: Colors.white,

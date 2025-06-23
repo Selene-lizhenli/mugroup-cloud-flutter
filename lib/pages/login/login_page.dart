@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
 import 'package:cloud/providers/core_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -21,6 +23,17 @@ class LoginPage extends HookConsumerWidget {
     final cloud = ref.watch(coreProvider).value!;
     final core = ref.read(coreProvider.notifier);
     final tenant = cloud.currentTenant;
+
+    final afterLogin = useCallback(() {
+      if (onLogin != null) {
+        onLogin!();
+        return;
+      }
+
+      // 默认跳转到首页
+      final router = AutoRouter.of(context);
+      router.replace(const HomeRoute());
+    }, [onLogin]);
 
     final enableLoginWays = useMemoized(() {
       final tenantLoginWays = tenant?.loginWays ?? [];
@@ -89,7 +102,14 @@ class LoginPage extends HookConsumerWidget {
             )
           : Column(
               children: [
-                if (loginWay.value != null) LoginWay(loginWay: loginWay.value!),
+                if (loginWay.value != null)
+                  LoginWay(
+                    loginWay: loginWay.value!,
+                    onQrcodeUsed: () async {
+                      await app.fetchUser();
+                      afterLogin();
+                    },
+                  ),
 
                 // 登录方式
                 if (restEnableLoginWays.value.isNotEmpty) ...[
