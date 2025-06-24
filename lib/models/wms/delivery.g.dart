@@ -18,8 +18,8 @@ _$DeliveryImpl _$$DeliveryImplFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      itemSumQty: (json['item_sum_qty'] as num?)?.toInt(),
-      itemCountQty: (json['item_count_qty'] as num?)?.toInt(),
+      itemSumQty: parseInt(json['item_sum_qty']),
+      itemCountQty: parseInt(json['item_count_qty']),
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => DeliveryItem.fromJson(e as Map<String, dynamic>))
           .toList(),

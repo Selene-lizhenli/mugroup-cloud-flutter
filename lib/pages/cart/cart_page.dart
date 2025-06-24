@@ -945,7 +945,7 @@ class CartPage extends HookConsumerWidget {
                     final productData = items
                         .map((item) => {
                               "product_id": item.sample.id,
-                              "inout_qty": item.count,
+                              "qty": item.count,
                               "product_no": item.sample.productNo,
                               "barcode": item.sample.barcode
                             })

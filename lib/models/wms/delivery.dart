@@ -8,6 +8,13 @@ part 'delivery.g.dart';
 
 enum DeliveryStatus { pending, finished }
 
+int? parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
 @freezed
 class Delivery with _$Delivery {
   factory Delivery({
@@ -17,8 +24,8 @@ class Delivery with _$Delivery {
     DeliveryStatus? status,
     Warehouse? warehouse,
     User? user,
-    @JsonKey(name: "item_sum_qty") int? itemSumQty,
-    @JsonKey(name: "item_count_qty") int? itemCountQty,
+    @JsonKey(name: "item_sum_qty", fromJson: parseInt) int? itemSumQty,
+    @JsonKey(name: "item_count_qty", fromJson: parseInt) int? itemCountQty,
     @JsonKey(name: 'items') List<DeliveryItem>? items,
   }) = _Delivery;
 

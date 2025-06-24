@@ -1,6 +1,8 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/delivery.dart';
+import 'package:cloud/models/wms/delivery_item.dart';
 import 'package:cloud/models/wms/inventory.dart';
 import 'package:cloud/models/wms/transfer_item.dart';
 
@@ -108,4 +110,34 @@ Future confirmTransferIn(int id, Map<String, dynamic>? data) async {
 Future addDeliveryItems(int deliveryId, Map<String, dynamic>? data) async {
   return api.post("api/tenant/wms/stock/deliveries/$deliveryId/add_items",
       data: data);
+}
+
+Future fetchDelivery(Map<String, dynamic>? data) async {
+  return api.get('api/tenant/wms/stock/deliveries', data: data).then((res) {
+    final list = res.data['data'];
+    if (list is List && list.isNotEmpty) {
+      return Delivery.fromJson(list[0]);
+    }
+    return null;
+  });
+}
+
+Future<ApiResponse<List<DeliveryItem>>> getDeliveryItems(
+    {required int id, Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/wms/stock/deliveries/$id/items",
+          queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<DeliveryItem>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(DeliveryItem.fromJson).toList();
+          },
+        ),
+      );
+}
+
+Future deliveryOut(int deliveryId) async {
+  return api.post("api/tenant/wms/stock/deliveries/$deliveryId/confirm");
 }

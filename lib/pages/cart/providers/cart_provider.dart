@@ -4,6 +4,7 @@ import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/delivery.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
@@ -110,6 +111,11 @@ class Cart extends _$Cart {
 
   set transfer(Transfer? transfer) {
     state = state.copyWith(transfer: transfer);
+    save();
+  }
+
+  set delivery(Delivery? delivery) {
+    state = state.copyWith(delivery: delivery);
     save();
   }
 

@@ -27,9 +27,9 @@ mixin _$Delivery {
   DeliveryStatus? get status => throw _privateConstructorUsedError;
   Warehouse? get warehouse => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
-  @JsonKey(name: "item_sum_qty")
+  @JsonKey(name: "item_sum_qty", fromJson: parseInt)
   int? get itemSumQty => throw _privateConstructorUsedError;
-  @JsonKey(name: "item_count_qty")
+  @JsonKey(name: "item_count_qty", fromJson: parseInt)
   int? get itemCountQty => throw _privateConstructorUsedError;
   @JsonKey(name: 'items')
   List<DeliveryItem>? get items => throw _privateConstructorUsedError;
@@ -52,8 +52,8 @@ abstract class $DeliveryCopyWith<$Res> {
       DeliveryStatus? status,
       Warehouse? warehouse,
       User? user,
-      @JsonKey(name: "item_sum_qty") int? itemSumQty,
-      @JsonKey(name: "item_count_qty") int? itemCountQty,
+      @JsonKey(name: "item_sum_qty", fromJson: parseInt) int? itemSumQty,
+      @JsonKey(name: "item_count_qty", fromJson: parseInt) int? itemCountQty,
       @JsonKey(name: 'items') List<DeliveryItem>? items});
 
   $WarehouseCopyWith<$Res>? get warehouse;
@@ -163,8 +163,8 @@ abstract class _$$DeliveryImplCopyWith<$Res>
       DeliveryStatus? status,
       Warehouse? warehouse,
       User? user,
-      @JsonKey(name: "item_sum_qty") int? itemSumQty,
-      @JsonKey(name: "item_count_qty") int? itemCountQty,
+      @JsonKey(name: "item_sum_qty", fromJson: parseInt) int? itemSumQty,
+      @JsonKey(name: "item_count_qty", fromJson: parseInt) int? itemCountQty,
       @JsonKey(name: 'items') List<DeliveryItem>? items});
 
   @override
@@ -245,8 +245,8 @@ class _$DeliveryImpl implements _Delivery {
       this.status,
       this.warehouse,
       this.user,
-      @JsonKey(name: "item_sum_qty") this.itemSumQty,
-      @JsonKey(name: "item_count_qty") this.itemCountQty,
+      @JsonKey(name: "item_sum_qty", fromJson: parseInt) this.itemSumQty,
+      @JsonKey(name: "item_count_qty", fromJson: parseInt) this.itemCountQty,
       @JsonKey(name: 'items') final List<DeliveryItem>? items})
       : _items = items;
 
@@ -267,10 +267,10 @@ class _$DeliveryImpl implements _Delivery {
   @override
   final User? user;
   @override
-  @JsonKey(name: "item_sum_qty")
+  @JsonKey(name: "item_sum_qty", fromJson: parseInt)
   final int? itemSumQty;
   @override
-  @JsonKey(name: "item_count_qty")
+  @JsonKey(name: "item_count_qty", fromJson: parseInt)
   final int? itemCountQty;
   final List<DeliveryItem>? _items;
   @override
@@ -337,16 +337,17 @@ class _$DeliveryImpl implements _Delivery {
 
 abstract class _Delivery implements Delivery {
   factory _Delivery(
-          {final int? id,
-          @JsonKey(name: "order_no") final String? orderNo,
-          final String? remark,
-          final DeliveryStatus? status,
-          final Warehouse? warehouse,
-          final User? user,
-          @JsonKey(name: "item_sum_qty") final int? itemSumQty,
-          @JsonKey(name: "item_count_qty") final int? itemCountQty,
-          @JsonKey(name: 'items') final List<DeliveryItem>? items}) =
-      _$DeliveryImpl;
+      {final int? id,
+      @JsonKey(name: "order_no") final String? orderNo,
+      final String? remark,
+      final DeliveryStatus? status,
+      final Warehouse? warehouse,
+      final User? user,
+      @JsonKey(name: "item_sum_qty", fromJson: parseInt) final int? itemSumQty,
+      @JsonKey(name: "item_count_qty", fromJson: parseInt)
+      final int? itemCountQty,
+      @JsonKey(name: 'items')
+      final List<DeliveryItem>? items}) = _$DeliveryImpl;
 
   factory _Delivery.fromJson(Map<String, dynamic> json) =
       _$DeliveryImpl.fromJson;
@@ -365,10 +366,10 @@ abstract class _Delivery implements Delivery {
   @override
   User? get user;
   @override
-  @JsonKey(name: "item_sum_qty")
+  @JsonKey(name: "item_sum_qty", fromJson: parseInt)
   int? get itemSumQty;
   @override
-  @JsonKey(name: "item_count_qty")
+  @JsonKey(name: "item_count_qty", fromJson: parseInt)
   int? get itemCountQty;
   @override
   @JsonKey(name: 'items')
