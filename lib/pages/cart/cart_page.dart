@@ -1101,28 +1101,33 @@ class CartPage extends HookConsumerWidget {
                   }
                   for (var item in codes) {
                     if (isUrl(item)) {
-                      RegExp transferExp = RegExp(r'wms/transfer/(.*)');
-                      RegExp deliveryExp = RegExp(r'wms/delivery/(.*)');
-                      final matchTransfer = transferExp.firstMatch(item);
-                      final matchDelivery = deliveryExp.firstMatch(item);
-
-                      /// 解析结果为调拨单
-                      if (matchTransfer != null) {
-                        final orderNo = matchTransfer.group(1)!;
-                        if (context.mounted) {
-                          context.router.push(WmsTransferRoute(code: orderNo));
-                          return;
+                      if (true) {
+                        // 处理调拨单
+                        RegExp transferExp = RegExp(r'wms/transfer/(.*)');
+                        final matchTransfer = transferExp.firstMatch(item);
+                        if (matchTransfer != null) {
+                          final orderNo = matchTransfer.group(1)!;
+                          if (context.mounted) {
+                            context.router
+                                .push(WmsTransferRoute(code: orderNo));
+                            return;
+                          }
+                        }
+                      }
+                      if (true) {
+                        // 处理出货单
+                        RegExp deliveryExp = RegExp(r'wms/delivery/(.*)');
+                        final matchDelivery = deliveryExp.firstMatch(item);
+                        if (matchDelivery != null) {
+                          final orderNo = matchDelivery.group(1)!;
+                          if (context.mounted) {
+                            context.router
+                                .push(WmsDeliveryRoute(code: orderNo));
+                            return;
+                          }
                         }
                       }
 
-                      ///解析结果为出货单
-                      if (matchDelivery != null) {
-                        final orderNo = matchDelivery.group(1)!;
-                        if (context.mounted) {
-                          context.router.push(WmsDeliveryRoute(code: orderNo));
-                          return;
-                        }
-                      }
                       EasyLoading.showError("不支持该条码!");
                       return;
                     } else {

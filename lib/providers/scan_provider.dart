@@ -71,6 +71,20 @@ class Scan extends _$Scan {
         }
       }
 
+      //判断是不是出货单
+      if (true) {
+        RegExp deliveryExp = RegExp(r'wms/delivery/(.*)');
+        final match = deliveryExp.firstMatch(barcodeString);
+
+        /// 解析结果为出货单
+        if (match != null) {
+          final orderNo = match.group(1)!;
+
+          app.router.push(WmsDeliveryRoute(code: orderNo));
+          return;
+        }
+      }
+
       // 默认不处理
       return;
     }
