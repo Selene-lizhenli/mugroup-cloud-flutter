@@ -1102,13 +1102,24 @@ class CartPage extends HookConsumerWidget {
                   for (var item in codes) {
                     if (isUrl(item)) {
                       RegExp transferExp = RegExp(r'wms/transfer/(.*)');
-                      final match = transferExp.firstMatch(item);
+                      RegExp deliveryExp = RegExp(r'wms/delivery/(.*)');
+                      final matchTransfer = transferExp.firstMatch(item);
+                      final matchDelivery = deliveryExp.firstMatch(item);
 
                       /// 解析结果为调拨单
-                      if (match != null) {
-                        final orderNo = match.group(1)!;
+                      if (matchTransfer != null) {
+                        final orderNo = matchTransfer.group(1)!;
                         if (context.mounted) {
                           context.router.push(WmsTransferRoute(code: orderNo));
+                          return;
+                        }
+                      }
+
+                      ///解析结果为出货单
+                      if (matchDelivery != null) {
+                        final orderNo = matchDelivery.group(1)!;
+                        if (context.mounted) {
+                          context.router.push(WmsDeliveryRoute(code: orderNo));
                           return;
                         }
                       }
