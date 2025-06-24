@@ -223,7 +223,6 @@ class WmsDeliveryPage extends HookConsumerWidget {
               final cart = ref.read(cartProvider.notifier);
               cart.delivery = delivery.value;
               cart.type = CartType.deliveryOut;
-              logger.d("eeeeeeee啦");
               context.pushRoute(const CartRoute());
             },
             deliveryOut: () async {
