@@ -898,7 +898,11 @@ class CartPage extends HookConsumerWidget {
                   cart.clear();
 
                   if (context.mounted) {
+                    //关闭弹窗
                     Navigator.of(context).pop();
+                    //返回调拨详情页面(保证刷新)
+                    context.router
+                        .push(WmsTransferRoute(code: transfer!.orderNo!));
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -962,7 +966,11 @@ class CartPage extends HookConsumerWidget {
                     cart.clear();
 
                     if (context.mounted) {
+                      //关闭弹窗
                       Navigator.of(context).pop();
+                      //返回出货详情页面(保证刷新)
+                      context.router
+                          .push(WmsDeliveryRoute(code: delivery!.orderNo!));
                     }
                   },
                   style: ElevatedButton.styleFrom(
