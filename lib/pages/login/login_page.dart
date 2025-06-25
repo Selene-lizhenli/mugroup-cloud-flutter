@@ -67,7 +67,6 @@ class LoginPage extends HookConsumerWidget {
     }, [enableLoginWays, loginWay.value]);
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -94,80 +93,79 @@ class LoginPage extends HookConsumerWidget {
           ),
         ],
       ),
-      body: tenant == null
-          ? Container(
-              height: MediaQuery.of(context).size.height * 0.4,
-              alignment: Alignment.center,
-              child:
-                  const Text(style: TextStyle(color: Colors.grey), "请选择租户后登录"),
-            )
-          : SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (loginWay.value != null)
-                        LoginWay(
-                          loginWay: loginWay.value!,
-                          onLogined: () async {
-                            await app.fetchUser();
-                            afterLogin();
-                          },
+      body: SafeArea(
+        child: tenant == null
+            ? Consumer(
+                builder: (context, ref, child) {
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    alignment: Alignment.center,
+                    child: const Text(
+                        style: TextStyle(color: Colors.grey), "请选择租户后登录"),
+                  );
+                },
+              )
+            : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (loginWay.value != null)
+                      LoginWay(
+                        loginWay: loginWay.value!,
+                        onLogined: () async {
+                          await app.fetchUser();
+                          afterLogin();
+                        },
+                      ),
+                    if (restEnableLoginWays.value.isNotEmpty) ...[
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: FlanDivider(
+                          child: Text(style: TextStyle(fontSize: 12), "其他登录方式"),
                         ),
-                      if (restEnableLoginWays.value.isNotEmpty) ...[
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: FlanDivider(
-                            child:
-                                Text(style: TextStyle(fontSize: 12), "其他登录方式"),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (var (index, item)
-                                in restEnableLoginWays.value.indexed) ...[
-                              if (index != 0)
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  color: Colors.grey,
-                                  height: 20,
-                                  width: 1,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var (index, item)
+                              in restEnableLoginWays.value.indexed) ...[
+                            if (index != 0)
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                color: Colors.grey,
+                                height: 20,
+                                width: 1,
+                              ),
+                            GestureDetector(
+                              onTap: () {
+                                loginWay.value = item;
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 5,
                                 ),
-                              GestureDetector(
-                                onTap: () {
-                                  loginWay.value = item;
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 5,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey,
-                                      ),
-                                      getLableByLoginWay(item),
+                                child: Center(
+                                  child: Text(
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
                                     ),
+                                    getLableByLoginWay(item),
                                   ),
                                 ),
-                              )
-                            ]
-                          ],
-                        )
-                      ]
-                    ],
-                  ),
+                              ),
+                            )
+                          ]
+                        ],
+                      )
+                    ]
+                  ],
                 ),
               ),
-            ),
+      ),
     );
   }
 }
