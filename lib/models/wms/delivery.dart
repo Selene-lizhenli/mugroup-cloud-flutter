@@ -6,7 +6,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'delivery.freezed.dart';
 part 'delivery.g.dart';
 
-enum DeliveryStatus { pending, finished }
+enum DeliveryStatus { pending, finished, shipping }
 
 int? parseInt(dynamic value) {
   if (value == null) return null;

@@ -138,6 +138,7 @@ Future<ApiResponse<List<DeliveryItem>>> getDeliveryItems(
       );
 }
 
-Future deliveryOut(int deliveryId) async {
-  return api.post("api/tenant/wms/stock/deliveries/$deliveryId/confirm");
+Future deliveryOut(int deliveryId, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/deliveries/$deliveryId/status",
+      data: data);
 }

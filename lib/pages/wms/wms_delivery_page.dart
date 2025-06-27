@@ -34,8 +34,9 @@ class WmsDeliveryPage extends HookConsumerWidget {
         useDebounced(searchKeyword.value, const Duration(milliseconds: 500));
 
     Map<DeliveryStatus, String> statusMap = {
-      DeliveryStatus.pending: "待确定",
-      DeliveryStatus.finished: "已完成",
+      DeliveryStatus.pending: "待装箱",
+      DeliveryStatus.finished: "已装箱",
+      DeliveryStatus.shipping: "已出运"
     };
 
     loadData({int page = 1, String? search}) async {
@@ -79,9 +80,41 @@ class WmsDeliveryPage extends HookConsumerWidget {
                 onPressed: () async {
                   Navigator.of(context).pop();
                   EasyLoading.show(status: '加载中...');
-                  await deliveryOut(delivery.value!.id!);
+                  await deliveryOut(delivery.value!.id!,
+                      {"status": statusMap[delivery.value?.status]});
                   delivery.value = await fetchDelivery({"order_no": code});
                   EasyLoading.showSuccess("出库成功!");
+                },
+                child: const Text("确认"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    void confirmDeliveryInBox(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("确认装箱"),
+            content: const Text("你确定要进行装箱操作吗？"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("取消"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  EasyLoading.show(status: '加载中...');
+                  //TODO
+
+                  delivery.value = await fetchDelivery({"order_no": code});
+                  EasyLoading.showSuccess("装箱成功!");
                 },
                 child: const Text("确认"),
               ),
@@ -224,6 +257,9 @@ class WmsDeliveryPage extends HookConsumerWidget {
               cart.delivery = delivery.value;
               cart.type = CartType.deliveryOut;
               context.pushRoute(const CartRoute());
+            },
+            deliveryInBox: () async {
+              confirmDeliveryInBox(context);
             },
             deliveryOut: () async {
               confirmDeliveryOut(context);
