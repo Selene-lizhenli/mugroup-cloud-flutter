@@ -1,5 +1,7 @@
+import 'package:cloud/app/app.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -14,6 +16,11 @@ class OperateBar extends HookConsumerWidget {
 
     final items = state.items;
     final cartType = state.type;
+
+    final core = app.container.read(coreProvider).value;
+    final tenant = core?.currentTenant;
+    final title = tenant?.title;
+    final showPrice = title != '硬电';
 
     Map<CartType, String> buttonText = {
       CartType.borrowOut: "借样",
@@ -55,23 +62,24 @@ class OperateBar extends HookConsumerWidget {
                             width: 1,
                           ),
                           if (cartType != CartType.quotation)
-                            Row(
-                              children: [
-                                const Text("合计: "),
-                                const Text(
-                                    style: TextStyle(
+                            if (showPrice)
+                              Row(
+                                children: [
+                                  const Text("合计: "),
+                                  const Text(
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w400),
+                                      '¥'),
+                                  Text(
+                                      style: const TextStyle(
+                                        fontSize: 20,
                                         color: Colors.red,
-                                        fontWeight: FontWeight.w400),
-                                    '¥'),
-                                Text(
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    totalPrice.toStringAsFixed(2)),
-                              ],
-                            ),
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      totalPrice.toStringAsFixed(2)),
+                                ],
+                              ),
                         ],
                       ),
                     ],

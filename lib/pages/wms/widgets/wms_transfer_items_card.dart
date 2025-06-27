@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/models/wms/transfer_item.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -10,6 +12,11 @@ class WmsTransferItemsCard extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var cover = transferItem!.product?.image?.elementAtOrNull(0)?.thumbUrl;
+
+    final core = app.container.read(coreProvider).value;
+    final tenant = core?.currentTenant;
+    final title = tenant?.title;
+    final showPrice = title != '硬电';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
@@ -120,23 +127,25 @@ class WmsTransferItemsCard extends HookConsumerWidget {
                                   ))
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  const Text(
-                                    "采购单价：",
-                                  ),
-                                  Expanded(
-                                      child: Text(
-                                    transferItem?.product?.purchaseCost != null
-                                        ? '￥${transferItem!.product!.purchaseCost}'
-                                        : '',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ))
-                                ],
-                              ),
+                              if (showPrice)
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "采购单价：",
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      transferItem?.product?.purchaseCost !=
+                                              null
+                                          ? '￥${transferItem!.product!.purchaseCost}'
+                                          : '',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ))
+                                  ],
+                                ),
                             ],
                           ),
                         ),

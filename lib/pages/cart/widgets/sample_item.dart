@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/widgets/quote_item.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/stepper.dart';
@@ -39,6 +41,12 @@ class SampleItem extends HookWidget {
     };
     final quotes = useState<List<Quote>?>([]);
     final loading = useState<bool>(false);
+
+    final core = app.container.read(coreProvider).value;
+    final tenant = core?.currentTenant;
+    final title = tenant?.title;
+    final showPrice = title != '硬电';
+
     final symbol = symbols[quotationInfo?.curreny] ?? "¥";
     if (sample.purchaseCost != null) {
       finalPrice = double.parse(sample.purchaseCost!) /
@@ -125,10 +133,16 @@ class SampleItem extends HookWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(displayPrice,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(color: Colors.red)),
+                      Expanded(
+                        child: showPrice
+                            ? Text(
+                                displayPrice,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(color: Colors.red),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                       if (cartType != CartType.quotation)
                         FlanStepper(
                           value: count,
