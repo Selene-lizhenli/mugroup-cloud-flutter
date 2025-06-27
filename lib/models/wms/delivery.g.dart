@@ -41,4 +41,5 @@ Map<String, dynamic> _$$DeliveryImplToJson(_$DeliveryImpl instance) =>
 const _$DeliveryStatusEnumMap = {
   DeliveryStatus.pending: 'pending',
   DeliveryStatus.finished: 'finished',
+  DeliveryStatus.shipping: 'shipping',
 };
