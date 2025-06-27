@@ -111,8 +111,8 @@ class WmsDeliveryPage extends HookConsumerWidget {
                 onPressed: () async {
                   Navigator.of(context).pop();
                   EasyLoading.show(status: '加载中...');
-                  //TODO
-
+                  await deliveryOut(
+                      delivery.value!.id!, {"status": 'finished'});
                   delivery.value = await fetchDelivery({"order_no": code});
                   EasyLoading.showSuccess("装箱成功!");
                 },
