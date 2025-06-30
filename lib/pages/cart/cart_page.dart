@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
@@ -6,6 +7,7 @@ import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/operate_bar.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
@@ -40,6 +42,17 @@ class CartPage extends HookConsumerWidget {
     final transfer = state.transfer;
     final delivery = state.delivery;
     final quotationInfo = state.quotationInfo;
+
+    final core = app.container.read(coreProvider).value;
+    final tenant = core?.currentTenant;
+    final title = tenant?.title;
+
+    final Map<String, List<CartSelect>> cartsMap = {
+      '硬电': [],
+      '奕派': [const CartSelect(CartType.quotation)],
+    };
+
+    final tenantCarts = cartsMap[title] ?? carts;
 
     final user = useState<User?>(null);
 
@@ -1060,7 +1073,7 @@ class CartPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: InkWell(
-          onTap: () => selectCart(carts),
+          onTap: () => selectCart(tenantCarts),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.ideographic,
@@ -1187,7 +1200,7 @@ class CartPage extends HookConsumerWidget {
                               ),
                             ),
                           ),
-                          onTap: () => selectCart(carts),
+                          onTap: () => selectCart(tenantCarts),
                         )
                       else
                         SliverPadding(
