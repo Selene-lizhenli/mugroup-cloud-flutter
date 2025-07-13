@@ -10,6 +10,7 @@ class Quotation with _$Quotation {
     int? id,
     User? user,
     double? exchange,
+    bool? showPrice,
     @JsonKey(name: 'commission_rate') double? commissionRate,
     @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
     @JsonKey(name: 'quote_at') DateTime? quoteAt,

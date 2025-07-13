@@ -13,6 +13,7 @@ _$QuotationImpl _$$QuotationImplFromJson(Map<String, dynamic> json) =>
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
       exchange: (json['exchange'] as num?)?.toDouble(),
+      showPrice: json['showPrice'] as bool?,
       commissionRate: (json['commission_rate'] as num?)?.toDouble(),
       inquiryAt: json['inquiry_at'] == null
           ? null
@@ -27,6 +28,7 @@ Map<String, dynamic> _$$QuotationImplToJson(_$QuotationImpl instance) =>
       'id': instance.id,
       'user': instance.user,
       'exchange': instance.exchange,
+      'showPrice': instance.showPrice,
       'commission_rate': instance.commissionRate,
       'inquiry_at': instance.inquiryAt?.toIso8601String(),
       'quote_at': instance.quoteAt?.toIso8601String(),

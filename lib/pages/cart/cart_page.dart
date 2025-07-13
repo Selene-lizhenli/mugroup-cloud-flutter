@@ -524,6 +524,7 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
+          bool? showPrice = quotationInfo?.showPrice;
           String? currency = quotationInfo?.curreny;
           final exchangeController = TextEditingController();
           final commissionRateController = TextEditingController();
@@ -542,7 +543,7 @@ class CartPage extends HookConsumerWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               content: SizedBox(
-                height: 270,
+                height: 360,
                 width: 300,
                 child: CustomScrollView(slivers: [
                   MultiSliver(
@@ -551,6 +552,38 @@ class CartPage extends HookConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text(
+                            "是否显示价格",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Radio<bool>(
+                                value: true,
+                                groupValue: showPrice,
+                                onChanged: (value) {
+                                  setState(() {
+                                    showPrice = value;
+                                  });
+                                },
+                              ),
+                              const Text('是', style: TextStyle(fontSize: 14)),
+                              const SizedBox(width: 20),
+                              Radio<bool>(
+                                value: false,
+                                groupValue: showPrice,
+                                onChanged: (value) {
+                                  setState(() {
+                                    showPrice = value;
+                                  });
+                                },
+                              ),
+                              const Text('否', style: TextStyle(fontSize: 14)),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
                           const Text(
                             "报价币种",
                             style: TextStyle(
@@ -680,8 +713,8 @@ class CartPage extends HookConsumerWidget {
                     double? exchange = double.tryParse(exchangeController.text);
                     double? commissionRate =
                         double.tryParse(commissionRateController.text);
-                    cart.quotationInfo =
-                        QuotationInfo(currency, exchange, commissionRate);
+                    cart.quotationInfo = QuotationInfo(
+                        showPrice, currency, exchange, commissionRate);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(

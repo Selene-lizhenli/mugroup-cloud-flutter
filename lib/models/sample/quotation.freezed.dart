@@ -23,6 +23,7 @@ mixin _$Quotation {
   int? get id => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
   double? get exchange => throw _privateConstructorUsedError;
+  bool? get showPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'commission_rate')
   double? get commissionRate => throw _privateConstructorUsedError;
   @JsonKey(name: 'inquiry_at')
@@ -45,6 +46,7 @@ abstract class $QuotationCopyWith<$Res> {
       {int? id,
       User? user,
       double? exchange,
+      bool? showPrice,
       @JsonKey(name: 'commission_rate') double? commissionRate,
       @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') DateTime? quoteAt});
@@ -68,6 +70,7 @@ class _$QuotationCopyWithImpl<$Res, $Val extends Quotation>
     Object? id = freezed,
     Object? user = freezed,
     Object? exchange = freezed,
+    Object? showPrice = freezed,
     Object? commissionRate = freezed,
     Object? inquiryAt = freezed,
     Object? quoteAt = freezed,
@@ -85,6 +88,10 @@ class _$QuotationCopyWithImpl<$Res, $Val extends Quotation>
           ? _value.exchange
           : exchange // ignore: cast_nullable_to_non_nullable
               as double?,
+      showPrice: freezed == showPrice
+          ? _value.showPrice
+          : showPrice // ignore: cast_nullable_to_non_nullable
+              as bool?,
       commissionRate: freezed == commissionRate
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
@@ -125,6 +132,7 @@ abstract class _$$QuotationImplCopyWith<$Res>
       {int? id,
       User? user,
       double? exchange,
+      bool? showPrice,
       @JsonKey(name: 'commission_rate') double? commissionRate,
       @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') DateTime? quoteAt});
@@ -147,6 +155,7 @@ class __$$QuotationImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? user = freezed,
     Object? exchange = freezed,
+    Object? showPrice = freezed,
     Object? commissionRate = freezed,
     Object? inquiryAt = freezed,
     Object? quoteAt = freezed,
@@ -164,6 +173,10 @@ class __$$QuotationImplCopyWithImpl<$Res>
           ? _value.exchange
           : exchange // ignore: cast_nullable_to_non_nullable
               as double?,
+      showPrice: freezed == showPrice
+          ? _value.showPrice
+          : showPrice // ignore: cast_nullable_to_non_nullable
+              as bool?,
       commissionRate: freezed == commissionRate
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
@@ -187,6 +200,7 @@ class _$QuotationImpl implements _Quotation {
       {this.id,
       this.user,
       this.exchange,
+      this.showPrice,
       @JsonKey(name: 'commission_rate') this.commissionRate,
       @JsonKey(name: 'inquiry_at') this.inquiryAt,
       @JsonKey(name: 'quote_at') this.quoteAt});
@@ -201,6 +215,8 @@ class _$QuotationImpl implements _Quotation {
   @override
   final double? exchange;
   @override
+  final bool? showPrice;
+  @override
   @JsonKey(name: 'commission_rate')
   final double? commissionRate;
   @override
@@ -212,7 +228,7 @@ class _$QuotationImpl implements _Quotation {
 
   @override
   String toString() {
-    return 'Quotation(id: $id, user: $user, exchange: $exchange, commissionRate: $commissionRate, inquiryAt: $inquiryAt, quoteAt: $quoteAt)';
+    return 'Quotation(id: $id, user: $user, exchange: $exchange, showPrice: $showPrice, commissionRate: $commissionRate, inquiryAt: $inquiryAt, quoteAt: $quoteAt)';
   }
 
   @override
@@ -224,6 +240,8 @@ class _$QuotationImpl implements _Quotation {
             (identical(other.user, user) || other.user == user) &&
             (identical(other.exchange, exchange) ||
                 other.exchange == exchange) &&
+            (identical(other.showPrice, showPrice) ||
+                other.showPrice == showPrice) &&
             (identical(other.commissionRate, commissionRate) ||
                 other.commissionRate == commissionRate) &&
             (identical(other.inquiryAt, inquiryAt) ||
@@ -233,8 +251,8 @@ class _$QuotationImpl implements _Quotation {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, user, exchange, commissionRate, inquiryAt, quoteAt);
+  int get hashCode => Object.hash(runtimeType, id, user, exchange, showPrice,
+      commissionRate, inquiryAt, quoteAt);
 
   @JsonKey(ignore: true)
   @override
@@ -255,6 +273,7 @@ abstract class _Quotation implements Quotation {
       {final int? id,
       final User? user,
       final double? exchange,
+      final bool? showPrice,
       @JsonKey(name: 'commission_rate') final double? commissionRate,
       @JsonKey(name: 'inquiry_at') final DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') final DateTime? quoteAt}) = _$QuotationImpl;
@@ -268,6 +287,8 @@ abstract class _Quotation implements Quotation {
   User? get user;
   @override
   double? get exchange;
+  @override
+  bool? get showPrice;
   @override
   @JsonKey(name: 'commission_rate')
   double? get commissionRate;

@@ -45,7 +45,10 @@ class SampleItem extends HookWidget {
     final core = app.container.read(coreProvider).value;
     final tenant = core?.currentTenant;
     final title = tenant?.title;
-    final showPrice = title != '硬电';
+
+    final showPrice = quotationInfo?.showPrice;
+
+    final isShowPrice = title != '硬电' && (showPrice ?? false);
 
     final symbol = symbols[quotationInfo?.curreny] ?? "¥";
     if (sample.purchaseCost != null) {
@@ -134,7 +137,7 @@ class SampleItem extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: showPrice
+                        child: isShowPrice
                             ? Text(
                                 displayPrice,
                                 overflow: TextOverflow.ellipsis,
