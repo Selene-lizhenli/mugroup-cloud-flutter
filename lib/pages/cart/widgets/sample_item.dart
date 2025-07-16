@@ -48,7 +48,11 @@ class SampleItem extends HookWidget {
 
     final showPrice = quotationInfo?.showPrice;
 
-    final isShowPrice = title != '硬电' && (showPrice ?? false);
+    var isShowPrice = title != '硬电';
+
+    if (cartType == CartType.quotation) {
+      isShowPrice = title != '硬电' && (showPrice ?? false);
+    }
 
     final symbol = symbols[quotationInfo?.curreny] ?? "¥";
     if (sample.purchaseCost != null) {
