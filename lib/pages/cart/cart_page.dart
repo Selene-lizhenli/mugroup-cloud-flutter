@@ -70,6 +70,24 @@ class CartPage extends HookConsumerWidget {
       const FlanActionSheetAction(name: "GBP")
     ];
 
+    final scrollController = ScrollController();
+    final exchangeFieldKey = GlobalKey();
+    final commissionRateFieldKey = GlobalKey();
+
+    void scrollToField(GlobalKey key) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        final context = key.currentContext;
+        if (context != null) {
+          Scrollable.ensureVisible(
+            context,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: 0.8, // 越小越靠上
+          );
+        }
+      });
+    }
+
     final header = useMemoized(() {
       if (cartType == CartType.borrowOut || cartType == CartType.inout) {
         return GestureDetector(
@@ -534,201 +552,225 @@ class CartPage extends HookConsumerWidget {
               quotationInfo?.commissionRate?.toString() ?? "";
 
           return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
+            return Dialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
-              title: const Text(
-                "报价单信息",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              content: SizedBox(
-                height: 360,
-                width: 300,
-                child: CustomScrollView(slivers: [
-                  MultiSliver(
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "是否显示价格",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Radio<bool>(
-                                value: true,
-                                groupValue: showPrice,
-                                onChanged: (value) {
-                                  setState(() {
-                                    showPrice = value;
-                                  });
-                                },
-                              ),
-                              const Text('是', style: TextStyle(fontSize: 14)),
-                              const SizedBox(width: 20),
-                              Radio<bool>(
-                                value: false,
-                                groupValue: showPrice,
-                                onChanged: (value) {
-                                  setState(() {
-                                    showPrice = value;
-                                  });
-                                },
-                              ),
-                              const Text('否', style: TextStyle(fontSize: 14)),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "报价币种",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () {
-                              showFlanActionSheet(
-                                context,
-                                description: "请选择报价币种",
-                                cancelText: "我再想想",
-                                actions: currencies,
-                                closeOnClickAction: true,
-                                onSelect: (action, index) {
-                                  currency = currencies[index].name;
-                                  setState(() {});
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      currency ?? "请选择报价币种",
-                                      style: TextStyle(
+              insetPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: LayoutBuilder(builder: (context, constraints) {
+                final maxHeight = MediaQuery.of(context).size.height * 0.85;
+
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxHeight),
+                  child: Padding(
+                    padding: MediaQuery.of(context).viewInsets,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        /// 可滚动部分
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("报价单信息",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 16),
+                                const Text("是否显示价格",
+                                    style: TextStyle(
                                         fontSize: 14,
-                                        color: currency == null
-                                            ? Colors.grey.shade600
-                                            : Colors.black87,
-                                      ),
+                                        fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Radio<bool>(
+                                      value: true,
+                                      groupValue: showPrice,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          showPrice = value;
+                                        });
+                                      },
+                                    ),
+                                    const Text('是',
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 20),
+                                    Radio<bool>(
+                                      value: false,
+                                      groupValue: showPrice,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          showPrice = value;
+                                        });
+                                      },
+                                    ),
+                                    const Text('否',
+                                        style: TextStyle(fontSize: 14)),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                const Text("报价币种",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    showFlanActionSheet(
+                                      context,
+                                      description: "请选择报价币种",
+                                      cancelText: "我再想想",
+                                      actions: currencies,
+                                      closeOnClickAction: true,
+                                      onSelect: (action, index) {
+                                        currency = currencies[index].name;
+                                        setState(() {});
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.grey.shade100,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            currency ?? "请选择报价币种",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: currency == null
+                                                  ? Colors.grey.shade600
+                                                  : Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                        const Icon(Icons.keyboard_arrow_right,
+                                            color: Colors.grey),
+                                      ],
                                     ),
                                   ),
-                                  const Icon(Icons.keyboard_arrow_right,
-                                      color: Colors.grey), // 添加右侧箭头
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "汇率",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey.shade100,
-                            ),
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                              ),
-                              controller: exchangeController,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}')),
+                                ),
+                                const SizedBox(height: 12),
+                                const Text("汇率",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 8),
+                                Container(
+                                  key: exchangeFieldKey,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade400),
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey.shade100,
+                                  ),
+                                  child: TextField(
+                                    controller: exchangeController,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}')),
+                                    ],
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    onTap: () {
+                                      scrollToField(exchangeFieldKey);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                const Text("佣金比率(%)",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 8),
+                                Container(
+                                  key: commissionRateFieldKey,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade400),
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey.shade100,
+                                  ),
+                                  child: TextField(
+                                    controller: commissionRateController,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}')),
+                                    ],
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    onTap: () {
+                                      scrollToField(commissionRateFieldKey);
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text(
-                            "佣金比率(%)",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey.shade100,
-                            ),
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
+                        ),
+
+                        /// 固定底部按钮区域
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text("取消",
+                                    style: TextStyle(color: Colors.grey)),
                               ),
-                              controller: commissionRateController,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}')),
-                              ],
-                            ),
+                              const SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  cart.quotationInfo = null;
+                                  double? exchange =
+                                      double.tryParse(exchangeController.text);
+                                  double? commissionRate = double.tryParse(
+                                      commissionRateController.text);
+                                  cart.quotationInfo = QuotationInfo(showPrice,
+                                      currency, exchange, commissionRate);
+                                  Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text("提交",
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ]),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    "取消",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    cart.quotationInfo = null;
-                    double? exchange = double.tryParse(exchangeController.text);
-                    double? commissionRate =
-                        double.tryParse(commissionRateController.text);
-                    cart.quotationInfo = QuotationInfo(
-                        showPrice, currency, exchange, commissionRate);
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                        )
+                      ],
                     ),
                   ),
-                  child: const Text(
-                    "提交",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+                );
+              }),
             );
           });
         },
