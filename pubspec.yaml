@@ -70,6 +70,7 @@ dependencies:
   flutter_datawedge: 1.2.0
   flutter_native_splash:
     ^2.4.1
+  crypto: ^3.0.6
     # path: ../flant
 
 dev_dependencies:

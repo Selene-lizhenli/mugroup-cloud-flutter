@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud/app/app.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:collection/collection.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -9,6 +12,16 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 final cookieJar = PersistCookieJar(
   storage: FileStorage(app.temporaryDirectory.path),
 );
+
+String generateSalt(String api, int time) {
+  final content = base64Encode(utf8.encode('$api$time'));
+
+  final toHash = "${content}MUGROUP";
+
+  final hash = md5.convert(utf8.encode(toHash)).toString();
+
+  return hash.toUpperCase().substring(0, 8);
+}
 
 final silentApi = Dio(
   BaseOptions(
@@ -43,6 +56,36 @@ final silentApi = Dio(
   ))
   ..interceptors.add(CookieManager(
     cookieJar,
+  ))
+  // 请求加签
+  ..interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) async {
+      final time = DateTime.now().millisecondsSinceEpoch;
+      final api = options.path;
+      final query = options.uri.query;
+
+      var body = "";
+      if (options.data is! FormData) {
+        final transformer = BackgroundTransformer();
+        body = await transformer.transformRequest(options);
+      }
+
+      final message = base64Encode(utf8.encode(body + query));
+
+      final salt = generateSalt(api, time);
+
+      final sign =
+          Hmac(sha512, utf8.encode(base64.encode(utf8.encode(api + salt))))
+              .convert(utf8.encode(message))
+              .toString()
+              .toLowerCase();
+
+      options.headers['Mu-Sign'] = '$salt.${sign.substring(0, 30)}';
+      options.headers['Mu-Sign-Version'] = '1';
+      options.headers['Mu-Sign-Time'] = time.toString();
+
+      handler.next(options);
+    },
   ));
 
 final api = silentApi.clone()
