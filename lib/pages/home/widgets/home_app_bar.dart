@@ -1,4 +1,5 @@
 import 'package:cloud/pages/home/providers/home_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -43,7 +44,6 @@ class HomeAppBar extends HookConsumerWidget {
       color: colorScheme.primary,
       child: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
@@ -71,6 +71,50 @@ class HomeAppBar extends HookConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: double.infinity, // 占满父级宽度
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: const Color(0xFFF03380),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Expanded(
+                    child: Text("12"),
+                  ),
+                  const Icon(
+                    CupertinoIcons.camera,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                    color: Colors.grey,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 0.8,
+                    height: 10,
+                  ),
+                  const Text(
+                    "搜索",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFF03380),
+                    ),
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
