@@ -1,4 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/home/providers/home_provider.dart';
+import 'package:cloud/pages/home/views/product_view.dart';
+import 'package:cloud/pages/home/views/supply_view.dart';
+import 'package:cloud/pages/home/widgets/home_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -8,20 +12,19 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(5.0),
+    final home = ref.watch(homeProvider);
+
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            PageView(
+              controller: home.pageController,
+              allowImplicitScrolling: false,
+              children: const [ProductView(), SupplyView()],
             ),
-          ),
-          child: const Text(
-            "敬请期待",
-            style: TextStyle(color: Colors.grey),
-          ),
+            const HomeAppBar(),
+          ],
         ),
       ),
     );
