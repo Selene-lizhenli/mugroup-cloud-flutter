@@ -8,10 +8,13 @@ part 'home_provider.g.dart';
 class Home extends _$Home {
   @override
   HomeState build() {
-    return HomeState(pageController: PageController());
+    return HomeState(
+      currentPage: 0,
+      pageController: PageController(),
+    );
   }
 
-  void sdf() {
-    state.pageController;
+  void setCurrentPage(int page) {
+    state = state.copyWith(currentPage: page);
   }
 }

@@ -16,6 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$HomeState {
+  int get currentPage => throw _privateConstructorUsedError;
   PageController get pageController => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -28,7 +29,7 @@ abstract class $HomeStateCopyWith<$Res> {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
       _$HomeStateCopyWithImpl<$Res, HomeState>;
   @useResult
-  $Res call({PageController pageController});
+  $Res call({int currentPage, PageController pageController});
 }
 
 /// @nodoc
@@ -44,9 +45,14 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? currentPage = null,
     Object? pageController = null,
   }) {
     return _then(_value.copyWith(
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
       pageController: null == pageController
           ? _value.pageController
           : pageController // ignore: cast_nullable_to_non_nullable
@@ -63,7 +69,7 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       __$$HomeStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({PageController pageController});
+  $Res call({int currentPage, PageController pageController});
 }
 
 /// @nodoc
@@ -77,9 +83,14 @@ class __$$HomeStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? currentPage = null,
     Object? pageController = null,
   }) {
     return _then(_$HomeStateImpl(
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
       pageController: null == pageController
           ? _value.pageController
           : pageController // ignore: cast_nullable_to_non_nullable
@@ -91,14 +102,17 @@ class __$$HomeStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$HomeStateImpl implements _HomeState {
-  const _$HomeStateImpl({required this.pageController});
+  const _$HomeStateImpl(
+      {required this.currentPage, required this.pageController});
 
+  @override
+  final int currentPage;
   @override
   final PageController pageController;
 
   @override
   String toString() {
-    return 'HomeState(pageController: $pageController)';
+    return 'HomeState(currentPage: $currentPage, pageController: $pageController)';
   }
 
   @override
@@ -106,12 +120,14 @@ class _$HomeStateImpl implements _HomeState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$HomeStateImpl &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
             (identical(other.pageController, pageController) ||
                 other.pageController == pageController));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, pageController);
+  int get hashCode => Object.hash(runtimeType, currentPage, pageController);
 
   @JsonKey(ignore: true)
   @override
@@ -121,9 +137,12 @@ class _$HomeStateImpl implements _HomeState {
 }
 
 abstract class _HomeState implements HomeState {
-  const factory _HomeState({required final PageController pageController}) =
-      _$HomeStateImpl;
+  const factory _HomeState(
+      {required final int currentPage,
+      required final PageController pageController}) = _$HomeStateImpl;
 
+  @override
+  int get currentPage;
   @override
   PageController get pageController;
   @override

@@ -8,24 +8,29 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
 
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            PageView(
-              controller: home.pageController,
-              allowImplicitScrolling: false,
-              children: const [ProductView(), SupplyView()],
-            ),
-            const HomeAppBar(),
-          ],
-        ),
+    return Scaffold(
+      // backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          PageView(
+            controller: home.pageController,
+            onPageChanged: (page) {
+              homeNotifier.setCurrentPage(page);
+            },
+            allowImplicitScrolling: false,
+            children: const [ProductView(), SupplyView()],
+          ),
+          const HomeAppBar(),
+        ],
       ),
     );
   }

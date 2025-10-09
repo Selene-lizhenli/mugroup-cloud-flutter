@@ -6,6 +6,7 @@ part 'home_state.freezed.dart';
 @freezed
 abstract class HomeState with _$HomeState {
   const factory HomeState({
+    required int currentPage,
     required PageController pageController,
   }) = _HomeState;
 }
