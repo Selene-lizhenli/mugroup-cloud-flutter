@@ -190,7 +190,7 @@ class __$$SampleImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
+class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   const _$SampleImpl(
       {this.id,
       this.barcode,
@@ -200,7 +200,8 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
       @JsonKey(name: 'page_no') this.pageNo,
       this.spec,
       final List<Media>? image})
-      : _image = image;
+      : _image = image,
+        super._();
 
   factory _$SampleImpl.fromJson(Map<String, dynamic> json) =>
       _$$SampleImplFromJson(json);
@@ -289,7 +290,7 @@ class _$SampleImpl with DiagnosticableTreeMixin implements _Sample {
   }
 }
 
-abstract class _Sample implements Sample {
+abstract class _Sample extends Sample {
   const factory _Sample(
       {final int? id,
       final String? barcode,
@@ -299,6 +300,7 @@ abstract class _Sample implements Sample {
       @JsonKey(name: 'page_no') final String? pageNo,
       final String? spec,
       final List<Media>? image}) = _$SampleImpl;
+  const _Sample._() : super._();
 
   factory _Sample.fromJson(Map<String, dynamic> json) = _$SampleImpl.fromJson;
 

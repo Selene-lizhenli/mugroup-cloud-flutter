@@ -7,6 +7,8 @@ part 'sample.g.dart';
 
 @freezed
 abstract class Sample with _$Sample {
+  const Sample._();
+
   const factory Sample({
     int? id,
     String? barcode,
@@ -19,4 +21,9 @@ abstract class Sample with _$Sample {
   }) = _Sample;
 
   factory Sample.fromJson(Map<String, Object?> json) => _$SampleFromJson(json);
+
+  String? get cover {
+    return image?.elementAtOrNull(0)?.thumbUrl ??
+        image?.elementAtOrNull(0)?.url;
+  }
 }

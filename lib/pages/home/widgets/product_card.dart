@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key});
+  final Sample sample;
+
+  const ProductCard({super.key, required this.sample});
 
   @override
   Widget build(BuildContext context) {
@@ -11,28 +14,36 @@ class ProductCard extends StatelessWidget {
       child: Container(
         color: Colors.white,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: CachedNetworkImage(
-                width: double.infinity,
-                fit: BoxFit.cover,
-                imageUrl:
-                    "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/352796/84c3f40a2e924fb0836ecd2b03424744_origin.jpg",
-              ),
-            ),
+            sample.cover == null
+                ? CachedNetworkImage(
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    imageUrl:
+                        "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/352796/84c3f40a2e924fb0836ecd2b03424744_origin.jpg",
+                  )
+                : CachedNetworkImage(
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                    imageUrl: sample.cover!,
+                    placeholder: (context, url) => AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(),
+                    ),
+                  ),
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "24PC 473ML 16oz带杯盖杯套骷髅头+蝴蝶结图案一次性纸杯套装",
-                    style: TextStyle(
+                  Text(
+                    sample.nameCn!,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                   ),
                   const SizedBox(
                     height: 5,
