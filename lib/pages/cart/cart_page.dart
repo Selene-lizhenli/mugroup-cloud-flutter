@@ -43,6 +43,8 @@ class CartPage extends HookConsumerWidget {
     final delivery = state.delivery;
     final quotationInfo = state.quotationInfo;
 
+    final borrower = useState<User?>(null);
+
     final core = app.container.read(coreProvider).value;
     final tenant = core?.currentTenant;
     final title = tenant?.title;
@@ -111,23 +113,51 @@ class CartPage extends HookConsumerWidget {
       }
 
       if (cartType == CartType.borrowIn) {
-        return GestureDetector(
-          onTap: () async {
-            final selectedBorrow =
-                await context.router.push<Borrow>(const SelectWmsBorrowRoute());
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () async {
+                final selectedBorrow = await context.router
+                    .push<Borrow>(const SelectWmsBorrowRoute());
 
-            cart.borrow = selectedBorrow;
-          },
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(borrow == null ? "请选择借样单" : borrow.orderNo ?? "未设置借样单号"),
-                const Icon(Icons.chevron_right)
-              ],
+                cart.borrow = selectedBorrow;
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(borrow == null
+                        ? "请选择借样单"
+                        : borrow.orderNo ?? "未设置借样单号"),
+                    const Icon(Icons.chevron_right)
+                  ],
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () async {
+                final selectedUser =
+                    await context.router.push<User>(const SelectUserRoute());
+
+                borrower.value = selectedUser;
+                logger.d(borrower.value?.name);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(borrower.value == null
+                        ? "请选择借样人"
+                        : "${borrower.value!.name}(${borrower.value!.jobNumber})"),
+                    const Icon(Icons.chevron_right)
+                  ],
+                ),
+              ),
+            )
+          ],
         );
       }
 
@@ -167,7 +197,7 @@ class CartPage extends HookConsumerWidget {
       return GestureDetector(
         child: const SizedBox(),
       );
-    }, [cartType, warehouse, borrow, transfer]);
+    }, [cartType, warehouse, borrow, transfer, borrower.value]);
 
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
@@ -1122,13 +1152,27 @@ class CartPage extends HookConsumerWidget {
 
       // 还样
       if (cartType == CartType.borrowIn) {
-        if (borrow == null) {
-          EasyLoading.showInfo("请先选择借样单!");
+        if (borrow == null && borrower.value == null) {
+          EasyLoading.showInfo("请先选择借样单!或请先选择借样人!");
           return;
         }
+
         EasyLoading.show(status: '加载中...');
-        final data = {"return_items": productData};
-        await borrowIn(borrow.id!, data);
+        if (borrow != null) {
+          final data = {
+            "return_items": productData,
+          };
+          await borrowIn(borrow.id!, data);
+        }
+
+        if (borrower.value != null) {
+          final data = {
+            "borrower_user_id": borrower.value!.id!,
+            "return_items": productData,
+          };
+          //TODO
+        }
+
         EasyLoading.showSuccess("还样成功!");
         cart.clear();
       }
