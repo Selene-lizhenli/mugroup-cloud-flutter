@@ -44,6 +44,10 @@ Future borrowIn(int borrowId, Map<String, dynamic>? data) async {
       data: data);
 }
 
+Future borrowInByUser(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/wms/stock/borrows/borrow_in", data: data);
+}
+
 Future<Transfer?> fetchTransferByOrederNo(
   String orderNo,
 ) async {

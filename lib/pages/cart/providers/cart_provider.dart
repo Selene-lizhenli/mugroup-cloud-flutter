@@ -193,4 +193,19 @@ class Cart extends _$Cart {
     state = state.copyWith(items: [...items]);
     save();
   }
+
+  void setSapleByProductId(List<Map<String, dynamic>> items) {
+    final updateMap = {
+      for (final item in items)
+        item['product_id'] as int: item['inout_qty'] as int,
+    };
+
+    final newItems = state.items
+        .where((item) => updateMap.containsKey(item.sample.id))
+        .map((item) => item.copyWith(count: updateMap[item.sample.id]!))
+        .toList();
+
+    state = state.copyWith(items: newItems);
+    save();
+  }
 }

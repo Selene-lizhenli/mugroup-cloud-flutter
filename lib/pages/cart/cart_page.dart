@@ -1170,11 +1170,14 @@ class CartPage extends HookConsumerWidget {
             "borrower_user_id": borrower.value!.id!,
             "return_items": productData,
           };
-          //TODO
+          final resp = await borrowInByUser(data);
+
+          //根据返回的数据更新购物车
+          cart.setSapleByProductId(
+              (resp.data["abnormal"] as List).cast<Map<String, dynamic>>());
         }
 
         EasyLoading.showSuccess("还样成功!");
-        cart.clear();
       }
 
       //盘点
