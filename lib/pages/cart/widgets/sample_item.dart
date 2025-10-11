@@ -150,17 +150,16 @@ class SampleItem extends HookWidget {
                               )
                             : const SizedBox.shrink(),
                       ),
-                      if (cartType != CartType.quotation)
-                        FlanStepper(
-                          value: count,
-                          onChange: (v, _) {
-                            if (v is int) {
-                              onChange?.call(v);
-                            } else {
-                              onChange?.call(int.parse(v.toString()));
-                            }
-                          },
-                        ),
+                      FlanStepper(
+                        value: count,
+                        onChange: (v, _) {
+                          if (v is int) {
+                            onChange?.call(v);
+                          } else {
+                            onChange?.call(int.parse(v.toString()));
+                          }
+                        },
+                      ),
                     ],
                   )
                 ],

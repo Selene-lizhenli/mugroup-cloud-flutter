@@ -511,6 +511,7 @@ class CartPage extends HookConsumerWidget {
                         .map((item) => {
                               "sample_id": item.sample.id,
                               "price": item.price,
+                              "qty": item.count
                             })
                         .toList(),
                     "user_id": user.value?.id,
