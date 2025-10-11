@@ -36,6 +36,9 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: WmsTransferRoute.page, path: "/wms/transfer/:id"),
       AutoRoute(page: WmsDeliveryRoute.page, path: "/wms/delivery/:id"),
       AutoRoute(
+          page: ShowroomQuotationsRoute.page,
+          path: "/showroom/quotations/:quoteNo"),
+      AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
       // selectors

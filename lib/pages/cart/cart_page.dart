@@ -1241,6 +1241,20 @@ class CartPage extends HookConsumerWidget {
                           }
                         }
                       }
+                      if (true) {
+                        // 处理报价单
+                        RegExp quotationExp =
+                            RegExp(r'showroom/quotations/(.*)');
+                        final matchQuotation = quotationExp.firstMatch(item);
+                        if (matchQuotation != null) {
+                          final quoteNo = matchQuotation.group(1)!;
+                          if (context.mounted) {
+                            context.router.push(
+                                ShowroomQuotationsRoute(quoteNo: quoteNo));
+                            return;
+                          }
+                        }
+                      }
 
                       EasyLoading.showError("不支持该条码!");
                       return;
