@@ -1,0 +1,19 @@
+import 'dart:io';
+
+import 'package:cloud/http/api.dart';
+import 'package:cloud/models/sample/media.dart';
+import 'package:dio/dio.dart';
+
+Future<TemporaryMedia> upload(
+    {required File file, required String fileName}) async {
+  final formData = FormData.fromMap({
+    "file": await MultipartFile.fromFile(
+      file.path,
+      filename: fileName,
+    ),
+  });
+
+  return api
+      .post("api/upload", data: formData)
+      .then((res) => TemporaryMedia.fromJson(res.data));
+}

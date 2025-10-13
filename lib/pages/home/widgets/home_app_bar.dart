@@ -1,5 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
+import 'package:cloud/services/media.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -135,7 +136,15 @@ class HomeAppBar extends HookConsumerWidget {
                       final AssetEntity? entity =
                           await CameraPicker.pickFromCamera(context);
 
-                      logger.d(entity);
+                      if (entity == null) {
+                        return;
+                      }
+
+                      final file = await entity.file;
+
+                      final temporaryMedia =
+                          await upload(file: file!, fileName: entity.title!);
+                      logger.d(temporaryMedia);
                     },
                   ),
                 ),
