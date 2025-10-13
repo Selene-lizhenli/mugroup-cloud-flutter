@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/delivery.dart';
@@ -206,6 +207,30 @@ class Cart extends _$Cart {
         .toList();
 
     state = state.copyWith(items: newItems);
+    save();
+  }
+
+  void setSampleByQuotationSamples(List<QuotationSample> quotationSamples) {
+    final currentItems = List<CartItem>.from(state.items);
+
+    for (final qs in quotationSamples) {
+      final sample = qs.showroomSample;
+      final qty = qs.qty ?? 1; // 默认数量为 1
+
+      if (sample == null) continue; // 跳过无效数据
+
+      final index =
+          currentItems.indexWhere((item) => item.sample.id == sample.id);
+
+      if (index >= 0) {
+        final existing = currentItems[index];
+        currentItems[index] = existing.copyWith(count: existing.count + qty);
+      } else {
+        currentItems.insert(0, CartItem(sample: sample, count: qty));
+      }
+    }
+
+    state = state.copyWith(items: currentItems);
     save();
   }
 }

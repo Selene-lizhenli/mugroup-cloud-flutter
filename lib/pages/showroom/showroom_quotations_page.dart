@@ -1,8 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_quotations_items_card.dart';
+import 'package:cloud/pages/showroom/widgets/showroom_quotations_operate_bar.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_quotations_text_card.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,6 +19,7 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cart = ref.read(cartProvider.notifier);
     final scrollController = useScrollController();
     final searchKeyword = useState<String>('');
     final quotation = useState<Quotation?>(null);
@@ -29,9 +33,9 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
 
       if (data?.id != null) {
         final res = await getQuotationSamples(
-            queryParameters: {"quotation_id": data!.id!});
+            queryParameters: {"quotation_id": data!.id!, 'showAll': "1"});
         quotationSampleItems.value = res.data;
-      } else {
+      } else { 
         quotationSampleItems.value = [];
       }
     }
@@ -53,6 +57,61 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
             code.contains(keyword);
       }).toList();
     }, [searchKeyword.value, quotationSampleItems.value]);
+
+    void addCartDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            title: const Text(
+              "确定添加进购物车",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "该操作为追加，在保留原有购物车数据上添加",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  cart.setSampleByQuotationSamples(quotationSampleItems.value);
+                  context.pushRoute(const CartRoute());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "提交",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -155,7 +214,12 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                 ),
               ],
             ),
-          )
+          ),
+          ShowroomQuotationsOperateBar(
+            addCart: () {
+              addCartDialog(context);
+            },
+          ),
         ],
       ),
     );
