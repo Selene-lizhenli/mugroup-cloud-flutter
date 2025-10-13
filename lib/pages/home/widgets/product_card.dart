@@ -17,11 +17,10 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             sample.cover == null
-                ? CachedNetworkImage(
+                ? Image.asset(
+                    'assets/noImage.png',
                     width: double.infinity,
-                    fit: BoxFit.cover,
-                    imageUrl:
-                        "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/352796/84c3f40a2e924fb0836ecd2b03424744_origin.jpg",
+                    fit: BoxFit.contain,
                   )
                 : CachedNetworkImage(
                     width: double.infinity,
