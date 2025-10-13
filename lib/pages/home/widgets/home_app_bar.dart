@@ -2,6 +2,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
@@ -35,10 +36,19 @@ class HomeAppBarItem extends StatelessWidget {
 }
 
 class HomeAppBar extends HookConsumerWidget {
-  const HomeAppBar({super.key});
+  final TextEditingController controller;
+  final void Function(String search)? onSearchText;
+
+  const HomeAppBar({
+    super.key,
+    required this.controller,
+    this.onSearchText,
+  });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+    final focusNode = useFocusNode();
+
     final colorScheme = Theme.of(context).colorScheme;
     final statusBarHeight = MediaQuery.of(context).padding.top;
 
@@ -96,8 +106,22 @@ class HomeAppBar extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Expanded(
-                  child: Text("12"),
+                Expanded(
+                  child: TextField(
+                    autofocus: false,
+                    controller: controller,
+                    onTapOutside: (event) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    focusNode: focusNode,
+                    decoration: const InputDecoration.collapsed(
+                      hintText: '',
+                    ),
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (value) {
+                      onSearchText?.call(value);
+                    },
+                  ),
                 ),
                 SizedBox(
                   width: 30,
@@ -121,11 +145,16 @@ class HomeAppBar extends HookConsumerWidget {
                   width: 0.8,
                   height: 20,
                 ),
-                const Text(
-                  "搜索",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFFF03380),
+                GestureDetector(
+                  onTap: () {
+                    onSearchText?.call(controller.text);
+                  },
+                  child: const Text(
+                    "搜索",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFFF03380),
+                    ),
                   ),
                 )
               ],

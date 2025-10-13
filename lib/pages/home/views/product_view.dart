@@ -1,4 +1,6 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/home/events/search_event.dart';
+import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/home_app_bar.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/services/sample.dart';
@@ -12,17 +14,29 @@ class ProductView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+
+    final home = ref.watch(homeProvider);
+    final search = useState(home.search);
     final samples = useState<List<Sample>>(<Sample>[]);
 
-    init() async {
-      final resp = await getSamples();
+    init(String? search) async {
+      final resp = await getSamples(queryParameters: {
+        "search": search,
+      });
       samples.value = resp.data;
     }
 
     useEffect(() {
-      init();
+      init(search.value);
 
-      return () {};
+      final searchEventSubscription =
+          home.bus.on<SearchEvent>().listen((SearchEvent event) {
+        init(event.search);
+      });
+
+      return () {
+        searchEventSubscription.cancel();
+      };
     }, []);
 
     return SingleChildScrollView(

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/views/product_view.dart';
 import 'package:cloud/pages/home/views/supply_view.dart';
@@ -29,7 +30,14 @@ class HomePage extends HookConsumerWidget {
             allowImplicitScrolling: false,
             children: const [ProductView(), SupplyView()],
           ),
-          const HomeAppBar(),
+          HomeAppBar(
+            controller: home.searchTextController,
+            onSearchText: (search) {
+              homeNotifier.setSearch(search);
+
+              home.bus.dispatch(SearchEvent(search));
+            },
+          ),
         ],
       ),
     );

@@ -16,8 +16,12 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$HomeState {
+  RxBus get bus => throw _privateConstructorUsedError;
   int get currentPage => throw _privateConstructorUsedError;
   PageController get pageController => throw _privateConstructorUsedError;
+  TextEditingController get searchTextController =>
+      throw _privateConstructorUsedError;
+  String? get search => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -29,7 +33,12 @@ abstract class $HomeStateCopyWith<$Res> {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
       _$HomeStateCopyWithImpl<$Res, HomeState>;
   @useResult
-  $Res call({int currentPage, PageController pageController});
+  $Res call(
+      {RxBus bus,
+      int currentPage,
+      PageController pageController,
+      TextEditingController searchTextController,
+      String? search});
 }
 
 /// @nodoc
@@ -45,10 +54,17 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? bus = null,
     Object? currentPage = null,
     Object? pageController = null,
+    Object? searchTextController = null,
+    Object? search = freezed,
   }) {
     return _then(_value.copyWith(
+      bus: null == bus
+          ? _value.bus
+          : bus // ignore: cast_nullable_to_non_nullable
+              as RxBus,
       currentPage: null == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
@@ -57,6 +73,14 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.pageController
           : pageController // ignore: cast_nullable_to_non_nullable
               as PageController,
+      searchTextController: null == searchTextController
+          ? _value.searchTextController
+          : searchTextController // ignore: cast_nullable_to_non_nullable
+              as TextEditingController,
+      search: freezed == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -69,7 +93,12 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       __$$HomeStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int currentPage, PageController pageController});
+  $Res call(
+      {RxBus bus,
+      int currentPage,
+      PageController pageController,
+      TextEditingController searchTextController,
+      String? search});
 }
 
 /// @nodoc
@@ -83,10 +112,17 @@ class __$$HomeStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? bus = null,
     Object? currentPage = null,
     Object? pageController = null,
+    Object? searchTextController = null,
+    Object? search = freezed,
   }) {
     return _then(_$HomeStateImpl(
+      bus: null == bus
+          ? _value.bus
+          : bus // ignore: cast_nullable_to_non_nullable
+              as RxBus,
       currentPage: null == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
@@ -95,6 +131,14 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.pageController
           : pageController // ignore: cast_nullable_to_non_nullable
               as PageController,
+      searchTextController: null == searchTextController
+          ? _value.searchTextController
+          : searchTextController // ignore: cast_nullable_to_non_nullable
+              as TextEditingController,
+      search: freezed == search
+          ? _value.search
+          : search // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -103,16 +147,26 @@ class __$$HomeStateImplCopyWithImpl<$Res>
 
 class _$HomeStateImpl implements _HomeState {
   const _$HomeStateImpl(
-      {required this.currentPage, required this.pageController});
+      {required this.bus,
+      required this.currentPage,
+      required this.pageController,
+      required this.searchTextController,
+      this.search});
 
+  @override
+  final RxBus bus;
   @override
   final int currentPage;
   @override
   final PageController pageController;
+  @override
+  final TextEditingController searchTextController;
+  @override
+  final String? search;
 
   @override
   String toString() {
-    return 'HomeState(currentPage: $currentPage, pageController: $pageController)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search)';
   }
 
   @override
@@ -120,14 +174,19 @@ class _$HomeStateImpl implements _HomeState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$HomeStateImpl &&
+            (identical(other.bus, bus) || other.bus == bus) &&
             (identical(other.currentPage, currentPage) ||
                 other.currentPage == currentPage) &&
             (identical(other.pageController, pageController) ||
-                other.pageController == pageController));
+                other.pageController == pageController) &&
+            (identical(other.searchTextController, searchTextController) ||
+                other.searchTextController == searchTextController) &&
+            (identical(other.search, search) || other.search == search));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentPage, pageController);
+  int get hashCode => Object.hash(runtimeType, bus, currentPage, pageController,
+      searchTextController, search);
 
   @JsonKey(ignore: true)
   @override
@@ -138,13 +197,22 @@ class _$HomeStateImpl implements _HomeState {
 
 abstract class _HomeState implements HomeState {
   const factory _HomeState(
-      {required final int currentPage,
-      required final PageController pageController}) = _$HomeStateImpl;
+      {required final RxBus bus,
+      required final int currentPage,
+      required final PageController pageController,
+      required final TextEditingController searchTextController,
+      final String? search}) = _$HomeStateImpl;
 
+  @override
+  RxBus get bus;
   @override
   int get currentPage;
   @override
   PageController get pageController;
+  @override
+  TextEditingController get searchTextController;
+  @override
+  String? get search;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>
