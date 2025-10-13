@@ -1,6 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/sample/quotation.dart';
+import 'package:cloud/models/sample/quotation_sample.dart';
+import 'package:cloud/pages/showroom/widgets/showroom_quotations_items_card.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_quotations_text_card.dart';
-import 'package:easy_refresh/easy_refresh.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,6 +18,27 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = useScrollController();
     final searchKeyword = useState<String>('');
+    final quotation = useState<Quotation?>(null);
+    final quotationId = useState<int?>(null);
+    final quotationSampleItems = useState<List<QuotationSample>>([]);
+
+    loadQuotation(String quoteNo) async {
+      final data = await getShowroomQuotationByQuoteNo(quoteNo);
+      quotation.value = data;
+      quotationId.value = data?.id;
+
+      if (data?.id != null) {
+        final res = await getQuotationSamples(
+            queryParameters: {"quotation_id": data!.id!});
+        quotationSampleItems.value = res.data;
+      } else {
+        quotationSampleItems.value = [];
+      }
+    }
+
+    useEffect(() {
+      loadQuotation(quoteNo);
+    }, [quoteNo]);
 
     return Scaffold(
       appBar: AppBar(
@@ -32,8 +56,6 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
       body: Column(
         children: [
           Expanded(
-              child: EasyRefresh(
-            refreshOnStart: true,
             child: CustomScrollView(
               controller: scrollController,
               slivers: [
@@ -57,6 +79,20 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                               ),
                             ],
                           ),
+                        ),
+                        ShowroomQuotatiosTextCard(
+                          title: "业务部门",
+                          lable: Text(
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                              quotation.value?.user?.department?.name ?? ''),
+                        ),
+                        ShowroomQuotatiosTextCard(
+                          title: "外销员",
+                          lable: Text(
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                              quotation.value?.user?.name ?? ""),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -98,14 +134,15 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return const Text('产品数据');
+                      return ShowroomQuotationItemsCard(
+                          quotationSampleItems.value[index]);
                     },
-                    childCount: 1,
+                    childCount: quotationSampleItems.value.length,
                   ),
                 ),
               ],
             ),
-          ))
+          )
         ],
       ),
     );
