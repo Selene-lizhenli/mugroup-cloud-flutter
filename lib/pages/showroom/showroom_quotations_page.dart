@@ -40,6 +40,20 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
       loadQuotation(quoteNo);
     }, [quoteNo]);
 
+    // 计算筛选后的结果
+    final filteredItems = useMemoized(() {
+      final keyword = searchKeyword.value.trim().toLowerCase();
+      if (keyword.isEmpty) return quotationSampleItems.value;
+      return quotationSampleItems.value.where((item) {
+        final name = item.showroomSample?.nameCn?.toLowerCase() ?? '';
+        final barcode = item.showroomSample?.barcode?.toLowerCase() ?? '';
+        final code = item.showroomSample?.productNo?.toLowerCase() ?? '';
+        return name.contains(keyword) ||
+            barcode.contains(keyword) ||
+            code.contains(keyword);
+      }).toList();
+    }, [searchKeyword.value, quotationSampleItems.value]);
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -134,10 +148,9 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return ShowroomQuotationItemsCard(
-                          quotationSampleItems.value[index]);
+                      return ShowroomQuotationItemsCard(filteredItems[index]);
                     },
-                    childCount: quotationSampleItems.value.length,
+                    childCount: filteredItems.length,
                   ),
                 ),
               ],
