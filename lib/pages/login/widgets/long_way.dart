@@ -56,7 +56,6 @@ class LoginWay extends HookConsumerWidget {
       await innerFetchQrcode();
 
       qrcodeTimer.value = Timer.periodic(const Duration(seconds: 1), (_) async {
-        logger.d("定时");
         if (qrcode.value == null) {
           return;
         }

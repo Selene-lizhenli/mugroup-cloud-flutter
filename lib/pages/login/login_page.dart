@@ -8,6 +8,7 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_wxwork/flutter_wxwork.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -110,7 +111,6 @@ class LoginPage extends HookConsumerWidget {
                 physics: const ClampingScrollPhysics(),
                 slivers: [
                   SliverFillRemaining(
-                    hasScrollBody: false,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -168,20 +168,68 @@ class LoginPage extends HookConsumerWidget {
                           )
                         ],
                         const Spacer(),
-                        TextButton(
-                            onPressed: () async {
-                              final wxwork = FlutterWxwork();
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const FlanDivider(
+                                child: Text('其他登录方式'),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  final wxwork = FlutterWxwork();
 
-                              await wxwork.register(
-                                scheme: 'wwauth75f2f662edcca130000002',
-                                corpId: 'ww75f2f662edcca130',
-                                agentId: '1000002',
-                              );
+                                  await wxwork.register(
+                                    scheme: 'wwauth75f2f662edcca130000002',
+                                    corpId: 'ww75f2f662edcca130',
+                                    agentId: '1000002',
+                                  );
 
-                              final result = await wxwork.auth();
-                              logger.d(result);
-                            },
-                            child: const Text("企业微信登录"))
+                                  final result = await wxwork.auth();
+                                  logger.d(result);
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(0xFFEBEDF0),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/wxwork.svg',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const DefaultTextStyle(
+                          style: TextStyle(
+                            color: Color(0xFF969799),
+                            fontSize: 12,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("网页版: https://cloud.mugroup.com"),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text("客服: 669082"),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
                       ],
                     ),
                   ),
