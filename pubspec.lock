@@ -673,6 +673,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_wxwork:
+    dependency: "direct main"
+    description:
+      name: flutter_wxwork
+      sha256: df8c14ee6e72e1bad5cf25178a584b95b37d8e1296a1a914ca1b823104fbb1f8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.11"
   freezed:
     dependency: "direct dev"
     description:

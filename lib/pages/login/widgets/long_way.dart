@@ -228,12 +228,16 @@ class LoginWay extends HookConsumerWidget {
                   else if (qrcode.value != null)
                     Column(
                       children: [
-                        QrImageView(
-                          data:
-                              '${tenant.baseUrl}login/qrcode/${qrcode.value!.id}',
-                          version: QrVersions.auto,
-                          size: 220.0,
-                          backgroundColor: Colors.white,
+                        SizedBox(
+                          width: 220,
+                          height: 220,
+                          child: QrImageView(
+                            data:
+                                '${tenant.baseUrl}login/qrcode/${qrcode.value!.id}',
+                            version: QrVersions.auto,
+                            size: 220.0,
+                            backgroundColor: Colors.white,
+                          ),
                         ),
                         const Text(
                           "请使用企业微信扫码登录",
