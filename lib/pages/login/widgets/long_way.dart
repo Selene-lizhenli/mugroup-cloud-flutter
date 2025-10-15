@@ -111,8 +111,6 @@ class LoginWay extends HookConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    logger.d("${tenant.baseUrl}login/qrcode/${qrcode.value?.id}");
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),

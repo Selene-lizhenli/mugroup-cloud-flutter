@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -181,13 +182,24 @@ class LoginPage extends HookConsumerWidget {
                                   final wxwork = FlutterWxwork();
 
                                   await wxwork.register(
-                                    scheme: 'wwauth75f2f662edcca130000002',
-                                    corpId: 'ww75f2f662edcca130',
-                                    agentId: '1000002',
+                                    scheme: 'wwauth9306502d79084189000089',
+                                    corpId: 'ww9306502d79084189',
+                                    agentId: '1000089',
                                   );
 
                                   final result = await wxwork.auth();
-                                  logger.d(result);
+                                  if (result.errCode != '0') {
+                                    return;
+                                  }
+
+                                  final code = result.code!;
+
+                                  await api.post(
+                                      'api/tenant/wechat/login',
+                                      data: {"code": code});
+
+                                  await app.fetchUser();
+                                  afterLogin();
                                 },
                                 child: Container(
                                   width: 40,
