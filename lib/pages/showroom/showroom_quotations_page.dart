@@ -85,7 +85,21 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                   if (context.mounted) {
                     Navigator.of(context).pop();
                   }
-                  cart.setSampleByQuotationSamples(quotationSampleItems.value);
+                  for (final qs in quotationSampleItems.value) {
+                    final sample = qs.showroomSample;
+                    final qty = qs.qty ?? 1; // 默认数量为 1
+
+                    if (sample == null) continue; // 跳过无效数据
+
+                    final hadSample = cart.getItemBySample(sample);
+
+                    if (hadSample != null) {
+                      cart.setSample(sample, hadSample.count + qty);
+                    } else {
+                      cart.setSample(sample, qty);
+                    }
+                  }
+
                   context.pushRoute(const CartRoute());
                 },
                 style: ElevatedButton.styleFrom(
