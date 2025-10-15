@@ -14,6 +14,192 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+TenantWxwork _$TenantWxworkFromJson(Map<String, dynamic> json) {
+  return _TenantWxwork.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TenantWxwork {
+  @JsonKey(name: 'agent_id')
+  String? get agentId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'corp_id')
+  String? get corpId => throw _privateConstructorUsedError;
+  String? get scheme => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TenantWxworkCopyWith<TenantWxwork> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TenantWxworkCopyWith<$Res> {
+  factory $TenantWxworkCopyWith(
+          TenantWxwork value, $Res Function(TenantWxwork) then) =
+      _$TenantWxworkCopyWithImpl<$Res, TenantWxwork>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'agent_id') String? agentId,
+      @JsonKey(name: 'corp_id') String? corpId,
+      String? scheme});
+}
+
+/// @nodoc
+class _$TenantWxworkCopyWithImpl<$Res, $Val extends TenantWxwork>
+    implements $TenantWxworkCopyWith<$Res> {
+  _$TenantWxworkCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? agentId = freezed,
+    Object? corpId = freezed,
+    Object? scheme = freezed,
+  }) {
+    return _then(_value.copyWith(
+      agentId: freezed == agentId
+          ? _value.agentId
+          : agentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      corpId: freezed == corpId
+          ? _value.corpId
+          : corpId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      scheme: freezed == scheme
+          ? _value.scheme
+          : scheme // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TenantWxworkImplCopyWith<$Res>
+    implements $TenantWxworkCopyWith<$Res> {
+  factory _$$TenantWxworkImplCopyWith(
+          _$TenantWxworkImpl value, $Res Function(_$TenantWxworkImpl) then) =
+      __$$TenantWxworkImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'agent_id') String? agentId,
+      @JsonKey(name: 'corp_id') String? corpId,
+      String? scheme});
+}
+
+/// @nodoc
+class __$$TenantWxworkImplCopyWithImpl<$Res>
+    extends _$TenantWxworkCopyWithImpl<$Res, _$TenantWxworkImpl>
+    implements _$$TenantWxworkImplCopyWith<$Res> {
+  __$$TenantWxworkImplCopyWithImpl(
+      _$TenantWxworkImpl _value, $Res Function(_$TenantWxworkImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? agentId = freezed,
+    Object? corpId = freezed,
+    Object? scheme = freezed,
+  }) {
+    return _then(_$TenantWxworkImpl(
+      agentId: freezed == agentId
+          ? _value.agentId
+          : agentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      corpId: freezed == corpId
+          ? _value.corpId
+          : corpId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      scheme: freezed == scheme
+          ? _value.scheme
+          : scheme // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TenantWxworkImpl implements _TenantWxwork {
+  _$TenantWxworkImpl(
+      {@JsonKey(name: 'agent_id') this.agentId,
+      @JsonKey(name: 'corp_id') this.corpId,
+      this.scheme});
+
+  factory _$TenantWxworkImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TenantWxworkImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'agent_id')
+  final String? agentId;
+  @override
+  @JsonKey(name: 'corp_id')
+  final String? corpId;
+  @override
+  final String? scheme;
+
+  @override
+  String toString() {
+    return 'TenantWxwork(agentId: $agentId, corpId: $corpId, scheme: $scheme)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TenantWxworkImpl &&
+            (identical(other.agentId, agentId) || other.agentId == agentId) &&
+            (identical(other.corpId, corpId) || other.corpId == corpId) &&
+            (identical(other.scheme, scheme) || other.scheme == scheme));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, agentId, corpId, scheme);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TenantWxworkImplCopyWith<_$TenantWxworkImpl> get copyWith =>
+      __$$TenantWxworkImplCopyWithImpl<_$TenantWxworkImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TenantWxworkImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TenantWxwork implements TenantWxwork {
+  factory _TenantWxwork(
+      {@JsonKey(name: 'agent_id') final String? agentId,
+      @JsonKey(name: 'corp_id') final String? corpId,
+      final String? scheme}) = _$TenantWxworkImpl;
+
+  factory _TenantWxwork.fromJson(Map<String, dynamic> json) =
+      _$TenantWxworkImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'agent_id')
+  String? get agentId;
+  @override
+  @JsonKey(name: 'corp_id')
+  String? get corpId;
+  @override
+  String? get scheme;
+  @override
+  @JsonKey(ignore: true)
+  _$$TenantWxworkImplCopyWith<_$TenantWxworkImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Tenant _$TenantFromJson(Map<String, dynamic> json) {
   return _Tenant.fromJson(json);
 }
@@ -26,6 +212,7 @@ mixin _$Tenant {
   List<String>? get loginWays => throw _privateConstructorUsedError;
   @JsonKey(name: 'base_url')
   String? get baseUrl => throw _privateConstructorUsedError;
+  TenantWxwork? get wxwork => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -41,7 +228,10 @@ abstract class $TenantCopyWith<$Res> {
       {int? id,
       String? title,
       @JsonKey(name: 'login_ways') List<String>? loginWays,
-      @JsonKey(name: 'base_url') String? baseUrl});
+      @JsonKey(name: 'base_url') String? baseUrl,
+      TenantWxwork? wxwork});
+
+  $TenantWxworkCopyWith<$Res>? get wxwork;
 }
 
 /// @nodoc
@@ -61,6 +251,7 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
     Object? title = freezed,
     Object? loginWays = freezed,
     Object? baseUrl = freezed,
+    Object? wxwork = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -79,7 +270,23 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
           ? _value.baseUrl
           : baseUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      wxwork: freezed == wxwork
+          ? _value.wxwork
+          : wxwork // ignore: cast_nullable_to_non_nullable
+              as TenantWxwork?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $TenantWxworkCopyWith<$Res>? get wxwork {
+    if (_value.wxwork == null) {
+      return null;
+    }
+
+    return $TenantWxworkCopyWith<$Res>(_value.wxwork!, (value) {
+      return _then(_value.copyWith(wxwork: value) as $Val);
+    });
   }
 }
 
@@ -94,7 +301,11 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
       {int? id,
       String? title,
       @JsonKey(name: 'login_ways') List<String>? loginWays,
-      @JsonKey(name: 'base_url') String? baseUrl});
+      @JsonKey(name: 'base_url') String? baseUrl,
+      TenantWxwork? wxwork});
+
+  @override
+  $TenantWxworkCopyWith<$Res>? get wxwork;
 }
 
 /// @nodoc
@@ -112,6 +323,7 @@ class __$$TenantImplCopyWithImpl<$Res>
     Object? title = freezed,
     Object? loginWays = freezed,
     Object? baseUrl = freezed,
+    Object? wxwork = freezed,
   }) {
     return _then(_$TenantImpl(
       id: freezed == id
@@ -130,6 +342,10 @@ class __$$TenantImplCopyWithImpl<$Res>
           ? _value.baseUrl
           : baseUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      wxwork: freezed == wxwork
+          ? _value.wxwork
+          : wxwork // ignore: cast_nullable_to_non_nullable
+              as TenantWxwork?,
     ));
   }
 }
@@ -141,7 +357,8 @@ class _$TenantImpl implements _Tenant {
       {this.id,
       this.title,
       @JsonKey(name: 'login_ways') final List<String>? loginWays,
-      @JsonKey(name: 'base_url') this.baseUrl})
+      @JsonKey(name: 'base_url') this.baseUrl,
+      this.wxwork})
       : _loginWays = loginWays;
 
   factory _$TenantImpl.fromJson(Map<String, dynamic> json) =>
@@ -165,10 +382,12 @@ class _$TenantImpl implements _Tenant {
   @override
   @JsonKey(name: 'base_url')
   final String? baseUrl;
+  @override
+  final TenantWxwork? wxwork;
 
   @override
   String toString() {
-    return 'Tenant(id: $id, title: $title, loginWays: $loginWays, baseUrl: $baseUrl)';
+    return 'Tenant(id: $id, title: $title, loginWays: $loginWays, baseUrl: $baseUrl, wxwork: $wxwork)';
   }
 
   @override
@@ -180,13 +399,14 @@ class _$TenantImpl implements _Tenant {
             (identical(other.title, title) || other.title == title) &&
             const DeepCollectionEquality()
                 .equals(other._loginWays, _loginWays) &&
-            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl));
+            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
+            (identical(other.wxwork, wxwork) || other.wxwork == wxwork));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, title,
-      const DeepCollectionEquality().hash(_loginWays), baseUrl);
+      const DeepCollectionEquality().hash(_loginWays), baseUrl, wxwork);
 
   @JsonKey(ignore: true)
   @override
@@ -207,7 +427,8 @@ abstract class _Tenant implements Tenant {
       {final int? id,
       final String? title,
       @JsonKey(name: 'login_ways') final List<String>? loginWays,
-      @JsonKey(name: 'base_url') final String? baseUrl}) = _$TenantImpl;
+      @JsonKey(name: 'base_url') final String? baseUrl,
+      final TenantWxwork? wxwork}) = _$TenantImpl;
 
   factory _Tenant.fromJson(Map<String, dynamic> json) = _$TenantImpl.fromJson;
 
@@ -221,6 +442,8 @@ abstract class _Tenant implements Tenant {
   @override
   @JsonKey(name: 'base_url')
   String? get baseUrl;
+  @override
+  TenantWxwork? get wxwork;
   @override
   @JsonKey(ignore: true)
   _$$TenantImplCopyWith<_$TenantImpl> get copyWith =>

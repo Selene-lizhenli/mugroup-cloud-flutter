@@ -169,57 +169,58 @@ class LoginPage extends HookConsumerWidget {
                           )
                         ],
                         const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const FlanDivider(
-                                child: Text('其他登录方式'),
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  final wxwork = FlutterWxwork();
+                        if (enableLoginWays.contains("wxwork") &&
+                            tenant.wxwork?.scheme != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const FlanDivider(
+                                  child: Text('其他登录方式'),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    final wxwork = FlutterWxwork();
 
-                                  await wxwork.register(
-                                    scheme: 'wwauth9306502d79084189000089',
-                                    corpId: 'ww9306502d79084189',
-                                    agentId: '1000089',
-                                  );
+                                    await wxwork.register(
+                                      scheme: tenant.wxwork!.scheme!,
+                                      corpId: tenant.wxwork!.corpId!,
+                                      agentId: tenant.wxwork!.agentId!,
+                                    );
 
-                                  final result = await wxwork.auth();
-                                  if (result.errCode != '0') {
-                                    return;
-                                  }
+                                    final result = await wxwork.auth();
+                                    if (result.errCode != '0') {
+                                      return;
+                                    }
 
-                                  final code = result.code!;
+                                    final code = result.code!;
 
-                                  await api.post(
-                                      'api/tenant/wechat/login',
-                                      data: {"code": code});
+                                    await api.post('api/tenant/wechat/login',
+                                        data: {"code": code});
 
-                                  await app.fetchUser();
-                                  afterLogin();
-                                },
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: const Color(0xFFEBEDF0),
-                                      width: 1,
+                                    await app.fetchUser();
+                                    afterLogin();
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFFEBEDF0),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/wxwork.svg',
                                     ),
                                   ),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/wxwork.svg',
-                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
                         const SizedBox(
                           height: 20,
                         ),

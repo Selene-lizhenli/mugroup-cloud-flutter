@@ -6,6 +6,20 @@ part of 'core.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$TenantWxworkImpl _$$TenantWxworkImplFromJson(Map<String, dynamic> json) =>
+    _$TenantWxworkImpl(
+      agentId: json['agent_id'] as String?,
+      corpId: json['corp_id'] as String?,
+      scheme: json['scheme'] as String?,
+    );
+
+Map<String, dynamic> _$$TenantWxworkImplToJson(_$TenantWxworkImpl instance) =>
+    <String, dynamic>{
+      'agent_id': instance.agentId,
+      'corp_id': instance.corpId,
+      'scheme': instance.scheme,
+    };
+
 _$TenantImpl _$$TenantImplFromJson(Map<String, dynamic> json) => _$TenantImpl(
       id: (json['id'] as num?)?.toInt(),
       title: json['title'] as String?,
@@ -13,6 +27,9 @@ _$TenantImpl _$$TenantImplFromJson(Map<String, dynamic> json) => _$TenantImpl(
           ?.map((e) => e as String)
           .toList(),
       baseUrl: json['base_url'] as String?,
+      wxwork: json['wxwork'] == null
+          ? null
+          : TenantWxwork.fromJson(json['wxwork'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
@@ -21,4 +38,5 @@ Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
       'title': instance.title,
       'login_ways': instance.loginWays,
       'base_url': instance.baseUrl,
+      'wxwork': instance.wxwork,
     };
