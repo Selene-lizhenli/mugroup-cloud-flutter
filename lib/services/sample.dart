@@ -1,7 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/quotation.dart';
-import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/sample/sample.dart';
 
 Future<ApiResponse<List<Sample>>> getSamples(

@@ -34,6 +34,7 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
 
     useEffect(() {
       loadQuotation(quoteNo);
+      return () {};
     }, [quoteNo]);
 
     // 计算筛选后的结果
