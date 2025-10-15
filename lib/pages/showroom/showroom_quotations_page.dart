@@ -23,21 +23,13 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
     final scrollController = useScrollController();
     final searchKeyword = useState<String>('');
     final quotation = useState<Quotation?>(null);
-    final quotationId = useState<int?>(null);
+
     final quotationSampleItems = useState<List<QuotationSample>>([]);
 
     loadQuotation(String quoteNo) async {
       final data = await getShowroomQuotationByQuoteNo(quoteNo);
       quotation.value = data;
-      quotationId.value = data?.id;
-
-      if (data?.id != null) {
-        final res = await getQuotationSamples(
-            queryParameters: {"quotation_id": data!.id!, 'showAll': "1"});
-        quotationSampleItems.value = res.data;
-      } else { 
-        quotationSampleItems.value = [];
-      }
+      quotationSampleItems.value = data?.quotationSamples ?? [];
     }
 
     useEffect(() {

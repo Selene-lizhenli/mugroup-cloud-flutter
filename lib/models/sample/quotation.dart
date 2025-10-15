@@ -1,3 +1,4 @@
+import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/user.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -11,6 +12,7 @@ class Quotation with _$Quotation {
     User? user,
     double? exchange,
     bool? showPrice,
+    List<QuotationSample>? quotationSamples,
     @JsonKey(name: 'commission_rate') double? commissionRate,
     @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
     @JsonKey(name: 'quote_at') DateTime? quoteAt,

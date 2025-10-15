@@ -51,19 +51,3 @@ Future<Quotation?> getShowroomQuotationByQuoteNo(String quoteNo) async {
     },
   );
 }
-
-Future<ApiResponse<List<QuotationSample>>> getQuotationSamples(
-    {Map<String, dynamic>? queryParameters}) async {
-  return api
-      .get("api/tenant/showroom/quotationSamples",
-          queryParameters: queryParameters)
-      .then(
-        (res) => ApiResponse<List<QuotationSample>>.fromJson(
-          res.data,
-          (data) {
-            var list = (data as List).cast<Map<String, dynamic>>();
-            return list.map(QuotationSample.fromJson).toList();
-          },
-        ),
-      );
-}
