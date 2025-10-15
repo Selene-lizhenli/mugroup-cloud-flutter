@@ -93,6 +93,7 @@ class Scan extends _$Scan {
           final quoteNo = matchQuotation.group(1)!;
 
           app.router.push(ShowroomQuotationsRoute(quoteNo: quoteNo));
+          return;
         }
       }
 
