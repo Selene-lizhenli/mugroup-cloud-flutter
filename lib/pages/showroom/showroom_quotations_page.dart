@@ -82,9 +82,6 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
                   for (final qs in quotationSampleItems.value) {
                     final sample = qs.showroomSample;
                     final qty = qs.qty ?? 1; // 默认数量为 1
@@ -99,7 +96,9 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
                       cart.setSample(sample, qty);
                     }
                   }
-
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
                   context.pushRoute(const CartRoute());
                 },
                 style: ElevatedButton.styleFrom(
