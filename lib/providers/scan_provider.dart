@@ -85,6 +85,17 @@ class Scan extends _$Scan {
         }
       }
 
+      //判断是不是报价单
+      if (true) {
+        RegExp quotationExp = RegExp(r'showroom/quotations/(.*)');
+        final matchQuotation = quotationExp.firstMatch(barcodeString);
+        if (matchQuotation != null) {
+          final quoteNo = matchQuotation.group(1)!;
+
+          app.router.push(ShowroomQuotationsRoute(quoteNo: quoteNo));
+        }
+      }
+
       // 默认不处理
       return;
     }
