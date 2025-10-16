@@ -1,5 +1,6 @@
 import 'package:cloud/core/rx_bus.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -20,6 +21,6 @@ abstract class HomeState with _$HomeState {
   }) = _HomeState;
 
   TemporaryMedia? get currentMedia {
-    return media.firstWhere((item) => item.id == currentMediaId);
+    return media.firstWhereOrNull((item) => item.id == currentMediaId);
   }
 }

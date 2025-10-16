@@ -62,12 +62,14 @@ class ProductView extends HookConsumerWidget {
     }
 
     useEffect(() {
-      final searchEventSubscription =
-          home.bus.on<SearchEvent>().listen((SearchEvent event) {
-        event.media != null
-            ? fetchData("", searchMedia: event.media, init: true)
-            : fetchData(event.search, init: true);
-      });
+      final searchEventSubscription = home.bus.on<SearchEvent>().listen(
+        (SearchEvent event) {
+          search.value = event.search;
+          media.value = event.media;
+
+          refreshController.callRefresh();
+        },
+      );
 
       return () {
         searchEventSubscription.cancel();
