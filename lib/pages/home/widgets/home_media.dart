@@ -36,13 +36,17 @@ class HomeMeidaItem extends StatelessWidget {
 }
 
 class HomeMedia extends StatelessWidget {
-  final TemporaryMedia media;
+  final List<TemporaryMedia> media;
+  final int currentMediaId;
   final GestureTapCallback? onTapUplod;
+  final Function(TemporaryMedia temporaryMedia)? onTapMedia;
 
   const HomeMedia({
     super.key,
     required this.media,
+    required this.currentMediaId,
     this.onTapUplod,
+    this.onTapMedia,
   });
 
   @override
@@ -59,20 +63,18 @@ class HomeMedia extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    HomeMeidaItem(
-                      active: true,
-                      media: media,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    HomeMeidaItem(
-                      active: false,
-                      media: media,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    for (var item in media) ...[
+                      GestureDetector(
+                        onTap: () => onTapMedia?.call(item),
+                        child: HomeMeidaItem(
+                          media: item,
+                          active: currentMediaId == item.id,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      )
+                    ]
                   ],
                 ),
               ),

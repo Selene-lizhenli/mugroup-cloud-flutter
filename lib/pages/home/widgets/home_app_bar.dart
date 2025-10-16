@@ -55,11 +55,6 @@ class HomeAppBar extends HookConsumerWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    TemporaryMedia? media = const TemporaryMedia(
-      id: 1222,
-      url:
-          "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
-    );
 
     handleUploadMedia() async {
       final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
@@ -111,8 +106,13 @@ class HomeAppBar extends HookConsumerWidget {
           const SizedBox(
             height: 5,
           ),
-          if (media != null)
-            HomeMedia(media: media, onTapUplod: handleUploadMedia)
+          if (home.currentMediaId != null)
+            HomeMedia(
+              media: home.media,
+              onTapUplod: handleUploadMedia,
+              currentMediaId: home.currentMediaId!,
+              onTapMedia: onSearchMedia,
+            )
           else
             Container(
               width: double.infinity, // 占满父级宽度

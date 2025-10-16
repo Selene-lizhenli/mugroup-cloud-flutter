@@ -22,7 +22,8 @@ mixin _$HomeState {
   TextEditingController get searchTextController =>
       throw _privateConstructorUsedError;
   String? get search => throw _privateConstructorUsedError;
-  TemporaryMedia? get media => throw _privateConstructorUsedError;
+  List<TemporaryMedia> get media => throw _privateConstructorUsedError;
+  int? get currentMediaId => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -40,9 +41,8 @@ abstract class $HomeStateCopyWith<$Res> {
       PageController pageController,
       TextEditingController searchTextController,
       String? search,
-      TemporaryMedia? media});
-
-  $TemporaryMediaCopyWith<$Res>? get media;
+      List<TemporaryMedia> media,
+      int? currentMediaId});
 }
 
 /// @nodoc
@@ -63,7 +63,8 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? pageController = null,
     Object? searchTextController = null,
     Object? search = freezed,
-    Object? media = freezed,
+    Object? media = null,
+    Object? currentMediaId = freezed,
   }) {
     return _then(_value.copyWith(
       bus: null == bus
@@ -86,23 +87,15 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
-      media: freezed == media
+      media: null == media
           ? _value.media
           : media // ignore: cast_nullable_to_non_nullable
-              as TemporaryMedia?,
+              as List<TemporaryMedia>,
+      currentMediaId: freezed == currentMediaId
+          ? _value.currentMediaId
+          : currentMediaId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $TemporaryMediaCopyWith<$Res>? get media {
-    if (_value.media == null) {
-      return null;
-    }
-
-    return $TemporaryMediaCopyWith<$Res>(_value.media!, (value) {
-      return _then(_value.copyWith(media: value) as $Val);
-    });
   }
 }
 
@@ -120,10 +113,8 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       PageController pageController,
       TextEditingController searchTextController,
       String? search,
-      TemporaryMedia? media});
-
-  @override
-  $TemporaryMediaCopyWith<$Res>? get media;
+      List<TemporaryMedia> media,
+      int? currentMediaId});
 }
 
 /// @nodoc
@@ -142,7 +133,8 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? pageController = null,
     Object? searchTextController = null,
     Object? search = freezed,
-    Object? media = freezed,
+    Object? media = null,
+    Object? currentMediaId = freezed,
   }) {
     return _then(_$HomeStateImpl(
       bus: null == bus
@@ -165,10 +157,14 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
-      media: freezed == media
-          ? _value.media
+      media: null == media
+          ? _value._media
           : media // ignore: cast_nullable_to_non_nullable
-              as TemporaryMedia?,
+              as List<TemporaryMedia>,
+      currentMediaId: freezed == currentMediaId
+          ? _value.currentMediaId
+          : currentMediaId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -182,7 +178,9 @@ class _$HomeStateImpl implements _HomeState {
       required this.pageController,
       required this.searchTextController,
       this.search,
-      this.media});
+      required final List<TemporaryMedia> media,
+      this.currentMediaId})
+      : _media = media;
 
   @override
   final RxBus bus;
@@ -194,12 +192,20 @@ class _$HomeStateImpl implements _HomeState {
   final TextEditingController searchTextController;
   @override
   final String? search;
+  final List<TemporaryMedia> _media;
   @override
-  final TemporaryMedia? media;
+  List<TemporaryMedia> get media {
+    if (_media is EqualUnmodifiableListView) return _media;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_media);
+  }
+
+  @override
+  final int? currentMediaId;
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId)';
   }
 
   @override
@@ -215,12 +221,21 @@ class _$HomeStateImpl implements _HomeState {
             (identical(other.searchTextController, searchTextController) ||
                 other.searchTextController == searchTextController) &&
             (identical(other.search, search) || other.search == search) &&
-            (identical(other.media, media) || other.media == media));
+            const DeepCollectionEquality().equals(other._media, _media) &&
+            (identical(other.currentMediaId, currentMediaId) ||
+                other.currentMediaId == currentMediaId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, bus, currentPage, pageController,
-      searchTextController, search, media);
+  int get hashCode => Object.hash(
+      runtimeType,
+      bus,
+      currentPage,
+      pageController,
+      searchTextController,
+      search,
+      const DeepCollectionEquality().hash(_media),
+      currentMediaId);
 
   @JsonKey(ignore: true)
   @override
@@ -236,7 +251,8 @@ abstract class _HomeState implements HomeState {
       required final PageController pageController,
       required final TextEditingController searchTextController,
       final String? search,
-      final TemporaryMedia? media}) = _$HomeStateImpl;
+      required final List<TemporaryMedia> media,
+      final int? currentMediaId}) = _$HomeStateImpl;
 
   @override
   RxBus get bus;
@@ -249,7 +265,9 @@ abstract class _HomeState implements HomeState {
   @override
   String? get search;
   @override
-  TemporaryMedia? get media;
+  List<TemporaryMedia> get media;
+  @override
+  int? get currentMediaId;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>

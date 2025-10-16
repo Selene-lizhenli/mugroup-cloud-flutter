@@ -30,7 +30,7 @@ class HomePage extends HookConsumerWidget {
               home.bus.dispatch(SearchEvent(search));
             },
             onSearchMedia: (temporaryMedia) {
-              homeNotifier.setMedia(temporaryMedia);
+              homeNotifier.addMedia(temporaryMedia);
             },
           ),
           Expanded(

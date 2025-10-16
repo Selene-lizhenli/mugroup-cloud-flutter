@@ -14,6 +14,7 @@ abstract class HomeState with _$HomeState {
     required PageController pageController,
     required TextEditingController searchTextController,
     String? search,
-    TemporaryMedia? media,
+    required List<TemporaryMedia> media,
+    int? currentMediaId,
   }) = _HomeState;
 }

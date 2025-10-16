@@ -16,7 +16,19 @@ class Home extends _$Home {
       pageController: PageController(),
       searchTextController: TextEditingController(),
       search: null,
-      media: null,
+      media: [
+        const TemporaryMedia(
+          id: 1222,
+          url:
+              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
+        ),
+        const TemporaryMedia(
+          id: 1223,
+          url:
+              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
+        )
+      ],
+      currentMediaId: 1222,
     );
 
     ref.onDispose(() {
@@ -36,7 +48,15 @@ class Home extends _$Home {
     state = state.copyWith(search: search);
   }
 
-  void setMedia(TemporaryMedia? media) {
-    state = state.copyWith(media: media);
+  void addMedia(TemporaryMedia media) {
+    var list = state.media;
+    if (!state.media.contains(media)) {
+      list = [media, ...list];
+    }
+
+    state = state.copyWith(
+      media: list,
+      currentMediaId: media.id,
+    );
   }
 }
