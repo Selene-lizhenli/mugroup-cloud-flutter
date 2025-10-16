@@ -1,5 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
@@ -23,17 +24,24 @@ class ProductView extends HookConsumerWidget {
         controlFinishLoad: true, controlFinishRefresh: true);
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
+    final media = useState<TemporaryMedia?>(null);
     final page = useState(1);
     final samples = useState<List<Sample>>(<Sample>[]);
 
-    fetchData(String? searchText, {bool? init = false}) async {
+    fetchData(
+      String? searchText, {
+      bool? init = false,
+      TemporaryMedia? searchMedia,
+    }) async {
       search.value = searchText;
+      media.value = searchMedia;
       if (init == true) {
         page.value = 1;
       }
 
       final resp = await getSamples(queryParameters: {
         "search": searchText,
+        if (searchMedia != null) "image": searchMedia.id,
         "page": page.value + 1,
         "pageSize": pageSize,
       });
@@ -54,7 +62,9 @@ class ProductView extends HookConsumerWidget {
     useEffect(() {
       final searchEventSubscription =
           home.bus.on<SearchEvent>().listen((SearchEvent event) {
-        fetchData(event.search, init: true);
+        event.media != null
+            ? fetchData("", searchMedia: event.media, init: true)
+            : fetchData(event.search, init: true);
       });
 
       return () {
@@ -77,7 +87,7 @@ class ProductView extends HookConsumerWidget {
             },
             onLoad: () async {
               logger.d('onLoad');
-              final resp = await fetchData(search.value);
+              final resp = await fetchData(search.value, searchMedia: media.value);
 
               refreshController.finishLoad(resp.data.length >= pageSize
                   ? IndicatorResult.success

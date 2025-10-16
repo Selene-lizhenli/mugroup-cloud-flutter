@@ -1,5 +1,8 @@
-class SearchEvent {
-  final String search;
+import 'package:cloud/models/sample/media.dart';
 
-  SearchEvent(this.search);
+class SearchEvent {
+  final String? search;
+  final TemporaryMedia? media;
+
+  SearchEvent({this.search, this.media});
 }

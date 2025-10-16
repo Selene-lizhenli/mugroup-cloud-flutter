@@ -116,7 +116,7 @@ class HomeAppBar extends HookConsumerWidget {
           else
             Container(
               width: double.infinity, // 占满父级宽度
-              margin: const EdgeInsets.symmetric(horizontal: 8),
+              margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 8),
               height: 40,
               decoration: BoxDecoration(
