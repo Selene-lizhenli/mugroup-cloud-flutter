@@ -22,6 +22,7 @@ mixin _$HomeState {
   TextEditingController get searchTextController =>
       throw _privateConstructorUsedError;
   String? get search => throw _privateConstructorUsedError;
+  TemporaryMedia? get media => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -38,7 +39,10 @@ abstract class $HomeStateCopyWith<$Res> {
       int currentPage,
       PageController pageController,
       TextEditingController searchTextController,
-      String? search});
+      String? search,
+      TemporaryMedia? media});
+
+  $TemporaryMediaCopyWith<$Res>? get media;
 }
 
 /// @nodoc
@@ -59,6 +63,7 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? pageController = null,
     Object? searchTextController = null,
     Object? search = freezed,
+    Object? media = freezed,
   }) {
     return _then(_value.copyWith(
       bus: null == bus
@@ -81,7 +86,23 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
+      media: freezed == media
+          ? _value.media
+          : media // ignore: cast_nullable_to_non_nullable
+              as TemporaryMedia?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $TemporaryMediaCopyWith<$Res>? get media {
+    if (_value.media == null) {
+      return null;
+    }
+
+    return $TemporaryMediaCopyWith<$Res>(_value.media!, (value) {
+      return _then(_value.copyWith(media: value) as $Val);
+    });
   }
 }
 
@@ -98,7 +119,11 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       int currentPage,
       PageController pageController,
       TextEditingController searchTextController,
-      String? search});
+      String? search,
+      TemporaryMedia? media});
+
+  @override
+  $TemporaryMediaCopyWith<$Res>? get media;
 }
 
 /// @nodoc
@@ -117,6 +142,7 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? pageController = null,
     Object? searchTextController = null,
     Object? search = freezed,
+    Object? media = freezed,
   }) {
     return _then(_$HomeStateImpl(
       bus: null == bus
@@ -139,6 +165,10 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
+      media: freezed == media
+          ? _value.media
+          : media // ignore: cast_nullable_to_non_nullable
+              as TemporaryMedia?,
     ));
   }
 }
@@ -151,7 +181,8 @@ class _$HomeStateImpl implements _HomeState {
       required this.currentPage,
       required this.pageController,
       required this.searchTextController,
-      this.search});
+      this.search,
+      this.media});
 
   @override
   final RxBus bus;
@@ -163,10 +194,12 @@ class _$HomeStateImpl implements _HomeState {
   final TextEditingController searchTextController;
   @override
   final String? search;
+  @override
+  final TemporaryMedia? media;
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media)';
   }
 
   @override
@@ -181,12 +214,13 @@ class _$HomeStateImpl implements _HomeState {
                 other.pageController == pageController) &&
             (identical(other.searchTextController, searchTextController) ||
                 other.searchTextController == searchTextController) &&
-            (identical(other.search, search) || other.search == search));
+            (identical(other.search, search) || other.search == search) &&
+            (identical(other.media, media) || other.media == media));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, bus, currentPage, pageController,
-      searchTextController, search);
+      searchTextController, search, media);
 
   @JsonKey(ignore: true)
   @override
@@ -201,7 +235,8 @@ abstract class _HomeState implements HomeState {
       required final int currentPage,
       required final PageController pageController,
       required final TextEditingController searchTextController,
-      final String? search}) = _$HomeStateImpl;
+      final String? search,
+      final TemporaryMedia? media}) = _$HomeStateImpl;
 
   @override
   RxBus get bus;
@@ -213,6 +248,8 @@ abstract class _HomeState implements HomeState {
   TextEditingController get searchTextController;
   @override
   String? get search;
+  @override
+  TemporaryMedia? get media;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +65,7 @@ class MyApp extends StatelessWidget {
         reevaluateListenable: authNotifier,
       ),
       theme: ThemeData(
+        extensions: [TDThemeData.defaultData()],
         useMaterial3: true,
         actionIconTheme: ActionIconThemeData(
           backButtonIconBuilder: (BuildContext context) {

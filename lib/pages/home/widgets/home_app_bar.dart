@@ -1,5 +1,6 @@
-import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
+import 'package:cloud/pages/home/widgets/home_media.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,11 +40,13 @@ class HomeAppBarItem extends StatelessWidget {
 class HomeAppBar extends HookConsumerWidget {
   final TextEditingController controller;
   final void Function(String search)? onSearchText;
+  final void Function(TemporaryMedia temporaryMedia)? onSearchMedia;
 
   const HomeAppBar({
     super.key,
     required this.controller,
     this.onSearchText,
+    this.onSearchMedia,
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,9 +55,27 @@ class HomeAppBar extends HookConsumerWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
     final statusBarHeight = MediaQuery.of(context).padding.top;
+    TemporaryMedia? media = const TemporaryMedia(
+      id: 1222,
+      url:
+          "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
+    );
+
+    handleUploadMedia() async {
+      final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
+
+      if (entity == null) {
+        return;
+      }
+
+      final file = await entity.file;
+
+      final temporaryMedia = await upload(file: file!, fileName: entity.title!);
+
+      onSearchMedia?.call(temporaryMedia);
+    }
 
     return Container(
-      height: statusBarHeight + 80,
       color: colorScheme.primary,
       child: Column(
         children: [
@@ -90,85 +111,75 @@ class HomeAppBar extends HookConsumerWidget {
           const SizedBox(
             height: 5,
           ),
-          Container(
-            width: double.infinity, // 占满父级宽度
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: const Color(0xFFF03380),
-                width: 1,
+          if (media != null)
+            HomeMedia(media: media, onTapUplod: handleUploadMedia)
+          else
+            Container(
+              width: double.infinity, // 占满父级宽度
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: const Color(0xFFF03380),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(5),
               ),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextField(
-                    autofocus: false,
-                    controller: controller,
-                    onTapOutside: (event) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    focusNode: focusNode,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '',
-                    ),
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (value) {
-                      onSearchText?.call(value);
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: IconButton(
-                    icon: const Icon(CupertinoIcons.camera,
-                        size: 30, color: Colors.grey),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () async {
-                      final AssetEntity? entity =
-                          await CameraPicker.pickFromCamera(context);
-
-                      if (entity == null) {
-                        return;
-                      }
-
-                      final file = await entity.file;
-
-                      final temporaryMedia =
-                          await upload(file: file!, fileName: entity.title!);
-                      logger.d(temporaryMedia);
-                    },
-                  ),
-                ),
-                Container(
-                  color: Colors.grey,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 0.8,
-                  height: 20,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    onSearchText?.call(controller.text);
-                  },
-                  child: const Text(
-                    "搜索",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFF03380),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      autofocus: false,
+                      controller: controller,
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                      focusNode: focusNode,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: '',
+                      ),
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (value) {
+                        onSearchText?.call(value);
+                      },
                     ),
                   ),
-                )
-              ],
+                  SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: IconButton(
+                      icon: const Icon(CupertinoIcons.camera,
+                          size: 30, color: Colors.grey),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: handleUploadMedia,
+                    ),
+                  ),
+                  Container(
+                    color: Colors.grey,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 0.8,
+                    height: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      onSearchText?.call(controller.text);
+                    },
+                    child: const Text(
+                      "搜索",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFFF03380),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
-          )
         ],
       ),
     );

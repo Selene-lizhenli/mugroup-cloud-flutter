@@ -3,7 +3,6 @@ import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
-import 'package:cloud/pages/home/widgets/home_app_bar.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -67,7 +66,6 @@ class ProductView extends HookConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HomeAppBarPlaceholder(),
         Expanded(
           child: EasyRefresh(
             controller: refreshController,

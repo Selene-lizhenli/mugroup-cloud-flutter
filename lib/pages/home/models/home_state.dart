@@ -1,4 +1,5 @@
 import 'package:cloud/core/rx_bus.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,5 +14,6 @@ abstract class HomeState with _$HomeState {
     required PageController pageController,
     required TextEditingController searchTextController,
     String? search,
+    TemporaryMedia? media,
   }) = _HomeState;
 }

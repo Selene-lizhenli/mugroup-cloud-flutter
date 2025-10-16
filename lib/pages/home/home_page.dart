@@ -19,17 +19,9 @@ class HomePage extends HookConsumerWidget {
     final homeNotifier = ref.read(homeProvider.notifier);
 
     return Scaffold(
-      // backgroundColor: Colors.black,
-      body: Stack(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PageView(
-            controller: home.pageController,
-            onPageChanged: (page) {
-              homeNotifier.setCurrentPage(page);
-            },
-            allowImplicitScrolling: false,
-            children: const [ProductView(), SupplyView()],
-          ),
           HomeAppBar(
             controller: home.searchTextController,
             onSearchText: (search) {
@@ -37,6 +29,19 @@ class HomePage extends HookConsumerWidget {
 
               home.bus.dispatch(SearchEvent(search));
             },
+            onSearchMedia: (temporaryMedia) {
+              homeNotifier.setMedia(temporaryMedia);
+            },
+          ),
+          Expanded(
+            child: PageView(
+              controller: home.pageController,
+              onPageChanged: (page) {
+                homeNotifier.setCurrentPage(page);
+              },
+              allowImplicitScrolling: false,
+              children: const [ProductView(), SupplyView()],
+            ),
           ),
         ],
       ),
