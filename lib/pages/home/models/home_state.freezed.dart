@@ -171,7 +171,7 @@ class __$$HomeStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$HomeStateImpl implements _HomeState {
+class _$HomeStateImpl extends _HomeState {
   const _$HomeStateImpl(
       {required this.bus,
       required this.currentPage,
@@ -180,7 +180,8 @@ class _$HomeStateImpl implements _HomeState {
       this.search,
       required final List<TemporaryMedia> media,
       this.currentMediaId})
-      : _media = media;
+      : _media = media,
+        super._();
 
   @override
   final RxBus bus;
@@ -244,7 +245,7 @@ class _$HomeStateImpl implements _HomeState {
       __$$HomeStateImplCopyWithImpl<_$HomeStateImpl>(this, _$identity);
 }
 
-abstract class _HomeState implements HomeState {
+abstract class _HomeState extends HomeState {
   const factory _HomeState(
       {required final RxBus bus,
       required final int currentPage,
@@ -253,6 +254,7 @@ abstract class _HomeState implements HomeState {
       final String? search,
       required final List<TemporaryMedia> media,
       final int? currentMediaId}) = _$HomeStateImpl;
+  const _HomeState._() : super._();
 
   @override
   RxBus get bus;

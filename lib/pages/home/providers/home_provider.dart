@@ -18,17 +18,21 @@ class Home extends _$Home {
       search: null,
       media: [
         const TemporaryMedia(
-          id: 1222,
+          id: 2318463,
+          thumbUrl:
+              'https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318463/conversions/CAP2644820930011794157-thumb.jpg',
           url:
-              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
+              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318463/CAP2644820930011794157.jpg",
         ),
         const TemporaryMedia(
-          id: 1223,
+          id: 2318464,
+          thumbUrl:
+              'https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318464/conversions/CAP5753167623670165613-thumb.jpg',
           url:
-              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/showroom/image/367194/conversions/199A1187-white.jpg",
+              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318464/CAP5753167623670165613.jpg",
         )
       ],
-      currentMediaId: 1222,
+      currentMediaId: 2318463,
     );
 
     ref.onDispose(() {
@@ -58,5 +62,23 @@ class Home extends _$Home {
       media: list,
       currentMediaId: media.id,
     );
+  }
+
+  HomeState deleteMedia(TemporaryMedia media) {
+    final nextMedia = List.of(state.media);
+    var nextCurrentMediaId = state.currentMediaId;
+
+    nextMedia.remove(media);
+
+    if (media.id == nextCurrentMediaId) {
+      nextCurrentMediaId = nextMedia.firstOrNull?.id;
+    }
+
+    state = state.copyWith(
+      media: nextMedia,
+      currentMediaId: nextCurrentMediaId,
+    );
+
+    return state;
   }
 }

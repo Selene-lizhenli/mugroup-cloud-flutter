@@ -24,7 +24,7 @@ class ProductView extends HookConsumerWidget {
         controlFinishLoad: true, controlFinishRefresh: true);
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
-    final media = useState<TemporaryMedia?>(null);
+    final media = useState<TemporaryMedia?>(home.currentMedia);
     final page = useState(1);
     final samples = useState<List<Sample>>(<Sample>[]);
 
@@ -39,12 +39,14 @@ class ProductView extends HookConsumerWidget {
         page.value = 1;
       }
 
-      final resp = await getSamples(queryParameters: {
+      final queryParameters = {
         "search": searchText,
         if (searchMedia != null) "image": searchMedia.id,
-        "page": page.value + 1,
+        "page": page.value,
         "pageSize": pageSize,
-      });
+      };
+      logger.d(queryParameters);
+      final resp = await getSamples(queryParameters: queryParameters);
 
       if (init == true) {
         samples.value = resp.data;
@@ -81,13 +83,18 @@ class ProductView extends HookConsumerWidget {
             controller: refreshController,
             refreshOnStart: true,
             onRefresh: () async {
-              await fetchData(search.value, init: true);
+              await fetchData(
+                search.value,
+                searchMedia: media.value,
+                init: true,
+              );
               refreshController.finishRefresh();
               refreshController.resetFooter();
             },
             onLoad: () async {
               logger.d('onLoad');
-              final resp = await fetchData(search.value, searchMedia: media.value);
+              final resp =
+                  await fetchData(search.value, searchMedia: media.value);
 
               refreshController.finishLoad(resp.data.length >= pageSize
                   ? IndicatorResult.success

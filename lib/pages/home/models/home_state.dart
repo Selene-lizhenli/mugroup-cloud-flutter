@@ -8,6 +8,7 @@ part 'home_state.freezed.dart';
 
 @freezed
 abstract class HomeState with _$HomeState {
+  const HomeState._();
   const factory HomeState({
     required RxBus bus,
     required int currentPage,
@@ -17,4 +18,8 @@ abstract class HomeState with _$HomeState {
     required List<TemporaryMedia> media,
     int? currentMediaId,
   }) = _HomeState;
+
+  TemporaryMedia? get currentMedia {
+    return media.firstWhere((item) => item.id == currentMediaId);
+  }
 }

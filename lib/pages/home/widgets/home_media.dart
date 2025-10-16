@@ -5,31 +5,63 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class HomeMeidaItem extends StatelessWidget {
   final TemporaryMedia media;
+  final GestureTapCallback? onTapDelete;
   final bool active;
   const HomeMeidaItem({
     super.key,
     required this.media,
     required this.active,
+    this.onTapDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-              color: active ? Colors.blue : TDTheme.of(context).grayColor1,
-              width: 2),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: CachedNetworkImage(
-            fit: BoxFit.cover,
-            imageUrl: media.url,
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                  color: active ? Colors.blue : TDTheme.of(context).grayColor1,
+                  width: 2),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl: media.url,
+              ),
+            ),
           ),
-        ),
+          // 删除
+          Positioned(
+              right: 0,
+              top: 0,
+              child: GestureDetector(
+                onTap: onTapDelete,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft:
+                            Radius.circular(TDTheme.of(context).radiusDefault),
+                        topRight:
+                            Radius.circular(TDTheme.of(context).radiusDefault)),
+                  ),
+                  child: const Center(
+                      child: Icon(
+                    TDIcons.close,
+                    size: 16,
+                    color: Colors.white,
+                  )),
+                ),
+              ))
+        ],
       ),
     );
   }
@@ -40,6 +72,7 @@ class HomeMedia extends StatelessWidget {
   final int currentMediaId;
   final GestureTapCallback? onTapUplod;
   final Function(TemporaryMedia temporaryMedia)? onTapMedia;
+  final Function(TemporaryMedia temporaryMedia)? onDeleteMedia;
 
   const HomeMedia({
     super.key,
@@ -47,6 +80,7 @@ class HomeMedia extends StatelessWidget {
     required this.currentMediaId,
     this.onTapUplod,
     this.onTapMedia,
+    this.onDeleteMedia,
   });
 
   @override
@@ -68,6 +102,7 @@ class HomeMedia extends StatelessWidget {
                         onTap: () => onTapMedia?.call(item),
                         child: HomeMeidaItem(
                           media: item,
+                          onTapDelete: () => onDeleteMedia?.call(item),
                           active: currentMediaId == item.id,
                         ),
                       ),

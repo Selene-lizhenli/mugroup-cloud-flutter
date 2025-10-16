@@ -38,6 +38,17 @@ class HomePage extends HookConsumerWidget {
 
               home.bus.dispatch(SearchEvent(media: temporaryMedia));
             },
+            onDeleteMedia: (temporaryMedia) {
+              final nextState = homeNotifier.deleteMedia(temporaryMedia);
+              if (nextState.currentMediaId == home.currentMediaId) {
+                return;
+              }
+
+              home.bus.dispatch(SearchEvent(
+                media: nextState.currentMedia,
+                search: nextState.search,
+              ));
+            },
           ),
           Expanded(
             child: PageView(

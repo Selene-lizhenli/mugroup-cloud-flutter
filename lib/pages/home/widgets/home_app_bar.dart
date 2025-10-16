@@ -41,12 +41,14 @@ class HomeAppBar extends HookConsumerWidget {
   final TextEditingController controller;
   final void Function(String search)? onSearchText;
   final void Function(TemporaryMedia temporaryMedia)? onSearchMedia;
+  final void Function(TemporaryMedia temporaryMedia)? onDeleteMedia;
 
   const HomeAppBar({
     super.key,
     required this.controller,
     this.onSearchText,
     this.onSearchMedia,
+    this.onDeleteMedia,
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -112,6 +114,7 @@ class HomeAppBar extends HookConsumerWidget {
               onTapUplod: handleUploadMedia,
               currentMediaId: home.currentMediaId!,
               onTapMedia: onSearchMedia,
+              onDeleteMedia: onDeleteMedia,
             )
           else
             Container(
