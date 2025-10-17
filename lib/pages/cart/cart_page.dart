@@ -44,6 +44,7 @@ class CartPage extends HookConsumerWidget {
     final quotationInfo = state.quotationInfo;
 
     final borrower = useState<User?>(null);
+    final stockInOption = useState<String?>(null);
 
     final core = app.container.read(coreProvider).value;
     final tenant = core?.currentTenant;
@@ -70,6 +71,18 @@ class CartPage extends HookConsumerWidget {
       const FlanActionSheetAction(name: "USD"),
       const FlanActionSheetAction(name: "EUR"),
       const FlanActionSheetAction(name: "GBP")
+    ];
+
+    final stockInOptions = [
+      {'stockInName': '采购入库', 'type': 'purchase'},
+      {'stockInName': '移除入库', 'type': 'remove'},
+      {'stockInName': '退货入库', 'type': 'return'},
+      {'stockInName': '其他入库', 'type': 'other'},
+      {'stockInName': '客户取消订单', 'type': 'cancel'},
+      {'stockInName': '调拨入库', 'type': 'transfer_in'},
+      {'stockInName': '还样入库', 'type': 'borrow_in'},
+      {'stockInName': '盘点入库', 'type': 'inventory_in'},
+      {'stockInName': '交样入库', 'type': 'submission_in'},
     ];
 
     final scrollController = ScrollController();
@@ -169,10 +182,76 @@ class CartPage extends HookConsumerWidget {
           ),
         );
       }
+
+      if (cartType == CartType.stockIn) {
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () async {
+                final selectedWarehouse = await context.router
+                    .push<Warehouse>(const SelectWmsWarehouseRoute());
+
+                cart.warehouse = selectedWarehouse;
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(warehouse == null
+                        ? "请选择仓库"
+                        : warehouse.name ?? "未设置仓库名称"),
+                    const Icon(Icons.chevron_right)
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                showFlanActionSheet(
+                  context,
+                  description: "请选择入库操作类型",
+                  cancelText: "我再想想",
+                  actions: stockInOptions
+                      .map((option) =>
+                          FlanActionSheetAction(name: option['stockInName']!))
+                      .toList(),
+                  closeOnClickAction: true,
+                  onSelect: (action, index) {
+                    stockInOption.value = stockInOptions[index]['type'];
+                  },
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(stockInOption.value == null
+                        ? "请选择入库操作类型"
+                        : stockInOptions.firstWhere((element) =>
+                                element['type'] ==
+                                stockInOption.value)['stockInName'] ??
+                            "未设置入库操作类型"),
+                    const Icon(Icons.chevron_right)
+                  ],
+                ),
+              ),
+            )
+          ],
+        );
+      }
       return GestureDetector(
         child: const SizedBox(),
       );
-    }, [cartType, warehouse, borrow, transfer, borrower.value]);
+    }, [
+      cartType,
+      warehouse,
+      borrow,
+      transfer,
+      borrower.value,
+      stockInOption.value
+    ]);
 
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
@@ -1084,6 +1163,110 @@ class CartPage extends HookConsumerWidget {
           });
     }
 
+    void stockInDialog(BuildContext context) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            final text = cartType == CartType.stockIn ? "入库" : "未知";
+            final remarkController = TextEditingController();
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              title: Text(
+                "确认$text",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                width: 400, // 固定宽度
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "备注",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: remarkController,
+                      decoration: InputDecoration(
+                        hintText: "请输入备注信息",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                      maxLines: null,
+                      minLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    "取消",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final productData = items
+                        .map((item) => {
+                              ///price没有记录
+                              'model_type':
+                                  "App\\Models\\Showroom\\ShowroomSample",
+                              "model_id": item.sample.id,
+                              "name": item.sample.nameCn,
+                              "product_no": item.sample.productNo,
+                              "inout_qty": item.count
+                            })
+                        .toList();
+                    final data = {
+                      "products": productData,
+                      "type": "in",
+                      'operation_type': stockInOption.value,
+                      'warehouse_id': warehouse?.id,
+                      'remark': remarkController.text.trim(),
+                    };
+
+                    EasyLoading.show(status: '加载中...');
+
+                    if (cartType == CartType.stockIn) {
+                      await storeWmsStockInOut(data);
+                      EasyLoading.showSuccess("入库成功!");
+                    }
+
+                    cart.clear();
+
+                    if (context.mounted) {
+                      //关闭弹窗
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "确认",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          });
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -1159,6 +1342,20 @@ class CartPage extends HookConsumerWidget {
         if (context.mounted) {
           context.router
               .push(ConfirmRoute(items: (items), warehouse: warehouse));
+        }
+      }
+
+      if (cartType == CartType.stockIn) {
+        if (warehouse == null) {
+          EasyLoading.showInfo("请先选择仓库!");
+          return;
+        }
+        if (stockInOption.value == null) {
+          EasyLoading.showInfo("请先选择入库操作类型!");
+          return;
+        }
+        if (context.mounted) {
+          stockInDialog(context);
         }
       }
     }

@@ -39,6 +39,7 @@ class Cart extends _$Cart {
     const defaultState = State(
       items: [],
       carts: [
+        CartSelect(CartType.stockIn),
         CartSelect(CartType.borrowOut),
         CartSelect(CartType.borrowIn),
         CartSelect(CartType.inout),

@@ -535,6 +535,7 @@ State _$StateFromJson(Map<String, dynamic> json) {
 mixin _$State {
   List<CartItem> get items => throw _privateConstructorUsedError;
   List<CartSelect> get carts => throw _privateConstructorUsedError;
+  String? get stockInOption => throw _privateConstructorUsedError;
   Warehouse? get warehouse => throw _privateConstructorUsedError;
   Borrow? get borrow => throw _privateConstructorUsedError;
   Transfer? get transfer => throw _privateConstructorUsedError;
@@ -556,6 +557,7 @@ abstract class $StateCopyWith<$Res> {
   $Res call(
       {List<CartItem> items,
       List<CartSelect> carts,
+      String? stockInOption,
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
@@ -586,6 +588,7 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
   $Res call({
     Object? items = null,
     Object? carts = null,
+    Object? stockInOption = freezed,
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
@@ -603,6 +606,10 @@ class _$StateCopyWithImpl<$Res, $Val extends State>
           ? _value.carts
           : carts // ignore: cast_nullable_to_non_nullable
               as List<CartSelect>,
+      stockInOption: freezed == stockInOption
+          ? _value.stockInOption
+          : stockInOption // ignore: cast_nullable_to_non_nullable
+              as String?,
       warehouse: freezed == warehouse
           ? _value.warehouse
           : warehouse // ignore: cast_nullable_to_non_nullable
@@ -705,6 +712,7 @@ abstract class _$$StateImplCopyWith<$Res> implements $StateCopyWith<$Res> {
   $Res call(
       {List<CartItem> items,
       List<CartSelect> carts,
+      String? stockInOption,
       Warehouse? warehouse,
       Borrow? borrow,
       Transfer? transfer,
@@ -738,6 +746,7 @@ class __$$StateImplCopyWithImpl<$Res>
   $Res call({
     Object? items = null,
     Object? carts = null,
+    Object? stockInOption = freezed,
     Object? warehouse = freezed,
     Object? borrow = freezed,
     Object? transfer = freezed,
@@ -755,6 +764,10 @@ class __$$StateImplCopyWithImpl<$Res>
           ? _value._carts
           : carts // ignore: cast_nullable_to_non_nullable
               as List<CartSelect>,
+      stockInOption: freezed == stockInOption
+          ? _value.stockInOption
+          : stockInOption // ignore: cast_nullable_to_non_nullable
+              as String?,
       warehouse: freezed == warehouse
           ? _value.warehouse
           : warehouse // ignore: cast_nullable_to_non_nullable
@@ -793,6 +806,7 @@ class _$StateImpl implements _State {
   const _$StateImpl(
       {required final List<CartItem> items,
       required final List<CartSelect> carts,
+      this.stockInOption,
       this.warehouse,
       this.borrow,
       this.transfer,
@@ -823,6 +837,8 @@ class _$StateImpl implements _State {
   }
 
   @override
+  final String? stockInOption;
+  @override
   final Warehouse? warehouse;
   @override
   final Borrow? borrow;
@@ -839,7 +855,7 @@ class _$StateImpl implements _State {
 
   @override
   String toString() {
-    return 'State(items: $items, carts: $carts, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, delivery: $delivery, type: $type, cartName: $cartName, quotationInfo: $quotationInfo)';
+    return 'State(items: $items, carts: $carts, stockInOption: $stockInOption, warehouse: $warehouse, borrow: $borrow, transfer: $transfer, delivery: $delivery, type: $type, cartName: $cartName, quotationInfo: $quotationInfo)';
   }
 
   @override
@@ -849,6 +865,8 @@ class _$StateImpl implements _State {
             other is _$StateImpl &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             const DeepCollectionEquality().equals(other._carts, _carts) &&
+            (identical(other.stockInOption, stockInOption) ||
+                other.stockInOption == stockInOption) &&
             (identical(other.warehouse, warehouse) ||
                 other.warehouse == warehouse) &&
             (identical(other.borrow, borrow) || other.borrow == borrow) &&
@@ -869,6 +887,7 @@ class _$StateImpl implements _State {
       runtimeType,
       const DeepCollectionEquality().hash(_items),
       const DeepCollectionEquality().hash(_carts),
+      stockInOption,
       warehouse,
       borrow,
       transfer,
@@ -895,6 +914,7 @@ abstract class _State implements State {
   const factory _State(
       {required final List<CartItem> items,
       required final List<CartSelect> carts,
+      final String? stockInOption,
       final Warehouse? warehouse,
       final Borrow? borrow,
       final Transfer? transfer,
@@ -909,6 +929,8 @@ abstract class _State implements State {
   List<CartItem> get items;
   @override
   List<CartSelect> get carts;
+  @override
+  String? get stockInOption;
   @override
   Warehouse? get warehouse;
   @override

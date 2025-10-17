@@ -8,6 +8,9 @@ part 'state.g.dart';
 
 enum CartType {
   /// 借样
+  stockIn,
+
+  /// 借样
   borrowOut,
 
   /// 还样
@@ -30,6 +33,7 @@ enum CartType {
 }
 
 Map<CartType, String> cartNames = {
+  CartType.stockIn: "入库选样车",
   CartType.borrowOut: "借样选样车",
   CartType.borrowIn: "还样选样车",
   CartType.transferOut: "调拨出库选样车",
