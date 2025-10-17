@@ -4,13 +4,21 @@ output: dist/
 releases:
   - name: dev
     jobs:
-      # 构建 apk 包并将其发布到 pgyer
-      - name: release-dev-android
+      - name: android
         package:
           platform: android
           target: apk
           build_args:
             target-platform: android-arm,android-arm64
+            dart-define:
+              APP_ENV: dev
+        publish_to: pgyer
+      - name: ios
+        package:
+          platform: ios
+          target: ipa
+          build_args:
+            export-options-plist: ios/adhoc_ExportOptions.plist
             dart-define:
               APP_ENV: dev
         publish_to: pgyer

@@ -1,10 +1,14 @@
 PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_app_update (0.0.1):
     - Flutter
   - flutter_broadcasts (0.0.1):
     - Flutter
   - flutter_native_splash (0.0.1):
+    - Flutter
+  - flutter_wxwork (0.0.3):
     - Flutter
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
@@ -61,25 +65,38 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - photo_manager (3.7.1):
+    - Flutter
+    - FlutterMacOS
   - PromisesObjC (2.4.0)
+  - sensors_plus (0.0.1):
+    - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
   - flutter_app_update (from `.symlinks/plugins/flutter_app_update/ios`)
   - flutter_broadcasts (from `.symlinks/plugins/flutter_broadcasts/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - flutter_wxwork (from `.symlinks/plugins/flutter_wxwork/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -96,6 +113,8 @@ SPEC REPOS:
     - PromisesObjC
 
 EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   Flutter:
     :path: Flutter
   flutter_app_update:
@@ -104,6 +123,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_broadcasts/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  flutter_wxwork:
+    :path: ".symlinks/plugins/flutter_wxwork/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   mobile_scanner:
@@ -112,16 +133,24 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  photo_manager:
+    :path: ".symlinks/plugins/photo_manager/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite:
     :path: ".symlinks/plugins/sqflite/darwin"
+  video_player_avfoundation:
+    :path: ".symlinks/plugins/video_player_avfoundation/darwin"
 
 SPEC CHECKSUMS:
+  camera_avfoundation: be3be85408cd4126f250386828e9b1dfa40ab436
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_app_update: 816fdb2e30e4832a7c45e3f108d391c42ef040a9
   flutter_broadcasts: 7bb7cc1024900a7f85e98b6faab795290b7c2339
   flutter_native_splash: 35ddbc7228eafcb3969dcc5f1fbbe27c1145a4f0
+  flutter_wxwork: 39312e535fa4fcbaab349048709df5bcd79aa794
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
@@ -136,9 +165,12 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  photo_manager: 1d80ae07a89a67dfbcae95953a1e5a24af7c3e62
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  sensors_plus: 6a11ed0c2e1d0bd0b20b4029d3bad27d96e0c65b
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite: c35dad70033b8862124f8337cc994a809fcd9fa3
+  video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
 
 PODFILE CHECKSUM: f2095d9946016fd9e5adc1075579dbb37c2bbacc
 

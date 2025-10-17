@@ -20,8 +20,36 @@
 		<string>$(FLUTTER_BUILD_NAME)</string>
 		<key>CFBundleSignature</key>
 		<string>????</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>scheme</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>wwauth8f1e80541af434bd000002</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>corpId</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>ww8f1e80541af434bd</string>
+				</array>
+			</dict>
+		</array>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>wxwork</string>
+			<string>wxworklocal</string>
+		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>UILaunchStoryboardName</key>
