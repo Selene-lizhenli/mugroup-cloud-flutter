@@ -73,6 +73,7 @@ class CartPage extends HookConsumerWidget {
     ];
 
     final stockInOptions = [
+      {'stockInName': '交样入库', 'type': 'submission_in'},
       {'stockInName': '采购入库', 'type': 'purchase'},
       {'stockInName': '移除入库', 'type': 'remove'},
       {'stockInName': '退货入库', 'type': 'return'},
@@ -81,7 +82,6 @@ class CartPage extends HookConsumerWidget {
       {'stockInName': '调拨入库', 'type': 'transfer_in'},
       {'stockInName': '还样入库', 'type': 'borrow_in'},
       {'stockInName': '盘点入库', 'type': 'inventory_in'},
-      {'stockInName': '交样入库', 'type': 'submission_in'},
     ];
 
     final scrollController = ScrollController();
