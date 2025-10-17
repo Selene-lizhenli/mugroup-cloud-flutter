@@ -1,0 +1,16 @@
+variables:
+  PGYER_API_KEY: '31c5ea9587585056f17b8fd2a85ec69b'
+output: dist/
+releases:
+  - name: dev
+    jobs:
+      # 构建 apk 包并将其发布到 pgyer
+      - name: release-dev-android
+        package:
+          platform: android
+          target: apk
+          build_args:
+            target-platform: android-arm,android-arm64
+            dart-define:
+              APP_ENV: dev
+        publish_to: pgyer

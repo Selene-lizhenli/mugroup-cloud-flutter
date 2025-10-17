@@ -48,3 +48,4 @@ app.*.map.json
 # 项目
 .env
 config.g.dart
+/dist
