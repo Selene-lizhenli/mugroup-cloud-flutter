@@ -16,23 +16,8 @@ class Home extends _$Home {
       pageController: PageController(),
       searchTextController: TextEditingController(),
       search: null,
-      media: [
-        const TemporaryMedia(
-          id: 2318463,
-          thumbUrl:
-              'https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318463/conversions/CAP2644820930011794157-thumb.jpg',
-          url:
-              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318463/CAP2644820930011794157.jpg",
-        ),
-        const TemporaryMedia(
-          id: 2318464,
-          thumbUrl:
-              'https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318464/conversions/CAP5753167623670165613-thumb.jpg',
-          url:
-              "https://mu-cloud.oss-cn-hangzhou.aliyuncs.com/tenant-cloud/temporary/2318464/CAP5753167623670165613.jpg",
-        )
-      ],
-      currentMediaId: 2318463,
+      media: [],
+      currentMediaId: null,
     );
 
     ref.onDispose(() {
