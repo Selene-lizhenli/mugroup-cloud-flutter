@@ -1,0 +1,40 @@
+name: Android(pgyer)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Flutter SDK
+        uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          version: 3.22.3
+          cache: true
+          cache-sdk: true
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: "oracle"
+          java-version: "17"
+          cache: gradle
+      - run: java --version
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Install
+        run: dart pub global activate fastforge
+
+      - name: Build Android
+        run: |
+          dart run melos prepare:cloud
+          fastforge release --name dev --jobs android
