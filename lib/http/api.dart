@@ -51,7 +51,11 @@ final silentApi = Dio(
       handler.next(options);
     },
     onError: (error, handler) {
-      return handler.next(error);
+      var err = error;
+      if (error.type == DioExceptionType.connectionError) {
+        err = error.copyWith(message: '网络错误，检查网络');
+      }
+      return handler.next(err);
     },
   ))
   ..interceptors.add(CookieManager(

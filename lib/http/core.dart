@@ -18,6 +18,11 @@ final coreApi = silentCoreApi
       handler.next(options);
     },
     onError: (error, handler) {
+      var err = error;
+      if (error.type == DioExceptionType.connectionError) {
+        err = error.copyWith(message: '网络错误，检查网络');
+      }
+
       final response = error.response;
 
       do {
@@ -28,10 +33,10 @@ final coreApi = silentCoreApi
         }
 
         if (error.message != null) {
-          EasyLoading.showError(error.message!);
+          EasyLoading.showError(err.message!);
         }
       } while (false);
 
-      return handler.next(error);
+      return handler.next(err);
     },
   ));

@@ -1,5 +1,8 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
+import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,7 +46,11 @@ Future<void> main() async {
         messageText: '最后更新于 %T',
       );
 
-  await app.loadCoreProvider();
+  try {
+    await app.loadCoreProvider();
+  } catch (e) {
+    logger.d("出错");
+  }
   runApp(
     UncontrolledProviderScope(
       container: app.container,
@@ -54,12 +61,52 @@ Future<void> main() async {
   FlutterNativeSplash.remove();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final core = ref.watch(coreProvider);
+    if (core.isLoading) {
+      return MaterialApp(
+        home: const Scaffold(
+          body: SizedBox(),
+        ),
+        builder: EasyLoading.init(),
+      );
+    }
+
+    if (core.hasError) {
+      final error = core.error is DioException
+          ? (core.error as DioException).message
+          : core.error.toString();
+
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  error ?? "",
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    return ref.refresh(coreProvider);
+                  },
+                  child: const Text('点击重试'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        builder: EasyLoading.init(),
+      );
+    }
+
     return MaterialApp.router(
       routerConfig: app.router.config(
         reevaluateListenable: authNotifier,
