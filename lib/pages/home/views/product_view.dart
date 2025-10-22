@@ -45,7 +45,6 @@ class ProductView extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
-      logger.d(queryParameters);
       final resp = await getSamples(queryParameters: queryParameters);
 
       if (init == true) {
@@ -67,7 +66,7 @@ class ProductView extends HookConsumerWidget {
           search.value = event.search;
           media.value = event.media;
 
-          refreshController.callRefresh();
+          refreshController.callRefresh(force: true);
         },
       );
 
@@ -76,58 +75,38 @@ class ProductView extends HookConsumerWidget {
       };
     }, []);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: EasyRefresh(
-            controller: refreshController,
-            refreshOnStart: true,
-            onRefresh: () async {
-              await fetchData(
-                search.value,
-                searchMedia: media.value,
-                init: true,
-              );
-              refreshController.finishRefresh();
-              refreshController.resetFooter();
-            },
-            onLoad: () async {
-              logger.d('onLoad');
-              final resp =
-                  await fetchData(search.value, searchMedia: media.value);
+    return EasyRefresh(
+      controller: refreshController,
+      refreshOnStart: true,
+      onRefresh: () async {
+        await fetchData(
+          search.value,
+          searchMedia: media.value,
+          init: true,
+        );
+        refreshController.finishRefresh();
+        refreshController.resetFooter();
+      },
+      onLoad: () async {
+        logger.d('onLoad');
+        final resp = await fetchData(search.value, searchMedia: media.value);
 
-              refreshController.finishLoad(resp.data.length >= pageSize
-                  ? IndicatorResult.success
-                  : IndicatorResult.noMore);
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // 产品列表
-                  MasonryGridView.count(
-                    crossAxisCount: 2, // 列数
-                    mainAxisSpacing: 5,
-                    crossAxisSpacing: 5,
-                    itemCount: samples.value.length,
-                    padding: const EdgeInsets.all(5),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final sample = samples.value[index];
-                      return ProductCard(sample: sample);
-                    },
-                  ),
-                  Container(
-                    height: 10,
-                  )
-                ],
-              ),
-            ),
-          ),
-        )
-      ],
+        refreshController.finishLoad(resp.data.length >= pageSize
+            ? IndicatorResult.success
+            : IndicatorResult.noMore);
+      },
+      child: MasonryGridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 5,
+        crossAxisSpacing: 5,
+        itemCount: samples.value.length,
+        padding: const EdgeInsets.all(5),
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          final sample = samples.value[index];
+          return ProductCard(sample: sample);
+        },
+      ),
     );
   }
 }
