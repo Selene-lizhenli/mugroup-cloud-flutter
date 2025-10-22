@@ -108,145 +108,161 @@ class LoginPage extends HookConsumerWidget {
                   );
                 },
               )
-            : CustomScrollView(
-                physics: const ClampingScrollPhysics(),
-                slivers: [
-                  SliverFillRemaining(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (loginWay.value != null)
-                          LoginWay(
-                            loginWay: loginWay.value!,
-                            onLogined: () async {
-                              await app.fetchUser();
-                              afterLogin();
-                            },
-                          ),
-                        if (restEnableLoginWays.value.isNotEmpty) ...[
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: FlanDivider(
-                              child: Text(
-                                  style: TextStyle(fontSize: 12), "其他登录方式"),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              for (var (index, item)
-                                  in restEnableLoginWays.value.indexed) ...[
-                                if (index != 0)
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    color: Colors.grey,
-                                    height: 20,
-                                    width: 1,
-                                  ),
-                                GestureDetector(
-                                  onTap: () {
-                                    loginWay.value = item;
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 5,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.grey,
-                                        ),
-                                        getLableByLoginWay(item),
-                                      ),
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (loginWay.value != null)
+                              LoginWay(
+                                loginWay: loginWay.value!,
+                                onLogined: () async {
+                                  await app.fetchUser();
+                                  afterLogin();
+                                },
+                              ),
+                            if (restEnableLoginWays.value.isNotEmpty) ...[
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: SizedBox(
+                                  height: 60,
+                                  child: FlanDivider(
+                                    child: Text(
+                                      style: TextStyle(fontSize: 14),
+                                      "切换登录",
                                     ),
                                   ),
-                                )
-                              ]
-                            ],
-                          )
-                        ],
-                        const Spacer(),
-                        if (enableLoginWays.contains("wxwork") &&
-                            tenant.wxwork?.scheme != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                const FlanDivider(
-                                  child: Text('其他登录方式'),
                                 ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    final wxwork = FlutterWxwork();
-
-                                    await wxwork.register(
-                                      scheme: tenant.wxwork!.scheme!,
-                                      corpId: tenant.wxwork!.corpId!,
-                                      agentId: tenant.wxwork!.agentId!,
-                                    );
-
-                                    final result = await wxwork.auth();
-                                    if (result.errCode != '0') {
-                                      return;
-                                    }
-
-                                    final code = result.code!;
-
-                                    await api.post('api/tenant/wechat/login',
-                                        data: {"code": code});
-
-                                    await app.fetchUser();
-                                    afterLogin();
-                                  },
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: const Color(0xFFEBEDF0),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  for (var (index, item)
+                                      in restEnableLoginWays.value.indexed) ...[
+                                    if (index != 0)
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        color: Colors.grey,
+                                        height: 20,
                                         width: 1,
                                       ),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      'assets/icons/wxwork.svg',
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const DefaultTextStyle(
-                          style: TextStyle(
-                            color: Color(0xFF969799),
-                            fontSize: 12,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("网页版: https://cloud.mugroup.com"),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text("客服: 669082"),
+                                    GestureDetector(
+                                      onTap: () {
+                                        loginWay.value = item;
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 5,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                            getLableByLoginWay(item),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ]
+                                ],
+                              )
                             ],
-                          ),
+                            const Spacer(),
+                            // 底部
+                            if (enableLoginWays.contains("wxwork") &&
+                                tenant.wxwork?.scheme != null)
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 60,
+                                      child: FlanDivider(
+                                        child: Text('快捷登录方式'),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final wxwork = FlutterWxwork();
+
+                                        await wxwork.register(
+                                          scheme: tenant.wxwork!.scheme!,
+                                          corpId: tenant.wxwork!.corpId!,
+                                          agentId: tenant.wxwork!.agentId!,
+                                        );
+
+                                        final result = await wxwork.auth();
+                                        if (result.errCode != '0') {
+                                          return;
+                                        }
+
+                                        final code = result.code!;
+
+                                        await api.post(
+                                            'api/tenant/wechat/login',
+                                            data: {"code": code});
+
+                                        await app.fetchUser();
+                                        afterLogin();
+                                      },
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: const Color(0xFFEBEDF0),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: SvgPicture.asset(
+                                          'assets/icons/wxwork.svg',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const DefaultTextStyle(
+                              style: TextStyle(
+                                color: Color(0xFF969799),
+                                fontSize: 12,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("网页版: https://cloud.mugroup.com"),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text("客服: 669082"),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
       ),
     );
