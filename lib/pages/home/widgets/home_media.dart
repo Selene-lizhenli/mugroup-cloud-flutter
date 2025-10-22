@@ -16,6 +16,8 @@ class HomeMeidaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AspectRatio(
       aspectRatio: 1,
       child: Stack(
@@ -25,7 +27,11 @@ class HomeMeidaItem extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                  color: active ? Colors.blue : TDTheme.of(context).grayColor1,
+                  color: active
+                      ? colorScheme.primary
+                      : const Color(
+                          0xFFe5e5e5,
+                        ),
                   width: 2),
             ),
             child: ClipRRect(
