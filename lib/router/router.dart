@@ -16,11 +16,11 @@ class AppRouter extends RootStackRouter {
         guards: [AuthGuard()],
         children: [
           AutoRoute(
+            initial: true,
             page: HomeRoute.page,
             path: 'home',
           ),
           AutoRoute(
-            initial: true,
             page: CartRoute.page,
             path: "cart",
           ),
