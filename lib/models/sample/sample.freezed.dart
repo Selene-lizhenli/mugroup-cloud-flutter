@@ -31,6 +31,7 @@ mixin _$Sample {
   @JsonKey(name: 'page_no')
   String? get pageNo => throw _privateConstructorUsedError;
   String? get spec => throw _privateConstructorUsedError;
+  SampleCategory? get category => throw _privateConstructorUsedError;
   List<Media>? get image => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,7 +52,10 @@ abstract class $SampleCopyWith<$Res> {
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
       String? spec,
+      SampleCategory? category,
       List<Media>? image});
+
+  $SampleCategoryCopyWith<$Res>? get category;
 }
 
 /// @nodoc
@@ -74,6 +78,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
     Object? spec = freezed,
+    Object? category = freezed,
     Object? image = freezed,
   }) {
     return _then(_value.copyWith(
@@ -105,11 +110,27 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.spec
           : spec // ignore: cast_nullable_to_non_nullable
               as String?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as SampleCategory?,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as List<Media>?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SampleCategoryCopyWith<$Res>? get category {
+    if (_value.category == null) {
+      return null;
+    }
+
+    return $SampleCategoryCopyWith<$Res>(_value.category!, (value) {
+      return _then(_value.copyWith(category: value) as $Val);
+    });
   }
 }
 
@@ -128,7 +149,11 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
       String? spec,
+      SampleCategory? category,
       List<Media>? image});
+
+  @override
+  $SampleCategoryCopyWith<$Res>? get category;
 }
 
 /// @nodoc
@@ -149,6 +174,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
     Object? spec = freezed,
+    Object? category = freezed,
     Object? image = freezed,
   }) {
     return _then(_$SampleImpl(
@@ -180,6 +206,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.spec
           : spec // ignore: cast_nullable_to_non_nullable
               as String?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as SampleCategory?,
       image: freezed == image
           ? _value._image
           : image // ignore: cast_nullable_to_non_nullable
@@ -199,6 +229,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
       @JsonKey(name: 'page_no') this.pageNo,
       this.spec,
+      this.category,
       final List<Media>? image})
       : _image = image,
         super._();
@@ -224,6 +255,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   final String? pageNo;
   @override
   final String? spec;
+  @override
+  final SampleCategory? category;
   final List<Media>? _image;
   @override
   List<Media>? get image {
@@ -236,7 +269,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, category: $category, image: $image)';
   }
 
   @override
@@ -251,6 +284,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
       ..add(DiagnosticsProperty('pageNo', pageNo))
       ..add(DiagnosticsProperty('spec', spec))
+      ..add(DiagnosticsProperty('category', category))
       ..add(DiagnosticsProperty('image', image));
   }
 
@@ -268,13 +302,24 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
                 other.purchaseCost == purchaseCost) &&
             (identical(other.pageNo, pageNo) || other.pageNo == pageNo) &&
             (identical(other.spec, spec) || other.spec == spec) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
             const DeepCollectionEquality().equals(other._image, _image));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, barcode, nameCn, productNo,
-      purchaseCost, pageNo, spec, const DeepCollectionEquality().hash(_image));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      barcode,
+      nameCn,
+      productNo,
+      purchaseCost,
+      pageNo,
+      spec,
+      category,
+      const DeepCollectionEquality().hash(_image));
 
   @JsonKey(ignore: true)
   @override
@@ -299,6 +344,7 @@ abstract class _Sample extends Sample {
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
       @JsonKey(name: 'page_no') final String? pageNo,
       final String? spec,
+      final SampleCategory? category,
       final List<Media>? image}) = _$SampleImpl;
   const _Sample._() : super._();
 
@@ -323,9 +369,176 @@ abstract class _Sample extends Sample {
   @override
   String? get spec;
   @override
+  SampleCategory? get category;
+  @override
   List<Media>? get image;
   @override
   @JsonKey(ignore: true)
   _$$SampleImplCopyWith<_$SampleImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SampleCategory _$SampleCategoryFromJson(Map<String, dynamic> json) {
+  return _SampleCategory.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SampleCategory {
+  int? get id => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $SampleCategoryCopyWith<SampleCategory> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SampleCategoryCopyWith<$Res> {
+  factory $SampleCategoryCopyWith(
+          SampleCategory value, $Res Function(SampleCategory) then) =
+      _$SampleCategoryCopyWithImpl<$Res, SampleCategory>;
+  @useResult
+  $Res call({int? id, String? name});
+}
+
+/// @nodoc
+class _$SampleCategoryCopyWithImpl<$Res, $Val extends SampleCategory>
+    implements $SampleCategoryCopyWith<$Res> {
+  _$SampleCategoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? name = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SampleCategoryImplCopyWith<$Res>
+    implements $SampleCategoryCopyWith<$Res> {
+  factory _$$SampleCategoryImplCopyWith(_$SampleCategoryImpl value,
+          $Res Function(_$SampleCategoryImpl) then) =
+      __$$SampleCategoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int? id, String? name});
+}
+
+/// @nodoc
+class __$$SampleCategoryImplCopyWithImpl<$Res>
+    extends _$SampleCategoryCopyWithImpl<$Res, _$SampleCategoryImpl>
+    implements _$$SampleCategoryImplCopyWith<$Res> {
+  __$$SampleCategoryImplCopyWithImpl(
+      _$SampleCategoryImpl _value, $Res Function(_$SampleCategoryImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? name = freezed,
+  }) {
+    return _then(_$SampleCategoryImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SampleCategoryImpl
+    with DiagnosticableTreeMixin
+    implements _SampleCategory {
+  const _$SampleCategoryImpl({this.id, this.name});
+
+  factory _$SampleCategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SampleCategoryImplFromJson(json);
+
+  @override
+  final int? id;
+  @override
+  final String? name;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SampleCategory(id: $id, name: $name)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'SampleCategory'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SampleCategoryImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SampleCategoryImplCopyWith<_$SampleCategoryImpl> get copyWith =>
+      __$$SampleCategoryImplCopyWithImpl<_$SampleCategoryImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SampleCategoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SampleCategory implements SampleCategory {
+  const factory _SampleCategory({final int? id, final String? name}) =
+      _$SampleCategoryImpl;
+
+  factory _SampleCategory.fromJson(Map<String, dynamic> json) =
+      _$SampleCategoryImpl.fromJson;
+
+  @override
+  int? get id;
+  @override
+  String? get name;
+  @override
+  @JsonKey(ignore: true)
+  _$$SampleCategoryImplCopyWith<_$SampleCategoryImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

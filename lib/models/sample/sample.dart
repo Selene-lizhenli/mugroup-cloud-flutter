@@ -17,6 +17,7 @@ abstract class Sample with _$Sample {
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'page_no') String? pageNo,
     String? spec,
+    SampleCategory? category,
     List<Media>? image,
   }) = _Sample;
 
@@ -26,4 +27,15 @@ abstract class Sample with _$Sample {
     return image?.elementAtOrNull(0)?.thumbUrl ??
         image?.elementAtOrNull(0)?.url;
   }
+}
+
+@freezed
+abstract class SampleCategory with _$SampleCategory {
+  const factory SampleCategory({
+    int? id,
+    String? name,
+  }) = _SampleCategory;
+
+  factory SampleCategory.fromJson(Map<String, Object?> json) =>
+      _$SampleCategoryFromJson(json);
 }

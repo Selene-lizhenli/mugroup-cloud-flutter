@@ -64,7 +64,6 @@ _$StateImpl _$$StateImplFromJson(Map<String, dynamic> json) => _$StateImpl(
       carts: (json['carts'] as List<dynamic>)
           .map((e) => CartSelect.fromJson(e as Map<String, dynamic>))
           .toList(),
-      stockInOption: json['stockInOption'] as String?,
       warehouse: json['warehouse'] == null
           ? null
           : Warehouse.fromJson(json['warehouse'] as Map<String, dynamic>),
@@ -89,7 +88,6 @@ Map<String, dynamic> _$$StateImplToJson(_$StateImpl instance) =>
     <String, dynamic>{
       'items': instance.items,
       'carts': instance.carts,
-      'stockInOption': instance.stockInOption,
       'warehouse': instance.warehouse,
       'borrow': instance.borrow,
       'transfer': instance.transfer,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
@@ -44,13 +45,54 @@ class ProductCard extends StatelessWidget {
                     ),
                     maxLines: 2,
                   ),
+                  DefaultTextStyle(
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[500],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (sample.productNo != null) ...[
+                          Text(sample.productNo!),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 5,
+                            ),
+                            child: Container(
+                              height: 8,
+                              width: 0.5,
+                              color: Colors.grey[500]!.withOpacity(0.8),
+                            ),
+                          )
+                        ],
+                        if (sample.barcode != null)
+                          Flexible(
+                            child: Text(
+                              sample.barcode!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                  if (sample.category != null)
+                    FlanTag(
+                      type: FlanTagType.warning,
+                      child: Text(
+                        sample.category!.name!,
+                        style: const TextStyle(fontSize: 9),
+                      ),
+                    ),
                   const SizedBox(
                     height: 5,
                   ),
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
-                        TextSpan(
+                        const TextSpan(
                           text: '¥',
                           style: TextStyle(
                             fontSize: 12,
@@ -58,8 +100,8 @@ class ProductCard extends StatelessWidget {
                           ),
                         ),
                         TextSpan(
-                          text: '99',
-                          style: TextStyle(
+                          text: sample.purchaseCost,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFFF03380),
