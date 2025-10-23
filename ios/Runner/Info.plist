@@ -31,7 +31,7 @@
 			<string>scheme</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wwauth8f1e80541af434bd000002</string>
+				<string>wwauth9306502d79084189000089</string>
 			</array>
 		</dict>
 		<dict>
@@ -41,7 +41,7 @@
 			<string>corpId</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ww8f1e80541af434bd</string>
+				<string>ww9306502d79084189</string>
 			</array>
 		</dict>
 	</array>
