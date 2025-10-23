@@ -67,7 +67,7 @@ class HomeAppBar extends HookConsumerWidget {
 
       final file = await entity.file;
 
-      final temporaryMedia = await upload(file: file!, fileName: entity.title!);
+      final temporaryMedia = await upload(file: file!);
 
       onSearchMedia?.call(temporaryMedia);
     }
