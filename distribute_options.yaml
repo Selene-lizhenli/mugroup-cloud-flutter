@@ -1,5 +1,7 @@
 variables:
   PGYER_API_KEY: '31c5ea9587585056f17b8fd2a85ec69b'
+  APPSTORE_APIKEY: 'BV7YMY7C4C'
+  APPSTORE_APIISSUER: '778876ae-e9ec-4ca4-8d8f-73edddb59ecb'
 output: dist/
 releases:
   - name: dev
@@ -22,3 +24,15 @@ releases:
             dart-define:
               APP_ENV: dev
         publish_to: pgyer
+
+  - name: appstore
+    jobs:
+      - name: release-prod-ios
+        package:
+          platform: ios
+          target: ipa
+          build_args:
+            export-options-plist: ios/ExportOptions.plist
+            dart-define:
+              APP_ENV: prod
+        publish_to: appstore
