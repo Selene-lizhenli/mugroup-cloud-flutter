@@ -114,7 +114,6 @@
 				87F5B1F523BC8FA0B44220B1 /* Pods-RunnerTests.release.xcconfig */,
 				37EC992615CD9E2B89DDB27F /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -279,9 +278,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -371,9 +374,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -489,11 +496,96 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = V6J4Q957X6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WXWorkApi\"",
+					"-l\"c++\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"Accelerate\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"CoreImage\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"CoreTelephony\"",
+					"-framework",
+					"\"CoreVideo\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleDataTransport\"",
+					"-framework",
+					"\"GoogleToolboxForMac\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"LocalAuthentication\"",
+					"-framework",
+					"\"MLImage\"",
+					"-framework",
+					"\"MLKitBarcodeScanning\"",
+					"-framework",
+					"\"MLKitCommon\"",
+					"-framework",
+					"\"MLKitVision\"",
+					"-framework",
+					"\"PhotosUI\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-framework",
+					"\"camera_avfoundation\"",
+					"-framework",
+					"\"flutter_app_update\"",
+					"-framework",
+					"\"flutter_broadcasts\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"flutter_wxwork\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"mobile_scanner\"",
+					"-framework",
+					"\"nanopb\"",
+					"-framework",
+					"\"package_info_plus\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"photo_manager\"",
+					"-framework",
+					"\"sensors_plus\"",
+					"-framework",
+					"\"shared_preferences_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mugroup.cloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -671,11 +763,96 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = V6J4Q957X6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WXWorkApi\"",
+					"-l\"c++\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"Accelerate\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"CoreImage\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"CoreTelephony\"",
+					"-framework",
+					"\"CoreVideo\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleDataTransport\"",
+					"-framework",
+					"\"GoogleToolboxForMac\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"LocalAuthentication\"",
+					"-framework",
+					"\"MLImage\"",
+					"-framework",
+					"\"MLKitBarcodeScanning\"",
+					"-framework",
+					"\"MLKitCommon\"",
+					"-framework",
+					"\"MLKitVision\"",
+					"-framework",
+					"\"PhotosUI\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-framework",
+					"\"camera_avfoundation\"",
+					"-framework",
+					"\"flutter_app_update\"",
+					"-framework",
+					"\"flutter_broadcasts\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"flutter_wxwork\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"mobile_scanner\"",
+					"-framework",
+					"\"nanopb\"",
+					"-framework",
+					"\"package_info_plus\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"photo_manager\"",
+					"-framework",
+					"\"sensors_plus\"",
+					"-framework",
+					"\"shared_preferences_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mugroup.cloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -693,11 +870,96 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = V6J4Q957X6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WXWorkApi\"",
+					"-l\"c++\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"Accelerate\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"CoreImage\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"CoreTelephony\"",
+					"-framework",
+					"\"CoreVideo\"",
+					"-framework",
+					"\"FBLPromises\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"GTMSessionFetcher\"",
+					"-framework",
+					"\"GoogleDataTransport\"",
+					"-framework",
+					"\"GoogleToolboxForMac\"",
+					"-framework",
+					"\"GoogleUtilities\"",
+					"-framework",
+					"\"LocalAuthentication\"",
+					"-framework",
+					"\"MLImage\"",
+					"-framework",
+					"\"MLKitBarcodeScanning\"",
+					"-framework",
+					"\"MLKitCommon\"",
+					"-framework",
+					"\"MLKitVision\"",
+					"-framework",
+					"\"PhotosUI\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-framework",
+					"\"camera_avfoundation\"",
+					"-framework",
+					"\"flutter_app_update\"",
+					"-framework",
+					"\"flutter_broadcasts\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"flutter_wxwork\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"mobile_scanner\"",
+					"-framework",
+					"\"nanopb\"",
+					"-framework",
+					"\"package_info_plus\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"photo_manager\"",
+					"-framework",
+					"\"sensors_plus\"",
+					"-framework",
+					"\"shared_preferences_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mugroup.cloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
