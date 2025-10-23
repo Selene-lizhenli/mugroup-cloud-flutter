@@ -2,14 +2,23 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class ProductCard extends StatelessWidget {
   final Sample sample;
 
-  const ProductCard({super.key, required this.sample});
+  final GestureTapCallback? onTapAddSample;
+
+  const ProductCard({
+    super.key,
+    required this.sample,
+    this.onTapAddSample,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: Container(
@@ -32,8 +41,12 @@ class ProductCard extends StatelessWidget {
                       child: Container(),
                     ),
                   ),
+            Container(
+              height: 0.5,
+              color: Colors.grey[200]!.withOpacity(0.8),
+            ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -45,6 +58,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     maxLines: 2,
                   ),
+                  // 产品编号
                   DefaultTextStyle(
                     style: TextStyle(
                       fontSize: 10,
@@ -89,26 +103,44 @@ class ProductCard extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: '¥',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFFF03380),
+                  Row(
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '¥',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorScheme.secondary,
+                              ),
+                            ),
+                            TextSpan(
+                              text: sample.purchaseCost,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.secondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: onTapAddSample,
+                        child: CircleAvatar(
+                          radius: 7,
+                          backgroundColor:
+                              colorScheme.secondary.withOpacity(0.3),
+                          child: Icon(
+                            TDIcons.add,
+                            size: 12,
+                            color: colorScheme.secondary,
                           ),
                         ),
-                        TextSpan(
-                          text: sample.purchaseCost,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFF03380),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 ],
               ),

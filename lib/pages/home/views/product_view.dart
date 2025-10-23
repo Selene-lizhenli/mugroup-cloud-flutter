@@ -104,7 +104,12 @@ class ProductView extends HookConsumerWidget {
         shrinkWrap: true,
         itemBuilder: (context, index) {
           final sample = samples.value[index];
-          return ProductCard(sample: sample);
+          return ProductCard(
+            sample: sample,
+            onTapAddSample: () {
+              logger.d("添加样品");
+            },
+          );
         },
       ),
     );

@@ -123,6 +123,7 @@ class MyApp extends ConsumerWidget {
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF355EBF),
+          secondary: Color(0xFFF03380),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6),
