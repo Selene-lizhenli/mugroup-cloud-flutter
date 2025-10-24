@@ -76,6 +76,7 @@ dependencies:
   flutter_wxwork: ^0.0.11
   flutter_svg: ^2.1.0
   path: ^1.9.0
+  wechat_assets_picker: ^9.8.0
     # path: ../flant
 
 dev_dependencies:
