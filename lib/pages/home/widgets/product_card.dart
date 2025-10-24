@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flant/flant.dart';
+import 'package:flant/styles/components/badge_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -9,10 +10,13 @@ class ProductCard extends StatelessWidget {
 
   final GestureTapCallback? onTapAddSample;
 
+  final int? cartCount;
+
   const ProductCard({
     super.key,
     required this.sample,
     this.onTapAddSample,
+    this.cartCount,
   });
 
   @override
@@ -129,14 +133,26 @@ class ProductCard extends StatelessWidget {
                       const Spacer(),
                       GestureDetector(
                         onTap: onTapAddSample,
-                        child: CircleAvatar(
-                          radius: 7,
-                          backgroundColor:
-                              colorScheme.secondary.withOpacity(0.3),
-                          child: Icon(
-                            TDIcons.add,
-                            size: 12,
-                            color: colorScheme.secondary,
+                        child: FlanBadgeTheme(
+                          data: FlanBadgeThemeData(
+                            size: 10,
+                            backgroundColor: colorScheme.secondary,
+                            fontSize: 7,
+                          ),
+                          child: FlanBadge(
+                            content:
+                                cartCount != null ? cartCount.toString() : '',
+                            max: 99,
+                            child: CircleAvatar(
+                              radius: 7,
+                              backgroundColor:
+                                  colorScheme.secondary.withOpacity(0.3),
+                              child: Icon(
+                                TDIcons.add,
+                                size: 12,
+                                color: colorScheme.secondary,
+                              ),
+                            ),
                           ),
                         ),
                       ),

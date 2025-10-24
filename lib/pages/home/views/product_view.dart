@@ -2,10 +2,12 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,6 +21,9 @@ class ProductView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
+
+    final cart = ref.read(cartProvider.notifier);
+    final cartState = ref.watch(cartProvider);
 
     final refreshController = useEasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
@@ -104,10 +109,14 @@ class ProductView extends HookConsumerWidget {
         shrinkWrap: true,
         itemBuilder: (context, index) {
           final sample = samples.value[index];
+          final cartItem = cartState.items
+              .firstWhereOrNull((element) => element.sample.id == sample.id);
+
           return ProductCard(
             sample: sample,
+            cartCount: cartItem?.count,
             onTapAddSample: () {
-              logger.d("添加样品");
+              cart.addSample(sample, 1);
             },
           );
         },
