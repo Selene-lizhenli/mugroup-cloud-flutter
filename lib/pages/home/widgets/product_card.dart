@@ -98,9 +98,18 @@ class ProductCard extends StatelessWidget {
                   if (sample.category != null)
                     FlanTag(
                       type: FlanTagType.warning,
-                      child: Text(
-                        sample.category!.name!,
-                        style: const TextStyle(fontSize: 9),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 3,
+                        ),
+                        child: Text(
+                          sample.category!.name!,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            height: 1,
+                          ),
+                        ),
                       ),
                     ),
                   const SizedBox(
