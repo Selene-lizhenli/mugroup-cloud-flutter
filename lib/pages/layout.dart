@@ -2,13 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:flant/components/badge.dart';
-import 'package:flant/styles/components/badge_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'package:version/version.dart';
 
 @RoutePage()
@@ -74,19 +73,23 @@ class Layout extends HookConsumerWidget {
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
       BottomNavigationBarItem(
-        icon: FlanBadgeTheme(
-          data: FlanBadgeThemeData(
-            backgroundColor: colorScheme.secondary,
-            size: 20.0,
-            fontSize: 14,
-          ),
-          child: FlanBadge(
-            content: cartState.items.length.toString(),
-            offset: const [2, 2],
-            max: 99,
-            showZero: false,
-            child: const Icon(Icons.shopping_cart),
-          ),
+        icon: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.bottomCenter,
+          children: [
+            const Icon(Icons.shopping_cart),
+            Positioned(
+              top: -8,
+              right: -10,
+              child: TDBadge(
+                TDBadgeType.message,
+                color: colorScheme.secondary,
+                size: TDBadgeSize.large,
+                showZero: false,
+                count: cartState.items.length.toString(),
+              ),
+            )
+          ],
         ),
         label: "选样车",
       ),

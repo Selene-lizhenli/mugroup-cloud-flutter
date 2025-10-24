@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flant/flant.dart';
-import 'package:flant/styles/components/badge_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -133,16 +132,11 @@ class ProductCard extends StatelessWidget {
                       const Spacer(),
                       GestureDetector(
                         onTap: onTapAddSample,
-                        child: FlanBadgeTheme(
-                          data: FlanBadgeThemeData(
-                            backgroundColor: colorScheme.secondary,
-                            fontSize: 12,
-                          ),
-                          child: FlanBadge(
-                            content:
-                                cartCount != null ? cartCount.toString() : '',
-                            max: 99,
-                            child: CircleAvatar(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            CircleAvatar(
                               radius: 10,
                               backgroundColor:
                                   colorScheme.secondary.withOpacity(0.3),
@@ -152,7 +146,19 @@ class ProductCard extends StatelessWidget {
                                 color: colorScheme.secondary,
                               ),
                             ),
-                          ),
+                            Positioned(
+                              top: -10,
+                              right: -8,
+                              child: TDBadge(
+                                TDBadgeType.message,
+                                color: colorScheme.secondary,
+                                showZero: false,
+                                count: cartCount != null
+                                    ? cartCount.toString()
+                                    : '',
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ],
