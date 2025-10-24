@@ -44,6 +44,7 @@ class Cart extends _$Cart {
       authNotifier.removeListener(handleAuthChange);
     });
 
+    const defaultQuotationInfo = QuotationInfo(true, 'CNY', null, null);
     final defaultState = State(
       items: [],
       carts: [
@@ -60,6 +61,7 @@ class Cart extends _$Cart {
         // if (user?.permissions?.contains('showroom.stock_delivery.store') ?? false)
         //   const CartSelect(CartType.deliveryOut),
       ],
+      quotationInfo: defaultQuotationInfo,
     );
 
     if (cloud.currentTenant?.id == 6) {
@@ -81,7 +83,12 @@ class Cart extends _$Cart {
         transfer: cacheState.transfer,
         type: cacheState.type,
         warehouse: cacheState.warehouse,
-        quotationInfo: cacheState.quotationInfo,
+        quotationInfo: defaultQuotationInfo.copyWith(
+          showPrice: cacheState.quotationInfo?.showPrice,
+          curreny: cacheState.quotationInfo?.curreny,
+          exchange: cacheState.quotationInfo?.exchange,
+          commissionRate: cacheState.quotationInfo?.commissionRate,
+        ),
       );
     }
 
