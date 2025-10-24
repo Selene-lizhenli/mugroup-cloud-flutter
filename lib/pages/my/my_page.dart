@@ -46,11 +46,13 @@ class MyPage extends HookConsumerWidget {
                     '工号: ${user?.jobNumber}',
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '部门: ${user?.department?.name}',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  if (user?.department != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      '部门: ${user?.department?.name}',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ]
                 ],
               ),
             ),

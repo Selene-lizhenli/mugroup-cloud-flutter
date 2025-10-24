@@ -12,6 +12,7 @@ class OperateBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final state = ref.watch(cartProvider);
 
     final items = state.items;
@@ -42,55 +43,58 @@ class OperateBar extends HookConsumerWidget {
     int totalCount = items.length;
 
     return Container(
-      height: 60,
       color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: Row(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.ideographic,
-                    children: [
-                      Text("已选: $totalCount 件"),
-                      const SizedBox(
-                        width: 1,
-                      ),
-                      if (cartType != CartType.quotation)
-                        if (showPrice)
-                          Row(
-                            children: [
-                              const Text("合计: "),
-                              const Text(
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w400),
-                                  '¥'),
-                              Text(
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  totalPrice.toStringAsFixed(2)),
-                            ],
-                          ),
-                    ],
-                  ),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.ideographic,
+                  children: [
+                    Text("已选: $totalCount 件"),
+                    const SizedBox(
+                      width: 1,
+                    ),
+                    if (cartType != CartType.quotation)
+                      if (showPrice)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.ideographic,
+                          children: [
+                            const Text("合计: "),
+                            const Text(
+                              '¥',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              totalPrice.toStringAsFixed(2),
+                            ),
+                          ],
+                        ),
+                  ],
+                ),
+              ],
             ),
           ),
           TextButton(
             onPressed: onPressed,
             style: TextButton.styleFrom(
               foregroundColor: Colors.white,
-              backgroundColor: Colors.blue,
+              backgroundColor: colorScheme.primary,
               padding: const EdgeInsets.symmetric(), // 设置内边距
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -100,13 +104,10 @@ class OperateBar extends HookConsumerWidget {
             child: Text(
               buttonText[cartType] ?? "确认",
               style: const TextStyle(
-                fontSize: 18.0,
+                fontSize: 16.0,
               ),
             ),
           ),
-          const SizedBox(
-            width: 10,
-          )
         ],
       ),
     );
