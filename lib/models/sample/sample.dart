@@ -27,6 +27,10 @@ abstract class Sample with _$Sample {
     return image?.elementAtOrNull(0)?.thumbUrl ??
         image?.elementAtOrNull(0)?.url;
   }
+
+  String get name {
+    return nameCn ?? "";
+  }
 }
 
 @freezed
