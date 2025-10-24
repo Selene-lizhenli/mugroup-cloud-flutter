@@ -6,6 +6,7 @@ import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/delivery.dart';
 import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
 import 'package:cloud/services/sample.dart';
@@ -22,12 +23,8 @@ class Cart extends _$Cart {
   @override
   State build() {
     final cloud = ref.watch(coreProvider).value!;
-    logger.d("购物车 初始化");
-    ref.onDispose(() {
-      logger.d("购物车 dispos 拉");
-    });
-
-    ref.listen(
+    final user = authNotifier.user;
+    final scanProviderSubscription = ref.listen(
       scanProvider,
       (previous, next) {
         for (var barcode in next) {
@@ -36,14 +33,32 @@ class Cart extends _$Cart {
       },
     );
 
-    const defaultState = State(
+    handleAuthChange() {
+      logger.d(authNotifier.user);
+    }
+
+    authNotifier.addListener(handleAuthChange);
+    ref.onDispose(() {
+      logger.d("购物车 dispos 拉");
+      scanProviderSubscription.close();
+      authNotifier.removeListener(handleAuthChange);
+    });
+
+    final defaultState = State(
       items: [],
       carts: [
-        CartSelect(CartType.stockIn),
-        CartSelect(CartType.borrowOut),
-        CartSelect(CartType.borrowIn),
-        CartSelect(CartType.inout),
-        CartSelect(CartType.quotation),
+        if (user?.permissions?.contains("wms.stock_inout.store") ?? false)
+          const CartSelect(CartType.stockIn),
+        if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
+          const CartSelect(CartType.borrowOut),
+        if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
+          const CartSelect(CartType.borrowIn),
+        if (user?.permissions?.contains('wms.stock_inventory.show') ?? false)
+          const CartSelect(CartType.inout),
+        if (user?.permissions?.contains('showroom.quotation.store') ?? false)
+          const CartSelect(CartType.quotation),
+        // if (user?.permissions?.contains('showroom.stock_delivery.store') ?? false)
+        //   const CartSelect(CartType.deliveryOut),
       ],
     );
 

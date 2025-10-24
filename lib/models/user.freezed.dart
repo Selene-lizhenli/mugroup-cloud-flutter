@@ -25,6 +25,7 @@ mixin _$User {
   @JsonKey(name: 'job_number')
   String? get jobNumber => throw _privateConstructorUsedError;
   Department? get department => throw _privateConstructorUsedError;
+  List<String>? get permissions => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -40,7 +41,8 @@ abstract class $UserCopyWith<$Res> {
       {int? id,
       String? name,
       @JsonKey(name: 'job_number') String? jobNumber,
-      Department? department});
+      Department? department,
+      List<String>? permissions});
 
   $DepartmentCopyWith<$Res>? get department;
 }
@@ -62,6 +64,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? name = freezed,
     Object? jobNumber = freezed,
     Object? department = freezed,
+    Object? permissions = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -80,6 +83,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as Department?,
+      permissions: freezed == permissions
+          ? _value.permissions
+          : permissions // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ) as $Val);
   }
 
@@ -107,7 +114,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       {int? id,
       String? name,
       @JsonKey(name: 'job_number') String? jobNumber,
-      Department? department});
+      Department? department,
+      List<String>? permissions});
 
   @override
   $DepartmentCopyWith<$Res>? get department;
@@ -127,6 +135,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? name = freezed,
     Object? jobNumber = freezed,
     Object? department = freezed,
+    Object? permissions = freezed,
   }) {
     return _then(_$UserImpl(
       id: freezed == id
@@ -145,6 +154,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as Department?,
+      permissions: freezed == permissions
+          ? _value._permissions
+          : permissions // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }
@@ -156,7 +169,9 @@ class _$UserImpl implements _User {
       {this.id,
       this.name,
       @JsonKey(name: 'job_number') this.jobNumber,
-      this.department});
+      this.department,
+      final List<String>? permissions})
+      : _permissions = permissions;
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -170,10 +185,19 @@ class _$UserImpl implements _User {
   final String? jobNumber;
   @override
   final Department? department;
+  final List<String>? _permissions;
+  @override
+  List<String>? get permissions {
+    final value = _permissions;
+    if (value == null) return null;
+    if (_permissions is EqualUnmodifiableListView) return _permissions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, jobNumber: $jobNumber, department: $department)';
+    return 'User(id: $id, name: $name, jobNumber: $jobNumber, department: $department, permissions: $permissions)';
   }
 
   @override
@@ -186,12 +210,15 @@ class _$UserImpl implements _User {
             (identical(other.jobNumber, jobNumber) ||
                 other.jobNumber == jobNumber) &&
             (identical(other.department, department) ||
-                other.department == department));
+                other.department == department) &&
+            const DeepCollectionEquality()
+                .equals(other._permissions, _permissions));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, jobNumber, department);
+  int get hashCode => Object.hash(runtimeType, id, name, jobNumber, department,
+      const DeepCollectionEquality().hash(_permissions));
 
   @JsonKey(ignore: true)
   @override
@@ -212,7 +239,8 @@ abstract class _User implements User {
       {final int? id,
       final String? name,
       @JsonKey(name: 'job_number') final String? jobNumber,
-      final Department? department}) = _$UserImpl;
+      final Department? department,
+      final List<String>? permissions}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -225,6 +253,8 @@ abstract class _User implements User {
   String? get jobNumber;
   @override
   Department? get department;
+  @override
+  List<String>? get permissions;
   @override
   @JsonKey(ignore: true)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>

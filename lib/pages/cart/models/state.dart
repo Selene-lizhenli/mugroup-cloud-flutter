@@ -7,7 +7,7 @@ part 'state.freezed.dart';
 part 'state.g.dart';
 
 enum CartType {
-  /// 借样
+  /// 入库
   stockIn,
 
   /// 借样

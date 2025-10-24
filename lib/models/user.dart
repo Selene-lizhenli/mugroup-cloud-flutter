@@ -11,6 +11,7 @@ abstract class User with _$User {
     String? name,
     @JsonKey(name: 'job_number') String? jobNumber,
     Department? department,
+    List<String>? permissions,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
