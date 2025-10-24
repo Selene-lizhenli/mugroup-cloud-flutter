@@ -32,7 +32,7 @@ class WmsTransferItemsCard extends HookConsumerWidget {
               Row(children: [
                 Expanded(
                     child: Text(
-                  '${transferItem?.product?.nameCn}',
+                  '${transferItem?.product?.name}',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: const TextStyle(fontWeight: FontWeight.w600),

@@ -74,7 +74,7 @@ class ConfirmItem extends HookWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          item?.sample.nameCn ?? "",
+                          item?.sample.name ?? "",
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),

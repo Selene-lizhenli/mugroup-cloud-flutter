@@ -24,6 +24,8 @@ mixin _$Sample {
   String? get barcode => throw _privateConstructorUsedError;
   @JsonKey(name: 'name_cn')
   String? get nameCn => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name_en')
+  String? get nameEn => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_no')
   String? get productNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'purchase_cost')
@@ -48,6 +50,7 @@ abstract class $SampleCopyWith<$Res> {
       {int? id,
       String? barcode,
       @JsonKey(name: 'name_cn') String? nameCn,
+      @JsonKey(name: 'name_en') String? nameEn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
@@ -74,6 +77,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? id = freezed,
     Object? barcode = freezed,
     Object? nameCn = freezed,
+    Object? nameEn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
@@ -93,6 +97,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameEn: freezed == nameEn
+          ? _value.nameEn
+          : nameEn // ignore: cast_nullable_to_non_nullable
               as String?,
       productNo: freezed == productNo
           ? _value.productNo
@@ -145,6 +153,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       {int? id,
       String? barcode,
       @JsonKey(name: 'name_cn') String? nameCn,
+      @JsonKey(name: 'name_en') String? nameEn,
       @JsonKey(name: 'product_no') String? productNo,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
@@ -170,6 +179,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? barcode = freezed,
     Object? nameCn = freezed,
+    Object? nameEn = freezed,
     Object? productNo = freezed,
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
@@ -189,6 +199,10 @@ class __$$SampleImplCopyWithImpl<$Res>
       nameCn: freezed == nameCn
           ? _value.nameCn
           : nameCn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      nameEn: freezed == nameEn
+          ? _value.nameEn
+          : nameEn // ignore: cast_nullable_to_non_nullable
               as String?,
       productNo: freezed == productNo
           ? _value.productNo
@@ -225,6 +239,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       {this.id,
       this.barcode,
       @JsonKey(name: 'name_cn') this.nameCn,
+      @JsonKey(name: 'name_en') this.nameEn,
       @JsonKey(name: 'product_no') this.productNo,
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
       @JsonKey(name: 'page_no') this.pageNo,
@@ -244,6 +259,9 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   @override
   @JsonKey(name: 'name_cn')
   final String? nameCn;
+  @override
+  @JsonKey(name: 'name_en')
+  final String? nameEn;
   @override
   @JsonKey(name: 'product_no')
   final String? productNo;
@@ -269,7 +287,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, productNo: $productNo, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, category: $category, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, category: $category, image: $image)';
   }
 
   @override
@@ -280,6 +298,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('barcode', barcode))
       ..add(DiagnosticsProperty('nameCn', nameCn))
+      ..add(DiagnosticsProperty('nameEn', nameEn))
       ..add(DiagnosticsProperty('productNo', productNo))
       ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
       ..add(DiagnosticsProperty('pageNo', pageNo))
@@ -296,6 +315,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.barcode, barcode) || other.barcode == barcode) &&
             (identical(other.nameCn, nameCn) || other.nameCn == nameCn) &&
+            (identical(other.nameEn, nameEn) || other.nameEn == nameEn) &&
             (identical(other.productNo, productNo) ||
                 other.productNo == productNo) &&
             (identical(other.purchaseCost, purchaseCost) ||
@@ -314,6 +334,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       id,
       barcode,
       nameCn,
+      nameEn,
       productNo,
       purchaseCost,
       pageNo,
@@ -340,6 +361,7 @@ abstract class _Sample extends Sample {
       {final int? id,
       final String? barcode,
       @JsonKey(name: 'name_cn') final String? nameCn,
+      @JsonKey(name: 'name_en') final String? nameEn,
       @JsonKey(name: 'product_no') final String? productNo,
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
       @JsonKey(name: 'page_no') final String? pageNo,
@@ -357,6 +379,9 @@ abstract class _Sample extends Sample {
   @override
   @JsonKey(name: 'name_cn')
   String? get nameCn;
+  @override
+  @JsonKey(name: 'name_en')
+  String? get nameEn;
   @override
   @JsonKey(name: 'product_no')
   String? get productNo;

@@ -13,6 +13,7 @@ abstract class Sample with _$Sample {
     int? id,
     String? barcode,
     @JsonKey(name: 'name_cn') String? nameCn,
+    @JsonKey(name: 'name_en') String? nameEn,
     @JsonKey(name: 'product_no') String? productNo,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'page_no') String? pageNo,
@@ -29,7 +30,7 @@ abstract class Sample with _$Sample {
   }
 
   String get name {
-    return nameCn ?? "";
+    return nameCn ?? nameEn ?? "";
   }
 }
 

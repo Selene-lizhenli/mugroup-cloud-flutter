@@ -86,7 +86,7 @@ class SampleItem extends HookWidget {
 
     return AppExpansionTile(
       title: Text(
-        sample.nameCn ?? "",
+        sample.name,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
       ),

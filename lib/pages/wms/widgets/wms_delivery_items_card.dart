@@ -32,7 +32,7 @@ class WmsDeliveryItemsCard extends HookConsumerWidget {
               Row(children: [
                 Expanded(
                     child: Text(
-                  '${deliveryItem?.product?.nameCn}',
+                  '${deliveryItem?.product?.name}',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: const TextStyle(fontWeight: FontWeight.w600),

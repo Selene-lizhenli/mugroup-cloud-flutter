@@ -1299,7 +1299,7 @@ class CartPage extends HookConsumerWidget {
                                 'model_type':
                                     "App\\Models\\Showroom\\ShowroomSample",
                                 "model_id": item.sample.id,
-                                "name": item.sample.nameCn,
+                                "name": item.sample.name,
                                 "product_no": item.sample.productNo,
                                 "inout_qty": item.count
                               })

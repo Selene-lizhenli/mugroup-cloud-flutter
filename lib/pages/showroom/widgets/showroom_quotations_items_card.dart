@@ -33,7 +33,7 @@ class ShowroomQuotationItemsCard extends HookConsumerWidget {
               Row(children: [
                 Expanded(
                     child: Text(
-                  '${quoationSample?.showroomSample?.nameCn}',
+                  '${quoationSample?.showroomSample?.name}',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: const TextStyle(fontWeight: FontWeight.w600),

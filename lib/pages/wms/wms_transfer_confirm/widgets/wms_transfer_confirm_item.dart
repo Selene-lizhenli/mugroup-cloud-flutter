@@ -24,7 +24,7 @@ class WmsTransferConfirmItem extends HookWidget {
   Widget build(BuildContext context) {
     var cover = item.product.image?.elementAtOrNull(0)?.thumbUrl ??
         item.product.image?.elementAtOrNull(0)?.url;
-        
+
     return Column(
       children: [
         Row(
@@ -42,7 +42,7 @@ class WmsTransferConfirmItem extends HookWidget {
                   Row(children: [
                     Expanded(
                         child: Text(
-                      '${item.product.nameCn}',
+                      item.product.name,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: const TextStyle(fontWeight: FontWeight.w600),
