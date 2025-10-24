@@ -117,27 +117,28 @@ class ProductCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '¥',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: colorScheme.secondary,
+                      if (sample.purchaseCost != null)
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '¥',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.secondary,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: sample.purchaseCost,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.secondary,
+                              TextSpan(
+                                text: sample.purchaseCost,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.secondary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                       const Spacer(),
                       GestureDetector(
                         onTap: onTapAddSample,
