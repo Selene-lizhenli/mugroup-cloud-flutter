@@ -16,8 +16,6 @@ class OperateBar extends HookConsumerWidget {
     final items = state.items;
     final cartType = state.type;
 
-    const showPrice = true;
-
     Map<CartType, String> buttonText = {
       CartType.borrowOut: "借样",
       CartType.borrowIn: "还样",
@@ -27,13 +25,6 @@ class OperateBar extends HookConsumerWidget {
       CartType.inout: "盘点",
       CartType.deliveryOut: '出货'
     };
-
-    double totalPrice = items.fold(0.0, (previousValue, item) {
-          // 尝试将 purchaseCost 从 String 转换为 double
-          double cost = double.tryParse(item.sample.purchaseCost ?? '0') ?? 0.0;
-          return previousValue! + (cost * item.count);
-        }) ??
-        0.0;
 
     int totalCount = items.length;
 
@@ -55,31 +46,6 @@ class OperateBar extends HookConsumerWidget {
                     const SizedBox(
                       width: 1,
                     ),
-                    if (cartType != CartType.quotation)
-                      if (showPrice)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.ideographic,
-                          children: [
-                            const Text("合计: "),
-                            const Text(
-                              '¥',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Text(
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              totalPrice.toStringAsFixed(2),
-                            ),
-                          ],
-                        ),
                   ],
                 ),
               ],
