@@ -62,6 +62,7 @@ class CartPage extends HookConsumerWidget {
       const FlanActionSheetAction(name: "客户会议用"),
       const FlanActionSheetAction(name: "客户选中，核价报价用"),
       const FlanActionSheetAction(name: "展会使用"),
+      const FlanActionSheetAction(name: "本组出货样"),
       const FlanActionSheetAction(name: "其他")
     ];
 
@@ -249,8 +250,10 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
-    void borrowDialog(BuildContext context) {
-      showDialog(
+    Future<void> borrowDialog(BuildContext context) async {
+      final reasonController = TextEditingController();
+
+      await showDialog(
         context: context,
         builder: (context) {
           String? borrowReason;
@@ -327,7 +330,9 @@ class CartPage extends HookConsumerWidget {
                             const Text(
                               "借样原因",
                               style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             GestureDetector(
@@ -353,23 +358,35 @@ class CartPage extends HookConsumerWidget {
                                   borderRadius: BorderRadius.circular(8),
                                   color: Colors.grey.shade100,
                                 ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        borrowReason ?? "请选择借样原因",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: borrowReason == null
-                                              ? Colors.grey.shade600
-                                              : Colors.black87,
+                                child: borrowReason == '其他'
+                                    ? TextField(
+                                        controller: reasonController,
+                                        decoration: const InputDecoration(
+                                          hintText: "请输入借样理由",
+                                          border: InputBorder.none,
                                         ),
+                                        maxLines: 2,
+                                        minLines: 1,
+                                      )
+                                    : Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              borrowReason ?? "请选择借样原因",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: borrowReason == null
+                                                    ? Colors.grey.shade600
+                                                    : Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                          const Icon(
+                                            Icons.keyboard_arrow_right,
+                                            color: Colors.grey,
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const Icon(Icons.keyboard_arrow_right,
-                                        color: Colors.grey), // 添加右侧箭头
-                                  ],
-                                ),
                               ),
                             ),
                             const SizedBox(
@@ -436,12 +453,19 @@ class CartPage extends HookConsumerWidget {
                   ),
                   ElevatedButton(
                     onPressed: () async {
+                      final reason = reasonController.text.isNotEmpty
+                          ? reasonController.text
+                          : borrowReason;
+
                       if (user.value == null) {
                         EasyLoading.showInfo("请先选择用户!");
                         return;
                       }
-                      if (borrowReason == null) {
-                        EasyLoading.showInfo("请先选择借样原因!");
+                      // 借样理由
+                      if ((borrowReason == null || borrowReason == '其他') &&
+                          reasonController.text.isEmpty) {
+                        EasyLoading.showInfo(
+                            "请先${borrowReason == null ? "选择" : "输入"}借样原因!");
                         return;
                       }
                       if (selectedDate == null) {
@@ -459,7 +483,7 @@ class CartPage extends HookConsumerWidget {
                         "borrower_id": user.value?.id,
                         "warehouse_id": warehouse?.id,
                         "products": productData,
-                        "borrow_reason": borrowReason,
+                        "borrow_reason": reason,
                         "expected_returned_at":
                             DateFormat("yyyy-MM-dd HH:mm:ss").format(
                                 DateTime.fromMillisecondsSinceEpoch(
@@ -491,6 +515,8 @@ class CartPage extends HookConsumerWidget {
           );
         },
       );
+
+      reasonController.dispose();
     }
 
     void quotationDialog(BuildContext context) {
