@@ -134,7 +134,7 @@ class LoginPage extends HookConsumerWidget {
                                   height: 60,
                                   child: FlanDivider(
                                     child: Text(
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 15),
                                       "切换登录",
                                     ),
                                   ),
@@ -165,7 +165,7 @@ class LoginPage extends HookConsumerWidget {
                                         child: Center(
                                           child: Text(
                                             style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 13,
                                               color: Colors.grey,
                                             ),
                                             getLableByLoginWay(item),
@@ -194,6 +194,7 @@ class LoginPage extends HookConsumerWidget {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
+                                        logger.d("123");
                                         final wxwork = FlutterWxwork();
 
                                         await wxwork.register(

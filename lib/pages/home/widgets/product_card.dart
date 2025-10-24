@@ -135,21 +135,20 @@ class ProductCard extends StatelessWidget {
                         onTap: onTapAddSample,
                         child: FlanBadgeTheme(
                           data: FlanBadgeThemeData(
-                            size: 10,
                             backgroundColor: colorScheme.secondary,
-                            fontSize: 7,
+                            fontSize: 12,
                           ),
                           child: FlanBadge(
                             content:
                                 cartCount != null ? cartCount.toString() : '',
                             max: 99,
                             child: CircleAvatar(
-                              radius: 7,
+                              radius: 10,
                               backgroundColor:
                                   colorScheme.secondary.withOpacity(0.3),
                               child: Icon(
                                 TDIcons.add,
-                                size: 12,
+                                size: 14,
                                 color: colorScheme.secondary,
                               ),
                             ),

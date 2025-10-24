@@ -77,10 +77,12 @@ class Layout extends HookConsumerWidget {
         icon: FlanBadgeTheme(
           data: FlanBadgeThemeData(
             backgroundColor: colorScheme.secondary,
-            fontSize: 8,
+            size: 20.0,
+            fontSize: 14,
           ),
           child: FlanBadge(
             content: cartState.items.length.toString(),
+            offset: const [2, 2],
             max: 99,
             showZero: false,
             child: const Icon(Icons.shopping_cart),
