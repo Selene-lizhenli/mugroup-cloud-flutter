@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:flant/components/badge.dart';
+import 'package:flant/styles/components/badge_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,6 +17,9 @@ class Layout extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final cartState = ref.watch(cartProvider);
+
     final checkVersion = useCallback(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final checkResp = await silentApi
@@ -68,8 +73,21 @@ class Layout extends HookConsumerWidget {
 
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-      const BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart), label: "选样车"),
+      BottomNavigationBarItem(
+        icon: FlanBadgeTheme(
+          data: FlanBadgeThemeData(
+            backgroundColor: colorScheme.secondary,
+            fontSize: 8,
+          ),
+          child: FlanBadge(
+            content: cartState.items.length.toString(),
+            max: 99,
+            showZero: false,
+            child: const Icon(Icons.shopping_cart),
+          ),
+        ),
+        label: "选样车",
+      ),
       const BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
     ];
 
