@@ -1,7 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud/app/app.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -14,10 +12,7 @@ class ShowroomQuotationItemsCard extends HookConsumerWidget {
     var cover =
         quoationSample?.showroomSample?.image?.elementAtOrNull(0)?.thumbUrl;
 
-    final core = app.container.read(coreProvider).value;
-    final tenant = core?.currentTenant;
-    final title = tenant?.title;
-    final showPrice = title != '硬电';
+    const showPrice = true;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),

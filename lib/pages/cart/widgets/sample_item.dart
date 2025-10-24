@@ -1,10 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud/app/app.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/widgets/quote_item.dart';
-import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/stepper.dart';
@@ -42,17 +40,7 @@ class SampleItem extends HookWidget {
     final quotes = useState<List<Quote>?>([]);
     final loading = useState<bool>(false);
 
-    final core = app.container.read(coreProvider).value;
-    final tenant = core?.currentTenant;
-    final title = tenant?.title;
-
-    final showPrice = quotationInfo?.showPrice;
-
-    var isShowPrice = title != '硬电';
-
-    if (cartType == CartType.quotation) {
-      isShowPrice = title != '硬电' && (showPrice ?? true);
-    }
+    final showPrice = quotationInfo?.showPrice ?? false;
 
     final symbol = symbols[quotationInfo?.curreny] ?? "¥";
     if (sample.purchaseCost != null) {
@@ -141,7 +129,7 @@ class SampleItem extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: isShowPrice
+                        child: showPrice
                             ? Text(
                                 displayPrice,
                                 overflow: TextOverflow.ellipsis,

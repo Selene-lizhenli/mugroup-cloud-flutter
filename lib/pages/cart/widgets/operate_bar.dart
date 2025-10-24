@@ -1,7 +1,5 @@
-import 'package:cloud/app/app.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -18,10 +16,7 @@ class OperateBar extends HookConsumerWidget {
     final items = state.items;
     final cartType = state.type;
 
-    final core = app.container.read(coreProvider).value;
-    final tenant = core?.currentTenant;
-    final title = tenant?.title;
-    final showPrice = title != '硬电';
+    const showPrice = true;
 
     Map<CartType, String> buttonText = {
       CartType.borrowOut: "借样",

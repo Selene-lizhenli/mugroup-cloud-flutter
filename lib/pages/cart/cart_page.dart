@@ -669,8 +669,7 @@ class CartPage extends HookConsumerWidget {
                                   children: [
                                     Radio<bool>(
                                       value: true,
-                                      groupValue:
-                                          showPrice == false ? false : true,
+                                      groupValue: showPrice,
                                       onChanged: (value) {
                                         setState(() {
                                           showPrice = value;
