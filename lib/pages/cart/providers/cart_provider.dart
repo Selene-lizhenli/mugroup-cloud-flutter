@@ -45,23 +45,28 @@ class Cart extends _$Cart {
     });
 
     const defaultQuotationInfo = QuotationInfo(true, 'CNY', null, null);
+    final defaultCarts = [
+      if (user?.permissions?.contains("wms.stock_inout.store") ?? false)
+        const CartSelect(CartType.stockIn),
+      if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
+        const CartSelect(CartType.borrowOut),
+      if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
+        const CartSelect(CartType.borrowIn),
+      if (user?.permissions?.contains('wms.stock_inventory.show') ?? false)
+        const CartSelect(CartType.inout),
+      if (user?.permissions?.contains('showroom.quotation.store') ?? false)
+        const CartSelect(CartType.quotation),
+      // if (user?.permissions?.contains('showroom.stock_delivery.store') ?? false)
+      //   const CartSelect(CartType.deliveryOut),
+    ];
+    final defaultCart = defaultCarts.length == 1 ? defaultCarts[0] : null;
+
     final defaultState = State(
       items: [],
-      carts: [
-        if (user?.permissions?.contains("wms.stock_inout.store") ?? false)
-          const CartSelect(CartType.stockIn),
-        if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
-          const CartSelect(CartType.borrowOut),
-        if (user?.permissions?.contains("wms.stock_borrow.store") ?? false)
-          const CartSelect(CartType.borrowIn),
-        if (user?.permissions?.contains('wms.stock_inventory.show') ?? false)
-          const CartSelect(CartType.inout),
-        if (user?.permissions?.contains('showroom.quotation.store') ?? false)
-          const CartSelect(CartType.quotation),
-        // if (user?.permissions?.contains('showroom.stock_delivery.store') ?? false)
-        //   const CartSelect(CartType.deliveryOut),
-      ],
+      carts: defaultCarts,
       quotationInfo: defaultQuotationInfo,
+      type: defaultCart?.type,
+      cartName: defaultCart != null ? cartNames[defaultCart.type] : null,
     );
 
     if (cloud.currentTenant?.id == 6) {
