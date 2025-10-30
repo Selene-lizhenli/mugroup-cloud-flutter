@@ -15,6 +15,7 @@ abstract class Sample with _$Sample {
     @JsonKey(name: 'name_cn') String? nameCn,
     @JsonKey(name: 'name_en') String? nameEn,
     @JsonKey(name: 'product_no') String? productNo,
+    @JsonKey(name: 'tax_rate') String? taxRate,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'page_no') String? pageNo,
     String? spec,

@@ -41,21 +41,38 @@ class SampleItem extends HookWidget {
     final loading = useState<bool>(false);
 
     final showPrice = quotationInfo?.showPrice ?? false;
+    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
 
-    final symbol = symbols[quotationInfo?.curreny] ?? "¥";
-    if (sample.purchaseCost != null) {
-      finalPrice = double.parse(sample.purchaseCost!) /
-          (quotationInfo?.exchange ?? 1) *
-          (1 + ((quotationInfo?.commissionRate ?? 0) * 0.01));
+    // 不含税率价格
+    double getPriceWithoutTax(Sample sample, bool showTaxRatePrice) {
+      // 将 purchaseCost 转成 double
+      final cost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
+
+      // 将 taxRate 从 String 转成 double
+      final rate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
+
+      if (!showTaxRatePrice) {
+        return cost / (1 + rate * 0.01);
+      }
+      return cost;
     }
 
+    var purchaseCost = getPriceWithoutTax(sample, showTaxRatePrice);
+
+    final symbol = symbols[quotationInfo?.curreny] ?? "¥";
+
+    // 计算换算后的最终价格
+    finalPrice = purchaseCost /
+        (quotationInfo?.exchange ?? 1) *
+        (1 + ((quotationInfo?.commissionRate ?? 0) * 0.01));
+
+    // 设置展示价格
     if (cartType == CartType.quotation) {
       displayPrice = sample.purchaseCost != null
-          ? '$symbol ${price ?? finalPrice?.toStringAsFixed(2)}'
+          ? '$symbol ${price ?? finalPrice.toStringAsFixed(2)}'
           : "";
     } else {
-      displayPrice =
-          sample.purchaseCost != null ? '¥${sample.purchaseCost}' : "";
+      displayPrice = sample.purchaseCost != null ? '¥$purchaseCost' : "";
     }
 
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??

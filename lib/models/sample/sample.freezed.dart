@@ -28,6 +28,8 @@ mixin _$Sample {
   String? get nameEn => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_no')
   String? get productNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'tax_rate')
+  String? get taxRate => throw _privateConstructorUsedError;
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost => throw _privateConstructorUsedError;
   @JsonKey(name: 'page_no')
@@ -52,6 +54,7 @@ abstract class $SampleCopyWith<$Res> {
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'name_en') String? nameEn,
       @JsonKey(name: 'product_no') String? productNo,
+      @JsonKey(name: 'tax_rate') String? taxRate,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
       String? spec,
@@ -79,6 +82,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? nameCn = freezed,
     Object? nameEn = freezed,
     Object? productNo = freezed,
+    Object? taxRate = freezed,
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
     Object? spec = freezed,
@@ -105,6 +109,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
       productNo: freezed == productNo
           ? _value.productNo
           : productNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      taxRate: freezed == taxRate
+          ? _value.taxRate
+          : taxRate // ignore: cast_nullable_to_non_nullable
               as String?,
       purchaseCost: freezed == purchaseCost
           ? _value.purchaseCost
@@ -155,6 +163,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'name_en') String? nameEn,
       @JsonKey(name: 'product_no') String? productNo,
+      @JsonKey(name: 'tax_rate') String? taxRate,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'page_no') String? pageNo,
       String? spec,
@@ -181,6 +190,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? nameCn = freezed,
     Object? nameEn = freezed,
     Object? productNo = freezed,
+    Object? taxRate = freezed,
     Object? purchaseCost = freezed,
     Object? pageNo = freezed,
     Object? spec = freezed,
@@ -207,6 +217,10 @@ class __$$SampleImplCopyWithImpl<$Res>
       productNo: freezed == productNo
           ? _value.productNo
           : productNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      taxRate: freezed == taxRate
+          ? _value.taxRate
+          : taxRate // ignore: cast_nullable_to_non_nullable
               as String?,
       purchaseCost: freezed == purchaseCost
           ? _value.purchaseCost
@@ -241,6 +255,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       @JsonKey(name: 'name_cn') this.nameCn,
       @JsonKey(name: 'name_en') this.nameEn,
       @JsonKey(name: 'product_no') this.productNo,
+      @JsonKey(name: 'tax_rate') this.taxRate,
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
       @JsonKey(name: 'page_no') this.pageNo,
       this.spec,
@@ -266,6 +281,9 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   @JsonKey(name: 'product_no')
   final String? productNo;
   @override
+  @JsonKey(name: 'tax_rate')
+  final String? taxRate;
+  @override
   @JsonKey(name: 'purchase_cost')
   final String? purchaseCost;
   @override
@@ -287,7 +305,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, category: $category, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, spec: $spec, category: $category, image: $image)';
   }
 
   @override
@@ -300,6 +318,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('nameCn', nameCn))
       ..add(DiagnosticsProperty('nameEn', nameEn))
       ..add(DiagnosticsProperty('productNo', productNo))
+      ..add(DiagnosticsProperty('taxRate', taxRate))
       ..add(DiagnosticsProperty('purchaseCost', purchaseCost))
       ..add(DiagnosticsProperty('pageNo', pageNo))
       ..add(DiagnosticsProperty('spec', spec))
@@ -318,6 +337,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
             (identical(other.nameEn, nameEn) || other.nameEn == nameEn) &&
             (identical(other.productNo, productNo) ||
                 other.productNo == productNo) &&
+            (identical(other.taxRate, taxRate) || other.taxRate == taxRate) &&
             (identical(other.purchaseCost, purchaseCost) ||
                 other.purchaseCost == purchaseCost) &&
             (identical(other.pageNo, pageNo) || other.pageNo == pageNo) &&
@@ -336,6 +356,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       nameCn,
       nameEn,
       productNo,
+      taxRate,
       purchaseCost,
       pageNo,
       spec,
@@ -363,6 +384,7 @@ abstract class _Sample extends Sample {
       @JsonKey(name: 'name_cn') final String? nameCn,
       @JsonKey(name: 'name_en') final String? nameEn,
       @JsonKey(name: 'product_no') final String? productNo,
+      @JsonKey(name: 'tax_rate') final String? taxRate,
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
       @JsonKey(name: 'page_no') final String? pageNo,
       final String? spec,
@@ -385,6 +407,9 @@ abstract class _Sample extends Sample {
   @override
   @JsonKey(name: 'product_no')
   String? get productNo;
+  @override
+  @JsonKey(name: 'tax_rate')
+  String? get taxRate;
   @override
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost;
