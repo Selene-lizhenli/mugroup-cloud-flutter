@@ -590,6 +590,7 @@ class CartPage extends HookConsumerWidget {
                     "curreny": quotationInfo?.curreny,
                     "exchange": quotationInfo?.exchange,
                     "commission_rate": quotationInfo?.commissionRate,
+                    "is_tax_inclusive": quotationInfo?.showTaxRatePrice
                   };
                   await storeShowroomQuotation(data);
                   EasyLoading.showSuccess('创建报价单成功!');
@@ -690,7 +691,7 @@ class CartPage extends HookConsumerWidget {
                               ),
                               const SizedBox(height: 10),
                               const Text(
-                                '是否显示含税价格',
+                                '采购价是否含税',
                                 style: TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.w500),
                               ),
