@@ -72,7 +72,8 @@ class SampleItem extends HookWidget {
           ? '$symbol ${price ?? finalPrice.toStringAsFixed(2)}'
           : "";
     } else {
-      displayPrice = sample.purchaseCost != null ? '¥$purchaseCost' : "";
+      displayPrice =
+          sample.purchaseCost != null ? '¥${sample.purchaseCost}' : "";
     }
 
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
