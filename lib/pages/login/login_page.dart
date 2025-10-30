@@ -8,6 +8,7 @@ import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_wxwork/flutter_wxwork.dart';
@@ -194,28 +195,31 @@ class LoginPage extends HookConsumerWidget {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
-                                        logger.d("123");
-                                        final wxwork = FlutterWxwork();
+                                        try {
+                                          final wxwork = FlutterWxwork();
 
-                                        await wxwork.register(
-                                          scheme: tenant.wxwork!.scheme!,
-                                          corpId: tenant.wxwork!.corpId!,
-                                          agentId: tenant.wxwork!.agentId!,
-                                        );
+                                          await wxwork.register(
+                                            scheme: tenant.wxwork!.scheme!,
+                                            corpId: tenant.wxwork!.corpId!,
+                                            agentId: tenant.wxwork!.agentId!,
+                                          );
 
-                                        final result = await wxwork.auth();
-                                        if (result.errCode != '0') {
-                                          return;
+                                          final result = await wxwork.auth();
+                                          if (result.errCode != '0') {
+                                            throw Exception('请授权登录');
+                                          }
+
+                                          final code = result.code!;
+
+                                          await api.post(
+                                              'api/tenant/wechat/login',
+                                              data: {"code": code});
+
+                                          await app.fetchUser();
+                                          afterLogin();
+                                        } catch (e) {
+                                          EasyLoading.showError(e.toString());
                                         }
-
-                                        final code = result.code!;
-
-                                        await api.post(
-                                            'api/tenant/wechat/login',
-                                            data: {"code": code});
-
-                                        await app.fetchUser();
-                                        afterLogin();
                                       },
                                       child: Container(
                                         width: 40,
