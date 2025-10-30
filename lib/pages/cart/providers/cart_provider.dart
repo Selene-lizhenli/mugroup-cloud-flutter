@@ -44,7 +44,7 @@ class Cart extends _$Cart {
       authNotifier.removeListener(handleAuthChange);
     });
 
-    const defaultQuotationInfo = QuotationInfo(true, 'CNY', null, null);
+    const defaultQuotationInfo = QuotationInfo(true, false, 'CNY', null, null);
     final defaultCarts = [
       if (user?.permissions?.contains("wms.stock_inout.store") ?? false)
         const CartSelect(CartType.stockIn),

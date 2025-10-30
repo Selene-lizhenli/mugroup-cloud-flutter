@@ -70,8 +70,12 @@ abstract class CartSelect with _$CartSelect {
 @freezed
 abstract class QuotationInfo with _$QuotationInfo {
   const QuotationInfo._();
-  const factory QuotationInfo(bool? showPrice, String? curreny,
-      double? exchange, double? commissionRate) = _QuotationInfo;
+  const factory QuotationInfo(
+      bool? showPrice,
+      bool? showTaxRatePrice,
+      String? curreny,
+      double? exchange,
+      double? commissionRate) = _QuotationInfo;
 
   factory QuotationInfo.fromJson(Map<String, Object?> json) =>
       _$QuotationInfoFromJson(json);

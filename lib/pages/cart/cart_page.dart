@@ -621,6 +621,7 @@ class CartPage extends HookConsumerWidget {
         context: context,
         builder: (context) {
           bool? showPrice = quotationInfo?.showPrice;
+          bool? showTaxRatePrice = quotationInfo?.showTaxRatePrice;
           String? currency = quotationInfo?.curreny;
           final exchangeController = TextEditingController();
           final commissionRateController = TextEditingController();
@@ -680,6 +681,40 @@ class CartPage extends HookConsumerWidget {
                                     onChanged: (value) {
                                       setState(() {
                                         showPrice = value;
+                                      });
+                                    },
+                                  ),
+                                  const Text('否',
+                                      style: TextStyle(fontSize: 14)),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                '是否显示含税价格',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Radio<bool>(
+                                    value: true,
+                                    groupValue: showTaxRatePrice,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        showTaxRatePrice = value;
+                                      });
+                                    },
+                                  ),
+                                  const Text('是',
+                                      style: TextStyle(fontSize: 14)),
+                                  const SizedBox(width: 20),
+                                  Radio<bool>(
+                                    value: false,
+                                    groupValue: showTaxRatePrice,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        showTaxRatePrice = value;
                                       });
                                     },
                                   ),
@@ -824,8 +859,12 @@ class CartPage extends HookConsumerWidget {
                                     double.tryParse(exchangeController.text);
                                 double? commissionRate = double.tryParse(
                                     commissionRateController.text);
-                                cart.quotationInfo = QuotationInfo(showPrice,
-                                    currency, exchange, commissionRate);
+                                cart.quotationInfo = QuotationInfo(
+                                    showPrice,
+                                    showTaxRatePrice,
+                                    currency,
+                                    exchange,
+                                    commissionRate);
                                 Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(

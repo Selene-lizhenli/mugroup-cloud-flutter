@@ -30,6 +30,7 @@ const _$CartTypeEnumMap = {
 _$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>
     _$QuotationInfoImpl(
       json['showPrice'] as bool?,
+      json['showTaxRatePrice'] as bool?,
       json['curreny'] as String?,
       (json['exchange'] as num?)?.toDouble(),
       (json['commissionRate'] as num?)?.toDouble(),
@@ -38,6 +39,7 @@ _$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$QuotationInfoImplToJson(_$QuotationInfoImpl instance) =>
     <String, dynamic>{
       'showPrice': instance.showPrice,
+      'showTaxRatePrice': instance.showTaxRatePrice,
       'curreny': instance.curreny,
       'exchange': instance.exchange,
       'commissionRate': instance.commissionRate,

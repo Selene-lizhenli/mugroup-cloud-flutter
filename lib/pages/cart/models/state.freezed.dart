@@ -158,6 +158,7 @@ QuotationInfo _$QuotationInfoFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$QuotationInfo {
   bool? get showPrice => throw _privateConstructorUsedError;
+  bool? get showTaxRatePrice => throw _privateConstructorUsedError;
   String? get curreny => throw _privateConstructorUsedError;
   double? get exchange => throw _privateConstructorUsedError;
   double? get commissionRate => throw _privateConstructorUsedError;
@@ -176,6 +177,7 @@ abstract class $QuotationInfoCopyWith<$Res> {
   @useResult
   $Res call(
       {bool? showPrice,
+      bool? showTaxRatePrice,
       String? curreny,
       double? exchange,
       double? commissionRate});
@@ -195,6 +197,7 @@ class _$QuotationInfoCopyWithImpl<$Res, $Val extends QuotationInfo>
   @override
   $Res call({
     Object? showPrice = freezed,
+    Object? showTaxRatePrice = freezed,
     Object? curreny = freezed,
     Object? exchange = freezed,
     Object? commissionRate = freezed,
@@ -203,6 +206,10 @@ class _$QuotationInfoCopyWithImpl<$Res, $Val extends QuotationInfo>
       showPrice: freezed == showPrice
           ? _value.showPrice
           : showPrice // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      showTaxRatePrice: freezed == showTaxRatePrice
+          ? _value.showTaxRatePrice
+          : showTaxRatePrice // ignore: cast_nullable_to_non_nullable
               as bool?,
       curreny: freezed == curreny
           ? _value.curreny
@@ -230,6 +237,7 @@ abstract class _$$QuotationInfoImplCopyWith<$Res>
   @useResult
   $Res call(
       {bool? showPrice,
+      bool? showTaxRatePrice,
       String? curreny,
       double? exchange,
       double? commissionRate});
@@ -247,6 +255,7 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? showPrice = freezed,
+    Object? showTaxRatePrice = freezed,
     Object? curreny = freezed,
     Object? exchange = freezed,
     Object? commissionRate = freezed,
@@ -255,6 +264,10 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
       freezed == showPrice
           ? _value.showPrice
           : showPrice // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      freezed == showTaxRatePrice
+          ? _value.showTaxRatePrice
+          : showTaxRatePrice // ignore: cast_nullable_to_non_nullable
               as bool?,
       freezed == curreny
           ? _value.curreny
@@ -275,8 +288,8 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$QuotationInfoImpl extends _QuotationInfo {
-  const _$QuotationInfoImpl(
-      this.showPrice, this.curreny, this.exchange, this.commissionRate)
+  const _$QuotationInfoImpl(this.showPrice, this.showTaxRatePrice, this.curreny,
+      this.exchange, this.commissionRate)
       : super._();
 
   factory _$QuotationInfoImpl.fromJson(Map<String, dynamic> json) =>
@@ -284,6 +297,8 @@ class _$QuotationInfoImpl extends _QuotationInfo {
 
   @override
   final bool? showPrice;
+  @override
+  final bool? showTaxRatePrice;
   @override
   final String? curreny;
   @override
@@ -293,7 +308,7 @@ class _$QuotationInfoImpl extends _QuotationInfo {
 
   @override
   String toString() {
-    return 'QuotationInfo(showPrice: $showPrice, curreny: $curreny, exchange: $exchange, commissionRate: $commissionRate)';
+    return 'QuotationInfo(showPrice: $showPrice, showTaxRatePrice: $showTaxRatePrice, curreny: $curreny, exchange: $exchange, commissionRate: $commissionRate)';
   }
 
   @override
@@ -303,6 +318,8 @@ class _$QuotationInfoImpl extends _QuotationInfo {
             other is _$QuotationInfoImpl &&
             (identical(other.showPrice, showPrice) ||
                 other.showPrice == showPrice) &&
+            (identical(other.showTaxRatePrice, showTaxRatePrice) ||
+                other.showTaxRatePrice == showTaxRatePrice) &&
             (identical(other.curreny, curreny) || other.curreny == curreny) &&
             (identical(other.exchange, exchange) ||
                 other.exchange == exchange) &&
@@ -312,8 +329,8 @@ class _$QuotationInfoImpl extends _QuotationInfo {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, showPrice, curreny, exchange, commissionRate);
+  int get hashCode => Object.hash(runtimeType, showPrice, showTaxRatePrice,
+      curreny, exchange, commissionRate);
 
   @JsonKey(ignore: true)
   @override
@@ -332,6 +349,7 @@ class _$QuotationInfoImpl extends _QuotationInfo {
 abstract class _QuotationInfo extends QuotationInfo {
   const factory _QuotationInfo(
       final bool? showPrice,
+      final bool? showTaxRatePrice,
       final String? curreny,
       final double? exchange,
       final double? commissionRate) = _$QuotationInfoImpl;
@@ -342,6 +360,8 @@ abstract class _QuotationInfo extends QuotationInfo {
 
   @override
   bool? get showPrice;
+  @override
+  bool? get showTaxRatePrice;
   @override
   String? get curreny;
   @override
