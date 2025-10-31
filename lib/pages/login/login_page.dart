@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
+import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -28,6 +29,7 @@ class LoginPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loginWay = useState<String?>(null);
     final restEnableLoginWays = useState<List<String>>([]);
+    final appleIdentityToken = useState<String?>(null);
     final cloud = ref.watch(coreProvider).value!;
     final core = ref.read(coreProvider.notifier);
     final tenant = cloud.currentTenant;
@@ -59,7 +61,7 @@ class LoginPage extends HookConsumerWidget {
         result.add("wxwork");
       }
 
-      if (Platform.isIOS) {
+      if (Platform.isIOS && tenant?.loginWays?.contains.call("apple") == true) {
         result.add("apple");
       }
       return result;
@@ -105,6 +107,7 @@ class LoginPage extends HookConsumerWidget {
                       name: tenant.title ?? "未命名租户(${tenant.id})",
                       callback: (action) async {
                         core.setCurrentTenantId(tenant.id);
+                        appleIdentityToken.value = null;
                       },
                     ),
                 ],
@@ -141,6 +144,7 @@ class LoginPage extends HookConsumerWidget {
                             if (loginWay.value != null)
                               LoginWay(
                                 loginWay: loginWay.value!,
+                                appleIdentityToken: appleIdentityToken.value,
                                 onLogined: () async {
                                   await app.fetchUser();
                                   afterLogin();
@@ -294,8 +298,37 @@ class LoginPage extends HookConsumerWidget {
                                                     scopes: [],
                                                   );
 
-                                                  logger.d(
-                                                      "Apple 登录成功: ${credential.authorizationCode}");
+                                                  EasyLoading.show();
+
+                                                  await api
+                                                      .get("api/csrf-cookie");
+
+                                                  final loginResult =
+                                                      await api.post(
+                                                    "api/tenant/apple/login",
+                                                    data: {
+                                                      "identityToken":
+                                                          credential
+                                                              .identityToken
+                                                    },
+                                                  );
+
+                                                  final user =
+                                                      loginResult.data is Map
+                                                          ? User.fromJson(
+                                                              loginResult.data)
+                                                          : null;
+
+                                                  if (user == null) {
+                                                    appleIdentityToken.value =
+                                                        credential
+                                                            .identityToken;
+                                                    loginWay.value = "account";
+                                                    return;
+                                                  }
+
+                                                  await app.fetchUser();
+                                                  afterLogin();
                                                 } catch (e) {
                                                   if (e
                                                       is SignInWithAppleAuthorizationException) {
@@ -307,6 +340,8 @@ class LoginPage extends HookConsumerWidget {
                                                   }
                                                   EasyLoading.showError(
                                                       e.toString());
+                                                } finally {
+                                                  EasyLoading.dismiss();
                                                 }
                                               },
                                               child: Container(
@@ -326,7 +361,7 @@ class LoginPage extends HookConsumerWidget {
                                                 ),
                                                 child: const Icon(
                                                   FontAwesomeIcons.apple,
-                                                  size: 20,
+                                                  size: 25,
                                                   color: Colors.white,
                                                 ),
                                               ),

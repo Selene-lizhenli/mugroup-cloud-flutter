@@ -12,9 +12,16 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class LoginWay extends HookConsumerWidget {
   final String loginWay;
+  final String? appleIdentityToken;
   final void Function()? onLogined;
 
-  const LoginWay({super.key, required this.loginWay, this.onLogined});
+  const LoginWay({
+    super.key,
+    required this.loginWay,
+    this.onLogined,
+    this.appleIdentityToken,
+  });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cloud = ref.watch(coreProvider).value!;
@@ -88,14 +95,20 @@ class LoginWay extends HookConsumerWidget {
 
       await api.get("api/csrf-cookie");
 
-      await api.post("api/login", data: {
+      final data = {
         "type": "account",
         "email": account,
         "password": password,
-      });
+        if (appleIdentityToken != null)
+          "apple": {
+            "identityToken": appleIdentityToken,
+          }
+      };
+
+      await api.post("api/login", data: data);
 
       onLogined?.call();
-    }, []);
+    }, [appleIdentityToken]);
 
     useEffect(() {
       if (loginWay == "wxwork") {
@@ -118,12 +131,26 @@ class LoginWay extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            style: const TextStyle(fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+            ),
             getLableByLoginWay(loginWay),
           ),
 
           // 账号密码
           if (loginWay == "account") ...[
+            if (appleIdentityToken != null)
+              const Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "绑定后可以 Apple 一键登录",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
             const SizedBox(
               height: 50,
             ),
