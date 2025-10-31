@@ -13,6 +13,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_wxwork/flutter_wxwork.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 @RoutePage()
 class LoginPage extends HookConsumerWidget {
@@ -193,49 +194,85 @@ class LoginPage extends HookConsumerWidget {
                                         child: Text('快捷登录方式'),
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        try {
-                                          final wxwork = FlutterWxwork();
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            try {
+                                              final wxwork = FlutterWxwork();
 
-                                          await wxwork.register(
-                                            scheme: tenant.wxwork!.scheme!,
-                                            corpId: tenant.wxwork!.corpId!,
-                                            agentId: tenant.wxwork!.agentId!,
-                                          );
+                                              await wxwork.register(
+                                                scheme: tenant.wxwork!.scheme!,
+                                                corpId: tenant.wxwork!.corpId!,
+                                                agentId:
+                                                    tenant.wxwork!.agentId!,
+                                              );
 
-                                          final result = await wxwork.auth();
-                                          if (result.errCode != '0') {
-                                            throw Exception('请授权登录');
-                                          }
+                                              final result =
+                                                  await wxwork.auth();
+                                              if (result.errCode != '0') {
+                                                throw Exception('请授权登录');
+                                              }
 
-                                          final code = result.code!;
+                                              final code = result.code!;
 
-                                          await api.post(
-                                              'api/tenant/wechat/login',
-                                              data: {"code": code});
+                                              await api.post(
+                                                  'api/tenant/wechat/login',
+                                                  data: {"code": code});
 
-                                          await app.fetchUser();
-                                          afterLogin();
-                                        } catch (e) {
-                                          EasyLoading.showError(e.toString());
-                                        }
-                                      },
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(0xFFEBEDF0),
-                                            width: 1,
+                                              await app.fetchUser();
+                                              afterLogin();
+                                            } catch (e) {
+                                              EasyLoading.showError(
+                                                  e.toString());
+                                            }
+                                          },
+                                          child: Container(
+                                            width: 40,
+                                            height: 40,
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: const Color(0xFFEBEDF0),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/wxwork.svg',
+                                            ),
                                           ),
                                         ),
-                                        child: SvgPicture.asset(
-                                          'assets/icons/wxwork.svg',
-                                        ),
-                                      ),
+                                      ],
+                                    ),
+                                    SignInWithAppleButton(
+                                      onPressed: () async {
+                                        try {
+                                          final credential =
+                                              await SignInWithApple
+                                                  .getAppleIDCredential(
+                                            scopes: [],
+                                          );
+
+                                          logger.d(
+                                              "Apple 登录成功: ${credential.authorizationCode}");
+                                        } catch (e) {
+                                          if (e
+                                              is SignInWithAppleAuthorizationException) {
+                                            if (e.code ==
+                                                AuthorizationErrorCode
+                                                    .canceled) {
+                                              return;
+                                            }
+                                          }
+                                          EasyLoading.showError(e.toString());
+                                        }
+
+                                        // Now send the credential (especially `credential.authorizationCode`) to your server to create a session
+                                        // after they have been validated with Apple (see `Integration` section for more information on how to do this)
+                                      },
                                     ),
                                   ],
                                 ),
