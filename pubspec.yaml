@@ -78,6 +78,7 @@ dependencies:
   path: ^1.9.0
   wechat_assets_picker: ^9.8.0
   sign_in_with_apple: ^7.0.1
+  font_awesome_flutter: 10.6.0
     # path: ../flant
 
 dev_dependencies:
