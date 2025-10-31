@@ -57,7 +57,7 @@ class LoginPage extends HookConsumerWidget {
       final result = <String>[];
 
       if (enableLoginWays.contains("wxwork") &&
-          tenant?.wxwork?.scheme != null) {
+          tenant?.wxwork?.schema != null) {
         result.add("wxwork");
       }
 
@@ -240,7 +240,7 @@ class LoginPage extends HookConsumerWidget {
 
                                                   await wxwork.register(
                                                     scheme:
-                                                        tenant.wxwork!.scheme!,
+                                                        tenant.wxwork!.schema!,
                                                     corpId:
                                                         tenant.wxwork!.corpId!,
                                                     agentId:

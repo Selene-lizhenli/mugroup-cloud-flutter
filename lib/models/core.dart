@@ -8,7 +8,7 @@ abstract class TenantWxwork with _$TenantWxwork {
   factory TenantWxwork({
     @JsonKey(name: 'agent_id') String? agentId,
     @JsonKey(name: 'corp_id') String? corpId,
-    String? scheme,
+    String? schema,
   }) = _TenantWxwork;
 
   factory TenantWxwork.fromJson(Map<String, dynamic> json) =>

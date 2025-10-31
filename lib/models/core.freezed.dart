@@ -24,7 +24,7 @@ mixin _$TenantWxwork {
   String? get agentId => throw _privateConstructorUsedError;
   @JsonKey(name: 'corp_id')
   String? get corpId => throw _privateConstructorUsedError;
-  String? get scheme => throw _privateConstructorUsedError;
+  String? get schema => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -41,7 +41,7 @@ abstract class $TenantWxworkCopyWith<$Res> {
   $Res call(
       {@JsonKey(name: 'agent_id') String? agentId,
       @JsonKey(name: 'corp_id') String? corpId,
-      String? scheme});
+      String? schema});
 }
 
 /// @nodoc
@@ -59,7 +59,7 @@ class _$TenantWxworkCopyWithImpl<$Res, $Val extends TenantWxwork>
   $Res call({
     Object? agentId = freezed,
     Object? corpId = freezed,
-    Object? scheme = freezed,
+    Object? schema = freezed,
   }) {
     return _then(_value.copyWith(
       agentId: freezed == agentId
@@ -70,9 +70,9 @@ class _$TenantWxworkCopyWithImpl<$Res, $Val extends TenantWxwork>
           ? _value.corpId
           : corpId // ignore: cast_nullable_to_non_nullable
               as String?,
-      scheme: freezed == scheme
-          ? _value.scheme
-          : scheme // ignore: cast_nullable_to_non_nullable
+      schema: freezed == schema
+          ? _value.schema
+          : schema // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -89,7 +89,7 @@ abstract class _$$TenantWxworkImplCopyWith<$Res>
   $Res call(
       {@JsonKey(name: 'agent_id') String? agentId,
       @JsonKey(name: 'corp_id') String? corpId,
-      String? scheme});
+      String? schema});
 }
 
 /// @nodoc
@@ -105,7 +105,7 @@ class __$$TenantWxworkImplCopyWithImpl<$Res>
   $Res call({
     Object? agentId = freezed,
     Object? corpId = freezed,
-    Object? scheme = freezed,
+    Object? schema = freezed,
   }) {
     return _then(_$TenantWxworkImpl(
       agentId: freezed == agentId
@@ -116,9 +116,9 @@ class __$$TenantWxworkImplCopyWithImpl<$Res>
           ? _value.corpId
           : corpId // ignore: cast_nullable_to_non_nullable
               as String?,
-      scheme: freezed == scheme
-          ? _value.scheme
-          : scheme // ignore: cast_nullable_to_non_nullable
+      schema: freezed == schema
+          ? _value.schema
+          : schema // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -130,7 +130,7 @@ class _$TenantWxworkImpl implements _TenantWxwork {
   _$TenantWxworkImpl(
       {@JsonKey(name: 'agent_id') this.agentId,
       @JsonKey(name: 'corp_id') this.corpId,
-      this.scheme});
+      this.schema});
 
   factory _$TenantWxworkImpl.fromJson(Map<String, dynamic> json) =>
       _$$TenantWxworkImplFromJson(json);
@@ -142,11 +142,11 @@ class _$TenantWxworkImpl implements _TenantWxwork {
   @JsonKey(name: 'corp_id')
   final String? corpId;
   @override
-  final String? scheme;
+  final String? schema;
 
   @override
   String toString() {
-    return 'TenantWxwork(agentId: $agentId, corpId: $corpId, scheme: $scheme)';
+    return 'TenantWxwork(agentId: $agentId, corpId: $corpId, schema: $schema)';
   }
 
   @override
@@ -156,12 +156,12 @@ class _$TenantWxworkImpl implements _TenantWxwork {
             other is _$TenantWxworkImpl &&
             (identical(other.agentId, agentId) || other.agentId == agentId) &&
             (identical(other.corpId, corpId) || other.corpId == corpId) &&
-            (identical(other.scheme, scheme) || other.scheme == scheme));
+            (identical(other.schema, schema) || other.schema == schema));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, agentId, corpId, scheme);
+  int get hashCode => Object.hash(runtimeType, agentId, corpId, schema);
 
   @JsonKey(ignore: true)
   @override
@@ -181,7 +181,7 @@ abstract class _TenantWxwork implements TenantWxwork {
   factory _TenantWxwork(
       {@JsonKey(name: 'agent_id') final String? agentId,
       @JsonKey(name: 'corp_id') final String? corpId,
-      final String? scheme}) = _$TenantWxworkImpl;
+      final String? schema}) = _$TenantWxworkImpl;
 
   factory _TenantWxwork.fromJson(Map<String, dynamic> json) =
       _$TenantWxworkImpl.fromJson;
@@ -193,7 +193,7 @@ abstract class _TenantWxwork implements TenantWxwork {
   @JsonKey(name: 'corp_id')
   String? get corpId;
   @override
-  String? get scheme;
+  String? get schema;
   @override
   @JsonKey(ignore: true)
   _$$TenantWxworkImplCopyWith<_$TenantWxworkImpl> get copyWith =>

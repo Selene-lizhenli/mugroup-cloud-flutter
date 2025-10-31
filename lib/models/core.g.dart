@@ -10,14 +10,14 @@ _$TenantWxworkImpl _$$TenantWxworkImplFromJson(Map<String, dynamic> json) =>
     _$TenantWxworkImpl(
       agentId: json['agent_id'] as String?,
       corpId: json['corp_id'] as String?,
-      scheme: json['scheme'] as String?,
+      schema: json['schema'] as String?,
     );
 
 Map<String, dynamic> _$$TenantWxworkImplToJson(_$TenantWxworkImpl instance) =>
     <String, dynamic>{
       'agent_id': instance.agentId,
       'corp_id': instance.corpId,
-      'scheme': instance.scheme,
+      'schema': instance.schema,
     };
 
 _$TenantImpl _$$TenantImplFromJson(Map<String, dynamic> json) => _$TenantImpl(
