@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
@@ -24,8 +26,15 @@ class Layout extends HookConsumerWidget {
       final checkResp = await silentApi
           .get("https://s3.mugroup.com/global/apks/cloud/version.json");
 
+      final info = checkResp.data;
+      final system = Platform.operatingSystem;
+      final systemVersionInfo = info[system];
+      if (systemVersionInfo == null) {
+        return;
+      }
+
       Version currentVersion = Version.parse(packageInfo.version);
-      Version latestVersion = Version.parse(checkResp.data['version']);
+      Version latestVersion = Version.parse(systemVersionInfo['version']);
 
       bool needUpgrade = latestVersion > currentVersion;
 
@@ -39,18 +48,18 @@ class Layout extends HookConsumerWidget {
           builder: (context) {
             return AlertDialog(
               title: const Text("发现新版本"),
-              content: Text(checkResp.data['detail']),
+              content: Text(systemVersionInfo['detail']),
               actions: [
                 TextButton(
                   child: const Text('升级'),
                   onPressed: () {
                     UpdateModel model = UpdateModel(
-                      checkResp.data['url'],
+                      info['apkUrl'],
                       "cloud.apk",
 
                       /// android res/mipmap icon name
                       "ic_launcher",
-                      '',
+                      info['iosUrl'],
                     );
                     AzhonAppUpdate.update(model);
 
