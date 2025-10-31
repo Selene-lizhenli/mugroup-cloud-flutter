@@ -58,7 +58,12 @@ class LoginPage extends HookConsumerWidget {
 
       if (enableLoginWays.contains("wxwork") &&
           tenant?.wxwork?.schema != null) {
-        result.add("wxwork");
+        // 判断是否安装
+        final wxwork = FlutterWxwork();
+        final isInstall = await wxwork.isAppInstalled();
+        if (isInstall) {
+          result.add("wxwork");
+        }
       }
 
       if (Platform.isIOS && tenant?.loginWays?.contains.call("apple") == true) {
