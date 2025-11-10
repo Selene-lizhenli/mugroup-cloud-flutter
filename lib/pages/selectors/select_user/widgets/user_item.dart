@@ -14,7 +14,7 @@ class UserItem extends HookWidget {
         Expanded(
           flex: 1,
           child: Container(
-            height: 40,
+            height: 60,
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,6 +27,16 @@ class UserItem extends HookWidget {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
+                const SizedBox(height: 4),
+                if (user.department?.name != null)
+                  Text(
+                    user.department?.name ?? '',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),
