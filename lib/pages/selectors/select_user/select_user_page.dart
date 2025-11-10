@@ -27,7 +27,9 @@ class SelectUserPage extends HookConsumerWidget {
     }
 
     useEffect(() {
-      fetchUsers(debouncedInput);
+      if (debouncedInput != null && debouncedInput.isNotEmpty) {
+        fetchUsers(debouncedInput);
+      }
       return null;
     }, [debouncedInput]);
 

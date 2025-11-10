@@ -44,7 +44,7 @@ class SearchAppTabbar extends HookConsumerWidget {
                         color: Colors.black,
                         backgroundColor: Colors.white),
                     decoration: const InputDecoration(
-                      hintText: '输入姓名/工号',
+                      hintText: '输入姓名/工号搜索',
                       counterText: '',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(
