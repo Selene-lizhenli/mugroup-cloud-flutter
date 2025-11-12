@@ -29,6 +29,8 @@ class SampleItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     double? finalPrice;
     String? displayPrice;
     Map<String, String> symbols = {
@@ -69,11 +71,11 @@ class SampleItem extends HookWidget {
     // 设置展示价格
     if (cartType == CartType.quotation) {
       displayPrice = sample.purchaseCost != null
-          ? '$symbol ${price ?? finalPrice.toStringAsFixed(2)}'
+          ? price ?? finalPrice.toStringAsFixed(2)
           : "";
     } else {
       displayPrice =
-          sample.purchaseCost != null ? '¥${sample.purchaseCost}' : "";
+          sample.purchaseCost != null ? '${sample.purchaseCost}' : "";
     }
 
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
@@ -142,18 +144,48 @@ class SampleItem extends HookWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
+                  if (showPrice)
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: symbol,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colorScheme.secondary,
+                            ),
+                          ),
+                          TextSpan(
+                            text: displayPrice,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.secondary,
+                            ),
+                          ),
+                          if (sample.hasTaxRate == true && showTaxRatePrice)
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.baseline,
+                              baseline: TextBaseline.alphabetic,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: Text(
+                                  '(含税率 ${sample.taxRate!})',
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: showPrice
-                            ? Text(
-                                displayPrice,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(color: Colors.red),
-                              )
-                            : const SizedBox.shrink(),
+                      const Expanded(
+                        child: SizedBox.shrink(),
                       ),
                       FlanStepper(
                         value: count,
