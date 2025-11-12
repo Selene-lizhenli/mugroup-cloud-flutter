@@ -30,7 +30,7 @@ class ProductView extends HookConsumerWidget {
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
     final media = useState<TemporaryMedia?>(home.currentMedia);
-    final page = useState(1);
+    final page = useRef(1);
     final samples = useState<List<Sample>>(<Sample>[]);
 
     fetchData(
@@ -56,10 +56,10 @@ class ProductView extends HookConsumerWidget {
         samples.value = resp.data;
       } else {
         samples.value = [...samples.value, ...resp.data];
+      }
 
-        if (resp.data.length >= 20) {
-          page.value++;
-        }
+      if (resp.data.length >= 20) {
+        page.value++;
       }
 
       return resp;
