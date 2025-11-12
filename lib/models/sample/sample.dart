@@ -33,6 +33,23 @@ abstract class Sample with _$Sample {
   String get name {
     return nameCn ?? nameEn ?? "";
   }
+
+  bool? get hasTaxRate {
+    bool? result;
+    if (taxRate == null) {
+      return result;
+    }
+
+    var numberTaxRate = double.tryParse(taxRate!);
+
+    if (numberTaxRate == null) {
+      return result;
+    }
+
+    result = numberTaxRate > 0;
+
+    return result;
+  }
 }
 
 @freezed

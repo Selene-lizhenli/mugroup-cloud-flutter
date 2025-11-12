@@ -136,6 +136,21 @@ class ProductCard extends StatelessWidget {
                                   color: colorScheme.secondary,
                                 ),
                               ),
+                              if (sample.hasTaxRate == true)
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.baseline,
+                                  baseline: TextBaseline.alphabetic,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      '(含税率 ${sample.taxRate!})',
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
