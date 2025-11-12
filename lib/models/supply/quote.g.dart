@@ -19,6 +19,10 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
           : DateTime.parse(json['chuhuo_at'] as String),
       json['sample_location'] as String?,
       json['record_user'] as String?,
+      json['can_bill'] as bool?,
+      json['tax_rate'] as String?,
+      json['purchase_cost'] as String?,
+      json['currency'] as String?,
     );
 
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
@@ -31,4 +35,8 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),
       'sample_location': instance.sampleLocation,
       'record_user': instance.recordUser,
+      'can_bill': instance.canBill,
+      'tax_rate': instance.taxRate,
+      'purchase_cost': instance.purchaseCost,
+      'currency': instance.currency,
     };

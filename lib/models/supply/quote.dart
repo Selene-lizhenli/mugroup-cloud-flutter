@@ -15,6 +15,10 @@ class Quote with _$Quote {
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
     @JsonKey(name: 'sample_location') String? sampleLocation,
     @JsonKey(name: 'record_user') String? recordUser,
+    @JsonKey(name: 'can_bill') bool? canBill,
+    @JsonKey(name: 'tax_rate') String? taxRate,
+    @JsonKey(name: 'purchase_cost') String? purchaseCost,
+    @JsonKey(name: 'currency') String? currency,
   ) = _Quote;
 
   factory Quote.fromJson(Map<String, dynamic> json) => _$QuoteFromJson(json);

@@ -27,48 +27,91 @@ class QuoteItem extends HookWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 122,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(
+            width: double.infinity,
+            child: Table(
+              defaultColumnWidth: const IntrinsicColumnWidth(),
+              children: [
+                TableRow(
                   children: [
-                    Text(
-                      '地区: ${item?.sampleLocation ?? ''}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    TableCell(
+                      child: Text(
+                        '地区: ${item?.sampleLocation ?? ''}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
-                    Text(
-                      '体积: ${item?.outerVolume ?? ''}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    Text(
-                      '记录人员: ${item?.recordUser ?? ''}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    TableCell(
+                      child: Text(
+                        '出货日期: ${formatBeijingTime(item?.chuhuoAt)}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                TableRow(
                   children: [
-                    Text(
-                      '出货日期: ${formatBeijingTime(item?.chuhuoAt)}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    TableCell(
+                      child: Text(
+                        '采购价: ${item?.purchaseCost ?? ''}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
-                    Text(
-                      '装箱量: ${item?.outerCapacity ?? ''}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    TableCell(
+                      child: Text(
+                        '采购币种: ${item?.currency ?? ""}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Text(
+                        '是否开票: ${item?.canBill == true ? '是' : item?.canBill == false ? "否" : ""}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: Text(
+                        '税率: ${item?.taxRate}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Text(
+                        '体积: ${item?.outerVolume ?? ''}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: Text(
+                        '装箱量: ${item?.outerCapacity ?? ''}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Text(
+                        '记录人员: ${item?.recordUser ?? ''}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     Text(
                       '包装: ${item?.packing ?? ''}',
@@ -77,8 +120,8 @@ class QuoteItem extends HookWidget {
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
