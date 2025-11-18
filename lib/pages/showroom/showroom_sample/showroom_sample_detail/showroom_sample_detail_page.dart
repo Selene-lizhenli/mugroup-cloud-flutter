@@ -1,9 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/showroom/showroom_sample/widgets/supply_quote_card.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -193,6 +196,25 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                         ),
                       ],
                     ),
+                  ),
+                  MasonryGridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
+                    itemCount: sample.value?.supplyQuotes?.length,
+                    padding: const EdgeInsets.all(5),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (sample.value?.supplyQuotes?.isNotEmpty ?? false)
+                            ...sample.value!.supplyQuotes!.map((quote) {
+                              return SupplyQuoteCard(quote: quote);
+                            }),
+                        ],
+                      );
+                    },
                   )
                 ],
               ),

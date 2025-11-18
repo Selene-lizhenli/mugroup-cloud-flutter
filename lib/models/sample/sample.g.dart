@@ -15,6 +15,9 @@ _$SampleImpl _$$SampleImplFromJson(Map<String, dynamic> json) => _$SampleImpl(
       taxRate: json['tax_rate'] as String?,
       purchaseCost: json['purchase_cost'] as String?,
       pageNo: json['page_no'] as String?,
+      supplyQuotes: (json['supplyQuotes'] as List<dynamic>?)
+          ?.map((e) => Quote.fromJson(e as Map<String, dynamic>))
+          .toList(),
       spec: json['spec'] as String?,
       category: json['category'] == null
           ? null
@@ -34,6 +37,7 @@ Map<String, dynamic> _$$SampleImplToJson(_$SampleImpl instance) =>
       'tax_rate': instance.taxRate,
       'purchase_cost': instance.purchaseCost,
       'page_no': instance.pageNo,
+      'supplyQuotes': instance.supplyQuotes,
       'spec': instance.spec,
       'category': instance.category,
       'image': instance.image,

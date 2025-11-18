@@ -1,4 +1,5 @@
 import 'package:cloud/models/media.dart';
+import 'package:cloud/models/supply/quote.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -18,6 +19,7 @@ abstract class Sample with _$Sample {
     @JsonKey(name: 'tax_rate') String? taxRate,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'page_no') String? pageNo,
+    List<Quote>? supplyQuotes,
     String? spec,
     SampleCategory? category,
     List<Media>? image,
