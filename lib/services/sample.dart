@@ -18,6 +18,17 @@ Future<ApiResponse<List<Sample>>> getSamples(
       );
 }
 
+Future<Sample?> getSample(int id) async {
+  return api.get("api/tenant/showroom/samples/$id").then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Sample.fromJson(res.data);
+    },
+  );
+}
+
 Future<Sample?> getSampleByBarcode(String barcode) async {
   return api.get("api/tenant/showroom/samples/barcode/$barcode").then(
     (res) {
