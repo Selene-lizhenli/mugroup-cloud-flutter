@@ -39,6 +39,8 @@ class AppRouter extends RootStackRouter {
           page: ShowroomQuotationsRoute.page,
           path: "/showroom/quotations/:quoteNo"),
       AutoRoute(
+          page: ShowroomSampleDetailRoute.page, path: "/showroom/sample/detail/:id"),
+      AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
       // selectors

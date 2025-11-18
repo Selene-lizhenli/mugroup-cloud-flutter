@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
@@ -29,21 +31,29 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            sample.cover == null
-                ? Image.asset(
-                    'assets/noImage.png',
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  )
-                : CachedNetworkImage(
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                    imageUrl: sample.cover!,
-                    placeholder: (context, url) => AspectRatio(
-                      aspectRatio: 1,
-                      child: Container(),
+            GestureDetector(
+              onTap: () {
+                if (context.mounted) {
+                  context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
+                  return;
+                }
+              },
+              child: sample.cover == null
+                  ? Image.asset(
+                      'assets/noImage.png',
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                    )
+                  : CachedNetworkImage(
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                      imageUrl: sample.cover!,
+                      placeholder: (context, url) => AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(),
+                      ),
                     ),
-                  ),
+            ),
             Container(
               height: 0.5,
               color: Colors.grey[200]!.withOpacity(0.8),
