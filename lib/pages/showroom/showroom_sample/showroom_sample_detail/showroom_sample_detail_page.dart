@@ -13,6 +13,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final sample = useState<Sample?>(null);
     final currentIndex = useState<int>(0);
 
@@ -29,7 +30,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('样品详情'),
-        backgroundColor: Colors.pink[300],
+        backgroundColor: colorScheme.secondary,
         elevation: 0,
       ),
       body: sample.value == null
@@ -38,7 +39,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 图片轮播和产品信息（价格、编号）
+                  // 图片轮播区域
                   if (sample.value?.image != null &&
                       sample.value!.image!.isNotEmpty)
                     Stack(
@@ -58,8 +59,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(8.0),
                                       child: Image.network(
                                         item.url!,
-                                        fit: BoxFit
-                                            .cover, // 使用 BoxFit.cover 保证图片不会失真
+                                        fit: BoxFit.cover,
                                         width: containerWidth,
                                         height: containerHeight,
                                       ),
@@ -82,36 +82,48 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                         Positioned(
                           bottom: 8.0,
                           right: 8.0,
-                          child: Text(
-                            '${currentIndex.value + 1} / ${sample.value!.image!.length}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              backgroundColor: Colors.black45,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 4.0), // 给文字添加适当的内边距
+                            decoration: BoxDecoration(
+                              color: Colors.black45, // 背景色
+                              borderRadius: BorderRadius.circular(8.0), // 设置圆角
+                            ),
+                            child: Text(
+                              '${currentIndex.value + 1} / ${sample.value!.image!.length}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
-
-                  // 产品名称
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
+                  // 产品名称区域
+                  Container(
+                    color: Colors.white, // 设置背景色为白色
+                    width: double.infinity, // 强制宽度占满
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 6),
                     child: Text(
                       sample.value!.nameCn ?? '', // 产品中文名称
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
+                      maxLines: 1, // 限制最多一行
+                      overflow: TextOverflow.ellipsis, // 超出部分用省略号显示
                     ),
                   ),
-
                   // 产品编号和价格信息
-                  Padding(
+                  Container(
+                    color: Colors.white, // 设置背景色为白色
+                    width: double.infinity, // 强制宽度占满
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 12.0),
+                        horizontal: 12.0, vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -122,18 +134,20 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                         ),
                         Text(
                           '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.red, // 使用红色突出价格
+                            color: colorScheme.secondary,
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  // 其他信息
-                  Padding(
+                  const SizedBox(height: 12), // 添加间隔
+                  // 其他信息区域
+                  Container(
+                    color: Colors.white, // 设置背景色为白色
+                    width: double.infinity, // 强制宽度占满
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: Column(
@@ -169,7 +183,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20), // 增加底部间距
                 ],
               ),
             ),
