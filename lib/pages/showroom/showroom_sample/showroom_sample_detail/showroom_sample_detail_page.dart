@@ -146,10 +146,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   const SizedBox(height: 12), // 添加间隔
                   // 其他信息区域
                   Container(
-                    color: Colors.white, // 设置背景色为白色
                     width: double.infinity, // 强制宽度占满
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
+                        horizontal: 16.0, vertical: 16.0), // 增加上下内边距
+                    decoration: const BoxDecoration(
+                      color: Colors.white, // 背景色
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -157,32 +159,47 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                         Text(
                           '规格: ${sample.value!.spec}',
                           style: const TextStyle(
-                              fontSize: 18, color: Colors.black87),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12), // 增加间隔
+
                         // 分类
                         Text(
                           '分类: ${sample.value!.category?.name ?? '未知'}',
                           style: const TextStyle(
-                              fontSize: 18, color: Colors.black87),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12), // 增加间隔
+
                         // 条形码
                         Text(
                           '条形码: ${sample.value!.barcode ?? '未知'}',
                           style: const TextStyle(
-                              fontSize: 18, color: Colors.black87),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12), // 增加间隔
+
                         // 税率
                         Text(
                           '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
                           style: const TextStyle(
-                              fontSize: 18, color: Colors.black87),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
