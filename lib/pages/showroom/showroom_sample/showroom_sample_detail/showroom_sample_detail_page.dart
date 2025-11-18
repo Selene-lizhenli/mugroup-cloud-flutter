@@ -52,16 +52,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   builder: (context, constraints) {
                                     double containerWidth =
                                         constraints.maxWidth;
-                                    double containerHeight =
-                                        containerWidth * 9 / 16;
-
                                     return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
                                       child: Image.network(
                                         item.url!,
-                                        fit: BoxFit.cover,
-                                        width: containerWidth,
-                                        height: containerHeight,
+                                        fit: BoxFit.fill,
+                                        width: containerWidth, // 确保图片显示完整，不裁剪
                                       ),
                                     );
                                   },
@@ -70,9 +65,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             );
                           }).toList(),
                           options: CarouselOptions(
-                            aspectRatio: 16 / 9,
-                            viewportFraction: 1.0,
-                            height: 300.0,
+                            viewportFraction: 1.0, // 图片占满屏幕
                             onPageChanged: (index, reason) {
                               currentIndex.value = index;
                             },
