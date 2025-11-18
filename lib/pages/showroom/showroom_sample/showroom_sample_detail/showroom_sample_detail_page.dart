@@ -66,6 +66,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                           }).toList(),
                           options: CarouselOptions(
                             viewportFraction: 1.0, // 图片占满屏幕
+                            height: 350,
                             onPageChanged: (index, reason) {
                               currentIndex.value = index;
                             },
