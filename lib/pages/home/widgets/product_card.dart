@@ -34,7 +34,9 @@ class ProductCard extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 if (context.mounted) {
-                  context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
+                  // context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
+                  context.router.push(const CrmCompanyCreateRoute());
+
                   return;
                 }
               },
