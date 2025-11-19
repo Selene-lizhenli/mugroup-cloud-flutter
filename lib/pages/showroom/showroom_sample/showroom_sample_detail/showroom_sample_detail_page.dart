@@ -1,12 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/showroom/showroom_sample/widgets/supply_quote_card.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -38,14 +36,13 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
       ),
       body: sample.value == null
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 图片轮播区域
-                  if (sample.value?.image != null &&
-                      sample.value!.image!.isNotEmpty)
-                    Stack(
+          : CustomScrollView(
+              slivers: [
+                // 图片轮播区域
+                if (sample.value?.image != null &&
+                    sample.value!.image!.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Stack(
                       children: [
                         CarouselSlider(
                           items: sample.value!.image!.map((item) {
@@ -81,10 +78,10 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                           right: 8.0,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 4.0), // 给文字添加适当的内边距
+                                horizontal: 8.0, vertical: 4.0),
                             decoration: BoxDecoration(
-                              color: Colors.black45, // 背景色
-                              borderRadius: BorderRadius.circular(8.0), // 设置圆角
+                              color: Colors.black45,
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: Text(
                               '${currentIndex.value + 1} / ${sample.value!.image!.length}',
@@ -98,27 +95,31 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                  // 产品名称区域
-                  Container(
-                    color: Colors.white, // 设置背景色为白色
-                    width: double.infinity, // 强制宽度占满
+                  ),
+                // 产品名称区域
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12.0, vertical: 6),
                     child: Text(
-                      sample.value!.nameCn ?? '', // 产品中文名称
+                      sample.value!.nameCn ?? '',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
-                      maxLines: 1, // 限制最多一行
-                      overflow: TextOverflow.ellipsis, // 超出部分用省略号显示
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  // 产品编号和价格信息
-                  Container(
-                    color: Colors.white, // 设置背景色为白色
-                    width: double.infinity, // 强制宽度占满
+                ),
+                // 产品编号和价格信息
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12.0, vertical: 4),
                     child: Row(
@@ -140,19 +141,20 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12), // 添加间隔
-                  // 其他信息区域
-                  Container(
-                    width: double.infinity, // 强制宽度占满
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 12)), // 添加间隔
+                // 其他信息区域
+                SliverToBoxAdapter(
+                  child: Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 16.0), // 增加上下内边距
+                        horizontal: 16.0, vertical: 16.0),
                     decoration: const BoxDecoration(
-                      color: Colors.white, // 背景色
+                      color: Colors.white,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 规格
                         Text(
                           '规格: ${sample.value!.spec}',
                           style: const TextStyle(
@@ -161,9 +163,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 12), // 增加间隔
-
-                        // 分类
+                        const SizedBox(height: 12),
                         Text(
                           '分类: ${sample.value!.category?.name ?? '未知'}',
                           style: const TextStyle(
@@ -172,9 +172,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 12), // 增加间隔
-
-                        // 条形码
+                        const SizedBox(height: 12),
                         Text(
                           '条形码: ${sample.value!.barcode ?? '未知'}',
                           style: const TextStyle(
@@ -183,9 +181,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 12), // 增加间隔
-
-                        // 税率
+                        const SizedBox(height: 12),
                         Text(
                           '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
                           style: const TextStyle(
@@ -197,27 +193,26 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  MasonryGridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 5,
-                    crossAxisSpacing: 5,
-                    itemCount: sample.value?.supplyQuotes?.length,
-                    padding: const EdgeInsets.all(5),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (sample.value?.supplyQuotes?.isNotEmpty ?? false)
-                            ...sample.value!.supplyQuotes!.map((quote) {
-                              return SupplyQuoteCard(quote: quote);
-                            }),
-                        ],
-                      );
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final quote = sample.value?.supplyQuotes?[index];
+                      if (quote == null) {
+                        return const SizedBox(); // 处理空的报价
+                      }
+                      return SupplyQuoteCard(quote: quote);
                     },
-                  )
-                ],
-              ),
+                    childCount: sample.value?.supplyQuotes?.length ?? 0,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5,
+                  ),
+                ),
+              ],
             ),
     );
   }

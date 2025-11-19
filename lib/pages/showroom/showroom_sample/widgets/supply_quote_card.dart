@@ -29,6 +29,8 @@ class SupplyQuoteCard extends HookConsumerWidget {
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
                 ),
+                maxLines: 2, // 限制最多一行
+                overflow: TextOverflow.ellipsis, // 超出一行时显示省略号
               ),
               const SizedBox(height: 8),
             ],
@@ -37,42 +39,6 @@ class SupplyQuoteCard extends HookConsumerWidget {
             if (quote.packing != null) ...[
               Text(
                 '包装: ${quote.packing!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 外箱容量
-            if (quote.outerCapacity != null) ...[
-              Text(
-                '外箱容量: ${quote.outerCapacity!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 外箱体积
-            if (quote.outerVolume != null) ...[
-              Text(
-                '外箱体积: ${quote.outerVolume!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 发货时间
-            if (quote.chuhuoAt != null) ...[
-              Text(
-                '发货时间: ${quote.chuhuoAt!.toLocal().toString()}',
                 style: TextStyle(
                   fontSize: 14,
                   color: colorScheme.onSurface,
@@ -92,8 +58,6 @@ class SupplyQuoteCard extends HookConsumerWidget {
               ),
               const SizedBox(height: 8),
             ],
-
-            const SizedBox(height: 8),
 
             // 税率
             if (quote.taxRate != null) ...[
