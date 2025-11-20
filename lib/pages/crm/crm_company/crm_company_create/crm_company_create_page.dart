@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
+import 'package:cloud/pages/crm/crm_company/widgets/multi_input.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,6 +30,11 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
     final industry = useState('');
     final source = useState('');
     final website = useState('');
+
+    final wechatAccounts = useState<List<String>>(['']);
+    final linkedInAccounts = useState<List<String>>(['']);
+    final whatsAppAccounts = useState<List<String>>(['']);
+    final faceBookAccounts = useState<List<String>>(['']);
 
     // --- 你的核心上传逻辑 ---
     Future<void> handleUploadMedia() async {
@@ -189,6 +195,42 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  MultiInput(
+                    label: '微信号',
+                    btnText: '添加更多微信号', // 自定义按钮文字
+                    values: wechatAccounts.value,
+                    onChanged: (newValues) {
+                      wechatAccounts.value = newValues;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  MultiInput(
+                    label: 'LinkedIn',
+                    btnText: '添加更多LinkedIn', // 自定义按钮文字
+                    values: linkedInAccounts.value,
+                    onChanged: (newValues) {
+                      linkedInAccounts.value = newValues;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  MultiInput(
+                    label: 'WhatsApp',
+                    btnText: '添加更多WhatsApp', // 自定义按钮文字
+                    values: whatsAppAccounts.value,
+                    onChanged: (newValues) {
+                      whatsAppAccounts.value = newValues;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  MultiInput(
+                    label: 'FaceBook',
+                    btnText: '添加更多FaceBook', // 自定义按钮文字
+                    values: faceBookAccounts.value,
+                    onChanged: (newValues) {
+                      faceBookAccounts.value = newValues;
+                    },
                   ),
                   const SizedBox(height: 40),
                 ],
