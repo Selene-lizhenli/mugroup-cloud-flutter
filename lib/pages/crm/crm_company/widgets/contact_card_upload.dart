@@ -1,22 +1,27 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class   ContactCardUploader extends StatelessWidget {
+class ContactCardUploader extends HookConsumerWidget {
   final String? imageUrl; // 名片图片地址
-  final bool isAnalyzing; // 是否正在OCR识别中
+  final bool isUploading;
   final VoidCallback onTap; // 点击回调
 
   const ContactCardUploader({
     super.key,
     this.imageUrl,
-    this.isAnalyzing = false,
+    this.isUploading = false,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final isHasImage = imageUrl != null && imageUrl!.isNotEmpty;
+
+    final isAnalyzing = useState(false);
+
 
     logger.d(imageUrl);
 
@@ -31,16 +36,31 @@ class   ContactCardUploader extends StatelessWidget {
               "名片识别",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            if (!isAnalyzing && !isHasImage)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  "智能识别",
-                  style: TextStyle(color: colorScheme.primary, fontSize: 12),
+            if (!isUploading)
+              Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () async {
+                    // await onSmartDetect();
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      "智能识别",
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -49,24 +69,24 @@ class   ContactCardUploader extends StatelessWidget {
 
         // 卡片主体区域
         GestureDetector(
-          onTap: isAnalyzing ? null : onTap,
+          onTap: isUploading ? null : onTap,
           child: AspectRatio(
-            aspectRatio: 1.6, // 标准名片比例 (约 85mm:54mm)
+            aspectRatio: 1.8,
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 color: isHasImage ? Colors.black : const Color(0xFFF7F8FA),
-                borderRadius: BorderRadius.circular(12), // 微圆角，不宜太圆
+                borderRadius: BorderRadius.circular(12),
                 // 如果没有图片，显示虚线边框效果 (用 border 模拟)
                 border: isHasImage
                     ? null
                     : Border.all(color: Colors.grey.shade300, width: 1.5),
-                image: isHasImage && !isAnalyzing
+                image: isHasImage && !isUploading
                     ? DecorationImage(
                         image: NetworkImage(imageUrl!),
                         fit: BoxFit.cover,
                         colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(0.1), // 稍微压暗一点，突出重拍按钮
+                          Colors.black.withOpacity(0.1),
                           BlendMode.darken,
                         ),
                       )
@@ -76,7 +96,7 @@ class   ContactCardUploader extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   // 1. 空状态内容
-                  if (!isHasImage && !isAnalyzing)
+                  if (!isHasImage && !isUploading)
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -111,7 +131,7 @@ class   ContactCardUploader extends StatelessWidget {
                     ),
 
                   // 2. 识别中状态 (覆盖层)
-                  if (isAnalyzing)
+                  if (isUploading)
                     Container(
                       width: double.infinity,
                       height: double.infinity,
@@ -129,7 +149,7 @@ class   ContactCardUploader extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            "正在智能识别...",
+                            "上传中...",
                             style: TextStyle(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -140,7 +160,7 @@ class   ContactCardUploader extends StatelessWidget {
                     ),
 
                   // 3. 已上传状态下的“重拍”按钮 (右上角)
-                  if (isHasImage && !isAnalyzing)
+                  if (isHasImage && !isUploading)
                     Positioned(
                       right: 12,
                       bottom: 12,

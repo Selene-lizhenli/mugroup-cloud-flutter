@@ -20,7 +20,6 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
     // --- 状态管理 ---
     final isUploading = useState(false); // 控制 Loading 状态
     final cardImageUrl = useState<String>('');
-    final isAnalyzing = useState(false); // OCR 识别状态
 
     final companyName = useState('');
     final address = useState('');
@@ -123,7 +122,7 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                 children: [
                   ContactCardUploader(
                     imageUrl: cardImageUrl.value,
-                    isAnalyzing: isAnalyzing.value,
+                    isUploading: isUploading.value,
                     onTap: handleUploadMedia,
                   ),
                   const SizedBox(height: 32),
