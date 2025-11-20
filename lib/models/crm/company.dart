@@ -9,16 +9,16 @@ class Company with _$Company {
     int? id,
     String? name,
     String? address,
-    String? domain,
     String? industry,
     String? location,
     String? source,
+    List<String>? domain,
     List<String>? email,
     List<String>? facebook,
     List<String>? linkedin,
     List<String>? whatsapp,
-    
   ) = _Company;
 
-  factory Company.fromJson(Map<String, dynamic> json) => _$CompanyFromJson(json);
+  factory Company.fromJson(Map<String, dynamic> json) =>
+      _$CompanyFromJson(json);
 }

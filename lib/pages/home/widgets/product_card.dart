@@ -35,7 +35,7 @@ class ProductCard extends StatelessWidget {
               onTap: () {
                 if (context.mounted) {
                   // context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
-                  context.router.push(const CrmCompanyCreateRoute());
+                  context.router.push(CrmCompanyDetailRoute(id: 1));
 
                   return;
                 }

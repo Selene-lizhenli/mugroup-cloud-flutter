@@ -23,10 +23,10 @@ mixin _$Company {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
-  String? get domain => throw _privateConstructorUsedError;
   String? get industry => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
   String? get source => throw _privateConstructorUsedError;
+  List<String>? get domain => throw _privateConstructorUsedError;
   List<String>? get email => throw _privateConstructorUsedError;
   List<String>? get facebook => throw _privateConstructorUsedError;
   List<String>? get linkedin => throw _privateConstructorUsedError;
@@ -46,10 +46,10 @@ abstract class $CompanyCopyWith<$Res> {
       {int? id,
       String? name,
       String? address,
-      String? domain,
       String? industry,
       String? location,
       String? source,
+      List<String>? domain,
       List<String>? email,
       List<String>? facebook,
       List<String>? linkedin,
@@ -72,10 +72,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
     Object? id = freezed,
     Object? name = freezed,
     Object? address = freezed,
-    Object? domain = freezed,
     Object? industry = freezed,
     Object? location = freezed,
     Object? source = freezed,
+    Object? domain = freezed,
     Object? email = freezed,
     Object? facebook = freezed,
     Object? linkedin = freezed,
@@ -94,10 +94,6 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      domain: freezed == domain
-          ? _value.domain
-          : domain // ignore: cast_nullable_to_non_nullable
-              as String?,
       industry: freezed == industry
           ? _value.industry
           : industry // ignore: cast_nullable_to_non_nullable
@@ -110,6 +106,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
           ? _value.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
+      domain: freezed == domain
+          ? _value.domain
+          : domain // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
@@ -141,10 +141,10 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
       {int? id,
       String? name,
       String? address,
-      String? domain,
       String? industry,
       String? location,
       String? source,
+      List<String>? domain,
       List<String>? email,
       List<String>? facebook,
       List<String>? linkedin,
@@ -165,10 +165,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? address = freezed,
-    Object? domain = freezed,
     Object? industry = freezed,
     Object? location = freezed,
     Object? source = freezed,
+    Object? domain = freezed,
     Object? email = freezed,
     Object? facebook = freezed,
     Object? linkedin = freezed,
@@ -187,10 +187,6 @@ class __$$CompanyImplCopyWithImpl<$Res>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      freezed == domain
-          ? _value.domain
-          : domain // ignore: cast_nullable_to_non_nullable
-              as String?,
       freezed == industry
           ? _value.industry
           : industry // ignore: cast_nullable_to_non_nullable
@@ -203,6 +199,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
           ? _value.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == domain
+          ? _value._domain
+          : domain // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       freezed == email
           ? _value._email
           : email // ignore: cast_nullable_to_non_nullable
@@ -230,15 +230,16 @@ class _$CompanyImpl implements _Company {
       this.id,
       this.name,
       this.address,
-      this.domain,
       this.industry,
       this.location,
       this.source,
+      final List<String>? domain,
       final List<String>? email,
       final List<String>? facebook,
       final List<String>? linkedin,
       final List<String>? whatsapp)
-      : _email = email,
+      : _domain = domain,
+        _email = email,
         _facebook = facebook,
         _linkedin = linkedin,
         _whatsapp = whatsapp;
@@ -253,13 +254,21 @@ class _$CompanyImpl implements _Company {
   @override
   final String? address;
   @override
-  final String? domain;
-  @override
   final String? industry;
   @override
   final String? location;
   @override
   final String? source;
+  final List<String>? _domain;
+  @override
+  List<String>? get domain {
+    final value = _domain;
+    if (value == null) return null;
+    if (_domain is EqualUnmodifiableListView) return _domain;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   final List<String>? _email;
   @override
   List<String>? get email {
@@ -302,7 +311,7 @@ class _$CompanyImpl implements _Company {
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, address: $address, domain: $domain, industry: $industry, location: $location, source: $source, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp)';
+    return 'Company(id: $id, name: $name, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp)';
   }
 
   @override
@@ -313,12 +322,12 @@ class _$CompanyImpl implements _Company {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.domain, domain) || other.domain == domain) &&
             (identical(other.industry, industry) ||
                 other.industry == industry) &&
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.source, source) || other.source == source) &&
+            const DeepCollectionEquality().equals(other._domain, _domain) &&
             const DeepCollectionEquality().equals(other._email, _email) &&
             const DeepCollectionEquality().equals(other._facebook, _facebook) &&
             const DeepCollectionEquality().equals(other._linkedin, _linkedin) &&
@@ -332,10 +341,10 @@ class _$CompanyImpl implements _Company {
       id,
       name,
       address,
-      domain,
       industry,
       location,
       source,
+      const DeepCollectionEquality().hash(_domain),
       const DeepCollectionEquality().hash(_email),
       const DeepCollectionEquality().hash(_facebook),
       const DeepCollectionEquality().hash(_linkedin),
@@ -360,10 +369,10 @@ abstract class _Company implements Company {
       final int? id,
       final String? name,
       final String? address,
-      final String? domain,
       final String? industry,
       final String? location,
       final String? source,
+      final List<String>? domain,
       final List<String>? email,
       final List<String>? facebook,
       final List<String>? linkedin,
@@ -378,13 +387,13 @@ abstract class _Company implements Company {
   @override
   String? get address;
   @override
-  String? get domain;
-  @override
   String? get industry;
   @override
   String? get location;
   @override
   String? get source;
+  @override
+  List<String>? get domain;
   @override
   List<String>? get email;
   @override
