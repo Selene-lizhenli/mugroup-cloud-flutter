@@ -3,8 +3,10 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/multi_input.dart';
+import 'package:cloud/services/crm.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flant/flant.dart';
@@ -24,14 +26,14 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
     final isUploading = useState(false); // 控制 Loading 状态
     final cardImage = useState<TemporaryMedia?>(null);
 
-    final companyName = useState('');
+    final name = useState('');
     final address = useState('');
     final country = useState('');
     final industry = useState('');
     final source = useState('');
-    final website = useState('');
+    final domain = useState('');
 
-    final wechatAccounts = useState<List<String>>(['']);
+    final emailAccounts = useState<List<String>>(['']);
     final linkedInAccounts = useState<List<String>>(['']);
     final whatsAppAccounts = useState<List<String>>(['']);
     final faceBookAccounts = useState<List<String>>(['']);
@@ -145,8 +147,8 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                   // --- 表单输入 ---
                   Input(
                     label: '客户名称',
-                    value: companyName.value,
-                    onChanged: (v) => companyName.value = v,
+                    value: name.value,
+                    onChanged: (v) => name.value = v,
                   ),
                   const SizedBox(height: 16),
                   Input(
@@ -188,8 +190,8 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                       Expanded(
                         child: Input(
                           label: '公司网址',
-                          value: website.value,
-                          onChanged: (v) => website.value = v,
+                          value: domain.value,
+                          onChanged: (v) => domain.value = v,
                           keyboardType: TextInputType.url,
                           textInputAction: TextInputAction.done,
                         ),
@@ -198,11 +200,11 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   MultiInput(
-                    label: '微信号',
-                    btnText: '添加更多微信号', // 自定义按钮文字
-                    values: wechatAccounts.value,
+                    label: '邮箱',
+                    btnText: '添加更多邮箱', // 自定义按钮文字
+                    values: emailAccounts.value,
                     onChanged: (newValues) {
-                      wechatAccounts.value = newValues;
+                      emailAccounts.value = newValues;
                     },
                   ),
                   const SizedBox(height: 16),
@@ -262,8 +264,22 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {
-                    debugPrint("提交数据: Name=${companyName.value}");
+                  onPressed: () async {
+                    final data = {
+                      'address': address.value,
+                      'domain': domain.value,
+                      'email': emailAccounts.value,
+                      'facebook': faceBookAccounts.value,
+                      'industry': industry.value,
+                      'linkedin': linkedInAccounts.value,
+                      'location': country.value,
+                      'name': name.value,
+                      'source': source.value,
+                      'whatsapp': whatsAppAccounts.value,
+                    };
+
+                    await storeCrmCompany(data);
+                    EasyLoading.showSuccess('创建成功!');
                   },
                   child: const Text(
                     "保存",
