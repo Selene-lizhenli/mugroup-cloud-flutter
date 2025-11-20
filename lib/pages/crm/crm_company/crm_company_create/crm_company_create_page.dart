@@ -1,9 +1,13 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
-import 'package:cloud/pages/crm/crm_company/widgets/input.dart';
+import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
+import 'package:cloud/services/media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flant/flant.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:cloud/pages/crm/crm_company/widgets/input.dart';
 
 @RoutePage()
 class CrmCompanyCreatePage extends HookConsumerWidget {
@@ -12,99 +16,219 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // --- 状态管理 ---
+    final isUploading = useState(false); // 控制 Loading 状态
+    final cardImageUrl = useState<String>('');
+    final isAnalyzing = useState(false); // OCR 识别状态
+
     final companyName = useState('');
+    final address = useState('');
+    final country = useState('');
+    final industry = useState('');
+    final source = useState('');
+    final website = useState('');
+
+    // --- 你的核心上传逻辑 ---
+    Future<void> handleUploadMedia() async {
+      await showFlanActionSheet(
+        context,
+        cancelText: "取消",
+        actions: [
+          FlanActionSheetAction(
+            name: "拍摄",
+            callback: (action) async {
+              // 1. 拍照
+              final AssetEntity? entity =
+                  await CameraPicker.pickFromCamera(context);
+
+              if (context.mounted) {
+                Navigator.of(context).maybePop(); // 关闭 ActionSheet
+              }
+
+              if (entity == null) return;
+
+              // 2. 开始上传
+              isUploading.value = true; // 开启 Loading
+              try {
+                final file = await entity.file;
+                // 调用上传接口
+                final temporaryMedia = await upload(file: file!);
+                cardImageUrl.value = temporaryMedia.url;
+              } catch (e) {
+                FlanToast.fail(context, message: "$e");
+              } finally {
+                isUploading.value = false; // 关闭 Loading
+              }
+            },
+          ),
+          FlanActionSheetAction(
+            name: "从手机相册选择",
+            callback: (action) async {
+              // 1. 选图
+              final List<AssetEntity>? result = await AssetPicker.pickAssets(
+                context,
+                pickerConfig: const AssetPickerConfig(
+                  maxAssets: 1, // 头像通常只选一张
+                  requestType: RequestType.image,
+                ),
+              );
+
+              if (context.mounted) {
+                Navigator.of(context).maybePop();
+              }
+
+              if (result == null || result.isEmpty) return;
+
+              // 2. 开始上传
+              isUploading.value = true;
+              try {
+                // 处理第一张选中的图片
+                final entity = result.first;
+                final file = await entity.file;
+                final temporaryMedia = await upload(file: file!);
+                cardImageUrl.value = temporaryMedia.url;
+              } catch (e) {
+                FlanToast.fail(context, message: "$e");
+              } finally {
+                isUploading.value = false;
+              }
+            },
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("客户创建"),
-        backgroundColor: colorScheme.primary,
-      ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
+      appBar: AppBar(
+        title: const Text("创建客户",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey.shade100, height: 1),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
           children: [
-            const Text("基本资料",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Input(
-              label: '客户名称',
-              onChanged: (value) {
-                logger.d(value);
-              },
+            Expanded(
+              child: ListView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                children: [
+                  ContactCardUploader(
+                    imageUrl: cardImageUrl.value,
+                    isAnalyzing: isAnalyzing.value,
+                    onTap: handleUploadMedia,
+                  ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    "基本资料",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87),
+                  ),
+                  const SizedBox(height: 8),
+                  // --- 表单输入 ---
+                  Input(
+                    label: '客户名称',
+                    value: companyName.value,
+                    onChanged: (v) => companyName.value = v,
+                  ),
+                  const SizedBox(height: 16),
+                  Input(
+                    label: '地址',
+                    value: address.value,
+                    onChanged: (v) => address.value = v,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Input(
+                          label: '国家/地区',
+                          value: country.value,
+                          onChanged: (v) => country.value = v,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Input(
+                          label: '行业',
+                          value: industry.value,
+                          onChanged: (v) => industry.value = v,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Input(
+                          label: '来源',
+                          value: source.value,
+                          onChanged: (v) => source.value = v,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Input(
+                          label: '公司网址',
+                          value: website.value,
+                          onChanged: (v) => website.value = v,
+                          keyboardType: TextInputType.url,
+                          textInputAction: TextInputAction.done,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            Input(
-              label: '地址',
-              onChanged: (value) {
-                logger.d(value);
-              },
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                    child: Input(
-                  label: '国家/地区',
-                  onChanged: (value) {
-                    logger.d(value);
+            // --- 底部保存按钮 ---
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    offset: const Offset(0, -4),
+                    blurRadius: 10,
+                  )
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shadowColor: colorScheme.primary.withOpacity(0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    debugPrint("提交数据: Name=${companyName.value}");
                   },
-                )),
-                const SizedBox(width: 12), // 间距
-                Expanded(
-                  child: Input(
-                    label: '行业',
-                    onChanged: (value) {
-                      logger.d(value);
-                    },
+                  child: const Text(
+                    "保存",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                    child: Input(
-                  label: '来源',
-                  onChanged: (value) {
-                    logger.d(value);
-                  },
-                )),
-                const SizedBox(width: 12), // 间距
-                Expanded(
-                  child: Input(
-                    label: '公司网址',
-                    onChanged: (value) {
-                      logger.d(value);
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary, // 按钮背景色
-                  foregroundColor: Colors.black, // 文字颜色
-                  side: BorderSide(
-                      color: Colors.grey.shade300, width: 1.5), // 边框颜色和宽度
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8), // 圆角
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16), // 内边距
-                ),
-                onPressed: () {
-                  print("提交：");
-                },
-                child: const Text(
-                  "保存",
-                  style: TextStyle(color: Colors.white),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
