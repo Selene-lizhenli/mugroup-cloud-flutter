@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,7 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
 
     // --- 状态管理 ---
     final isUploading = useState(false); // 控制 Loading 状态
-    final cardImageUrl = useState<String>('');
+    final cardImage = useState<TemporaryMedia?>(null);
 
     final companyName = useState('');
     final address = useState('');
@@ -53,9 +55,7 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                 final file = await entity.file;
                 // 调用上传接口
                 final temporaryMedia = await upload(file: file!);
-                cardImageUrl.value = temporaryMedia.url;
-              } catch (e) {
-                FlanToast.fail(context, message: "$e");
+                cardImage.value = temporaryMedia;
               } finally {
                 isUploading.value = false; // 关闭 Loading
               }
@@ -86,9 +86,7 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                 final entity = result.first;
                 final file = await entity.file;
                 final temporaryMedia = await upload(file: file!);
-                cardImageUrl.value = temporaryMedia.url;
-              } catch (e) {
-                FlanToast.fail(context, message: "$e");
+                cardImage.value = temporaryMedia;
               } finally {
                 isUploading.value = false;
               }
@@ -121,9 +119,13 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 children: [
                   ContactCardUploader(
-                    imageUrl: cardImageUrl.value,
+                    image: cardImage.value,
                     isUploading: isUploading.value,
                     onTap: handleUploadMedia,
+                    onSuccess: (value) {
+                      // 成功回调
+                      logger.d(value);
+                    },
                   ),
                   const SizedBox(height: 32),
                   const Text(

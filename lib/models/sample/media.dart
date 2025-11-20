@@ -10,6 +10,7 @@ part 'media.g.dart';
 abstract class TemporaryMedia with _$TemporaryMedia {
   const factory TemporaryMedia({
     required int id,
+    String? uuid,
     @JsonKey(name: 'thumb_url') String? thumbUrl,
     required String url,
   }) = _TemporaryMedia;

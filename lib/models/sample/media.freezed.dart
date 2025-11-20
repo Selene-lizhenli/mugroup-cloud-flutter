@@ -21,6 +21,7 @@ TemporaryMedia _$TemporaryMediaFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$TemporaryMedia {
   int get id => throw _privateConstructorUsedError;
+  String? get uuid => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumb_url')
   String? get thumbUrl => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
@@ -37,7 +38,11 @@ abstract class $TemporaryMediaCopyWith<$Res> {
           TemporaryMedia value, $Res Function(TemporaryMedia) then) =
       _$TemporaryMediaCopyWithImpl<$Res, TemporaryMedia>;
   @useResult
-  $Res call({int id, @JsonKey(name: 'thumb_url') String? thumbUrl, String url});
+  $Res call(
+      {int id,
+      String? uuid,
+      @JsonKey(name: 'thumb_url') String? thumbUrl,
+      String url});
 }
 
 /// @nodoc
@@ -54,6 +59,7 @@ class _$TemporaryMediaCopyWithImpl<$Res, $Val extends TemporaryMedia>
   @override
   $Res call({
     Object? id = null,
+    Object? uuid = freezed,
     Object? thumbUrl = freezed,
     Object? url = null,
   }) {
@@ -62,6 +68,10 @@ class _$TemporaryMediaCopyWithImpl<$Res, $Val extends TemporaryMedia>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
+      uuid: freezed == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String?,
       thumbUrl: freezed == thumbUrl
           ? _value.thumbUrl
           : thumbUrl // ignore: cast_nullable_to_non_nullable
@@ -82,7 +92,11 @@ abstract class _$$TemporaryMediaImplCopyWith<$Res>
       __$$TemporaryMediaImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, @JsonKey(name: 'thumb_url') String? thumbUrl, String url});
+  $Res call(
+      {int id,
+      String? uuid,
+      @JsonKey(name: 'thumb_url') String? thumbUrl,
+      String url});
 }
 
 /// @nodoc
@@ -97,6 +111,7 @@ class __$$TemporaryMediaImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? uuid = freezed,
     Object? thumbUrl = freezed,
     Object? url = null,
   }) {
@@ -105,6 +120,10 @@ class __$$TemporaryMediaImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
+      uuid: freezed == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String?,
       thumbUrl: freezed == thumbUrl
           ? _value.thumbUrl
           : thumbUrl // ignore: cast_nullable_to_non_nullable
@@ -122,6 +141,7 @@ class __$$TemporaryMediaImplCopyWithImpl<$Res>
 class _$TemporaryMediaImpl implements _TemporaryMedia {
   const _$TemporaryMediaImpl(
       {required this.id,
+      this.uuid,
       @JsonKey(name: 'thumb_url') this.thumbUrl,
       required this.url});
 
@@ -131,6 +151,8 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
   @override
   final int id;
   @override
+  final String? uuid;
+  @override
   @JsonKey(name: 'thumb_url')
   final String? thumbUrl;
   @override
@@ -138,7 +160,7 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
 
   @override
   String toString() {
-    return 'TemporaryMedia(id: $id, thumbUrl: $thumbUrl, url: $url)';
+    return 'TemporaryMedia(id: $id, uuid: $uuid, thumbUrl: $thumbUrl, url: $url)';
   }
 
   @override
@@ -147,6 +169,7 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
         (other.runtimeType == runtimeType &&
             other is _$TemporaryMediaImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.uuid, uuid) || other.uuid == uuid) &&
             (identical(other.thumbUrl, thumbUrl) ||
                 other.thumbUrl == thumbUrl) &&
             (identical(other.url, url) || other.url == url));
@@ -154,7 +177,7 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, thumbUrl, url);
+  int get hashCode => Object.hash(runtimeType, id, uuid, thumbUrl, url);
 
   @JsonKey(ignore: true)
   @override
@@ -174,6 +197,7 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
 abstract class _TemporaryMedia implements TemporaryMedia {
   const factory _TemporaryMedia(
       {required final int id,
+      final String? uuid,
       @JsonKey(name: 'thumb_url') final String? thumbUrl,
       required final String url}) = _$TemporaryMediaImpl;
 
@@ -182,6 +206,8 @@ abstract class _TemporaryMedia implements TemporaryMedia {
 
   @override
   int get id;
+  @override
+  String? get uuid;
   @override
   @JsonKey(name: 'thumb_url')
   String? get thumbUrl;
