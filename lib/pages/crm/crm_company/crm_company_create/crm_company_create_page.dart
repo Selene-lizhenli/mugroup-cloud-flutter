@@ -24,6 +24,7 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
 
     // --- 状态管理 ---
     final isUploading = useState(false); // 控制 Loading 状态
+    final isSubmitting = useState(false);
     final cardImage = useState<TemporaryMedia?>(null);
 
     final name = useState('');
@@ -259,32 +260,75 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
                     backgroundColor: colorScheme.primary,
                     foregroundColor: Colors.white,
                     elevation: 2,
+                    disabledBackgroundColor:
+                        colorScheme.primary.withOpacity(0.6),
+                    disabledForegroundColor: Colors.white,
                     shadowColor: colorScheme.primary.withOpacity(0.4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () async {
-                    final data = {
-                      'address': address.value,
-                      'domain': domain.value,
-                      'email': emailAccounts.value,
-                      'facebook': faceBookAccounts.value,
-                      'industry': industry.value,
-                      'linkedin': linkedInAccounts.value,
-                      'location': country.value,
-                      'name': name.value,
-                      'source': source.value,
-                      'whatsapp': whatsAppAccounts.value,
-                    };
+                  onPressed: isSubmitting.value
+                      ? null
+                      : () async {
+                          // 1. 开启提交状态
+                          isSubmitting.value = true;
 
-                    await storeCrmCompany(data);
-                    EasyLoading.showSuccess('创建成功!');
-                  },
-                  child: const Text(
-                    "保存",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                          try {
+                            // 简单校验
+                            if (name.value.isEmpty) {
+                              EasyLoading.showInfo('请输入客户名称');
+                              return;
+                            }
+
+                            final data = {
+                              'address': address.value,
+                              'domain': domain.value,
+                              // 过滤掉空字符串
+                              'email': emailAccounts.value
+                                  .where((e) => e.trim().isNotEmpty)
+                                  .toList(),
+                              'facebook': faceBookAccounts.value
+                                  .where((e) => e.trim().isNotEmpty)
+                                  .toList(),
+                              'industry': industry.value,
+                              'linkedin': linkedInAccounts.value
+                                  .where((e) => e.trim().isNotEmpty)
+                                  .toList(),
+                              'location': country.value,
+                              'name': name.value,
+                              'source': source.value,
+                              'whatsapp': whatsAppAccounts.value
+                                  .where((e) => e.trim().isNotEmpty)
+                                  .toList(),
+                            };
+
+                            await storeCrmCompany(data);
+
+                            EasyLoading.showSuccess('创建成功!');
+
+                            // 成功后通常会返回上一页
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          } finally {
+                            isSubmitting.value = false;
+                          }
+                        },
+                  child: isSubmitting.value
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "保存",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
             ),
