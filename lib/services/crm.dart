@@ -23,3 +23,15 @@ Future<Company?> showCrmCompany(int id) async {
     },
   );
 }
+
+Future<Company?> updateCrmCompany(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/crm/companies/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Company.fromJson(res.data);
+    },
+  );
+}
