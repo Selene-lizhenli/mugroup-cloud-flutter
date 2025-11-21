@@ -1,17 +1,26 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/multi_input.dart';
+import 'package:cloud/services/media.dart';
+import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/input.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class CrmCompanyForm extends HookConsumerWidget {
   final Company? initial; // 创建时 null，编辑时传 Company
+  final bool showUpload;
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
   const CrmCompanyForm({
     super.key,
+    this.showUpload = false,
     required this.initial,
     required this.onSubmit,
   });
@@ -19,6 +28,10 @@ class CrmCompanyForm extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final isUploading = useState(false); // 控制 Loading 状态
+    final isSubmitting = useState(false);
+    final cardImage = useState<TemporaryMedia?>(null);
 
     final name = useState(initial?.name ?? '');
     final address = useState(initial?.address ?? '');
@@ -38,8 +51,71 @@ class CrmCompanyForm extends HookConsumerWidget {
     final faceBookAccounts =
         useState<List<String>>(initial?.facebook?.toList() ?? ['']);
 
-    // 状态
-    final isSubmitting = useState(false);
+    // --- 你的核心上传逻辑 ---
+    Future<void> handleUploadMedia() async {
+      await showFlanActionSheet(
+        context,
+        cancelText: "取消",
+        actions: [
+          FlanActionSheetAction(
+            name: "拍摄",
+            callback: (action) async {
+              // 1. 拍照
+              final AssetEntity? entity =
+                  await CameraPicker.pickFromCamera(context);
+
+              if (context.mounted) {
+                Navigator.of(context).maybePop(); // 关闭 ActionSheet
+              }
+
+              if (entity == null) return;
+
+              // 2. 开始上传
+              isUploading.value = true; // 开启 Loading
+              try {
+                final file = await entity.file;
+                // 调用上传接口
+                final temporaryMedia = await upload(file: file!);
+                cardImage.value = temporaryMedia;
+              } finally {
+                isUploading.value = false; // 关闭 Loading
+              }
+            },
+          ),
+          FlanActionSheetAction(
+            name: "从手机相册选择",
+            callback: (action) async {
+              // 1. 选图
+              final List<AssetEntity>? result = await AssetPicker.pickAssets(
+                context,
+                pickerConfig: const AssetPickerConfig(
+                  maxAssets: 1, // 头像通常只选一张
+                  requestType: RequestType.image,
+                ),
+              );
+
+              if (context.mounted) {
+                Navigator.of(context).maybePop();
+              }
+
+              if (result == null || result.isEmpty) return;
+
+              // 2. 开始上传
+              isUploading.value = true;
+              try {
+                // 处理第一张选中的图片
+                final entity = result.first;
+                final file = await entity.file;
+                final temporaryMedia = await upload(file: file!);
+                cardImage.value = temporaryMedia;
+              } finally {
+                isUploading.value = false;
+              }
+            },
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
@@ -47,6 +123,18 @@ class CrmCompanyForm extends HookConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             children: [
+              if (showUpload) ...[
+                ContactCardUploader(
+                  image: cardImage.value,
+                  isUploading: isUploading.value,
+                  onTap: handleUploadMedia,
+                  onSuccess: (value) {
+                    // 成功回调
+                    logger.d(value);
+                  },
+                ),
+                const SizedBox(height: 32)
+              ],
               const Text(
                 "基本资料",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
