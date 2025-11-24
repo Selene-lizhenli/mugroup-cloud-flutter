@@ -4,6 +4,8 @@ A new Flutter project.
 
 ## 版本
 flutter 3.22.3
+java 17.0.14
+
 
 ## 常见问题
 
