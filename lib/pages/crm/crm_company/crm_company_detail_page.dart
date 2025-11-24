@@ -34,7 +34,7 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text("公司详情"),
+        title: const Text("客户详情"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
