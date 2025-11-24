@@ -31,7 +31,7 @@ import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.d
 import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
     as _i13;
 import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i14;
-import 'package:cloud/pages/showroom/showroom_sample/showroom_sample_detail/showroom_sample_detail_page.dart'
+import 'package:cloud/pages/showroom/showroom_sample_detail_page.dart'
     as _i15;
 import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i16;
 import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.dart'

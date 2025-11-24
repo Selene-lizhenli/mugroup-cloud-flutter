@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/pages/showroom/showroom_sample/widgets/supply_quote_card.dart';
+import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,6 +21,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
     loadSample(int id) async {
       final data = await getSample(id);
+      logger.d(data);
       sample.value = data;
     }
 
@@ -199,6 +201,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final quote = sample.value?.supplyQuotes?[index];
+                      logger.d('wixi');
                       if (quote == null) {
                         return const SizedBox(); // 处理空的报价
                       }
@@ -214,6 +217,95 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                 ),
               ],
             ),
+    );
+  }
+}
+
+class SupplyQuoteCard extends HookConsumerWidget {
+  final Quote quote;
+  const SupplyQuoteCard({
+    super.key,
+    required this.quote,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 供应商名称
+            if (quote.supplier?.name != null) ...[
+              Text(
+                '供应商: ${quote.supplier?.name}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+                maxLines: 2, // 限制最多一行
+                overflow: TextOverflow.ellipsis, // 超出一行时显示省略号
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // 包装
+            if (quote.packing != null) ...[
+              Text(
+                '包装: ${quote.packing!}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // 样品位置
+            if (quote.sampleLocation != null) ...[
+              Text(
+                '样品位置: ${quote.sampleLocation!}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // 税率
+            if (quote.taxRate != null) ...[
+              Text(
+                '税率: ${quote.taxRate!}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // 采购成本
+            if (quote.purchaseCost != null) ...[
+              Text(
+                '采购成本: ¥${quote.purchaseCost!}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.secondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
