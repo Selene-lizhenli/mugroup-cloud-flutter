@@ -1,6 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/crm_company_card.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -81,8 +83,7 @@ class CompanyView extends HookConsumerWidget {
           return CrmCompanyCard(
             company: company,
             onTap: () {
-              // 使用 AutoRoute 跳转到详情页
-              // context.router.push(CrmCompanyDetailRoute(id: company.id));
+              context.router.push(CrmCompanyDetailRoute(id: company.id!));
             },
           );
         },
