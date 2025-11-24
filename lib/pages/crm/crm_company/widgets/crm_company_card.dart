@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class CrmCompanyCard extends StatelessWidget {
   final Company company;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
 
   const CrmCompanyCard({
     super.key,
     required this.company,
     this.onTap,
+    this.onEdit,
   });
 
   @override
@@ -71,6 +73,19 @@ class CrmCompanyCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (onEdit != null)
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 16,
+                        icon:
+                            Icon(Icons.edit_outlined, color: Colors.grey[500]),
+                        onPressed: onEdit,
+                        alignment: Alignment.center,
+                      ),
+                    ),
                 ],
               ),
 

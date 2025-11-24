@@ -19,7 +19,7 @@ class CrmCompanyEditPage extends HookConsumerWidget {
 
     Future loadCompany() async {
       try {
-        final data = await showCrmCompany(1);
+        final data = await showCrmCompany(id);
         company.value = data;
       } finally {
         isLoading.value = false;
