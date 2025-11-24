@@ -51,7 +51,7 @@ class CrmCompanyEditPage extends HookConsumerWidget {
           await updateCrmCompany(id, data);
           EasyLoading.showSuccess("保存成功");
           if (context.mounted) {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           }
         },
       ),

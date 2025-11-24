@@ -85,8 +85,19 @@ class CompanyView extends HookConsumerWidget {
             onTap: () {
               context.router.push(CrmCompanyDetailRoute(id: company.id!));
             },
-            onEdit: () {
-              context.router.push(CrmCompanyEditRoute(id: company.id!));
+            onEdit: () async {
+              final shouldRefresh = await context.router
+                  .push(CrmCompanyEditRoute(id: company.id!));
+
+              if (shouldRefresh == true) {
+                await fetchData(
+                  search.value,
+                  init: true,
+                );
+
+                refreshController.finishRefresh();
+                refreshController.resetFooter();
+              }
             },
           );
         },
