@@ -21,6 +21,10 @@ class AppRouter extends RootStackRouter {
             path: 'home',
           ),
           AutoRoute(
+            page: CrmCompanyRoute.page,
+            path: "crm/company",
+          ),
+          AutoRoute(
             page: CartRoute.page,
             path: "cart",
           ),
@@ -43,7 +47,8 @@ class AppRouter extends RootStackRouter {
           path: "/showroom/sample/detail/:id"),
       AutoRoute(page: CrmCompanyCreateRoute.page, path: "/crm/company/create"),
       AutoRoute(page: CrmCompanyEditRoute.page, path: "/crm/company/edit/:id"),
-      AutoRoute(page: CrmCompanyDetailRoute.page, path: "/crm/company/detail/:id"),
+      AutoRoute(
+          page: CrmCompanyDetailRoute.page, path: "/crm/company/detail/:id"),
       AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),

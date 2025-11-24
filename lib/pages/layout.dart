@@ -81,6 +81,7 @@ class Layout extends HookConsumerWidget {
 
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
+      const BottomNavigationBarItem(icon: Icon(Icons.business), label: "客户"),
       BottomNavigationBarItem(
         icon: Stack(
           clipBehavior: Clip.none,
