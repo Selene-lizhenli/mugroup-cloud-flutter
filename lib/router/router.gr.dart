@@ -13,11 +13,11 @@ import 'package:cloud/models/wms/warehouse.dart' as _i21;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
 import 'package:cloud/pages/cart/models/state.dart' as _i20;
-import 'package:cloud/pages/crm/crm_company/crm_company_create/crm_company_create_page.dart'
+import 'package:cloud/pages/crm/crm_company/crm_company_create_page.dart'
     as _i3;
-import 'package:cloud/pages/crm/crm_company/crm_company_detail/crm_company_detail_page.dart'
+import 'package:cloud/pages/crm/crm_company/crm_company_detail_page.dart'
     as _i4;
-import 'package:cloud/pages/crm/crm_company/crm_company_edit/crm_company_edit_page.dart'
+import 'package:cloud/pages/crm/crm_company/crm_company_edit_page.dart'
     as _i5;
 import 'package:cloud/pages/home/home_page.dart' as _i6;
 import 'package:cloud/pages/layout.dart' as _i7;
