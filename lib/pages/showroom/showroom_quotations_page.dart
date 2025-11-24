@@ -1,10 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/quotation.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/pages/showroom/widgets/showroom_quotations_items_card.dart';
-import 'package:cloud/pages/showroom/widgets/showroom_quotations_operate_bar.dart';
-import 'package:cloud/pages/showroom/widgets/showroom_quotations_text_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
@@ -226,6 +224,232 @@ class ShowroomQuotationsPage extends HookConsumerWidget {
               addCartDialog(context);
             },
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class ShowroomQuotationItemsCard extends HookConsumerWidget {
+  final QuotationSample? quoationSample;
+
+  const ShowroomQuotationItemsCard(this.quoationSample, {super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var cover =
+        quoationSample?.showroomSample?.image?.elementAtOrNull(0)?.thumbUrl;
+
+    const showPrice = true;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          color: Colors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(children: [
+                Expanded(
+                    child: Text(
+                  '${quoationSample?.showroomSample?.name}',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  '${quoationSample?.qty ?? 1}',
+                  style: const TextStyle(
+                    color: Colors.blue, // 设置颜色
+                    fontSize: 18, // 加大字体
+                    fontWeight: FontWeight.bold, // 可选，设置加粗
+                  ),
+                ),
+              ]),
+              const SizedBox(
+                height: 10,
+              ),
+              Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      cover != null
+                          ? CachedNetworkImage(
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.contain,
+                              imageUrl: cover,
+                            )
+                          : Image.asset(
+                              'assets/noImage.png',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.contain,
+                            ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          height: 100,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    "条形码：",
+                                    style: TextStyle(),
+                                  ),
+                                  Expanded(
+                                      child: Text(
+                                    quoationSample?.showroomSample?.barcode ??
+                                        '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    "产品编码：",
+                                  ),
+                                  Expanded(
+                                      child: Text(
+                                    quoationSample?.showroomSample?.productNo ??
+                                        '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ))
+                                ],
+                              ),
+                              if (showPrice)
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "采购单价：",
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      quoationSample?.showroomSample
+                                                  ?.purchaseCost !=
+                                              null
+                                          ? '￥${quoationSample?.showroomSample!.purchaseCost}'
+                                          : '',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ))
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ShowroomQuotationsOperateBar extends HookConsumerWidget {
+  final void Function()? addCart;
+
+  const ShowroomQuotationsOperateBar({super.key, this.addCart});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: TextButton(
+                  onPressed: addCart,
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue[700], // 设置背景颜色
+                    foregroundColor: Colors.white, // 设置文字颜色
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16), // 设置内边距
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // 圆角
+                    ),
+                  ),
+                  child: const Text(
+                    "添加进购物车",
+                  )),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ShowroomQuotatiosTextCard extends HookConsumerWidget {
+  final String title;
+  final Widget lable;
+
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+
+  const ShowroomQuotatiosTextCard(
+      {super.key,
+      required this.title,
+      required this.lable,
+      this.margin,
+      this.padding});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.white,
+      ),
+      margin: margin ?? const EdgeInsets.all(1),
+      padding: padding ?? const EdgeInsets.all(10),
+      child: Row(
+        children: [
+          SizedBox(
+              width: 70,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        '$title:'),
+                  ],
+                ),
+              )),
+          lable,
         ],
       ),
     );
