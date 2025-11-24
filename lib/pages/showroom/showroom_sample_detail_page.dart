@@ -4,6 +4,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,33 +44,44 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               child: Stack(
                 children: [
                   CarouselSlider(
-                    items: sample.value!.image!.map((item) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return LayoutBuilder(
-                            builder: (context, constraints) {
-                              double containerWidth = constraints.maxWidth;
-                              return ClipRRect(
-                                child: Image.network(
-                                  item.url!,
-                                  fit: BoxFit.fill,
-                                  width: containerWidth, // 确保图片显示完整，不裁剪
-                                ),
-                              );
-                            },
+                    items: sample.value!.image!.indexed.map((item) {
+                      final index = item.$1;
+                      final media = item.$2;
+
+                      return GestureDetector(
+                        onTap: () {
+                          showFlanImagePreview(
+                            context,
+                            images: sample.value!.image!
+                                .map((item) => media.url!)
+                                .toList(),
+                            startPosition: index,
+                            loop: false,
                           );
                         },
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            double containerWidth = constraints.maxWidth;
+                            return ClipRRect(
+                              child: Image.network(
+                                media.url!,
+                                fit: BoxFit.contain,
+                                width: containerWidth,
+                              ),
+                            );
+                          },
+                        ),
                       );
                     }).toList(),
                     options: CarouselOptions(
                       viewportFraction: 1.0, // 图片占满屏幕
-                      height: 350,
+                      aspectRatio: 1,
+                      enableInfiniteScroll: false,
                       onPageChanged: (index, reason) {
                         currentIndex.value = index;
                       },
                     ),
                   ),
-                  // 右下角的图片索引
                   Positioned(
                     bottom: 8.0,
                     right: 8.0,
@@ -107,7 +119,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
