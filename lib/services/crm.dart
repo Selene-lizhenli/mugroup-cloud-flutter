@@ -1,5 +1,21 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/response.dart';
+
+Future<ApiResponse<List<Company>>> getCompanies(
+    {Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/crm/companies", queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<Company>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(Company.fromJson).toList();
+          },
+        ),
+      );
+}
 
 Future<Company?> storeCrmCompany(Map<String, dynamic>? data) async {
   return api.post("api/tenant/crm/companies", data: data).then(
