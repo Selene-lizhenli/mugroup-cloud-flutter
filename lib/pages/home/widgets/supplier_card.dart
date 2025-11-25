@@ -67,8 +67,8 @@ class SupplierCard extends StatelessWidget {
     final Contact? mainContact = supplier.contacts?.first;
 
     // UI 增强：显示核心供应商、可开票状态
-    final bool isCore = supplier.isCore as bool;
-    final bool canBill = supplier.canBill as bool;
+    final bool isCore = supplier.isCore ?? false;
+    final bool canBill = supplier.canBill ?? false;
 
     return InkWell(
       onTap: onClick,
