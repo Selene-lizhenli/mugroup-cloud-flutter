@@ -21,11 +21,24 @@ Supplier _$SupplierFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Supplier {
   int? get id => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+  String? get city => throw _privateConstructorUsedError;
+  String? get province => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_no')
   String? get supplierNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_core')
+  bool? get isCore => throw _privateConstructorUsedError;
+  @JsonKey(name: 'can_bill')
+  bool? get canBill => throw _privateConstructorUsedError;
+  @JsonKey(name: 'business_scope')
+  String? get businessScope => throw _privateConstructorUsedError;
+  @JsonKey(name: 'export_market')
+  String? get exportMarket => throw _privateConstructorUsedError;
+  @JsonKey(name: 'shipping_amount')
+  String? get shippingAmount => throw _privateConstructorUsedError;
   @JsonKey(name: 'short_name')
   String? get shortName => throw _privateConstructorUsedError;
-  String? get name => throw _privateConstructorUsedError;
+  List<Contact>? get contacts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -40,9 +53,17 @@ abstract class $SupplierCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      String? name,
+      String? city,
+      String? province,
       @JsonKey(name: 'supplier_no') String? supplierNo,
+      @JsonKey(name: 'is_core') bool? isCore,
+      @JsonKey(name: 'can_bill') bool? canBill,
+      @JsonKey(name: 'business_scope') String? businessScope,
+      @JsonKey(name: 'export_market') String? exportMarket,
+      @JsonKey(name: 'shipping_amount') String? shippingAmount,
       @JsonKey(name: 'short_name') String? shortName,
-      String? name});
+      List<Contact>? contacts});
 }
 
 /// @nodoc
@@ -59,27 +80,67 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
   @override
   $Res call({
     Object? id = freezed,
-    Object? supplierNo = freezed,
-    Object? shortName = freezed,
     Object? name = freezed,
+    Object? city = freezed,
+    Object? province = freezed,
+    Object? supplierNo = freezed,
+    Object? isCore = freezed,
+    Object? canBill = freezed,
+    Object? businessScope = freezed,
+    Object? exportMarket = freezed,
+    Object? shippingAmount = freezed,
+    Object? shortName = freezed,
+    Object? contacts = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      city: freezed == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String?,
+      province: freezed == province
+          ? _value.province
+          : province // ignore: cast_nullable_to_non_nullable
+              as String?,
       supplierNo: freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCore: freezed == isCore
+          ? _value.isCore
+          : isCore // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      canBill: freezed == canBill
+          ? _value.canBill
+          : canBill // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      businessScope: freezed == businessScope
+          ? _value.businessScope
+          : businessScope // ignore: cast_nullable_to_non_nullable
+              as String?,
+      exportMarket: freezed == exportMarket
+          ? _value.exportMarket
+          : exportMarket // ignore: cast_nullable_to_non_nullable
+              as String?,
+      shippingAmount: freezed == shippingAmount
+          ? _value.shippingAmount
+          : shippingAmount // ignore: cast_nullable_to_non_nullable
               as String?,
       shortName: freezed == shortName
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
-      name: freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
+      contacts: freezed == contacts
+          ? _value.contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<Contact>?,
     ) as $Val);
   }
 }
@@ -94,9 +155,17 @@ abstract class _$$SupplierImplCopyWith<$Res>
   @useResult
   $Res call(
       {int? id,
+      String? name,
+      String? city,
+      String? province,
       @JsonKey(name: 'supplier_no') String? supplierNo,
+      @JsonKey(name: 'is_core') bool? isCore,
+      @JsonKey(name: 'can_bill') bool? canBill,
+      @JsonKey(name: 'business_scope') String? businessScope,
+      @JsonKey(name: 'export_market') String? exportMarket,
+      @JsonKey(name: 'shipping_amount') String? shippingAmount,
       @JsonKey(name: 'short_name') String? shortName,
-      String? name});
+      List<Contact>? contacts});
 }
 
 /// @nodoc
@@ -111,27 +180,67 @@ class __$$SupplierImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
-    Object? supplierNo = freezed,
-    Object? shortName = freezed,
     Object? name = freezed,
+    Object? city = freezed,
+    Object? province = freezed,
+    Object? supplierNo = freezed,
+    Object? isCore = freezed,
+    Object? canBill = freezed,
+    Object? businessScope = freezed,
+    Object? exportMarket = freezed,
+    Object? shippingAmount = freezed,
+    Object? shortName = freezed,
+    Object? contacts = freezed,
   }) {
     return _then(_$SupplierImpl(
       freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == province
+          ? _value.province
+          : province // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == isCore
+          ? _value.isCore
+          : isCore // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      freezed == canBill
+          ? _value.canBill
+          : canBill // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      freezed == businessScope
+          ? _value.businessScope
+          : businessScope // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == exportMarket
+          ? _value.exportMarket
+          : exportMarket // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == shippingAmount
+          ? _value.shippingAmount
+          : shippingAmount // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == shortName
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
-      freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
+      freezed == contacts
+          ? _value._contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<Contact>?,
     ));
   }
 }
@@ -139,8 +248,20 @@ class __$$SupplierImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$SupplierImpl implements _Supplier {
-  _$SupplierImpl(this.id, @JsonKey(name: 'supplier_no') this.supplierNo,
-      @JsonKey(name: 'short_name') this.shortName, this.name);
+  _$SupplierImpl(
+      this.id,
+      this.name,
+      this.city,
+      this.province,
+      @JsonKey(name: 'supplier_no') this.supplierNo,
+      @JsonKey(name: 'is_core') this.isCore,
+      @JsonKey(name: 'can_bill') this.canBill,
+      @JsonKey(name: 'business_scope') this.businessScope,
+      @JsonKey(name: 'export_market') this.exportMarket,
+      @JsonKey(name: 'shipping_amount') this.shippingAmount,
+      @JsonKey(name: 'short_name') this.shortName,
+      final List<Contact>? contacts)
+      : _contacts = contacts;
 
   factory _$SupplierImpl.fromJson(Map<String, dynamic> json) =>
       _$$SupplierImplFromJson(json);
@@ -148,17 +269,45 @@ class _$SupplierImpl implements _Supplier {
   @override
   final int? id;
   @override
+  final String? name;
+  @override
+  final String? city;
+  @override
+  final String? province;
+  @override
   @JsonKey(name: 'supplier_no')
   final String? supplierNo;
   @override
+  @JsonKey(name: 'is_core')
+  final bool? isCore;
+  @override
+  @JsonKey(name: 'can_bill')
+  final bool? canBill;
+  @override
+  @JsonKey(name: 'business_scope')
+  final String? businessScope;
+  @override
+  @JsonKey(name: 'export_market')
+  final String? exportMarket;
+  @override
+  @JsonKey(name: 'shipping_amount')
+  final String? shippingAmount;
+  @override
   @JsonKey(name: 'short_name')
   final String? shortName;
+  final List<Contact>? _contacts;
   @override
-  final String? name;
+  List<Contact>? get contacts {
+    final value = _contacts;
+    if (value == null) return null;
+    if (_contacts is EqualUnmodifiableListView) return _contacts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'Supplier(id: $id, supplierNo: $supplierNo, shortName: $shortName, name: $name)';
+    return 'Supplier(id: $id, name: $name, city: $city, province: $province, supplierNo: $supplierNo, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, contacts: $contacts)';
   }
 
   @override
@@ -167,16 +316,41 @@ class _$SupplierImpl implements _Supplier {
         (other.runtimeType == runtimeType &&
             other is _$SupplierImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.province, province) ||
+                other.province == province) &&
             (identical(other.supplierNo, supplierNo) ||
                 other.supplierNo == supplierNo) &&
+            (identical(other.isCore, isCore) || other.isCore == isCore) &&
+            (identical(other.canBill, canBill) || other.canBill == canBill) &&
+            (identical(other.businessScope, businessScope) ||
+                other.businessScope == businessScope) &&
+            (identical(other.exportMarket, exportMarket) ||
+                other.exportMarket == exportMarket) &&
+            (identical(other.shippingAmount, shippingAmount) ||
+                other.shippingAmount == shippingAmount) &&
             (identical(other.shortName, shortName) ||
                 other.shortName == shortName) &&
-            (identical(other.name, name) || other.name == name));
+            const DeepCollectionEquality().equals(other._contacts, _contacts));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, supplierNo, shortName, name);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      city,
+      province,
+      supplierNo,
+      isCore,
+      canBill,
+      businessScope,
+      exportMarket,
+      shippingAmount,
+      shortName,
+      const DeepCollectionEquality().hash(_contacts));
 
   @JsonKey(ignore: true)
   @override
@@ -195,9 +369,17 @@ class _$SupplierImpl implements _Supplier {
 abstract class _Supplier implements Supplier {
   factory _Supplier(
       final int? id,
+      final String? name,
+      final String? city,
+      final String? province,
       @JsonKey(name: 'supplier_no') final String? supplierNo,
+      @JsonKey(name: 'is_core') final bool? isCore,
+      @JsonKey(name: 'can_bill') final bool? canBill,
+      @JsonKey(name: 'business_scope') final String? businessScope,
+      @JsonKey(name: 'export_market') final String? exportMarket,
+      @JsonKey(name: 'shipping_amount') final String? shippingAmount,
       @JsonKey(name: 'short_name') final String? shortName,
-      final String? name) = _$SupplierImpl;
+      final List<Contact>? contacts) = _$SupplierImpl;
 
   factory _Supplier.fromJson(Map<String, dynamic> json) =
       _$SupplierImpl.fromJson;
@@ -205,13 +387,34 @@ abstract class _Supplier implements Supplier {
   @override
   int? get id;
   @override
+  String? get name;
+  @override
+  String? get city;
+  @override
+  String? get province;
+  @override
   @JsonKey(name: 'supplier_no')
   String? get supplierNo;
+  @override
+  @JsonKey(name: 'is_core')
+  bool? get isCore;
+  @override
+  @JsonKey(name: 'can_bill')
+  bool? get canBill;
+  @override
+  @JsonKey(name: 'business_scope')
+  String? get businessScope;
+  @override
+  @JsonKey(name: 'export_market')
+  String? get exportMarket;
+  @override
+  @JsonKey(name: 'shipping_amount')
+  String? get shippingAmount;
   @override
   @JsonKey(name: 'short_name')
   String? get shortName;
   @override
-  String? get name;
+  List<Contact>? get contacts;
   @override
   @JsonKey(ignore: true)
   _$$SupplierImplCopyWith<_$SupplierImpl> get copyWith =>
