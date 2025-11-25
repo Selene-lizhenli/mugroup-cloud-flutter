@@ -32,3 +32,14 @@ Future<ApiResponse<List<Supplier>>> getSupplySuppliers(
         ),
       );
 }
+
+Future<Supplier?> getSupplier(int id) async {
+  return api.get("api/tenant/supply/suppliers/$id").then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Supplier.fromJson(res.data);
+    },
+  );
+}

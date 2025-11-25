@@ -50,6 +50,9 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: CrmCompanyDetailRoute.page, path: "/crm/company/detail/:id"),
       AutoRoute(
+          page: SupplySupplierDetailRoute.page,
+          path: "/supply/supplier/detail/:id"),
+      AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
       // selectors

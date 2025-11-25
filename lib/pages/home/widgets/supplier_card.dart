@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/contact.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 
 class SupplierCard extends StatelessWidget {
@@ -71,7 +73,13 @@ class SupplierCard extends StatelessWidget {
     final bool canBill = supplier.canBill ?? false;
 
     return InkWell(
-      onTap: onClick,
+      onTap: () {
+        if (context.mounted) {
+          context.router.push(SupplySupplierDetailRoute(id: supplier.id!));
+
+          return;
+        }
+      },
       borderRadius: BorderRadius.circular(16.0),
       child: Container(
         decoration: BoxDecoration(
