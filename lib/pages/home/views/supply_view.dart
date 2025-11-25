@@ -1,5 +1,6 @@
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/supplier_card.dart';
 import 'package:cloud/services/supply.dart';
@@ -25,6 +26,20 @@ class SupplyView extends HookConsumerWidget {
 
     final page = useRef(1);
     final suppliers = useState<List<Supplier>>(<Supplier>[]);
+
+    useEffect(() {
+      final searchEventSubscription = home.bus.on<SearchEvent>().listen(
+        (SearchEvent event) {
+          search.value = event.search;
+
+          refreshController.callRefresh(force: true);
+        },
+      );
+
+      return () {
+        searchEventSubscription.cancel();
+      };
+    }, []);
 
     fetchData(
       String? searchText, {
