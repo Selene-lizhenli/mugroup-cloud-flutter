@@ -1,8 +1,13 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/schema.dart';
 
-Future<List<Schema>?> getSchema(String schemaName) async {
-  return api.get("api/tenant/schemas/$schemaName").then(
+Future<List<Schema>?> getSchema(String schemaName,
+    {bool filter = false}) async {
+  var url = "api/tenant/schemas/$schemaName";
+  if (filter) {
+    url = "api/tenant/schemas/$schemaName?filter=$filter";
+  }
+  return api.get(url).then(
     (res) {
       if (res.data == null) {
         return null;

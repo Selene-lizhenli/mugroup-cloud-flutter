@@ -1,0 +1,111 @@
+import 'package:cloud/models/schema.dart';
+import 'package:cloud/pages/widgets/input.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+
+class DynamicBuildField extends StatelessWidget {
+  final Schema schema;
+
+  const DynamicBuildField({super.key, required this.schema});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = schema;
+
+    if (s.widget == 'input') {
+      return FormBuilderField<String>(
+        name: s.name,
+        validator: (value) {
+          if (s.isRequired && (value == null || value.isEmpty)) {
+            return '必填';
+          }
+          return null;
+        },
+        initialValue: '',
+        builder: (field) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Input(
+                label: s.title,
+                value: field.value ?? '',
+                onChanged: field.didChange,
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    if (s.widget == 'inputNumber') {
+      return FormBuilderTextField(
+        name: s.name,
+        decoration: InputDecoration(labelText: s.title),
+        keyboardType: TextInputType.number,
+        validator: (value) {
+          if (s.isRequired && (value == null || value.isEmpty)) {
+            return '必填';
+          }
+          if (value != null && double.tryParse(value) == null) {
+            return '请输入数字';
+          }
+          return null;
+        },
+      );
+    }
+
+    if (s.widget == 'select') {
+      return FormBuilderDropdown<String>(
+        name: s.name,
+        decoration: InputDecoration(labelText: s.title),
+        items: (s.props?.options ?? [])
+            .map((o) => DropdownMenuItem(
+                  value: o.value,
+                  child: Text(o.label),
+                ))
+            .toList(),
+      );
+    }
+
+    if (s.widget == 'switch') {
+      return FormBuilderSwitch(
+        name: s.name,
+        title: Text(s.title),
+        initialValue: false,
+      );
+    }
+
+    if (s.widget == 'datePicker') {
+      return FormBuilderDateTimePicker(
+        name: s.name,
+        decoration: InputDecoration(labelText: s.title),
+        inputType: InputType.date,
+        validator: (value) {
+          if (s.isRequired && value == null) {
+            return '必填';
+          }
+          return null;
+        },
+      );
+    }
+
+    if (s.widget == 'SampleImagesUpload') {
+      return Text("SampleImagesUpload: ${s.name}");
+    }
+
+    if (s.widget == 'ShowroomCategorySelect') {
+      return Text("ShowroomCategorySelect: ${s.name}");
+    }
+
+    if (s.widget == 'textArea') {
+      return FormBuilderTextField(
+        name: s.name,
+        decoration: InputDecoration(labelText: s.title),
+        maxLines: 5,
+      );
+    }
+
+    /// 未匹配到，返回空
+    return const SizedBox.shrink();
+  }
+}
