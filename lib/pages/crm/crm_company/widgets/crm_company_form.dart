@@ -2,14 +2,14 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/contact_card_upload.dart';
-import 'package:cloud/pages/crm/crm_company/widgets/multi_input.dart';
+import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/multi_input.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:cloud/pages/crm/crm_company/widgets/input.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
