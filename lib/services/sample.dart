@@ -18,6 +18,24 @@ Future<ApiResponse<List<Sample>>> getSamples(
       );
 }
 
+Future<ApiResponse<List<Sample>>> getSampleSimilars({
+  required int id,
+  Map<String, dynamic>? queryParameters,
+}) async {
+  return api
+      .get("api/tenant/showroom/samples/$id/similars",
+          queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<Sample>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(Sample.fromJson).toList();
+          },
+        ),
+      );
+}
+
 Future<Sample?> getSample(int id) async {
   return api.get("api/tenant/showroom/samples/$id").then(
     (res) {
