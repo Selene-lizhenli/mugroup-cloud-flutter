@@ -87,73 +87,79 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               controller: scrollController,
               slivers: [
                 // 图片轮播区域
-                if (sample.value?.image != null &&
-                    sample.value!.image!.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Stack(
-                      children: [
-                        CarouselSlider(
-                          items: sample.value!.image!.indexed.map((item) {
-                            final index = item.$1;
-                            final media = item.$2;
-
-                            return GestureDetector(
-                              onTap: () {
-                                showFlanImagePreview(
-                                  context,
-                                  images: sample.value!.image!
-                                      .map((item) => media.url!)
-                                      .toList(),
-                                  startPosition: index,
-                                  loop: false,
+                SliverToBoxAdapter(
+                  child: (sample.value?.image != null &&
+                          sample.value!.image!.isNotEmpty)
+                      ? Stack(
+                          children: [
+                            CarouselSlider(
+                              items: sample.value!.image!.indexed.map((item) {
+                                final index = item.$1;
+                                final media = item.$2;
+                                return GestureDetector(
+                                  onTap: () {
+                                    showFlanImagePreview(
+                                      context,
+                                      images: sample.value!.image!
+                                          .map((item) => item.url!)
+                                          .toList(),
+                                      startPosition: index,
+                                      loop: false,
+                                    );
+                                  },
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      double containerWidth =
+                                          constraints.maxWidth;
+                                      return ClipRRect(
+                                        child: Image.network(
+                                          media.url!,
+                                          fit: BoxFit.contain,
+                                          width: containerWidth,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 );
-                              },
-                              child: LayoutBuilder(
-                                builder: (context, constraints) {
-                                  double containerWidth = constraints.maxWidth;
-                                  return ClipRRect(
-                                    child: Image.network(
-                                      media.url!,
-                                      fit: BoxFit.contain,
-                                      width: containerWidth,
-                                    ),
-                                  );
+                              }).toList(),
+                              options: CarouselOptions(
+                                viewportFraction: 1.0,
+                                aspectRatio: 1,
+                                enableInfiniteScroll: false,
+                                onPageChanged: (index, reason) {
+                                  currentIndex.value = index;
                                 },
                               ),
-                            );
-                          }).toList(),
-                          options: CarouselOptions(
-                            viewportFraction: 1.0, // 图片占满屏幕
-                            aspectRatio: 1,
-                            enableInfiniteScroll: false,
-                            onPageChanged: (index, reason) {
-                              currentIndex.value = index;
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 8.0,
-                          right: 8.0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 4.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black45,
-                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Text(
-                              '${currentIndex.value + 1} / ${sample.value!.image!.length}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            Positioned(
+                              bottom: 8.0,
+                              right: 8.0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 4.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black45,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Text(
+                                  '${currentIndex.value + 1} / ${sample.value!.image!.length}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
+                        )
+                      : Image.asset(
+                          'assets/noImage.png',
+                          width: double.infinity,
+                          fit: BoxFit.contain,
                         ),
-                      ],
-                    ),
-                  ),
+                ),
+
                 // 产品编号和价格信息
                 SliverToBoxAdapter(
                   child: Container(
