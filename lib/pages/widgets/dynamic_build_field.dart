@@ -1,6 +1,7 @@
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
+import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -125,10 +126,22 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'textArea') {
-      return FormBuilderTextField(
-        name: s.name,
-        decoration: InputDecoration(labelText: s.title),
-        maxLines: 5,
+      return FormBuilderField<String>(
+        name: schema.name,
+        validator: (value) {
+          if (schema.isRequired && value == null) return '必填';
+          return null;
+        },
+        builder: (field) {
+          return TextArea(
+            name: schema.name,
+            label: schema.title,
+            value: field.value,
+            onChanged: (value) {
+              field.didChange(value);
+            },
+          );
+        },
       );
     }
 
