@@ -1,4 +1,5 @@
 import 'package:cloud/models/schema.dart';
+import 'package:cloud/pages/widgets/date_picker_input.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
@@ -104,15 +105,21 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'datePicker') {
-      return FormBuilderDateTimePicker(
+      return FormBuilderField<DateTime>(
         name: s.name,
-        decoration: InputDecoration(labelText: s.title),
-        inputType: InputType.date,
         validator: (value) {
-          if (s.isRequired && value == null) {
-            return '必填';
-          }
+          if (s.isRequired && value == null) return '必填';
           return null;
+        },
+        builder: (field) {
+          return DatePickerInput(
+            name: s.name,
+            label: s.title,
+            value: field.value,
+            onChanged: (date) {
+              field.didChange(date);
+            },
+          );
         },
       );
     }
