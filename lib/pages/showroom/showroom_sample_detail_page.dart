@@ -321,26 +321,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                     ),
                   ),
                 ),
-
-                // SampleSimilars
-                SliverToBoxAdapter(
-                  child: MasonryGridView.count(
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 5,
-                    crossAxisSpacing: 5,
-                    itemCount: sampleSimilars.value.length,
-                    padding: const EdgeInsets.all(5),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final sample = sampleSimilars.value[index];
-
-                      return ProductCard(
-                        sample: sample,
-                      );
-                    },
-                  ),
-                ),
               ],
             ),
           ),
@@ -527,5 +507,3 @@ class SupplyQuoteCard extends HookConsumerWidget {
     );
   }
 }
-
-
