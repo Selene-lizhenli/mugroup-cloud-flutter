@@ -154,6 +154,43 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       ],
                     ),
                   ),
+                // 产品编号和价格信息
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.secondary,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '产品编号: ${sample.value!.productNo}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 // 产品名称区域
                 SliverToBoxAdapter(
                   child: Container(
@@ -170,33 +207,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                // 产品编号和价格信息
-                SliverToBoxAdapter(
-                  child: Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '产品编号: ${sample.value!.productNo}',
-                          style:
-                              const TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        Text(
-                          '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.secondary,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
