@@ -310,11 +310,18 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                           mainAxisSpacing: 5,
                           crossAxisSpacing: 5,
                           itemCount: sampleSimilars.value.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.all(4),
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final sample = sampleSimilars.value[index];
-                            return ProductCard(sample: sample);
+                            return Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.grey.shade200, width: 1.5),
+                                borderRadius: BorderRadius.circular(8), // 可选，圆角
+                              ),
+                              child: ProductCard(sample: sample),
+                            );
                           },
                         ),
                       ],
