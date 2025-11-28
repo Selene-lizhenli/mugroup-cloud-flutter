@@ -1,5 +1,6 @@
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -72,15 +73,24 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'select') {
-      return FormBuilderDropdown<String>(
-        name: s.name,
-        decoration: InputDecoration(labelText: s.title),
-        items: (s.props?.options ?? [])
-            .map((o) => DropdownMenuItem(
-                  value: o.value,
-                  child: Text(o.label),
-                ))
-            .toList(),
+      return FormBuilderField<String>(
+        name: schema.name,
+        validator: (value) {
+          if (schema.isRequired && value == null) return '必填';
+          return null;
+        },
+        builder: (field) {
+          return Select(
+            label: schema.title,
+            value: field.value,
+            options: (schema.props?.options ?? [])
+                .map((o) => SelectOption(label: o.label, value: o.value))
+                .toList(),
+            onChanged: (value) {
+              field.didChange(value); // 更新表单状态
+            },
+          );
+        },
       );
     }
 
