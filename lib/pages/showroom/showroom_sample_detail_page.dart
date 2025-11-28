@@ -9,6 +9,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -28,9 +29,16 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     final sampleSimilars = useState(<Sample>[]);
     final similarPage = useRef(1);
 
+    final isLoading = useState<bool>(true);
+    final hasMounted = useState(false);
+
     loadSample(int id) async {
-      final data = await getSample(id);
-      sample.value = data;
+      try {
+        final data = await getSample(id);
+        sample.value = data;
+      } finally {
+        isLoading.value = false;
+      }
     }
 
     useEffect(() {
@@ -53,12 +61,22 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     }, []);
 
     useEffect(() {
-      loadSample(id);
+      // 等页面真正挂载后再加载数据
+      Future.delayed(Duration.zero, () {
+        hasMounted.value = true;
+        loadSample(id);
+      });
       return () {};
     }, [id]);
 
-    if (sample.value == null) {
-      return const Center(child: CircularProgressIndicator());
+    if (!hasMounted.value || isLoading.value) {
+      return Scaffold(
+        body: Skeleton(
+          isLoading: true,
+          skeleton: SkeletonListView(),
+          child: Container(),
+        ),
+      );
     }
 
     return Scaffold(
