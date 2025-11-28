@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -10,6 +11,8 @@ class Input extends HookConsumerWidget {
   final TextInputType? keyboardType;
   final String? hintText;
 
+  final List<TextInputFormatter>? inputFormatters;
+
   const Input({
     super.key,
     this.label = '',
@@ -18,6 +21,7 @@ class Input extends HookConsumerWidget {
     this.textInputAction = TextInputAction.next,
     this.keyboardType,
     this.hintText,
+    this.inputFormatters,
   });
 
   @override
@@ -65,6 +69,7 @@ class Input extends HookConsumerWidget {
           onChanged: onChanged,
           textInputAction: textInputAction,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           style: const TextStyle(fontSize: 16, color: Colors.black87),
           cursorColor: colorScheme.primary,
           decoration: InputDecoration(

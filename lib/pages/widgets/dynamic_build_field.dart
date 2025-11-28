@@ -1,6 +1,7 @@
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class DynamicBuildField extends StatelessWidget {
@@ -38,10 +39,8 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'inputNumber') {
-      return FormBuilderTextField(
+      return FormBuilderField<String>(
         name: s.name,
-        decoration: InputDecoration(labelText: s.title),
-        keyboardType: TextInputType.number,
         validator: (value) {
           if (s.isRequired && (value == null || value.isEmpty)) {
             return '必填';
@@ -50,6 +49,24 @@ class DynamicBuildField extends StatelessWidget {
             return '请输入数字';
           }
           return null;
+        },
+        builder: (field) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Input(
+                label: s.title,
+                value: field.value ?? '',
+                onChanged: field.didChange,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  // 正则表达式：只允许数字和一个小数点
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                ],
+              ),
+            ],
+          );
         },
       );
     }
