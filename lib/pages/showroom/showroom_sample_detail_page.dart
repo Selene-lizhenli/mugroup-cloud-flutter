@@ -281,6 +281,46 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                     mainAxisSpacing: 5,
                   ),
                 ),
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 标题
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Text(
+                            '为你推荐',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // 瀑布流
+                        MasonryGridView.count(
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 5,
+                          crossAxisSpacing: 5,
+                          itemCount: sampleSimilars.value.length,
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final sample = sampleSimilars.value[index];
+                            return ProductCard(sample: sample);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
                 // SampleSimilars
                 SliverToBoxAdapter(
@@ -487,3 +527,5 @@ class SupplyQuoteCard extends HookConsumerWidget {
     );
   }
 }
+
+
