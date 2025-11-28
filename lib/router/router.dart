@@ -22,10 +22,6 @@ class AppRouter extends RootStackRouter {
             path: 'home',
           ),
           AutoRoute(
-            page: CrmCompanyRoute.page,
-            path: "crm/company",
-          ),
-          AutoRoute(
             page: CartRoute.page,
             path: "cart",
           ),

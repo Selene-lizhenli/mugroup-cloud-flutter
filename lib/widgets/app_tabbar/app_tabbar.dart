@@ -22,7 +22,6 @@ class AppTabbar extends StatelessWidget {
       },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-        BottomNavigationBarItem(icon: Icon(Icons.business), label: "客户"),
         BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "选样车"),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
       ],
