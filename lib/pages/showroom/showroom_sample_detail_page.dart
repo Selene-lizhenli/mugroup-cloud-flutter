@@ -428,88 +428,298 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
 class SupplyQuoteCard extends HookConsumerWidget {
   final Quote quote;
+
+  final VoidCallback? onTap;
+
   const SupplyQuoteCard({
     super.key,
     required this.quote,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
+    const orange600 = Color(0xFFEA580C);
+    const orange100 = Color(0xFFFFEDD5);
+    const slate50 = Color(0xFFF8FAFC);
+    const slate100 = Color(0xFFF1F5F9);
+    const slate200 = Color(0xFFE2E8F0);
+    const slate400 = Color(0xFF94A3B8);
+    const slate600 = Color(0xFF475569);
+    const slate800 = Color(0xFF1E293B);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+    // 价格处理逻辑
+    final priceParts = (quote.purchaseCost ?? '0.00').split('.');
+    final priceInt = priceParts[0];
+    final priceDec = priceParts.length > 1 ? priceParts[1] : '00';
+    final currencySymbol = quote.currency == 'USD' ? '\$' : '¥';
+
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: slate200,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 供应商名称
-            if (quote.supplier?.name != null) ...[
-              Text(
-                '供应商: ${quote.supplier?.name}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: RichText(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: const TextStyle(
+                          fontSize: 14, color: slate800, height: 1.4),
+                      children: [
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: orange100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              '包装',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFFC2410C), // orange-700
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        TextSpan(
+                          text: quote.packing ?? "未填写包装详情",
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                maxLines: 2, // 限制最多一行
-                overflow: TextOverflow.ellipsis, // 超出一行时显示省略号
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: slate50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: slate100),
               ),
-              const SizedBox(height: 8),
-            ],
-
-            // 包装
-            if (quote.packing != null) ...[
-              Text(
-                '包装: ${quote.packing!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
+              child: Column(
+                children: [
+                  _buildSpecItem(
+                    Icons.inventory_2_outlined, // Box
+                    '装箱:',
+                    quote.outerCapacity ?? '-',
+                    slate400,
+                    slate600,
+                  ),
+                  const SizedBox(height: 4),
+                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 4),
+                  _buildSpecItem(
+                    Icons.check_box_outlined,
+                    '体积:',
+                    quote.outerVolume ?? '-',
+                    slate400,
+                    slate600,
+                  ),
+                  const SizedBox(height: 4),
+                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 4),
+                  // 交期
+                  _buildSpecItem(
+                    Icons.calendar_today_outlined,
+                    '交期:',
+                    quote.chuhuoAt != null
+                        ? "${quote.chuhuoAt!.year}-${quote.chuhuoAt!.month}-${quote.chuhuoAt!.day}"
+                        : '待定',
+                    slate400,
+                    slate600,
+                    isFullWidth: true,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          currencySymbol,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: orange600,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          priceInt,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: orange600,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        Text(
+                          '.$priceDec',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: orange600,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: slate100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            '不含运费',
+                            style: TextStyle(fontSize: 10, color: slate400),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        if (quote.canBill ?? false)
+                          _buildBottomTag(
+                            label: '含税${quote.taxRate ?? ''}',
+                            color: Colors.indigo,
+                            bgColor: const Color(0xFFEEF2FF),
+                            borderColor: const Color(0xFFC7D2FE),
+                          )
+                        else
+                          _buildBottomTag(
+                            label: '不含税',
+                            color: Colors.grey,
+                            bgColor: slate50,
+                            borderColor: slate200,
+                          ),
+                      ],
+                    )
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 样品位置
-            if (quote.sampleLocation != null) ...[
-              Text(
-                '样品位置: ${quote.sampleLocation!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 税率
-            if (quote.taxRate != null) ...[
-              Text(
-                '税率: ${quote.taxRate!}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            // 采购成本
-            if (quote.purchaseCost != null) ...[
-              Text(
-                '采购成本: ¥${quote.purchaseCost!}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.secondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 工厂名称
+                    Text(
+                      quote.supplier?.shortName ?? "未知工厂",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: slate600),
+                    ),
+                    const SizedBox(height: 2),
+                    // 地址
+                    Text(
+                      "${quote.supplier?.province ?? ''} ${quote.supplier?.city ?? ''}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 10, color: slate400),
+                    ),
+                  ],
+                ))
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSpecItem(IconData icon, String label, String value,
+      Color labelColor, Color valueColor,
+      {bool isFullWidth = false}) {
+    return Row(
+      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: labelColor),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: labelColor),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+                fontSize: 12, color: valueColor, fontWeight: FontWeight.w500),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomTag({
+    required String label,
+    IconData? icon,
+    required Color color,
+    required Color bgColor,
+    required Color borderColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 0.5),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 10, color: color),
+            const SizedBox(width: 2),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+                fontSize: 10, color: color, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }
