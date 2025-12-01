@@ -1,4 +1,4 @@
-import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
+import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
@@ -26,20 +26,6 @@ class SupplyView extends HookConsumerWidget {
 
     final page = useRef(1);
     final suppliers = useState<List<Supplier>>(<Supplier>[]);
-
-    useEffect(() {
-      final searchEventSubscription = home.bus.on<SearchEvent>().listen(
-        (SearchEvent event) {
-          search.value = event.search;
-
-          refreshController.callRefresh(force: true);
-        },
-      );
-
-      return () {
-        searchEventSubscription.cancel();
-      };
-    }, []);
 
     fetchData(
       String? searchText, {
@@ -69,6 +55,39 @@ class SupplyView extends HookConsumerWidget {
 
       return resp;
     }
+
+    useEffect(() {
+      if (home.currentPage != 1) {
+        return null;
+      }
+
+      final searchEventSubscription = home.bus.on<SearchEvent>().listen(
+        (SearchEvent event) {
+          search.value = event.search;
+
+          refreshController.callRefresh(force: true);
+        },
+      );
+
+      return () {
+        searchEventSubscription.cancel();
+      };
+    }, [home.currentPage]);
+
+    useUpdateEffect(() {
+      if (home.currentPage != 1) {
+        return null;
+      }
+
+      if (home.search == search.value) {
+        return null;
+      }
+
+      search.value = home.search;
+      refreshController.callRefresh(force: true);
+
+      return null;
+    }, [home.currentPage, home.search, search.value]);
 
     return EasyRefresh(
       controller: refreshController,

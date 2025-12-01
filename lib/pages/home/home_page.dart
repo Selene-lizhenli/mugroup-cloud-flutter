@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/views/product_view.dart';
@@ -57,6 +58,7 @@ class HomePage extends HookConsumerWidget {
             child: PageView(
               controller: home.pageController,
               onPageChanged: (page) {
+                logger.d([111, page]);
                 homeNotifier.setCurrentPage(page);
                 currentPageIndex.value = page;
               },

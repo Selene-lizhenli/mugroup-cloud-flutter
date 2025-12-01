@@ -66,6 +66,10 @@ class ProductView extends HookConsumerWidget {
     }
 
     useEffect(() {
+      if (home.currentPage != 0) {
+        return null;
+      }
+
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
           search.value = event.search;
@@ -78,7 +82,22 @@ class ProductView extends HookConsumerWidget {
       return () {
         searchEventSubscription.cancel();
       };
-    }, []);
+    }, [home.currentPage]);
+
+    useUpdateEffect(() {
+      if (home.currentPage != 0) {
+        return null;
+      }
+
+      if (home.search == search.value) {
+        return null;
+      }
+
+      search.value = home.search;
+      refreshController.callRefresh(force: true);
+
+      return null;
+    }, [home.currentPage, home.search, search.value]);
 
     return EasyRefresh(
       controller: refreshController,

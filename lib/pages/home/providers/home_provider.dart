@@ -13,7 +13,7 @@ class Home extends _$Home {
     final homeState = HomeState(
       bus: RxBus(),
       currentPage: 0,
-      pageController: PageController(),
+      pageController: PageController(initialPage: 0),
       searchTextController: TextEditingController(),
       search: null,
       media: [],
