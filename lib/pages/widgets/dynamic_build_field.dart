@@ -1,5 +1,7 @@
+import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/schema.dart';
+import 'package:cloud/pages/widgets/category_select.dart';
 import 'package:cloud/pages/widgets/date_picker_input.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -147,7 +149,22 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'ShowroomCategorySelect') {
-      return Text("ShowroomCategorySelect: ${s.name}");
+      return FormBuilderField<Category>(
+        name: s.name,
+        validator: (value) {
+          if (s.isRequired && value == null) return '必填';
+          return null;
+        },
+        builder: (field) {
+          return CategorySelect(
+            label: s.title,
+            value: field.value,
+            onChanged: (category) {
+              field.didChange(category);
+            },
+          );
+        },
+      );
     }
 
     if (s.widget == 'textArea') {

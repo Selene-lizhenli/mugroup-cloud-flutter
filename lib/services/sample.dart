@@ -1,5 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
+import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/quotation.dart';
 import 'package:cloud/models/sample/sample.dart';
 
@@ -78,4 +79,18 @@ Future<Quotation?> getShowroomQuotationByQuoteNo(String quoteNo) async {
       return Quotation.fromJson(res.data);
     },
   );
+}
+
+Future<List<Category>?> getAllShowroomCategories() async {
+  final res = await api.get(
+    "api/tenant/showroom/categories",
+    queryParameters: {'all': '0'},
+  );
+
+  if (res.data is List) {
+    return (res.data as List)
+        .map((e) => Category.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+  return null;
 }
