@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
@@ -287,22 +286,43 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final quote = sample.value?.supplyQuotes?[index];
-                      logger.d('wixi');
-                      if (quote == null) {
-                        return const SizedBox(); // 处理空的报价
-                      }
-                      return SupplyQuoteCard(quote: quote);
-                    },
-                    childCount: sample.value?.supplyQuotes?.length ?? 0,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
+
+                DecoratedSliver(
+                  decoration: const BoxDecoration(color: Colors.white),
+                  sliver: SliverMainAxisGroup(
+                    slivers: [
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: 16.0, right: 16.0, top: 8.0, bottom: 4.0),
+                          child: Text(
+                            '工厂报价',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.all(4),
+                        sliver: SliverMasonryGrid.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 5,
+                          crossAxisSpacing: 5,
+                          childCount: sample.value?.supplyQuotes?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final quote = sample.value?.supplyQuotes?[index];
+                            if (quote == null) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return SupplyQuoteCard(quote: quote);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
@@ -452,7 +472,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
 class SupplyQuoteCard extends HookConsumerWidget {
   final Quote quote;
-
   final VoidCallback? onTap;
 
   const SupplyQuoteCard({
@@ -464,7 +483,6 @@ class SupplyQuoteCard extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const orange600 = Color(0xFFEA580C);
-    const orange100 = Color(0xFFFFEDD5);
     const slate50 = Color(0xFFF8FAFC);
     const slate100 = Color(0xFFF1F5F9);
     const slate200 = Color(0xFFE2E8F0);
@@ -488,60 +506,43 @@ class SupplyQuoteCard extends HookConsumerWidget {
             color: slate200,
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: RichText(
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      style: const TextStyle(
-                          fontSize: 14, color: slate800, height: 1.4),
-                      children: [
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 6),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: orange100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              '包装',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Color(0xFFC2410C), // orange-700
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        TextSpan(
-                          text: quote.packing ?? "未填写包装详情",
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                Text(
+                  quote.supplier?.shortName ?? "未知工厂",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: slate800),
+                ),
+                const SizedBox(height: 2),
+                // 地址
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined,
+                        size: 12, color: slate400),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        "${quote.supplier?.province ?? ''} ${quote.supplier?.city ?? ''}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12, color: slate400),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -552,7 +553,17 @@ class SupplyQuoteCard extends HookConsumerWidget {
               child: Column(
                 children: [
                   _buildSpecItem(
-                    Icons.inventory_2_outlined, // Box
+                    Icons.all_inbox_outlined,
+                    '包装:',
+                    quote.packing ?? '-',
+                    slate400,
+                    slate600,
+                  ),
+                  const SizedBox(height: 4),
+                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 4),
+                  _buildSpecItem(
+                    Icons.inventory_2_outlined,
                     '装箱:',
                     quote.outerCapacity ?? '-',
                     slate400,
@@ -574,7 +585,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
                   // 交期
                   _buildSpecItem(
                     Icons.calendar_today_outlined,
-                    '交期:',
+                    '出货日期:',
                     quote.chuhuoAt != null
                         ? "${quote.chuhuoAt!.year}-${quote.chuhuoAt!.month}-${quote.chuhuoAt!.day}"
                         : '待定',
@@ -585,7 +596,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -624,66 +635,28 @@ class SupplyQuoteCard extends HookConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: slate100,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            '不含运费',
-                            style: TextStyle(fontSize: 10, color: slate400),
-                          ),
+                        Row(
+                          children: [
+                            if (quote.canBill ?? false)
+                              _buildBottomTag(
+                                label: '含税${quote.taxRate ?? ''}',
+                                color: Colors.indigo,
+                                bgColor: const Color(0xFFEEF2FF),
+                                borderColor: const Color(0xFFC7D2FE),
+                              )
+                            else
+                              _buildBottomTag(
+                                label: '不含税',
+                                color: Colors.grey,
+                                bgColor: slate50,
+                                borderColor: slate200,
+                              ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        if (quote.canBill ?? false)
-                          _buildBottomTag(
-                            label: '含税${quote.taxRate ?? ''}',
-                            color: Colors.indigo,
-                            bgColor: const Color(0xFFEEF2FF),
-                            borderColor: const Color(0xFFC7D2FE),
-                          )
-                        else
-                          _buildBottomTag(
-                            label: '不含税',
-                            color: Colors.grey,
-                            bgColor: slate50,
-                            borderColor: slate200,
-                          ),
-                      ],
-                    )
                   ],
                 ),
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 工厂名称
-                    Text(
-                      quote.supplier?.shortName ?? "未知工厂",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: slate600),
-                    ),
-                    const SizedBox(height: 2),
-                    // 地址
-                    Text(
-                      "${quote.supplier?.province ?? ''} ${quote.supplier?.city ?? ''}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 10, color: slate400),
-                    ),
-                  ],
-                ))
               ],
             ),
           ],
@@ -702,14 +675,14 @@ class SupplyQuoteCard extends HookConsumerWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(fontSize: 12, color: labelColor),
+          style: TextStyle(fontSize: 10, color: labelColor),
         ),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
-                fontSize: 12, color: valueColor, fontWeight: FontWeight.w500),
+                fontSize: 10, color: valueColor, fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),
