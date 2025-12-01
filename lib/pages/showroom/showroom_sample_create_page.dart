@@ -13,6 +13,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final schemas = useState<List<Schema>?>(null);
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
@@ -33,6 +34,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('样品创建')),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -44,21 +46,30 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
               children: [
                 for (final item in schemas.value ?? [])
                   DynamicBuildField(schema: item),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    final formState = formKey.currentState;
-                    if (formState?.saveAndValidate() ?? false) {
-                      final values = formState?.value;
-                      debugPrint('提交表单: $values');
-                    } else {
-                      debugPrint('表单校验失败');
-                    }
-                  },
-                  child: const Text('提交'),
-                ),
               ],
             ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+          onPressed: () {
+            final formState = formKey.currentState;
+            if (formState?.saveAndValidate() ?? false) {
+              final values = formState?.value;
+              debugPrint('提交表单: $values');
+            } else {
+              debugPrint('表单校验失败');
+            }
+          },
+          child: const Text(
+            '提交',
+            style: TextStyle(color: Colors.white),
           ),
         ),
       ),
