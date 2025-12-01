@@ -1589,162 +1589,162 @@ class CartPage extends HookConsumerWidget {
       body: Column(
         children: [
           Expanded(
-            child: () {
-              return CustomScrollView(
-                slivers: [
-                  MultiSliver(
-                    children: [
-                      SliverPadding(
-                        padding: const EdgeInsets.only(
-                          bottom: 10,
-                          left: 10,
-                          right: 10,
-                        ),
-                        sliver: SliverStack(
-                          insetOnOverlap: true,
-                          children: [
-                            const SliverPositioned.fill(
-                              top: 0,
-                              child: SampleCard(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                              ),
+            child: CustomScrollView(
+              slivers: [
+                MultiSliver(
+                  children: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                      ),
+                      sliver: SliverStack(
+                        insetOnOverlap: true,
+                        children: [
+                          const SliverPositioned.fill(
+                            top: 0,
+                            child: SampleCard(
+                              margin: EdgeInsets.zero,
+                              padding: EdgeInsets.zero,
                             ),
-                            SliverClip(
-                              child: MultiSliver(
-                                children: [
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  SliverPinnedHeader(child: header),
-                                  SliverClip(
-                                    child: MultiSliver(
-                                      children: [
-                                        if (items.isEmpty)
-                                          Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 10),
-                                              child: Text(
-                                                "${cartName ?? "选样车"}空咯，请扫码添加",
-                                                style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 12),
-                                              ),
-                                            ),
-                                          )
-                                        else
-                                          SliverList(
-                                            delegate:
-                                                SliverChildBuilderDelegate(
-                                              (context, index) {
-                                                final cartItem = items[index];
-                                                return Slidable(
-                                                  key: ValueKey(cartItem
-                                                      .sample.productNo),
-                                                  endActionPane: ActionPane(
-                                                    extentRatio: cartType ==
-                                                            CartType.quotation
-                                                        ? 0.5
-                                                        : 0.25,
-                                                    motion:
-                                                        const ScrollMotion(),
-                                                    children: [
-                                                      if (cartType ==
-                                                          CartType.quotation)
-                                                        SlidableAction(
-                                                          onPressed: (context) {
-                                                            setPriceDialog(
-                                                                context,
-                                                                cartItem);
-                                                          },
-                                                          backgroundColor:
-                                                              Colors.blue,
-                                                          foregroundColor:
-                                                              Colors.white,
-                                                          icon: Icons
-                                                              .attach_money,
-                                                          label: '调价',
-                                                        ),
-                                                      SlidableAction(
-                                                        onPressed: (context) {
-                                                          cart.removeSample(
-                                                              cartItem.sample);
-                                                        },
-                                                        backgroundColor:
-                                                            Colors.red,
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        icon: Icons.delete,
-                                                        label: '移除',
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Stack(
-                                                    alignment:
-                                                        Alignment.topRight,
-                                                    children: [
-                                                      Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            vertical: 8,
-                                                            horizontal: 10,
-                                                          ),
-                                                          child: SampleItem(
-                                                            sample:
-                                                                cartItem.sample,
-                                                            price:
-                                                                cartItem.price,
-                                                            quotationInfo:
-                                                                quotationInfo,
-                                                            cartType: cartType,
-                                                            count:
-                                                                cartItem.count,
-                                                            onChange: (value) {
-                                                              if (cartItem
-                                                                      .count ==
-                                                                  value) {
-                                                                return;
-                                                              }
-                                                              cart.setSample(
-                                                                  cartItem
-                                                                      .sample,
-                                                                  value);
-                                                            },
-                                                          )),
-                                                      if (cartType ==
-                                                              CartType
-                                                                  .quotation &&
-                                                          cartItem.price !=
-                                                              null)
-                                                        const TDBadge(
-                                                          TDBadgeType.subscript,
-                                                          padding:
-                                                              EdgeInsets.all(4),
-                                                          message: '改',
-                                                        ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                              childCount: items.length,
+                          ),
+                          SliverClip(
+                            child: MultiSliver(
+                              children: [
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                SliverPinnedHeader(child: header),
+                                SliverClip(
+                                  child: MultiSliver(
+                                    children: [
+                                      if (items.isEmpty)
+                                        Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 10),
+                                            child: Text(
+                                              "${cartName ?? "选样车"}空咯，请扫码添加",
+                                              style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
                                             ),
                                           ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
+                                        ),
+                                      SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                          (context, index) {
+                                            final cartItem = items[index];
+                                            return Slidable(
+                                              key: ValueKey(
+                                                  cartItem.sample.productNo),
+                                              endActionPane: ActionPane(
+                                                extentRatio: cartType ==
+                                                        CartType.quotation
+                                                    ? 0.5
+                                                    : 0.25,
+                                                motion: const ScrollMotion(),
+                                                children: [
+                                                  if (cartType ==
+                                                      CartType.quotation)
+                                                    SlidableAction(
+                                                      onPressed: (context) {
+                                                        setPriceDialog(
+                                                            context, cartItem);
+                                                      },
+                                                      backgroundColor:
+                                                          Colors.blue,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      icon: Icons.attach_money,
+                                                      label: '调价',
+                                                    ),
+                                                  SlidableAction(
+                                                    onPressed: (context) {
+                                                      cart.removeSample(
+                                                          cartItem.sample);
+                                                    },
+                                                    backgroundColor: Colors.red,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    icon: Icons.delete,
+                                                    label: '移除',
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Stack(
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        vertical: 8,
+                                                        horizontal: 10,
+                                                      ),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          if (!context
+                                                              .mounted) {
+                                                            return;
+                                                          }
+
+                                                          context.router.push(
+                                                            ShowroomSampleDetailRoute(
+                                                              id: cartItem
+                                                                  .sample.id!,
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: SampleItem(
+                                                          sample:
+                                                              cartItem.sample,
+                                                          price: cartItem.price,
+                                                          quotationInfo:
+                                                              quotationInfo,
+                                                          cartType: cartType,
+                                                          count: cartItem.count,
+                                                          onChange: (value) {
+                                                            if (cartItem
+                                                                    .count ==
+                                                                value) {
+                                                              return;
+                                                            }
+                                                            cart.setSample(
+                                                                cartItem.sample,
+                                                                value);
+                                                          },
+                                                        ),
+                                                      )),
+                                                  if (cartType ==
+                                                          CartType.quotation &&
+                                                      cartItem.price != null)
+                                                    const TDBadge(
+                                                      TDBadgeType.subscript,
+                                                      padding:
+                                                          EdgeInsets.all(4),
+                                                      message: '改',
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                          childCount: items.length,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
-              );
-            }(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           if (cartType == null)
             InkWell(
