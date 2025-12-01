@@ -682,10 +682,14 @@ class SupplySupplierDetailRouteArgs {
 
 /// generated route for
 /// [_i22.SupplySupplierDetailSamplePage]
-class SupplySupplierDetailSampleRoute extends _i26.PageRouteInfo<void> {
-  const SupplySupplierDetailSampleRoute({List<_i26.PageRouteInfo>? children})
-      : super(
+class SupplySupplierDetailSampleRoute
+    extends _i26.PageRouteInfo<SupplySupplierDetailSampleRouteArgs> {
+  SupplySupplierDetailSampleRoute({
+    _i29.Key? key,
+    List<_i26.PageRouteInfo>? children,
+  }) : super(
           SupplySupplierDetailSampleRoute.name,
+          args: SupplySupplierDetailSampleRouteArgs(key: key),
           initialChildren: children,
         );
 
@@ -694,9 +698,26 @@ class SupplySupplierDetailSampleRoute extends _i26.PageRouteInfo<void> {
   static _i26.PageInfo page = _i26.PageInfo(
     name,
     builder: (data) {
-      return const _i22.SupplySupplierDetailSamplePage();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<SupplySupplierDetailSampleRouteArgs>(
+          orElse: () => SupplySupplierDetailSampleRouteArgs());
+      return _i22.SupplySupplierDetailSamplePage(
+        key: args.key,
+        id: pathParams.getInt('id'),
+      );
     },
   );
+}
+
+class SupplySupplierDetailSampleRouteArgs {
+  const SupplySupplierDetailSampleRouteArgs({this.key});
+
+  final _i29.Key? key;
+
+  @override
+  String toString() {
+    return 'SupplySupplierDetailSampleRouteArgs{key: $key}';
+  }
 }
 
 /// generated route for
