@@ -358,14 +358,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final sample = sampleSimilars.value[index];
-                            return Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.grey.shade200, width: 1.5),
-                                borderRadius: BorderRadius.circular(8), // 可选，圆角
-                              ),
-                              child: ProductCard(sample: sample),
-                            );
+                            return ProductCard(sample: sample);
                           },
                         ),
                       ],
@@ -380,87 +373,32 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
             top: 0,
             left: 10,
             right: 10,
-            child: IgnorePointer(
-              ignoring: appBarOpacity.value == 0,
-              child: AnimatedOpacity(
-                opacity: appBarOpacity.value,
-                duration: const Duration(milliseconds: 100),
-                child: SafeArea(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (Navigator.canPop(context))
-                        Material(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(4),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              alignment: Alignment.center,
-                              child: const Icon(
-                                Icons.arrow_back,
-                                color: Colors.white,
-                                size: 15,
-                              ),
-                            ),
+            child: SafeArea(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (Navigator.canPop(context))
+                    Material(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(4),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 15,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // 电梯
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              ignoring: appElevatorOpacity.value < 1,
-              child: AnimatedOpacity(
-                opacity: appElevatorOpacity.value,
-                duration: const Duration(milliseconds: 100),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
                       ),
                     ),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: SafeArea(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (Navigator.canPop(context))
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              alignment: Alignment.center,
-                              child: const Icon(
-                                Icons.arrow_back,
-                                color: Colors.black,
-                                size: 15,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
+                ],
               ),
             ),
           ),
