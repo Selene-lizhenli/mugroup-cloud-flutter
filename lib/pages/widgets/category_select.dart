@@ -5,8 +5,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 class CategorySelect extends HookWidget {
   final String? label;
-  final Category? value;
-  final ValueChanged<Category?>? onChanged;
+  final int? value;
+  final ValueChanged<int?>? onChanged;
 
   const CategorySelect({
     super.key,
@@ -24,7 +24,7 @@ class CategorySelect extends HookWidget {
     /// 初始化加载数据
     useEffect(() {
       () async {
-        if (fetched.value == true) return;
+        if (fetched.value) return;
         fetched.value = true;
 
         loading.value = true;
@@ -40,14 +40,14 @@ class CategorySelect extends HookWidget {
       onTap: () async {
         if (loading.value) return;
 
-        final selected = await CategorySelectPopup.show(
+        final selectedId = await CategorySelectPopup.show(
           context,
           all: categories.value,
-          selected: value,
+          selectedId: value,
         );
 
-        if (selected != null) {
-          onChanged?.call(selected);
+        if (selectedId != null) {
+          onChanged?.call(selectedId);
         }
       },
       child: Container(
@@ -60,7 +60,7 @@ class CategorySelect extends HookWidget {
           children: [
             Expanded(
               child: Text(
-                value != null ? _pathOf(value!) : "请选择分类",
+                value != null ? _pathOf(categories.value, value!) : "请选择分类",
                 style: TextStyle(
                   fontSize: 15,
                   color: value == null ? Colors.grey : const Color(0xFF0F172A),
@@ -89,8 +89,10 @@ class CategorySelect extends HookWidget {
     );
   }
 
-  String _pathOf(Category c) {
-    return [...(c.ancestors ?? []), c]
+  String _pathOf(List<Category> all, int id) {
+    final cat = all.firstWhere((c) => c.id == id,
+        orElse: () => Category(id: id, name: "未命名"));
+    return [...(cat.ancestors ?? []), cat]
         .map((e) => e.name ?? "")
         .where((e) => e.isNotEmpty)
         .join(" / ");
@@ -99,20 +101,20 @@ class CategorySelect extends HookWidget {
 
 class CategorySelectPopup extends HookWidget {
   final List<Category> all;
-  final Category? selected;
+  final int? selectedId; // 只记录选中 id
 
   const CategorySelectPopup({
     super.key,
     required this.all,
-    this.selected,
+    this.selectedId,
   });
 
-  static Future<Category?> show(
+  static Future<int?> show(
     BuildContext context, {
     required List<Category> all,
-    Category? selected,
+    int? selectedId,
   }) {
-    return showModalBottomSheet<Category>(
+    return showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -120,7 +122,7 @@ class CategorySelectPopup extends HookWidget {
         heightFactor: 0.85,
         child: CategorySelectPopup(
           all: all,
-          selected: selected,
+          selectedId: selectedId,
         ),
       ),
     );
@@ -161,7 +163,7 @@ class CategorySelectPopup extends HookWidget {
                     itemBuilder: (_, i) {
                       final c = filtered[i];
                       return InkWell(
-                        onTap: () => Navigator.pop(context, c),
+                        onTap: () => Navigator.pop(context, c.id), // 返回 id
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 14),
@@ -181,7 +183,7 @@ class CategorySelectPopup extends HookWidget {
                                   ),
                                 ),
                               ),
-                              if (selected?.id == c.id)
+                              if (selectedId == c.id)
                                 const Icon(Icons.check, color: Colors.blue),
                             ],
                           ),

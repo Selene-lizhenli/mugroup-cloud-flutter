@@ -109,7 +109,7 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'datePicker') {
-      return FormBuilderField<DateTime>(
+      return FormBuilderField<String>(
         name: s.name,
         validator: (value) {
           if (s.isRequired && value == null) return '必填';
@@ -149,7 +149,7 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'ShowroomCategorySelect') {
-      return FormBuilderField<Category>(
+      return FormBuilderField<int>(
         name: s.name,
         validator: (value) {
           if (s.isRequired && value == null) return '必填';
@@ -159,8 +159,8 @@ class DynamicBuildField extends StatelessWidget {
           return CategorySelect(
             label: s.title,
             value: field.value,
-            onChanged: (category) {
-              field.didChange(category);
+            onChanged: (categoryId) {
+              field.didChange(categoryId);
             },
           );
         },

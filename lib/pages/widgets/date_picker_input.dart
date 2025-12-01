@@ -6,10 +6,10 @@ class DatePickerInput extends HookWidget {
   final String name;
   final String label;
   final bool isRequired;
-  final DateTime? value;
-  final DateTime? minDate;
-  final DateTime? maxDate;
-  final ValueChanged<DateTime?>? onChanged;
+  final String? value;
+  final String? minDate;
+  final String? maxDate;
+  final ValueChanged<String?>? onChanged;
 
   const DatePickerInput({
     super.key,
@@ -22,26 +22,22 @@ class DatePickerInput extends HookWidget {
     this.onChanged,
   });
 
+  DateTime _parse(String dateStr) => DateTime.parse(dateStr);
+
+  String _format(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController(
-      text: value != null
-          ? '${value!.year}-${value!.month.toString().padLeft(2, '0')}-${value!.day.toString().padLeft(2, '0')}'
-          : '',
-    );
+    final controller = useTextEditingController(text: value ?? '');
     final focusNode = useFocusNode();
 
-    return FormBuilderField<DateTime>(
+    return FormBuilderField<String>(
       name: name,
       initialValue: value,
-      validator: (val) => (isRequired && val == null) ? '必填' : null,
+      validator: (val) =>
+          (isRequired && (val == null || val.isEmpty)) ? '必填' : null,
       builder: (field) {
-        if (value != null && value != field.value) {
-          field.didChange(value);
-          controller.text =
-              '${value!.year}-${value!.month.toString().padLeft(2, '0')}-${value!.day.toString().padLeft(2, '0')}';
-        }
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -58,10 +54,12 @@ class DatePickerInput extends HookWidget {
             ],
             GestureDetector(
               onTap: () async {
+                DateTime initialDate =
+                    field.value != null ? _parse(field.value!) : DateTime.now();
                 final pickedDate = await showDialog<DateTime>(
                   context: context,
                   builder: (context) {
-                    DateTime selectedDate = field.value ?? DateTime.now();
+                    DateTime selectedDate = initialDate;
                     return Dialog(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -75,22 +73,22 @@ class DatePickerInput extends HookWidget {
                             const Text(
                               '选择日期',
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 16),
                             Expanded(
                               child: CalendarDatePicker(
-                                initialDate: field.value ?? DateTime.now(),
-                                firstDate: minDate ?? DateTime(1900),
-                                lastDate: maxDate ?? DateTime(2100),
+                                initialDate: initialDate,
+                                firstDate: minDate != null
+                                    ? _parse(minDate!)
+                                    : DateTime(1900),
+                                lastDate: maxDate != null
+                                    ? _parse(maxDate!)
+                                    : DateTime(2100),
                                 onDateChanged: (date) {
                                   selectedDate = date;
                                 },
                                 currentDate: DateTime.now(),
-                                // 可以加自定义样式
-                                // 选中日期高亮颜色
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -116,10 +114,10 @@ class DatePickerInput extends HookWidget {
                 );
 
                 if (pickedDate != null) {
-                  field.didChange(pickedDate);
-                  controller.text =
-                      '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
-                  if (onChanged != null) onChanged!(pickedDate);
+                  final dateStr = _format(pickedDate);
+                  field.didChange(dateStr);
+                  controller.text = dateStr;
+                  if (onChanged != null) onChanged!(dateStr);
                 }
               },
               child: AbsorbPointer(
@@ -136,9 +134,8 @@ class DatePickerInput extends HookWidget {
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12), // 更圆润的圆角
-                      borderSide: BorderSide(
-                          color: Colors.grey.shade300), // 平时无边框(配合背景色)
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
