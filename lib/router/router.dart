@@ -10,7 +10,7 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes {
     return [
-      RedirectRoute(path: '/', redirectTo: '/showroom/sample/detail/570535'),
+      // RedirectRoute(path: '/', redirectTo: '/showroom/sample/detail/570535'),
       AutoRoute(
         page: Layout.page,
         initial: true,
@@ -53,8 +53,24 @@ class AppRouter extends RootStackRouter {
           page: SupplySupplierCreateRoute.page,
           path: "/supply/supplier/create"),
       AutoRoute(
-          page: SupplySupplierDetailRoute.page,
-          path: "/supply/supplier/detail/:id"),
+        page: SupplySupplierDetailRoute.page,
+        guards: [AuthGuard()],
+        path: '/supply/supplier/detail/:id',
+        children: [
+          AutoRoute(
+            page: SupplySupplierDetailInfoRoute.page,
+            path: "",
+          ),
+          AutoRoute(
+            page: SupplySupplierDetailContactRoute.page,
+            path: "contact",
+          ),
+          AutoRoute(
+            page: SupplySupplierDetailSampleRoute.page,
+            path: "sample",
+          ),
+        ],
+      ),
       AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
