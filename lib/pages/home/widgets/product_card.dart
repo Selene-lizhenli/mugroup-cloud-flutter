@@ -165,37 +165,38 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         const Spacer(),
-                        GestureDetector(
-                          onTap: onTapAddSample,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor:
-                                    colorScheme.secondary.withOpacity(0.3),
-                                child: Icon(
-                                  TDIcons.add,
-                                  size: 14,
-                                  color: colorScheme.secondary,
+                        if (onTapAddSample != null)
+                          GestureDetector(
+                            onTap: onTapAddSample,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                CircleAvatar(
+                                  radius: 10,
+                                  backgroundColor:
+                                      colorScheme.secondary.withOpacity(0.3),
+                                  child: Icon(
+                                    TDIcons.add,
+                                    size: 14,
+                                    color: colorScheme.secondary,
+                                  ),
                                 ),
-                              ),
-                              Positioned(
-                                top: -10,
-                                right: -8,
-                                child: TDBadge(
-                                  TDBadgeType.message,
-                                  color: colorScheme.secondary,
-                                  showZero: false,
-                                  count: cartCount != null
-                                      ? cartCount.toString()
-                                      : '',
-                                ),
-                              )
-                            ],
+                                Positioned(
+                                  top: -10,
+                                  right: -8,
+                                  child: TDBadge(
+                                    TDBadgeType.message,
+                                    color: colorScheme.secondary,
+                                    showZero: false,
+                                    count: cartCount != null
+                                        ? cartCount.toString()
+                                        : '',
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     )
                   ],
