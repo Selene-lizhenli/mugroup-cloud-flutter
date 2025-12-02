@@ -1,4 +1,4 @@
-import 'package:cloud/models/sample/category.dart';
+import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/pages/widgets/category_select.dart';
@@ -29,7 +29,6 @@ class DynamicBuildField extends StatelessWidget {
           }
           return null;
         },
-        initialValue: '',
         builder: (field) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,19 +128,40 @@ class DynamicBuildField extends StatelessWidget {
     }
 
     if (s.widget == 'SampleImagesUpload') {
-      return FormBuilderField<List<TemporaryMedia>>(
+      return FormBuilderField<List<dynamic>>(
         name: s.name,
         validator: (value) {
-          if (s.isRequired && value == null) return '必填';
+          if (s.isRequired && (value == null || value.isEmpty)) return '必填';
           return null;
         },
         builder: (field) {
+          List<TemporaryMedia> displayValue = [];
+
+          if (field.value != null) {
+            displayValue = field.value!
+                .map((e) {
+                  if (e is Media) {
+                    return TemporaryMedia(
+                      id: e.id!,
+                      url: e.url!,
+                      thumbUrl: e.thumbUrl,
+                    );
+                  } else if (e is TemporaryMedia) {
+                    return e;
+                  }
+
+                  return null;
+                })
+                .whereType<TemporaryMedia>()
+                .toList();
+          }
+
           return ImageUploader(
             name: s.name,
             label: s.title,
-            value: field.value,
-            onChanged: (date) {
-              field.didChange(date);
+            value: displayValue,
+            onChanged: (newValue) {
+              field.didChange(newValue);
             },
           );
         },

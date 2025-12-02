@@ -4,6 +4,17 @@ import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/quotation.dart';
 import 'package:cloud/models/sample/sample.dart';
 
+Future<Sample?> updateShowroomSample(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/samples/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Sample.fromJson(res.data);
+    },
+  );
+}
+
 Future<Sample?> storeShowroomSample(Map<String, dynamic>? data) async {
   return api.post("api/tenant/showroom/samples", data: data).then(
     (res) {

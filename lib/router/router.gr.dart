@@ -566,6 +566,7 @@ class ShowroomSampleEditRoute
             key: key,
             id: id,
           ),
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -574,7 +575,10 @@ class ShowroomSampleEditRoute
   static _i27.PageInfo page = _i27.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ShowroomSampleEditRouteArgs>();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<ShowroomSampleEditRouteArgs>(
+          orElse: () =>
+              ShowroomSampleEditRouteArgs(id: pathParams.getInt('id')));
       return _i18.ShowroomSampleEditPage(
         key: args.key,
         id: args.id,
