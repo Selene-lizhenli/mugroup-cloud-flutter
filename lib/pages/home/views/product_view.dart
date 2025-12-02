@@ -50,7 +50,6 @@ class ProductView extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
-      logger.d(queryParameters);
       final resp = await getSamples(queryParameters: queryParameters);
 
       if (init == true) {
@@ -127,23 +126,39 @@ class ProductView extends HookConsumerWidget {
             ? IndicatorResult.success
             : IndicatorResult.noMore);
       },
-      child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 5,
-        itemCount: samples.value.length,
-        padding: const EdgeInsets.all(5),
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final sample = samples.value[index];
-          final cartItem = cartState.items
-              .firstWhereOrNull((element) => element.sample.id == sample.id);
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableWidth = constraints.maxWidth;
 
-          return ProductCard(
-            sample: sample,
-            cartCount: cartItem?.count,
-            onTapAddSample: () {
-              cart.addSample(sample, 1);
+          var crossAxisCount = 2;
+
+          if (availableWidth > 500) {
+            crossAxisCount = 3;
+          }
+
+          if (availableWidth > 800) {
+            crossAxisCount = 4;
+          }
+
+          return MasonryGridView.count(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 5,
+            crossAxisSpacing: 5,
+            itemCount: samples.value.length,
+            padding: const EdgeInsets.all(5),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              final sample = samples.value[index];
+              final cartItem = cartState.items.firstWhereOrNull(
+                  (element) => element.sample.id == sample.id);
+
+              return ProductCard(
+                sample: sample,
+                cartCount: cartItem?.count,
+                onTapAddSample: () {
+                  cart.addSample(sample, 1);
+                },
+              );
             },
           );
         },
