@@ -50,6 +50,7 @@ class ProductView extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
+      logger.d(queryParameters);
       final resp = await getSamples(queryParameters: queryParameters);
 
       if (init == true) {
@@ -89,15 +90,22 @@ class ProductView extends HookConsumerWidget {
         return null;
       }
 
-      if (home.search == search.value) {
+      if ((home.search == search.value) && (home.currentMedia == media.value)) {
         return null;
       }
 
       search.value = home.search;
+      media.value = home.currentMedia;
       refreshController.callRefresh(force: true);
 
       return null;
-    }, [home.currentPage, home.search, search.value]);
+    }, [
+      home.currentPage,
+      home.search,
+      home.currentMedia,
+      search.value,
+      media.value
+    ]);
 
     return EasyRefresh(
       controller: refreshController,

@@ -1,4 +1,6 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
@@ -20,9 +22,12 @@ class SupplyView extends HookConsumerWidget {
 
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
+    final media = useState<TemporaryMedia?>(home.currentMedia);
 
     final refreshController = useEasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
+      controlFinishLoad: true,
+      controlFinishRefresh: true,
+    );
 
     final page = useRef(1);
     final suppliers = useState<List<Supplier>>(<Supplier>[]);
@@ -30,17 +35,21 @@ class SupplyView extends HookConsumerWidget {
     fetchData(
       String? searchText, {
       bool? init = false,
+      TemporaryMedia? searchMedia,
     }) async {
       search.value = searchText;
+      media.value = searchMedia;
       if (init == true) {
         page.value = 1;
       }
 
       final queryParameters = {
         "search": searchText,
+        if (searchMedia != null) "image": searchMedia.id,
         "page": page.value,
         "pageSize": pageSize,
       };
+      logger.d(queryParameters);
       final resp = await getSupplySuppliers(queryParameters: queryParameters);
 
       if (init == true) {
@@ -64,6 +73,7 @@ class SupplyView extends HookConsumerWidget {
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
           search.value = event.search;
+          media.value = event.media;
 
           refreshController.callRefresh(force: true);
         },
@@ -79,15 +89,22 @@ class SupplyView extends HookConsumerWidget {
         return null;
       }
 
-      if (home.search == search.value) {
+      if ((home.search == search.value) && (home.currentMedia == media.value)) {
         return null;
       }
 
       search.value = home.search;
+      media.value = home.currentMedia;
       refreshController.callRefresh(force: true);
 
       return null;
-    }, [home.currentPage, home.search, search.value]);
+    }, [
+      home.currentPage,
+      home.search,
+      home.currentMedia,
+      search.value,
+      media.value
+    ]);
 
     return EasyRefresh(
       controller: refreshController,
@@ -96,6 +113,7 @@ class SupplyView extends HookConsumerWidget {
         await fetchData(
           search.value,
           init: true,
+          searchMedia: media.value,
         );
         refreshController.finishRefresh();
         refreshController.resetFooter();
