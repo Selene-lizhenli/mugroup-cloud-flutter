@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -116,6 +117,8 @@ class ImageUploader extends HookConsumerWidget {
             ...List.generate(currentImages.length, (index) {
               final item = currentImages[index];
               return _buildImageItem(
+                context,
+                index,
                 item.thumbUrl ?? item.url,
                 onRemove: () => handleDelete(index),
               );
@@ -130,34 +133,45 @@ class ImageUploader extends HookConsumerWidget {
   }
 
   // 子组件：单个图片预览
-  Widget _buildImageItem(String? url, {required VoidCallback onRemove}) {
+  Widget _buildImageItem(BuildContext context, int index, String? url,
+      {required VoidCallback onRemove}) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            color: Colors.grey[200],
-            border: Border.all(color: Colors.grey[300]!),
+        GestureDetector(
+          onTap: () {
+            showFlanImagePreview(
+              context,
+              images: value!.map((e) => e.url).toList(),
+              startPosition: index,
+              loop: false,
+            );
+          },
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: Colors.grey[200],
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: url != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2));
+                      },
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  )
+                : const Icon(Icons.image, color: Colors.grey),
           ),
-          child: url != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2));
-                    },
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.broken_image, color: Colors.grey),
-                  ),
-                )
-              : const Icon(Icons.image, color: Colors.grey),
         ),
         Positioned(
           top: -6,
