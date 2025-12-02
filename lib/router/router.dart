@@ -10,8 +10,8 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes {
     return [
-      RedirectRoute(
-          path: '/', redirectTo: '/supply/supplier/detail/13611/sample'),
+      // RedirectRoute(
+      //     path: '/', redirectTo: '/supply/supplier/detail/13611/sample'),
       AutoRoute(
         page: Layout.page,
         initial: true,
