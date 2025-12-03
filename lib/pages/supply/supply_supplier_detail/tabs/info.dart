@@ -167,38 +167,6 @@ class SupplySupplierDetailInfoPage extends HookConsumerWidget {
           ),
 
           const SizedBox(height: 16),
-
-          buildSectionCard(
-            title: "联系人 (${supplier.value?.contacts?.length} 人)",
-            children: (supplier.value?.contacts ?? []).map((contact) {
-              return Padding(
-                padding:
-                    const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 姓名 (用作标题，不带图标)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      child: Text(
-                        contact.name ?? "",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ),
-                    buildIconInfoRow(
-                        Icons.phone_iphone, "移动电话", contact.mobile),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 32),
         ],
       ),
     );

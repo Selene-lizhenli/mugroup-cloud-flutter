@@ -624,10 +624,14 @@ class SupplySupplierCreateRoute extends _i27.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i20.SupplySupplierDetailContactPage]
-class SupplySupplierDetailContactRoute extends _i27.PageRouteInfo<void> {
-  const SupplySupplierDetailContactRoute({List<_i27.PageRouteInfo>? children})
-      : super(
+class SupplySupplierDetailContactRoute
+    extends _i27.PageRouteInfo<SupplySupplierDetailContactRouteArgs> {
+  SupplySupplierDetailContactRoute({
+    _i30.Key? key,
+    List<_i27.PageRouteInfo>? children,
+  }) : super(
           SupplySupplierDetailContactRoute.name,
+          args: SupplySupplierDetailContactRouteArgs(key: key),
           initialChildren: children,
         );
 
@@ -636,9 +640,26 @@ class SupplySupplierDetailContactRoute extends _i27.PageRouteInfo<void> {
   static _i27.PageInfo page = _i27.PageInfo(
     name,
     builder: (data) {
-      return const _i20.SupplySupplierDetailContactPage();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<SupplySupplierDetailContactRouteArgs>(
+          orElse: () => SupplySupplierDetailContactRouteArgs());
+      return _i20.SupplySupplierDetailContactPage(
+        key: args.key,
+        id: pathParams.getInt('id'),
+      );
     },
   );
+}
+
+class SupplySupplierDetailContactRouteArgs {
+  const SupplySupplierDetailContactRouteArgs({this.key});
+
+  final _i30.Key? key;
+
+  @override
+  String toString() {
+    return 'SupplySupplierDetailContactRouteArgs{key: $key}';
+  }
 }
 
 /// generated route for
