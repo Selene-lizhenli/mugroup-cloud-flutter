@@ -26,6 +26,8 @@ mixin _$Supplier {
   String? get province => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_no')
   String? get supplierNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'usci_code')
+  String? get usciCode => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_core')
   bool? get isCore => throw _privateConstructorUsedError;
   @JsonKey(name: 'can_bill')
@@ -38,6 +40,14 @@ mixin _$Supplier {
   String? get shippingAmount => throw _privateConstructorUsedError;
   @JsonKey(name: 'short_name')
   String? get shortName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bank_name')
+  String? get bankName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bank_account')
+  String? get bankAccount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'business_title')
+  String? get businessTitle => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bill_type')
+  String? get billType => throw _privateConstructorUsedError;
   List<Contact>? get contacts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,12 +67,17 @@ abstract class $SupplierCopyWith<$Res> {
       String? city,
       String? province,
       @JsonKey(name: 'supplier_no') String? supplierNo,
+      @JsonKey(name: 'usci_code') String? usciCode,
       @JsonKey(name: 'is_core') bool? isCore,
       @JsonKey(name: 'can_bill') bool? canBill,
       @JsonKey(name: 'business_scope') String? businessScope,
       @JsonKey(name: 'export_market') String? exportMarket,
       @JsonKey(name: 'shipping_amount') String? shippingAmount,
       @JsonKey(name: 'short_name') String? shortName,
+      @JsonKey(name: 'bank_name') String? bankName,
+      @JsonKey(name: 'bank_account') String? bankAccount,
+      @JsonKey(name: 'business_title') String? businessTitle,
+      @JsonKey(name: 'bill_type') String? billType,
       List<Contact>? contacts});
 }
 
@@ -84,12 +99,17 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
     Object? city = freezed,
     Object? province = freezed,
     Object? supplierNo = freezed,
+    Object? usciCode = freezed,
     Object? isCore = freezed,
     Object? canBill = freezed,
     Object? businessScope = freezed,
     Object? exportMarket = freezed,
     Object? shippingAmount = freezed,
     Object? shortName = freezed,
+    Object? bankName = freezed,
+    Object? bankAccount = freezed,
+    Object? businessTitle = freezed,
+    Object? billType = freezed,
     Object? contacts = freezed,
   }) {
     return _then(_value.copyWith(
@@ -112,6 +132,10 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       supplierNo: freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      usciCode: freezed == usciCode
+          ? _value.usciCode
+          : usciCode // ignore: cast_nullable_to_non_nullable
               as String?,
       isCore: freezed == isCore
           ? _value.isCore
@@ -137,6 +161,22 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
+      bankName: freezed == bankName
+          ? _value.bankName
+          : bankName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bankAccount: freezed == bankAccount
+          ? _value.bankAccount
+          : bankAccount // ignore: cast_nullable_to_non_nullable
+              as String?,
+      businessTitle: freezed == businessTitle
+          ? _value.businessTitle
+          : businessTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      billType: freezed == billType
+          ? _value.billType
+          : billType // ignore: cast_nullable_to_non_nullable
+              as String?,
       contacts: freezed == contacts
           ? _value.contacts
           : contacts // ignore: cast_nullable_to_non_nullable
@@ -159,12 +199,17 @@ abstract class _$$SupplierImplCopyWith<$Res>
       String? city,
       String? province,
       @JsonKey(name: 'supplier_no') String? supplierNo,
+      @JsonKey(name: 'usci_code') String? usciCode,
       @JsonKey(name: 'is_core') bool? isCore,
       @JsonKey(name: 'can_bill') bool? canBill,
       @JsonKey(name: 'business_scope') String? businessScope,
       @JsonKey(name: 'export_market') String? exportMarket,
       @JsonKey(name: 'shipping_amount') String? shippingAmount,
       @JsonKey(name: 'short_name') String? shortName,
+      @JsonKey(name: 'bank_name') String? bankName,
+      @JsonKey(name: 'bank_account') String? bankAccount,
+      @JsonKey(name: 'business_title') String? businessTitle,
+      @JsonKey(name: 'bill_type') String? billType,
       List<Contact>? contacts});
 }
 
@@ -184,12 +229,17 @@ class __$$SupplierImplCopyWithImpl<$Res>
     Object? city = freezed,
     Object? province = freezed,
     Object? supplierNo = freezed,
+    Object? usciCode = freezed,
     Object? isCore = freezed,
     Object? canBill = freezed,
     Object? businessScope = freezed,
     Object? exportMarket = freezed,
     Object? shippingAmount = freezed,
     Object? shortName = freezed,
+    Object? bankName = freezed,
+    Object? bankAccount = freezed,
+    Object? businessTitle = freezed,
+    Object? billType = freezed,
     Object? contacts = freezed,
   }) {
     return _then(_$SupplierImpl(
@@ -212,6 +262,10 @@ class __$$SupplierImplCopyWithImpl<$Res>
       freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == usciCode
+          ? _value.usciCode
+          : usciCode // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == isCore
           ? _value.isCore
@@ -237,6 +291,22 @@ class __$$SupplierImplCopyWithImpl<$Res>
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == bankName
+          ? _value.bankName
+          : bankName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == bankAccount
+          ? _value.bankAccount
+          : bankAccount // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == businessTitle
+          ? _value.businessTitle
+          : businessTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == billType
+          ? _value.billType
+          : billType // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == contacts
           ? _value._contacts
           : contacts // ignore: cast_nullable_to_non_nullable
@@ -254,12 +324,17 @@ class _$SupplierImpl implements _Supplier {
       this.city,
       this.province,
       @JsonKey(name: 'supplier_no') this.supplierNo,
+      @JsonKey(name: 'usci_code') this.usciCode,
       @JsonKey(name: 'is_core') this.isCore,
       @JsonKey(name: 'can_bill') this.canBill,
       @JsonKey(name: 'business_scope') this.businessScope,
       @JsonKey(name: 'export_market') this.exportMarket,
       @JsonKey(name: 'shipping_amount') this.shippingAmount,
       @JsonKey(name: 'short_name') this.shortName,
+      @JsonKey(name: 'bank_name') this.bankName,
+      @JsonKey(name: 'bank_account') this.bankAccount,
+      @JsonKey(name: 'business_title') this.businessTitle,
+      @JsonKey(name: 'bill_type') this.billType,
       final List<Contact>? contacts)
       : _contacts = contacts;
 
@@ -278,6 +353,9 @@ class _$SupplierImpl implements _Supplier {
   @JsonKey(name: 'supplier_no')
   final String? supplierNo;
   @override
+  @JsonKey(name: 'usci_code')
+  final String? usciCode;
+  @override
   @JsonKey(name: 'is_core')
   final bool? isCore;
   @override
@@ -295,6 +373,18 @@ class _$SupplierImpl implements _Supplier {
   @override
   @JsonKey(name: 'short_name')
   final String? shortName;
+  @override
+  @JsonKey(name: 'bank_name')
+  final String? bankName;
+  @override
+  @JsonKey(name: 'bank_account')
+  final String? bankAccount;
+  @override
+  @JsonKey(name: 'business_title')
+  final String? businessTitle;
+  @override
+  @JsonKey(name: 'bill_type')
+  final String? billType;
   final List<Contact>? _contacts;
   @override
   List<Contact>? get contacts {
@@ -307,7 +397,7 @@ class _$SupplierImpl implements _Supplier {
 
   @override
   String toString() {
-    return 'Supplier(id: $id, name: $name, city: $city, province: $province, supplierNo: $supplierNo, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, contacts: $contacts)';
+    return 'Supplier(id: $id, name: $name, city: $city, province: $province, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, contacts: $contacts)';
   }
 
   @override
@@ -322,6 +412,8 @@ class _$SupplierImpl implements _Supplier {
                 other.province == province) &&
             (identical(other.supplierNo, supplierNo) ||
                 other.supplierNo == supplierNo) &&
+            (identical(other.usciCode, usciCode) ||
+                other.usciCode == usciCode) &&
             (identical(other.isCore, isCore) || other.isCore == isCore) &&
             (identical(other.canBill, canBill) || other.canBill == canBill) &&
             (identical(other.businessScope, businessScope) ||
@@ -332,6 +424,14 @@ class _$SupplierImpl implements _Supplier {
                 other.shippingAmount == shippingAmount) &&
             (identical(other.shortName, shortName) ||
                 other.shortName == shortName) &&
+            (identical(other.bankName, bankName) ||
+                other.bankName == bankName) &&
+            (identical(other.bankAccount, bankAccount) ||
+                other.bankAccount == bankAccount) &&
+            (identical(other.businessTitle, businessTitle) ||
+                other.businessTitle == businessTitle) &&
+            (identical(other.billType, billType) ||
+                other.billType == billType) &&
             const DeepCollectionEquality().equals(other._contacts, _contacts));
   }
 
@@ -344,12 +444,17 @@ class _$SupplierImpl implements _Supplier {
       city,
       province,
       supplierNo,
+      usciCode,
       isCore,
       canBill,
       businessScope,
       exportMarket,
       shippingAmount,
       shortName,
+      bankName,
+      bankAccount,
+      businessTitle,
+      billType,
       const DeepCollectionEquality().hash(_contacts));
 
   @JsonKey(ignore: true)
@@ -373,12 +478,17 @@ abstract class _Supplier implements Supplier {
       final String? city,
       final String? province,
       @JsonKey(name: 'supplier_no') final String? supplierNo,
+      @JsonKey(name: 'usci_code') final String? usciCode,
       @JsonKey(name: 'is_core') final bool? isCore,
       @JsonKey(name: 'can_bill') final bool? canBill,
       @JsonKey(name: 'business_scope') final String? businessScope,
       @JsonKey(name: 'export_market') final String? exportMarket,
       @JsonKey(name: 'shipping_amount') final String? shippingAmount,
       @JsonKey(name: 'short_name') final String? shortName,
+      @JsonKey(name: 'bank_name') final String? bankName,
+      @JsonKey(name: 'bank_account') final String? bankAccount,
+      @JsonKey(name: 'business_title') final String? businessTitle,
+      @JsonKey(name: 'bill_type') final String? billType,
       final List<Contact>? contacts) = _$SupplierImpl;
 
   factory _Supplier.fromJson(Map<String, dynamic> json) =
@@ -395,6 +505,9 @@ abstract class _Supplier implements Supplier {
   @override
   @JsonKey(name: 'supplier_no')
   String? get supplierNo;
+  @override
+  @JsonKey(name: 'usci_code')
+  String? get usciCode;
   @override
   @JsonKey(name: 'is_core')
   bool? get isCore;
@@ -413,6 +526,18 @@ abstract class _Supplier implements Supplier {
   @override
   @JsonKey(name: 'short_name')
   String? get shortName;
+  @override
+  @JsonKey(name: 'bank_name')
+  String? get bankName;
+  @override
+  @JsonKey(name: 'bank_account')
+  String? get bankAccount;
+  @override
+  @JsonKey(name: 'business_title')
+  String? get businessTitle;
+  @override
+  @JsonKey(name: 'bill_type')
+  String? get billType;
   @override
   List<Contact>? get contacts;
   @override
