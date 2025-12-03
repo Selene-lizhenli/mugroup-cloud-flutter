@@ -24,6 +24,7 @@ mixin _$Supplier {
   String? get name => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
   String? get province => throw _privateConstructorUsedError;
+  String? get address => throw _privateConstructorUsedError;
   String? get annual => throw _privateConstructorUsedError;
   String? get advantages => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_no')
@@ -92,6 +93,7 @@ abstract class $SupplierCopyWith<$Res> {
       String? name,
       String? city,
       String? province,
+      String? address,
       String? annual,
       String? advantages,
       @JsonKey(name: 'supplier_no') String? supplierNo,
@@ -138,6 +140,7 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
     Object? name = freezed,
     Object? city = freezed,
     Object? province = freezed,
+    Object? address = freezed,
     Object? annual = freezed,
     Object? advantages = freezed,
     Object? supplierNo = freezed,
@@ -182,6 +185,10 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       province: freezed == province
           ? _value.province
           : province // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
               as String?,
       annual: freezed == annual
           ? _value.annual
@@ -308,6 +315,7 @@ abstract class _$$SupplierImplCopyWith<$Res>
       String? name,
       String? city,
       String? province,
+      String? address,
       String? annual,
       String? advantages,
       @JsonKey(name: 'supplier_no') String? supplierNo,
@@ -352,6 +360,7 @@ class __$$SupplierImplCopyWithImpl<$Res>
     Object? name = freezed,
     Object? city = freezed,
     Object? province = freezed,
+    Object? address = freezed,
     Object? annual = freezed,
     Object? advantages = freezed,
     Object? supplierNo = freezed,
@@ -396,6 +405,10 @@ class __$$SupplierImplCopyWithImpl<$Res>
       freezed == province
           ? _value.province
           : province // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == annual
           ? _value.annual
@@ -517,6 +530,7 @@ class _$SupplierImpl implements _Supplier {
       this.name,
       this.city,
       this.province,
+      this.address,
       this.annual,
       this.advantages,
       @JsonKey(name: 'supplier_no') this.supplierNo,
@@ -557,6 +571,8 @@ class _$SupplierImpl implements _Supplier {
   final String? city;
   @override
   final String? province;
+  @override
+  final String? address;
   @override
   final String? annual;
   @override
@@ -645,7 +661,7 @@ class _$SupplierImpl implements _Supplier {
 
   @override
   String toString() {
-    return 'Supplier(id: $id, name: $name, city: $city, province: $province, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, contacts: $contacts)';
+    return 'Supplier(id: $id, name: $name, city: $city, province: $province, address: $address, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, contacts: $contacts)';
   }
 
   @override
@@ -658,6 +674,7 @@ class _$SupplierImpl implements _Supplier {
             (identical(other.city, city) || other.city == city) &&
             (identical(other.province, province) ||
                 other.province == province) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.annual, annual) || other.annual == annual) &&
             (identical(other.advantages, advantages) ||
                 other.advantages == advantages) &&
@@ -717,6 +734,7 @@ class _$SupplierImpl implements _Supplier {
         name,
         city,
         province,
+        address,
         annual,
         advantages,
         supplierNo,
@@ -766,6 +784,7 @@ abstract class _Supplier implements Supplier {
       final String? name,
       final String? city,
       final String? province,
+      final String? address,
       final String? annual,
       final String? advantages,
       @JsonKey(name: 'supplier_no') final String? supplierNo,
@@ -805,6 +824,8 @@ abstract class _Supplier implements Supplier {
   String? get city;
   @override
   String? get province;
+  @override
+  String? get address;
   @override
   String? get annual;
   @override

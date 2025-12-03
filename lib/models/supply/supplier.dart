@@ -11,6 +11,7 @@ class Supplier with _$Supplier {
     String? name,
     String? city,
     String? province,
+    String? address,
     String? annual,
     String? advantages,
     @JsonKey(name: 'supplier_no') String? supplierNo,

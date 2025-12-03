@@ -7,7 +7,6 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,39 +15,16 @@ class SupplySupplierForm extends HookConsumerWidget {
   final Supplier? initial;
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
-  const SupplySupplierForm(
-      {super.key, required this.initial, required this.onSubmit});
+  const SupplySupplierForm({
+    super.key,
+    required this.initial,
+    required this.onSubmit,
+  });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-
-    final name = useState(initial?.name ?? '');
-    final shortName = useState(initial?.shortName ?? '');
-    final supplierNo = useState(initial?.supplierNo ?? '');
-    final usciCode = useState(initial?.usciCode ?? '');
-    final businessScope = useState(initial?.businessScope ?? '');
-    final bankName = useState(initial?.bankName ?? '');
-    final bankAccount = useState(initial?.bankAccount ?? '');
-    final businessTitle = useState(initial?.businessTitle ?? "");
-    final billType = useState(initial?.billType ?? "");
-    final typeId = useState(initial?.typeId ?? "");
-    final isCore = useState(initial?.isCore ?? false);
-    final isCorporate = useState(initial?.isCorporate ?? false);
-    final supplierType = useState(initial?.supplierType ?? "");
-    final exportMarket = useState(initial?.exportMarket ?? '');
-    final corpCustomer = useState(initial?.corpCustomer ?? '');
-    final corpCompany = useState(initial?.corpCompany ?? "");
-    final corpSkuid = useState(initial?.corpSkuid ?? "");
-    final showroomArea = useState(initial?.showroomArea ?? '');
-    final marketRate = useState(initial?.marketRate ?? '');
-    final landType = useState(initial?.landType ?? '');
-    final factoryArea = useState(initial?.factoryArea ?? "");
-    final employeeCount = useState(initial?.employeeCount ?? '');
-    final annual = useState(initial?.annual ?? '');
-    final advantages = useState(initial?.advantages ?? "");
-    final developedAt = useState(initial?.developedAt ?? '');
-    final images = useState<List<TemporaryMedia>?>(null);
 
     return Column(
       children: [
@@ -61,29 +37,43 @@ class SupplySupplierForm extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ImageUploader(
-                      name: 'images',
-                      label: '名片',
-                      value: images.value,
-                      onChanged: (value) {
-                        images.value = value;
+                    FormBuilderField<List<TemporaryMedia>>(
+                      name: "images",
+                      builder: (field) {
+                        return ImageUploader(
+                          label: "名片",
+                          value: field.value,
+                          onChanged: field.didChange,
+                        );
                       },
                     ),
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '厂商编号',
-                            value: supplierNo.value,
-                            onChanged: (v) => supplierNo.value = v,
+                          child: FormBuilderField<String>(
+                            name: "supplier_no",
+                            initialValue: initial?.supplierNo,
+                            builder: (field) {
+                              return Input(
+                                label: '厂商编号',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '税号代码',
-                            value: usciCode.value,
-                            onChanged: (v) => usciCode.value = v,
+                          child: FormBuilderField<String>(
+                            name: "usci_code",
+                            initialValue: initial?.usciCode,
+                            builder: (field) {
+                              return Input(
+                                label: '税号代码',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -91,136 +81,90 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '厂商简称',
-                            value: shortName.value,
-                            onChanged: (v) => shortName.value = v,
+                          child: FormBuilderField<String>(
+                            name: "short_name",
+                            initialValue: initial?.shortName,
+                            builder: (field) {
+                              return Input(
+                                label: '厂商简称',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '厂商名称',
-                            value: name.value,
-                            onChanged: (v) => name.value = v,
+                          child: FormBuilderField<String>(
+                            name: "name",
+                            initialValue: initial?.name,
+                            builder: (field) {
+                              return Input(
+                                label: '厂商名称',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
                     const Row(
                       children: [
-                        Expanded(
-                          child: Text('省份'),
-                        ),
+                        Expanded(child: Text('省份')),
                         SizedBox(width: 16),
-                        Expanded(
-                          child: Text('城市'),
-                        ),
+                        Expanded(child: Text('城市')),
                       ],
                     ),
-                    Input(
-                      label: '厂商地址',
-                      value: supplierNo.value,
-                      onChanged: (v) => supplierNo.value = v,
+                    FormBuilderField<String>(
+                      name: "address",
+                      initialValue: initial?.address,
+                      builder: (field) {
+                        return Input(
+                          label: '厂商地址',
+                          value: field.value ?? '',
+                          onChanged: field.didChange,
+                        );
+                      },
                     ),
-                    TextArea(
-                      name: 'business_scope',
-                      label: '营业范围',
-                      value: businessScope.value,
-                      onChanged: (value) {
-                        businessScope.value = value ?? "";
+                    FormBuilderField<String>(
+                      name: "business_scope",
+                      initialValue: initial?.businessScope,
+                      builder: (field) {
+                        return TextArea(
+                          label: '营业范围',
+                          value: field.value,
+                          onChanged: field.didChange,
+                        );
                       },
                     ),
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '开户银行',
-                            value: bankName.value,
-                            onChanged: (v) => bankName.value = v,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Input(
-                            label: '银行账号',
-                            value: bankAccount.value,
-                            onChanged: (v) => bankAccount.value = v,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Input(
-                            label: '收款单位',
-                            value: businessTitle.value,
-                            onChanged: (v) => businessTitle.value = v,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Select(
-                            label: '发票类型',
-                            value: billType.value,
-                            options: [
-                              SelectOption(label: '1', value: '1'),
-                              SelectOption(label: '3', value: '3'),
-                              SelectOption(label: '9', value: '9'),
-                              SelectOption(label: '13', value: '13'),
-                              SelectOption(label: '不开票', value: 'none'),
-                            ],
-                            onChanged: (value) {
-                              billType.value = value ?? '';
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Text('供应商分类'),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CheckboxInput(
-                              label: '是否核心',
-                              value: isCore.value,
-                              onChanged: (value) {
-                                isCore.value = value;
-                              }),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                            child: CheckboxInput(
-                                label: '是否已合作',
-                                value: isCorporate.value,
-                                onChanged: (value) {
-                                  isCorporate.value = value;
-                                })),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Select(
-                            label: '供应商类型',
-                            value: supplierType.value,
-                            options: [
-                              SelectOption(label: '生产工厂', value: '1'),
-                              SelectOption(label: '工贸一体', value: '2'),
-                              SelectOption(label: '贸易商', value: '3'),
-                            ],
-                            onChanged: (value) {
-                              supplierType.value = value ?? '';
+                          child: FormBuilderField<String>(
+                            name: "bank_name",
+                            initialValue: initial?.bankName,
+                            builder: (field) {
+                              return Input(
+                                label: '开户银行',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
                             },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '主销市场',
-                            value: exportMarket.value,
-                            onChanged: (v) => exportMarket.value = v,
+                          child: FormBuilderField<String>(
+                            name: "bank_account",
+                            initialValue: initial?.bankAccount,
+                            builder: (field) {
+                              return Input(
+                                label: '银行账号',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -228,18 +172,69 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '合作客户',
-                            value: corpCustomer.value,
-                            onChanged: (v) => corpCustomer.value = v,
+                          child: FormBuilderField<String>(
+                            name: "business_title",
+                            initialValue: initial?.businessTitle,
+                            builder: (field) {
+                              return Input(
+                                label: '收款单位',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '合作公司',
-                            value: corpCompany.value,
-                            onChanged: (v) => corpCompany.value = v,
+                          child: FormBuilderField<String>(
+                            name: "bill_type",
+                            initialValue: initial?.billType,
+                            builder: (field) {
+                              return Select(
+                                label: '发票类型',
+                                value: field.value,
+                                options: [
+                                  SelectOption(label: '1', value: '1'),
+                                  SelectOption(label: '3', value: '3'),
+                                  SelectOption(label: '9', value: '9'),
+                                  SelectOption(label: '13', value: '13'),
+                                  SelectOption(label: '不开票', value: 'none'),
+                                ],
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Text("供应商分类"),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FormBuilderField<bool>(
+                            name: "is_core",
+                            initialValue: initial?.isCore ?? false,
+                            builder: (field) {
+                              return CheckboxInput(
+                                label: "是否核心",
+                                value: field.value ?? false,
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: FormBuilderField<bool>(
+                            name: "is_corporate",
+                            initialValue: initial?.isCorporate ?? false,
+                            builder: (field) {
+                              return CheckboxInput(
+                                label: "是否已合作",
+                                value: field.value ?? false,
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -247,18 +242,35 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '合作货号',
-                            value: corpSkuid.value,
-                            onChanged: (v) => corpSkuid.value = v,
+                          child: FormBuilderField<String>(
+                            name: "supplier_type",
+                            initialValue: initial?.supplierType,
+                            builder: (field) {
+                              return Select(
+                                label: '供应商类型',
+                                value: field.value,
+                                options: [
+                                  SelectOption(label: '生产工厂', value: '1'),
+                                  SelectOption(label: '工贸一体', value: '2'),
+                                  SelectOption(label: '贸易商', value: '3'),
+                                ],
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '样品间面积',
-                            value: showroomArea.value,
-                            onChanged: (v) => showroomArea.value = v,
+                          child: FormBuilderField<String>(
+                            name: "export_market",
+                            initialValue: initial?.exportMarket,
+                            builder: (field) {
+                              return Input(
+                                label: '主销市场',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -266,18 +278,30 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '市场占比',
-                            value: marketRate.value,
-                            onChanged: (v) => marketRate.value = v,
+                          child: FormBuilderField<String>(
+                            name: "corp_customer",
+                            initialValue: initial?.corpCustomer,
+                            builder: (field) {
+                              return Input(
+                                label: '合作客户',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '土地厂房性质',
-                            value: landType.value,
-                            onChanged: (v) => landType.value = v,
+                          child: FormBuilderField<String>(
+                            name: "corp_company",
+                            initialValue: initial?.corpCompany,
+                            builder: (field) {
+                              return Input(
+                                label: '合作公司',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -285,18 +309,30 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '工厂面积',
-                            value: factoryArea.value,
-                            onChanged: (v) => factoryArea.value = v,
+                          child: FormBuilderField<String>(
+                            name: "corp_skuid",
+                            initialValue: initial?.corpSkuid,
+                            builder: (field) {
+                              return Input(
+                                label: '合作货号',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '员工人数',
-                            value: employeeCount.value,
-                            onChanged: (v) => employeeCount.value = v,
+                          child: FormBuilderField<String>(
+                            name: "showroom_area",
+                            initialValue: initial?.showroomArea,
+                            builder: (field) {
+                              return Input(
+                                label: '样品间面积',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -304,28 +340,105 @@ class SupplySupplierForm extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Input(
-                            label: '年产值',
-                            value: annual.value,
-                            onChanged: (v) => annual.value = v,
+                          child: FormBuilderField<String>(
+                            name: "market_rate",
+                            initialValue: initial?.marketRate,
+                            builder: (field) {
+                              return Input(
+                                label: '市场占比',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Input(
-                            label: '工厂优势',
-                            value: advantages.value,
-                            onChanged: (v) => advantages.value = v,
+                          child: FormBuilderField<String>(
+                            name: "land_type",
+                            initialValue: initial?.landType,
+                            builder: (field) {
+                              return Input(
+                                label: '土地厂房性质',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
-                    DatePickerInput(
-                      name: 'developed_at',
-                      label: '开发日期',
-                      value: developedAt.value,
-                      onChanged: (date) {
-                        developedAt.value = date ?? '';
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "factory_area",
+                            initialValue: initial?.factoryArea,
+                            builder: (field) {
+                              return Input(
+                                label: '工厂面积',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "employee_count",
+                            initialValue: initial?.employeeCount,
+                            builder: (field) {
+                              return Input(
+                                label: '员工人数',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "annual",
+                            initialValue: initial?.annual,
+                            builder: (field) {
+                              return Input(
+                                label: '年产值',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "advantages",
+                            initialValue: initial?.advantages,
+                            builder: (field) {
+                              return Input(
+                                label: '工厂优势',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    FormBuilderField<String>(
+                      name: "developed_at",
+                      initialValue: initial?.developedAt,
+                      builder: (field) {
+                        return DatePickerInput(
+                          label: '开发日期',
+                          value: field.value,
+                          onChanged: field.didChange,
+                        );
                       },
                     )
                   ],
@@ -347,16 +460,9 @@ class SupplySupplierForm extends HookConsumerWidget {
               onPressed: () async {
                 final formState = formKey.currentState;
                 if (formState?.saveAndValidate() ?? false) {
-                  final values = formState?.value;
-                  debugPrint('提交表单: $values');
-                  //TODO
+                  final values = formState!.value;
 
-                  EasyLoading.showSuccess('创建供应商成功!');
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                } else {
-                  debugPrint('表单校验失败');
+                  onSubmit(values);
                 }
               },
               child: const Text(
