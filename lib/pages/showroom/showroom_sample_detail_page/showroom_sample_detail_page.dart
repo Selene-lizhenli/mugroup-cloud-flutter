@@ -25,8 +25,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final sample = useState<Sample?>(null);
     final currentIndex = useState<int>(0);
-    final appBarOpacity = useState(1.0);
-    final appElevatorOpacity = useState(0.0);
     final sampleSimilars = useState(<Sample>[]);
     final similarPage = useRef(1);
 
@@ -41,25 +39,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
         isLoading.value = false;
       }
     }
-
-    useEffect(() {
-      calAppOpacity() {
-        final offset = scrollController.offset;
-
-        final newOpacity = (1 - offset / 200).clamp(0.0, 1.0);
-
-        final eleVatorOpacity = ((offset - 200) / 200).clamp(0.0, 1.0);
-
-        appBarOpacity.value = newOpacity;
-        appElevatorOpacity.value = eleVatorOpacity;
-      }
-
-      scrollController.addListener(calAppOpacity);
-
-      return () {
-        scrollController.removeListener(calAppOpacity);
-      };
-    }, []);
 
     useEffect(() {
       // 等页面真正挂载后再加载数据
@@ -371,12 +350,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
             ),
           ),
           // Sample AppBar
-          const Positioned(
+          Positioned(
             top: 0,
-            left: 10,
-            right: 10,
-            child: SafeArea(
-              child: SampleAppBar(),
+            left: 0,
+            right: 0,
+            child: SampleAppBar(
+              scrollController: scrollController,
             ),
           ),
         ],
