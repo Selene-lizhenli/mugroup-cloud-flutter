@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flant/flant.dart';
@@ -452,14 +453,26 @@ class SupplyQuoteCard extends HookConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  quote.supplier?.shortName ?? "未知工厂",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: slate800),
+                GestureDetector(
+                  onTap: () {
+                    if (context.mounted) {
+                      final supplierId = quote.supplier?.id;
+                      if (supplierId == null) return;
+                      context.router
+                          .push(SupplySupplierDetailRoute(id: supplierId));
+
+                      return;
+                    }
+                  },
+                  child: Text(
+                    quote.supplier?.shortName ?? "未知工厂",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: slate800),
+                  ),
                 ),
                 const SizedBox(height: 2),
                 // 地址
