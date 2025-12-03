@@ -43,3 +43,14 @@ Future<Supplier?> getSupplier(int id) async {
     },
   );
 }
+
+Future<Supplier?> storeShowroomSupplier(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/suppliers", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Supplier.fromJson(res.data);
+    },
+  );
+}

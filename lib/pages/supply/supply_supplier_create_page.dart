@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/supply/widgets/supply_supplier_form.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,7 +15,7 @@ class SupplySupplierCreatePage extends HookConsumerWidget {
       body: SupplySupplierForm(
         initial: null,
         onSubmit: (data) async {
-          //TODO
+          await storeShowroomSupplier(data);
           EasyLoading.showSuccess("创建成功");
           if (context.mounted) {
             Navigator.of(context).pop();
