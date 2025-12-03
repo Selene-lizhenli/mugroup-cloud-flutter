@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TextArea extends HookConsumerWidget {
-  final String name;
   final String label;
   final int maxLines;
   final String? hintText;
@@ -13,7 +11,6 @@ class TextArea extends HookConsumerWidget {
 
   const TextArea({
     super.key,
-    required this.name,
     required this.label,
     this.maxLines = 5,
     this.hintText,
@@ -43,8 +40,7 @@ class TextArea extends HookConsumerWidget {
           ),
           const SizedBox(height: 8),
         ],
-        FormBuilderTextField(
-          name: name,
+        TextFormField(
           initialValue: value,
           maxLines: maxLines,
           keyboardType: TextInputType.multiline,

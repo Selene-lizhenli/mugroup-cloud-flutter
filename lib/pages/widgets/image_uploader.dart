@@ -9,7 +9,6 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class ImageUploader extends HookConsumerWidget {
-  final String name;
   final String? label;
   final int? maxCount;
   final List<TemporaryMedia>? value;
@@ -17,7 +16,6 @@ class ImageUploader extends HookConsumerWidget {
 
   const ImageUploader({
     super.key,
-    required this.name,
     this.label,
     this.maxCount,
     this.value,

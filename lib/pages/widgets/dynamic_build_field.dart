@@ -116,7 +116,6 @@ class DynamicBuildField extends StatelessWidget {
         },
         builder: (field) {
           return DatePickerInput(
-            name: s.name,
             label: s.title,
             value: field.value,
             onChanged: (date) {
@@ -157,7 +156,6 @@ class DynamicBuildField extends StatelessWidget {
           }
 
           return ImageUploader(
-            name: s.name,
             label: s.title,
             value: displayValue,
             onChanged: (newValue) {
@@ -196,7 +194,6 @@ class DynamicBuildField extends StatelessWidget {
         },
         builder: (field) {
           return TextArea(
-            name: schema.name,
             label: schema.title,
             value: field.value,
             onChanged: (value) {
