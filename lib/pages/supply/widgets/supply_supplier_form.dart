@@ -225,14 +225,17 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: FormBuilderField<bool>(
+                          child: FormBuilderField<String>(
                             name: "is_corporate",
-                            initialValue: initial?.isCorporate ?? false,
+                            initialValue: initial?.isCorporate ?? '0',
                             builder: (field) {
+                              final boolValue = field.value == '1';
                               return CheckboxInput(
                                 label: "是否已合作",
-                                value: field.value ?? false,
-                                onChanged: field.didChange,
+                                value: boolValue,
+                                onChanged: (checked) {
+                                  field.didChange(checked ? '1' : '0');
+                                },
                               );
                             },
                           ),
