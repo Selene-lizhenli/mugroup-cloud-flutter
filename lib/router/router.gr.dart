@@ -32,7 +32,8 @@ import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_
     as _i14;
 import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i15;
 import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i16;
-import 'package:cloud/pages/showroom/showroom_sample_detail_page.dart' as _i17;
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
+    as _i17;
 import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i18;
 import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i19;
 import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'

@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -370,37 +371,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
             ),
           ),
           // Sample AppBar
-          Positioned(
+          const Positioned(
             top: 0,
             left: 10,
             right: 10,
             child: SafeArea(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (Navigator.canPop(context))
-                    Material(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(4),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
+              child: SampleAppBar(),
             ),
           ),
         ],
