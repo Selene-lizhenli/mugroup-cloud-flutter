@@ -44,20 +44,23 @@ android {
         versionName = flutterVersionName
     }
 
-    signingConfigs {
-        debug {
-            storeFile file(STORE_FILE)
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-        }
-        release {
-            storeFile file(STORE_FILE)
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-        }
-    }
+    // 先使用证书轮替， 等后续时间长了 改为配置
+    // signingConfigs {
+    //     debug {
+    //         enableV3Signing = true
+    //         storeFile file(STORE_FILE)
+    //         storePassword STORE_PASSWORD
+    //         keyAlias KEY_ALIAS
+    //         keyPassword KEY_PASSWORD
+    //     }
+    //     release {
+    //         enableV3Signing = true
+    //         storeFile file(STORE_FILE)
+    //         storePassword STORE_PASSWORD
+    //         keyAlias KEY_ALIAS
+    //         keyPassword KEY_PASSWORD
+    //     }
+    // }
 
     buildTypes {
         release {
