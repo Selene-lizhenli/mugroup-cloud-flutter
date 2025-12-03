@@ -1,5 +1,7 @@
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/widgets/check_box_input.dart';
+import 'package:cloud/pages/widgets/date_picker_input.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
@@ -30,6 +32,22 @@ class SupplySupplierForm extends HookConsumerWidget {
     final bankAccount = useState(initial?.bankAccount ?? '');
     final businessTitle = useState(initial?.businessTitle ?? "");
     final billType = useState(initial?.billType ?? "");
+    final typeId = useState(initial?.typeId ?? "");
+    final isCore = useState(initial?.isCore ?? false);
+    final isCorporate = useState(initial?.isCorporate ?? false);
+    final supplierType = useState(initial?.supplierType ?? "");
+    final exportMarket = useState(initial?.exportMarket ?? '');
+    final corpCustomer = useState(initial?.corpCustomer ?? '');
+    final corpCompany = useState(initial?.corpCompany ?? "");
+    final corpSkuid = useState(initial?.corpSkuid ?? "");
+    final showroomArea = useState(initial?.showroomArea ?? '');
+    final marketRate = useState(initial?.marketRate ?? '');
+    final landType = useState(initial?.landType ?? '');
+    final factoryArea = useState(initial?.factoryArea ?? "");
+    final employeeCount = useState(initial?.employeeCount ?? '');
+    final annual = useState(initial?.annual ?? '');
+    final advantages = useState(initial?.advantages ?? "");
+    final developedAt = useState(initial?.developedAt ?? '');
     final images = useState<List<TemporaryMedia>?>(null);
 
     return Column(
@@ -160,6 +178,156 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
+                    const Text('供应商分类'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CheckboxInput(
+                              label: '是否核心',
+                              value: isCore.value,
+                              onChanged: (value) {
+                                isCore.value = value;
+                              }),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                            child: CheckboxInput(
+                                label: '是否已合作',
+                                value: isCorporate.value,
+                                onChanged: (value) {
+                                  isCorporate.value = value;
+                                })),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Select(
+                            label: '供应商类型',
+                            value: supplierType.value,
+                            options: [
+                              SelectOption(label: '生产工厂', value: '1'),
+                              SelectOption(label: '工贸一体', value: '2'),
+                              SelectOption(label: '贸易商', value: '3'),
+                            ],
+                            onChanged: (value) {
+                              supplierType.value = value ?? '';
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '主销市场',
+                            value: exportMarket.value,
+                            onChanged: (v) => exportMarket.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Input(
+                            label: '合作客户',
+                            value: corpCustomer.value,
+                            onChanged: (v) => corpCustomer.value = v,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '合作公司',
+                            value: corpCompany.value,
+                            onChanged: (v) => corpCompany.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Input(
+                            label: '合作货号',
+                            value: corpSkuid.value,
+                            onChanged: (v) => corpSkuid.value = v,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '样品间面积',
+                            value: showroomArea.value,
+                            onChanged: (v) => showroomArea.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Input(
+                            label: '市场占比',
+                            value: marketRate.value,
+                            onChanged: (v) => marketRate.value = v,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '土地厂房性质',
+                            value: landType.value,
+                            onChanged: (v) => landType.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Input(
+                            label: '工厂面积',
+                            value: factoryArea.value,
+                            onChanged: (v) => factoryArea.value = v,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '员工人数',
+                            value: employeeCount.value,
+                            onChanged: (v) => employeeCount.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Input(
+                            label: '年产值',
+                            value: annual.value,
+                            onChanged: (v) => annual.value = v,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Input(
+                            label: '工厂优势',
+                            value: advantages.value,
+                            onChanged: (v) => advantages.value = v,
+                          ),
+                        ),
+                      ],
+                    ),
+                    DatePickerInput(
+                      name: 'developed_at',
+                      label: '开发日期',
+                      value: developedAt.value,
+                      onChanged: (date) {
+                        developedAt.value = date ?? '';
+                      },
+                    )
                   ],
                 ),
               ),
