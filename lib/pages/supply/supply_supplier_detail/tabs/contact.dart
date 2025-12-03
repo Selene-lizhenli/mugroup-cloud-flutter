@@ -2,9 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 @RoutePage()
 class SupplySupplierDetailContactPage extends HookConsumerWidget {
@@ -13,6 +13,15 @@ class SupplySupplierDetailContactPage extends HookConsumerWidget {
     super.key,
     @PathParam.inherit('id') required this.id,
   });
+
+  Future<void> makePhoneCall(String phoneNumber) async {
+    if (phoneNumber.isEmpty) return;
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,7 +84,14 @@ class SupplySupplierDetailContactPage extends HookConsumerWidget {
                       ),
                     ),
                     buildIconInfoRow(
-                        Icons.phone_iphone, "移动电话", contact.mobile),
+                      Icons.phone_iphone,
+                      "移动电话",
+                      contact.mobile,
+                      onTap:
+                          (contact.mobile != null && contact.mobile!.isNotEmpty)
+                              ? () => makePhoneCall(contact.mobile!)
+                              : null,
+                    ),
                   ],
                 ),
               );
@@ -121,7 +137,8 @@ Widget buildSectionCard({
   );
 }
 
-Widget buildIconInfoRow(IconData icon, String label, dynamic value) {
+Widget buildIconInfoRow(IconData icon, String label, dynamic value,
+    {VoidCallback? onTap}) {
   String parseListOrString(dynamic value) {
     if (value == null) return "";
     if (value is List) return value.join(", ");
@@ -133,9 +150,7 @@ Widget buildIconInfoRow(IconData icon, String label, dynamic value) {
   if (text.isEmpty) return const SizedBox.shrink();
 
   return InkWell(
-    onTap: () {
-      Clipboard.setData(ClipboardData(text: text));
-    },
+    onTap: onTap,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
