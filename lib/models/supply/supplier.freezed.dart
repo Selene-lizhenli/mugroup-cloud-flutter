@@ -54,7 +54,7 @@ mixin _$Supplier {
   @JsonKey(name: 'type_id')
   String? get typeId => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_corporate')
-  bool? get isCorporate => throw _privateConstructorUsedError;
+  String? get isCorporate => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_type')
   String? get supplierType => throw _privateConstructorUsedError;
   @JsonKey(name: 'corp_customer')
@@ -109,7 +109,7 @@ abstract class $SupplierCopyWith<$Res> {
       @JsonKey(name: 'business_title') String? businessTitle,
       @JsonKey(name: 'bill_type') String? billType,
       @JsonKey(name: 'type_id') String? typeId,
-      @JsonKey(name: 'is_corporate') bool? isCorporate,
+      @JsonKey(name: 'is_corporate') String? isCorporate,
       @JsonKey(name: 'supplier_type') String? supplierType,
       @JsonKey(name: 'corp_customer') String? corpCustomer,
       @JsonKey(name: 'corp_company') String? corpCompany,
@@ -253,7 +253,7 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       isCorporate: freezed == isCorporate
           ? _value.isCorporate
           : isCorporate // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as String?,
       supplierType: freezed == supplierType
           ? _value.supplierType
           : supplierType // ignore: cast_nullable_to_non_nullable
@@ -331,7 +331,7 @@ abstract class _$$SupplierImplCopyWith<$Res>
       @JsonKey(name: 'business_title') String? businessTitle,
       @JsonKey(name: 'bill_type') String? billType,
       @JsonKey(name: 'type_id') String? typeId,
-      @JsonKey(name: 'is_corporate') bool? isCorporate,
+      @JsonKey(name: 'is_corporate') String? isCorporate,
       @JsonKey(name: 'supplier_type') String? supplierType,
       @JsonKey(name: 'corp_customer') String? corpCustomer,
       @JsonKey(name: 'corp_company') String? corpCompany,
@@ -473,7 +473,7 @@ class __$$SupplierImplCopyWithImpl<$Res>
       freezed == isCorporate
           ? _value.isCorporate
           : isCorporate // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as String?,
       freezed == supplierType
           ? _value.supplierType
           : supplierType // ignore: cast_nullable_to_non_nullable
@@ -618,7 +618,7 @@ class _$SupplierImpl implements _Supplier {
   final String? typeId;
   @override
   @JsonKey(name: 'is_corporate')
-  final bool? isCorporate;
+  final String? isCorporate;
   @override
   @JsonKey(name: 'supplier_type')
   final String? supplierType;
@@ -800,7 +800,7 @@ abstract class _Supplier implements Supplier {
       @JsonKey(name: 'business_title') final String? businessTitle,
       @JsonKey(name: 'bill_type') final String? billType,
       @JsonKey(name: 'type_id') final String? typeId,
-      @JsonKey(name: 'is_corporate') final bool? isCorporate,
+      @JsonKey(name: 'is_corporate') final String? isCorporate,
       @JsonKey(name: 'supplier_type') final String? supplierType,
       @JsonKey(name: 'corp_customer') final String? corpCustomer,
       @JsonKey(name: 'corp_company') final String? corpCompany,
@@ -871,7 +871,7 @@ abstract class _Supplier implements Supplier {
   String? get typeId;
   @override
   @JsonKey(name: 'is_corporate')
-  bool? get isCorporate;
+  String? get isCorporate;
   @override
   @JsonKey(name: 'supplier_type')
   String? get supplierType;

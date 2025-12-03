@@ -28,7 +28,7 @@ _$SupplierImpl _$$SupplierImplFromJson(Map<String, dynamic> json) =>
       json['business_title'] as String?,
       json['bill_type'] as String?,
       json['type_id'] as String?,
-      json['is_corporate'] as bool?,
+      json['is_corporate'] as String?,
       json['supplier_type'] as String?,
       json['corp_customer'] as String?,
       json['corp_company'] as String?,
