@@ -4,6 +4,7 @@ import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_submit_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -63,305 +64,328 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          EasyRefresh.builder(
-            onRefresh: () async {
-              final data = await getSample(id);
-              sample.value = data;
-            },
-            scrollController: scrollController,
-            onLoad: () async {
-              final resp = await getSampleSimilars(
-                id: id,
-                queryParameters: {
-                  "page": similarPage.value,
-                },
-              );
+          Column(
+            children: [
+              Expanded(
+                child: EasyRefresh.builder(
+                  onRefresh: () async {
+                    final data = await getSample(id);
+                    sample.value = data;
+                  },
+                  scrollController: scrollController,
+                  onLoad: () async {
+                    final resp = await getSampleSimilars(
+                      id: id,
+                      queryParameters: {
+                        "page": similarPage.value,
+                      },
+                    );
 
-              sampleSimilars.value = [...sampleSimilars.value, ...resp.data];
+                    sampleSimilars.value = [
+                      ...sampleSimilars.value,
+                      ...resp.data
+                    ];
 
-              if (similarPage.value >= resp.meta!.pagination!.totalPages) {
-                return IndicatorResult.noMore;
-              }
+                    if (similarPage.value >=
+                        resp.meta!.pagination!.totalPages) {
+                      return IndicatorResult.noMore;
+                    }
 
-              similarPage.value = similarPage.value + 1;
+                    similarPage.value = similarPage.value + 1;
 
-              return IndicatorResult.success;
-            },
-            childBuilder: (context, physics) {
-              return CustomScrollView(
-                physics: physics,
-                controller: scrollController,
-                slivers: [
-                  // 图片轮播区域
-                  SliverToBoxAdapter(
-                    child: (sample.value?.image != null &&
-                            sample.value!.image!.isNotEmpty)
-                        ? Stack(
-                            children: [
-                              CarouselSlider(
-                                items: sample.value!.image!.indexed.map((item) {
-                                  final index = item.$1;
-                                  final media = item.$2;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      showFlanImagePreview(
-                                        context,
-                                        images: sample.value!.image!
-                                            .map((item) => item.url!)
-                                            .toList(),
-                                        startPosition: index,
-                                        loop: false,
-                                      );
-                                    },
-                                    child: LayoutBuilder(
-                                      builder: (context, constraints) {
-                                        double containerWidth =
-                                            constraints.maxWidth;
-                                        return ClipRRect(
-                                          child: Image.network(
-                                            media.url!,
-                                            fit: BoxFit.contain,
-                                            width: containerWidth,
+                    return IndicatorResult.success;
+                  },
+                  childBuilder: (context, physics) {
+                    return CustomScrollView(
+                      physics: physics,
+                      controller: scrollController,
+                      slivers: [
+                        // 图片轮播区域
+                        SliverToBoxAdapter(
+                          child: (sample.value?.image != null &&
+                                  sample.value!.image!.isNotEmpty)
+                              ? Stack(
+                                  children: [
+                                    CarouselSlider(
+                                      items: sample.value!.image!.indexed
+                                          .map((item) {
+                                        final index = item.$1;
+                                        final media = item.$2;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            showFlanImagePreview(
+                                              context,
+                                              images: sample.value!.image!
+                                                  .map((item) => item.url!)
+                                                  .toList(),
+                                              startPosition: index,
+                                              loop: false,
+                                            );
+                                          },
+                                          child: LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              double containerWidth =
+                                                  constraints.maxWidth;
+                                              return ClipRRect(
+                                                child: Image.network(
+                                                  media.url!,
+                                                  fit: BoxFit.contain,
+                                                  width: containerWidth,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         );
-                                      },
+                                      }).toList(),
+                                      options: CarouselOptions(
+                                        viewportFraction: 1.0,
+                                        aspectRatio: 1,
+                                        enableInfiniteScroll: false,
+                                        onPageChanged: (index, reason) {
+                                          currentIndex.value = index;
+                                        },
+                                        scrollPhysics:
+                                            const BouncingScrollPhysics(),
+                                      ),
                                     ),
-                                  );
-                                }).toList(),
-                                options: CarouselOptions(
-                                  viewportFraction: 1.0,
-                                  aspectRatio: 1,
-                                  enableInfiniteScroll: false,
-                                  onPageChanged: (index, reason) {
-                                    currentIndex.value = index;
-                                  },
-                                  scrollPhysics: const BouncingScrollPhysics(),
+                                    Positioned(
+                                      bottom: 8.0,
+                                      right: 8.0,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 4.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black45,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: Text(
+                                          '${currentIndex.value + 1} / ${sample.value!.image!.length}',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Image.asset(
+                                  'assets/noImage.png',
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
                                 ),
-                              ),
-                              Positioned(
-                                bottom: 8.0,
-                                right: 8.0,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 4.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(8.0),
+                        ),
+
+                        MultiSliver(
+                          children: [
+                            // 产品编号和价格信息
+                            Container(
+                              color: Colors.white,
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 4),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.secondary,
+                                    ),
                                   ),
-                                  child: Text(
-                                    '${currentIndex.value + 1} / ${sample.value!.image!.length}',
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '产品编号: ${sample.value!.productNo}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // 产品名称区域
+                            Container(
+                              color: Colors.white,
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 6),
+                              child: Text(
+                                sample.value!.nameCn ?? '',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(height: 12), // 添加间隔
+                            // 其他信息区域
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 16.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '规格: ${sample.value!.spec}',
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
                                     ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Image.asset(
-                            'assets/noImage.png',
-                            width: double.infinity,
-                            fit: BoxFit.contain,
-                          ),
-                  ),
-
-                  MultiSliver(
-                    children: [
-                      // 产品编号和价格信息
-                      Container(
-                        color: Colors.white,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.secondary,
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '分类: ${sample.value!.category?.name ?? '未知'}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '条形码: ${sample.value!.barcode ?? '未知'}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 12)),
+                            // 工厂报价
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '产品编号: ${sample.value!.productNo}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                              color: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 标题
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(
+                                      '工厂报价',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // 瀑布流
+                                  MasonryGridView.count(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 5,
+                                    crossAxisSpacing: 5,
+                                    itemCount:
+                                        sample.value?.supplyQuotes?.length ?? 0,
+                                    padding: const EdgeInsets.all(4),
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      final quote =
+                                          sample.value?.supplyQuotes?[index];
+                                      if (quote == null) {
+                                        return const SizedBox.shrink();
+                                      }
 
-                      // 产品名称区域
-                      Container(
-                        color: Colors.white,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 6),
-                        child: Text(
-                          sample.value!.nameCn ?? '',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 12), // 添加间隔
-                      // 其他信息区域
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 16.0),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '规格: ${sample.value!.spec}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                      return SupplyQuoteCard(quote: quote);
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              '分类: ${sample.value!.category?.name ?? '未知'}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '条形码: ${sample.value!.barcode ?? '未知'}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                      // 工厂报价
-                      Container(
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 标题
-                            const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                              child: Text(
-                                '工厂报价',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            // 瀑布流
-                            MasonryGridView.count(
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 5,
-                              crossAxisSpacing: 5,
-                              itemCount:
-                                  sample.value?.supplyQuotes?.length ?? 0,
-                              padding: const EdgeInsets.all(4),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                final quote =
-                                    sample.value?.supplyQuotes?[index];
-                                if (quote == null) {
-                                  return const SizedBox.shrink();
-                                }
 
-                                return SupplyQuoteCard(quote: quote);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // 相似产品
-                      Container(
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 标题
-                            const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                              child: Text(
-                                '为你推荐',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
+                            // 相似产品
+                            Container(
+                              color: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 标题
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(
+                                      '为你推荐',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // 瀑布流
+                                  MasonryGridView.count(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 5,
+                                    crossAxisSpacing: 5,
+                                    itemCount: sampleSimilars.value.length,
+                                    padding: const EdgeInsets.all(4),
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      final sample =
+                                          sampleSimilars.value[index];
+                                      return ProductCard(sample: sample);
+                                    },
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            // 瀑布流
-                            MasonryGridView.count(
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 5,
-                              crossAxisSpacing: 5,
-                              itemCount: sampleSimilars.value.length,
-                              padding: const EdgeInsets.all(4),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                final sample = sampleSimilars.value[index];
-                                return ProductCard(sample: sample);
-                              },
-                            ),
+                            )
                           ],
                         ),
-                      )
-                    ],
-                  ),
-                ],
-              );
-            },
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+              // Sample SubmitBar
+              const SampleSubmitBar(),
+            ],
           ),
           // Sample AppBar
           Positioned(
