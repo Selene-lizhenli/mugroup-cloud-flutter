@@ -2,6 +2,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/models/supply/supplier_type.dart';
 
 Future<ApiResponse<List<Quote>>> getSupplyQuotes(
     {Map<String, dynamic>? queryParameters}) async {
@@ -54,3 +55,19 @@ Future<Supplier?> storeShowroomSupplier(Map<String, dynamic>? data) async {
     },
   );
 }
+
+
+Future<List<SupplierType>?> getAllSupplySupplierTypes() async {
+  final res = await api.get(
+    "api/tenant/supply/supplier/types",
+    queryParameters: {'all': '0'},
+  );
+
+  if (res.data is List) {
+    return (res.data as List)
+        .map((e) => SupplierType.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+  return null;
+}
+

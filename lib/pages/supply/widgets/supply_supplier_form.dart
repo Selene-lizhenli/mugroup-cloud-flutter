@@ -9,6 +9,7 @@ import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/multi_select.dart';
 import 'package:cloud/pages/widgets/select.dart';
+import 'package:cloud/pages/widgets/supplier_type_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -234,7 +235,17 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    const Text("供应商分类"),
+                    FormBuilderField<dynamic>(
+                      name: "type_id",
+                      builder: (field) {
+                        return SupplierTypeSelect(
+                            label: '供应商分类',
+                            value: field.value.toString(),
+                            onChanged: (value) {
+                              field.didChange(value);
+                            });
+                      },
+                    ),
                     Row(
                       children: [
                         Expanded(
