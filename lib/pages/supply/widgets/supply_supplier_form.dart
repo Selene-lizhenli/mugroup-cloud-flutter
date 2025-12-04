@@ -34,6 +34,7 @@ class SupplySupplierForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
+                initialValue: initial?.toJson() ?? {},
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -52,7 +53,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "supplier_no",
-                            initialValue: initial?.supplierNo,
                             builder: (field) {
                               return Input(
                                 label: '厂商编号',
@@ -66,7 +66,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "usci_code",
-                            initialValue: initial?.usciCode,
                             builder: (field) {
                               return Input(
                                 label: '税号代码',
@@ -83,7 +82,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "short_name",
-                            initialValue: initial?.shortName,
                             builder: (field) {
                               return Input(
                                 label: '厂商简称',
@@ -97,7 +95,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "name",
-                            initialValue: initial?.name,
                             builder: (field) {
                               return Input(
                                 label: '厂商名称',
@@ -118,7 +115,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                     ),
                     FormBuilderField<String>(
                       name: "address",
-                      initialValue: initial?.address,
                       builder: (field) {
                         return Input(
                           label: '厂商地址',
@@ -129,7 +125,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                     ),
                     FormBuilderField<String>(
                       name: "business_scope",
-                      initialValue: initial?.businessScope,
                       builder: (field) {
                         return TextArea(
                           label: '营业范围',
@@ -143,7 +138,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "bank_name",
-                            initialValue: initial?.bankName,
                             builder: (field) {
                               return Input(
                                 label: '开户银行',
@@ -157,7 +151,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "bank_account",
-                            initialValue: initial?.bankAccount,
                             builder: (field) {
                               return Input(
                                 label: '银行账号',
@@ -174,7 +167,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "business_title",
-                            initialValue: initial?.businessTitle,
                             builder: (field) {
                               return Input(
                                 label: '收款单位',
@@ -188,7 +180,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "bill_type",
-                            initialValue: initial?.billType,
                             builder: (field) {
                               return Select(
                                 label: '发票类型',
@@ -213,7 +204,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<bool>(
                             name: "is_core",
-                            initialValue: initial?.isCore ?? false,
                             builder: (field) {
                               return CheckboxInput(
                                 label: "是否核心",
@@ -227,7 +217,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "is_corporate",
-                            initialValue: initial?.isCorporate ?? '0',
                             builder: (field) {
                               final boolValue = field.value == '1';
                               return CheckboxInput(
@@ -247,15 +236,14 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "supplier_type",
-                            initialValue: initial?.supplierType,
                             builder: (field) {
                               return Select(
                                 label: '供应商类型',
                                 value: field.value,
                                 options: [
-                                  SelectOption(label: '生产工厂', value: '1'),
-                                  SelectOption(label: '工贸一体', value: '2'),
-                                  SelectOption(label: '贸易商', value: '3'),
+                                  SelectOption(label: '生产工厂', value: '生产工厂'),
+                                  SelectOption(label: '工贸一体', value: '工贸一体'),
+                                  SelectOption(label: '贸易商', value: '贸易商'),
                                 ],
                                 onChanged: field.didChange,
                               );
@@ -266,7 +254,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "export_market",
-                            initialValue: initial?.exportMarket,
                             builder: (field) {
                               return Input(
                                 label: '主销市场',
@@ -283,7 +270,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "corp_customer",
-                            initialValue: initial?.corpCustomer,
                             builder: (field) {
                               return Input(
                                 label: '合作客户',
@@ -297,7 +283,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "corp_company",
-                            initialValue: initial?.corpCompany,
                             builder: (field) {
                               return Input(
                                 label: '合作公司',
@@ -314,7 +299,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "corp_skuid",
-                            initialValue: initial?.corpSkuid,
                             builder: (field) {
                               return Input(
                                 label: '合作货号',
@@ -328,7 +312,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "showroom_area",
-                            initialValue: initial?.showroomArea,
                             builder: (field) {
                               return Input(
                                 label: '样品间面积',
@@ -345,7 +328,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "market_rate",
-                            initialValue: initial?.marketRate,
                             builder: (field) {
                               return Input(
                                 label: '市场占比',
@@ -359,7 +341,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "land_type",
-                            initialValue: initial?.landType,
                             builder: (field) {
                               return Input(
                                 label: '土地厂房性质',
@@ -376,7 +357,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "factory_area",
-                            initialValue: initial?.factoryArea,
                             builder: (field) {
                               return Input(
                                 label: '工厂面积',
@@ -390,7 +370,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "employee_count",
-                            initialValue: initial?.employeeCount,
                             builder: (field) {
                               return Input(
                                 label: '员工人数',
@@ -407,7 +386,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                         Expanded(
                           child: FormBuilderField<String>(
                             name: "annual",
-                            initialValue: initial?.annual,
                             builder: (field) {
                               return Input(
                                 label: '年产值',
@@ -419,15 +397,10 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: FormBuilderField<String>(
+                          child: FormBuilderField<List<dynamic>>(
                             name: "advantages",
-                            initialValue: initial?.advantages,
                             builder: (field) {
-                              return Input(
-                                label: '工厂优势',
-                                value: field.value ?? '',
-                                onChanged: field.didChange,
-                              );
+                              return const Text('工厂优势');
                             },
                           ),
                         ),
@@ -435,11 +408,20 @@ class SupplySupplierForm extends HookConsumerWidget {
                     ),
                     FormBuilderField<String>(
                       name: "developed_at",
-                      initialValue: initial?.developedAt,
                       builder: (field) {
+                        DateTime? date;
+                        if (field.value != null && field.value!.isNotEmpty) {
+                          date = DateTime.tryParse(field.value!);
+                        }
+
+                        String? formattedDate;
+                        if (date != null) {
+                          formattedDate =
+                              '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                        }
                         return DatePickerInput(
                           label: '开发日期',
-                          value: field.value,
+                          value: formattedDate,
                           onChanged: field.didChange,
                         );
                       },

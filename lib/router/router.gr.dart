@@ -809,6 +809,7 @@ class SupplySupplierEditRoute
             key: key,
             id: id,
           ),
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -817,7 +818,10 @@ class SupplySupplierEditRoute
   static _i28.PageInfo page = _i28.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<SupplySupplierEditRouteArgs>();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<SupplySupplierEditRouteArgs>(
+          orElse: () =>
+              SupplySupplierEditRouteArgs(id: pathParams.getInt('id')));
       return _i24.SupplySupplierEditPage(
         key: args.key,
         id: args.id,

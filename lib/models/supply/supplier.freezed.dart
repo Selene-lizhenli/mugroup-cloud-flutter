@@ -26,7 +26,7 @@ mixin _$Supplier {
   String? get province => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
   String? get annual => throw _privateConstructorUsedError;
-  String? get advantages => throw _privateConstructorUsedError;
+  List<dynamic>? get advantages => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_no')
   String? get supplierNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'usci_code')
@@ -52,7 +52,7 @@ mixin _$Supplier {
   @JsonKey(name: 'bill_type')
   String? get billType => throw _privateConstructorUsedError;
   @JsonKey(name: 'type_id')
-  String? get typeId => throw _privateConstructorUsedError;
+  int? get typeId => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_corporate')
   String? get isCorporate => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_type')
@@ -95,7 +95,7 @@ abstract class $SupplierCopyWith<$Res> {
       String? province,
       String? address,
       String? annual,
-      String? advantages,
+      List<dynamic>? advantages,
       @JsonKey(name: 'supplier_no') String? supplierNo,
       @JsonKey(name: 'usci_code') String? usciCode,
       @JsonKey(name: 'is_core') bool? isCore,
@@ -108,7 +108,7 @@ abstract class $SupplierCopyWith<$Res> {
       @JsonKey(name: 'bank_account') String? bankAccount,
       @JsonKey(name: 'business_title') String? businessTitle,
       @JsonKey(name: 'bill_type') String? billType,
-      @JsonKey(name: 'type_id') String? typeId,
+      @JsonKey(name: 'type_id') int? typeId,
       @JsonKey(name: 'is_corporate') String? isCorporate,
       @JsonKey(name: 'supplier_type') String? supplierType,
       @JsonKey(name: 'corp_customer') String? corpCustomer,
@@ -197,7 +197,7 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       advantages: freezed == advantages
           ? _value.advantages
           : advantages // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as List<dynamic>?,
       supplierNo: freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
@@ -249,7 +249,7 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       typeId: freezed == typeId
           ? _value.typeId
           : typeId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       isCorporate: freezed == isCorporate
           ? _value.isCorporate
           : isCorporate // ignore: cast_nullable_to_non_nullable
@@ -317,7 +317,7 @@ abstract class _$$SupplierImplCopyWith<$Res>
       String? province,
       String? address,
       String? annual,
-      String? advantages,
+      List<dynamic>? advantages,
       @JsonKey(name: 'supplier_no') String? supplierNo,
       @JsonKey(name: 'usci_code') String? usciCode,
       @JsonKey(name: 'is_core') bool? isCore,
@@ -330,7 +330,7 @@ abstract class _$$SupplierImplCopyWith<$Res>
       @JsonKey(name: 'bank_account') String? bankAccount,
       @JsonKey(name: 'business_title') String? businessTitle,
       @JsonKey(name: 'bill_type') String? billType,
-      @JsonKey(name: 'type_id') String? typeId,
+      @JsonKey(name: 'type_id') int? typeId,
       @JsonKey(name: 'is_corporate') String? isCorporate,
       @JsonKey(name: 'supplier_type') String? supplierType,
       @JsonKey(name: 'corp_customer') String? corpCustomer,
@@ -415,9 +415,9 @@ class __$$SupplierImplCopyWithImpl<$Res>
           : annual // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == advantages
-          ? _value.advantages
+          ? _value._advantages
           : advantages // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as List<dynamic>?,
       freezed == supplierNo
           ? _value.supplierNo
           : supplierNo // ignore: cast_nullable_to_non_nullable
@@ -469,7 +469,7 @@ class __$$SupplierImplCopyWithImpl<$Res>
       freezed == typeId
           ? _value.typeId
           : typeId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       freezed == isCorporate
           ? _value.isCorporate
           : isCorporate // ignore: cast_nullable_to_non_nullable
@@ -532,7 +532,7 @@ class _$SupplierImpl implements _Supplier {
       this.province,
       this.address,
       this.annual,
-      this.advantages,
+      final List<dynamic>? advantages,
       @JsonKey(name: 'supplier_no') this.supplierNo,
       @JsonKey(name: 'usci_code') this.usciCode,
       @JsonKey(name: 'is_core') this.isCore,
@@ -558,7 +558,8 @@ class _$SupplierImpl implements _Supplier {
       @JsonKey(name: 'employee_count') this.employeeCount,
       @JsonKey(name: 'developed_at') this.developedAt,
       final List<Contact>? contacts)
-      : _contacts = contacts;
+      : _advantages = advantages,
+        _contacts = contacts;
 
   factory _$SupplierImpl.fromJson(Map<String, dynamic> json) =>
       _$$SupplierImplFromJson(json);
@@ -575,8 +576,16 @@ class _$SupplierImpl implements _Supplier {
   final String? address;
   @override
   final String? annual;
+  final List<dynamic>? _advantages;
   @override
-  final String? advantages;
+  List<dynamic>? get advantages {
+    final value = _advantages;
+    if (value == null) return null;
+    if (_advantages is EqualUnmodifiableListView) return _advantages;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'supplier_no')
   final String? supplierNo;
@@ -615,7 +624,7 @@ class _$SupplierImpl implements _Supplier {
   final String? billType;
   @override
   @JsonKey(name: 'type_id')
-  final String? typeId;
+  final int? typeId;
   @override
   @JsonKey(name: 'is_corporate')
   final String? isCorporate;
@@ -676,8 +685,8 @@ class _$SupplierImpl implements _Supplier {
                 other.province == province) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.annual, annual) || other.annual == annual) &&
-            (identical(other.advantages, advantages) ||
-                other.advantages == advantages) &&
+            const DeepCollectionEquality()
+                .equals(other._advantages, _advantages) &&
             (identical(other.supplierNo, supplierNo) ||
                 other.supplierNo == supplierNo) &&
             (identical(other.usciCode, usciCode) ||
@@ -736,7 +745,7 @@ class _$SupplierImpl implements _Supplier {
         province,
         address,
         annual,
-        advantages,
+        const DeepCollectionEquality().hash(_advantages),
         supplierNo,
         usciCode,
         isCore,
@@ -786,7 +795,7 @@ abstract class _Supplier implements Supplier {
       final String? province,
       final String? address,
       final String? annual,
-      final String? advantages,
+      final List<dynamic>? advantages,
       @JsonKey(name: 'supplier_no') final String? supplierNo,
       @JsonKey(name: 'usci_code') final String? usciCode,
       @JsonKey(name: 'is_core') final bool? isCore,
@@ -799,7 +808,7 @@ abstract class _Supplier implements Supplier {
       @JsonKey(name: 'bank_account') final String? bankAccount,
       @JsonKey(name: 'business_title') final String? businessTitle,
       @JsonKey(name: 'bill_type') final String? billType,
-      @JsonKey(name: 'type_id') final String? typeId,
+      @JsonKey(name: 'type_id') final int? typeId,
       @JsonKey(name: 'is_corporate') final String? isCorporate,
       @JsonKey(name: 'supplier_type') final String? supplierType,
       @JsonKey(name: 'corp_customer') final String? corpCustomer,
@@ -829,7 +838,7 @@ abstract class _Supplier implements Supplier {
   @override
   String? get annual;
   @override
-  String? get advantages;
+  List<dynamic>? get advantages;
   @override
   @JsonKey(name: 'supplier_no')
   String? get supplierNo;
@@ -868,7 +877,7 @@ abstract class _Supplier implements Supplier {
   String? get billType;
   @override
   @JsonKey(name: 'type_id')
-  String? get typeId;
+  int? get typeId;
   @override
   @JsonKey(name: 'is_corporate')
   String? get isCorporate;
