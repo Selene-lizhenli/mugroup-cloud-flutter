@@ -4,6 +4,7 @@ import 'package:cloud/pages/widgets/check_box_input.dart';
 import 'package:cloud/pages/widgets/date_picker_input.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/multi_select.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:flutter/material.dart';
@@ -381,30 +382,36 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FormBuilderField<String>(
-                            name: "annual",
-                            builder: (field) {
-                              return Input(
-                                label: '年产值',
-                                value: field.value ?? '',
-                                onChanged: field.didChange,
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: FormBuilderField<List<dynamic>>(
-                            name: "advantages",
-                            builder: (field) {
-                              return const Text('工厂优势');
-                            },
-                          ),
-                        ),
-                      ],
+                    FormBuilderField<String>(
+                      name: "annual",
+                      builder: (field) {
+                        return Input(
+                          label: '年产值',
+                          value: field.value ?? '',
+                          onChanged: field.didChange,
+                        );
+                      },
+                    ),
+                    FormBuilderField<List<dynamic>>(
+                      name: "advantages",
+                      builder: (field) {
+                        return MultiSelect(
+                          label: "工厂优势",
+                          value: field.value ?? [],
+                          options: [
+                            SelectOption(label: '价格', value: '价格'),
+                            SelectOption(label: '各类认证齐全', value: '各类认证齐全'),
+                            SelectOption(label: '配合服务好', value: '配合服务好'),
+                            SelectOption(label: '工厂开发能力强', value: '工厂开发能力强'),
+                            SelectOption(label: '资金稳定', value: '资金稳定'),
+                            SelectOption(label: '地方政府关系好', value: '地方政府关系好'),
+                            SelectOption(
+                                label: '产品有专利不可代替', value: '产品有专利不可代替'),
+                            SelectOption(label: '契约精神强', value: '契约精神强'),
+                          ],
+                          onChanged: (val) => field.didChange(val),
+                        );
+                      },
                     ),
                     FormBuilderField<String>(
                       name: "developed_at",
