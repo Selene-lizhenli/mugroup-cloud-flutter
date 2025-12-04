@@ -1,7 +1,10 @@
+import 'package:city_pickers/city_pickers.dart';
+import 'package:cloud/constants/province_code.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/widgets/check_box_input.dart';
 import 'package:cloud/pages/widgets/date_picker_input.dart';
+import 'package:cloud/pages/widgets/dynamic_city_pickers.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/multi_select.dart';
@@ -26,6 +29,8 @@ class SupplySupplierForm extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+
+    final province = useState<String?>(null);
 
     return Column(
       children: [
@@ -107,11 +112,41 @@ class SupplySupplierForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       children: [
-                        Expanded(child: Text('省份')),
-                        SizedBox(width: 16),
-                        Expanded(child: Text('城市')),
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "province",
+                            builder: (field) {
+                              return DynamicCityPickers(
+                                label: '省份',
+                                showType: ShowType.p,
+                                value: field.value ?? '',
+                                onChanged: (value) {
+                                  field.didChange(value?.provinceName);
+                                  province.value = value?.provinceName;
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: FormBuilderField<String>(
+                            name: "city",
+                            builder: (field) {
+                              return DynamicCityPickers(
+                                label: '城市',
+                                showType: ShowType.c,
+                                locationCode: getProvinceCode(province.value),
+                                value: field.value ?? '',
+                                onChanged: (value) {
+                                  field.didChange(value?.cityName);
+                                },
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
                     FormBuilderField<String>(
