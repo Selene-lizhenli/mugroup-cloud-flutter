@@ -56,6 +56,17 @@ Future<Supplier?> storeShowroomSupplier(Map<String, dynamic>? data) async {
   );
 }
 
+Future<Supplier?> updateShowroomSupplier(int id, Map<String, dynamic>? data) async {
+  return api.put("api/tenant/supply/suppliers/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Supplier.fromJson(res.data);
+    },
+  );
+}
+
 
 Future<List<SupplierType>?> getAllSupplySupplierTypes() async {
   final res = await api.get(

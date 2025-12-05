@@ -42,7 +42,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
       body: SupplySupplierForm(
         initial: supplier.value,
         onSubmit: (data) async {
-          //TODO 供应商编辑接口
+          await updateShowroomSupplier(id, data);
           EasyLoading.showSuccess("编辑成功");
           if (context.mounted) {
             Navigator.of(context).pop();
