@@ -46,7 +46,7 @@ Future<Supplier?> getSupplier(int id) async {
   );
 }
 
-Future<Supplier?> storeShowroomSupplier(Map<String, dynamic>? data) async {
+Future<Supplier?> storeSupplySupplier(Map<String, dynamic>? data) async {
   return api.post("api/tenant/supply/suppliers", data: data).then(
     (res) {
       if (res.data == null) {
@@ -57,7 +57,7 @@ Future<Supplier?> storeShowroomSupplier(Map<String, dynamic>? data) async {
   );
 }
 
-Future<Supplier?> updateShowroomSupplier(int id, Map<String, dynamic>? data) async {
+Future<Supplier?> updateSupplySupplier(int id, Map<String, dynamic>? data) async {
   return api.put("api/tenant/supply/suppliers/$id", data: data).then(
     (res) {
       if (res.data == null) {

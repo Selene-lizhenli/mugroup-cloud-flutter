@@ -79,7 +79,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
                 SupplySupplierForm(
                   initial: supplier.value,
                   onSubmit: (data) async {
-                    await updateShowroomSupplier(id, data);
+                    await updateSupplySupplier(id, data);
                     EasyLoading.showSuccess("编辑成功");
                   },
                 ),
