@@ -50,7 +50,7 @@ class SupplyView extends HookConsumerWidget {
       };
       final resp = await getSupplySuppliers(queryParameters: queryParameters);
 
-      if (init == true) {
+      if (init == true || page.value == 1) {
         suppliers.value = resp.data;
       } else {
         suppliers.value = [...suppliers.value, ...resp.data];

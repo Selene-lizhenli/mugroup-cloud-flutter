@@ -52,7 +52,7 @@ class ProductView extends HookConsumerWidget {
       };
       final resp = await getSamples(queryParameters: queryParameters);
 
-      if (init == true) {
+      if (init == true || page.value == 1) {
         samples.value = resp.data;
       } else {
         samples.value = [...samples.value, ...resp.data];
@@ -119,7 +119,6 @@ class ProductView extends HookConsumerWidget {
         refreshController.resetFooter();
       },
       onLoad: () async {
-        logger.d('onLoad');
         final resp = await fetchData(search.value, searchMedia: media.value);
 
         refreshController.finishLoad(resp.data.length >= pageSize
