@@ -129,7 +129,6 @@ class SupplyView extends HookConsumerWidget {
         crossAxisSpacing: 5,
         itemCount: suppliers.value.length,
         padding: const EdgeInsets.all(5),
-        shrinkWrap: true,
         itemBuilder: (context, index) {
           final supplier = suppliers.value[index];
 

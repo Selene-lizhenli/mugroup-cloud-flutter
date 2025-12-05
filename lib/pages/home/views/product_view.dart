@@ -146,7 +146,7 @@ class ProductView extends HookConsumerWidget {
             crossAxisSpacing: 5,
             itemCount: samples.value.length,
             padding: const EdgeInsets.all(5),
-            shrinkWrap: true,
+            shrinkWrap: false,
             itemBuilder: (context, index) {
               final sample = samples.value[index];
               final cartItem = cartState.items.firstWhereOrNull(
