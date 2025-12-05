@@ -51,6 +51,7 @@
 	<array>
 		<string>wxwork</string>
 		<string>wxworklocal</string>
+		<string>tel</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
