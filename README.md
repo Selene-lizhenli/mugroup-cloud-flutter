@@ -19,3 +19,9 @@ dart run build_runner build --delete-conflicting-outputs
 ```sh
 dart run melos prepare:cloud
 ```
+
+## ios
+
+```
+fastforge release --name appstore
+```
