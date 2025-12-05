@@ -65,6 +65,9 @@ class AppRouter extends RootStackRouter {
           page: SupplySupplierContactEditRoute.page,
           path: "/supply/supplier/contact/edit/:id"),
       AutoRoute(
+          page: SupplySupplierCertCreateRoute.page,
+          path: "/supply/supplier/cert/create/:supplierId"),
+      AutoRoute(
         page: SupplySupplierDetailRoute.page,
         guards: [AuthGuard()],
         path: '/supply/supplier/detail/:id',
