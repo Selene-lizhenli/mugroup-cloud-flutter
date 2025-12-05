@@ -1,5 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
+import 'package:cloud/models/supply/contact.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/models/supply/supplier_type.dart';
@@ -82,3 +83,52 @@ Future<List<SupplierType>?> getAllSupplySupplierTypes() async {
   return null;
 }
 
+Future<ApiResponse<List<Contact>>?> getSupplySupplierContacts(int id) async {
+  return api
+      .get(
+        "api/tenant/supply/suppliers/$id/contacts",
+      )
+      .then(
+        (res) => ApiResponse<List<Contact>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(Contact.fromJson).toList();
+          },
+        ),
+      );
+}
+
+Future<Contact?> getSupplySupplierContact(int id) async {
+  return api.get("api/tenant/supply/contacts/$id").then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Contact.fromJson(res.data);
+    },
+  );
+}
+
+Future<Contact?> updateSupplySupplierContact(
+    int id, Map<String, dynamic>? data) async {
+  return api.put("api/tenant/supply/contacts/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Contact.fromJson(res.data);
+    },
+  );
+}
+
+Future<Contact?> storeSupplySupplierContact(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/contacts", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Contact.fromJson(res.data);
+    },
+  );
+}

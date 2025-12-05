@@ -10,8 +10,7 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes {
     return [
-      // RedirectRoute(
-      //     path: '/', redirectTo: '/supply/supplier/detail/13611/sample'),
+      RedirectRoute(path: '/', redirectTo: '/supply/supplier/edit/62364'),
       AutoRoute(
         page: Layout.page,
         initial: true,
@@ -59,6 +58,12 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: SupplySupplierEditRoute.page,
           path: "/supply/supplier/edit/:id"),
+      AutoRoute(
+          page: SupplySupplierContactCreateRoute.page,
+          path: "/supply/supplier/contact/create/:supplierId"),
+      AutoRoute(
+          page: SupplySupplierContactEditRoute.page,
+          path: "/supply/supplier/contact/edit/:id"),
       AutoRoute(
         page: SupplySupplierDetailRoute.page,
         guards: [AuthGuard()],

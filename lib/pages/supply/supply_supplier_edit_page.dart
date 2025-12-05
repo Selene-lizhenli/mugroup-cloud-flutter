@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_page.dart';
 import 'package:cloud/pages/supply/widgets/supply_supplier_form.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
@@ -83,8 +84,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
                   },
                 ),
 
-                /// 联系人模块（例）
-                Text('联系人模块'),
+                SupplySupplierContactPage(supplierId: id),
 
                 /// 证书模块（例）
                 Text('证书模块'),
