@@ -357,19 +357,36 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   // 瀑布流
-                                  MasonryGridView.count(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 5,
-                                    crossAxisSpacing: 5,
-                                    itemCount: sampleSimilars.value.length,
-                                    padding: const EdgeInsets.all(4),
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      final sample =
-                                          sampleSimilars.value[index];
-                                      return ProductCard(sample: sample);
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final availableWidth =
+                                          constraints.maxWidth;
+
+                                      var crossAxisCount = 2;
+
+                                      if (availableWidth > 500) {
+                                        crossAxisCount = 3;
+                                      }
+
+                                      if (availableWidth > 800) {
+                                        crossAxisCount = 4;
+                                      }
+
+                                      return MasonryGridView.count(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        crossAxisCount: crossAxisCount,
+                                        mainAxisSpacing: 5,
+                                        crossAxisSpacing: 5,
+                                        itemCount: sampleSimilars.value.length,
+                                        padding: const EdgeInsets.all(4),
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          final sample =
+                                              sampleSimilars.value[index];
+                                          return ProductCard(sample: sample);
+                                        },
+                                      );
                                     },
                                   ),
                                 ],
@@ -384,7 +401,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               ),
 
               // Sample SubmitBar
-              const SampleSubmitBar(),
+              // const SampleSubmitBar(),
             ],
           ),
           // Sample AppBar
