@@ -20,7 +20,6 @@ class SupplySupplierDetailInfoPage extends HookConsumerWidget {
     // 状态管理
     final supplier = useState<Supplier?>(null);
     final isLoading = useState(true);
-    final colorScheme = Theme.of(context).colorScheme;
 
     Future loadSupplier() async {
       try {
@@ -67,27 +66,6 @@ class SupplySupplierDetailInfoPage extends HookConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        ((supplier.value?.name ?? supplier.value?.shortName) ??
-                                '未')
-                            .trim()
-                            .substring(0, 1), // 获取第一个字符，并确保没有空格
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
