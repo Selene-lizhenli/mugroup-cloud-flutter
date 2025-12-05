@@ -1,5 +1,4 @@
 import 'package:city_pickers/city_pickers.dart';
-import 'package:cloud/constants/province_code.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/widgets/check_box_input.dart';
@@ -31,7 +30,7 @@ class SupplySupplierForm extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
-    final province = useState<String?>(null);
+    final provinceId = useState<String?>(null);
 
     return Column(
       children: [
@@ -125,7 +124,7 @@ class SupplySupplierForm extends HookConsumerWidget {
                                 value: field.value ?? '',
                                 onChanged: (value) {
                                   field.didChange(value?.provinceName);
-                                  province.value = value?.provinceName;
+                                  provinceId.value = value?.provinceId;
                                 },
                               );
                             },
@@ -139,7 +138,7 @@ class SupplySupplierForm extends HookConsumerWidget {
                               return DynamicCityPickers(
                                 label: '城市',
                                 showType: ShowType.c,
-                                locationCode: getProvinceCode(province.value),
+                                locationCode: provinceId.value,
                                 value: field.value ?? '',
                                 onChanged: (value) {
                                   field.didChange(value?.cityName);
