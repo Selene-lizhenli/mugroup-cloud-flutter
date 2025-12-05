@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
@@ -100,86 +101,106 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                       physics: physics,
                       controller: scrollController,
                       slivers: [
-                        // 图片轮播区域
-                        SliverToBoxAdapter(
-                          child: (sample.value?.image != null &&
-                                  sample.value!.image!.isNotEmpty)
-                              ? Stack(
-                                  children: [
-                                    CarouselSlider(
-                                      items: sample.value!.image!.indexed
-                                          .map((item) {
-                                        final index = item.$1;
-                                        final media = item.$2;
-                                        return GestureDetector(
-                                          onTap: () {
-                                            showFlanImagePreview(
-                                              context,
-                                              images: sample.value!.image!
-                                                  .map((item) => item.url!)
-                                                  .toList(),
-                                              startPosition: index,
-                                              loop: false,
-                                            );
-                                          },
-                                          child: LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              double containerWidth =
-                                                  constraints.maxWidth;
-                                              return ClipRRect(
-                                                child: Image.network(
-                                                  media.url!,
-                                                  fit: BoxFit.contain,
-                                                  width: containerWidth,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      }).toList(),
-                                      options: CarouselOptions(
-                                        viewportFraction: 1.0,
-                                        aspectRatio: 1,
-                                        enableInfiniteScroll: false,
-                                        onPageChanged: (index, reason) {
-                                          currentIndex.value = index;
-                                        },
-                                        scrollPhysics:
-                                            const BouncingScrollPhysics(),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 8.0,
-                                      right: 8.0,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0, vertical: 4.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black45,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                        ),
-                                        child: Text(
-                                          '${currentIndex.value + 1} / ${sample.value!.image!.length}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Image.asset(
-                                  'assets/noImage.png',
-                                  width: double.infinity,
-                                  fit: BoxFit.contain,
-                                ),
-                        ),
-
                         MultiSliver(
                           children: [
+                            // 图片轮播区域
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                var pageSize = 1;
+                                final availableWidth = constraints.maxWidth;
+
+                                if (availableWidth > 500) {
+                                  pageSize = 2;
+                                }
+                                if (availableWidth > 800) {
+                                  pageSize = 3;
+                                }
+
+                                return (sample.value?.image != null &&
+                                        sample.value!.image!.isNotEmpty)
+                                    ? Stack(
+                                        children: [
+                                          CarouselSlider(
+                                            items: sample.value!.image!.indexed
+                                                .map((item) {
+                                              final index = item.$1;
+                                              final media = item.$2;
+
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  showFlanImagePreview(
+                                                    context,
+                                                    images: sample.value!.image!
+                                                        .map(
+                                                            (item) => item.url!)
+                                                        .toList(),
+                                                    startPosition: index,
+                                                    loop: false,
+                                                  );
+                                                },
+                                                child: LayoutBuilder(
+                                                  builder:
+                                                      (context, constraints) {
+                                                    double containerWidth =
+                                                        constraints.maxWidth;
+                                                    return ClipRRect(
+                                                      child: Image.network(
+                                                        media.url!,
+                                                        fit: BoxFit.contain,
+                                                        width: containerWidth,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            }).toList(),
+                                            options: CarouselOptions(
+                                              viewportFraction: 1 / pageSize,
+                                              aspectRatio: pageSize / 1,
+                                              enableInfiniteScroll: false,
+                                              pageSnapping:
+                                                  pageSize > 1 ? false : true,
+                                              padEnds: false,
+                                              onPageChanged: (index, reason) {
+                                                logger.d([index, reason]);
+                                                currentIndex.value = index;
+                                              },
+                                              scrollPhysics:
+                                                  const BouncingScrollPhysics(),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: 8.0,
+                                            right: 8.0,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 4.0),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black45,
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                              child: Text(
+                                                '${currentIndex.value + 1}/ ${sample.value!.image!.length < pageSize ? 1 : sample.value!.image!.length - pageSize + 1}',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Image.asset(
+                                        'assets/noImage.png',
+                                        width: double.infinity,
+                                        fit: BoxFit.contain,
+                                      );
+                              },
+                            ),
                             // 产品编号和价格信息
                             Container(
                               color: Colors.white,
