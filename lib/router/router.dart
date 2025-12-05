@@ -5,12 +5,12 @@ import 'router.gr.dart';
 @AutoRouterConfig()
 class AppRouter extends RootStackRouter {
   @override
-  RouteType get defaultRouteType => const RouteType.custom();
+  RouteType get defaultRouteType => const RouteType.cupertino();
 
   @override
   List<AutoRoute> get routes {
     return [
-      RedirectRoute(path: '/', redirectTo: '/supply/supplier/edit/62364'),
+      // RedirectRoute(path: '/', redirectTo: '/supply/supplier/edit/62364'),
       AutoRoute(
         page: Layout.page,
         initial: true,
