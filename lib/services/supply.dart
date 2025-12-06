@@ -1,4 +1,5 @@
 import 'package:cloud/http/api.dart';
+import 'package:cloud/models/log.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/supply/cert.dart';
 import 'package:cloud/models/supply/contact.dart';
@@ -169,6 +170,31 @@ Future<Cert?> storeSupplySupplierCert(Map<String, dynamic>? data) async {
         return null;
       }
       return Cert.fromJson(res.data);
+    },
+  );
+}
+
+Future<List<Log>?> getSupplySupplierActivitiesById(int id) async {
+  final res = await api.get("api/tenant/supply/suppliers/$id/activities");
+
+  if (res.data is List) {
+    return (res.data as List)
+        .map((e) => Log.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+  return null;
+}
+
+Future<Log?> storeSupplySupplierActivity(
+    int id, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/supply/suppliers/$id/activities", data: data)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Log.fromJson(res.data);
     },
   );
 }

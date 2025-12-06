@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_page.dart';
 import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_page.dart';
 import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_page.dart';
 import 'package:cloud/pages/supply/widgets/supply_supplier_form.dart';
@@ -89,8 +90,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
 
                 SupplySupplierCertPage(supplierId: id),
 
-                /// 动态模块（例）
-                Text('动态模块'),
+                SupplySupplierActivityPage(supplierId: id),
 
                 /// 验厂模块（例）
                 Text('验厂模块')
