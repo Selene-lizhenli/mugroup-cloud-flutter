@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class SampleSubmitBar extends HookConsumerWidget {
   final Sample? sample;
@@ -145,6 +147,8 @@ class SampleSubmitBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final cart = ref.read(cartProvider.notifier);
+    final cartState = ref.watch(cartProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -162,14 +166,29 @@ class SampleSubmitBar extends HookConsumerWidget {
         bottom: true,
         child: Row(
           children: [
-            InkWell(
+            SubmitIcon(
+              label: "供应商",
+              icon: Icons.store,
               onTap: () => _handleSupplierTap(context),
-              child: const SubmitIcon("供应商"),
             ),
             const SizedBox(width: 5),
-            const SubmitIcon("购物车"),
+            SubmitIcon(
+              label: "选样车",
+              icon: Icons.shopping_cart,
+              badgeCount: cartState.items.length.toString(),
+              badgeColor: colorScheme.secondary,
+              onTap: () {
+                context.router.push(const CartRoute());
+              },
+            ),
             const Spacer(),
             FlanButton(
+              onClick: () {
+                final currentSample = sample;
+                if (currentSample != null) {
+                  cart.addSample(currentSample, 1);
+                }
+              },
               round: true,
               size: FlanButtonSize.small,
               color: colorScheme.secondary,
@@ -186,27 +205,67 @@ class SampleSubmitBar extends HookConsumerWidget {
 
 class SubmitIcon extends StatelessWidget {
   final String label;
-  const SubmitIcon(
-    this.label, {
+  final IconData icon;
+  final String? badgeCount;
+  final VoidCallback? onTap;
+  final Color? badgeColor;
+
+  const SubmitIcon({
     super.key,
+    required this.label,
+    required this.icon,
+    this.badgeCount,
+    this.onTap,
+    this.badgeColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(
-          Icons.shopping_cart,
-          size: 15,
+        Icon(
+          icon,
+          size: 20,
+          color: Colors.grey.shade700,
         ),
+        const SizedBox(height: 2),
         Text(
           label,
           style: const TextStyle(
             color: Colors.grey,
             fontSize: 11,
+            height: 1.0,
           ),
         ),
       ],
+    );
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
+        child: badgeCount == null || badgeCount == "0"
+            ? content
+            : Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  content,
+                  Positioned(
+                    top: -8,
+                    right: -10,
+                    child: TDBadge(
+                      TDBadgeType.message,
+                      color: badgeColor ?? Colors.red,
+                      size: TDBadgeSize.small,
+                      count: badgeCount,
+                      showZero: false,
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 }
