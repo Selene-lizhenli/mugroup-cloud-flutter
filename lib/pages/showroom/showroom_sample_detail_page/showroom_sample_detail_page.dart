@@ -399,9 +399,9 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   },
                 ),
               ),
-
-              // Sample SubmitBar
-              // const SampleSubmitBar(),
+              SampleSubmitBar(
+                sample: sample.value,
+              ),
             ],
           ),
           // Sample AppBar
