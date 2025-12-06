@@ -3,6 +3,7 @@ import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_page.dart';
 import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_page.dart';
 import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_page.dart';
+import 'package:cloud/pages/supply/supply_supplier_yanchang/supply_supplier_yanchang_page.dart';
 import 'package:cloud/pages/supply/widgets/supply_supplier_form.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
@@ -92,8 +93,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
 
                 SupplySupplierActivityPage(supplierId: id),
 
-                /// 验厂模块（例）
-                Text('验厂模块')
+                SupplySupplierYanchangPage(supplierId: id)
               ],
             ),
           ),

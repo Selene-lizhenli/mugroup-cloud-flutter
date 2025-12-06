@@ -1,5 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/log.dart';
+import 'package:cloud/models/media.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/supply/cert.dart';
 import 'package:cloud/models/supply/contact.dart';
@@ -195,6 +196,18 @@ Future<Log?> storeSupplySupplierActivity(
         return null;
       }
       return Log.fromJson(res.data);
+    },
+  );
+}
+
+Future<Media?> uploadSupplySupplierYanChang(
+    int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/suppliers/$id/media", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Media.fromJson(res.data);
     },
   );
 }

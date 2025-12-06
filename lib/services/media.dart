@@ -5,9 +5,7 @@ import 'package:cloud/models/sample/media.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
-Future<TemporaryMedia> upload(
-    {required File file}) async {
-
+Future<TemporaryMedia> upload({required File file}) async {
   final fileName = basename(file.path);
   final formData = FormData.fromMap({
     "file": await MultipartFile.fromFile(
@@ -19,4 +17,8 @@ Future<TemporaryMedia> upload(
   return api
       .post("api/upload", data: formData)
       .then((res) => TemporaryMedia.fromJson(res.data));
+}
+
+Future deleteMedia(int id, Map<String, dynamic>? data) async {
+  return api.delete("api/tenant/files/medias/$id", data: data);
 }
