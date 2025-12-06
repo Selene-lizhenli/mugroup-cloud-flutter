@@ -92,6 +92,7 @@ class HomeMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.all(0),
       padding: const EdgeInsets.all(8.0),
       color: Colors.white,
       child: SizedBox(

@@ -49,12 +49,21 @@ class AppRouter extends RootStackRouter {
           page: ShowroomSampleDetailRoute.page,
           path: "/showroom/sample/detail/:id"),
       AutoRoute(page: CrmCompanyCreateRoute.page, path: "/crm/company/create"),
+      AutoRoute(page: CrmCompanyRoute.page, path: "/crm/company"),
       AutoRoute(page: CrmCompanyEditRoute.page, path: "/crm/company/edit/:id"),
       AutoRoute(
           page: CrmCompanyDetailRoute.page, path: "/crm/company/detail/:id"),
       AutoRoute(
           page: SupplySupplierCreateRoute.page,
           path: "/supply/supplier/create"),
+      AutoRoute(page: SupplySupplierRoute.page, path: "/supply"),
+      AutoRoute(page: QuoteCreateRoute.page, path: "/quote/create"),
+      AutoRoute(page: QuoteListRoute.page, path: "/quote"), //报价单列表页面
+
+      AutoRoute(page: MarketRoute.page, path: "/market"),
+      AutoRoute(
+          page: MarketCreateRoute.page, path: "/market/create"), // 市场产品列表页面
+
       AutoRoute(
           page: SupplySupplierEditRoute.page,
           path: "/supply/supplier/edit/:id"),

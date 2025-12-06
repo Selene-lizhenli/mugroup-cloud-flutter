@@ -35,20 +35,21 @@ import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i16;
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
     as _i17;
 import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i18;
+import 'package:cloud/pages/quote/quote_create_page.dart' as _i40;
+import 'package:cloud/pages/quote/quote_page.dart' as _i42;
+import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
+    as _i22;
 import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_create_page.dart'
     as _i19;
 import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'
     as _i20;
 import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_create_page.dart'
     as _i21;
-import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_edit_page.dart'
-    as _i22;
-import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i23;
-import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
-    as _i26;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
-    as _i24;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
+    as _i23;
+import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i41;
+import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i24;
+import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.dart'
     as _i25;
 import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
     as _i27;
@@ -58,6 +59,9 @@ import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.d
     as _i30;
 import 'package:cloud/pages/wms/wms_transfer_page.dart' as _i31;
 import 'package:flutter/material.dart' as _i35;
+
+import 'package:cloud/pages/market/market_page.dart' as _i52;
+import 'package:cloud/pages/market/market_create_page.dart' as _i51;
 
 /// generated route for
 /// [_i1.CartPage]
@@ -754,41 +758,6 @@ class SupplySupplierContactCreateRouteArgs {
   }
 }
 
-/// generated route for
-/// [_i22.SupplySupplierContactEditPage]
-class SupplySupplierContactEditRoute
-    extends _i32.PageRouteInfo<SupplySupplierContactEditRouteArgs> {
-  SupplySupplierContactEditRoute({
-    _i35.Key? key,
-    required int id,
-    List<_i32.PageRouteInfo>? children,
-  }) : super(
-          SupplySupplierContactEditRoute.name,
-          args: SupplySupplierContactEditRouteArgs(
-            key: key,
-            id: id,
-          ),
-          rawPathParams: {'id': id},
-          initialChildren: children,
-        );
-
-  static const String name = 'SupplySupplierContactEditRoute';
-
-  static _i32.PageInfo page = _i32.PageInfo(
-    name,
-    builder: (data) {
-      final pathParams = data.inheritedPathParams;
-      final args = data.argsAs<SupplySupplierContactEditRouteArgs>(
-          orElse: () =>
-              SupplySupplierContactEditRouteArgs(id: pathParams.getInt('id')));
-      return _i22.SupplySupplierContactEditPage(
-        key: args.key,
-        id: args.id,
-      );
-    },
-  );
-}
-
 class SupplySupplierContactEditRouteArgs {
   const SupplySupplierContactEditRouteArgs({
     this.key,
@@ -805,50 +774,56 @@ class SupplySupplierContactEditRouteArgs {
   }
 }
 
-/// generated route for
-/// [_i23.SupplySupplierCreatePage]
-class SupplySupplierCreateRoute extends _i32.PageRouteInfo<void> {
-  const SupplySupplierCreateRoute({List<_i32.PageRouteInfo>? children})
+//市场产品
+class MarketRoute extends _i32.PageRouteInfo<void> {
+  const MarketRoute({List<_i32.PageRouteInfo>? children})
       : super(
-          SupplySupplierCreateRoute.name,
+          MarketRoute.name,
           initialChildren: children,
         );
 
-  static const String name = 'SupplySupplierCreateRoute';
+  static const String name = 'MarketRoute';
 
   static _i32.PageInfo page = _i32.PageInfo(
     name,
     builder: (data) {
-      return const _i23.SupplySupplierCreatePage();
+      return const _i52.MarketPage();
     },
   );
 }
 
-/// generated route for
-/// [_i24.SupplySupplierDetailContactPage]
-class SupplySupplierDetailContactRoute
-    extends _i32.PageRouteInfo<SupplySupplierDetailContactRouteArgs> {
-  SupplySupplierDetailContactRoute({
-    _i35.Key? key,
-    List<_i32.PageRouteInfo>? children,
-  }) : super(
-          SupplySupplierDetailContactRoute.name,
-          args: SupplySupplierDetailContactRouteArgs(key: key),
+//新增市场产品
+class MarketCreateRoute extends _i32.PageRouteInfo<void> {
+  const MarketCreateRoute({List<_i32.PageRouteInfo>? children})
+      : super(
+          MarketCreateRoute.name,
           initialChildren: children,
         );
 
-  static const String name = 'SupplySupplierDetailContactRoute';
+  static const String name = 'MarketCreateRoute';
 
   static _i32.PageInfo page = _i32.PageInfo(
     name,
     builder: (data) {
-      final pathParams = data.inheritedPathParams;
-      final args = data.argsAs<SupplySupplierDetailContactRouteArgs>(
-          orElse: () => SupplySupplierDetailContactRouteArgs());
-      return _i24.SupplySupplierDetailContactPage(
-        key: args.key,
-        id: pathParams.getInt('id'),
-      );
+      return const _i51.MarketCreatePage();
+    },
+  );
+}
+
+// 供应商列表页面
+class SupplySupplierRoute extends _i32.PageRouteInfo<void> {
+  const SupplySupplierRoute({List<_i32.PageRouteInfo>? children})
+      : super(
+          SupplySupplierRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SupplySupplierRoute';
+
+  static _i32.PageInfo page = _i32.PageInfo(
+    name,
+    builder: (data) {
+      return const _i41.SupplySupplierPage();
     },
   );
 }
@@ -864,35 +839,6 @@ class SupplySupplierDetailContactRouteArgs {
   }
 }
 
-/// generated route for
-/// [_i25.SupplySupplierDetailInfoPage]
-class SupplySupplierDetailInfoRoute
-    extends _i32.PageRouteInfo<SupplySupplierDetailInfoRouteArgs> {
-  SupplySupplierDetailInfoRoute({
-    _i35.Key? key,
-    List<_i32.PageRouteInfo>? children,
-  }) : super(
-          SupplySupplierDetailInfoRoute.name,
-          args: SupplySupplierDetailInfoRouteArgs(key: key),
-          initialChildren: children,
-        );
-
-  static const String name = 'SupplySupplierDetailInfoRoute';
-
-  static _i32.PageInfo page = _i32.PageInfo(
-    name,
-    builder: (data) {
-      final pathParams = data.inheritedPathParams;
-      final args = data.argsAs<SupplySupplierDetailInfoRouteArgs>(
-          orElse: () => SupplySupplierDetailInfoRouteArgs());
-      return _i25.SupplySupplierDetailInfoPage(
-        key: args.key,
-        id: pathParams.getInt('id'),
-      );
-    },
-  );
-}
-
 class SupplySupplierDetailInfoRouteArgs {
   const SupplySupplierDetailInfoRouteArgs({this.key});
 
@@ -902,41 +848,6 @@ class SupplySupplierDetailInfoRouteArgs {
   String toString() {
     return 'SupplySupplierDetailInfoRouteArgs{key: $key}';
   }
-}
-
-/// generated route for
-/// [_i26.SupplySupplierDetailPage]
-class SupplySupplierDetailRoute
-    extends _i32.PageRouteInfo<SupplySupplierDetailRouteArgs> {
-  SupplySupplierDetailRoute({
-    _i35.Key? key,
-    required int id,
-    List<_i32.PageRouteInfo>? children,
-  }) : super(
-          SupplySupplierDetailRoute.name,
-          args: SupplySupplierDetailRouteArgs(
-            key: key,
-            id: id,
-          ),
-          rawPathParams: {'id': id},
-          initialChildren: children,
-        );
-
-  static const String name = 'SupplySupplierDetailRoute';
-
-  static _i32.PageInfo page = _i32.PageInfo(
-    name,
-    builder: (data) {
-      final pathParams = data.inheritedPathParams;
-      final args = data.argsAs<SupplySupplierDetailRouteArgs>(
-          orElse: () =>
-              SupplySupplierDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i26.SupplySupplierDetailPage(
-        key: args.key,
-        id: args.id,
-      );
-    },
-  );
 }
 
 class SupplySupplierDetailRouteArgs {

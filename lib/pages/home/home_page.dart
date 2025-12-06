@@ -15,6 +15,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cloud/pages/home/widgets/home_app_bar.dart';
+import 'package:cloud/router/router.gr.dart';
 
 const pageSize = 20;
 
@@ -33,6 +34,7 @@ class HomePage extends HookConsumerWidget {
     final samples = useState<List<Sample>>(<Sample>[]);
     final bool isSearchMode =
         (search.value?.isNotEmpty ?? false) || home.currentMediaId != null;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final refreshController = useEasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
@@ -87,183 +89,266 @@ class HomePage extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      body: Column(
-        children: [
-          // 固定顶部 HomeAppBar
-          HomeAppBar(
-            controller: home.searchTextController,
-            onSearchText: (searchValue) {
-              homeNotifier.setSearch(searchValue);
-              home.bus.dispatch(SearchEvent(search: searchValue));
-            },
-            onSearchMedia: (temporaryMedia) {
-              homeNotifier.addMedia(temporaryMedia);
-              if (temporaryMedia.id == home.currentMediaId) return;
-              logger.d(temporaryMedia);
-              home.bus.dispatch(
-                  SearchEvent(media: temporaryMedia, search: search.value));
-            },
-            onDeleteMedia: (temporaryMedia) {
-              final nextState = homeNotifier.deleteMedia(temporaryMedia);
-              home.bus.dispatch(SearchEvent(
-                media: nextState.currentMedia,
-                search: nextState.search,
-              ));
-            },
-          ),
+      body: Container(
+          color: colorScheme.secondary,
+          child: Column(
+            children: [
+              // 固定顶部 HomeAppBar
+              HomeAppBar(
+                controller: home.searchTextController,
+                onSearchText: (searchValue) {
+                  homeNotifier.setSearch(searchValue);
+                  home.bus.dispatch(SearchEvent(search: searchValue));
+                },
+                onSearchMedia: (temporaryMedia) {
+                  homeNotifier.addMedia(temporaryMedia);
+                  if (temporaryMedia.id == home.currentMediaId) return;
+                  logger.d(temporaryMedia);
+                  home.bus.dispatch(
+                      SearchEvent(media: temporaryMedia, search: search.value));
+                },
+                onDeleteMedia: (temporaryMedia) {
+                  final nextState = homeNotifier.deleteMedia(temporaryMedia);
+                  home.bus.dispatch(SearchEvent(
+                    media: nextState.currentMedia,
+                    search: nextState.search,
+                  ));
+                },
+              ),
 
-          // 可滚动内容
-          Expanded(
-            child: EasyRefresh(
-              controller: refreshController,
-              refreshOnStart: true,
-              onRefresh: () async {
-                await fetchData(search.value,
-                    searchMedia: media.value, init: true);
-                refreshController.finishRefresh();
-                refreshController.resetFooter();
-              },
-              onLoad: () async {
-                final resp =
-                    await fetchData(search.value, searchMedia: media.value);
-                refreshController.finishLoad(resp.data.length >= pageSize
-                    ? IndicatorResult.success
-                    : IndicatorResult.noMore);
-              },
-              child: CustomScrollView(
-                slivers: [
-                  // 顶部两个 Card（只有未搜索时显示）
-                  if (!isSearchMode)
-                    SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 8),
-                          Card(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              side: BorderSide(
-                                color: Color(0xFFFA338A),
-                                width: 0.25,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                children: const [
-                                  Expanded(
-                                      child: BuildQuickAction(
-                                          icon: Icons.person,
-                                          title: "客户管理",
-                                          color: Colors.orange,
-                                          url: "")),
-                                  Expanded(
-                                      child: BuildQuickAction(
-                                          icon: Icons.group,
-                                          title: "供应商管理",
-                                          color: Colors.red,
-                                          url: "")),
-                                  Expanded(
-                                      child: BuildQuickAction(
-                                          icon: Icons.inventory_2,
-                                          title: "产品管理",
-                                          color: Colors.blue,
-                                          url: "")),
-                                  Expanded(
-                                      child: BuildQuickAction(
-                                          icon: Icons.receipt_long,
-                                          title: "报价单管理",
-                                          color: Colors.green,
-                                          url: "")),
-                                ],
-                              ),
+              // 可滚动内容
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(6, 0, 6, 0), // 所有方向的边距都是6
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 232, 231, 232), // 背景色必须设置
+                    borderRadius: home.currentMediaId != null
+                        ? null // 搜索模式：取消圆角
+                        : const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8),
+                          ),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: EasyRefresh(
+                    controller: refreshController,
+                    refreshOnStart: true,
+                    onRefresh: () async {
+                      await fetchData(search.value,
+                          searchMedia: media.value, init: true);
+                      refreshController.finishRefresh();
+                      refreshController.resetFooter();
+                    },
+                    onLoad: () async {
+                      final resp = await fetchData(search.value,
+                          searchMedia: media.value);
+                      refreshController.finishLoad(resp.data.length >= pageSize
+                          ? IndicatorResult.success
+                          : IndicatorResult.noMore);
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+                        // 顶部两个 Card（只有未搜索时显示）
+                        if (!isSearchMode)
+                          SliverToBoxAdapter(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 6),
+                                const Card(
+                                  // margin: EdgeInsets.zero, // 去除边距
+                                  elevation: 0, // 去除阴影
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                    side: BorderSide.none, // 移除边框线
+                                  ),
+
+                                  child: Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                            child: BuildQuickAction(
+                                                icon: Icons.person,
+                                                title: "客户管理",
+                                                color: Colors.orange,
+                                                route: CrmCompanyRoute())),
+                                        Expanded(
+                                            child: BuildQuickAction(
+                                                icon: Icons.group,
+                                                title: "供应商管理",
+                                                color: Colors.red,
+                                                route: SupplySupplierRoute())),
+                                        Expanded(
+                                            child: BuildQuickAction(
+                                                icon: Icons.inventory_2,
+                                                title: "市场产品管理", //todo 新页面
+                                                color: Colors.blue,
+                                                route: MarketRoute())),
+                                        Expanded(
+                                            child: BuildQuickAction(
+                                                icon: Icons.receipt_long,
+                                                title: "报价单管理", // 报价单列表页面
+                                                color: Colors.green,
+                                                route: QuoteListRoute())),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Card(
+                                  color: colorScheme.secondary,
+                                  elevation: 2, // 去除阴影
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                    side: BorderSide.none, // 移除边框线
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                            height: 73, // 高度限制
+                                            padding: const EdgeInsets.fromLTRB(
+                                                12, 8, 10, 8), // 所有方向的边距都是6
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(8),
+                                              bottomLeft: Radius.circular(8),
+                                              // topRight: Radius.circular(8),
+                                            )),
+                                            child: const Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text("快",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      height:
+                                                          1.2, // 行高倍数，默认大约 1.4
+                                                      color: Color(
+                                                          0xFFFFFFFF), // 使用 Flutter 预设的蓝色
+                                                    )),
+                                                Text("捷",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      height: 1.2,
+                                                      color: Color(
+                                                          0xFFFFFFFF), // 使用 Flutter 预设的蓝色
+                                                    )),
+                                                Text("入",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      height: 1.2,
+                                                      color: Color(
+                                                          0xFFFFFFFF), // 使用 Flutter 预设的蓝色
+                                                    )),
+                                                Text("口",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      height: 1.2,
+                                                      color: Color(
+                                                          0xFFFFFFFF), // 使用 Flutter 预设的蓝色
+                                                    )),
+                                              ],
+                                            )),
+                                        Expanded(
+                                            child: Container(
+                                                height: 72, // 高度限制
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        12,
+                                                        8,
+                                                        10,
+                                                        8), // 所有方向的边距都是6
+                                                decoration: const BoxDecoration(
+                                                    color: Color(0xFFFFFFFF),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(8),
+                                                      topRight:
+                                                          Radius.circular(8),
+                                                      bottomLeft:
+                                                          Radius.circular(8),
+                                                      bottomRight:
+                                                          Radius.circular(8),
+                                                      // topRight: Radius.circular(8),
+                                                    )),
+                                                margin:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 0, 1, 0),
+                                                child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly, // 平均分配空间
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .stretch, // 关键：让子元素高度填满
+                                                    children: [
+                                                      BuildQuickAction(
+                                                          icon: Icons.add,
+                                                          title: "新增客户",
+                                                          color: Colors.orange,
+                                                          route:
+                                                              CrmCompanyCreateRoute()),
+                                                      BuildQuickAction(
+                                                          icon: Icons.add,
+                                                          title: "新增供应商",
+                                                          color: Colors.red,
+                                                          route:
+                                                              SupplySupplierCreateRoute()),
+                                                      BuildQuickAction(
+                                                          icon: Icons.add,
+                                                          title: "新增市场产品",
+                                                          color: Colors.blue,
+                                                          route:
+                                                              MarketCreateRoute()),
+                                                      BuildQuickAction(
+                                                          icon: Icons.add,
+                                                          title: "新增报价单",
+                                                          color: Colors.green,
+                                                          route:
+                                                              QuoteCreateRoute()),
+                                                    ])))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Card(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
-                              child: Column(
-                                children: const [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text("快捷入口",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                  SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: BuildQuickAction(
-                                              icon: Icons.add,
-                                              title: "创建客户",
-                                              color: Colors.orange,
-                                              url: "")),
-                                      Expanded(
-                                          child: BuildQuickAction(
-                                              icon: Icons.add,
-                                              title: "创建供应商",
-                                              color: Colors.red,
-                                              url: "")),
-                                      Expanded(
-                                          child: BuildQuickAction(
-                                              icon: Icons.add,
-                                              title: "创建产品",
-                                              color: Colors.blue,
-                                              url: "")),
-                                      Expanded(
-                                          child: BuildQuickAction(
-                                              icon: Icons.add,
-                                              title: "创建报价单",
-                                              color: Colors.green,
-                                              url: "")),
-                                    ],
-                                  ),
-                                  SizedBox(height: 12),
-                                ],
-                              ),
-                            ),
+
+                        // 产品 Grid
+                        SliverPadding(
+                          padding: const EdgeInsets.all(5),
+                          sliver: SliverMasonryGrid.count(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                            childCount: samples.value.length,
+                            itemBuilder: (context, index) {
+                              final sample = samples.value[index];
+                              final cartItem = cartState.items.firstWhereOrNull(
+                                  (element) => element.sample.id == sample.id);
+
+                              return ProductCard(
+                                sample: sample,
+                                cartCount: cartItem?.count,
+                                onTapAddSample: () {
+                                  cart.addSample(sample, 1);
+                                },
+                              );
+                            },
                           ),
-                        ],
-                      ),
-                    ),
-
-                  // 产品 Grid
-                  SliverPadding(
-                    padding: const EdgeInsets.all(5),
-                    sliver: SliverMasonryGrid.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 5,
-                      crossAxisSpacing: 5,
-                      childCount: samples.value.length,
-                      itemBuilder: (context, index) {
-                        final sample = samples.value[index];
-                        final cartItem = cartState.items.firstWhereOrNull(
-                            (element) => element.sample.id == sample.id);
-
-                        return ProductCard(
-                          sample: sample,
-                          cartCount: cartItem?.count,
-                          onTapAddSample: () {
-                            cart.addSample(sample, 1);
-                          },
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+                ),
+              )
+            ],
+          )),
     );
   }
 }

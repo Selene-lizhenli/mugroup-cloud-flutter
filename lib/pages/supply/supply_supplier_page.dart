@@ -10,11 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:auto_route/auto_route.dart';
 
 const pageSize = 20;
 
-class SupplyView extends HookConsumerWidget {
-  const SupplyView({super.key});
+@RoutePage()
+class SupplySupplierPage extends HookConsumerWidget {
+  const SupplySupplierPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
@@ -50,7 +53,7 @@ class SupplyView extends HookConsumerWidget {
       };
       final resp = await getSupplySuppliers(queryParameters: queryParameters);
 
-      if (init == true || page.value == 1) {
+      if (init == true) {
         suppliers.value = resp.data;
       } else {
         suppliers.value = [...suppliers.value, ...resp.data];
@@ -104,39 +107,51 @@ class SupplyView extends HookConsumerWidget {
       media.value
     ]);
 
-    return EasyRefresh(
-      controller: refreshController,
-      refreshOnStart: true,
-      onRefresh: () async {
-        await fetchData(
-          search.value,
-          init: true,
-          searchMedia: media.value,
-        );
-        refreshController.finishRefresh();
-        refreshController.resetFooter();
-      },
-      onLoad: () async {
-        final resp = await fetchData(search.value);
-
-        refreshController.finishLoad(resp.data.length >= pageSize
-            ? IndicatorResult.success
-            : IndicatorResult.noMore);
-      },
-      child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 5,
-        itemCount: suppliers.value.length,
-        padding: const EdgeInsets.all(5),
-        itemBuilder: (context, index) {
-          final supplier = suppliers.value[index];
-
-          return SupplierCard(
-            supplier: supplier,
-            onClick: () {},
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("供应商列表"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: EasyRefresh(
+        controller: refreshController,
+        refreshOnStart: true,
+        onRefresh: () async {
+          await fetchData(
+            search.value,
+            init: true,
+            searchMedia: media.value,
           );
+          refreshController.finishRefresh();
+          refreshController.resetFooter();
         },
+        onLoad: () async {
+          final resp = await fetchData(search.value);
+
+          refreshController.finishLoad(resp.data.length >= pageSize
+              ? IndicatorResult.success
+              : IndicatorResult.noMore);
+        },
+        child: MasonryGridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 5,
+          crossAxisSpacing: 5,
+          itemCount: suppliers.value.length,
+          padding: const EdgeInsets.all(5),
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            final supplier = suppliers.value[index];
+
+            return SupplierCard(
+              supplier: supplier,
+              onClick: () {},
+            );
+          },
+        ),
       ),
     );
   }

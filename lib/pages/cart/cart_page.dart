@@ -42,7 +42,7 @@ class CartPage extends HookConsumerWidget {
     final quotationInfo = state.quotationInfo;
 
     final borrower = useState<User?>(null);
-
+    const warningColor = Color(0xFFFFD75E);
     final user = useState<User?>(null);
 
     final borrowReasons = [
@@ -651,13 +651,28 @@ class CartPage extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "报价单信息",
+                              "报价单设置",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 5),
+                            const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.info,
+                                      size: 12, color: Color(0xFF555555)),
+                                  Text(
+                                    " 注：以下设置将对选样车中的所有样品生效！",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        height: 1,
+                                        color: Color(0xFF555555)),
+                                  ),
+                                ]),
+                            const SizedBox(height: 10),
                             const Text(
                               "是否显示价格",
                               style: TextStyle(
@@ -665,7 +680,7 @@ class CartPage extends HookConsumerWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Row(
                               children: [
                                 Radio<bool>(
@@ -697,7 +712,7 @@ class CartPage extends HookConsumerWidget {
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Row(
                               children: [
                                 Radio<bool>(
@@ -1463,23 +1478,24 @@ class CartPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: InkWell(
-          onTap: () => selectCart(carts),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.ideographic,
-            children: [
-              Text(cartType != null ? cartName! : '请选择选样车'),
-              if (cartType != null)
-                const SizedBox(
-                  width: 5,
-                ),
-              if (items.isNotEmpty)
-                Text(
-                  "(${items.length})",
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-            ],
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: InkWell(
+            onTap: () => selectCart(carts),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(cartType != null ? cartName! : '请选择选样车'),
+                const Icon(Icons.arrow_drop_down),
+                if (cartType != null) const SizedBox(width: 5),
+                if (items.isNotEmpty)
+                  Text(
+                    "(${items.length})",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -1620,15 +1636,16 @@ class CartPage extends HookConsumerWidget {
                                   child: MultiSliver(
                                     children: [
                                       if (items.isEmpty)
-                                        Center(
+                                        const Center(
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 10),
+                                            padding: EdgeInsets.fromLTRB(
+                                                0, 10, 0, 20),
                                             child: Text(
-                                              "${cartName ?? "选样车"}空咯，请扫码添加",
-                                              style: const TextStyle(
+                                              "这里是空的，快去添加吧~",
+                                              style: TextStyle(
                                                   color: Colors.grey,
-                                                  fontSize: 12),
+                                                  fontSize: 12,
+                                                  height: 1.2),
                                             ),
                                           ),
                                         ),
@@ -1749,13 +1766,13 @@ class CartPage extends HookConsumerWidget {
           if (cartType == null)
             InkWell(
               child: const SampleCard(
-                child: Center(
-                  child: Text(
-                    '请选择需要的选样车',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ),
-              ),
+                  color: warningColor,
+                  child: Center(
+                    child: Text(
+                      '请先选择您需要的选样车',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  )),
               onTap: () => selectCart(carts),
             )
           else if (items.isNotEmpty)

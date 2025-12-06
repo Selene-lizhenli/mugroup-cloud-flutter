@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/home_media.dart';
@@ -114,7 +115,7 @@ class HomeAppBar extends HookConsumerWidget {
     }
 
     return Container(
-      color: Color.fromARGB(255, 250, 51, 138),
+      color: colorScheme.secondary,
       child: Column(
         children: [
           SizedBox(height: statusBarHeight),
@@ -127,7 +128,7 @@ class HomeAppBar extends HookConsumerWidget {
             padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
             height: 40,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: const Color.fromARGB(255, 255, 255, 255),
               border: Border.all(
                 color: colorScheme.secondary,
                 width: 1,
@@ -180,7 +181,7 @@ class HomeAppBar extends HookConsumerWidget {
                       top: 2, bottom: 2, left: 2, right: 0),
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFFFA338A),
+                      backgroundColor: colorScheme.secondary,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       shape: RoundedRectangleBorder(
