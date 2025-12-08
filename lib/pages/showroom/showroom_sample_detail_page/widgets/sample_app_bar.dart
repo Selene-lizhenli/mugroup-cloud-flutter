@@ -49,6 +49,8 @@ class SampleAppBar extends HookWidget {
         horizontal: 10,
       ),
       child: SafeArea(
+        top: true,
+        bottom: false,
         child: Column(
           children: [
             Row(
@@ -68,13 +70,13 @@ class SampleAppBar extends HookWidget {
                               Navigator.pop(context);
                             },
                             child: Container(
-                              width: 25,
-                              height: 25,
+                              width: 26,
+                              height: 26,
                               alignment: Alignment.center,
                               child: const Icon(
                                 Icons.arrow_back,
                                 color: Colors.white,
-                                size: 18,
+                                size: 24,
                               ),
                             ),
                           ),
@@ -92,13 +94,13 @@ class SampleAppBar extends HookWidget {
                                 Navigator.pop(context);
                               },
                               child: Container(
-                                width: 25,
-                                height: 25,
+                                width: 26,
+                                height: 26,
                                 alignment: Alignment.center,
                                 child: const Icon(
                                   Icons.arrow_back,
                                   color: Colors.black,
-                                  size: 18,
+                                  size: 24,
                                 ),
                               ),
                             ),
@@ -117,12 +119,7 @@ class SampleAppBar extends HookWidget {
                   for (var electorFloor in electorFloors)
                     _ElevatorFloor(
                       electorFloor.name,
-                      onTap: () {
-                        // Scrollable.ensureVisible(
-                        //   electorFloor.key.currentContext!,
-                        //   duration: const Duration(milliseconds: 300),
-                        // );
-
+                     onTap: () {
                         final context = electorFloor.key.currentContext;
                         if (context == null) {
                           return;
