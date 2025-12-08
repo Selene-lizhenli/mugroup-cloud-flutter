@@ -25,6 +25,18 @@ class TextArea extends HookConsumerWidget {
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final controller = useTextEditingController(text: value);
+    // 监听外部 value 变化同步给 controller
+    useEffect(() {
+      if (controller.text != value) {
+        controller.text = value ?? "";
+        // 保持光标在末尾
+        controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: controller.text.length),
+        );
+      }
+      return null;
+    }, [value]);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +53,7 @@ class TextArea extends HookConsumerWidget {
           const SizedBox(height: 8),
         ],
         TextFormField(
-          initialValue: value,
+          controller: controller,
           maxLines: maxLines,
           keyboardType: TextInputType.multiline,
           focusNode: focusNode,

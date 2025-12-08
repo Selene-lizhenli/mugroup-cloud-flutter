@@ -16,7 +16,7 @@ class ImageUploader extends HookConsumerWidget {
   final ValueChanged<List<TemporaryMedia>>? onChanged;
   // --- 图片识别参数 ---
   final bool showRecognizeButton;
-  final Future<dynamic> Function(TemporaryMedia media)? recognizeApi;
+  final Future<dynamic> Function(Map<String, dynamic>)? recognizeApi;
   final ValueChanged<dynamic>? onRecognizeResult;
 
   const ImageUploader(
@@ -120,10 +120,7 @@ class ImageUploader extends HookConsumerWidget {
       await EasyLoading.show(
           status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
 
-      // 4. 取第一张图片进行识别
-      final TemporaryMedia firstImage = currentImages.first;
-
-      final result = await recognizeApi!(firstImage);
+      final result = await recognizeApi!({'image': currentImages});
 
       // 5. 回调结果
       if (result != null && onRecognizeResult != null) {

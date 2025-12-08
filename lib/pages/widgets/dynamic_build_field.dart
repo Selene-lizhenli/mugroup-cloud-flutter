@@ -7,18 +7,33 @@ import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
+import 'package:cloud/services/openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class DynamicBuildField extends StatelessWidget {
+class DynamicBuildField extends HookConsumerWidget {
   final Schema schema;
 
   const DynamicBuildField({super.key, required this.schema});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = schema;
+
+    final recognizeApi = useMemoized(() {
+      if (s.table == 'showroom_samples') {
+        return identifySample;
+      }
+      if (s.table == 'supply_suppliers') {
+        return identifySupplySuppliersCard;
+      }
+      if (s.table == 'crm_companies') {
+        return identifyCompanyCard;
+      }
+    }, [s]);
 
     if (s.widget == 'input') {
       return FormBuilderField<String>(
@@ -157,6 +172,15 @@ class DynamicBuildField extends StatelessWidget {
 
           return ImageUploader(
             label: s.title,
+            showRecognizeButton: true,
+            recognizeApi: recognizeApi,
+            onRecognizeResult: (data) {
+              if (data != null && data is Map<String, dynamic>) {
+                final form = FormBuilder.of(context);
+                form?.patchValue(data);
+                form?.save();
+              }
+            },
             value: displayValue,
             onChanged: (newValue) {
               field.didChange(newValue);
