@@ -9,6 +9,7 @@ import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:dio/dio.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -260,15 +261,22 @@ class LoginPage extends HookConsumerWidget {
 
                                                   final code = result.code!;
 
-                                                  await api.post(
+                                                  await silentApi.post(
                                                       'api/tenant/wechat/login',
                                                       data: {"code": code});
 
                                                   await app.fetchUser();
                                                   afterLogin();
                                                 } catch (e) {
+                                                  var message = e.toString();
+                                                  if (e is DioException) {
+                                                    message = e.response
+                                                            ?.data['message'] ??
+                                                        message;
+                                                  }
+
                                                   EasyLoading.showError(
-                                                      e.toString());
+                                                      message);
                                                 }
                                               },
                                               child: Container(
