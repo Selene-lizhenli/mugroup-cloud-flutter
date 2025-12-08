@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier_cert.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/supply.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
@@ -105,7 +106,24 @@ class SupplySupplierCertPage extends HookConsumerWidget {
                                     _row("名称", cert?.name ?? ""),
                                     _row("创建时间", createdAtStr),
                                     _row("备注", remark ?? ""),
-                                    _row("附件", media?[0].url ?? ''),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (media != null) {
+                                          showFlanImagePreview(
+                                            context,
+                                            images: media
+                                                .map((item) => item.url!)
+                                                .toList(),
+                                            startPosition: index,
+                                            loop: false,
+                                          );
+                                        }
+                                      },
+                                      child: const Text(
+                                        '附件',
+                                        style: TextStyle(color: Colors.blue),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
