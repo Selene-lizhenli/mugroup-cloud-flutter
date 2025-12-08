@@ -1,3 +1,4 @@
+import 'package:cloud/models/media.dart';
 import 'package:cloud/models/supply/contact.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -38,6 +39,9 @@ class Supplier with _$Supplier {
     @JsonKey(name: 'factory_area') String? factoryArea,
     @JsonKey(name: 'employee_count') String? employeeCount,
     @JsonKey(name: 'developed_at') String? developedAt,
+    @JsonKey(name: 'site_photos') List<Media>? sitePhotos,
+    @JsonKey(name: 'showroom_photos') List<Media>? showroomPhotos,
+    @JsonKey(name: 'device_photos') List<Media>? devicePhotos,
     List<Contact>? contacts,
   ) = _Supplier;
 

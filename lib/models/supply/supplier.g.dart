@@ -39,6 +39,15 @@ _$SupplierImpl _$$SupplierImplFromJson(Map<String, dynamic> json) =>
       json['factory_area'] as String?,
       json['employee_count'] as String?,
       json['developed_at'] as String?,
+      (json['site_photos'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['showroom_photos'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['device_photos'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
       (json['contacts'] as List<dynamic>?)
           ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -77,5 +86,8 @@ Map<String, dynamic> _$$SupplierImplToJson(_$SupplierImpl instance) =>
       'factory_area': instance.factoryArea,
       'employee_count': instance.employeeCount,
       'developed_at': instance.developedAt,
+      'site_photos': instance.sitePhotos,
+      'showroom_photos': instance.showroomPhotos,
+      'device_photos': instance.devicePhotos,
       'contacts': instance.contacts,
     };

@@ -200,8 +200,7 @@ Future<Log?> storeSupplySupplierActivity(
   );
 }
 
-Future<Media?> uploadSupplySupplierYanChang(
-    int id, Map<String, dynamic>? data) async {
+Future<Media?> uploadSupplySupplierYanChang(int id, dynamic data) async {
   return api.post("api/tenant/supply/suppliers/$id/media", data: data).then(
     (res) {
       if (res.data == null) {

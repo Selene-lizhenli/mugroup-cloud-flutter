@@ -75,6 +75,12 @@ mixin _$Supplier {
   String? get employeeCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'developed_at')
   String? get developedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'site_photos')
+  List<Media>? get sitePhotos => throw _privateConstructorUsedError;
+  @JsonKey(name: 'showroom_photos')
+  List<Media>? get showroomPhotos => throw _privateConstructorUsedError;
+  @JsonKey(name: 'device_photos')
+  List<Media>? get devicePhotos => throw _privateConstructorUsedError;
   List<Contact>? get contacts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -120,6 +126,9 @@ abstract class $SupplierCopyWith<$Res> {
       @JsonKey(name: 'factory_area') String? factoryArea,
       @JsonKey(name: 'employee_count') String? employeeCount,
       @JsonKey(name: 'developed_at') String? developedAt,
+      @JsonKey(name: 'site_photos') List<Media>? sitePhotos,
+      @JsonKey(name: 'showroom_photos') List<Media>? showroomPhotos,
+      @JsonKey(name: 'device_photos') List<Media>? devicePhotos,
       List<Contact>? contacts});
 }
 
@@ -167,6 +176,9 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
     Object? factoryArea = freezed,
     Object? employeeCount = freezed,
     Object? developedAt = freezed,
+    Object? sitePhotos = freezed,
+    Object? showroomPhotos = freezed,
+    Object? devicePhotos = freezed,
     Object? contacts = freezed,
   }) {
     return _then(_value.copyWith(
@@ -294,6 +306,18 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
           ? _value.developedAt
           : developedAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      sitePhotos: freezed == sitePhotos
+          ? _value.sitePhotos
+          : sitePhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+      showroomPhotos: freezed == showroomPhotos
+          ? _value.showroomPhotos
+          : showroomPhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+      devicePhotos: freezed == devicePhotos
+          ? _value.devicePhotos
+          : devicePhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
       contacts: freezed == contacts
           ? _value.contacts
           : contacts // ignore: cast_nullable_to_non_nullable
@@ -342,6 +366,9 @@ abstract class _$$SupplierImplCopyWith<$Res>
       @JsonKey(name: 'factory_area') String? factoryArea,
       @JsonKey(name: 'employee_count') String? employeeCount,
       @JsonKey(name: 'developed_at') String? developedAt,
+      @JsonKey(name: 'site_photos') List<Media>? sitePhotos,
+      @JsonKey(name: 'showroom_photos') List<Media>? showroomPhotos,
+      @JsonKey(name: 'device_photos') List<Media>? devicePhotos,
       List<Contact>? contacts});
 }
 
@@ -387,6 +414,9 @@ class __$$SupplierImplCopyWithImpl<$Res>
     Object? factoryArea = freezed,
     Object? employeeCount = freezed,
     Object? developedAt = freezed,
+    Object? sitePhotos = freezed,
+    Object? showroomPhotos = freezed,
+    Object? devicePhotos = freezed,
     Object? contacts = freezed,
   }) {
     return _then(_$SupplierImpl(
@@ -514,6 +544,18 @@ class __$$SupplierImplCopyWithImpl<$Res>
           ? _value.developedAt
           : developedAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == sitePhotos
+          ? _value._sitePhotos
+          : sitePhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+      freezed == showroomPhotos
+          ? _value._showroomPhotos
+          : showroomPhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+      freezed == devicePhotos
+          ? _value._devicePhotos
+          : devicePhotos // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
       freezed == contacts
           ? _value._contacts
           : contacts // ignore: cast_nullable_to_non_nullable
@@ -557,8 +599,14 @@ class _$SupplierImpl implements _Supplier {
       @JsonKey(name: 'factory_area') this.factoryArea,
       @JsonKey(name: 'employee_count') this.employeeCount,
       @JsonKey(name: 'developed_at') this.developedAt,
+      @JsonKey(name: 'site_photos') final List<Media>? sitePhotos,
+      @JsonKey(name: 'showroom_photos') final List<Media>? showroomPhotos,
+      @JsonKey(name: 'device_photos') final List<Media>? devicePhotos,
       final List<Contact>? contacts)
       : _advantages = advantages,
+        _sitePhotos = sitePhotos,
+        _showroomPhotos = showroomPhotos,
+        _devicePhotos = devicePhotos,
         _contacts = contacts;
 
   factory _$SupplierImpl.fromJson(Map<String, dynamic> json) =>
@@ -658,6 +706,39 @@ class _$SupplierImpl implements _Supplier {
   @override
   @JsonKey(name: 'developed_at')
   final String? developedAt;
+  final List<Media>? _sitePhotos;
+  @override
+  @JsonKey(name: 'site_photos')
+  List<Media>? get sitePhotos {
+    final value = _sitePhotos;
+    if (value == null) return null;
+    if (_sitePhotos is EqualUnmodifiableListView) return _sitePhotos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<Media>? _showroomPhotos;
+  @override
+  @JsonKey(name: 'showroom_photos')
+  List<Media>? get showroomPhotos {
+    final value = _showroomPhotos;
+    if (value == null) return null;
+    if (_showroomPhotos is EqualUnmodifiableListView) return _showroomPhotos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<Media>? _devicePhotos;
+  @override
+  @JsonKey(name: 'device_photos')
+  List<Media>? get devicePhotos {
+    final value = _devicePhotos;
+    if (value == null) return null;
+    if (_devicePhotos is EqualUnmodifiableListView) return _devicePhotos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   final List<Contact>? _contacts;
   @override
   List<Contact>? get contacts {
@@ -670,7 +751,7 @@ class _$SupplierImpl implements _Supplier {
 
   @override
   String toString() {
-    return 'Supplier(id: $id, name: $name, city: $city, province: $province, address: $address, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, contacts: $contacts)';
+    return 'Supplier(id: $id, name: $name, city: $city, province: $province, address: $address, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, sitePhotos: $sitePhotos, showroomPhotos: $showroomPhotos, devicePhotos: $devicePhotos, contacts: $contacts)';
   }
 
   @override
@@ -732,6 +813,12 @@ class _$SupplierImpl implements _Supplier {
                 other.employeeCount == employeeCount) &&
             (identical(other.developedAt, developedAt) ||
                 other.developedAt == developedAt) &&
+            const DeepCollectionEquality()
+                .equals(other._sitePhotos, _sitePhotos) &&
+            const DeepCollectionEquality()
+                .equals(other._showroomPhotos, _showroomPhotos) &&
+            const DeepCollectionEquality()
+                .equals(other._devicePhotos, _devicePhotos) &&
             const DeepCollectionEquality().equals(other._contacts, _contacts));
   }
 
@@ -770,6 +857,9 @@ class _$SupplierImpl implements _Supplier {
         factoryArea,
         employeeCount,
         developedAt,
+        const DeepCollectionEquality().hash(_sitePhotos),
+        const DeepCollectionEquality().hash(_showroomPhotos),
+        const DeepCollectionEquality().hash(_devicePhotos),
         const DeepCollectionEquality().hash(_contacts)
       ]);
 
@@ -820,6 +910,9 @@ abstract class _Supplier implements Supplier {
       @JsonKey(name: 'factory_area') final String? factoryArea,
       @JsonKey(name: 'employee_count') final String? employeeCount,
       @JsonKey(name: 'developed_at') final String? developedAt,
+      @JsonKey(name: 'site_photos') final List<Media>? sitePhotos,
+      @JsonKey(name: 'showroom_photos') final List<Media>? showroomPhotos,
+      @JsonKey(name: 'device_photos') final List<Media>? devicePhotos,
       final List<Contact>? contacts) = _$SupplierImpl;
 
   factory _Supplier.fromJson(Map<String, dynamic> json) =
@@ -911,6 +1004,15 @@ abstract class _Supplier implements Supplier {
   @override
   @JsonKey(name: 'developed_at')
   String? get developedAt;
+  @override
+  @JsonKey(name: 'site_photos')
+  List<Media>? get sitePhotos;
+  @override
+  @JsonKey(name: 'showroom_photos')
+  List<Media>? get showroomPhotos;
+  @override
+  @JsonKey(name: 'device_photos')
+  List<Media>? get devicePhotos;
   @override
   List<Contact>? get contacts;
   @override

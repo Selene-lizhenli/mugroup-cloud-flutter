@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud/models/media.dart';
+import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/services/media.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:dio/dio.dart';
@@ -17,6 +18,8 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final supplier = useState<Supplier?>(null);
+
     final supplierMedias = useMemoized(() => [
           {'title': '场地实拍', 'collection_name': 'site_photos'},
           {'title': '样品间实拍', 'collection_name': 'showroom_photos'},
@@ -35,6 +38,28 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
       newMap[collectionName] = newList;
       mediaMapState.value = newMap;
     }
+
+    useEffect(() {
+      Future<void> loadData() async {
+        if (supplierId == null) return;
+
+        final resp = await getSupplier(supplierId!);
+        supplier.value = resp;
+
+        if (resp != null) {
+          final newMap = <String, List<Media>>{
+            'site_photos': resp.sitePhotos ?? [],
+            'showroom_photos': resp.showroomPhotos ?? [],
+            'device_photos': resp.devicePhotos ?? [],
+          };
+
+          mediaMapState.value = newMap;
+        }
+      }
+
+      loadData();
+      return null;
+    }, [supplierId]);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
@@ -94,10 +119,9 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
                         });
 
                         final result = await uploadSupplySupplierYanChang(
-                            supplierId!, formData as Map<String, dynamic>?);
+                            supplierId!, formData);
                         return result;
                       } catch (e) {
-                        EasyLoading.showError("上传失败");
                         return null;
                       }
                     },
