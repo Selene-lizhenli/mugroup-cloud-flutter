@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,6 +16,7 @@ class SampleAppBar extends HookWidget {
   Widget build(BuildContext context) {
     final appBarKey = GlobalKey();
     final backgroupOpacity = useState(0.0);
+    final currentElectorFloorIndex = useState(0);
 
     useEffect(() {
       calAppOpacity() {
@@ -33,6 +35,41 @@ class SampleAppBar extends HookWidget {
         scrollController.removeListener(calAppOpacity);
       };
     }, []);
+
+    // 计算电梯楼层
+    useEffect(() {
+      calElectorFloorIndex() {
+        final appBarBox =
+            appBarKey.currentContext!.findRenderObject() as RenderBox;
+        final appBarHeight = appBarBox.size.height;
+
+        for (var (index, electorFloor) in electorFloors.indexed) {
+          final ctx = electorFloor.key.currentContext;
+          if (ctx == null) continue;
+
+          final renderBox = ctx.findRenderObject();
+          if (renderBox == null || !renderBox.attached) continue;
+
+          final box = renderBox as RenderBox;
+          final offset = box.localToGlobal(Offset.zero);
+
+          if (offset.dy - appBarHeight >0) {
+            logger
+                .d([index, offset.dy, appBarHeight, offset.dy - appBarHeight]);
+          }
+
+          if (offset.dy - appBarHeight <= 2) {
+            currentElectorFloorIndex.value = index;
+          }
+        }
+      }
+
+      scrollController.addListener(calElectorFloorIndex);
+
+      return () {
+        scrollController.removeListener(calElectorFloorIndex);
+      };
+    }, [electorFloors, appBarKey]);
 
     return Container(
       key: appBarKey,
@@ -116,10 +153,11 @@ class SampleAppBar extends HookWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (var electorFloor in electorFloors)
+                  for (var (index, electorFloor) in electorFloors.indexed)
                     _ElevatorFloor(
                       electorFloor.name,
-                     onTap: () {
+                      active: currentElectorFloorIndex.value == index,
+                      onTap: () {
                         final context = electorFloor.key.currentContext;
                         if (context == null) {
                           return;
@@ -162,16 +200,27 @@ class SampleAppBar extends HookWidget {
 
 class _ElevatorFloor extends StatelessWidget {
   final String name;
-  final GestureTapCallback onTap;
-  const _ElevatorFloor(this.name, {required this.onTap});
+  final GestureTapCallback? onTap;
+  final bool? active;
+  const _ElevatorFloor(
+    this.name, {
+    this.onTap,
+    this.active,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Text(name),
+      child: DefaultTextStyle(
+        style: TextStyle(
+          fontSize: 18,
+          color: active == true ? Colors.black : const Color(0xFF505259),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(name),
+        ),
       ),
     );
   }
