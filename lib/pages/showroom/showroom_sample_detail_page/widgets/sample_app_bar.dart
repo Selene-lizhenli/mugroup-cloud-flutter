@@ -1,15 +1,19 @@
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class SampleAppBar extends HookWidget {
   final ScrollController scrollController;
+  final List<ElevatorFloor> electorFloors;
   const SampleAppBar({
     super.key,
     required this.scrollController,
+    required this.electorFloors,
   });
 
   @override
   Widget build(BuildContext context) {
+    final appBarKey = GlobalKey();
     final backgroupOpacity = useState(0.0);
 
     useEffect(() {
@@ -31,6 +35,7 @@ class SampleAppBar extends HookWidget {
     }, []);
 
     return Container(
+      key: appBarKey,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(backgroupOpacity.value),
         border: Border(
@@ -63,13 +68,13 @@ class SampleAppBar extends HookWidget {
                               Navigator.pop(context);
                             },
                             child: Container(
-                              width: 20,
-                              height: 20,
+                              width: 25,
+                              height: 25,
                               alignment: Alignment.center,
                               child: const Icon(
                                 Icons.arrow_back,
                                 color: Colors.white,
-                                size: 15,
+                                size: 18,
                               ),
                             ),
                           ),
@@ -87,13 +92,13 @@ class SampleAppBar extends HookWidget {
                                 Navigator.pop(context);
                               },
                               child: Container(
-                                width: 20,
-                                height: 20,
+                                width: 25,
+                                height: 25,
                                 alignment: Alignment.center,
                                 child: const Icon(
                                   Icons.arrow_back,
                                   color: Colors.black,
-                                  size: 15,
+                                  size: 18,
                                 ),
                               ),
                             ),
@@ -104,20 +109,72 @@ class SampleAppBar extends HookWidget {
                   ),
               ],
             ),
-            // Opacity(
-            //   opacity: backgroupOpacity.value,
-            //   child: const Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       Text("商品"),
-            //     ],
-            //   ),
-            // ),
+            Opacity(
+              opacity: backgroupOpacity.value,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var electorFloor in electorFloors)
+                    _ElevatorFloor(
+                      electorFloor.name,
+                      onTap: () {
+                        // Scrollable.ensureVisible(
+                        //   electorFloor.key.currentContext!,
+                        //   duration: const Duration(milliseconds: 300),
+                        // );
+
+                        final context = electorFloor.key.currentContext;
+                        if (context == null) {
+                          return;
+                        }
+
+                        // appbar 高度
+                        final appBarBox = appBarKey.currentContext!
+                            .findRenderObject() as RenderBox;
+                        final appBarheight = appBarBox.size.height;
+
+                        final ctx = electorFloor.key.currentContext;
+                        if (ctx == null) return;
+
+                        final box = ctx.findRenderObject() as RenderBox;
+
+                        final offset = box.localToGlobal(Offset.zero);
+
+                        final realOffset =
+                            offset.dy + scrollController.offset - appBarheight;
+
+                        scrollController.animateTo(
+                          realOffset,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
+                ],
+              ),
+            ),
             const SizedBox(
               height: 5,
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ElevatorFloor extends StatelessWidget {
+  final String name;
+  final GestureTapCallback onTap;
+  const _ElevatorFloor(this.name, {required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Text(name),
       ),
     );
   }

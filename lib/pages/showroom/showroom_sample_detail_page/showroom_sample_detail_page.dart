@@ -4,10 +4,12 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_submit_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     final currentIndex = useState<int>(0);
     final sampleSimilars = useState(<Sample>[]);
     final similarPage = useRef(1);
+    final elevatorFloors = useState(<ElevatorFloor>[]);
 
     final isLoading = useState<bool>(true);
     final hasMounted = useState(false);
@@ -41,6 +44,13 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
       } finally {
         isLoading.value = false;
       }
+
+      elevatorFloors.value = [
+        ElevatorFloor(id: 'detail', name: '详情', key: GlobalKey()),
+        if (sample.value?.supplyQuotes?.isNotEmpty == true)
+          ElevatorFloor(id: 'supplyQuote', name: '工厂报价', key: GlobalKey()),
+        ElevatorFloor(id: 'similar', name: '推荐', key: GlobalKey()),
+      ];
     }
 
     useEffect(() {
@@ -105,6 +115,10 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                           children: [
                             // 图片轮播区域
                             LayoutBuilder(
+                              key: elevatorFloors.value
+                                  .firstWhereOrNull(
+                                      (floor) => floor.id == "detail")
+                                  ?.key,
                               builder: (context, constraints) {
                                 var pageSize = 1;
                                 final availableWidth = constraints.maxWidth;
@@ -310,6 +324,10 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             // 工厂报价
                             Container(
                               color: Colors.white,
+                              key: elevatorFloors.value
+                                  .firstWhereOrNull(
+                                      (floor) => floor.id == "supplyQuote")
+                                  ?.key,
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Column(
@@ -358,6 +376,10 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                             // 相似产品
                             Container(
                               color: Colors.white,
+                              key: elevatorFloors.value
+                                  .firstWhereOrNull(
+                                      (floor) => floor.id == "similar")
+                                  ?.key,
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Column(
@@ -432,6 +454,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
             right: 0,
             child: SampleAppBar(
               scrollController: scrollController,
+              electorFloors: elevatorFloors.value,
             ),
           ),
         ],
