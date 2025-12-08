@@ -2,12 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class SampleSubmitBar extends HookConsumerWidget {
   final Sample? sample;
@@ -46,7 +46,6 @@ class SampleSubmitBar extends HookConsumerWidget {
       final supplierId = supplier?.id;
       if (supplierId == null) return;
       context.router.push(SupplySupplierDetailRoute(id: supplierId));
-
       return;
     }
   }
@@ -109,7 +108,6 @@ class SampleSubmitBar extends HookConsumerWidget {
                     ),
                     itemBuilder: (context, index) {
                       final supplier = suppliers[index];
-
                       return Material(
                         color: Colors.white,
                         child: InkWell(
@@ -149,123 +147,51 @@ class SampleSubmitBar extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final cart = ref.read(cartProvider.notifier);
     final cartState = ref.watch(cartProvider);
+    final user = ref.watch(userProvider).user;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.withOpacity(0.6),
-            width: 0.5,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: SafeArea(
-        top: false,
-        bottom: true,
-        child: Row(
-          children: [
-            SubmitIcon(
-              label: "供应商",
-              icon: Icons.store,
-              onTap: () => _handleSupplierTap(context),
-            ),
-            const SizedBox(width: 5),
-            SubmitIcon(
-              label: "选样车",
-              icon: Icons.shopping_cart,
-              badgeCount: cartState.items.length.toString(),
-              badgeColor: colorScheme.secondary,
-              onTap: () {
-                context.router.push(const CartRoute());
-              },
-            ),
-            const Spacer(),
-            FlanButton(
-              onClick: () {
-                final currentSample = sample;
-                if (currentSample != null) {
-                  cart.addSample(currentSample, 1);
-                }
-              },
-              round: true,
-              size: FlanButtonSize.small,
-              color: colorScheme.secondary,
-              child: const Text(
-                "加入选样车",
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    // 购物车数量逻辑
+    final badgeCount = cartState.items.length.toString();
+    final showBadge = cartState.items.isNotEmpty;
 
-class SubmitIcon extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final String? badgeCount;
-  final VoidCallback? onTap;
-  final Color? badgeColor;
-
-  const SubmitIcon({
-    super.key,
-    required this.label,
-    required this.icon,
-    this.badgeCount,
-    this.onTap,
-    this.badgeColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
+    return FlanActionBar(
+      safeAreaInsetBottom: true,
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: Colors.grey.shade700,
+        FlanActionBarIcon(
+          iconName: FlanIcons.shop_o,
+          text: '供应商',
+          onClick: () => _handleSupplierTap(context),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 11,
-            height: 1.0,
+        FlanActionBarIcon(
+          iconName: FlanIcons.cart_o,
+          text: '选样车',
+          badge: showBadge ? badgeCount : '',
+          onClick: () {
+            context.router.push(const CartRoute());
+          },
+        ),
+        FlanActionBarButton(
+          type: FlanButtonType.warning,
+          text: '加入选样车',
+          color: colorScheme.primary,
+          onClick: () {
+            final currentSample = sample;
+            if (currentSample != null) {
+              cart.addSample(currentSample, 1);
+            }
+          },
+        ),
+        if (user?.permissions?.contains('showroom.quotation.store') ?? false)
+          FlanActionBarButton(
+            type: FlanButtonType.danger,
+            text: '编辑样品',
+            color: colorScheme.secondary,
+            onClick: () {
+              if (sample?.id != null) {
+                context.router.push(ShowroomSampleEditRoute(id: sample!.id!));
+              }
+            },
           ),
-        ),
       ],
-    );
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
-        child: badgeCount == null || badgeCount == "0"
-            ? content
-            : Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  content,
-                  Positioned(
-                    top: -8,
-                    right: -10,
-                    child: TDBadge(
-                      TDBadgeType.message,
-                      color: badgeColor ?? Colors.red,
-                      size: TDBadgeSize.small,
-                      count: badgeCount,
-                      showZero: false,
-                    ),
-                  ),
-                ],
-              ),
-      ),
     );
   }
 }
