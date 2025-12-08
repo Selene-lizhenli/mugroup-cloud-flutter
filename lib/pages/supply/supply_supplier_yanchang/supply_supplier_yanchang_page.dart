@@ -128,19 +128,39 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
 
                     onItemRemove: (media) async {
                       final bool? confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) {
-                            return Text('123');
-                          });
+                        context: context,
+                        builder: (BuildContext ctx) {
+                          return AlertDialog(
+                            title: const Text('提示'),
+                            content: const Text('确定要移除这张图片吗？'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(ctx).pop(false),
+                                child: const Text(
+                                  '取消',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(ctx).pop(true),
+                                child: const Text(
+                                  '确定',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
 
                       if (confirm != true) return false;
 
-                      EasyLoading.show(status: '移除中...');
+                      if (media.id == null) {
+                        return true;
+                      }
+
                       try {
-                        if (media.id == null) return true;
-
                         await deleteMedia(media.id!, {});
-
                         EasyLoading.showSuccess('移除成功');
                         return true;
                       } catch (e) {
