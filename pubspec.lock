@@ -557,9 +557,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "0ba776e70256df4cca032d9bca44351bc4a65654"
-      url: "git@github.com:edram/flant.git"
+      ref: "5def462"
+      resolved-ref: "5def4625985576443d06fd8e2d608379b687b3d0"
+      url: "https://github.com/edram/flant.git"
     source: git
     version: "0.0.1-alpha"
   flutter:

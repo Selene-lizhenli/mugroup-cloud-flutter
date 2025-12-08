@@ -52,7 +52,9 @@ dependencies:
   flutter_easyloading: ^3.0.5
   collection: ^1.18.0
   flant:
-    git: git@github.com:edram/flant.git
+    git: 
+      url: https://github.com/edram/flant.git
+      ref: 5def462
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   hooks_riverpod: ^2.6.1
