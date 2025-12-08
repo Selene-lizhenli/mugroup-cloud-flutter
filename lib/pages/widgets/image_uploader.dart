@@ -4,6 +4,7 @@ import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -13,14 +14,20 @@ class ImageUploader extends HookConsumerWidget {
   final int? maxCount;
   final List<TemporaryMedia>? value;
   final ValueChanged<List<TemporaryMedia>>? onChanged;
+  // --- 图片识别参数 ---
+  final bool showRecognizeButton;
+  final Future<dynamic> Function(TemporaryMedia media)? recognizeApi;
+  final ValueChanged<dynamic>? onRecognizeResult;
 
-  const ImageUploader({
-    super.key,
-    this.label,
-    this.maxCount,
-    this.value,
-    this.onChanged,
-  });
+  const ImageUploader(
+      {super.key,
+      this.label,
+      this.maxCount,
+      this.value,
+      this.onChanged,
+      this.showRecognizeButton = false,
+      this.recognizeApi,
+      this.onRecognizeResult});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -98,13 +105,76 @@ class ImageUploader extends HookConsumerWidget {
       onChanged?.call(newImageList);
     }
 
+    Future<void> handleSmartRecognize() async {
+      // 1. 校验是否有图片
+      if (currentImages.isEmpty) {
+        EasyLoading.showInfo("请先上传图片");
+        return;
+      }
+
+      if (recognizeApi == null) {
+        debugPrint('ImageUploader: recognizeApi is null');
+        return;
+      }
+
+      await EasyLoading.show(
+          status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
+
+      // 4. 取第一张图片进行识别
+      final TemporaryMedia firstImage = currentImages.first;
+
+      final result = await recognizeApi!(firstImage);
+
+      // 5. 回调结果
+      if (result != null && onRecognizeResult != null) {
+        EasyLoading.showSuccess("识别成功");
+        onRecognizeResult!(result);
+      } else {
+        EasyLoading.dismiss();
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (label != null) ...[
-          Text(label!,
-              style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        if (label != null || showRecognizeButton) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 左右对齐
+            children: [
+              if (label != null)
+                Text(
+                  label!,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                )
+              else
+                const SizedBox(), // 占位
+
+              if (showRecognizeButton)
+                GestureDetector(
+                  onTap: handleSmartRecognize,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.center_focus_weak,
+                            size: 16, color: Theme.of(context).primaryColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          "智能识别",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
         ],
         Wrap(
