@@ -10,6 +10,7 @@ import 'package:cloud/pages/widgets/multi_select.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/supplier_type_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
+import 'package:cloud/services/openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -49,6 +50,14 @@ class SupplySupplierForm extends HookConsumerWidget {
                       builder: (field) {
                         return ImageUploader(
                           label: "名片",
+                          showRecognizeButton: true,
+                          recognizeApi: identifySupplySuppliersCard,
+                          onRecognizeResult: (data) {
+                            if (data != null && data is Map<String, dynamic>) {
+                              formKey.currentState?.patchValue(data);
+                              formKey.currentState?.save();
+                            }
+                          },
                           value: field.value,
                           onChanged: field.didChange,
                         );
