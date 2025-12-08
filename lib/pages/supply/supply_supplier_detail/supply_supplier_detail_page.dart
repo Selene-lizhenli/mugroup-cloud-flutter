@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -9,6 +10,7 @@ class SupplySupplierDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "供应商"),
       const BottomNavigationBarItem(icon: Icon(Icons.people), label: "联系人列表"),
@@ -25,6 +27,21 @@ class SupplySupplierDetailPage extends HookConsumerWidget {
             elevation: 0,
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.white,
+            actions: [
+              TextButton(
+                onPressed: () {
+                  context.router.push(SupplySupplierEditRoute(id: id));
+                },
+                child: Text(
+                  "编辑",
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
           ),
           body: child,
           bottomNavigationBar: BottomNavigationBar(
