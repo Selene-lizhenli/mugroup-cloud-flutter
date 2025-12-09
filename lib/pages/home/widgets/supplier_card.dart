@@ -90,7 +90,23 @@ class SupplierCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-
+                  if (supplier.supplierNo != '')
+                    Row(
+                      children: [
+                        const Icon(Icons.numbers, size: 14, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Text(
+                          supplier.supplierNo ?? '暂无',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 4),
                   if ((supplier.city?.isNotEmpty ?? false) ||
                       (supplier.province?.isNotEmpty ?? false))
                     Wrap(
@@ -155,7 +171,7 @@ class SupplierCard extends StatelessWidget {
                                 ),
                               )
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -204,7 +220,7 @@ class SupplierCard extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
+      padding: const EdgeInsets.only(top: 4, bottom: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
