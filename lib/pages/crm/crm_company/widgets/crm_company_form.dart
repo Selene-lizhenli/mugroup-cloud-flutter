@@ -119,8 +119,11 @@ class CrmCompanyForm extends HookConsumerWidget {
                           isUploading: isUploading.value,
                           onTap: handleUploadMedia,
                           onSuccess: (value) {
-                            // 成功回调
-                            logger.d(value);
+                            if (value != null &&
+                                value is Map<String, dynamic>) {
+                              formKey.currentState?.patchValue(value);
+                              formKey.currentState?.save();
+                            }
                           },
                         );
                       },
