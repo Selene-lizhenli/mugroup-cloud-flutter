@@ -26,6 +26,7 @@ String generateSalt(String api, int time) {
 final silentApi = Dio(
   BaseOptions(
     connectTimeout: const Duration(seconds: 120),
+    listFormat: ListFormat.multiCompatible,
     headers: {
       Headers.acceptHeader: 'application/json',
     },
