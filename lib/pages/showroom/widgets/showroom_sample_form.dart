@@ -1,3 +1,4 @@
+import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -30,7 +31,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
 
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
-      final images = formKey.currentState?.value['images'];
+      final images = formKey.currentState?.value['image'];
 
       if (images == null || (images is List && images.isEmpty)) {
         EasyLoading.showInfo("请先上传图片");
@@ -89,11 +90,31 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         ),
                       ),
                       children: [
-                        FormBuilderField<List<TemporaryMedia>>(
-                          name: "images",
+                        FormBuilderField<List<dynamic>>(
+                          name: "image",
                           builder: (field) {
+                            List<TemporaryMedia> displayValue = [];
+
+                            if (field.value != null) {
+                              displayValue = field.value!
+                                  .map((e) {
+                                    if (e is Media) {
+                                      return TemporaryMedia(
+                                        id: e.id!,
+                                        url: e.url!,
+                                        thumbUrl: e.thumbUrl,
+                                      );
+                                    } else if (e is TemporaryMedia) {
+                                      return e;
+                                    }
+
+                                    return null;
+                                  })
+                                  .whereType<TemporaryMedia>()
+                                  .toList();
+                            }
                             return ImageUploader(
-                              value: field.value,
+                              value: displayValue,
                               onChanged: field.didChange,
                             );
                           },
