@@ -1,7 +1,7 @@
 import 'package:city_pickers/city_pickers.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
-import 'package:cloud/pages/showroom/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/check_box_input.dart';
 import 'package:cloud/pages/widgets/date_picker_input.dart';
 import 'package:cloud/pages/widgets/dynamic_city_pickers.dart';

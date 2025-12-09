@@ -1,6 +1,6 @@
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/pages/showroom/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
