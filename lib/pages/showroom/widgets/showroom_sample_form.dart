@@ -111,6 +111,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                 builder: (field) {
                                   return Input(
                                     label: '产品货号',
+                                    hintText: '自动生成',
                                     value: field.value ?? '',
                                     onChanged: field.didChange,
                                   );
