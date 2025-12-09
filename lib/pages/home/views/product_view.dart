@@ -215,10 +215,15 @@ class ProductDropdownMenu extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final query = useState<Map<String, dynamic>>({});
-    final supportFacet = {"supplier_ids": "供应商", "category_id": "产品分类"};
+    final supportFacet = {
+      "supplier_ids": "供应商",
+      "category_id": "产品分类",
+      "trade_country": "贸易国别"
+    };
     final menuOptions = {
       "supplier_ids": {"multiple": true},
-      "category_id": {"multiple": false}
+      "category_id": {"multiple": false},
+      "trade_country": {"multiple": false},
     };
 
     final suppliers = useState(<Supplier>[]);
@@ -362,7 +367,6 @@ class ProductDropdownMenu extends HookWidget {
 
               onChange(query.value);
             },
-            isScrollable: true,
             items: menus,
           ),
           // Text(query.value.toString()),
