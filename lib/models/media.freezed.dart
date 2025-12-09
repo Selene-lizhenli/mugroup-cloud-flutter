@@ -148,13 +148,14 @@ class __$$MediaImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$MediaImpl implements _Media {
+class _$MediaImpl extends _Media {
   const _$MediaImpl(
       {this.id,
       this.name,
       this.url,
       this.filename,
-      @JsonKey(name: 'thumb_url') this.thumbUrl});
+      @JsonKey(name: 'thumb_url') this.thumbUrl})
+      : super._();
 
   factory _$MediaImpl.fromJson(Map<String, dynamic> json) =>
       _$$MediaImplFromJson(json);
@@ -209,13 +210,14 @@ class _$MediaImpl implements _Media {
   }
 }
 
-abstract class _Media implements Media {
+abstract class _Media extends Media {
   const factory _Media(
       {final int? id,
       final String? name,
       final String? url,
       final String? filename,
       @JsonKey(name: 'thumb_url') final String? thumbUrl}) = _$MediaImpl;
+  const _Media._() : super._();
 
   factory _Media.fromJson(Map<String, dynamic> json) = _$MediaImpl.fromJson;
 

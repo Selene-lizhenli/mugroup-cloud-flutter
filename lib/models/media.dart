@@ -5,6 +5,8 @@ part 'media.g.dart';
 
 @freezed
 abstract class Media with _$Media {
+  const Media._();
+
   const factory Media({
     int? id,
     String? name,
@@ -14,4 +16,8 @@ abstract class Media with _$Media {
   }) = _Media;
 
   factory Media.fromJson(Map<String, Object?> json) => _$MediaFromJson(json);
+
+  String? get thumbOrUrl {
+    return thumbUrl ?? url;
+  }
 }

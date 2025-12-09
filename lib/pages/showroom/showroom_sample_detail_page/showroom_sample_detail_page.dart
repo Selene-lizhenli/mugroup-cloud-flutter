@@ -159,7 +159,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                                         constraints.maxWidth;
                                                     return ClipRRect(
                                                       child: Image.network(
-                                                        media.url!,
+                                                        media.thumbOrUrl!,
                                                         fit: BoxFit.contain,
                                                         width: containerWidth,
                                                       ),

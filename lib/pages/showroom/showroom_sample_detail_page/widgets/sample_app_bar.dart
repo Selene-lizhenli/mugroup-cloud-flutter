@@ -53,11 +53,6 @@ class SampleAppBar extends HookWidget {
           final box = renderBox as RenderBox;
           final offset = box.localToGlobal(Offset.zero);
 
-          if (offset.dy - appBarHeight >0) {
-            logger
-                .d([index, offset.dy, appBarHeight, offset.dy - appBarHeight]);
-          }
-
           if (offset.dy - appBarHeight <= 2) {
             currentElectorFloorIndex.value = index;
           }

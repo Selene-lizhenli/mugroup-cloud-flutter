@@ -153,46 +153,53 @@ class SampleSubmitBar extends HookConsumerWidget {
     final badgeCount = cartState.items.length.toString();
     final showBadge = cartState.items.isNotEmpty;
 
-    return FlanActionBar(
-      safeAreaInsetBottom: true,
-      children: [
-        FlanActionBarIcon(
-          iconName: FlanIcons.shop_o,
-          text: '供应商',
-          onClick: () => _handleSupplierTap(context),
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        bottom: true,
+        top: false,
+        child: FlanActionBar(
+          children: [
+            FlanActionBarIcon(
+              iconName: FlanIcons.shop_o,
+              text: '供应商',
+              onClick: () => _handleSupplierTap(context),
+            ),
+            FlanActionBarIcon(
+              iconName: FlanIcons.cart_o,
+              text: '选样车',
+              badge: showBadge ? badgeCount : '',
+              onClick: () {
+                context.router.push(const CartRoute());
+              },
+            ),
+            if (user?.permissions?.contains('schema.showroom_samples.update') ??
+                false)
+              FlanActionBarButton(
+                type: FlanButtonType.danger,
+                text: '编辑样品',
+                color: colorScheme.secondary,
+                onClick: () {
+                  if (sample?.id != null) {
+                    context.router
+                        .push(ShowroomSampleEditRoute(id: sample!.id!));
+                  }
+                },
+              ),
+            FlanActionBarButton(
+              type: FlanButtonType.warning,
+              text: '加入选样车',
+              color: colorScheme.primary,
+              onClick: () {
+                final currentSample = sample;
+                if (currentSample != null) {
+                  cart.addSample(currentSample, 1);
+                }
+              },
+            ),
+          ],
         ),
-        FlanActionBarIcon(
-          iconName: FlanIcons.cart_o,
-          text: '选样车',
-          badge: showBadge ? badgeCount : '',
-          onClick: () {
-            context.router.push(const CartRoute());
-          },
-        ),
-        if (user?.permissions?.contains('schema.showroom_samples.update') ??
-            false)
-          FlanActionBarButton(
-            type: FlanButtonType.danger,
-            text: '编辑样品',
-            color: colorScheme.secondary,
-            onClick: () {
-              if (sample?.id != null) {
-                context.router.push(ShowroomSampleEditRoute(id: sample!.id!));
-              }
-            },
-          ),
-        FlanActionBarButton(
-          type: FlanButtonType.warning,
-          text: '加入选样车',
-          color: colorScheme.primary,
-          onClick: () {
-            final currentSample = sample;
-            if (currentSample != null) {
-              cart.addSample(currentSample, 1);
-            }
-          },
-        ),
-      ],
+      ),
     );
   }
 }
