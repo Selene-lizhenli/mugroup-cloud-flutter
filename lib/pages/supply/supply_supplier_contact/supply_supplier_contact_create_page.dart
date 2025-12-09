@@ -1,6 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/pages/widgets/dynamic_build_field.dart';
+import 'package:cloud/pages/widgets/image_uploader.dart';
+import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/schema.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +49,24 @@ class SupplySupplierContactCreatePage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                FormBuilderField<List<TemporaryMedia>>(
+                  name: "images",
+                  builder: (field) {
+                    return ImageUploader(
+                      label: "名片",
+                      showRecognizeButton: true,
+                      recognizeApi: identifySupplySuppliersCard,
+                      onRecognizeResult: (data) {
+                        if (data != null && data is Map<String, dynamic>) {
+                          formKey.currentState?.patchValue(data);
+                          formKey.currentState?.save();
+                        }
+                      },
+                      value: field.value,
+                      onChanged: field.didChange,
+                    );
+                  },
+                ),
                 for (final item in schemas.value ?? [])
                   DynamicBuildField(schema: item),
               ],
