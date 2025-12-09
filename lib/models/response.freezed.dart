@@ -282,6 +282,8 @@ Meta _$MetaFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Meta {
   Pagination? get pagination => throw _privateConstructorUsedError;
+  @JsonKey(name: 'facet_counts')
+  List<FacetCount>? get facetCounts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -293,7 +295,9 @@ abstract class $MetaCopyWith<$Res> {
   factory $MetaCopyWith(Meta value, $Res Function(Meta) then) =
       _$MetaCopyWithImpl<$Res, Meta>;
   @useResult
-  $Res call({Pagination? pagination});
+  $Res call(
+      {Pagination? pagination,
+      @JsonKey(name: 'facet_counts') List<FacetCount>? facetCounts});
 
   $PaginationCopyWith<$Res>? get pagination;
 }
@@ -312,12 +316,17 @@ class _$MetaCopyWithImpl<$Res, $Val extends Meta>
   @override
   $Res call({
     Object? pagination = freezed,
+    Object? facetCounts = freezed,
   }) {
     return _then(_value.copyWith(
       pagination: freezed == pagination
           ? _value.pagination
           : pagination // ignore: cast_nullable_to_non_nullable
               as Pagination?,
+      facetCounts: freezed == facetCounts
+          ? _value.facetCounts
+          : facetCounts // ignore: cast_nullable_to_non_nullable
+              as List<FacetCount>?,
     ) as $Val);
   }
 
@@ -341,7 +350,9 @@ abstract class _$$MetaImplCopyWith<$Res> implements $MetaCopyWith<$Res> {
       __$$MetaImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Pagination? pagination});
+  $Res call(
+      {Pagination? pagination,
+      @JsonKey(name: 'facet_counts') List<FacetCount>? facetCounts});
 
   @override
   $PaginationCopyWith<$Res>? get pagination;
@@ -358,12 +369,17 @@ class __$$MetaImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? pagination = freezed,
+    Object? facetCounts = freezed,
   }) {
     return _then(_$MetaImpl(
       pagination: freezed == pagination
           ? _value.pagination
           : pagination // ignore: cast_nullable_to_non_nullable
               as Pagination?,
+      facetCounts: freezed == facetCounts
+          ? _value._facetCounts
+          : facetCounts // ignore: cast_nullable_to_non_nullable
+              as List<FacetCount>?,
     ));
   }
 }
@@ -371,17 +387,30 @@ class __$$MetaImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$MetaImpl implements _Meta {
-  _$MetaImpl({this.pagination});
+  _$MetaImpl(
+      {this.pagination,
+      @JsonKey(name: 'facet_counts') final List<FacetCount>? facetCounts})
+      : _facetCounts = facetCounts;
 
   factory _$MetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$MetaImplFromJson(json);
 
   @override
   final Pagination? pagination;
+  final List<FacetCount>? _facetCounts;
+  @override
+  @JsonKey(name: 'facet_counts')
+  List<FacetCount>? get facetCounts {
+    final value = _facetCounts;
+    if (value == null) return null;
+    if (_facetCounts is EqualUnmodifiableListView) return _facetCounts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'Meta(pagination: $pagination)';
+    return 'Meta(pagination: $pagination, facetCounts: $facetCounts)';
   }
 
   @override
@@ -390,12 +419,15 @@ class _$MetaImpl implements _Meta {
         (other.runtimeType == runtimeType &&
             other is _$MetaImpl &&
             (identical(other.pagination, pagination) ||
-                other.pagination == pagination));
+                other.pagination == pagination) &&
+            const DeepCollectionEquality()
+                .equals(other._facetCounts, _facetCounts));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, pagination);
+  int get hashCode => Object.hash(runtimeType, pagination,
+      const DeepCollectionEquality().hash(_facetCounts));
 
   @JsonKey(ignore: true)
   @override
@@ -412,12 +444,18 @@ class _$MetaImpl implements _Meta {
 }
 
 abstract class _Meta implements Meta {
-  factory _Meta({final Pagination? pagination}) = _$MetaImpl;
+  factory _Meta(
+          {final Pagination? pagination,
+          @JsonKey(name: 'facet_counts') final List<FacetCount>? facetCounts}) =
+      _$MetaImpl;
 
   factory _Meta.fromJson(Map<String, dynamic> json) = _$MetaImpl.fromJson;
 
   @override
   Pagination? get pagination;
+  @override
+  @JsonKey(name: 'facet_counts')
+  List<FacetCount>? get facetCounts;
   @override
   @JsonKey(ignore: true)
   _$$MetaImplCopyWith<_$MetaImpl> get copyWith =>
@@ -602,5 +640,333 @@ abstract class _Pagination implements Pagination {
   @override
   @JsonKey(ignore: true)
   _$$PaginationImplCopyWith<_$PaginationImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+FacetCount _$FacetCountFromJson(Map<String, dynamic> json) {
+  return _FacetCount.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FacetCount {
+  List<FacetCountCount> get counts => throw _privateConstructorUsedError;
+  @JsonKey(name: 'field_name')
+  String get fieldName => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $FacetCountCopyWith<FacetCount> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FacetCountCopyWith<$Res> {
+  factory $FacetCountCopyWith(
+          FacetCount value, $Res Function(FacetCount) then) =
+      _$FacetCountCopyWithImpl<$Res, FacetCount>;
+  @useResult
+  $Res call(
+      {List<FacetCountCount> counts,
+      @JsonKey(name: 'field_name') String fieldName});
+}
+
+/// @nodoc
+class _$FacetCountCopyWithImpl<$Res, $Val extends FacetCount>
+    implements $FacetCountCopyWith<$Res> {
+  _$FacetCountCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? counts = null,
+    Object? fieldName = null,
+  }) {
+    return _then(_value.copyWith(
+      counts: null == counts
+          ? _value.counts
+          : counts // ignore: cast_nullable_to_non_nullable
+              as List<FacetCountCount>,
+      fieldName: null == fieldName
+          ? _value.fieldName
+          : fieldName // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$FacetCountImplCopyWith<$Res>
+    implements $FacetCountCopyWith<$Res> {
+  factory _$$FacetCountImplCopyWith(
+          _$FacetCountImpl value, $Res Function(_$FacetCountImpl) then) =
+      __$$FacetCountImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {List<FacetCountCount> counts,
+      @JsonKey(name: 'field_name') String fieldName});
+}
+
+/// @nodoc
+class __$$FacetCountImplCopyWithImpl<$Res>
+    extends _$FacetCountCopyWithImpl<$Res, _$FacetCountImpl>
+    implements _$$FacetCountImplCopyWith<$Res> {
+  __$$FacetCountImplCopyWithImpl(
+      _$FacetCountImpl _value, $Res Function(_$FacetCountImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? counts = null,
+    Object? fieldName = null,
+  }) {
+    return _then(_$FacetCountImpl(
+      counts: null == counts
+          ? _value._counts
+          : counts // ignore: cast_nullable_to_non_nullable
+              as List<FacetCountCount>,
+      fieldName: null == fieldName
+          ? _value.fieldName
+          : fieldName // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FacetCountImpl implements _FacetCount {
+  _$FacetCountImpl(
+      {required final List<FacetCountCount> counts,
+      @JsonKey(name: 'field_name') required this.fieldName})
+      : _counts = counts;
+
+  factory _$FacetCountImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FacetCountImplFromJson(json);
+
+  final List<FacetCountCount> _counts;
+  @override
+  List<FacetCountCount> get counts {
+    if (_counts is EqualUnmodifiableListView) return _counts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_counts);
+  }
+
+  @override
+  @JsonKey(name: 'field_name')
+  final String fieldName;
+
+  @override
+  String toString() {
+    return 'FacetCount(counts: $counts, fieldName: $fieldName)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FacetCountImpl &&
+            const DeepCollectionEquality().equals(other._counts, _counts) &&
+            (identical(other.fieldName, fieldName) ||
+                other.fieldName == fieldName));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_counts), fieldName);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FacetCountImplCopyWith<_$FacetCountImpl> get copyWith =>
+      __$$FacetCountImplCopyWithImpl<_$FacetCountImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FacetCountImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _FacetCount implements FacetCount {
+  factory _FacetCount(
+          {required final List<FacetCountCount> counts,
+          @JsonKey(name: 'field_name') required final String fieldName}) =
+      _$FacetCountImpl;
+
+  factory _FacetCount.fromJson(Map<String, dynamic> json) =
+      _$FacetCountImpl.fromJson;
+
+  @override
+  List<FacetCountCount> get counts;
+  @override
+  @JsonKey(name: 'field_name')
+  String get fieldName;
+  @override
+  @JsonKey(ignore: true)
+  _$$FacetCountImplCopyWith<_$FacetCountImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+FacetCountCount _$FacetCountCountFromJson(Map<String, dynamic> json) {
+  return _FacetCountCount.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FacetCountCount {
+  int get count => throw _privateConstructorUsedError;
+  String get value => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $FacetCountCountCopyWith<FacetCountCount> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FacetCountCountCopyWith<$Res> {
+  factory $FacetCountCountCopyWith(
+          FacetCountCount value, $Res Function(FacetCountCount) then) =
+      _$FacetCountCountCopyWithImpl<$Res, FacetCountCount>;
+  @useResult
+  $Res call({int count, String value});
+}
+
+/// @nodoc
+class _$FacetCountCountCopyWithImpl<$Res, $Val extends FacetCountCount>
+    implements $FacetCountCountCopyWith<$Res> {
+  _$FacetCountCountCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? count = null,
+    Object? value = null,
+  }) {
+    return _then(_value.copyWith(
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      value: null == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$FacetCountCountImplCopyWith<$Res>
+    implements $FacetCountCountCopyWith<$Res> {
+  factory _$$FacetCountCountImplCopyWith(_$FacetCountCountImpl value,
+          $Res Function(_$FacetCountCountImpl) then) =
+      __$$FacetCountCountImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int count, String value});
+}
+
+/// @nodoc
+class __$$FacetCountCountImplCopyWithImpl<$Res>
+    extends _$FacetCountCountCopyWithImpl<$Res, _$FacetCountCountImpl>
+    implements _$$FacetCountCountImplCopyWith<$Res> {
+  __$$FacetCountCountImplCopyWithImpl(
+      _$FacetCountCountImpl _value, $Res Function(_$FacetCountCountImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? count = null,
+    Object? value = null,
+  }) {
+    return _then(_$FacetCountCountImpl(
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      value: null == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FacetCountCountImpl implements _FacetCountCount {
+  _$FacetCountCountImpl({required this.count, required this.value});
+
+  factory _$FacetCountCountImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FacetCountCountImplFromJson(json);
+
+  @override
+  final int count;
+  @override
+  final String value;
+
+  @override
+  String toString() {
+    return 'FacetCountCount(count: $count, value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FacetCountCountImpl &&
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, count, value);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FacetCountCountImplCopyWith<_$FacetCountCountImpl> get copyWith =>
+      __$$FacetCountCountImplCopyWithImpl<_$FacetCountCountImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FacetCountCountImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _FacetCountCount implements FacetCountCount {
+  factory _FacetCountCount(
+      {required final int count,
+      required final String value}) = _$FacetCountCountImpl;
+
+  factory _FacetCountCount.fromJson(Map<String, dynamic> json) =
+      _$FacetCountCountImpl.fromJson;
+
+  @override
+  int get count;
+  @override
+  String get value;
+  @override
+  @JsonKey(ignore: true)
+  _$$FacetCountCountImplCopyWith<_$FacetCountCountImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -16,6 +16,7 @@ sealed class ApiResponse<T> with _$ApiResponse<T> {
 class Meta with _$Meta {
   factory Meta({
     Pagination? pagination,
+    @JsonKey(name: 'facet_counts') List<FacetCount>? facetCounts,
   }) = _Meta;
 
   factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
@@ -31,4 +32,26 @@ class Pagination with _$Pagination {
 
   factory Pagination.fromJson(Map<String, dynamic> json) =>
       _$PaginationFromJson(json);
+}
+
+@freezed
+class FacetCount with _$FacetCount {
+  factory FacetCount({
+    required List<FacetCountCount> counts,
+    @JsonKey(name: 'field_name') required String fieldName,
+  }) = _FacetCount;
+
+  factory FacetCount.fromJson(Map<String, dynamic> json) =>
+      _$FacetCountFromJson(json);
+}
+
+@freezed
+class FacetCountCount with _$FacetCountCount {
+  factory FacetCountCount({
+    required int count,
+    required String value,
+  }) = _FacetCountCount;
+
+  factory FacetCountCount.fromJson(Map<String, dynamic> json) =>
+      _$FacetCountCountFromJson(json);
 }

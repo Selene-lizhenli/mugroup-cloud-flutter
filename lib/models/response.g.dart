@@ -30,11 +30,15 @@ _$MetaImpl _$$MetaImplFromJson(Map<String, dynamic> json) => _$MetaImpl(
       pagination: json['pagination'] == null
           ? null
           : Pagination.fromJson(json['pagination'] as Map<String, dynamic>),
+      facetCounts: (json['facet_counts'] as List<dynamic>?)
+          ?.map((e) => FacetCount.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$MetaImplToJson(_$MetaImpl instance) =>
     <String, dynamic>{
       'pagination': instance.pagination,
+      'facet_counts': instance.facetCounts,
     };
 
 _$PaginationImpl _$$PaginationImplFromJson(Map<String, dynamic> json) =>
@@ -49,4 +53,32 @@ Map<String, dynamic> _$$PaginationImplToJson(_$PaginationImpl instance) =>
       'total': instance.total,
       'count': instance.count,
       'total_pages': instance.totalPages,
+    };
+
+_$FacetCountImpl _$$FacetCountImplFromJson(Map<String, dynamic> json) =>
+    _$FacetCountImpl(
+      counts: (json['counts'] as List<dynamic>)
+          .map((e) => FacetCountCount.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      fieldName: json['field_name'] as String,
+    );
+
+Map<String, dynamic> _$$FacetCountImplToJson(_$FacetCountImpl instance) =>
+    <String, dynamic>{
+      'counts': instance.counts,
+      'field_name': instance.fieldName,
+    };
+
+_$FacetCountCountImpl _$$FacetCountCountImplFromJson(
+        Map<String, dynamic> json) =>
+    _$FacetCountCountImpl(
+      count: (json['count'] as num).toInt(),
+      value: json['value'] as String,
+    );
+
+Map<String, dynamic> _$$FacetCountCountImplToJson(
+        _$FacetCountCountImpl instance) =>
+    <String, dynamic>{
+      'count': instance.count,
+      'value': instance.value,
     };

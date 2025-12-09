@@ -1,4 +1,6 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
+import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
@@ -30,9 +32,11 @@ class ProductView extends HookConsumerWidget {
         controlFinishLoad: true, controlFinishRefresh: true);
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
+    final query = useState<Map<String, dynamic>>({});
     final media = useState<TemporaryMedia?>(home.currentMedia);
     final page = useRef(1);
     final samples = useState<List<Sample>>(<Sample>[]);
+    final facetCounts = useState(<FacetCount>[]);
 
     final mediaQuery = MediaQuery.of(context);
 
@@ -62,6 +66,7 @@ class ProductView extends HookConsumerWidget {
         if (searchMedia != null) "image": searchMedia.id,
         "page": page.value,
         "pageSize": pageSize,
+        ...query.value,
       };
       final resp = await getSamples(queryParameters: queryParameters);
 
@@ -69,6 +74,9 @@ class ProductView extends HookConsumerWidget {
         samples.value = resp.data;
       } else {
         samples.value = [...samples.value, ...resp.data];
+      }
+      if (page.value == 1) {
+        facetCounts.value = resp.meta?.facetCounts ?? [];
       }
 
       if (resp.data.length >= 20) {
@@ -146,9 +154,18 @@ class ProductView extends HookConsumerWidget {
               Container(
                 height: 0,
               ),
-              const SliverPinnedHeader(
-                child: ProductDropdownMenu(),
-              ),
+              if (facetCounts.value.isNotEmpty)
+                SliverPinnedHeader(
+                  child: ProductDropdownMenu(
+                    facetCounts: facetCounts.value,
+                    value: query.value,
+                    onChange: (menuQuery) {
+                      query.value = menuQuery;
+                      logger.d(menuQuery);
+                      refreshController.callRefresh(force: true);
+                    },
+                  ),
+                ),
               MasonryGridView.count(
                 crossAxisCount: crossAxisCount,
                 mainAxisSpacing: 5,
@@ -180,85 +197,85 @@ class ProductView extends HookConsumerWidget {
   }
 }
 
-class ProductDropdownMenu extends StatelessWidget {
+class ProductDropdownMenu extends HookWidget {
+  final List<FacetCount> facetCounts;
+  final Map<String, dynamic> value;
+  final void Function(Map<String, dynamic> query) onChange;
+
   const ProductDropdownMenu({
     super.key,
+    required this.value,
+    required this.facetCounts,
+    required this.onChange,
   });
 
   @override
   Widget build(BuildContext context) {
+    final query = useState<Map<String, dynamic>>({});
+    final supportFacet = {"supplier_ids": "供应商"};
+
+    useEffect(() {
+      query.value = value;
+      return null;
+    }, [value]);
+
+    final menus = <TDDropdownItem>[];
+
+    for (var facetCount in facetCounts) {
+      final field = facetCount.fieldName;
+      if (!supportFacet.containsKey(field)) {
+        continue;
+      }
+
+      TDDropdownItem? item;
+      final options = <TDDropdownItemOption>[];
+      final selectValues = query.value[field];
+
+      for (var count in facetCount.counts) {
+        var selected = false;
+        if (selectValues is List) {
+          selected = selectValues.contains(count.value);
+        }
+        options.add(TDDropdownItemOption(
+          label: count.value,
+          value: count.value,
+          selected: selected,
+        ));
+      }
+
+      item = TDDropdownItem(
+        label: supportFacet[field],
+        multiple: true,
+        options: options,
+        optionsColumns: 2,
+        onConfirm: (value) {
+          query.value = {
+            ...query.value,
+            field: value,
+          };
+        },
+        onReset: () {
+          query.value = {...query.value}..remove(field);
+        },
+      );
+
+      menus.add(item);
+    }
+
     return Container(
-      color: Colors.red,
-      child: TDDropdownMenu(
-        direction: TDDropdownMenuDirection.down,
-        // isScrollable: true,
-        items: [
-          TDDropdownItem(
-            label: '产品目录',
-            multiple: true,
-            options: [
-              TDDropdownItemOption(label: '选项2', value: '2'),
-              TDDropdownItemOption(label: '选项3', value: '3'),
-              TDDropdownItemOption(label: '选项4', value: '4'),
-              TDDropdownItemOption(label: '选项5', value: '5'),
-              TDDropdownItemOption(label: '选项6', value: '6'),
-              TDDropdownItemOption(label: '选项7', value: '7'),
-              TDDropdownItemOption(label: '选项8', value: '8'),
-            ],
-            onChange: (value) {
-              print('选择：$value');
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          TDDropdownMenu(
+            direction: TDDropdownMenuDirection.down,
+            onMenuClosed: (value) {
+              onChange(query.value);
             },
-            onConfirm: (value) {
-              print('确定选择：$value');
-            },
-            onReset: () {
-              print('清空选择');
-            },
+            isScrollable: true,
+            items: menus,
           ),
-          TDDropdownItem(
-            label: '供应商',
-            multiple: true,
-            options: [
-              TDDropdownItemOption(label: '选项2', value: '2'),
-              TDDropdownItemOption(label: '选项3', value: '3'),
-              TDDropdownItemOption(label: '选项4', value: '4'),
-              TDDropdownItemOption(label: '选项5', value: '5'),
-              TDDropdownItemOption(label: '选项6', value: '6'),
-              TDDropdownItemOption(label: '选项7', value: '7'),
-              TDDropdownItemOption(label: '选项8', value: '8'),
-            ],
-            onChange: (value) {
-              print('选择：$value');
-            },
-            onConfirm: (value) {
-              print('确定选择：$value');
-            },
-            onReset: () {
-              print('清空选择');
-            },
-          ),
-          TDDropdownItem(
-            label: '贸易国别',
-            multiple: true,
-            options: [
-              TDDropdownItemOption(label: '选项2', value: '2'),
-              TDDropdownItemOption(label: '选项3', value: '3'),
-              TDDropdownItemOption(label: '选项4', value: '4'),
-              TDDropdownItemOption(label: '选项5', value: '5'),
-              TDDropdownItemOption(label: '选项6', value: '6'),
-              TDDropdownItemOption(label: '选项7', value: '7'),
-              TDDropdownItemOption(label: '选项8', value: '8'),
-            ],
-            onChange: (value) {
-              print('选择：$value');
-            },
-            onConfirm: (value) {
-              print('确定选择：$value');
-            },
-            onReset: () {
-              print('清空选择');
-            },
-          ),
+          Text(query.value.toString()),
         ],
       ),
     );
