@@ -99,8 +99,41 @@ class ImageUploader extends HookConsumerWidget {
       );
     }
 
-    void handleDelete(int index) {
+    void handleDelete(int index) async {
+      final bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text('提示'),
+            content: const Text('确定要移除这张图片吗？'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text(
+                  '取消',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text(
+                  '确定',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      if (confirm != true) {
+        return;
+      }
       final newImageList = [...currentImages];
+      var item = newImageList[index];
+      //已经迁移到了样品的图片
+      if (item.uuid == null) {
+        await deleteMedia(item.id, {});
+      }
       newImageList.removeAt(index);
       onChanged?.call(newImageList);
     }
