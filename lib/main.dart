@@ -107,12 +107,30 @@ class MyApp extends ConsumerWidget {
       );
     }
 
+    TDTheme.needMultiTheme();
+
+    final tdTheme = TDThemeData.defaultData().copyWith(
+      name: 'default',
+      colorMap: {
+        "brandColor1": const Color(0xFFF2F3FF),
+        "brandColor2": const Color(0xFFD9E1FF),
+        "brandColor3": const Color(0xFFB5C8FF),
+        "brandColor4": const Color(0xFF8BABFF),
+        "brandColor5": const Color(0xFF698EF2),
+        "brandColor6": const Color(0xFF4C73D5),
+        "brandColor7": const Color(0xFF355EBF),
+        "brandColor8": const Color(0xFF063FA0),
+        "brandColor9": const Color(0xFF002B79),
+        "brandColor10": const Color(0xFF001B54),
+      },
+    );
+
     return MaterialApp.router(
       routerConfig: app.router.config(
         reevaluateListenable: authNotifier,
       ),
       theme: ThemeData(
-        extensions: [TDThemeData.defaultData()],
+        extensions: [tdTheme],
         useMaterial3: true,
         actionIconTheme: ActionIconThemeData(
           backButtonIconBuilder: (BuildContext context) {
