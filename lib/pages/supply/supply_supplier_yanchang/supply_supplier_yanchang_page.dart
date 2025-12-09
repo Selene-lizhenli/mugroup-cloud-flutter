@@ -129,26 +129,102 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
                     onItemRemove: (media) async {
                       final bool? confirm = await showDialog<bool>(
                         context: context,
+                        barrierDismissible: false,
                         builder: (BuildContext ctx) {
-                          return AlertDialog(
-                            title: const Text('提示'),
-                            content: const Text('确定要移除这张图片吗？'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(ctx).pop(false),
-                                child: const Text(
-                                  '取消',
-                                  style: TextStyle(color: Colors.grey),
+                          return Dialog(
+                            backgroundColor: Colors.white,
+                            surfaceTintColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            insetPadding:
+                                const EdgeInsets.symmetric(horizontal: 40),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 26, left: 24, right: 24, bottom: 26),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        '提示',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF323233),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        '确定要移除这张图片吗？',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF646566),
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.of(ctx).pop(true),
-                                child: const Text(
-                                  '确定',
-                                  style: TextStyle(color: Colors.red),
+                                const Divider(
+                                    height: 0,
+                                    thickness: 0.5,
+                                    color: Color(0xFFEBEDF0)),
+                                SizedBox(
+                                  height: 48,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(ctx).pop(false),
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(16)),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            '取消',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                      const VerticalDivider(
+                                          width: 0,
+                                          thickness: 0.5,
+                                          color: Color(0xFFEBEDF0)),
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(ctx).pop(true),
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                  bottomRight:
+                                                      Radius.circular(16)),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            '确定',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Color(0xFFEE0A24)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           );
                         },
                       );
