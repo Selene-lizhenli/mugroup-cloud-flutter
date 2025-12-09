@@ -169,6 +169,18 @@ class SampleSubmitBar extends HookConsumerWidget {
             context.router.push(const CartRoute());
           },
         ),
+        if (user?.permissions?.contains('schema.showroom_samples.update') ??
+            false)
+          FlanActionBarButton(
+            type: FlanButtonType.danger,
+            text: '编辑样品',
+            color: colorScheme.secondary,
+            onClick: () {
+              if (sample?.id != null) {
+                context.router.push(ShowroomSampleEditRoute(id: sample!.id!));
+              }
+            },
+          ),
         FlanActionBarButton(
           type: FlanButtonType.warning,
           text: '加入选样车',
@@ -180,17 +192,6 @@ class SampleSubmitBar extends HookConsumerWidget {
             }
           },
         ),
-        if (user?.permissions?.contains('showroom.quotation.store') ?? false)
-          FlanActionBarButton(
-            type: FlanButtonType.danger,
-            text: '编辑样品',
-            color: colorScheme.secondary,
-            onClick: () {
-              if (sample?.id != null) {
-                context.router.push(ShowroomSampleEditRoute(id: sample!.id!));
-              }
-            },
-          ),
       ],
     );
   }
