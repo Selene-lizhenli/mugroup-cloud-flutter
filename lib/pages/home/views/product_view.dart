@@ -1,6 +1,7 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
+import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
@@ -77,7 +78,7 @@ class ProductView extends HookConsumerWidget {
       } else {
         samples.value = [...samples.value, ...resp.data];
       }
-      if (page.value == 1) {
+      if (page.value == 1 && query.value.isEmpty) {
         facetCounts.value = resp.meta?.facetCounts ?? [];
       }
 
@@ -214,8 +215,14 @@ class ProductDropdownMenu extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final query = useState<Map<String, dynamic>>({});
-    final supportFacet = {"supplier_ids": "供应商"};
+    final supportFacet = {"supplier_ids": "供应商", "category_id": "产品分类"};
+    final menuOptions = {
+      "supplier_ids": {"multiple": true},
+      "category_id": {"multiple": false}
+    };
+
     final suppliers = useState(<Supplier>[]);
+    final categories = useState(<Category>[]);
 
     useEffect(() {
       query.value = value;
@@ -229,6 +236,12 @@ class ProductDropdownMenu extends HookWidget {
       });
 
       suppliers.value = resp.data;
+    }, []);
+
+    final fetchCategories = useCallback(() async {
+      final resp = await getAllShowroomCategories();
+
+      categories.value = resp ?? [];
     }, []);
 
     useEffect(() {
@@ -249,6 +262,22 @@ class ProductDropdownMenu extends HookWidget {
       return null;
     }, [fetchSuppliers, facetCounts]);
 
+    useEffect(() {
+      if (categories.value.isNotEmpty) {
+        return null;
+      }
+      final categoryFacetCount = facetCounts.firstWhereOrNull(
+          (facetCount) => facetCount.fieldName == "category_id");
+
+      if (categoryFacetCount == null) {
+        return null;
+      }
+
+      fetchCategories();
+
+      return null;
+    }, [fetchCategories, facetCounts]);
+
     final menus = <TDDropdownItem>[];
 
     for (var facetCount in facetCounts) {
@@ -258,6 +287,7 @@ class ProductDropdownMenu extends HookWidget {
       }
 
       TDDropdownItem? item;
+      final option = menuOptions[field];
       final options = <TDDropdownItemOption>[];
       final selectValues = query.value[field];
 
@@ -275,6 +305,11 @@ class ProductDropdownMenu extends HookWidget {
           }
 
           label = supplier.name ?? label;
+        } else if (field == "category_id") {
+          final category = categories.value
+              .firstWhereOrNull((item) => item.id.toString() == count.value);
+
+          label = category?.name ?? label;
         }
 
         options.add(TDDropdownItemOption(
@@ -286,10 +321,20 @@ class ProductDropdownMenu extends HookWidget {
 
       item = TDDropdownItem(
         label: supportFacet[field],
-        multiple: true,
+        multiple: option?['multiple'],
         options: options,
         optionsColumns: 2,
+        onChange: (value) {
+          query.value = {
+            ...query.value,
+            field: value,
+          };
+        },
         onConfirm: (value) {
+          if (value is List && value.isEmpty) {
+            query.value = {...query.value}..remove(field);
+            return;
+          }
           query.value = {
             ...query.value,
             field: value,
