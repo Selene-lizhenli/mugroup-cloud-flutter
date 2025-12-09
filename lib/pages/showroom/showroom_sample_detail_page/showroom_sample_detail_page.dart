@@ -333,20 +333,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // 标题
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text(
-                                      '工厂报价',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
                                   // 瀑布流
                                   MasonryGridView.count(
                                     physics:
