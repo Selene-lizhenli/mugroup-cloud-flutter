@@ -3,11 +3,13 @@ import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -213,11 +215,39 @@ class ProductDropdownMenu extends HookWidget {
   Widget build(BuildContext context) {
     final query = useState<Map<String, dynamic>>({});
     final supportFacet = {"supplier_ids": "供应商"};
+    final suppliers = useState(<Supplier>[]);
 
     useEffect(() {
       query.value = value;
       return null;
     }, [value]);
+
+    final fetchSuppliers = useCallback((List<String> ids) async {
+      final resp = await getSupplySuppliers(queryParameters: {
+        "ids": ids,
+        "pageSize": ids.length,
+      });
+
+      suppliers.value = resp.data;
+    }, []);
+
+    useEffect(() {
+      final ids = facetCounts
+              .firstWhereOrNull(
+                  (facetCount) => facetCount.fieldName == "supplier_ids")
+              ?.counts
+              .map((count) => count.value)
+              .toList() ??
+          [];
+
+      if (ids.isEmpty) {
+        return null;
+      }
+
+      fetchSuppliers(ids);
+
+      return null;
+    }, [fetchSuppliers, facetCounts]);
 
     final menus = <TDDropdownItem>[];
 
@@ -232,12 +262,23 @@ class ProductDropdownMenu extends HookWidget {
       final selectValues = query.value[field];
 
       for (var count in facetCount.counts) {
+        var label = count.value;
         var selected = false;
         if (selectValues is List) {
           selected = selectValues.contains(count.value);
         }
+        if (field == "supplier_ids") {
+          final supplier = suppliers.value
+              .firstWhereOrNull((item) => item.id.toString() == count.value);
+          if (supplier == null) {
+            continue;
+          }
+
+          label = supplier.name ?? label;
+        }
+
         options.add(TDDropdownItemOption(
-          label: count.value,
+          label: label,
           value: count.value,
           selected: selected,
         ));
@@ -269,13 +310,17 @@ class ProductDropdownMenu extends HookWidget {
         children: [
           TDDropdownMenu(
             direction: TDDropdownMenuDirection.down,
-            onMenuClosed: (value) {
+            onMenuClosed: (index) {
+              if (const DeepCollectionEquality().equals(query.value, value)) {
+                return;
+              }
+
               onChange(query.value);
             },
             isScrollable: true,
             items: menus,
           ),
-          Text(query.value.toString()),
+          // Text(query.value.toString()),
         ],
       ),
     );
