@@ -30,6 +30,21 @@ class ShowroomSampleForm extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
+    final Map<String, dynamic> initialValues =
+        Map<String, dynamic>.from(initial?.toJson() ?? {});
+
+    if (initialValues['spec'] != null &&
+        initialValues['spec'].toString().isNotEmpty) {
+      final String spec = initialValues['spec'].toString();
+      final List<String> parts = spec.split('x');
+
+      if (parts.isNotEmpty) initialValues['length'] = parts[0];
+      if (parts.length > 1) initialValues['width'] = parts[1];
+      if (parts.length > 2) {
+        initialValues['heigth'] = parts[2];
+      }
+    }
+
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
       final images = formKey.currentState?.value['image'];
@@ -65,7 +80,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
-                initialValue: initial?.toJson() ?? {},
+                initialValue: initialValues,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
