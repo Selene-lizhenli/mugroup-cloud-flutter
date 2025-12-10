@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -106,25 +105,42 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     if (sample.category != null)
-                      FlanTag(
-                        type: FlanTagType.warning,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 0,
-                            vertical: 3,
-                          ),
-                          child: Text(
-                            sample.category!.name!,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              height: 1,
+                      TDTag(
+                        sample.category!.name!,
+                        isLight: true,
+                        theme: TDTagTheme.warning,
+                        size: TDTagSize.medium,
+                      ),
+
+                    // 贸易国别
+                    if (sample.tradeCountry != null)
+                      Container(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const TDTag(
+                              '贸易国别',
+                              isLight: true,
+                              size: TDTagSize.small,
                             ),
-                          ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              sample.tradeCountry!,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF6F6F6F),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     const SizedBox(
                       height: 5,
                     ),
+                    // 价格
                     Row(
                       children: [
                         if (sample.purchaseCost != null)
@@ -198,7 +214,8 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                       ],
-                    )
+                    ),
+                    // 工厂报价
                   ],
                 ),
               )
