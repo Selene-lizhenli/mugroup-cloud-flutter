@@ -1,5 +1,17 @@
 import 'package:cloud/http/api.dart';
 
+Future translate(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/openai/translate", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return res.data;
+    },
+  );
+}
+
 Future identifySample(Map<String, dynamic>? data) async {
   return api.post("api/tenant/openai/identifySample", data: data).then(
     (res) {

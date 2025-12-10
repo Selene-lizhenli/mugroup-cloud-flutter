@@ -6,6 +6,7 @@ import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
+import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -169,8 +170,10 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         FormBuilderField<String>(
                           name: "name_en",
                           builder: (field) {
-                            return Input(
+                            return TranslatableInput(
                               label: '英文名称',
+                              sourceText: formKey
+                                  .currentState?.fields['name_cn']?.value,
                               value: field.value ?? '',
                               onChanged: field.didChange,
                             );
