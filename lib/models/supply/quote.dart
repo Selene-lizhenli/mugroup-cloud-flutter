@@ -8,8 +8,10 @@ part 'quote.g.dart';
 class Quote with _$Quote {
   factory Quote(
     int? id,
+    int? moq,
     Supplier? supplier,
     String? packing,
+    String? material,
     @JsonKey(name: 'outer_capacity') String? outerCapacity,
     @JsonKey(name: 'outer_volume') String? outerVolume,
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,

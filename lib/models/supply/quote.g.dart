@@ -8,10 +8,12 @@ part of 'quote.dart';
 
 _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       (json['id'] as num?)?.toInt(),
+      (json['moq'] as num?)?.toInt(),
       json['supplier'] == null
           ? null
           : Supplier.fromJson(json['supplier'] as Map<String, dynamic>),
       json['packing'] as String?,
+      json['material'] as String?,
       json['outer_capacity'] as String?,
       json['outer_volume'] as String?,
       json['chuhuo_at'] == null
@@ -28,8 +30,10 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'moq': instance.moq,
       'supplier': instance.supplier,
       'packing': instance.packing,
+      'material': instance.material,
       'outer_capacity': instance.outerCapacity,
       'outer_volume': instance.outerVolume,
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),

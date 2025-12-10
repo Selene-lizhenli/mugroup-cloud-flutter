@@ -21,8 +21,10 @@ Quote _$QuoteFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Quote {
   int? get id => throw _privateConstructorUsedError;
+  int? get moq => throw _privateConstructorUsedError;
   Supplier? get supplier => throw _privateConstructorUsedError;
   String? get packing => throw _privateConstructorUsedError;
+  String? get material => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_capacity')
   String? get outerCapacity => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_volume')
@@ -54,8 +56,10 @@ abstract class $QuoteCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      int? moq,
       Supplier? supplier,
       String? packing,
+      String? material,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
@@ -83,8 +87,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
   @override
   $Res call({
     Object? id = freezed,
+    Object? moq = freezed,
     Object? supplier = freezed,
     Object? packing = freezed,
+    Object? material = freezed,
     Object? outerCapacity = freezed,
     Object? outerVolume = freezed,
     Object? chuhuoAt = freezed,
@@ -100,6 +106,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      moq: freezed == moq
+          ? _value.moq
+          : moq // ignore: cast_nullable_to_non_nullable
+              as int?,
       supplier: freezed == supplier
           ? _value.supplier
           : supplier // ignore: cast_nullable_to_non_nullable
@@ -107,6 +117,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       packing: freezed == packing
           ? _value.packing
           : packing // ignore: cast_nullable_to_non_nullable
+              as String?,
+      material: freezed == material
+          ? _value.material
+          : material // ignore: cast_nullable_to_non_nullable
               as String?,
       outerCapacity: freezed == outerCapacity
           ? _value.outerCapacity
@@ -169,8 +183,10 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      int? moq,
       Supplier? supplier,
       String? packing,
+      String? material,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
@@ -197,8 +213,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? moq = freezed,
     Object? supplier = freezed,
     Object? packing = freezed,
+    Object? material = freezed,
     Object? outerCapacity = freezed,
     Object? outerVolume = freezed,
     Object? chuhuoAt = freezed,
@@ -214,6 +232,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == moq
+          ? _value.moq
+          : moq // ignore: cast_nullable_to_non_nullable
+              as int?,
       freezed == supplier
           ? _value.supplier
           : supplier // ignore: cast_nullable_to_non_nullable
@@ -221,6 +243,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
       freezed == packing
           ? _value.packing
           : packing // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == material
+          ? _value.material
+          : material // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == outerCapacity
           ? _value.outerCapacity
@@ -267,8 +293,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
 class _$QuoteImpl implements _Quote {
   _$QuoteImpl(
       this.id,
+      this.moq,
       this.supplier,
       this.packing,
+      this.material,
       @JsonKey(name: 'outer_capacity') this.outerCapacity,
       @JsonKey(name: 'outer_volume') this.outerVolume,
       @JsonKey(name: 'chuhuo_at') this.chuhuoAt,
@@ -285,9 +313,13 @@ class _$QuoteImpl implements _Quote {
   @override
   final int? id;
   @override
+  final int? moq;
+  @override
   final Supplier? supplier;
   @override
   final String? packing;
+  @override
+  final String? material;
   @override
   @JsonKey(name: 'outer_capacity')
   final String? outerCapacity;
@@ -318,7 +350,7 @@ class _$QuoteImpl implements _Quote {
 
   @override
   String toString() {
-    return 'Quote(id: $id, supplier: $supplier, packing: $packing, outerCapacity: $outerCapacity, outerVolume: $outerVolume, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency)';
+    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, outerCapacity: $outerCapacity, outerVolume: $outerVolume, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency)';
   }
 
   @override
@@ -327,9 +359,12 @@ class _$QuoteImpl implements _Quote {
         (other.runtimeType == runtimeType &&
             other is _$QuoteImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.moq, moq) || other.moq == moq) &&
             (identical(other.supplier, supplier) ||
                 other.supplier == supplier) &&
             (identical(other.packing, packing) || other.packing == packing) &&
+            (identical(other.material, material) ||
+                other.material == material) &&
             (identical(other.outerCapacity, outerCapacity) ||
                 other.outerCapacity == outerCapacity) &&
             (identical(other.outerVolume, outerVolume) ||
@@ -353,8 +388,10 @@ class _$QuoteImpl implements _Quote {
   int get hashCode => Object.hash(
       runtimeType,
       id,
+      moq,
       supplier,
       packing,
+      material,
       outerCapacity,
       outerVolume,
       chuhuoAt,
@@ -382,8 +419,10 @@ class _$QuoteImpl implements _Quote {
 abstract class _Quote implements Quote {
   factory _Quote(
       final int? id,
+      final int? moq,
       final Supplier? supplier,
       final String? packing,
+      final String? material,
       @JsonKey(name: 'outer_capacity') final String? outerCapacity,
       @JsonKey(name: 'outer_volume') final String? outerVolume,
       @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
@@ -399,9 +438,13 @@ abstract class _Quote implements Quote {
   @override
   int? get id;
   @override
+  int? get moq;
+  @override
   Supplier? get supplier;
   @override
   String? get packing;
+  @override
+  String? get material;
   @override
   @JsonKey(name: 'outer_capacity')
   String? get outerCapacity;
