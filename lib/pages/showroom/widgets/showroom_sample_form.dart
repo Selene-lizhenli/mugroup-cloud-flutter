@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -7,6 +8,7 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -194,6 +196,193 @@ class ShowroomSampleForm extends HookConsumerWidget {
                             );
                           },
                         ),
+                      ],
+                    ),
+                    BuildFormCard(
+                      title: '供应商信息',
+                      action: GestureDetector(
+                        onTap: () {
+                          EasyLoading.showInfo('添加功能待开发');
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.add_circle_outline,
+                                size: 16,
+                                color: Theme.of(context).primaryColor),
+                            const SizedBox(width: 4),
+                            Text("添加",
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      children: [
+                        if (initial?.supplyQuotes != null &&
+                            initial!.supplyQuotes!.isNotEmpty)
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            itemCount: initial!.supplyQuotes!.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final quote = initial!.supplyQuotes![index];
+                              final supplier = quote.supplier;
+
+                              final supplierName = supplier?.shortName ??
+                                  supplier?.name ??
+                                  '未知供应商';
+
+                              final supplierNo = supplier?.supplierNo;
+
+                              final price = quote.purchaseCost;
+
+                              final currency = quote.currency;
+
+                              final packing = quote.packing ?? '';
+
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: Colors.grey.withOpacity(0.2)),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(8),
+                                    onTap: () {
+                                      if (context.mounted) {
+                                        final supplierId = quote.supplier?.id;
+                                        if (supplierId == null) return;
+                                        context.router.push(
+                                            SupplySupplierDetailRoute(
+                                                id: supplierId));
+
+                                        return;
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  supplierName,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.black87,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Icon(Icons.chevron_right,
+                                                  size: 16,
+                                                  color: Colors.grey[300]),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Text.rich(
+                                                TextSpan(children: [
+                                                  TextSpan(
+                                                    text: currency,
+                                                    style: const TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.red),
+                                                  ),
+                                                  const TextSpan(text: ' '),
+                                                  TextSpan(
+                                                    text: price,
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.red),
+                                                  ),
+                                                ]),
+                                              ),
+                                              Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8),
+                                                width: 1,
+                                                height: 10,
+                                                color: Colors.grey[300],
+                                              ),
+                                              Text(
+                                                "$supplierNo",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[600]),
+                                              ),
+                                              if (packing.isNotEmpty) ...[
+                                                Container(
+                                                  margin: const EdgeInsets
+                                                      .symmetric(horizontal: 8),
+                                                  width: 1,
+                                                  height: 10,
+                                                  color: Colors.grey[300],
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    packing,
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color:
+                                                            Colors.grey[600]),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        else
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                  color: Colors.grey.withOpacity(0.1)),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(Icons.inbox_outlined,
+                                    size: 32, color: Colors.grey[300]),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "暂无供应商",
+                                  style: TextStyle(
+                                      color: Colors.grey[400], fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                     BuildFormCard(
