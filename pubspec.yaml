@@ -153,6 +153,7 @@ flutter:
           weight: 400
 
   assets:
+    - assets/coming.png
     - assets/noImage.png
     - assets/icons/
   #

@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/home_media.dart';
@@ -57,9 +56,7 @@ class HomeAppBar extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final focusNode = useFocusNode();
-
     final colorScheme = Theme.of(context).colorScheme;
-    final statusBarHeight = MediaQuery.of(context).padding.top;
 
     handleUploadMedia() async {
       await showFlanActionSheet(
@@ -115,22 +112,18 @@ class HomeAppBar extends HookConsumerWidget {
     }
 
     return Container(
-      color: colorScheme.secondary,
+      color: colorScheme.primary,
       child: Column(
         children: [
-          SizedBox(height: statusBarHeight),
-          const SizedBox(
-            height: 5,
-          ),
           Container(
             width: double.infinity,
             margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
             padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
             height: 40,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 255),
+              color: colorScheme.onPrimary,
               border: Border.all(
-                color: colorScheme.secondary,
+                color: colorScheme.primary,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(5),
@@ -181,7 +174,7 @@ class HomeAppBar extends HookConsumerWidget {
                       top: 2, bottom: 2, left: 2, right: 0),
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: colorScheme.secondary,
+                      backgroundColor: colorScheme.primary,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       shape: RoundedRectangleBorder(
@@ -191,11 +184,11 @@ class HomeAppBar extends HookConsumerWidget {
                     onPressed: () {
                       onSearchText?.call(controller.text);
                     },
-                    child: const Text(
+                    child: Text(
                       "搜索",
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -213,19 +206,6 @@ class HomeAppBar extends HookConsumerWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class HomeAppBarPlaceholder extends StatelessWidget {
-  const HomeAppBarPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-
-    return Container(
-      height: statusBarHeight + 80,
     );
   }
 }

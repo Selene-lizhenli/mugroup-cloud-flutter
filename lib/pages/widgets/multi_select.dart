@@ -170,7 +170,7 @@ class MultiSelect extends HookConsumerWidget {
 
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4), 
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE2E2E2),
                           borderRadius: BorderRadius.circular(6),

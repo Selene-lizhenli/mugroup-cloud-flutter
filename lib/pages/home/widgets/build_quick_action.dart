@@ -18,6 +18,8 @@ class BuildQuickAction extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Material(
@@ -37,10 +39,8 @@ class BuildQuickAction extends HookConsumerWidget {
         ),
         const SizedBox(height: 6),
         Text(title,
-            style: const TextStyle(
-              fontSize: 12,
-              height: 1,
-            )),
+            style: TextStyle(
+                fontSize: 12, height: 1, color: colorScheme.onSurface)),
       ],
     );
   }

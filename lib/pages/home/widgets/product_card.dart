@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -35,7 +34,7 @@ class ProductCard extends StatelessWidget {
           }
         },
         child: Container(
-          color: Colors.white,
+          color: colorScheme.surface,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -56,7 +55,7 @@ class ProductCard extends StatelessWidget {
                     ),
               Container(
                 height: 0.5,
-                color: Colors.grey[200]!.withOpacity(0.8),
+                color: colorScheme.outlineVariant,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -75,7 +74,7 @@ class ProductCard extends StatelessWidget {
                     DefaultTextStyle(
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.grey[500],
+                        color: colorScheme.surfaceContainerHighest,
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,7 +89,7 @@ class ProductCard extends StatelessWidget {
                               child: Container(
                                 height: 8,
                                 width: 0.5,
-                                color: Colors.grey[500]!.withOpacity(0.8),
+                                color: colorScheme.outline,
                               ),
                             )
                           ],
@@ -105,26 +104,35 @@ class ProductCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (sample.category != null)
-                      FlanTag(
-                        type: FlanTagType.warning,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 0,
-                            vertical: 3,
-                          ),
-                          child: Text(
-                            sample.category!.name!,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              height: 1,
+                    // 贸易国别
+                    if (sample.tradeCountry != null)
+                      Container(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "贸易国别",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colorScheme.surfaceContainerHighest,
+                              ),
                             ),
-                          ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            TDTag(
+                              sample.tradeCountry!,
+                              isLight: true,
+                              size: TDTagSize.small,
+                            ),
+                          ],
                         ),
                       ),
                     const SizedBox(
                       height: 5,
                     ),
+                    // 价格
                     Row(
                       children: [
                         if (sample.purchaseCost != null)
@@ -154,8 +162,9 @@ class ProductCard extends StatelessWidget {
                                       padding: const EdgeInsets.only(left: 5),
                                       child: Text(
                                         '(含税率 ${sample.taxRate!})',
-                                        style: const TextStyle(
-                                          color: Colors.grey,
+                                        style: TextStyle(
+                                          color: colorScheme
+                                              .surfaceContainerHighest,
                                           fontSize: 11,
                                         ),
                                       ),
@@ -187,7 +196,7 @@ class ProductCard extends StatelessWidget {
                                   right: -8,
                                   child: TDBadge(
                                     TDBadgeType.message,
-                                    color: colorScheme.secondary,
+                                    color: colorScheme.primary,
                                     showZero: false,
                                     count: cartCount != null
                                         ? cartCount.toString()

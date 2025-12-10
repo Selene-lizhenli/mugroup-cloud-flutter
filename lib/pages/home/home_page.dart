@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -6,6 +5,7 @@ import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
+import 'package:cloud/pages/home/widgets/build_tab_button.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/pages/home/widgets/build_quick_action.dart';
 import 'package:cloud/services/sample.dart';
@@ -20,7 +20,6 @@ import 'package:cloud/router/router.gr.dart';
 
 const pageSize = 20;
 
-@RoutePage()
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
@@ -32,20 +31,28 @@ class HomePage extends HookConsumerWidget {
     final cartState = ref.watch(cartProvider);
     final search = useState(home.search);
     final media = useState<TemporaryMedia?>(home.currentMedia);
-    final page = useRef(1);
+    final page = useRef<num>(1);
+    final totalPages = useRef<num>(0);
+
     final samples = useState<List<Sample>>(<Sample>[]);
-    final bool isSearchMode =
+    bool isSearchMode =
         (search.value?.isNotEmpty ?? false) || home.currentMediaId != null;
     final colorScheme = Theme.of(context).colorScheme;
+    final tabIndex = useState<int>(0); // 0=集团样品，1=市场产品，2=日本产品
 
     final refreshController = useEasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
+    final statusBarHeight = MediaQuery.of(context).padding.top;
 
-    // 数据请求方法
     fetchData(String? searchText,
-        {bool? init = false, TemporaryMedia? searchMedia}) async {
+        {bool? init = false,
+        TemporaryMedia? searchMedia,
+        num? pageValue}) async {
       search.value = searchText;
       media.value = searchMedia;
+      // ApiResponse<List<Sample>> resp;
+      var resp;
+
       if (init == true) {
         page.value = 1;
       }
@@ -56,33 +63,41 @@ class HomePage extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
-      final resp = await getSamples(queryParameters: queryParameters);
+      // tabIndex 不同调用不同接口
+      if (tabIndex.value == 0) {
+        resp = await getSamples(queryParameters: queryParameters);
+      } else if (tabIndex.value == 1) {
+        resp = await getMarketProducts(queryParameters: queryParameters);
+      } else if (tabIndex.value == 2) {
+        resp = await getSamples(
+            queryParameters: {...queryParameters, 'item_type[]': 'japan'});
+      }
 
       if (init == true) {
         samples.value = resp.data;
       } else {
         samples.value = [...samples.value, ...resp.data];
       }
-
-      if (resp.data.length >= pageSize) {
-        page.value++;
-      }
+      totalPages.value = resp.meta.pagination.totalPages;
 
       return resp;
     }
 
-    // 监听搜索事件并直接调用 fetchData
+    /**
+     * 逻辑：监听事件、重置、并直接调用fetchData
+     * 更新：更新关键字和media
+     * 重置：page重置为1 ，清空旧列表
+     * 事件：onRefresh  changeTab  onSearchText onSearchMedia onDeleteMedia
+     */
     useEffect(() {
       final sub = home.bus.on<SearchEvent>().listen((event) async {
         search.value = event.search;
         media.value = event.media;
-        // logger.d(media);
-        logger.d(search);
-        logger.i(event);
-
-        // 触发数据刷新
+        page.value = 1;
+        samples.value = [];
+        isSearchMode =
+            (search.value?.isNotEmpty ?? false) || home.currentMediaId != null;
         await fetchData(search.value, searchMedia: media.value, init: true);
-
         // 重置刷新状态
         refreshController.finishRefresh();
         refreshController.resetFooter();
@@ -90,22 +105,75 @@ class HomePage extends HookConsumerWidget {
       return () => sub.cancel();
     }, []);
 
+    changeTab(int index) async {
+      tabIndex.value = index;
+      home.bus.dispatch(SearchEvent(
+        media: media.value,
+        search: search.value,
+      ));
+    }
+
+    onProductLoad() async {
+      var resp;
+
+      if (totalPages.value == page.value) {
+        return;
+      } else {
+        page.value++;
+        resp = await fetchData(
+          search.value,
+          searchMedia: media.value,
+        );
+      }
+      refreshController.finishLoad(resp.meta.pagination.totalPages == page.value
+          ? IndicatorResult.noMore
+          : IndicatorResult.success);
+    }
+
     return Scaffold(
       body: Container(
-          color: colorScheme.secondary,
+          color: colorScheme.primary,
           child: Column(
             children: [
+              SizedBox(height: statusBarHeight),
+              Container(
+                color: colorScheme.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    HomeTabButton(
+                      title: "样品",
+                      index: 0,
+                      tabIndex: tabIndex,
+                      onTap: () => changeTab(0),
+                    ),
+                    HomeTabButton(
+                      title: "市场产品",
+                      index: 1,
+                      tabIndex: tabIndex,
+                      onTap: () => changeTab(1),
+                    ),
+                    HomeTabButton(
+                      title: "日本优选",
+                      index: 2,
+                      tabIndex: tabIndex,
+                      onTap: () => changeTab(2),
+                    ),
+                  ],
+                ),
+              ),
               // 固定顶部 HomeAppBar
               HomeAppBar(
                 controller: home.searchTextController,
                 onSearchText: (searchValue) {
                   homeNotifier.setSearch(searchValue);
-                  home.bus.dispatch(SearchEvent(search: searchValue));
+                  home.bus.dispatch(
+                      SearchEvent(search: searchValue, media: media.value));
                 },
                 onSearchMedia: (temporaryMedia) {
                   homeNotifier.addMedia(temporaryMedia);
                   if (temporaryMedia.id == home.currentMediaId) return;
-                  logger.d(temporaryMedia);
                   home.bus.dispatch(
                       SearchEvent(media: temporaryMedia, search: search.value));
                 },
@@ -121,11 +189,11 @@ class HomePage extends HookConsumerWidget {
               // 可滚动内容
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(6, 0, 6, 0), // 所有方向的边距都是6
+                  padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 232, 231, 232), // 背景色必须设置
+                    color: colorScheme.surfaceTint,
                     borderRadius: home.currentMediaId != null
-                        ? null // 搜索模式：取消圆角
+                        ? null
                         : const BorderRadius.only(
                             topLeft: Radius.circular(8),
                             topRight: Radius.circular(8),
@@ -136,18 +204,12 @@ class HomePage extends HookConsumerWidget {
                     controller: refreshController,
                     refreshOnStart: true,
                     onRefresh: () async {
-                      await fetchData(search.value,
-                          searchMedia: media.value, init: true);
-                      refreshController.finishRefresh();
-                      refreshController.resetFooter();
+                      home.bus.dispatch(SearchEvent(
+                        media: media.value,
+                        search: search.value,
+                      ));
                     },
-                    onLoad: () async {
-                      final resp = await fetchData(search.value,
-                          searchMedia: media.value);
-                      refreshController.finishLoad(resp.data.length >= pageSize
-                          ? IndicatorResult.success
-                          : IndicatorResult.noMore);
-                    },
+                    onLoad: onProductLoad,
                     child: CustomScrollView(
                       slivers: [
                         // 顶部两个 Card（只有未搜索时显示）
@@ -156,16 +218,16 @@ class HomePage extends HookConsumerWidget {
                             child: Column(
                               children: [
                                 const SizedBox(height: 6),
-                                const Card(
-                                  // margin: EdgeInsets.zero, // 去除边距
+                                Card(
+                                  color: colorScheme.surface,
                                   elevation: 0, // 去除阴影
-                                  shape: RoundedRectangleBorder(
+                                  shape: const RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8)),
                                     side: BorderSide.none, // 移除边框线
                                   ),
 
-                                  child: Padding(
+                                  child: const Padding(
                                     padding: EdgeInsets.all(12),
                                     child: Row(
                                       children: [
@@ -181,12 +243,12 @@ class HomePage extends HookConsumerWidget {
                                                 title: "供应商管理",
                                                 color: Colors.red,
                                                 route: SupplySupplierRoute())),
-                                        Expanded(
-                                            child: BuildQuickAction(
-                                                icon: Icons.inventory_2,
-                                                title: "市场产品管理", //todo 新页面
-                                                color: Colors.blue,
-                                                route: MarketRoute())),
+                                        // Expanded(
+                                        //     child: BuildQuickAction(
+                                        //         icon: Icons.inventory_2,
+                                        //         title: "市场产品管理", //todo 新页面
+                                        //         color: Colors.blue,
+                                        //         route: MarketRoute())),
                                         Expanded(
                                             child: BuildQuickAction(
                                                 icon: Icons.receipt_long,
@@ -198,7 +260,7 @@ class HomePage extends HookConsumerWidget {
                                   ),
                                 ),
                                 Card(
-                                  color: colorScheme.secondary,
+                                  color: colorScheme.primary,
                                   elevation: 2, // 去除阴影
                                   shape: const RoundedRectangleBorder(
                                     borderRadius:
@@ -305,7 +367,7 @@ class HomePage extends HookConsumerWidget {
                                                           title: "新增市场产品",
                                                           color: Colors.blue,
                                                           route:
-                                                              MarketCreateRoute()),
+                                                              ShowroomSampleCreateRoute()),
                                                       BuildQuickAction(
                                                           icon: Icons.add,
                                                           title: "新增报价单",
@@ -320,8 +382,7 @@ class HomePage extends HookConsumerWidget {
                               ],
                             ),
                           ),
-
-                        // 产品 Grid
+                        // feeds流
                         SliverPadding(
                           padding: const EdgeInsets.all(5),
                           sliver: SliverMasonryGrid.count(

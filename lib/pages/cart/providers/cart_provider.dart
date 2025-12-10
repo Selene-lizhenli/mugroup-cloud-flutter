@@ -163,8 +163,17 @@ class Cart extends _$Cart {
   }
 
   CartItem? getItemBySample(Sample sample) {
-    return state.items.firstWhereOrNull((item) =>
-        item.sample.id == sample.id || item.sample.barcode == sample.barcode);
+    final barcode = sample.barcode?.trim(); //pda使用条形码
+
+    return state.items.firstWhereOrNull((item) {
+      final itemBarcode = item.sample.barcode?.trim();
+
+      final sameId = item.sample.id == sample.id;
+      final sameBarcode =
+          barcode != null && barcode.isNotEmpty && itemBarcode == barcode;
+
+      return sameId || sameBarcode;
+    });
   }
 
   void addSample(Sample sample, int step) {

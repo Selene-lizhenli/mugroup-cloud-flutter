@@ -93,6 +93,22 @@ Future<Sample?> getSample(int id) async {
   );
 }
 
+Future<ApiResponse<List<Sample>>> getMarketProducts(
+    {Map<String, dynamic>? queryParameters}) async {
+  return api
+      .get("api/tenant/showroom/market_products",
+          queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<Sample>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(Sample.fromJson).toList();
+          },
+        ),
+      );
+}
+
 Future<Sample?> getSampleByBarcode(String barcode) async {
   return api.get("api/tenant/showroom/samples/barcode/$barcode").then(
     (res) {

@@ -140,9 +140,19 @@ class MyApp extends ConsumerWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF355EBF),
-          secondary: Color(0xFFFA338A),
-          error: Color(0xFFDC3545),
+          primary: Color(0xFFFA338A), //玫粉色
+          onPrimary: Colors.white, //玫粉色上的颜色
+          secondary: Color(0xFF355EBF), //蓝色
+          onSecondary: Colors.white, //蓝色上的颜色
+          surfaceTint: Color.fromARGB(255, 240, 239, 240), //纸张背景色
+          surface: Colors.white, //卡片背景颜色
+          onSurface: Colors.black, //字体颜色 黑色
+          surfaceContainerHighest: Colors.grey, //灰色 不重要的文字
+          error: Color(0xFFDC3545), //错误提示
+          outline: Colors.grey, //分割线  灰色
+          outlineVariant: Color.fromARGB(235, 230, 230, 230), //分割线 淡淡
+          tertiary: Color.fromARGB(255, 248, 227, 164), //提醒色 淡淡
+          surfaceContainer: Color(0xFFF7F8FA),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6),

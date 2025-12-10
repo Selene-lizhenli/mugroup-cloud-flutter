@@ -23,6 +23,7 @@ class DynamicCityPickers extends HookConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final controller = useTextEditingController(text: value);
+    final focusNode = useFocusNode();
 
     useEffect(() {
       controller.text = value;
@@ -54,6 +55,7 @@ class DynamicCityPickers extends HookConsumerWidget {
 
             onChanged?.call(result);
           },
+          focusNode: focusNode,
           style: const TextStyle(fontSize: 16, color: Colors.black87),
           cursorColor: colorScheme.primary,
           decoration: InputDecoration(
@@ -61,10 +63,9 @@ class DynamicCityPickers extends HookConsumerWidget {
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
             // 未选中时是极淡的灰色背景，选中时变白
-
+            fillColor: colorScheme.surfaceContainer, // 浅灰背景，和 Input 保持一致
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
             // 边框设置
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12), // 更圆润的圆角

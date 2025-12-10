@@ -92,7 +92,7 @@ class Layout extends HookConsumerWidget {
               right: -10,
               child: TDBadge(
                 TDBadgeType.message,
-                color: colorScheme.secondary,
+                color: colorScheme.primary,
                 size: TDBadgeSize.large,
                 showZero: false,
                 count: cartState.items.length.toString(),
