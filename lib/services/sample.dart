@@ -26,18 +26,6 @@ Future<Sample?> storeShowroomSample(Map<String, dynamic>? data) async {
   );
 }
 
-Future<Sample?> updateShowroomMarketProduct(
-    int id, Map<String, dynamic>? data) async {
-  return api.post("api/tenant/showroom/market_products/$id", data: data).then(
-    (res) {
-      if (res.data == null) {
-        return null;
-      }
-      return Sample.fromJson(res.data);
-    },
-  );
-}
-
 Future<Sample?> storeShowroomMarketProduct(Map<String, dynamic>? data) async {
   return api.post("api/tenant/showroom/market_products", data: data).then(
     (res) {

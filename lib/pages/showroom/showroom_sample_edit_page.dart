@@ -35,7 +35,7 @@ class ShowroomSampleEditPage extends HookConsumerWidget {
       body: ShowroomSampleForm(
         initial: sample.value,
         onSubmit: (data) async {
-          await updateShowroomMarketProduct(id, data);
+          await updateShowroomSample(id, data);
           EasyLoading.showSuccess("编辑成功");
           if (context.mounted) {
             Navigator.of(context).pop();
