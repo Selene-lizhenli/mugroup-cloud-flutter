@@ -11,6 +11,8 @@ class Input extends HookConsumerWidget {
   final TextInputType? keyboardType;
   final String? hintText;
 
+  final String? errorText;
+
   final List<TextInputFormatter>? inputFormatters;
 
   const Input({
@@ -21,6 +23,7 @@ class Input extends HookConsumerWidget {
     this.textInputAction = TextInputAction.next,
     this.keyboardType,
     this.hintText,
+    this.errorText,
     this.inputFormatters,
   });
 
@@ -74,6 +77,7 @@ class Input extends HookConsumerWidget {
           cursorColor: colorScheme.primary,
           decoration: InputDecoration(
             hintText: hintText ?? "请输入$label",
+            errorText: errorText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
             // 未选中时是极淡的灰色背景，选中时变白
@@ -82,7 +86,14 @@ class Input extends HookConsumerWidget {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
 
-            // 边框设置
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12), // 更圆润的圆角
               borderSide:
