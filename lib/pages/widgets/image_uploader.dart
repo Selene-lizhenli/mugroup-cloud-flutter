@@ -43,8 +43,13 @@ class ImageUploader extends HookConsumerWidget {
         final File? file = await entity.file;
 
         if (file != null) {
-          final TemporaryMedia temporaryMedia = await upload(file: file);
-          uploadedMedias.add(temporaryMedia);
+          try {
+            EasyLoading.show(status: '上传中...');
+            final TemporaryMedia temporaryMedia = await upload(file: file);
+            uploadedMedias.add(temporaryMedia);
+          } finally {
+            EasyLoading.dismiss();
+          }
         }
       }
 
