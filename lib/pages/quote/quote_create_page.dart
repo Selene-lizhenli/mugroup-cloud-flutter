@@ -10,7 +10,7 @@ class QuoteCreatePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('报价单管理')),
+      appBar: AppBar(title: const Text('新增报价单')),
       body: SupplySupplierForm(
         initial: null,
         onSubmit: (data) async {

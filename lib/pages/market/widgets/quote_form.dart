@@ -44,7 +44,7 @@ class SupplySupplierForm extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ImageUploader(
-                      name: 'images',
+                      // name: 'images',
                       label: '名片',
                       value: images.value,
                       onChanged: (value) {
@@ -106,7 +106,7 @@ class SupplySupplierForm extends HookConsumerWidget {
                       onChanged: (v) => supplierNo.value = v,
                     ),
                     TextArea(
-                      name: 'business_scope',
+                      // name: 'business_scope',
                       label: '营业范围',
                       value: businessScope.value,
                       onChanged: (value) {

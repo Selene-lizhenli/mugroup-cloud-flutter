@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -19,6 +20,7 @@ import 'package:cloud/router/router.gr.dart';
 
 const pageSize = 20;
 
+@RoutePage()
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
@@ -190,7 +192,7 @@ class HomePage extends HookConsumerWidget {
                                                 icon: Icons.receipt_long,
                                                 title: "报价单管理", // 报价单列表页面
                                                 color: Colors.green,
-                                                route: QuoteListRoute())),
+                                                route: QuoteRoute())),
                                       ],
                                     ),
                                   ),
