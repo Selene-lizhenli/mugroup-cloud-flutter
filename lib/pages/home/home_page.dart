@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/views/product_view.dart';
@@ -59,6 +60,13 @@ class HomePage extends HookConsumerWidget {
               onPageChanged: (page) {
                 homeNotifier.setCurrentPage(page);
                 currentPageIndex.value = page;
+                home.bus.dispatch(
+                  SearchEvent(
+                    media: home.currentMedia,
+                    search: home.search,
+                    from: SearchEventFrom.tab,
+                  ),
+                );
               },
               allowImplicitScrolling: false,
               children: const [ProductView(), SupplyView()],

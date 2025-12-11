@@ -32,7 +32,9 @@ class ProductView extends HookConsumerWidget {
     final cartState = ref.watch(cartProvider);
 
     final refreshController = useEasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
+      controlFinishLoad: true,
+      controlFinishRefresh: true,
+    );
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
     final query = useState<Map<String, dynamic>>({});
@@ -91,12 +93,20 @@ class ProductView extends HookConsumerWidget {
     }
 
     useEffect(() {
-      if (home.currentPage != 0) {
-        return null;
-      }
-
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
+          final currentHome = ref.read(homeProvider);
+          if (currentHome.currentPage != 0) {
+            return;
+          }
+
+          if (event.from == SearchEventFrom.tab) {
+            if (search.value == event.search &&
+                media.value?.id == event.media?.id) {
+              return;
+            }
+          }
+
           search.value = event.search;
           media.value = event.media;
 
@@ -107,29 +117,7 @@ class ProductView extends HookConsumerWidget {
       return () {
         searchEventSubscription.cancel();
       };
-    }, [home.currentPage]);
-
-    useUpdateEffect(() {
-      if (home.currentPage != 0) {
-        return null;
-      }
-
-      if ((home.search == search.value) && (home.currentMedia == media.value)) {
-        return null;
-      }
-
-      search.value = home.search;
-      media.value = home.currentMedia;
-      refreshController.callRefresh(force: true);
-
-      return null;
-    }, [
-      home.currentPage,
-      home.search,
-      home.currentMedia,
-      search.value,
-      media.value
-    ]);
+    }, []);
 
     return EasyRefresh(
       controller: refreshController,

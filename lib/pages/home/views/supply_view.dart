@@ -64,12 +64,20 @@ class SupplyView extends HookConsumerWidget {
     }
 
     useEffect(() {
-      if (home.currentPage != 1) {
-        return null;
-      }
-
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
+          final currentHome = ref.read(homeProvider);
+          if (currentHome.currentPage != 1) {
+            return;
+          }
+
+          if (event.from == SearchEventFrom.tab) {
+            if (search.value == event.search &&
+                media.value?.id == event.media?.id) {
+              return;
+            }
+          }
+
           search.value = event.search;
           media.value = event.media;
 
@@ -80,29 +88,7 @@ class SupplyView extends HookConsumerWidget {
       return () {
         searchEventSubscription.cancel();
       };
-    }, [home.currentPage]);
-
-    useUpdateEffect(() {
-      if (home.currentPage != 1) {
-        return null;
-      }
-
-      if ((home.search == search.value) && (home.currentMedia == media.value)) {
-        return null;
-      }
-
-      search.value = home.search;
-      media.value = home.currentMedia;
-      refreshController.callRefresh(force: true);
-
-      return null;
-    }, [
-      home.currentPage,
-      home.search,
-      home.currentMedia,
-      search.value,
-      media.value
-    ]);
+    }, []);
 
     return EasyRefresh(
       controller: refreshController,
