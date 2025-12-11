@@ -112,6 +112,7 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
 
                     onUpload: (File file) async {
                       try {
+                        EasyLoading.show(status: '上传中...');
                         String fileName = file.path.split('/').last;
                         FormData formData = FormData.fromMap({
                           "file": await MultipartFile.fromFile(file.path,
@@ -122,8 +123,8 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
                         final result = await uploadSupplySupplierYanChang(
                             supplierId!, formData);
                         return result;
-                      } catch (e) {
-                        return null;
+                      } finally {
+                        EasyLoading.dismiss();
                       }
                     },
 
