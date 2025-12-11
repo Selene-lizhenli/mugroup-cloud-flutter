@@ -12,6 +12,7 @@ class Quote with _$Quote {
     Supplier? supplier,
     String? packing,
     String? material,
+    @JsonKey(name: 'supplier_id') int? supplierId,
     @JsonKey(name: 'outer_capacity') String? outerCapacity,
     @JsonKey(name: 'outer_volume') String? outerVolume,
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
@@ -21,6 +22,7 @@ class Quote with _$Quote {
     @JsonKey(name: 'tax_rate') String? taxRate,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'currency') String? currency,
+    @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
   ) = _Quote;
 
   factory Quote.fromJson(Map<String, dynamic> json) => _$QuoteFromJson(json);

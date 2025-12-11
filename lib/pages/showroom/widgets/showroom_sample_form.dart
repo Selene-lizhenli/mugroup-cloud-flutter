@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -8,7 +7,6 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -198,192 +196,206 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    BuildFormCard(
-                      title: '供应商信息',
-                      action: GestureDetector(
-                        onTap: () {
-                          EasyLoading.showInfo('添加功能待开发');
-                        },
-                        child: Row(
-                          children: [
-                            Icon(Icons.add_circle_outline,
-                                size: 16,
-                                color: Theme.of(context).primaryColor),
-                            const SizedBox(width: 4),
-                            Text("添加",
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                      children: [
-                        if (initial?.supplyQuotes != null &&
-                            initial!.supplyQuotes!.isNotEmpty)
-                          ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: initial!.supplyQuotes!.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 10),
-                            itemBuilder: (context, index) {
-                              final quote = initial!.supplyQuotes![index];
-                              final supplier = quote.supplier;
+                    FormBuilderField<List<Map<String, dynamic>>>(
+                      name: "supply_quotes",
+                      initialValue: initial?.supplyQuotes
+                              ?.map((e) => e.toJson())
+                              .toList() ??
+                          [],
+                      builder:
+                          (FormFieldState<List<Map<String, dynamic>>> field) {
+                        final List<Map<String, dynamic>> valueList =
+                            field.value ?? [];
 
-                              final supplierName = supplier?.shortName ??
-                                  supplier?.name ??
-                                  '未知供应商';
-
-                              final supplierNo = supplier?.supplierNo;
-
-                              final price = quote.purchaseCost;
-
-                              final currency = quote.currency;
-
-                              final packing = quote.packing ?? '';
-
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      color: Colors.grey.withOpacity(0.2)),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      if (context.mounted) {
-                                        final supplierId = quote.supplier?.id;
-                                        if (supplierId == null) return;
-                                        context.router.push(
-                                            SupplySupplierDetailRoute(
-                                                id: supplierId));
-
-                                        return;
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  supplierName,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.black87,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Icon(Icons.chevron_right,
-                                                  size: 16,
-                                                  color: Colors.grey[300]),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Text.rich(
-                                                TextSpan(children: [
-                                                  TextSpan(
-                                                    text: currency,
-                                                    style: const TextStyle(
-                                                        fontSize: 10,
-                                                        color: Colors.red),
-                                                  ),
-                                                  const TextSpan(text: ' '),
-                                                  TextSpan(
-                                                    text: price,
-                                                    style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.red),
-                                                  ),
-                                                ]),
-                                              ),
-                                              Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8),
-                                                width: 1,
-                                                height: 10,
-                                                color: Colors.grey[300],
-                                              ),
-                                              Text(
-                                                "$supplierNo",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey[600]),
-                                              ),
-                                              if (packing.isNotEmpty) ...[
-                                                Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(horizontal: 8),
-                                                  width: 1,
-                                                  height: 10,
-                                                  color: Colors.grey[300],
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    packing,
-                                                    style: TextStyle(
-                                                        fontSize: 12,
-                                                        color:
-                                                            Colors.grey[600]),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                        return BuildFormCard(
+                          title: '工厂报价',
+                          action: GestureDetector(
+                            onTap: () {
+                              final newList =
+                                  List<Map<String, dynamic>>.from(valueList);
+                              newList.add({});
+                              field.didChange(newList);
                             },
-                          )
-                        else
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 24),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                  color: Colors.grey.withOpacity(0.1)),
-                            ),
-                            child: Column(
+                            child: Row(
                               children: [
-                                Icon(Icons.inbox_outlined,
-                                    size: 32, color: Colors.grey[300]),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "暂无供应商",
-                                  style: TextStyle(
-                                      color: Colors.grey[400], fontSize: 12),
-                                ),
+                                Icon(Icons.add_circle_outline,
+                                    size: 16,
+                                    color: Theme.of(context).primaryColor),
+                                const SizedBox(width: 4),
+                                Text("添加",
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 13)),
                               ],
                             ),
                           ),
-                      ],
+                          children: [
+                            if (valueList.isEmpty)
+                              Container(
+                                width: double.infinity,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 24),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: Colors.grey.withOpacity(0.1)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.inbox_outlined,
+                                        size: 32, color: Colors.grey[300]),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "暂无工厂报价",
+                                      style: TextStyle(
+                                          color: Colors.grey[400],
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              ...valueList.asMap().entries.map((entry) {
+                                final int index = entry.key;
+                                final Map<String, dynamic> item = entry.value;
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.2)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "报价 #${index + 1}",
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey[600]),
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              final newList = List<
+                                                  Map<String,
+                                                      dynamic>>.from(valueList);
+                                              newList.removeAt(index);
+                                              field.didChange(newList);
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(4.0),
+                                              child: Icon(Icons.delete_outline,
+                                                  size: 18, color: Colors.red),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Input(
+                                              label: '供应商货号',
+                                              value: item['supplier_product_no']
+                                                      ?.toString() ??
+                                                  "",
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'supplier_product_no': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Input(
+                                              label: '供应商价格',
+                                              value: item['purchase_cost']
+                                                      ?.toString() ??
+                                                  '',
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'purchase_cost': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Input(
+                                              label: '最小起订量',
+                                              value:
+                                                  item['moq']?.toString() ?? '',
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'moq': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Input(
+                                              label: '材质',
+                                              value: item['material']
+                                                      ?.toString() ??
+                                                  '',
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'material': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                          ],
+                        );
+                      },
                     ),
                     BuildFormCard(
                       title: '产品规格',

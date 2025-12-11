@@ -14,6 +14,7 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
           : Supplier.fromJson(json['supplier'] as Map<String, dynamic>),
       json['packing'] as String?,
       json['material'] as String?,
+      (json['supplier_id'] as num?)?.toInt(),
       json['outer_capacity'] as String?,
       json['outer_volume'] as String?,
       json['chuhuo_at'] == null
@@ -25,6 +26,7 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       json['tax_rate'] as String?,
       json['purchase_cost'] as String?,
       json['currency'] as String?,
+      json['supplier_product_no'] as String?,
     );
 
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
@@ -34,6 +36,7 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'supplier': instance.supplier,
       'packing': instance.packing,
       'material': instance.material,
+      'supplier_id': instance.supplierId,
       'outer_capacity': instance.outerCapacity,
       'outer_volume': instance.outerVolume,
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),
@@ -43,4 +46,5 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'tax_rate': instance.taxRate,
       'purchase_cost': instance.purchaseCost,
       'currency': instance.currency,
+      'supplier_product_no': instance.supplierProductNo,
     };
