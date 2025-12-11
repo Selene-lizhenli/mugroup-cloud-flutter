@@ -69,6 +69,7 @@ class ProductView extends HookConsumerWidget {
         if (searchMedia != null) "image": searchMedia.id,
         "page": page.value,
         "pageSize": pageSize,
+        "includes": 'supplyQuotes.supplier',
         ...query.value,
       };
       final resp = await getSamples(queryParameters: queryParameters);
