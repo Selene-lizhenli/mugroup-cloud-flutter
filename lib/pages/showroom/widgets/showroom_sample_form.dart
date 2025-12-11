@@ -5,9 +5,11 @@ import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/services/openai.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -210,11 +212,43 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         return BuildFormCard(
                           title: '工厂报价',
                           action: GestureDetector(
-                            onTap: () {
-                              final newList =
-                                  List<Map<String, dynamic>>.from(valueList);
-                              newList.add({});
-                              field.didChange(newList);
+                            onTap: () async {
+                              final selectedSupplier =
+                                  await showModalBottomSheet<
+                                      Map<String, dynamic>>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (BuildContext ctx) {
+                                  return const SupplierSelect();
+                                },
+                              );
+
+                              if (selectedSupplier != null) {
+                                final currentList =
+                                    List<Map<String, dynamic>>.from(valueList);
+
+                                final newId = selectedSupplier['id'];
+
+                                final isExist = currentList.any(
+                                    (item) => item['supplier_id'] == newId);
+
+                                if (!isExist) {
+                                  final newItem = {
+                                    'supplier_id': newId,
+                                    'supplier': {
+                                      'id': newId,
+                                      'name': selectedSupplier['name'] ??
+                                          selectedSupplier['shortName'],
+                                    }
+                                  };
+
+                                  currentList.add(newItem);
+                                  field.didChange(currentList);
+                                } else {
+                                  EasyLoading.showInfo('该供应商已在列表中');
+                                }
+                              }
                             },
                             child: Row(
                               children: [
@@ -260,6 +294,15 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                 final int index = entry.key;
                                 final Map<String, dynamic> item = entry.value;
 
+                                String name = '';
+                                final supplier = item['supplier'];
+
+                                if (supplier is Map) {
+                                  name = supplier['name']?.toString() ?? '';
+                                } else if (supplier != null) {
+                                  name = supplier.name ?? '';
+                                }
+
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 8),
                                   padding: const EdgeInsets.all(8),
@@ -278,19 +321,39 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            "报价 #${index + 1}",
+                                            name,
                                             style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.grey[600]),
+                                                color: Colors.grey[800]),
                                           ),
                                           InkWell(
-                                            onTap: () {
+                                            onTap: () async {
                                               final newList = List<
                                                   Map<String,
                                                       dynamic>>.from(valueList);
-                                              newList.removeAt(index);
-                                              field.didChange(newList);
+
+                                              final quoteId = item['id'];
+
+                                              if (quoteId != null) {
+                                                try {
+                                                  EasyLoading.show(
+                                                      status: '删除中...');
+                                                  await deleteSupplyQuote(
+                                                      quoteId);
+                                                  EasyLoading.dismiss();
+
+                                                  newList.removeAt(index);
+                                                  field.didChange(newList);
+                                                  EasyLoading.showSuccess(
+                                                      '删除成功');
+                                                } finally {
+                                                  EasyLoading.dismiss();
+                                                }
+                                              } else {
+                                                newList.removeAt(index);
+                                                field.didChange(newList);
+                                              }
                                             },
                                             child: const Padding(
                                               padding: EdgeInsets.all(4.0),

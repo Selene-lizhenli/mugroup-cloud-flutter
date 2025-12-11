@@ -24,6 +24,10 @@ Future<ApiResponse<List<Quote>>> getSupplyQuotes(
       );
 }
 
+Future deleteSupplyQuote(int id) async {
+  return api.delete("api/tenant/supply/quotes/$id");
+}
+
 Future<ApiResponse<List<Supplier>>> getSupplySuppliers(
     {Map<String, dynamic>? queryParameters}) async {
   return api
