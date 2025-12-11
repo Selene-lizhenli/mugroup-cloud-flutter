@@ -2,6 +2,7 @@ import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
@@ -329,30 +330,38 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                           ),
                                           InkWell(
                                             onTap: () async {
-                                              final newList = List<
-                                                  Map<String,
-                                                      dynamic>>.from(valueList);
+                                              final bool isConfirmed =
+                                                  await ConfirmDialog.show(
+                                                context,
+                                                content: '确定要移除这个工厂报价吗？',
+                                              );
+                                              if (isConfirmed) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
 
-                                              final quoteId = item['id'];
+                                                final quoteId = item['id'];
 
-                                              if (quoteId != null) {
-                                                try {
-                                                  EasyLoading.show(
-                                                      status: '删除中...');
-                                                  await deleteSupplyQuote(
-                                                      quoteId);
-                                                  EasyLoading.dismiss();
+                                                if (quoteId != null) {
+                                                  try {
+                                                    EasyLoading.show(
+                                                        status: '删除中...');
+                                                    await deleteSupplyQuote(
+                                                        quoteId);
+                                                    EasyLoading.dismiss();
 
+                                                    newList.removeAt(index);
+                                                    field.didChange(newList);
+                                                    EasyLoading.showSuccess(
+                                                        '删除成功');
+                                                  } finally {
+                                                    EasyLoading.dismiss();
+                                                  }
+                                                } else {
                                                   newList.removeAt(index);
                                                   field.didChange(newList);
-                                                  EasyLoading.showSuccess(
-                                                      '删除成功');
-                                                } finally {
-                                                  EasyLoading.dismiss();
                                                 }
-                                              } else {
-                                                newList.removeAt(index);
-                                                field.didChange(newList);
                                               }
                                             },
                                             child: const Padding(
