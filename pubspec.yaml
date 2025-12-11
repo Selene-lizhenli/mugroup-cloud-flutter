@@ -35,7 +35,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   flutter_broadcasts: ^0.4.0
-  tdesign_flutter: ^0.2.0
   auto_route: 9.2.2
   dio: ^5.8.0+1
   freezed_annotation: ^2.4.4
@@ -55,6 +54,11 @@ dependencies:
     git: 
       url: https://github.com/edram/flant.git
       ref: 5def462
+  tdesign_flutter:
+    git: 
+      url: https://github.com/edram/tdesign-flutter.git
+      path: tdesign-component
+      ref: a5ea826
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   hooks_riverpod: ^2.6.1

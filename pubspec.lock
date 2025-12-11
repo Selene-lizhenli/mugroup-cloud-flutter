@@ -1617,10 +1617,11 @@ packages:
   tdesign_flutter:
     dependency: "direct main"
     description:
-      name: tdesign_flutter
-      sha256: "0cee25925b3350fde8f7258be754170bcab15813f7c2c142e1233d84a2c0a046"
-      url: "https://pub.dev"
-    source: hosted
+      path: tdesign-component
+      ref: a5ea826
+      resolved-ref: a5ea826cffd5fb33aa4fab94a981ede9602d1fc7
+      url: "https://github.com/edram/tdesign-flutter.git"
+    source: git
     version: "0.2.0"
   term_glyph:
     dependency: transitive
