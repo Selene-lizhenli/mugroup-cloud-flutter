@@ -222,9 +222,9 @@ class ProductDropdownMenu extends HookWidget {
       "trade_country": "贸易国别"
     };
     final menuOptions = {
-      "supplier_ids": {"multiple": true},
-      "category_id": {"multiple": false},
-      "trade_country": {"multiple": false},
+      "supplier_ids": (multiple: true, optionsColumns: 1),
+      "category_id": (multiple: true, optionsColumns: 2),
+      "trade_country": (multiple: false, optionsColumns: 2),
     };
 
     final suppliers = useState(<Supplier>[]);
@@ -327,9 +327,9 @@ class ProductDropdownMenu extends HookWidget {
 
       item = TDDropdownItem(
         label: supportFacet[field],
-        multiple: option?['multiple'],
+        multiple: option?.multiple,
         options: options,
-        optionsColumns: 2,
+        optionsColumns: option?.optionsColumns,
         onChange: (value) {
           query.value = {
             ...query.value,
