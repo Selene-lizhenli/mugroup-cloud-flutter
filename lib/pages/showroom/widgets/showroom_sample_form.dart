@@ -398,12 +398,28 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                     label: '单位',
                                     value: field.value,
                                     options: [
+                                      SelectOption(label: 'PC', value: 'PC'),
+                                      SelectOption(label: 'SET', value: 'SET'),
+                                      SelectOption(label: 'CTN', value: 'CTN'),
+                                      SelectOption(label: 'KG', value: 'KG'),
+                                      SelectOption(label: 'T', value: 'T'),
+                                      SelectOption(label: 'CBM', value: 'CBM'),
+                                      SelectOption(label: 'M', value: 'M'),
+                                      SelectOption(label: 'L', value: 'L'),
+                                      SelectOption(label: 'BAG', value: 'BAG'),
                                       SelectOption(
-                                          label: 'Piece', value: 'Piece'),
-                                      SelectOption(label: 'Set', value: 'Set'),
+                                          label: 'PACK', value: 'PACK'),
+                                      SelectOption(
+                                          label: 'CASE', value: 'CASE'),
+                                      SelectOption(
+                                          label: 'PAIR', value: 'PAIR'),
+                                      SelectOption(label: 'BOX', value: 'BOX'),
+                                      SelectOption(label: 'SQM', value: 'SQM'),
+                                      SelectOption(label: 'G', value: 'G'),
+                                      SelectOption(
+                                          label: 'Pieces', value: 'Pieces'),
                                       SelectOption(
                                           label: 'Pair', value: 'Pair'),
-                                      SelectOption(label: 'Bag', value: 'Bag'),
                                     ],
                                     onChanged: field.didChange,
                                   );

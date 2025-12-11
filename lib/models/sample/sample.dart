@@ -17,6 +17,7 @@ abstract class Sample with _$Sample {
     String? construction,
     String? remark,
     String? series,
+    String? unit,
     @JsonKey(name: 'category_id') int? categoryId,
     @JsonKey(name: 'name_cn') String? nameCn,
     @JsonKey(name: 'name_en') String? nameEn,
