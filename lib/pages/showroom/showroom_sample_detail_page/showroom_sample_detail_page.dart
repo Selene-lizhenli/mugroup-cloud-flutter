@@ -361,7 +361,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
                             // 相似产品
                             Container(
-                              color: Colors.white,
                               key: elevatorFloors.value
                                   .firstWhereOrNull(
                                       (floor) => floor.id == "similar")
@@ -372,19 +371,23 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // 标题
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text(
-                                      '为你推荐',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                                  Container(
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 8.0),
+                                      child: Text(
+                                        '为你推荐',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+
                                   // 瀑布流
                                   LayoutBuilder(
                                     builder: (context, constraints) {
