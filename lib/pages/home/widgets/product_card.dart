@@ -230,7 +230,7 @@ class ProductCard extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
-                  child: EasyRefresh(
+                  child: EasyRefresh.builder(
                     onRefresh: () async {
                       await context.router
                           .push(ShowroomSampleDetailRoute(id: sample.id!));
@@ -245,9 +245,10 @@ class ProductCard extends StatelessWidget {
                       processingText: "前往详情",
                       showMessage: false,
                     ),
-                    child: CarouselSlider(
+                    childBuilder: (context, physics) => CarouselSlider(
                       options: CarouselOptions(
-                        height: null,
+                        height: 130,
+                        scrollPhysics: physics,
                         reverse: true,
                         viewportFraction:
                             sample.supplyQuotes!.length > 1 ? 0.9 : 1,
@@ -351,55 +352,72 @@ class _ProductSupplyQuote extends StatelessWidget {
                 maxLines: 2,
               ),
             ),
-          Row(
-            children: [
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: _currencySymbol(supplyQuote.currency),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colorScheme.secondary,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: _currencySymbol(supplyQuote.currency),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colorScheme.secondary,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: supplyQuote.purchaseCost,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.secondary,
+                      TextSpan(
+                        text: supplyQuote.purchaseCost,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.secondary,
+                        ),
                       ),
-                    ),
-                    if (supplyQuote.taxRate != null)
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.baseline,
-                        baseline: TextBaseline.alphabetic,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text(
-                            '(含税率 ${supplyQuote.taxRate})',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 11,
+                      if (supplyQuote.taxRate != null)
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.baseline,
+                          baseline: TextBaseline.alphabetic,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: Text(
+                              '(含税率 ${supplyQuote.taxRate})',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 11,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const Spacer(),
+          // 参数
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            primary: false,
+            physics: const ClampingScrollPhysics(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _buildQuotoParams(context),
+            ),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 _formatBeijingTime(supplyQuote.chuhuoAt),
                 style: TextStyle(
-                  color: tdTheme.grayColor7,
-                  fontSize: tdTheme.fontBodySmall!.size,
+                  color: tdTheme.fontGyColor2,
+                  fontSize: tdTheme.fontTitleMedium!.size,
                 ),
               ),
             ],
@@ -407,6 +425,51 @@ class _ProductSupplyQuote extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildQuotoParams(BuildContext context) {
+    final tdTheme = TDTheme.of(context);
+    final fontLinkSmall = tdTheme.fontLinkSmall;
+    final List<({String key, String value})> parmas = [];
+
+    if (supplyQuote.moq != null) {
+      parmas.add((key: "MOQ", value: supplyQuote.moq.toString()));
+    }
+    if (supplyQuote.outerVolume != null) {
+      parmas.add((key: "外箱体积", value: supplyQuote.outerVolume!));
+    }
+    if (supplyQuote.outerGrossWeight != null) {
+      parmas.add((key: "外箱毛重", value: supplyQuote.outerGrossWeight!));
+    }
+    if (supplyQuote.outerCapacity != null) {
+      parmas.add((key: "外箱装量", value: supplyQuote.outerCapacity!));
+    }
+
+    return [
+      for (var (index, param) in parmas.indexed) ...[
+        Column(
+          children: [
+            Text(param.value),
+            Text(
+              param.key,
+              style: TextStyle(
+                color: tdTheme.fontGyColor2,
+                fontWeight: fontLinkSmall!.fontWeight,
+                height: 1,
+                fontSize: fontLinkSmall.size,
+              ),
+            ),
+          ],
+        ),
+        if (index != parmas.length - 1)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            width: 0.5,
+            height: 30,
+            color: tdTheme.grayColor5,
+          ),
+      ]
+    ];
   }
 
   String _formatBeijingTime(DateTime? time) {

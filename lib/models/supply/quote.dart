@@ -15,6 +15,7 @@ class Quote with _$Quote {
     @JsonKey(name: 'supplier_id') int? supplierId,
     @JsonKey(name: 'outer_capacity') String? outerCapacity,
     @JsonKey(name: 'outer_volume') String? outerVolume,
+    @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
     @JsonKey(name: 'sample_location') String? sampleLocation,
     @JsonKey(name: 'record_user') String? recordUser,

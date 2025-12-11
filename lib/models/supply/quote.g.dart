@@ -17,6 +17,7 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       (json['supplier_id'] as num?)?.toInt(),
       json['outer_capacity'] as String?,
       json['outer_volume'] as String?,
+      json['outer_gross_weight'] as String?,
       json['chuhuo_at'] == null
           ? null
           : DateTime.parse(json['chuhuo_at'] as String),
@@ -39,6 +40,7 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'supplier_id': instance.supplierId,
       'outer_capacity': instance.outerCapacity,
       'outer_volume': instance.outerVolume,
+      'outer_gross_weight': instance.outerGrossWeight,
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),
       'sample_location': instance.sampleLocation,
       'record_user': instance.recordUser,

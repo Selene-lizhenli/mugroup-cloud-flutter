@@ -31,6 +31,8 @@ mixin _$Quote {
   String? get outerCapacity => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_volume')
   String? get outerVolume => throw _privateConstructorUsedError;
+  @JsonKey(name: 'outer_gross_weight')
+  String? get outerGrossWeight => throw _privateConstructorUsedError;
   @JsonKey(name: 'chuhuo_at')
   DateTime? get chuhuoAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_location')
@@ -67,6 +69,7 @@ abstract class $QuoteCopyWith<$Res> {
       @JsonKey(name: 'supplier_id') int? supplierId,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
+      @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
       @JsonKey(name: 'sample_location') String? sampleLocation,
       @JsonKey(name: 'record_user') String? recordUser,
@@ -100,6 +103,7 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
     Object? supplierId = freezed,
     Object? outerCapacity = freezed,
     Object? outerVolume = freezed,
+    Object? outerGrossWeight = freezed,
     Object? chuhuoAt = freezed,
     Object? sampleLocation = freezed,
     Object? recordUser = freezed,
@@ -141,6 +145,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       outerVolume: freezed == outerVolume
           ? _value.outerVolume
           : outerVolume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      outerGrossWeight: freezed == outerGrossWeight
+          ? _value.outerGrossWeight
+          : outerGrossWeight // ignore: cast_nullable_to_non_nullable
               as String?,
       chuhuoAt: freezed == chuhuoAt
           ? _value.chuhuoAt
@@ -206,6 +214,7 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       @JsonKey(name: 'supplier_id') int? supplierId,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
+      @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
       @JsonKey(name: 'sample_location') String? sampleLocation,
       @JsonKey(name: 'record_user') String? recordUser,
@@ -238,6 +247,7 @@ class __$$QuoteImplCopyWithImpl<$Res>
     Object? supplierId = freezed,
     Object? outerCapacity = freezed,
     Object? outerVolume = freezed,
+    Object? outerGrossWeight = freezed,
     Object? chuhuoAt = freezed,
     Object? sampleLocation = freezed,
     Object? recordUser = freezed,
@@ -279,6 +289,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
       freezed == outerVolume
           ? _value.outerVolume
           : outerVolume // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == outerGrossWeight
+          ? _value.outerGrossWeight
+          : outerGrossWeight // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == chuhuoAt
           ? _value.chuhuoAt
@@ -328,6 +342,7 @@ class _$QuoteImpl implements _Quote {
       @JsonKey(name: 'supplier_id') this.supplierId,
       @JsonKey(name: 'outer_capacity') this.outerCapacity,
       @JsonKey(name: 'outer_volume') this.outerVolume,
+      @JsonKey(name: 'outer_gross_weight') this.outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') this.chuhuoAt,
       @JsonKey(name: 'sample_location') this.sampleLocation,
       @JsonKey(name: 'record_user') this.recordUser,
@@ -360,6 +375,9 @@ class _$QuoteImpl implements _Quote {
   @JsonKey(name: 'outer_volume')
   final String? outerVolume;
   @override
+  @JsonKey(name: 'outer_gross_weight')
+  final String? outerGrossWeight;
+  @override
   @JsonKey(name: 'chuhuo_at')
   final DateTime? chuhuoAt;
   @override
@@ -386,7 +404,7 @@ class _$QuoteImpl implements _Quote {
 
   @override
   String toString() {
-    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo)';
+    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo)';
   }
 
   @override
@@ -407,6 +425,8 @@ class _$QuoteImpl implements _Quote {
                 other.outerCapacity == outerCapacity) &&
             (identical(other.outerVolume, outerVolume) ||
                 other.outerVolume == outerVolume) &&
+            (identical(other.outerGrossWeight, outerGrossWeight) ||
+                other.outerGrossWeight == outerGrossWeight) &&
             (identical(other.chuhuoAt, chuhuoAt) ||
                 other.chuhuoAt == chuhuoAt) &&
             (identical(other.sampleLocation, sampleLocation) ||
@@ -435,6 +455,7 @@ class _$QuoteImpl implements _Quote {
       supplierId,
       outerCapacity,
       outerVolume,
+      outerGrossWeight,
       chuhuoAt,
       sampleLocation,
       recordUser,
@@ -468,6 +489,7 @@ abstract class _Quote implements Quote {
       @JsonKey(name: 'supplier_id') final int? supplierId,
       @JsonKey(name: 'outer_capacity') final String? outerCapacity,
       @JsonKey(name: 'outer_volume') final String? outerVolume,
+      @JsonKey(name: 'outer_gross_weight') final String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
       @JsonKey(name: 'sample_location') final String? sampleLocation,
       @JsonKey(name: 'record_user') final String? recordUser,
@@ -499,6 +521,9 @@ abstract class _Quote implements Quote {
   @override
   @JsonKey(name: 'outer_volume')
   String? get outerVolume;
+  @override
+  @JsonKey(name: 'outer_gross_weight')
+  String? get outerGrossWeight;
   @override
   @JsonKey(name: 'chuhuo_at')
   DateTime? get chuhuoAt;
