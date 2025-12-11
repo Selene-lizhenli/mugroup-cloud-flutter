@@ -131,11 +131,14 @@ class ProductCard extends StatelessWidget {
                             const SizedBox(
                               width: 5,
                             ),
-                            Text(
-                              sample.tradeCountry!,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF6F6F6F),
+                            Flexible(
+                              child: Text(
+                                sample.tradeCountry!,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF6F6F6F),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
