@@ -10,7 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 @RoutePage()
 class CrmCompanyEditPage extends HookConsumerWidget {
   final int id;
-  const CrmCompanyEditPage({super.key, required this.id});
+  const CrmCompanyEditPage({super.key, @pathParam required this.id});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

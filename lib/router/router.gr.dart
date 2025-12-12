@@ -209,6 +209,7 @@ class CrmCompanyEditRoute extends _i32.PageRouteInfo<CrmCompanyEditRouteArgs> {
             key: key,
             id: id,
           ),
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -217,7 +218,9 @@ class CrmCompanyEditRoute extends _i32.PageRouteInfo<CrmCompanyEditRouteArgs> {
   static _i32.PageInfo page = _i32.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<CrmCompanyEditRouteArgs>();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<CrmCompanyEditRouteArgs>(
+          orElse: () => CrmCompanyEditRouteArgs(id: pathParams.getInt('id')));
       return _i5.CrmCompanyEditPage(
         key: args.key,
         id: args.id,
