@@ -1,4 +1,4 @@
-import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
@@ -11,12 +11,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class CrmCompanyForm extends HookConsumerWidget {
-  final Company? initial;
+class CrmCotactForm extends HookConsumerWidget {
+  final Contact? initial;
   final bool showUpload;
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
-  const CrmCompanyForm({
+  const CrmCotactForm({
     super.key,
     this.showUpload = false,
     required this.initial,
@@ -107,24 +107,44 @@ class CrmCompanyForm extends HookConsumerWidget {
                           name: "name",
                           builder: (field) {
                             return Input(
-                              label: '客户名称',
+                              label: '名称',
                               value: field.value ?? '',
                               onChanged: field.didChange,
                             );
                           },
                         ),
                         FormBuilderField<String>(
-                          name: "address",
+                          name: "company_id",
                           builder: (field) {
                             return Input(
-                              label: '地址',
+                              label: '公司',
                               value: field.value ?? '',
                               onChanged: field.didChange,
                             );
                           },
                         ),
                         FormBuilderField<String>(
-                          name: "country",
+                          name: "position",
+                          builder: (field) {
+                            return Input(
+                              label: '职位',
+                              value: field.value ?? '',
+                              onChanged: field.didChange,
+                            );
+                          },
+                        ),
+                        FormBuilderField<String>(
+                          name: "birthday",
+                          builder: (field) {
+                            return Input(
+                              label: '生日',
+                              value: field.value ?? '',
+                              onChanged: field.didChange,
+                            );
+                          },
+                        ),
+                        FormBuilderField<String>(
+                          name: "location",
                           builder: (field) {
                             return Input(
                               label: '国家/地区',
@@ -133,54 +153,12 @@ class CrmCompanyForm extends HookConsumerWidget {
                             );
                           },
                         ),
-                        FormBuilderField<String>(
-                          name: "industry",
-                          builder: (field) {
-                            return Input(
-                              label: '行业',
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
-                        FormBuilderField<String>(
-                          name: "source",
-                          builder: (field) {
-                            return Input(
-                              label: '来源',
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
-                        FormBuilderField<List<String>>(
-                          name: "domain",
-                          builder: (field) {
-                            return MultiInput(
-                              label: '公司网址',
-                              btnText: '添加公司网址',
-                              values: field.value ?? [''],
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
                         FormBuilderField<List<String>>(
                           name: "email",
                           builder: (field) {
                             return MultiInput(
-                              label: '邮箱',
+                              label: '公司邮箱',
                               btnText: '添加邮箱',
-                              values: field.value ?? [''],
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
-                        FormBuilderField<List<String>>(
-                          name: "linkedin",
-                          builder: (field) {
-                            return MultiInput(
-                              label: 'LinkedIn',
-                              btnText: '添加 LinkedIn',
                               values: field.value ?? [''],
                               onChanged: field.didChange,
                             );
@@ -192,6 +170,17 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: 'WhatsApp',
                               btnText: '添加 WhatsApp',
+                              values: field.value ?? [''],
+                              onChanged: field.didChange,
+                            );
+                          },
+                        ),
+                        FormBuilderField<List<String>>(
+                          name: "linkedin",
+                          builder: (field) {
+                            return MultiInput(
+                              label: 'LinkedIn',
+                              btnText: '添加 LinkedIn',
                               values: field.value ?? [''],
                               onChanged: field.didChange,
                             );
