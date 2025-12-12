@@ -9,7 +9,17 @@ class Contact with _$Contact {
     int? id,
     String? name,
     String? mobile,
+    String? department,
+    String? sex,
+    String? position,
+    String? phone,
+    String? fax,
+    String? email,
+    String? qq,
+    String? wechat,
+    String? remark,
   ) = _Contact;
 
-  factory Contact.fromJson(Map<String, dynamic> json) => _$ContactFromJson(json);
+  factory Contact.fromJson(Map<String, dynamic> json) =>
+      _$ContactFromJson(json);
 }
