@@ -168,8 +168,9 @@ Future<ApiResponse<List<Cert>>?> getSupplySupplierCerts() async {
       );
 }
 
-Future<Cert?> storeSupplySupplierCert(Map<String, dynamic>? data) async {
-  return api.post("api/tenant/supply/certs", data: data).then(
+Future<Cert?> storeSupplySupplierCert(
+    int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/supplier/$id/certs", data: data).then(
     (res) {
       if (res.data == null) {
         return null;

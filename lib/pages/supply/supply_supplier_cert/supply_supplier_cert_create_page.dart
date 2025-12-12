@@ -79,7 +79,7 @@ class SupplySupplierCertCreatePage extends HookConsumerWidget {
               final values = formState!.value;
               debugPrint('提交表单: $values');
 
-              await storeSupplySupplierCert(values);
+              await storeSupplySupplierCert(supplierId, values);
               EasyLoading.showSuccess('供应商证书创建成功!');
               if (context.mounted) {
                 Navigator.of(context).pop();
