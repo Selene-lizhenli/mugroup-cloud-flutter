@@ -52,6 +52,8 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: CrmCompanyEditRoute.page, path: "/crm/company/edit/:id"),
       AutoRoute(
           page: CrmCompanyDetailRoute.page, path: "/crm/company/detail/:id"),
+      AutoRoute(page: CrmContactCreateRoute.page, path: "/crm/contact/create"),
+      AutoRoute(page: CrmContactEditRoute.page, path: "/crm/contact/edit/:id"),
       AutoRoute(
           page: SupplySupplierCreateRoute.page,
           path: "/supply/supplier/create"),
