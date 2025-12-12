@@ -40,7 +40,7 @@ class SupplySupplierActivityCreatePage extends HookConsumerWidget {
                   },
                 ),
                 FormBuilderField<String>(
-                  name: "remark",
+                  name: "description",
                   builder: (field) {
                     return TextArea(
                       label: '备注',

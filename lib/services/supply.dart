@@ -191,18 +191,8 @@ Future<List<Log>?> getSupplySupplierActivitiesById(int id) async {
   return null;
 }
 
-Future<Log?> storeSupplySupplierActivity(
-    int id, Map<String, dynamic>? data) async {
-  return api
-      .post("api/tenant/supply/suppliers/$id/activities", data: data)
-      .then(
-    (res) {
-      if (res.data == null) {
-        return null;
-      }
-      return Log.fromJson(res.data);
-    },
-  );
+Future storeSupplySupplierActivity(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/suppliers/$id/activities", data: data);
 }
 
 Future<Media?> uploadSupplySupplierYanChang(int id, dynamic data) async {
