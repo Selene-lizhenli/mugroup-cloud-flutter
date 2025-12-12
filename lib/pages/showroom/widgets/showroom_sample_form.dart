@@ -321,13 +321,16 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
+                                          Expanded(
+                                              child: Text(
                                             name,
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey[800]),
-                                          ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          )),
                                           InkWell(
                                             onTap: () async {
                                               final bool isConfirmed =
