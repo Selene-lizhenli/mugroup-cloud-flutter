@@ -19,42 +19,42 @@ import 'package:cloud/pages/crm/crm_company/crm_company_detail_page.dart'
     as _i4;
 import 'package:cloud/pages/crm/crm_company/crm_company_edit_page.dart' as _i5;
 import 'package:cloud/pages/crm/crm_company/crm_company_page.dart' as _i6;
-import 'package:cloud/pages/layout.dart' as _i7;
-import 'package:cloud/pages/login/login_page.dart' as _i8;
-import 'package:cloud/pages/my/my_page.dart' as _i9;
-import 'package:cloud/pages/quote/quote_create_page.dart' as _i10;
-import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i11;
-import 'package:cloud/pages/quote/quote_detail/tabs/info.dart' as _i27;
-import 'package:cloud/pages/quote/quote_page.dart' as _i12;
-import 'package:cloud/pages/scan/scan_page.dart' as _i13;
+import 'package:cloud/pages/home/home_page.dart' as _i7;
+import 'package:cloud/pages/layout.dart' as _i8;
+import 'package:cloud/pages/login/login_page.dart' as _i9;
+import 'package:cloud/pages/my/my_page.dart' as _i10;
+import 'package:cloud/pages/quote/quote_create_page.dart' as _i11;
+import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i12;
+import 'package:cloud/pages/quote/quote_detail/tabs/contact.dart' as _i27;
+import 'package:cloud/pages/quote/quote_page.dart' as _i13;
+import 'package:cloud/pages/scan/scan_page.dart' as _i14;
 import 'package:cloud/pages/selectors/select_user/select_user_page.dart'
-    as _i14;
-import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.dart'
     as _i15;
-import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
+import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.dart'
     as _i16;
-import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i17;
-import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i18;
+import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
+    as _i17;
+import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i18;
+import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i19;
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
-    as _i19;
-import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i20;
+    as _i20;
+import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i21;
 import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_create_page.dart'
-    as _i21;
-import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'
     as _i22;
-import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_create_page.dart'
+import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'
     as _i23;
-import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_edit_page.dart'
+import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_create_page.dart'
     as _i24;
-import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i25;
+import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_edit_page.dart'
+    as _i25;
+import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i26;
 import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
-    as _i28;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
-    as _i26;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
     as _i29;
-import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i30;
-import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i31;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
+    as _i28;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
+    as _i30;
+import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i31;
 import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i32;
 import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.dart'
     as _i33;
@@ -264,7 +264,26 @@ class CrmCompanyRoute extends _i35.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i7.Layout]
+/// [_i7.HomePage]
+class HomeRoute extends _i35.PageRouteInfo<void> {
+  const HomeRoute({List<_i35.PageRouteInfo>? children})
+      : super(
+          HomeRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'HomeRoute';
+
+  static _i35.PageInfo page = _i35.PageInfo(
+    name,
+    builder: (data) {
+      return const _i7.HomePage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i8.Layout]
 class Layout extends _i35.PageRouteInfo<void> {
   const Layout({List<_i35.PageRouteInfo>? children})
       : super(
@@ -277,13 +296,13 @@ class Layout extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i7.Layout();
+      return const _i8.Layout();
     },
   );
 }
 
 /// generated route for
-/// [_i8.LoginPage]
+/// [_i9.LoginPage]
 class LoginRoute extends _i35.PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
     _i38.Key? key,
@@ -305,7 +324,7 @@ class LoginRoute extends _i35.PageRouteInfo<LoginRouteArgs> {
     builder: (data) {
       final args =
           data.argsAs<LoginRouteArgs>(orElse: () => const LoginRouteArgs());
-      return _i8.LoginPage(
+      return _i9.LoginPage(
         key: args.key,
         onLogin: args.onLogin,
       );
@@ -330,7 +349,7 @@ class LoginRouteArgs {
 }
 
 /// generated route for
-/// [_i9.MyPage]
+/// [_i10.MyPage]
 class MyRoute extends _i35.PageRouteInfo<void> {
   const MyRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -343,13 +362,13 @@ class MyRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i9.MyPage();
+      return const _i10.MyPage();
     },
   );
 }
 
 /// generated route for
-/// [_i10.QuoteCreatePage]
+/// [_i11.QuoteCreatePage]
 class QuoteCreateRoute extends _i35.PageRouteInfo<void> {
   const QuoteCreateRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -362,13 +381,13 @@ class QuoteCreateRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i10.QuoteCreatePage();
+      return const _i11.QuoteCreatePage();
     },
   );
 }
 
 /// generated route for
-/// [_i11.QuoteDetailPage]
+/// [_i12.QuoteDetailPage]
 class QuoteDetailRoute extends _i35.PageRouteInfo<QuoteDetailRouteArgs> {
   QuoteDetailRoute({
     _i38.Key? key,
@@ -392,7 +411,7 @@ class QuoteDetailRoute extends _i35.PageRouteInfo<QuoteDetailRouteArgs> {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<QuoteDetailRouteArgs>(
           orElse: () => QuoteDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i11.QuoteDetailPage(
+      return _i12.QuoteDetailPage(
         key: args.key,
         id: args.id,
       );
@@ -417,7 +436,7 @@ class QuoteDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i12.QuotePage]
+/// [_i13.QuotePage]
 class QuoteRoute extends _i35.PageRouteInfo<void> {
   const QuoteRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -430,13 +449,13 @@ class QuoteRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i12.QuotePage();
+      return const _i13.QuotePage();
     },
   );
 }
 
 /// generated route for
-/// [_i13.ScanPage]
+/// [_i14.ScanPage]
 class ScanRoute extends _i35.PageRouteInfo<void> {
   const ScanRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -449,13 +468,13 @@ class ScanRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i13.ScanPage();
+      return const _i14.ScanPage();
     },
   );
 }
 
 /// generated route for
-/// [_i14.SelectUserPage]
+/// [_i15.SelectUserPage]
 class SelectUserRoute extends _i35.PageRouteInfo<void> {
   const SelectUserRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -468,13 +487,13 @@ class SelectUserRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i14.SelectUserPage();
+      return const _i15.SelectUserPage();
     },
   );
 }
 
 /// generated route for
-/// [_i15.SelectWmsBorrowPage]
+/// [_i16.SelectWmsBorrowPage]
 class SelectWmsBorrowRoute extends _i35.PageRouteInfo<void> {
   const SelectWmsBorrowRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -487,13 +506,13 @@ class SelectWmsBorrowRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i15.SelectWmsBorrowPage();
+      return const _i16.SelectWmsBorrowPage();
     },
   );
 }
 
 /// generated route for
-/// [_i16.SelectWmsWarehousePage]
+/// [_i17.SelectWmsWarehousePage]
 class SelectWmsWarehouseRoute extends _i35.PageRouteInfo<void> {
   const SelectWmsWarehouseRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -506,13 +525,13 @@ class SelectWmsWarehouseRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i16.SelectWmsWarehousePage();
+      return const _i17.SelectWmsWarehousePage();
     },
   );
 }
 
 /// generated route for
-/// [_i17.ShowroomQuotationsPage]
+/// [_i18.ShowroomQuotationsPage]
 class ShowroomQuotationsRoute
     extends _i35.PageRouteInfo<ShowroomQuotationsRouteArgs> {
   ShowroomQuotationsRoute({
@@ -538,7 +557,7 @@ class ShowroomQuotationsRoute
       final args = data.argsAs<ShowroomQuotationsRouteArgs>(
           orElse: () => ShowroomQuotationsRouteArgs(
               quoteNo: pathParams.getString('quoteNo')));
-      return _i17.ShowroomQuotationsPage(
+      return _i18.ShowroomQuotationsPage(
         key: args.key,
         quoteNo: args.quoteNo,
       );
@@ -563,7 +582,7 @@ class ShowroomQuotationsRouteArgs {
 }
 
 /// generated route for
-/// [_i18.ShowroomSampleCreatePage]
+/// [_i19.ShowroomSampleCreatePage]
 class ShowroomSampleCreateRoute extends _i35.PageRouteInfo<void> {
   const ShowroomSampleCreateRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -576,13 +595,13 @@ class ShowroomSampleCreateRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i18.ShowroomSampleCreatePage();
+      return const _i19.ShowroomSampleCreatePage();
     },
   );
 }
 
 /// generated route for
-/// [_i19.ShowroomSampleDetailPage]
+/// [_i20.ShowroomSampleDetailPage]
 class ShowroomSampleDetailRoute
     extends _i35.PageRouteInfo<ShowroomSampleDetailRouteArgs> {
   ShowroomSampleDetailRoute({
@@ -608,7 +627,7 @@ class ShowroomSampleDetailRoute
       final args = data.argsAs<ShowroomSampleDetailRouteArgs>(
           orElse: () =>
               ShowroomSampleDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i19.ShowroomSampleDetailPage(
+      return _i20.ShowroomSampleDetailPage(
         key: args.key,
         id: args.id,
       );
@@ -633,7 +652,7 @@ class ShowroomSampleDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i20.ShowroomSampleEditPage]
+/// [_i21.ShowroomSampleEditPage]
 class ShowroomSampleEditRoute
     extends _i35.PageRouteInfo<ShowroomSampleEditRouteArgs> {
   ShowroomSampleEditRoute({
@@ -659,7 +678,7 @@ class ShowroomSampleEditRoute
       final args = data.argsAs<ShowroomSampleEditRouteArgs>(
           orElse: () =>
               ShowroomSampleEditRouteArgs(id: pathParams.getInt('id')));
-      return _i20.ShowroomSampleEditPage(
+      return _i21.ShowroomSampleEditPage(
         key: args.key,
         id: args.id,
       );
@@ -684,7 +703,7 @@ class ShowroomSampleEditRouteArgs {
 }
 
 /// generated route for
-/// [_i21.SupplySupplierActivityCreatePage]
+/// [_i22.SupplySupplierActivityCreatePage]
 class SupplySupplierActivityCreateRoute
     extends _i35.PageRouteInfo<SupplySupplierActivityCreateRouteArgs> {
   SupplySupplierActivityCreateRoute({
@@ -706,7 +725,7 @@ class SupplySupplierActivityCreateRoute
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierActivityCreateRouteArgs>();
-      return _i21.SupplySupplierActivityCreatePage(
+      return _i22.SupplySupplierActivityCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -731,7 +750,7 @@ class SupplySupplierActivityCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i22.SupplySupplierCertCreatePage]
+/// [_i23.SupplySupplierCertCreatePage]
 class SupplySupplierCertCreateRoute
     extends _i35.PageRouteInfo<SupplySupplierCertCreateRouteArgs> {
   SupplySupplierCertCreateRoute({
@@ -753,7 +772,7 @@ class SupplySupplierCertCreateRoute
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierCertCreateRouteArgs>();
-      return _i22.SupplySupplierCertCreatePage(
+      return _i23.SupplySupplierCertCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -778,7 +797,7 @@ class SupplySupplierCertCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i23.SupplySupplierContactCreatePage]
+/// [_i24.SupplySupplierContactCreatePage]
 class SupplySupplierContactCreateRoute
     extends _i35.PageRouteInfo<SupplySupplierContactCreateRouteArgs> {
   SupplySupplierContactCreateRoute({
@@ -800,7 +819,7 @@ class SupplySupplierContactCreateRoute
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierContactCreateRouteArgs>();
-      return _i23.SupplySupplierContactCreatePage(
+      return _i24.SupplySupplierContactCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -825,7 +844,7 @@ class SupplySupplierContactCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i24.SupplySupplierContactEditPage]
+/// [_i25.SupplySupplierContactEditPage]
 class SupplySupplierContactEditRoute
     extends _i35.PageRouteInfo<SupplySupplierContactEditRouteArgs> {
   SupplySupplierContactEditRoute({
@@ -851,7 +870,7 @@ class SupplySupplierContactEditRoute
       final args = data.argsAs<SupplySupplierContactEditRouteArgs>(
           orElse: () =>
               SupplySupplierContactEditRouteArgs(id: pathParams.getInt('id')));
-      return _i24.SupplySupplierContactEditPage(
+      return _i25.SupplySupplierContactEditPage(
         key: args.key,
         id: args.id,
       );
@@ -876,7 +895,7 @@ class SupplySupplierContactEditRouteArgs {
 }
 
 /// generated route for
-/// [_i25.SupplySupplierCreatePage]
+/// [_i26.SupplySupplierCreatePage]
 class SupplySupplierCreateRoute extends _i35.PageRouteInfo<void> {
   const SupplySupplierCreateRoute({List<_i35.PageRouteInfo>? children})
       : super(
@@ -889,13 +908,13 @@ class SupplySupplierCreateRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i25.SupplySupplierCreatePage();
+      return const _i26.SupplySupplierCreatePage();
     },
   );
 }
 
 /// generated route for
-/// [_i26.SupplySupplierDetailContactPage]
+/// [_i27.SupplySupplierDetailContactPage]
 class SupplySupplierDetailContactRoute
     extends _i35.PageRouteInfo<SupplySupplierDetailContactRouteArgs> {
   SupplySupplierDetailContactRoute({
@@ -915,7 +934,7 @@ class SupplySupplierDetailContactRoute
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailContactRouteArgs>(
           orElse: () => SupplySupplierDetailContactRouteArgs());
-      return _i26.SupplySupplierDetailContactPage(
+      return _i27.SupplySupplierDetailContactPage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -935,7 +954,7 @@ class SupplySupplierDetailContactRouteArgs {
 }
 
 /// generated route for
-/// [_i27.SupplySupplierDetailInfoPage]
+/// [_i28.SupplySupplierDetailInfoPage]
 class SupplySupplierDetailInfoRoute
     extends _i35.PageRouteInfo<SupplySupplierDetailInfoRouteArgs> {
   SupplySupplierDetailInfoRoute({
@@ -955,7 +974,7 @@ class SupplySupplierDetailInfoRoute
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailInfoRouteArgs>(
           orElse: () => SupplySupplierDetailInfoRouteArgs());
-      return _i27.SupplySupplierDetailInfoPage(
+      return _i28.SupplySupplierDetailInfoPage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -975,7 +994,7 @@ class SupplySupplierDetailInfoRouteArgs {
 }
 
 /// generated route for
-/// [_i28.SupplySupplierDetailPage]
+/// [_i29.SupplySupplierDetailPage]
 class SupplySupplierDetailRoute
     extends _i35.PageRouteInfo<SupplySupplierDetailRouteArgs> {
   SupplySupplierDetailRoute({
@@ -1001,7 +1020,7 @@ class SupplySupplierDetailRoute
       final args = data.argsAs<SupplySupplierDetailRouteArgs>(
           orElse: () =>
               SupplySupplierDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i28.SupplySupplierDetailPage(
+      return _i29.SupplySupplierDetailPage(
         key: args.key,
         id: args.id,
       );
@@ -1026,7 +1045,7 @@ class SupplySupplierDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i29.SupplySupplierDetailSamplePage]
+/// [_i30.SupplySupplierDetailSamplePage]
 class SupplySupplierDetailSampleRoute
     extends _i35.PageRouteInfo<SupplySupplierDetailSampleRouteArgs> {
   SupplySupplierDetailSampleRoute({
@@ -1046,7 +1065,7 @@ class SupplySupplierDetailSampleRoute
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailSampleRouteArgs>(
           orElse: () => SupplySupplierDetailSampleRouteArgs());
-      return _i29.SupplySupplierDetailSamplePage(
+      return _i30.SupplySupplierDetailSamplePage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -1066,7 +1085,7 @@ class SupplySupplierDetailSampleRouteArgs {
 }
 
 /// generated route for
-/// [_i30.SupplySupplierEditPage]
+/// [_i31.SupplySupplierEditPage]
 class SupplySupplierEditRoute
     extends _i35.PageRouteInfo<SupplySupplierEditRouteArgs> {
   SupplySupplierEditRoute({
@@ -1092,7 +1111,7 @@ class SupplySupplierEditRoute
       final args = data.argsAs<SupplySupplierEditRouteArgs>(
           orElse: () =>
               SupplySupplierEditRouteArgs(id: pathParams.getInt('id')));
-      return _i30.SupplySupplierEditPage(
+      return _i31.SupplySupplierEditPage(
         key: args.key,
         id: args.id,
       );
@@ -1114,25 +1133,6 @@ class SupplySupplierEditRouteArgs {
   String toString() {
     return 'SupplySupplierEditRouteArgs{key: $key, id: $id}';
   }
-}
-
-/// generated route for
-/// [_i31.SupplySupplierPage]
-class SupplySupplierRoute extends _i35.PageRouteInfo<void> {
-  const SupplySupplierRoute({List<_i35.PageRouteInfo>? children})
-      : super(
-          SupplySupplierRoute.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'SupplySupplierRoute';
-
-  static _i35.PageInfo page = _i35.PageInfo(
-    name,
-    builder: (data) {
-      return const _i31.SupplySupplierPage();
-    },
-  );
 }
 
 /// generated route for

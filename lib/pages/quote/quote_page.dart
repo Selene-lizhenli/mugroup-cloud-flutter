@@ -16,7 +16,7 @@ class QuotePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorScheme.surface, // ← 你想要的颜色
+        backgroundColor: colorScheme.surface,
         title: const Text("报价单列表"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

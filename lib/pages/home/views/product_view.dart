@@ -1,16 +1,14 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
-import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/home/events/search_event.dart';
 import 'package:cloud/pages/home/providers/home_provider.dart';
 import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/pages/home/widgets/product_dropdown_menu.dart';
 import 'package:cloud/services/sample.dart';
-import 'package:cloud/services/supply.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +16,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 const pageSize = 20;
 
@@ -32,7 +29,9 @@ class ProductView extends HookConsumerWidget {
     final cartState = ref.watch(cartProvider);
 
     final refreshController = useEasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
+      controlFinishLoad: true,
+      controlFinishRefresh: true,
+    );
     final home = ref.watch(homeProvider);
     final search = useState(home.search);
     final query = useState<Map<String, dynamic>>({});
@@ -40,6 +39,7 @@ class ProductView extends HookConsumerWidget {
     final page = useRef(1);
     final samples = useState<List<Sample>>(<Sample>[]);
     final facetCounts = useState(<FacetCount>[]);
+    final colorScheme = Theme.of(context).colorScheme;
 
     final mediaQuery = MediaQuery.of(context);
 
@@ -69,6 +69,7 @@ class ProductView extends HookConsumerWidget {
         if (searchMedia != null) "image": searchMedia.id,
         "page": page.value,
         "pageSize": pageSize,
+        "includes": 'supplyQuotes.supplier',
         ...query.value,
       };
       final resp = await getSamples(queryParameters: queryParameters);
@@ -90,12 +91,20 @@ class ProductView extends HookConsumerWidget {
     }
 
     useEffect(() {
-      if (home.currentPage != 0) {
-        return null;
-      }
-
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
+          final currentHome = ref.read(homeProvider);
+          if (currentHome.currentPage != 0) {
+            return;
+          }
+
+          if (event.from == SearchEventFrom.tab) {
+            if (search.value == event.search &&
+                media.value?.id == event.media?.id) {
+              return;
+            }
+          }
+
           search.value = event.search;
           media.value = event.media;
 
@@ -106,272 +115,101 @@ class ProductView extends HookConsumerWidget {
       return () {
         searchEventSubscription.cancel();
       };
-    }, [home.currentPage]);
-
-    useUpdateEffect(() {
-      if (home.currentPage != 0) {
-        return null;
-      }
-
-      if ((home.search == search.value) && (home.currentMedia == media.value)) {
-        return null;
-      }
-
-      search.value = home.search;
-      media.value = home.currentMedia;
-      refreshController.callRefresh(force: true);
-
-      return null;
-    }, [
-      home.currentPage,
-      home.search,
-      home.currentMedia,
-      search.value,
-      media.value
-    ]);
-
-    return EasyRefresh(
-      controller: refreshController,
-      refreshOnStart: true,
-      onRefresh: () async {
-        await fetchData(
-          search.value,
-          searchMedia: media.value,
-          init: true,
-        );
-        refreshController.finishRefresh();
-        refreshController.resetFooter();
-      },
-      onLoad: () async {
-        final resp = await fetchData(search.value, searchMedia: media.value);
-
-        refreshController.finishLoad(resp.data.length >= pageSize
-            ? IndicatorResult.success
-            : IndicatorResult.noMore);
-      },
-      child: CustomScrollView(
-        slivers: [
-          MultiSliver(
-            children: [
-              // 解决 Header 下拉刷新时不会跟着移动的
-              Container(
-                height: 0,
-              ),
-              if (facetCounts.value.isNotEmpty)
-                SliverPinnedHeader(
-                  child: ProductDropdownMenu(
-                    facetCounts: facetCounts.value,
-                    value: query.value,
-                    onChange: (menuQuery) {
-                      query.value = menuQuery;
-                      logger.d(menuQuery);
-                      refreshController.callRefresh(force: true);
-                    },
-                  ),
-                ),
-              MasonryGridView.count(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
-                itemCount: samples.value.length,
-                padding: const EdgeInsets.all(5),
-                clipBehavior: Clip.none,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final sample = samples.value[index];
-                  final cartItem = cartState.items.firstWhereOrNull(
-                      (element) => element.sample.id == sample.id);
-
-                  return ProductCard(
-                    sample: sample,
-                    cartCount: cartItem?.count,
-                    onTapAddSample: () {
-                      cart.addSample(sample, 1);
-                    },
-                  );
-                },
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class ProductDropdownMenu extends HookWidget {
-  final List<FacetCount> facetCounts;
-  final Map<String, dynamic> value;
-  final void Function(Map<String, dynamic> query) onChange;
-
-  const ProductDropdownMenu({
-    super.key,
-    required this.value,
-    required this.facetCounts,
-    required this.onChange,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final query = useState<Map<String, dynamic>>({});
-    final supportFacet = {
-      "supplier_ids": "供应商",
-      "category_id": "产品分类",
-      "trade_country": "贸易国别"
-    };
-    final menuOptions = {
-      "supplier_ids": {"multiple": true},
-      "category_id": {"multiple": false},
-      "trade_country": {"multiple": false},
-    };
-
-    final suppliers = useState(<Supplier>[]);
-    final categories = useState(<Category>[]);
-
-    useEffect(() {
-      query.value = value;
-      return null;
-    }, [value]);
-
-    final fetchSuppliers = useCallback((List<String> ids) async {
-      final resp = await getSupplySuppliers(queryParameters: {
-        "ids": ids,
-        "pageSize": ids.length,
-      });
-
-      suppliers.value = resp.data;
     }, []);
-
-    final fetchCategories = useCallback(() async {
-      final resp = await getAllShowroomCategories();
-
-      categories.value = resp ?? [];
-    }, []);
-
-    useEffect(() {
-      final ids = facetCounts
-              .firstWhereOrNull(
-                  (facetCount) => facetCount.fieldName == "supplier_ids")
-              ?.counts
-              .map((count) => count.value)
-              .toList() ??
-          [];
-
-      if (ids.isEmpty) {
-        return null;
-      }
-
-      fetchSuppliers(ids);
-
-      return null;
-    }, [fetchSuppliers, facetCounts]);
-
-    useEffect(() {
-      if (categories.value.isNotEmpty) {
-        return null;
-      }
-      final categoryFacetCount = facetCounts.firstWhereOrNull(
-          (facetCount) => facetCount.fieldName == "category_id");
-
-      if (categoryFacetCount == null) {
-        return null;
-      }
-
-      fetchCategories();
-
-      return null;
-    }, [fetchCategories, facetCounts]);
-
-    final menus = <TDDropdownItem>[];
-
-    for (var facetCount in facetCounts) {
-      final field = facetCount.fieldName;
-      if (!supportFacet.containsKey(field)) {
-        continue;
-      }
-
-      TDDropdownItem? item;
-      final option = menuOptions[field];
-      final options = <TDDropdownItemOption>[];
-      final selectValues = query.value[field];
-
-      for (var count in facetCount.counts) {
-        var label = count.value;
-        var selected = false;
-        if (selectValues is List) {
-          selected = selectValues.contains(count.value);
-        }
-        if (field == "supplier_ids") {
-          final supplier = suppliers.value
-              .firstWhereOrNull((item) => item.id.toString() == count.value);
-          if (supplier == null) {
-            continue;
-          }
-
-          label = supplier.name ?? label;
-        } else if (field == "category_id") {
-          final category = categories.value
-              .firstWhereOrNull((item) => item.id.toString() == count.value);
-
-          label = category?.name ?? label;
-        }
-
-        options.add(TDDropdownItemOption(
-          label: label,
-          value: count.value,
-          selected: selected,
-        ));
-      }
-
-      item = TDDropdownItem(
-        label: supportFacet[field],
-        multiple: option?['multiple'],
-        options: options,
-        optionsColumns: 2,
-        onChange: (value) {
-          query.value = {
-            ...query.value,
-            field: value,
-          };
-        },
-        onConfirm: (value) {
-          if (value is List && value.isEmpty) {
-            query.value = {...query.value}..remove(field);
-            return;
-          }
-          query.value = {
-            ...query.value,
-            field: value,
-          };
-        },
-        onReset: () {
-          query.value = {...query.value}..remove(field);
-        },
-      );
-
-      menus.add(item);
-    }
 
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          TDDropdownMenu(
-            direction: TDDropdownMenuDirection.down,
-            onMenuClosed: (index) {
-              if (const DeepCollectionEquality().equals(query.value, value)) {
-                return;
-              }
+        padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceTint,
+          borderRadius: home.currentMediaId != null
+              ? null
+              : const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: EasyRefresh(
+          controller: refreshController,
+          refreshOnStart: true,
+          onRefresh: () async {
+            await fetchData(
+              search.value,
+              searchMedia: media.value,
+              init: true,
+            );
+            refreshController.finishRefresh();
+            refreshController.resetFooter();
+          },
+          onLoad: () async {
+            final resp =
+                await fetchData(search.value, searchMedia: media.value);
 
-              onChange(query.value);
-            },
-            items: menus,
+            refreshController.finishLoad(resp.data.length >= pageSize
+                ? IndicatorResult.success
+                : IndicatorResult.noMore);
+          },
+          child: CustomScrollView(
+            slivers: [
+              MultiSliver(
+                children: [
+                  // 解决 Header 下拉刷新时不会跟着移动的
+                  Container(
+                    height: 0,
+                  ),
+                  if (facetCounts.value.isNotEmpty)
+                    SliverPinnedHeader(
+                      child: ProductDropdownMenu(
+                        facetCounts: facetCounts.value,
+                        value: query.value,
+                        onChange: (menuQuery) {
+                          query.value = menuQuery;
+                          logger.d(menuQuery);
+                          refreshController.callRefresh(force: true);
+                        },
+                      ),
+                    ),
+                  if (samples.value.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Text(
+                          '暂无数据',
+                          style: TextStyle(
+                            color: colorScheme.surfaceContainerHighest,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    MasonryGridView.count(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 5,
+                      crossAxisSpacing: 5,
+                      itemCount: samples.value.length,
+                      padding: const EdgeInsets.all(5),
+                      clipBehavior: Clip.none,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final sample = samples.value[index];
+                        final cartItem = cartState.items.firstWhereOrNull(
+                            (element) => element.sample.id == sample.id);
+
+                        return ProductCard(
+                          sample: sample,
+                          cartCount: cartItem?.count,
+                          onTapAddSample: () {
+                            cart.addSample(sample, 1);
+                          },
+                        );
+                      },
+                    ),
+                ],
+              )
+            ],
           ),
-          // Text(query.value.toString()),
-        ],
-      ),
-    );
+        ));
   }
 }

@@ -1,5 +1,9 @@
 import 'package:cloud/core/rx_bus.dart';
+import 'package:cloud/models/response.dart';
+import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/home/models/home_state.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,15 +22,24 @@ class Home extends _$Home {
       search: null,
       media: [],
       currentMediaId: null,
+      samples: [],
+      suppliers: [],
+      facetCounts: [],
+      samplePages: 0,
+      sampleNoMore: false,
+      supplierPages: 0,
+      supplierNoMore: false,
     );
 
-    ref.onDispose(() {
-      homeState.pageController.dispose();
-      homeState.searchTextController.dispose();
-      homeState.bus.dispose();
-    });
-
     return homeState;
+  }
+
+  void setproductTotalPages(int page) {
+    state = state.copyWith(samplePages: page);
+  }
+
+  void setsupplierTotalPages(int page) {
+    state = state.copyWith(supplierPages: page);
   }
 
   void setCurrentPage(int page) {
@@ -48,6 +61,34 @@ class Home extends _$Home {
       currentMediaId: media.id,
     );
   }
+
+  void setSamples(List<Sample> list) {
+    state = state.copyWith(samples: list);
+  }
+
+  void addSamples(List<Sample> list) {
+    state = state.copyWith(samples: [...state.samples, ...list]);
+  }
+
+  void setFacetCounts(List<FacetCount> list) {
+    state = state.copyWith(facetCounts: list);
+  }
+
+  void setSuppliers(List<Supplier> list) {
+    state = state.copyWith(suppliers: list);
+  }
+
+  void addSuppliers(List<Supplier> list) {
+    state = state.copyWith(suppliers: [...state.suppliers, ...list]);
+  }
+
+  // void setCategories(List<Category> list) {
+  //   state = state.copyWith(categories: list);
+  // }
+
+  // void addCategories(List<Category> list) {
+  //   state = state.copyWith(categories: [...state.categories, ...list]);
+  // }
 
   HomeState deleteMedia(TemporaryMedia media) {
     final nextMedia = List.of(state.media);

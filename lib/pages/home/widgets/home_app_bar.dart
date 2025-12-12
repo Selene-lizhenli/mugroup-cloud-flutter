@@ -31,7 +31,7 @@ class HomeAppBarItem extends StatelessWidget {
             ? const TextStyle(fontSize: 18, color: Colors.white)
             : const TextStyle(fontSize: 16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text(text),
         ),
       ),
@@ -115,6 +115,33 @@ class HomeAppBar extends HookConsumerWidget {
       color: colorScheme.primary,
       child: Column(
         children: [
+          Row(
+            children: [
+              const SizedBox(width: 3),
+              HomeAppBarItem(
+                onTap: () {
+                  home.pageController.animateToPage(
+                    0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.ease,
+                  );
+                },
+                text: "样品",
+                active: home.currentPage == 0,
+              ),
+              HomeAppBarItem(
+                onTap: () {
+                  home.pageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.ease,
+                  );
+                },
+                text: "供应商",
+                active: home.currentPage == 1,
+              ),
+            ],
+          ),
           Container(
             width: double.infinity,
             margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),

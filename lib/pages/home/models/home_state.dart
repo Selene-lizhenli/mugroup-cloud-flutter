@@ -1,9 +1,12 @@
-import 'package:cloud/core/rx_bus.dart';
+import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/supply/supplier.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud/core/rx_bus.dart';
 
 part 'home_state.freezed.dart';
 
@@ -17,9 +20,19 @@ abstract class HomeState with _$HomeState {
     required TextEditingController searchTextController,
     String? search,
     required List<TemporaryMedia> media,
-    int? currentMediaId,
-  }) = _HomeState;
+    int? currentMediaId, // 当前选中的媒体id
 
+    // ----------  样品 ----------
+    @Default([]) List<Sample> samples,
+    @Default([]) List<FacetCount> facetCounts,
+    @Default(1) int samplePages,
+    @Default(false) bool sampleNoMore,
+
+    // ----------  服务商 ----------
+    @Default([]) List<Supplier> suppliers,
+    @Default(1) int supplierPages,
+    @Default(false) bool supplierNoMore,
+  }) = _HomeState;
   TemporaryMedia? get currentMedia {
     return media.firstWhereOrNull((item) => item.id == currentMediaId);
   }

@@ -662,8 +662,8 @@ class CartPage extends HookConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.info,
-                                      size: 12, color: Color(0xFF555555)),
+                                  // Icon(Icons.info,
+                                  //     size: 12, color: Color(0xFF555555)),
                                   Text(
                                     " 注：以下设置将对选样车中的所有样品生效！",
                                     style: TextStyle(
