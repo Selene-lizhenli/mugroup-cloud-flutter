@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/contact.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -44,7 +46,8 @@ class CrmContactPage extends HookConsumerWidget {
               elevation: 2,
               child: InkWell(
                 onTap: () async {
-                  // TODO创建
+                  await context.router
+                      .push(CrmContactCreateRoute(companyId: companyId));
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
@@ -104,7 +107,9 @@ class CrmContactPage extends HookConsumerWidget {
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () async {
                                   if (c?.id != null) {
-                                    //TODO
+                                    await context.router.push(
+                                      CrmContactEditRoute(id: c!.id!),
+                                    );
                                   }
                                 },
                                 child: const Icon(

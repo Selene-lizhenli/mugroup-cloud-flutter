@@ -67,3 +67,15 @@ Future<ApiResponse<List<Contact>>> getContacts(
         ),
       );
 }
+
+Future<Contact?> getContact(int id, {Map<String, dynamic>? data}) async {
+  return api.get("api/tenant/crm/contacts/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Contact.fromJson(res.data);
+    },
+  );
+}

@@ -13,12 +13,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CrmCotactForm extends HookConsumerWidget {
   final Contact? initial;
-  final bool showUpload;
+
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
   const CrmCotactForm({
     super.key,
-    this.showUpload = false,
     required this.initial,
     required this.onSubmit,
   });
@@ -113,13 +112,13 @@ class CrmCotactForm extends HookConsumerWidget {
                             );
                           },
                         ),
-                        FormBuilderField<String>(
+                        FormBuilderField<int>(
                           name: "company_id",
                           builder: (field) {
                             return Input(
                               label: '公司',
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
+                              value: field.value?.toString() ?? '',
+                              // onChanged: () {},
                             );
                           },
                         ),
