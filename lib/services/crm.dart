@@ -3,7 +3,7 @@ import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/response.dart';
 
-Future<ApiResponse<List<Company>>> getCompanies(
+Future<ApiResponse<List<Company>>> getCrmCompanies(
     {Map<String, dynamic>? queryParameters}) async {
   return api
       .get("api/tenant/crm/companies", queryParameters: queryParameters)
@@ -53,7 +53,7 @@ Future<Company?> updateCrmCompany(int id, Map<String, dynamic>? data) async {
   );
 }
 
-Future<ApiResponse<List<Contact>>> getContacts(
+Future<ApiResponse<List<Contact>>> getCrmContacts(
     {Map<String, dynamic>? queryParameters}) async {
   return api
       .get("api/tenant/crm/contacts", queryParameters: queryParameters)
@@ -68,7 +68,7 @@ Future<ApiResponse<List<Contact>>> getContacts(
       );
 }
 
-Future<Contact?> getContact(int id, {Map<String, dynamic>? data}) async {
+Future<Contact?> getCrmContact(int id, {Map<String, dynamic>? data}) async {
   return api.get("api/tenant/crm/contacts/$id", data: data).then(
     (res) {
       if (res.data == null) {

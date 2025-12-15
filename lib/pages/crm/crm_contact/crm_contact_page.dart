@@ -19,7 +19,7 @@ class CrmContactPage extends HookConsumerWidget {
       () async {
         try {
           final resp =
-              await getContacts(queryParameters: {'company_id': companyId});
+              await getCrmContacts(queryParameters: {'company_id': companyId});
           contacts.value = resp.data;
         } finally {
           isLoading.value = false;

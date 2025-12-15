@@ -18,7 +18,7 @@ class CrmContactEditPage extends HookConsumerWidget {
 
     Future loadCotact() async {
       try {
-        final data = await getContact(id);
+        final data = await getCrmContact(id);
         contact.value = data;
       } finally {
         isLoading.value = false;

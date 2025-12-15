@@ -37,7 +37,7 @@ class CompanyView extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
-      final resp = await getCompanies(queryParameters: queryParameters);
+      final resp = await getCrmCompanies(queryParameters: queryParameters);
 
       if (init == true) {
         companies.value = resp.data;
