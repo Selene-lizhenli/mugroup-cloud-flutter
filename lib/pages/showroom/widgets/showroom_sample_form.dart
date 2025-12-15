@@ -20,11 +20,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ShowroomSampleForm extends HookConsumerWidget {
   final Sample? initial;
+  final Future<void> Function(Map<String, dynamic>)? onSave;
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
   const ShowroomSampleForm({
     super.key,
     required this.initial,
+    this.onSave,
     required this.onSubmit,
   });
 
@@ -645,35 +647,77 @@ class ShowroomSampleForm extends HookConsumerWidget {
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-          child: SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: () async {
-                final formState = formKey.currentState;
-                if (formState?.saveAndValidate() ?? false) {
-                  final Map<String, dynamic> submitValues =
-                      Map.from(formState!.value);
+          child: Row(
+            children: [
+              if (onSave != null)
+                Expanded(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.secondary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () async {
+                        final formState = formKey.currentState;
+                        if (formState?.saveAndValidate() ?? false) {
+                          final Map<String, dynamic> submitValues =
+                              Map.from(formState!.value);
 
-                  final length = submitValues['length']?.toString() ?? '';
-                  final width = submitValues['width']?.toString() ?? '';
-                  final height = submitValues['heigth']?.toString() ?? '';
+                          final length =
+                              submitValues['length']?.toString() ?? '';
+                          final width = submitValues['width']?.toString() ?? '';
+                          final height =
+                              submitValues['heigth']?.toString() ?? '';
 
-                  final spec = [length, width, height].join('x');
-                  submitValues['spec'] = spec;
+                          final spec = [length, width, height].join('x');
+                          submitValues['spec'] = spec;
 
-                  onSubmit(submitValues);
-                }
-              },
-              child: const Text(
-                '提交',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+                          onSave!(submitValues);
+                        }
+                      },
+                      child: const Text(
+                        '提交并继续',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () async {
+                      final formState = formKey.currentState;
+                      if (formState?.saveAndValidate() ?? false) {
+                        final Map<String, dynamic> submitValues =
+                            Map.from(formState!.value);
+
+                        final length = submitValues['length']?.toString() ?? '';
+                        final width = submitValues['width']?.toString() ?? '';
+                        final height = submitValues['heigth']?.toString() ?? '';
+
+                        final spec = [length, width, height].join('x');
+                        submitValues['spec'] = spec;
+
+                        onSubmit(submitValues);
+                      }
+                    },
+                    child: const Text(
+                      '提交',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ],

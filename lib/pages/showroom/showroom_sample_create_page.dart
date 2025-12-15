@@ -20,6 +20,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       ),
       body: ShowroomSampleForm(
         initial: null,
+        onSave: (data) async {
+          await storeShowroomMarketProduct(data);
+          EasyLoading.showSuccess("创建成功");
+        },
         onSubmit: (data) async {
           await storeShowroomMarketProduct(data);
           EasyLoading.showSuccess("创建成功");
