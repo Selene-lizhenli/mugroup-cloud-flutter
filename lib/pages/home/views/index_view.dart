@@ -57,8 +57,6 @@ class HomeProductPage extends HookConsumerWidget {
     final facetCounts = home.facetCounts;
     final samples = home.samples;
 
-    logger.d(facetCounts);
-
     final mediaQuery = MediaQuery.of(context);
     var crossAxisCount = 2;
     if (mediaQuery.size.width > 500) {
@@ -246,7 +244,6 @@ class HomeProductPage extends HookConsumerWidget {
                   value: query.value,
                   onChange: (menuQuery) {
                     query.value = menuQuery;
-                    logger.d(menuQuery);
                     refreshController.callRefresh(force: true);
                   },
                 ),

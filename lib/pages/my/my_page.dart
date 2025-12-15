@@ -4,6 +4,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,9 @@ class MyPage extends HookConsumerWidget {
                 Icons.chevron_right,
                 color: colorScheme.onSurface,
               ),
-              onTap: () {},
+              onTap: () {
+                context.router.push(const QuoteRoute());
+              },
             ),
             const SizedBox(height: 8),
             ListTile(
@@ -92,6 +95,10 @@ class MyPage extends HookConsumerWidget {
                 style: TextStyle(
                   color: colorScheme.onSurface,
                 ),
+              ),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurface,
               ),
               leading: Icon(
                 Icons.cleaning_services,

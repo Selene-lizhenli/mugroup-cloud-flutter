@@ -294,7 +294,7 @@ class ProductView extends HookConsumerWidget {
                                                 icon: Icons.add,
                                                 title: "新增报价单", // 报价单列表页面
                                                 color: Colors.green,
-                                                route: QuoteRoute()),
+                                                route: QuoteCreateRoute()),
                                           ])))
                             ],
                           ),
@@ -316,7 +316,6 @@ class ProductView extends HookConsumerWidget {
                         value: query.value,
                         onChange: (menuQuery) {
                           query.value = menuQuery;
-                          logger.d(menuQuery);
                           refreshController.callRefresh(force: true);
                         },
                       ),

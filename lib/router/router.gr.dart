@@ -28,7 +28,6 @@ import 'package:cloud/pages/login/login_page.dart' as _i11;
 import 'package:cloud/pages/my/my_page.dart' as _i12;
 import 'package:cloud/pages/quote/quote_create_page.dart' as _i13;
 import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i14;
-import 'package:cloud/pages/quote/quote_detail/tabs/info.dart' as _i30;
 import 'package:cloud/pages/quote/quote_detail/tabs/sample.dart' as _i32;
 import 'package:cloud/pages/quote/quote_page.dart' as _i15;
 import 'package:cloud/pages/scan/scan_page.dart' as _i16;
@@ -56,6 +55,8 @@ import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail
     as _i31;
 import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
     as _i29;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
+    as _i30;
 import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i33;
 import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i34;
 import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i35;

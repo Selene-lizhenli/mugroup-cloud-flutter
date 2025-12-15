@@ -2,6 +2,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/quotation.dart';
+import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/sample.dart';
 
 Future<Sample?> updateShowroomSample(int id, Map<String, dynamic>? data) async {
@@ -106,6 +107,19 @@ Future<Quotation?> storeShowroomQuotation(Map<String, dynamic>? data) async {
       return Quotation.fromJson(res.data);
     },
   );
+}
+
+Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
+    Map<String, dynamic>? data) async {
+  return api.get("api/tenant/showroom/quotations", data: data).then(
+        (res) => ApiResponse<List<QuotationList>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(QuotationList.fromJson).toList();
+          },
+        ),
+      );
 }
 
 Future<Quotation?> getShowroomQuotationByQuoteNo(String quoteNo) async {
