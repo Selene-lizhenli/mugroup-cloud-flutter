@@ -11,8 +11,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text('样品创建'),
         backgroundColor: Colors.white,

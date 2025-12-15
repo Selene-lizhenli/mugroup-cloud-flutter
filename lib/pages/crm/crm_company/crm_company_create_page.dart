@@ -11,8 +11,12 @@ class CrmCompanyCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text("新建客户")),
+      appBar: AppBar(
+        title: const Text("新建客户"),
+        backgroundColor: colorScheme.surface,
+      ),
       body: CrmCompanyForm(
         initial: null,
         showUpload: true,

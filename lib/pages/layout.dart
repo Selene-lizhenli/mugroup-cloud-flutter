@@ -93,6 +93,7 @@ class Layout extends HookConsumerWidget {
               child: TDBadge(
                 TDBadgeType.message,
                 color: colorScheme.primary,
+                textColor: colorScheme.tertiary,
                 size: TDBadgeSize.large,
                 showZero: false,
                 count: cartState.items.length.toString(),
@@ -126,8 +127,8 @@ class Layout extends HookConsumerWidget {
               context.tabsRouter.setActiveIndex(index);
             },
             items: items,
-            selectedItemColor: const Color(0xFFFA338A), // 选中文字 + 图标颜色
-            unselectedItemColor: Colors.grey, // 非选中颜色
+            selectedItemColor: colorScheme.primary, // 选中文字 + 图标颜色
+            unselectedItemColor: colorScheme.surfaceContainerHighest, // 非选中颜色
             showUnselectedLabels: true, // 未选中也显示文字
           ),
         );

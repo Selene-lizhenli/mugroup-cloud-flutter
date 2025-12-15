@@ -8,10 +8,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 @RoutePage()
 class SupplySupplierCreatePage extends HookConsumerWidget {
   const SupplySupplierCreatePage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('供应商创建')),
+      appBar: AppBar(
+        title: const Text('供应商创建'),
+        backgroundColor: colorScheme.surface,
+      ),
       body: SupplySupplierForm(
         initial: null,
         onSubmit: (data) async {
