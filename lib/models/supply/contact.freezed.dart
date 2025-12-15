@@ -23,6 +23,15 @@ mixin _$Contact {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get mobile => throw _privateConstructorUsedError;
+  String? get department => throw _privateConstructorUsedError;
+  String? get sex => throw _privateConstructorUsedError;
+  String? get position => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  String? get fax => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get qq => throw _privateConstructorUsedError;
+  String? get wechat => throw _privateConstructorUsedError;
+  String? get remark => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -34,7 +43,19 @@ abstract class $ContactCopyWith<$Res> {
   factory $ContactCopyWith(Contact value, $Res Function(Contact) then) =
       _$ContactCopyWithImpl<$Res, Contact>;
   @useResult
-  $Res call({int? id, String? name, String? mobile});
+  $Res call(
+      {int? id,
+      String? name,
+      String? mobile,
+      String? department,
+      String? sex,
+      String? position,
+      String? phone,
+      String? fax,
+      String? email,
+      String? qq,
+      String? wechat,
+      String? remark});
 }
 
 /// @nodoc
@@ -53,6 +74,15 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
     Object? id = freezed,
     Object? name = freezed,
     Object? mobile = freezed,
+    Object? department = freezed,
+    Object? sex = freezed,
+    Object? position = freezed,
+    Object? phone = freezed,
+    Object? fax = freezed,
+    Object? email = freezed,
+    Object? qq = freezed,
+    Object? wechat = freezed,
+    Object? remark = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -67,6 +97,42 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
           ? _value.mobile
           : mobile // ignore: cast_nullable_to_non_nullable
               as String?,
+      department: freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sex: freezed == sex
+          ? _value.sex
+          : sex // ignore: cast_nullable_to_non_nullable
+              as String?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      fax: freezed == fax
+          ? _value.fax
+          : fax // ignore: cast_nullable_to_non_nullable
+              as String?,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      qq: freezed == qq
+          ? _value.qq
+          : qq // ignore: cast_nullable_to_non_nullable
+              as String?,
+      wechat: freezed == wechat
+          ? _value.wechat
+          : wechat // ignore: cast_nullable_to_non_nullable
+              as String?,
+      remark: freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -78,7 +144,19 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
       __$$ContactImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id, String? name, String? mobile});
+  $Res call(
+      {int? id,
+      String? name,
+      String? mobile,
+      String? department,
+      String? sex,
+      String? position,
+      String? phone,
+      String? fax,
+      String? email,
+      String? qq,
+      String? wechat,
+      String? remark});
 }
 
 /// @nodoc
@@ -95,6 +173,15 @@ class __$$ContactImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? mobile = freezed,
+    Object? department = freezed,
+    Object? sex = freezed,
+    Object? position = freezed,
+    Object? phone = freezed,
+    Object? fax = freezed,
+    Object? email = freezed,
+    Object? qq = freezed,
+    Object? wechat = freezed,
+    Object? remark = freezed,
   }) {
     return _then(_$ContactImpl(
       freezed == id
@@ -109,6 +196,42 @@ class __$$ContactImplCopyWithImpl<$Res>
           ? _value.mobile
           : mobile // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == sex
+          ? _value.sex
+          : sex // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == fax
+          ? _value.fax
+          : fax // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == qq
+          ? _value.qq
+          : qq // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == wechat
+          ? _value.wechat
+          : wechat // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -116,7 +239,19 @@ class __$$ContactImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ContactImpl implements _Contact {
-  _$ContactImpl(this.id, this.name, this.mobile);
+  _$ContactImpl(
+      this.id,
+      this.name,
+      this.mobile,
+      this.department,
+      this.sex,
+      this.position,
+      this.phone,
+      this.fax,
+      this.email,
+      this.qq,
+      this.wechat,
+      this.remark);
 
   factory _$ContactImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContactImplFromJson(json);
@@ -127,10 +262,28 @@ class _$ContactImpl implements _Contact {
   final String? name;
   @override
   final String? mobile;
+  @override
+  final String? department;
+  @override
+  final String? sex;
+  @override
+  final String? position;
+  @override
+  final String? phone;
+  @override
+  final String? fax;
+  @override
+  final String? email;
+  @override
+  final String? qq;
+  @override
+  final String? wechat;
+  @override
+  final String? remark;
 
   @override
   String toString() {
-    return 'Contact(id: $id, name: $name, mobile: $mobile)';
+    return 'Contact(id: $id, name: $name, mobile: $mobile, department: $department, sex: $sex, position: $position, phone: $phone, fax: $fax, email: $email, qq: $qq, wechat: $wechat, remark: $remark)';
   }
 
   @override
@@ -140,12 +293,24 @@ class _$ContactImpl implements _Contact {
             other is _$ContactImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.mobile, mobile) || other.mobile == mobile));
+            (identical(other.mobile, mobile) || other.mobile == mobile) &&
+            (identical(other.department, department) ||
+                other.department == department) &&
+            (identical(other.sex, sex) || other.sex == sex) &&
+            (identical(other.position, position) ||
+                other.position == position) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.fax, fax) || other.fax == fax) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.qq, qq) || other.qq == qq) &&
+            (identical(other.wechat, wechat) || other.wechat == wechat) &&
+            (identical(other.remark, remark) || other.remark == remark));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, mobile);
+  int get hashCode => Object.hash(runtimeType, id, name, mobile, department,
+      sex, position, phone, fax, email, qq, wechat, remark);
 
   @JsonKey(ignore: true)
   @override
@@ -162,8 +327,19 @@ class _$ContactImpl implements _Contact {
 }
 
 abstract class _Contact implements Contact {
-  factory _Contact(final int? id, final String? name, final String? mobile) =
-      _$ContactImpl;
+  factory _Contact(
+      final int? id,
+      final String? name,
+      final String? mobile,
+      final String? department,
+      final String? sex,
+      final String? position,
+      final String? phone,
+      final String? fax,
+      final String? email,
+      final String? qq,
+      final String? wechat,
+      final String? remark) = _$ContactImpl;
 
   factory _Contact.fromJson(Map<String, dynamic> json) = _$ContactImpl.fromJson;
 
@@ -173,6 +349,24 @@ abstract class _Contact implements Contact {
   String? get name;
   @override
   String? get mobile;
+  @override
+  String? get department;
+  @override
+  String? get sex;
+  @override
+  String? get position;
+  @override
+  String? get phone;
+  @override
+  String? get fax;
+  @override
+  String? get email;
+  @override
+  String? get qq;
+  @override
+  String? get wechat;
+  @override
+  String? get remark;
   @override
   @JsonKey(ignore: true)
   _$$ContactImplCopyWith<_$ContactImpl> get copyWith =>

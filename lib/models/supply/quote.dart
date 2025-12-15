@@ -8,10 +8,14 @@ part 'quote.g.dart';
 class Quote with _$Quote {
   factory Quote(
     int? id,
+    int? moq,
     Supplier? supplier,
     String? packing,
+    String? material,
+    @JsonKey(name: 'supplier_id') int? supplierId,
     @JsonKey(name: 'outer_capacity') String? outerCapacity,
     @JsonKey(name: 'outer_volume') String? outerVolume,
+    @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
     @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
     @JsonKey(name: 'sample_location') String? sampleLocation,
     @JsonKey(name: 'record_user') String? recordUser,
@@ -19,6 +23,7 @@ class Quote with _$Quote {
     @JsonKey(name: 'tax_rate') String? taxRate,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'currency') String? currency,
+    @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
   ) = _Quote;
 
   factory Quote.fromJson(Map<String, dynamic> json) => _$QuoteFromJson(json);

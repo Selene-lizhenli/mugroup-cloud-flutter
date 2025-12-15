@@ -211,6 +211,7 @@ class CrmCompanyEditRoute extends _i35.PageRouteInfo<CrmCompanyEditRouteArgs> {
             key: key,
             id: id,
           ),
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -219,7 +220,9 @@ class CrmCompanyEditRoute extends _i35.PageRouteInfo<CrmCompanyEditRouteArgs> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<CrmCompanyEditRouteArgs>();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<CrmCompanyEditRouteArgs>(
+          orElse: () => CrmCompanyEditRouteArgs(id: pathParams.getInt('id')));
       return _i5.CrmCompanyEditPage(
         key: args.key,
         id: args.id,
@@ -277,7 +280,7 @@ class HomeRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i7.HomePage();
+      return const _i9.HomePage();
     },
   );
 }
@@ -296,7 +299,7 @@ class Layout extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i8.Layout();
+      return const _i10.Layout();
     },
   );
 }
@@ -324,7 +327,7 @@ class LoginRoute extends _i35.PageRouteInfo<LoginRouteArgs> {
     builder: (data) {
       final args =
           data.argsAs<LoginRouteArgs>(orElse: () => const LoginRouteArgs());
-      return _i9.LoginPage(
+      return _i11.LoginPage(
         key: args.key,
         onLogin: args.onLogin,
       );
@@ -362,7 +365,7 @@ class MyRoute extends _i35.PageRouteInfo<void> {
   static _i35.PageInfo page = _i35.PageInfo(
     name,
     builder: (data) {
-      return const _i10.MyPage();
+      return const _i12.MyPage();
     },
   );
 }

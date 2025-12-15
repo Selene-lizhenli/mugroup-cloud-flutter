@@ -2,12 +2,15 @@ import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/services/openai.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -29,6 +32,21 @@ class ShowroomSampleForm extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+
+    final Map<String, dynamic> initialValues =
+        Map<String, dynamic>.from(initial?.toJson() ?? {});
+
+    if (initialValues['spec'] != null &&
+        initialValues['spec'].toString().isNotEmpty) {
+      final String spec = initialValues['spec'].toString();
+      final List<String> parts = spec.split('x');
+
+      if (parts.isNotEmpty) initialValues['length'] = parts[0];
+      if (parts.length > 1) initialValues['width'] = parts[1];
+      if (parts.length > 2) {
+        initialValues['heigth'] = parts[2];
+      }
+    }
 
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
@@ -65,7 +83,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
-                initialValue: initial?.toJson() ?? {},
+                initialValue: initialValues,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -181,6 +199,279 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         ),
                       ],
                     ),
+                    FormBuilderField<List<Map<String, dynamic>>>(
+                      name: "supply_quotes",
+                      initialValue: initial?.supplyQuotes
+                              ?.map((e) => e.toJson())
+                              .toList() ??
+                          [],
+                      builder:
+                          (FormFieldState<List<Map<String, dynamic>>> field) {
+                        final List<Map<String, dynamic>> valueList =
+                            field.value ?? [];
+
+                        return BuildFormCard(
+                          title: '工厂报价',
+                          action: GestureDetector(
+                            onTap: () async {
+                              final selectedSupplier =
+                                  await showModalBottomSheet<
+                                      Map<String, dynamic>>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (BuildContext ctx) {
+                                  return const SupplierSelect();
+                                },
+                              );
+
+                              if (selectedSupplier != null) {
+                                final currentList =
+                                    List<Map<String, dynamic>>.from(valueList);
+
+                                final newId = selectedSupplier['id'];
+
+                                final isExist = currentList.any(
+                                    (item) => item['supplier_id'] == newId);
+
+                                if (!isExist) {
+                                  final newItem = {
+                                    'supplier_id': newId,
+                                    'supplier': {
+                                      'id': newId,
+                                      'name': selectedSupplier['name'] ??
+                                          selectedSupplier['shortName'],
+                                    }
+                                  };
+
+                                  currentList.add(newItem);
+                                  field.didChange(currentList);
+                                } else {
+                                  EasyLoading.showInfo('该供应商已在列表中');
+                                }
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Icons.add_circle_outline,
+                                    size: 16,
+                                    color: Theme.of(context).primaryColor),
+                                const SizedBox(width: 4),
+                                Text("添加",
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 13)),
+                              ],
+                            ),
+                          ),
+                          children: [
+                            if (valueList.isEmpty)
+                              Container(
+                                width: double.infinity,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 24),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: Colors.grey.withOpacity(0.1)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.inbox_outlined,
+                                        size: 32, color: Colors.grey[300]),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "暂无工厂报价",
+                                      style: TextStyle(
+                                          color: Colors.grey[400],
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              ...valueList.asMap().entries.map((entry) {
+                                final int index = entry.key;
+                                final Map<String, dynamic> item = entry.value;
+
+                                String name = '';
+                                final supplier = item['supplier'];
+
+                                if (supplier is Map) {
+                                  name = supplier['name']?.toString() ?? '';
+                                } else if (supplier != null) {
+                                  name = supplier.name ?? '';
+                                }
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.2)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                              child: Text(
+                                            name,
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey[800]),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          )),
+                                          InkWell(
+                                            onTap: () async {
+                                              final bool isConfirmed =
+                                                  await ConfirmDialog.show(
+                                                context,
+                                                content: '确定要移除这个工厂报价吗？',
+                                              );
+                                              if (isConfirmed) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+
+                                                final quoteId = item['id'];
+
+                                                if (quoteId != null) {
+                                                  try {
+                                                    EasyLoading.show(
+                                                        status: '删除中...');
+                                                    await deleteSupplyQuote(
+                                                        quoteId);
+                                                    EasyLoading.dismiss();
+
+                                                    newList.removeAt(index);
+                                                    field.didChange(newList);
+                                                    EasyLoading.showSuccess(
+                                                        '删除成功');
+                                                  } finally {
+                                                    EasyLoading.dismiss();
+                                                  }
+                                                } else {
+                                                  newList.removeAt(index);
+                                                  field.didChange(newList);
+                                                }
+                                              }
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(4.0),
+                                              child: Icon(Icons.delete_outline,
+                                                  size: 18, color: Colors.red),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Input(
+                                              label: '供应商货号',
+                                              value: item['supplier_product_no']
+                                                      ?.toString() ??
+                                                  "",
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'supplier_product_no': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Input(
+                                              label: '供应商价格',
+                                              value: item['purchase_cost']
+                                                      ?.toString() ??
+                                                  '',
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'purchase_cost': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Input(
+                                              label: '最小起订量',
+                                              value:
+                                                  item['moq']?.toString() ?? '',
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'moq': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Input(
+                                              label: '材质',
+                                              value: item['material']
+                                                      ?.toString() ??
+                                                  '',
+                                              onChanged: (val) {
+                                                final newList = List<
+                                                        Map<String,
+                                                            dynamic>>.from(
+                                                    valueList);
+                                                newList[index] = {
+                                                  ...newList[index],
+                                                  'material': val
+                                                };
+                                                field.didChange(newList);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                          ],
+                        );
+                      },
+                    ),
                     BuildFormCard(
                       title: '产品规格',
                       children: [
@@ -194,12 +485,28 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                     label: '单位',
                                     value: field.value,
                                     options: [
+                                      SelectOption(label: 'PC', value: 'PC'),
+                                      SelectOption(label: 'SET', value: 'SET'),
+                                      SelectOption(label: 'CTN', value: 'CTN'),
+                                      SelectOption(label: 'KG', value: 'KG'),
+                                      SelectOption(label: 'T', value: 'T'),
+                                      SelectOption(label: 'CBM', value: 'CBM'),
+                                      SelectOption(label: 'M', value: 'M'),
+                                      SelectOption(label: 'L', value: 'L'),
+                                      SelectOption(label: 'BAG', value: 'BAG'),
                                       SelectOption(
-                                          label: 'Piece', value: 'Piece'),
-                                      SelectOption(label: 'Set', value: 'Set'),
+                                          label: 'PACK', value: 'PACK'),
+                                      SelectOption(
+                                          label: 'CASE', value: 'CASE'),
+                                      SelectOption(
+                                          label: 'PAIR', value: 'PAIR'),
+                                      SelectOption(label: 'BOX', value: 'BOX'),
+                                      SelectOption(label: 'SQM', value: 'SQM'),
+                                      SelectOption(label: 'G', value: 'G'),
+                                      SelectOption(
+                                          label: 'Pieces', value: 'Pieces'),
                                       SelectOption(
                                           label: 'Pair', value: 'Pair'),
-                                      SelectOption(label: 'Bag', value: 'Bag'),
                                     ],
                                     onChanged: field.didChange,
                                   );
@@ -320,6 +627,9 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           builder: (field) {
                             return TextArea(
                               label: '英文描述',
+                              showTranslate: true,
+                              sourceText: formKey.currentState
+                                  ?.fields['description_cn']?.value,
                               value: field.value,
                               onChanged: field.didChange,
                             );

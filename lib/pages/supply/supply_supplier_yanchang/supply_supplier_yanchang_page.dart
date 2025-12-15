@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/services/media.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:dio/dio.dart';
@@ -111,6 +112,7 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
 
                     onUpload: (File file) async {
                       try {
+                        EasyLoading.show(status: '上传中...');
                         String fileName = file.path.split('/').last;
                         FormData formData = FormData.fromMap({
                           "file": await MultipartFile.fromFile(file.path,
@@ -121,112 +123,15 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
                         final result = await uploadSupplySupplierYanChang(
                             supplierId!, formData);
                         return result;
-                      } catch (e) {
-                        return null;
+                      } finally {
+                        EasyLoading.dismiss();
                       }
                     },
 
                     onItemRemove: (media) async {
-                      final bool? confirm = await showDialog<bool>(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext ctx) {
-                          return Dialog(
-                            backgroundColor: Colors.white,
-                            surfaceTintColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            insetPadding:
-                                const EdgeInsets.symmetric(horizontal: 40),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                      top: 26, left: 24, right: 24, bottom: 26),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        '提示',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF323233),
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        '确定要移除这张图片吗？',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFF646566),
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Divider(
-                                    height: 0,
-                                    thickness: 0.5,
-                                    color: Color(0xFFEBEDF0)),
-                                SizedBox(
-                                  height: 48,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(ctx).pop(false),
-                                          style: TextButton.styleFrom(
-                                            padding: EdgeInsets.zero,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(16)),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            '取消',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                      ),
-                                      const VerticalDivider(
-                                          width: 0,
-                                          thickness: 0.5,
-                                          color: Color(0xFFEBEDF0)),
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(ctx).pop(true),
-                                          style: TextButton.styleFrom(
-                                            padding: EdgeInsets.zero,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                                  bottomRight:
-                                                      Radius.circular(16)),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            '确定',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Color(0xFFEE0A24)),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                      final bool confirm = await ConfirmDialog.show(
+                        context,
+                        content: '确定要移除这张图片吗？',
                       );
 
                       if (confirm != true) return false;

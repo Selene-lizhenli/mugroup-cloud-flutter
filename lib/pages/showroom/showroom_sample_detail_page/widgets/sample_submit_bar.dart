@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
@@ -7,11 +9,15 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SampleSubmitBar extends HookConsumerWidget {
   final Sample? sample;
   const SampleSubmitBar({super.key, this.sample});
+
+  static final GlobalKey cartIconKey = GlobalKey();
+  static final GlobalKey updateButtonKey = GlobalKey();
 
   void _handleSupplierTap(BuildContext context) {
     final quotes = sample?.supplyQuotes ?? [];
@@ -142,6 +148,86 @@ class SampleSubmitBar extends HookConsumerWidget {
     );
   }
 
+  Future<void> _playAddToCartAnimation(BuildContext context) async {
+    final RenderBox? startRenderBox =
+        updateButtonKey.currentContext?.findRenderObject() as RenderBox?;
+
+    final RenderBox? endRenderBox =
+        cartIconKey.currentContext?.findRenderObject() as RenderBox?;
+
+    if (startRenderBox == null || endRenderBox == null) return;
+
+    final startOffset = startRenderBox.localToGlobal(
+        Offset(startRenderBox.size.width / 2, startRenderBox.size.height / 2));
+
+    final endOffset = endRenderBox.localToGlobal(
+        Offset(endRenderBox.size.width / 2, endRenderBox.size.height / 2));
+
+    OverlayEntry? overlayEntry;
+    final completer = Completer<void>();
+
+    const duration = Duration(milliseconds: 600);
+
+    final path = Path();
+    path.moveTo(startOffset.dx, startOffset.dy);
+
+    final controlPointX = (startOffset.dx + endOffset.dx) / 2;
+    final controlPointY = min(startOffset.dy, endOffset.dy) - 200.0; // 向上抛150像素
+    path.quadraticBezierTo(
+        controlPointX, controlPointY, endOffset.dx, endOffset.dy);
+
+    // 计算路径上的点
+    final pathMetrics = path.computeMetrics().toList();
+    if (pathMetrics.isEmpty) return;
+    final pathMetric = pathMetrics.first;
+
+    overlayEntry = OverlayEntry(
+      builder: (ctx) {
+        return HookBuilder(
+          builder: (context) {
+            final controller = useAnimationController(duration: duration);
+
+            final animation =
+                useAnimation(Tween(begin: 0.0, end: 1.0).animate(controller));
+
+            useEffect(() {
+              controller.forward().then((_) {
+                overlayEntry?.remove();
+                completer.complete();
+              });
+              return null;
+            }, []);
+
+            final currentPosition =
+                pathMetric.getTangentForOffset(pathMetric.length * animation);
+
+            if (currentPosition == null) return const SizedBox.shrink();
+
+            return Positioned(
+              top: currentPosition.position.dy - 10,
+              left: currentPosition.position.dx - 10,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    color: Colors.redAccent,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    Overlay.of(context).insert(overlayEntry);
+
+    await completer.future;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -166,6 +252,7 @@ class SampleSubmitBar extends HookConsumerWidget {
               onClick: () => _handleSupplierTap(context),
             ),
             FlanActionBarIcon(
+              key: cartIconKey,
               iconName: FlanIcons.cart_o,
               text: '选样车',
               badge: showBadge ? badgeCount : '',
@@ -187,12 +274,14 @@ class SampleSubmitBar extends HookConsumerWidget {
                 },
               ),
             FlanActionBarButton(
+              key: updateButtonKey,
               type: FlanButtonType.warning,
               text: '加入选样车',
               color: colorScheme.primary,
-              onClick: () {
+              onClick: () async {
                 final currentSample = sample;
                 if (currentSample != null) {
+                  await _playAddToCartAnimation(context);
                   cart.addSample(currentSample, 1);
                 }
               },

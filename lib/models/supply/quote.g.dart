@@ -8,12 +8,16 @@ part of 'quote.dart';
 
 _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       (json['id'] as num?)?.toInt(),
+      (json['moq'] as num?)?.toInt(),
       json['supplier'] == null
           ? null
           : Supplier.fromJson(json['supplier'] as Map<String, dynamic>),
       json['packing'] as String?,
+      json['material'] as String?,
+      (json['supplier_id'] as num?)?.toInt(),
       json['outer_capacity'] as String?,
       json['outer_volume'] as String?,
+      json['outer_gross_weight'] as String?,
       json['chuhuo_at'] == null
           ? null
           : DateTime.parse(json['chuhuo_at'] as String),
@@ -23,15 +27,20 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       json['tax_rate'] as String?,
       json['purchase_cost'] as String?,
       json['currency'] as String?,
+      json['supplier_product_no'] as String?,
     );
 
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'moq': instance.moq,
       'supplier': instance.supplier,
       'packing': instance.packing,
+      'material': instance.material,
+      'supplier_id': instance.supplierId,
       'outer_capacity': instance.outerCapacity,
       'outer_volume': instance.outerVolume,
+      'outer_gross_weight': instance.outerGrossWeight,
       'chuhuo_at': instance.chuhuoAt?.toIso8601String(),
       'sample_location': instance.sampleLocation,
       'record_user': instance.recordUser,
@@ -39,4 +48,5 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'tax_rate': instance.taxRate,
       'purchase_cost': instance.purchaseCost,
       'currency': instance.currency,
+      'supplier_product_no': instance.supplierProductNo,
     };

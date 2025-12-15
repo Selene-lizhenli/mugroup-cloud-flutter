@@ -24,6 +24,10 @@ Future<ApiResponse<List<Quote>>> getSupplyQuotes(
       );
 }
 
+Future deleteSupplyQuote(int id) async {
+  return api.delete("api/tenant/supply/quotes/$id");
+}
+
 Future<ApiResponse<List<Supplier>>> getSupplySuppliers(
     {Map<String, dynamic>? queryParameters}) async {
   return api
@@ -164,8 +168,9 @@ Future<ApiResponse<List<Cert>>?> getSupplySupplierCerts() async {
       );
 }
 
-Future<Cert?> storeSupplySupplierCert(Map<String, dynamic>? data) async {
-  return api.post("api/tenant/supply/certs", data: data).then(
+Future<Cert?> storeSupplySupplierCert(
+    int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/supplier/$id/certs", data: data).then(
     (res) {
       if (res.data == null) {
         return null;
@@ -186,18 +191,8 @@ Future<List<Log>?> getSupplySupplierActivitiesById(int id) async {
   return null;
 }
 
-Future<Log?> storeSupplySupplierActivity(
-    int id, Map<String, dynamic>? data) async {
-  return api
-      .post("api/tenant/supply/suppliers/$id/activities", data: data)
-      .then(
-    (res) {
-      if (res.data == null) {
-        return null;
-      }
-      return Log.fromJson(res.data);
-    },
-  );
+Future storeSupplySupplierActivity(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/supply/suppliers/$id/activities", data: data);
 }
 
 Future<Media?> uploadSupplySupplierYanChang(int id, dynamic data) async {

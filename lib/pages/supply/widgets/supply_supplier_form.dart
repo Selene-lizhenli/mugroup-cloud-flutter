@@ -70,6 +70,7 @@ class SupplySupplierForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 initialValue: initial?.toJson() ?? {},
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -128,11 +129,18 @@ class SupplySupplierForm extends HookConsumerWidget {
                             Expanded(
                               child: FormBuilderField<String>(
                                 name: "usci_code",
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return '该项不能为空';
+                                  }
+                                  return null;
+                                },
                                 builder: (field) {
                                   return Input(
                                     label: '税号代码',
                                     value: field.value ?? '',
                                     onChanged: field.didChange,
+                                    errorText: field.errorText,
                                   );
                                 },
                               ),
@@ -157,11 +165,18 @@ class SupplySupplierForm extends HookConsumerWidget {
                             Expanded(
                               child: FormBuilderField<String>(
                                 name: "name",
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return '该项不能为空';
+                                  }
+                                  return null;
+                                },
                                 builder: (field) {
                                   return Input(
                                     label: '厂商名称',
                                     value: field.value ?? '',
                                     onChanged: field.didChange,
+                                    errorText: field.errorText,
                                   );
                                 },
                               ),

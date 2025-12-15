@@ -63,12 +63,8 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     }, [id]);
 
     if (!hasMounted.value || isLoading.value) {
-      return Scaffold(
-        body: Skeleton(
-          isLoading: true,
-          skeleton: SkeletonListView(),
-          child: Container(),
-        ),
+      return const Scaffold(
+        body: SampleDetailSkeleton(),
       );
     }
 
@@ -361,7 +357,6 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
                             // 相似产品
                             Container(
-                              color: Colors.white,
                               key: elevatorFloors.value
                                   .firstWhereOrNull(
                                       (floor) => floor.id == "similar")
@@ -372,19 +367,23 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // 标题
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text(
-                                      '为你推荐',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                                  Container(
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 8.0),
+                                      child: Text(
+                                        '为你推荐',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+
                                   // 瀑布流
                                   LayoutBuilder(
                                     builder: (context, constraints) {
@@ -709,6 +708,122 @@ class SupplyQuoteCard extends HookConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class SampleDetailSkeleton extends StatelessWidget {
+  const SampleDetailSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeleton(
+      isLoading: true,
+      skeleton: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                const SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                    width: double.infinity,
+                    height: 280,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SkeletonLine(
+                        style: SkeletonLineStyle(
+                          width: 100,
+                          height: 28,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      SkeletonLine(
+                        style: SkeletonLineStyle(
+                          width: 120,
+                          height: 28,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+                  child: SkeletonParagraph(
+                    style: const SkeletonParagraphStyle(
+                      lines: 2,
+                      spacing: 6,
+                      lineStyle: SkeletonLineStyle(
+                        height: 16,
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    child: SkeletonParagraph(
+                      style: SkeletonParagraphStyle(
+                        lines: 4,
+                        spacing: 20,
+                        padding: EdgeInsets.zero,
+                        lineStyle: SkeletonLineStyle(
+                          height: 18,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SkeletonItem(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: SkeletonAvatar(
+                          style: SkeletonAvatarStyle(
+                            width: 120,
+                            height: 20,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: List.generate(2, (index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: SkeletonAvatar(
+                              style: SkeletonAvatarStyle(
+                                width: 48,
+                                height: 28,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+      child: Container(),
     );
   }
 }

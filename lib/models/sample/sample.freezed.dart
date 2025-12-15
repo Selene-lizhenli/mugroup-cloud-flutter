@@ -26,6 +26,7 @@ mixin _$Sample {
   String? get construction => throw _privateConstructorUsedError;
   String? get remark => throw _privateConstructorUsedError;
   String? get series => throw _privateConstructorUsedError;
+  String? get unit => throw _privateConstructorUsedError;
   @JsonKey(name: 'category_id')
   int? get categoryId => throw _privateConstructorUsedError;
   @JsonKey(name: 'name_cn')
@@ -70,6 +71,7 @@ abstract class $SampleCopyWith<$Res> {
       String? construction,
       String? remark,
       String? series,
+      String? unit,
       @JsonKey(name: 'category_id') int? categoryId,
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'name_en') String? nameEn,
@@ -108,6 +110,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? construction = freezed,
     Object? remark = freezed,
     Object? series = freezed,
+    Object? unit = freezed,
     Object? categoryId = freezed,
     Object? nameCn = freezed,
     Object? nameEn = freezed,
@@ -148,6 +151,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
       series: freezed == series
           ? _value.series
           : series // ignore: cast_nullable_to_non_nullable
+              as String?,
+      unit: freezed == unit
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
               as String?,
       categoryId: freezed == categoryId
           ? _value.categoryId
@@ -239,6 +246,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       String? construction,
       String? remark,
       String? series,
+      String? unit,
       @JsonKey(name: 'category_id') int? categoryId,
       @JsonKey(name: 'name_cn') String? nameCn,
       @JsonKey(name: 'name_en') String? nameEn,
@@ -276,6 +284,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? construction = freezed,
     Object? remark = freezed,
     Object? series = freezed,
+    Object? unit = freezed,
     Object? categoryId = freezed,
     Object? nameCn = freezed,
     Object? nameEn = freezed,
@@ -316,6 +325,10 @@ class __$$SampleImplCopyWithImpl<$Res>
       series: freezed == series
           ? _value.series
           : series // ignore: cast_nullable_to_non_nullable
+              as String?,
+      unit: freezed == unit
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
               as String?,
       categoryId: freezed == categoryId
           ? _value.categoryId
@@ -391,6 +404,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       this.construction,
       this.remark,
       this.series,
+      this.unit,
       @JsonKey(name: 'category_id') this.categoryId,
       @JsonKey(name: 'name_cn') this.nameCn,
       @JsonKey(name: 'name_en') this.nameEn,
@@ -425,6 +439,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   final String? remark;
   @override
   final String? series;
+  @override
+  final String? unit;
   @override
   @JsonKey(name: 'category_id')
   final int? categoryId;
@@ -484,7 +500,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image)';
   }
 
   @override
@@ -498,6 +514,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('construction', construction))
       ..add(DiagnosticsProperty('remark', remark))
       ..add(DiagnosticsProperty('series', series))
+      ..add(DiagnosticsProperty('unit', unit))
       ..add(DiagnosticsProperty('categoryId', categoryId))
       ..add(DiagnosticsProperty('nameCn', nameCn))
       ..add(DiagnosticsProperty('nameEn', nameEn))
@@ -527,6 +544,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
                 other.construction == construction) &&
             (identical(other.remark, remark) || other.remark == remark) &&
             (identical(other.series, series) || other.series == series) &&
+            (identical(other.unit, unit) || other.unit == unit) &&
             (identical(other.categoryId, categoryId) ||
                 other.categoryId == categoryId) &&
             (identical(other.nameCn, nameCn) || other.nameCn == nameCn) &&
@@ -563,6 +581,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
         construction,
         remark,
         series,
+        unit,
         categoryId,
         nameCn,
         nameEn,
@@ -602,6 +621,7 @@ abstract class _Sample extends Sample {
       final String? construction,
       final String? remark,
       final String? series,
+      final String? unit,
       @JsonKey(name: 'category_id') final int? categoryId,
       @JsonKey(name: 'name_cn') final String? nameCn,
       @JsonKey(name: 'name_en') final String? nameEn,
@@ -633,6 +653,8 @@ abstract class _Sample extends Sample {
   String? get remark;
   @override
   String? get series;
+  @override
+  String? get unit;
   @override
   @JsonKey(name: 'category_id')
   int? get categoryId;
