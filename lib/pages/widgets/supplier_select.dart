@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -133,90 +135,136 @@ class SupplierSelect extends HookConsumerWidget {
                         child: Text("暂无数据",
                             style: TextStyle(
                                 color: Colors.grey[400], fontSize: 13)))
-                    : ListView.separated(
-                        padding: EdgeInsets.zero,
-                        itemCount: suppliers.value!.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 4),
-                        itemBuilder: (context, index) {
-                          final supplier = suppliers.value![index];
-
-                          final supplierName =
-                              supplier.shortName ?? supplier.name ?? '未知供应商';
-
-                          final supplierNo = supplier.supplierNo;
-
-                          final address = supplier.address;
-
-                          return Container(
+                    : Expanded(
+                        child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                    color: Colors.grey.withOpacity(0.2)),
+                                    color: Colors.blue.withOpacity(0.6)),
                               ),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(8),
                                   onTap: () {
-                                    Navigator.of(context)
-                                        .pop(supplier.toJson());
+                                    if (context.mounted) {
+                                      context.router.push(
+                                          const SupplySupplierCreateRoute());
+                                      return;
+                                    }
                                   },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                supplierName,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black87,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            Text(
-                                              "$supplierNo",
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey[600]),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                address ?? '',
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.grey[400],
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ],
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 18),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 24,
+                                        color: Colors.blue,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ));
-                        },
-                      ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                              child: ListView.separated(
+                            padding: EdgeInsets.all(4),
+                            itemCount: suppliers.value!.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 4),
+                            itemBuilder: (context, index) {
+                              final supplier = suppliers.value![index];
+
+                              final supplierName = supplier.shortName ??
+                                  supplier.name ??
+                                  '未知供应商';
+
+                              final supplierNo = supplier.supplierNo;
+
+                              final address = supplier.address;
+
+                              return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.2)),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8),
+                                      onTap: () {
+                                        Navigator.of(context)
+                                            .pop(supplier.toJson());
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    supplierName,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black87,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "$supplierNo",
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey[600]),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    address ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ));
+                            },
+                          )),
+                        ],
+                      )),
           ),
         ],
       ),
