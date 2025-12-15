@@ -79,3 +79,26 @@ Future<Contact?> getContact(int id, {Map<String, dynamic>? data}) async {
     },
   );
 }
+
+Future<Contact?> storeCrmContact(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/crm/contacts", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Contact.fromJson(res.data);
+    },
+  );
+}
+
+Future<Contact?> updateCrmContact(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/crm/contacts/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Contact.fromJson(res.data);
+    },
+  );
+}

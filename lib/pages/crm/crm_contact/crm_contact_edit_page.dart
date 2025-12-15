@@ -46,7 +46,7 @@ class CrmContactEditPage extends HookConsumerWidget {
       body: CrmCotactForm(
         initial: contact.value,
         onSubmit: (data) async {
-          //TODO
+          await updateCrmContact(id, data);
           EasyLoading.showSuccess("编辑成功");
           if (context.mounted) {
             Navigator.of(context).pop();
