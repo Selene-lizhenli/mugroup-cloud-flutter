@@ -1,6 +1,7 @@
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/company_select.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/multi_input.dart';
@@ -115,10 +116,10 @@ class CrmCotactForm extends HookConsumerWidget {
                         FormBuilderField<int>(
                           name: "company_id",
                           builder: (field) {
-                            return Input(
+                            return CompanySelect(
                               label: '公司',
-                              value: field.value?.toString() ?? '',
-                              // onChanged: () {},
+                              value: field.value,
+                              onChanged: field.didChange,
                             );
                           },
                         ),

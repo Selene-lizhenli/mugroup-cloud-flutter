@@ -18,6 +18,18 @@ Future<ApiResponse<List<Company>>> getCrmCompanies(
       );
 }
 
+Future<Company?> getCrmCompany(int id, {Map<String, dynamic>? data}) async {
+  return api.get("api/tenant/crm/companies/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Company.fromJson(res.data);
+    },
+  );
+}
+
 Future<Company?> storeCrmCompany(Map<String, dynamic>? data) async {
   return api.post("api/tenant/crm/companies", data: data).then(
     (res) {
