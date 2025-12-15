@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,8 +57,7 @@ class TranslatableInput extends HookConsumerWidget {
 
     // 翻译处理函数
     Future<void> handleTranslate() async {
-      logger.d(sourceText);
-      if (sourceText == null) {
+      if (sourceText == null || sourceText!.trim().isEmpty) {
         EasyLoading.showInfo('请先输入中文名称');
         return;
       }
@@ -129,7 +127,6 @@ class TranslatableInput extends HookConsumerWidget {
             suffixIcon: _buildSuffixIcon(
               context: context,
               loading: loading.value,
-              hasText: controller.text.isNotEmpty,
               onTranslate: handleTranslate,
               onClear: () {
                 controller.clear();
@@ -145,7 +142,6 @@ class TranslatableInput extends HookConsumerWidget {
   Widget? _buildSuffixIcon({
     required BuildContext context,
     required bool loading,
-    required bool hasText,
     required VoidCallback onTranslate,
     required VoidCallback onClear,
   }) {
@@ -158,29 +154,25 @@ class TranslatableInput extends HookConsumerWidget {
       );
     }
 
-    if (hasText) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextButton(
-            onPressed: onTranslate,
-            style: TextButton.styleFrom(
-              minimumSize: const Size(0, 36),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              '翻译',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(
+          onPressed: onTranslate,
+          style: TextButton.styleFrom(
+            minimumSize: const Size(0, 36),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            '翻译',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(width: 4),
-        ],
-      );
-    }
-
-    return null;
+        ),
+        const SizedBox(width: 4),
+      ],
+    );
   }
 }
