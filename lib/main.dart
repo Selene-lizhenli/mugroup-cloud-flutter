@@ -149,10 +149,13 @@ class MyApp extends ConsumerWidget {
           onSurface: Colors.black, //字体颜色 黑色
           surfaceContainerHighest: Colors.grey, //灰色 不重要的文字
           error: Color(0xFFDC3545), //错误提示
+          errorContainer: Color(0xFFF8D7DA),
+          onErrorContainer: Color(0xFF58151C),
           outline: Colors.grey, //分割线  灰色
           outlineVariant: Color.fromARGB(235, 230, 230, 230), //分割线 淡淡
           tertiary: Color.fromARGB(255, 248, 227, 164), //提醒色 淡淡
           surfaceContainer: Color(0xFFF7F8FA),
+          onTertiaryContainer: Color(0xFF4A3A00),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6),

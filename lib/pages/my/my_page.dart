@@ -20,6 +20,7 @@ class MyPage extends HookConsumerWidget {
     final cloud = ref.watch(coreProvider).value!;
     final cart = ref.read(cartProvider.notifier);
     final tenant = cloud.currentTenant;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -31,26 +32,34 @@ class MyPage extends HookConsumerWidget {
             Container(
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              color: Colors.white,
+              color: colorScheme.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
                   Text(
                     "${user?.name}",
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '工号: ${user?.jobNumber}',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.surfaceContainerHighest,
+                    ),
                   ),
                   if (user?.department != null) ...[
                     const SizedBox(height: 8),
                     Text(
                       '部门: ${user?.department?.name}',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.surfaceContainerHighest,
+                      ),
                     ),
                   ]
                 ],
@@ -58,9 +67,36 @@ class MyPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 8),
             ListTile(
-              tileColor: Colors.white,
-              title: const Text('清空缓存'),
-              leading: const Icon(Icons.cleaning_services),
+              tileColor: colorScheme.surface,
+              title: Text(
+                '报价单管理',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              leading: Icon(
+                Icons.receipt_long,
+                color: colorScheme.primary,
+              ),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurface,
+              ),
+              onTap: () {},
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              tileColor: colorScheme.surface,
+              title: Text(
+                '清空缓存',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              leading: Icon(
+                Icons.cleaning_services,
+                color: colorScheme.secondary,
+              ),
               onTap: () {
                 showFlanActionSheet(
                   context,
@@ -82,15 +118,28 @@ class MyPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 8),
             ListTile(
-              tileColor: Colors.white,
+              tileColor: colorScheme.surface,
               title: Text(
-                  '${cloud.currentTenant?.title ?? ""} (${app.fullVersion})'),
-              leading: const Icon(CupertinoIcons.info),
+                '版本信息(${app.fullVersion})',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              leading: Icon(
+                CupertinoIcons.info,
+                color: colorScheme.tertiary,
+              ),
             ),
             const SizedBox(height: 8),
             ListTile(
-              tileColor: Colors.white,
-              title: const Center(child: Text('退出登录')),
+              tileColor: colorScheme.surface,
+              title: Center(
+                  child: Text(
+                '退出登录',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              )),
               onTap: () {
                 showFlanActionSheet(
                   context,
