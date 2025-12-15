@@ -26,17 +26,6 @@ Future<Sample?> storeShowroomSample(Map<String, dynamic>? data) async {
   );
 }
 
-Future<Sample?> storeShowroomMarketProduct(Map<String, dynamic>? data) async {
-  return api.post("api/tenant/showroom/market_products", data: data).then(
-    (res) {
-      if (res.data == null) {
-        return null;
-      }
-      return Sample.fromJson(res.data);
-    },
-  );
-}
-
 Future<ApiResponse<List<Sample>>> getSamples(
     {Map<String, dynamic>? queryParameters}) async {
   return api
