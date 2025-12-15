@@ -24,12 +24,12 @@ mixin _$HomeState {
   String? get search => throw _privateConstructorUsedError;
   List<TemporaryMedia> get media => throw _privateConstructorUsedError;
   int? get currentMediaId => throw _privateConstructorUsedError; // 当前选中的媒体id
-// ---------- 找样品 ----------
+// ----------  样品 ----------
   List<Sample> get samples => throw _privateConstructorUsedError;
   List<FacetCount> get facetCounts => throw _privateConstructorUsedError;
   int get samplePages => throw _privateConstructorUsedError;
   bool get sampleNoMore =>
-      throw _privateConstructorUsedError; // ---------- 找服务商 ----------
+      throw _privateConstructorUsedError; // ----------  服务商 ----------
   List<Supplier> get suppliers => throw _privateConstructorUsedError;
   int get supplierPages => throw _privateConstructorUsedError;
   bool get supplierNoMore => throw _privateConstructorUsedError;
@@ -307,10 +307,10 @@ class _$HomeStateImpl extends _HomeState {
   @override
   final int? currentMediaId;
 // 当前选中的媒体id
-// ---------- 找样品 ----------
+// ----------  样品 ----------
   final List<Sample> _samples;
 // 当前选中的媒体id
-// ---------- 找样品 ----------
+// ----------  样品 ----------
   @override
   @JsonKey()
   List<Sample> get samples {
@@ -334,9 +334,9 @@ class _$HomeStateImpl extends _HomeState {
   @override
   @JsonKey()
   final bool sampleNoMore;
-// ---------- 找服务商 ----------
+// ----------  服务商 ----------
   final List<Supplier> _suppliers;
-// ---------- 找服务商 ----------
+// ----------  服务商 ----------
   @override
   @JsonKey()
   List<Supplier> get suppliers {
@@ -446,7 +446,7 @@ abstract class _HomeState extends HomeState {
   @override
   int? get currentMediaId;
   @override // 当前选中的媒体id
-// ---------- 找样品 ----------
+// ----------  样品 ----------
   List<Sample> get samples;
   @override
   List<FacetCount> get facetCounts;
@@ -454,7 +454,7 @@ abstract class _HomeState extends HomeState {
   int get samplePages;
   @override
   bool get sampleNoMore;
-  @override // ---------- 找服务商 ----------
+  @override // ----------  服务商 ----------
   List<Supplier> get suppliers;
   @override
   int get supplierPages;
