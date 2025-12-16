@@ -46,6 +46,7 @@ class SupplierCard extends StatelessWidget {
 
     final bool isCore = supplier.isCore ?? false;
     final bool canBill = supplier.canBill ?? false;
+    final shippingAmount = supplier.shippingAmount;
 
     return InkWell(
       onTap: () {
@@ -174,6 +175,22 @@ class SupplierCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                  const SizedBox(height: 4),
+                  if (supplier.businessScope != null)
+                    Row(
+                      children: [
+                        Icon(Icons.receipt,
+                            size: 14, color: Colors.grey.shade500),
+                        const SizedBox(width: 6),
+                        Text(
+                          '出货总额: $shippingAmount',
+                          style: TextStyle(
+                              fontSize: 13, color: Colors.grey.shade600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
 
                   // 主营产品
