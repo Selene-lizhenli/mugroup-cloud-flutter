@@ -31,10 +31,10 @@ class ProductDropdownMenu extends HookWidget {
       "item_type": "产品类别",
     };
     final menuOptions = {
-      "supplier_ids": {"multiple": true},
-      "category_id": {"multiple": false},
-      "trade_country": {"multiple": false},
-      "item_type": {"multiple": true}
+      "supplier_ids": (multiple: true, optionsColumns: 1),
+      "category_id": (multiple: true, optionsColumns: 2),
+      "trade_country": (multiple: false, optionsColumns: 2),
+      "item_type": (multiple: true, optionsColumns: 1)
     };
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);
@@ -101,6 +101,10 @@ class ProductDropdownMenu extends HookWidget {
         continue;
       }
 
+      if (facetCount.counts.length <= 1) {
+        continue;
+      }
+
       TDDropdownItem? item;
       final option = menuOptions[field];
       final options = <TDDropdownItemOption>[];
@@ -136,9 +140,9 @@ class ProductDropdownMenu extends HookWidget {
 
       item = TDDropdownItem(
         label: supportFacet[field],
-        multiple: option?['multiple'],
+        multiple: option?.multiple,
+        optionsColumns: option?.optionsColumns,
         options: options,
-        optionsColumns: 2,
         onChange: (value) {
           query.value = {
             ...query.value,
@@ -162,6 +166,8 @@ class ProductDropdownMenu extends HookWidget {
 
       menus.add(item);
     }
+
+    if (menus.isEmpty) return const SizedBox.shrink();
 
     return Container(
         color: Colors.white,
