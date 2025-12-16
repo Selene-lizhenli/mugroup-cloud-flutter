@@ -193,7 +193,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                                     BorderRadius.circular(8.0),
                                               ),
                                               child: Text(
-                                                '${currentIndex.value + 1}/ ${sample.value!.image!.length < pageSize ? 1 : sample.value!.image!.length - pageSize + 1}',
+                                                '${currentIndex.value + 1}/${sample.value!.image!.length < pageSize ? 1 : sample.value!.image!.length - pageSize + 1}',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
