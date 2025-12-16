@@ -26,6 +26,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final itemTypeSpan = _buildItemTypeSpan(context);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
@@ -66,11 +67,19 @@ class ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      sample.name,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          if (itemTypeSpan != null) itemTypeSpan,
+                          TextSpan(
+                            text: sample.name,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                       maxLines: 2,
                     ),
@@ -284,6 +293,51 @@ class ProductCard extends StatelessWidget {
                 ),
               ]
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  WidgetSpan? _buildItemTypeSpan(BuildContext context) {
+    String? itemType = sample.itemType;
+    if (itemType == null) {
+      return null;
+    }
+
+    final colorMap = {"japan": Colors.yellow[800], "market_product": Colors.red};
+    final labelMap = {"japan": "日本产品", "market_product": "内部"};
+
+    final label = labelMap[itemType];
+    final bg = colorMap[itemType] ?? Colors.grey;
+
+    if (label == null) {
+      return null;
+    }
+
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 4),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(4),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 3,
+              vertical: 2,
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 8,
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
       ),
