@@ -101,13 +101,18 @@ class SupplyView extends HookConsumerWidget {
           controller: refreshController,
           refreshOnStart: true,
           onRefresh: () async {
-            await fetchData(
-              search.value,
-              init: true,
-              searchMedia: media.value,
-            );
-            refreshController.finishRefresh();
-            refreshController.resetFooter();
+            try {
+              await fetchData(
+                search.value,
+                init: true,
+                searchMedia: media.value,
+              );
+              refreshController.finishRefresh();
+            } catch (e) {
+              refreshController.finishRefresh(IndicatorResult.fail, false);
+            } finally {
+              refreshController.resetFooter();
+            }
           },
           onLoad: () async {
             final resp = await fetchData(search.value);

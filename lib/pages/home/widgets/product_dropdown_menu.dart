@@ -129,6 +129,14 @@ class ProductDropdownMenu extends HookWidget {
               .firstWhereOrNull((item) => item.id.toString() == count.value);
 
           label = category?.name ?? label;
+        } else if (field == "item_type") {
+          if (label == "market_product") {
+            label = "内部";
+          }
+
+          if (label == "sample") {
+            label = "样品";
+          }
         }
 
         options.add(TDDropdownItemOption(
