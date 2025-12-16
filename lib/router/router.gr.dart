@@ -28,7 +28,8 @@ import 'package:cloud/pages/login/login_page.dart' as _i11;
 import 'package:cloud/pages/my/my_page.dart' as _i12;
 import 'package:cloud/pages/quote/quote_create_page.dart' as _i13;
 import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i14;
-import 'package:cloud/pages/quote/quote_detail/tabs/sample.dart' as _i32;
+import 'package:cloud/pages/quote/quote_detail/tabs/contact.dart' as _i29;
+import 'package:cloud/pages/quote/quote_detail/tabs/info.dart' as _i30;
 import 'package:cloud/pages/quote/quote_page.dart' as _i15;
 import 'package:cloud/pages/scan/scan_page.dart' as _i16;
 import 'package:cloud/pages/selectors/select_user/select_user_page.dart'
@@ -53,10 +54,8 @@ import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_conta
 import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i28;
 import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
     as _i31;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
-    as _i29;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
-    as _i30;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
+    as _i32;
 import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i33;
 import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i34;
 import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i35;
@@ -684,10 +683,18 @@ class ShowroomQuotationsRouteArgs {
 
 /// generated route for
 /// [_i21.ShowroomSampleCreatePage]
-class ShowroomSampleCreateRoute extends _i38.PageRouteInfo<void> {
-  const ShowroomSampleCreateRoute({List<_i38.PageRouteInfo>? children})
-      : super(
+class ShowroomSampleCreateRoute
+    extends _i38.PageRouteInfo<ShowroomSampleCreateRouteArgs> {
+  ShowroomSampleCreateRoute({
+    _i41.Key? key,
+    required String itemType,
+    List<_i38.PageRouteInfo>? children,
+  }) : super(
           ShowroomSampleCreateRoute.name,
+          args: ShowroomSampleCreateRouteArgs(
+            key: key,
+            itemType: itemType,
+          ),
           initialChildren: children,
         );
 
@@ -696,9 +703,29 @@ class ShowroomSampleCreateRoute extends _i38.PageRouteInfo<void> {
   static _i38.PageInfo page = _i38.PageInfo(
     name,
     builder: (data) {
-      return const _i21.ShowroomSampleCreatePage();
+      final args = data.argsAs<ShowroomSampleCreateRouteArgs>();
+      return _i21.ShowroomSampleCreatePage(
+        key: args.key,
+        itemType: args.itemType,
+      );
     },
   );
+}
+
+class ShowroomSampleCreateRouteArgs {
+  const ShowroomSampleCreateRouteArgs({
+    this.key,
+    required this.itemType,
+  });
+
+  final _i41.Key? key;
+
+  final String itemType;
+
+  @override
+  String toString() {
+    return 'ShowroomSampleCreateRouteArgs{key: $key, itemType: $itemType}';
+  }
 }
 
 /// generated route for

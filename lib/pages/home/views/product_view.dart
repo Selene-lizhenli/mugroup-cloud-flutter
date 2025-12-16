@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -26,7 +25,6 @@ class ProductView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
-
     final cart = ref.read(cartProvider.notifier);
     final cartState = ref.watch(cartProvider);
 
@@ -271,27 +269,30 @@ class ProductView extends HookConsumerWidget {
                                         icon: Icons.add,
                                         title: "新增产品",
                                         color: colorScheme.secondary,
-                                        route:
-                                            const ShowroomSampleCreateRoute(),
+                                        route: (itemType) =>
+                                            ShowroomSampleCreateRoute(
+                                                itemType: itemType),
                                       ),
                                       BuildQuickAction(
                                         icon: Icons.add,
                                         title: "新增供应商",
                                         color: colorScheme.error,
-                                        route:
+                                        route: (itemType) =>
                                             const SupplySupplierCreateRoute(),
                                       ),
-                                      const BuildQuickAction(
+                                      BuildQuickAction(
                                         icon: Icons.add,
                                         title: "新增客户",
                                         color: Colors.orange,
-                                        route: CrmCompanyCreateRoute(),
+                                        route: (itemType) =>
+                                            const CrmCompanyCreateRoute(),
                                       ),
-                                      const BuildQuickAction(
+                                      BuildQuickAction(
                                         icon: Icons.add,
                                         title: "新增报价单", // 报价单列表页面
                                         color: Colors.green,
-                                        route: QuoteCreateRoute(),
+                                        route: (itemType) =>
+                                            const QuoteCreateRoute(),
                                       ),
                                     ],
                                   ),

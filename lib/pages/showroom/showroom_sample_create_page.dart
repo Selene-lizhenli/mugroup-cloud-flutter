@@ -7,7 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class ShowroomSampleCreatePage extends HookConsumerWidget {
-  const ShowroomSampleCreatePage({super.key});
+  final String itemType;
+  const ShowroomSampleCreatePage({super.key, required this.itemType});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,11 +24,11 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       body: ShowroomSampleForm(
         initial: null,
         onSave: (data) async {
-          await storeShowroomSample({...data, 'item_type': 'market_product'});
+          await storeShowroomSample({...data, 'item_type': itemType});
           EasyLoading.showSuccess("创建成功");
         },
         onSubmit: (data) async {
-          await storeShowroomSample({...data, 'item_type': 'market_product'});
+          await storeShowroomSample({...data, 'item_type': itemType});
           EasyLoading.showSuccess("创建成功");
           if (context.mounted) {
             Navigator.of(context).pop();
