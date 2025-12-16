@@ -27,12 +27,14 @@ class ProductDropdownMenu extends HookWidget {
     final supportFacet = {
       "supplier_ids": "供应商",
       "category_id": "产品分类",
-      "trade_country": "贸易国别"
+      "trade_country": "贸易国别",
+      "item_type": "产品类别",
     };
     final menuOptions = {
       "supplier_ids": {"multiple": true},
       "category_id": {"multiple": false},
       "trade_country": {"multiple": false},
+      "item_type": {"multiple": true}
     };
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);
@@ -169,6 +171,7 @@ class ProductDropdownMenu extends HookWidget {
           children: [
             TDDropdownMenu(
               direction: TDDropdownMenuDirection.down,
+              isScrollable: true,
               onMenuClosed: (index) {
                 if (const DeepCollectionEquality().equals(query.value, value)) {
                   return;

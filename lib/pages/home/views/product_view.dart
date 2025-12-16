@@ -67,6 +67,7 @@ class ProductView extends HookConsumerWidget {
       final queryParameters = {
         "search": searchText,
         if (searchMedia != null) "image": searchMedia.id,
+        "item_type": "all",
         "page": page.value,
         "pageSize": pageSize,
         "includes": 'supplyQuotes.supplier',
