@@ -24,15 +24,26 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       body: ShowroomSampleForm(
         initial: null,
         onSave: (data) async {
+          EasyLoading.show(status: '创建中...');
           await storeShowroomSample({...data, 'item_type': itemType});
-          EasyLoading.showSuccess("创建成功");
+          EasyLoading.showSuccess(
+            '创建成功',
+            duration: const Duration(seconds: 1),
+          );
+          return true;
         },
         onSubmit: (data) async {
+          EasyLoading.show(status: '创建中...');
           await storeShowroomSample({...data, 'item_type': itemType});
-          EasyLoading.showSuccess("创建成功");
+          EasyLoading.showSuccess(
+            "创建成功",
+            duration: const Duration(seconds: 1),
+          );
+          
           if (context.mounted) {
             Navigator.of(context).pop();
           }
+          return true;
         },
       ),
     );
