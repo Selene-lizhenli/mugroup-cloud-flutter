@@ -29,6 +29,7 @@ abstract class Sample with _$Sample {
     @JsonKey(name: 'developed_at') String? developedAt,
     @JsonKey(name: 'description_cn') String? descriptionCn,
     @JsonKey(name: 'description_en') String? descriptionEn,
+    @JsonKey(name: 'item_type') String? itemType,
     List<Quote>? supplyQuotes,
     String? spec,
     SampleCategory? category,

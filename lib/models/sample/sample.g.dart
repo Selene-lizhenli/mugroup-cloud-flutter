@@ -25,6 +25,7 @@ _$SampleImpl _$$SampleImplFromJson(Map<String, dynamic> json) => _$SampleImpl(
       developedAt: json['developed_at'] as String?,
       descriptionCn: json['description_cn'] as String?,
       descriptionEn: json['description_en'] as String?,
+      itemType: json['item_type'] as String?,
       supplyQuotes: (json['supplyQuotes'] as List<dynamic>?)
           ?.map((e) => Quote.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -57,6 +58,7 @@ Map<String, dynamic> _$$SampleImplToJson(_$SampleImpl instance) =>
       'developed_at': instance.developedAt,
       'description_cn': instance.descriptionCn,
       'description_en': instance.descriptionEn,
+      'item_type': instance.itemType,
       'supplyQuotes': instance.supplyQuotes,
       'spec': instance.spec,
       'category': instance.category,

@@ -239,6 +239,16 @@ class SampleSubmitBar extends HookConsumerWidget {
     final badgeCount = cartState.items.length.toString();
     final showBadge = cartState.items.isNotEmpty;
 
+    bool canEdit = false;
+    final permissions = user?.permissions ?? [];
+    final itemType = sample?.itemType;
+
+    if (itemType == 'sample') {
+      canEdit = permissions.contains('showroom.sample.update');
+    } else if (itemType == 'market_product') {
+      canEdit = permissions.contains('showroom.market_product.update');
+    }
+
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -260,8 +270,7 @@ class SampleSubmitBar extends HookConsumerWidget {
                 context.router.push(const CartRoute());
               },
             ),
-            if (user?.permissions?.contains('schema.showroom_samples.update') ??
-                false)
+            if (canEdit)
               FlanActionBarButton(
                 type: FlanButtonType.danger,
                 text: '编辑样品',

@@ -49,6 +49,8 @@ mixin _$Sample {
   String? get descriptionCn => throw _privateConstructorUsedError;
   @JsonKey(name: 'description_en')
   String? get descriptionEn => throw _privateConstructorUsedError;
+  @JsonKey(name: 'item_type')
+  String? get itemType => throw _privateConstructorUsedError;
   List<Quote>? get supplyQuotes => throw _privateConstructorUsedError;
   String? get spec => throw _privateConstructorUsedError;
   SampleCategory? get category => throw _privateConstructorUsedError;
@@ -83,6 +85,7 @@ abstract class $SampleCopyWith<$Res> {
       @JsonKey(name: 'developed_at') String? developedAt,
       @JsonKey(name: 'description_cn') String? descriptionCn,
       @JsonKey(name: 'description_en') String? descriptionEn,
+      @JsonKey(name: 'item_type') String? itemType,
       List<Quote>? supplyQuotes,
       String? spec,
       SampleCategory? category,
@@ -122,6 +125,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? developedAt = freezed,
     Object? descriptionCn = freezed,
     Object? descriptionEn = freezed,
+    Object? itemType = freezed,
     Object? supplyQuotes = freezed,
     Object? spec = freezed,
     Object? category = freezed,
@@ -200,6 +204,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.descriptionEn
           : descriptionEn // ignore: cast_nullable_to_non_nullable
               as String?,
+      itemType: freezed == itemType
+          ? _value.itemType
+          : itemType // ignore: cast_nullable_to_non_nullable
+              as String?,
       supplyQuotes: freezed == supplyQuotes
           ? _value.supplyQuotes
           : supplyQuotes // ignore: cast_nullable_to_non_nullable
@@ -258,6 +266,7 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       @JsonKey(name: 'developed_at') String? developedAt,
       @JsonKey(name: 'description_cn') String? descriptionCn,
       @JsonKey(name: 'description_en') String? descriptionEn,
+      @JsonKey(name: 'item_type') String? itemType,
       List<Quote>? supplyQuotes,
       String? spec,
       SampleCategory? category,
@@ -296,6 +305,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? developedAt = freezed,
     Object? descriptionCn = freezed,
     Object? descriptionEn = freezed,
+    Object? itemType = freezed,
     Object? supplyQuotes = freezed,
     Object? spec = freezed,
     Object? category = freezed,
@@ -374,6 +384,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.descriptionEn
           : descriptionEn // ignore: cast_nullable_to_non_nullable
               as String?,
+      itemType: freezed == itemType
+          ? _value.itemType
+          : itemType // ignore: cast_nullable_to_non_nullable
+              as String?,
       supplyQuotes: freezed == supplyQuotes
           ? _value._supplyQuotes
           : supplyQuotes // ignore: cast_nullable_to_non_nullable
@@ -416,6 +430,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       @JsonKey(name: 'developed_at') this.developedAt,
       @JsonKey(name: 'description_cn') this.descriptionCn,
       @JsonKey(name: 'description_en') this.descriptionEn,
+      @JsonKey(name: 'item_type') this.itemType,
       final List<Quote>? supplyQuotes,
       this.spec,
       this.category,
@@ -474,6 +489,9 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   @override
   @JsonKey(name: 'description_en')
   final String? descriptionEn;
+  @override
+  @JsonKey(name: 'item_type')
+  final String? itemType;
   final List<Quote>? _supplyQuotes;
   @override
   List<Quote>? get supplyQuotes {
@@ -500,7 +518,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, itemType: $itemType, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image)';
   }
 
   @override
@@ -526,6 +544,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('developedAt', developedAt))
       ..add(DiagnosticsProperty('descriptionCn', descriptionCn))
       ..add(DiagnosticsProperty('descriptionEn', descriptionEn))
+      ..add(DiagnosticsProperty('itemType', itemType))
       ..add(DiagnosticsProperty('supplyQuotes', supplyQuotes))
       ..add(DiagnosticsProperty('spec', spec))
       ..add(DiagnosticsProperty('category', category))
@@ -563,6 +582,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
                 other.descriptionCn == descriptionCn) &&
             (identical(other.descriptionEn, descriptionEn) ||
                 other.descriptionEn == descriptionEn) &&
+            (identical(other.itemType, itemType) ||
+                other.itemType == itemType) &&
             const DeepCollectionEquality()
                 .equals(other._supplyQuotes, _supplyQuotes) &&
             (identical(other.spec, spec) || other.spec == spec) &&
@@ -593,6 +614,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
         developedAt,
         descriptionCn,
         descriptionEn,
+        itemType,
         const DeepCollectionEquality().hash(_supplyQuotes),
         spec,
         category,
@@ -633,6 +655,7 @@ abstract class _Sample extends Sample {
       @JsonKey(name: 'developed_at') final String? developedAt,
       @JsonKey(name: 'description_cn') final String? descriptionCn,
       @JsonKey(name: 'description_en') final String? descriptionEn,
+      @JsonKey(name: 'item_type') final String? itemType,
       final List<Quote>? supplyQuotes,
       final String? spec,
       final SampleCategory? category,
@@ -688,6 +711,9 @@ abstract class _Sample extends Sample {
   @override
   @JsonKey(name: 'description_en')
   String? get descriptionEn;
+  @override
+  @JsonKey(name: 'item_type')
+  String? get itemType;
   @override
   List<Quote>? get supplyQuotes;
   @override
