@@ -412,7 +412,10 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                         itemBuilder: (context, index) {
                                           final sample =
                                               sampleSimilars.value[index];
-                                          return ProductCard(sample: sample);
+                                          return ProductCard(
+                                            key: ValueKey(sample.id),
+                                            sample: sample,
+                                          );
                                         },
                                       );
                                     },

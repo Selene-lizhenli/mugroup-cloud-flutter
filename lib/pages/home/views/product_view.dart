@@ -358,6 +358,7 @@ class ProductView extends HookConsumerWidget {
                             (element) => element.sample.id == sample.id);
 
                         return ProductCard(
+                          key: ValueKey(sample.id),
                           sample: sample,
                           cartCount: cartItem?.count,
                           onTapAddSample: () {
