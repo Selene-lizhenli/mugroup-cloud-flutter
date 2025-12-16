@@ -687,7 +687,7 @@ class ShowroomSampleCreateRoute
     extends _i38.PageRouteInfo<ShowroomSampleCreateRouteArgs> {
   ShowroomSampleCreateRoute({
     _i41.Key? key,
-    required String itemType,
+    String? itemType,
     List<_i38.PageRouteInfo>? children,
   }) : super(
           ShowroomSampleCreateRoute.name,
@@ -703,7 +703,8 @@ class ShowroomSampleCreateRoute
   static _i38.PageInfo page = _i38.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ShowroomSampleCreateRouteArgs>();
+      final args = data.argsAs<ShowroomSampleCreateRouteArgs>(
+          orElse: () => const ShowroomSampleCreateRouteArgs());
       return _i21.ShowroomSampleCreatePage(
         key: args.key,
         itemType: args.itemType,
@@ -715,12 +716,12 @@ class ShowroomSampleCreateRoute
 class ShowroomSampleCreateRouteArgs {
   const ShowroomSampleCreateRouteArgs({
     this.key,
-    required this.itemType,
+    this.itemType,
   });
 
   final _i41.Key? key;
 
-  final String itemType;
+  final String? itemType;
 
   @override
   String toString() {

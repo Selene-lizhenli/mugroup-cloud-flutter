@@ -20,8 +20,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ShowroomSampleForm extends HookConsumerWidget {
   final Sample? initial;
-  final Future<bool> Function(Map<String, dynamic>)? onSave;
-  final Future<bool> Function(Map<String, dynamic>) onSubmit;
+  final Future<bool?> Function(Map<String, dynamic>)? onSave;
+  final Future<bool?> Function(Map<String, dynamic>) onSubmit;
 
   const ShowroomSampleForm({
     super.key,
@@ -675,7 +675,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           submitValues['spec'] = spec;
 
                           final success = await onSave!(submitValues);
-                          if (success) {
+                          if (success == true) {
                             formKey.currentState?.reset();
                           }
                         }
@@ -711,7 +711,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         submitValues['spec'] = spec;
 
                         final success = await onSubmit(submitValues);
-                        if (success) {
+                        if (success == true) {
                           formKey.currentState?.reset();
                         }
                       }

@@ -269,6 +269,7 @@ class ProductView extends HookConsumerWidget {
                                         icon: Icons.add,
                                         title: "新增产品",
                                         color: colorScheme.secondary,
+                                        needItemType: true,
                                         route: (itemType) =>
                                             ShowroomSampleCreateRoute(
                                                 itemType: itemType),

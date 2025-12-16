@@ -9,13 +9,15 @@ class BuildQuickAction extends HookConsumerWidget {
   final IconData icon; // 图标
   final String title; // 文字
   final Color color;
-  final PageRouteInfo Function(String itemType) route;
+  final bool needItemType;
+  final PageRouteInfo Function(String? itemType) route;
 
   const BuildQuickAction({
     super.key,
     required this.icon,
     required this.title,
     required this.color,
+    this.needItemType = false,
     required this.route,
   });
   @override
@@ -24,6 +26,10 @@ class BuildQuickAction extends HookConsumerWidget {
     final user = ref.watch(userProvider).user;
 
     void handleTap() async {
+      if (!needItemType) {
+        context.router.push(route(null));
+        return;
+      }
       final permissions = user?.permissions ?? [];
       const marketPerm = 'showroom.market_product.store';
       const samplePerm = 'showroom.sample.store';

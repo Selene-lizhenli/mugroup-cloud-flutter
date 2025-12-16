@@ -7,8 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class ShowroomSampleCreatePage extends HookConsumerWidget {
-  final String itemType;
-  const ShowroomSampleCreatePage({super.key, required this.itemType});
+  final String? itemType;
+  const ShowroomSampleCreatePage({super.key, this.itemType});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +39,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
             "创建成功",
             duration: const Duration(seconds: 1),
           );
-          
+
           if (context.mounted) {
             Navigator.of(context).pop();
           }
