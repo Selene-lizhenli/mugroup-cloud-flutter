@@ -31,11 +31,15 @@ class SupplySupplierActivityCreatePage extends HookConsumerWidget {
               children: [
                 FormBuilderField<List<TemporaryMedia>>(
                   name: "attachments",
+                  validator: (value) {
+                    return '必填';
+                  },
                   builder: (field) {
                     return ImageUploader(
                       label: "附件",
                       value: field.value,
                       onChanged: field.didChange,
+                      errorText: field.errorText,
                     );
                   },
                 ),

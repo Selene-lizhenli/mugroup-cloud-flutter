@@ -20,15 +20,19 @@ class ImageUploader extends HookConsumerWidget {
   final Future<dynamic> Function(Map<String, dynamic>)? recognizeApi;
   final ValueChanged<dynamic>? onRecognizeResult;
 
-  const ImageUploader(
-      {super.key,
-      this.label,
-      this.maxCount,
-      this.value,
-      this.onChanged,
-      this.showRecognizeButton = false,
-      this.recognizeApi,
-      this.onRecognizeResult});
+  final String? errorText;
+
+  const ImageUploader({
+    super.key,
+    this.label,
+    this.maxCount,
+    this.value,
+    this.onChanged,
+    this.showRecognizeButton = false,
+    this.recognizeApi,
+    this.onRecognizeResult,
+    this.errorText,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,6 +40,9 @@ class ImageUploader extends HookConsumerWidget {
     final int remainingCount = (maxCount == null || maxCount! <= 0)
         ? 999
         : maxCount! - currentImages.length;
+
+    // 判断当前是否有错误信息
+    final bool hasError = errorText != null && errorText!.isNotEmpty;
 
     Future<void> processAndUploadEntities(List<AssetEntity> entities) async {
       final List<TemporaryMedia> uploadedMedias = [];
@@ -209,9 +216,24 @@ class ImageUploader extends HookConsumerWidget {
             }),
 
             // 渲染添加按钮 (如果没有达到最大限制)
-            if (remainingCount > 0) _buildAddButton(onTap: handlePickAndUpload),
+            if (remainingCount > 0)
+              _buildAddButton(
+                onTap: handlePickAndUpload,
+                hasError: hasError, // 传递错误状态，改变按钮样式
+              ),
           ],
         ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, left: 2.0),
+            child: Text(
+              errorText!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error, // 使用主题的错误色(通常是红色)
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -278,7 +300,7 @@ class ImageUploader extends HookConsumerWidget {
   }
 
   // 子组件：添加按钮
-  Widget _buildAddButton({required VoidCallback onTap}) {
+  Widget _buildAddButton({required VoidCallback onTap, bool hasError = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -287,7 +309,11 @@ class ImageUploader extends HookConsumerWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFF7F7F7),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFD9D9D9)),
+          // 如果有错误，边框变红
+          border: Border.all(
+            color: hasError ? Colors.red : const Color(0xFFD9D9D9),
+            width: hasError ? 1.2 : 1.0, // 错误时边框稍微加粗一点点
+          ),
         ),
         child: const Icon(Icons.add, color: Color(0xFF999999), size: 28),
       ),

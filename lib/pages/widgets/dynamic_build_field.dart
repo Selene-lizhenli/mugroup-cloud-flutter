@@ -52,6 +52,7 @@ class DynamicBuildField extends HookConsumerWidget {
                 label: s.title,
                 value: field.value ?? '',
                 onChanged: field.didChange,
+                errorText: field.errorText,
               ),
             ],
           );
@@ -185,6 +186,7 @@ class DynamicBuildField extends HookConsumerWidget {
             onChanged: (newValue) {
               field.didChange(newValue);
             },
+            errorText: field.errorText,
           );
         },
       );
