@@ -111,13 +111,14 @@ class QuoteDetailPage extends HookConsumerWidget {
           return false;
         },
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //  左侧时间轴
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.fromLTRB(4, 20, 4, 20),
               // color: Theme.of(context).colorScheme.surface,
               child: SizedBox(
-                width: 40,
+                width: 42,
                 child: TimelineList(
                   items: state.list,
                   currentIndex: currentIndex.value,
@@ -126,6 +127,7 @@ class QuoteDetailPage extends HookConsumerWidget {
                 ),
               ),
             ),
+            //右侧详细信息
             Expanded(
               child: QuoteDetailBody(
                 item: quoteDetailState.baseInfo,

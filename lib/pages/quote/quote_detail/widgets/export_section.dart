@@ -32,86 +32,80 @@ class ExportActionBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(children: [
-            Text(
-              '共计',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 12,
-                color: colorScheme.surfaceContainerHighest,
-                fontWeight: FontWeight.w500,
+          // ===== 左侧：统计信息 =====
+          Row(
+            children: [
+              Text(
+                '共计',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 12,
+                  color: colorScheme.surfaceContainerHighest,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            SizedBox(width: 3),
-            Text(
-              ' ${item?.sumQty ?? "-"} ',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              const SizedBox(width: 3),
+              Text(
+                '${item?.sumQty ?? "-"}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            SizedBox(width: 8),
-            Text(
-              '种类',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 12,
-                color: colorScheme.surfaceContainerHighest,
-                fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              Text(
+                '种类',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 12,
+                  color: colorScheme.surfaceContainerHighest,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            SizedBox(width: 3),
-            Text(
-              ' ${item?.productCount ?? "-"} ',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              const SizedBox(width: 3),
+              Text(
+                '${item?.productCount ?? "-"}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ]),
-          Text(
-            '导出到：',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurface,
-            ),
+            ],
           ),
-          // TextButton.icon( //todo
-          //   onPressed: () {},
-          //   label: Text(
-          //     '本地',
-          //     style: TextStyle(
-          //       fontSize: 12,
-          //       color: colorScheme.primary,
-          //     ),
-          //   ),
-          //   style: TextButton.styleFrom(
-          //     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          //     minimumSize: Size.zero,
-          //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          //   ),
-          // ),
-          TextButton.icon(
-            onPressed: () {
-              showEmployeePicker();
-            },
-            label: Text(
-              '企微',
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.primary,
+
+          // ===== 中间撑开 =====
+          const Spacer(),
+
+          Row(
+            children: [
+              Text(
+                '导出到：',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: colorScheme.onSurface,
+                ),
               ),
-            ),
-            icon: Icon(
-              Icons.send_outlined,
-              size: 16,
-              color: colorScheme.primary,
-            ),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  showEmployeePicker();
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '企微',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
         ],
       ),

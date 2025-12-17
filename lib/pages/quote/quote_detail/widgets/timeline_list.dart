@@ -30,7 +30,6 @@ class TimelineList extends StatelessWidget {
       itemBuilder: (_, index) {
         final isCurrent = index == currentIndex;
         final isLast = index == items.length - 1;
-        final isFirst = index == 0;
 
         return InkWell(
           onTap: () => onTap(index),
@@ -43,7 +42,6 @@ class TimelineList extends StatelessWidget {
                 SizedBox(
                   child: Column(
                     children: [
-                      if (isFirst) const SizedBox(height: 12),
                       _TimelineNode(
                         isCurrent: isCurrent,
                         colorScheme: colorScheme,
