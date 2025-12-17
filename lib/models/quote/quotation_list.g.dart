@@ -37,7 +37,7 @@ _$QuotationListImpl _$$QuotationListImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updated_at'] as String),
       userId: (json['user_id'] as num?)?.toInt(),
       creatorId: (json['creator_id'] as num?)?.toInt(),
-      companyId: json['company_id'] as String?,
+      companyId: (json['company_id'] as num?)?.toInt(),
       itemType: json['item_type'] as String?,
       departmentId: (json['department_id'] as num?)?.toInt(),
       isTaxInclusive: json['is_tax_inclusive'] as bool?,

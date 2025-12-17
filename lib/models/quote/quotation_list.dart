@@ -33,7 +33,7 @@ class QuotationList with _$QuotationList {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(name: 'user_id') int? userId,
     @JsonKey(name: 'creator_id') int? creatorId,
-    @JsonKey(name: 'company_id') String? companyId,
+    @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'item_type') String? itemType,
     @JsonKey(name: 'department_id') int? departmentId,
     @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,

@@ -65,7 +65,7 @@ mixin _$QuotationList {
   @JsonKey(name: 'creator_id')
   int? get creatorId => throw _privateConstructorUsedError;
   @JsonKey(name: 'company_id')
-  String? get companyId => throw _privateConstructorUsedError;
+  int? get companyId => throw _privateConstructorUsedError;
   @JsonKey(name: 'item_type')
   String? get itemType => throw _privateConstructorUsedError;
   @JsonKey(name: 'department_id')
@@ -120,7 +120,7 @@ abstract class $QuotationListCopyWith<$Res> {
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'creator_id') int? creatorId,
-      @JsonKey(name: 'company_id') String? companyId,
+      @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'item_type') String? itemType,
       @JsonKey(name: 'department_id') int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
@@ -289,7 +289,7 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
       companyId: freezed == companyId
           ? _value.companyId
           : companyId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       itemType: freezed == itemType
           ? _value.itemType
           : itemType // ignore: cast_nullable_to_non_nullable
@@ -400,7 +400,7 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'creator_id') int? creatorId,
-      @JsonKey(name: 'company_id') String? companyId,
+      @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'item_type') String? itemType,
       @JsonKey(name: 'department_id') int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
@@ -570,7 +570,7 @@ class __$$QuotationListImplCopyWithImpl<$Res>
       companyId: freezed == companyId
           ? _value.companyId
           : companyId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       itemType: freezed == itemType
           ? _value.itemType
           : itemType // ignore: cast_nullable_to_non_nullable
@@ -725,7 +725,7 @@ class _$QuotationListImpl implements _QuotationList {
   final int? creatorId;
   @override
   @JsonKey(name: 'company_id')
-  final String? companyId;
+  final int? companyId;
   @override
   @JsonKey(name: 'item_type')
   final String? itemType;
@@ -903,7 +903,7 @@ abstract class _QuotationList implements QuotationList {
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
       @JsonKey(name: 'user_id') final int? userId,
       @JsonKey(name: 'creator_id') final int? creatorId,
-      @JsonKey(name: 'company_id') final String? companyId,
+      @JsonKey(name: 'company_id') final int? companyId,
       @JsonKey(name: 'item_type') final String? itemType,
       @JsonKey(name: 'department_id') final int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') final bool? isTaxInclusive,
@@ -988,7 +988,7 @@ abstract class _QuotationList implements QuotationList {
   int? get creatorId;
   @override
   @JsonKey(name: 'company_id')
-  String? get companyId;
+  int? get companyId;
   @override
   @JsonKey(name: 'item_type')
   String? get itemType;
