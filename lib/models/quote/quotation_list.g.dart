@@ -52,6 +52,9 @@ _$QuotationListImpl _$$QuotationListImplFromJson(Map<String, dynamic> json) =>
       creator: json['creator'] == null
           ? null
           : User.fromJson(json['creator'] as Map<String, dynamic>),
+      company: json['company'] == null
+          ? null
+          : Company.fromJson(json['company'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
@@ -90,4 +93,5 @@ Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
       'last_sent_at': instance.lastSentAt?.toIso8601String(),
       'user': instance.user,
       'creator': instance.creator,
+      'company': instance.company,
     };

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
@@ -153,9 +154,17 @@ class _QuotePageState extends State<QuotePage>
                         itemBuilder: (context, index) {
                           if (index < list.length) {
                             return QuoteCard(
-                                item: list[index], tabIndex: tabIndex);
+                              item: list[index],
+                              tabIndex: tabIndex,
+                              onTap: () {
+                                final tempId = list[index].id;
+
+                                context.router.push(QuoteDetailRoute(
+                                    id: tempId!,
+                                    userId: list[index].user?.id ?? 0));
+                              },
+                            );
                           } else {
-                            // 最后一条逻辑
                             if (isLoadingMore) {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -164,7 +173,8 @@ class _QuotePageState extends State<QuotePage>
                               );
                             } else if (!hasMore) {
                               return Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 child: Center(
                                   child: Text(
                                     '没有更多了',

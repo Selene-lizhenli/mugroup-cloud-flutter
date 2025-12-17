@@ -80,6 +80,7 @@ mixin _$QuotationList {
   DateTime? get lastSentAt => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
   User? get creator => throw _privateConstructorUsedError;
+  Company? get company => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -127,10 +128,12 @@ abstract class $QuotationListCopyWith<$Res> {
       @JsonKey(name: 'sum_qty') String? sumQty,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
       User? user,
-      User? creator});
+      User? creator,
+      Company? company});
 
   $UserCopyWith<$Res>? get user;
   $UserCopyWith<$Res>? get creator;
+  $CompanyCopyWith<$Res>? get company;
 }
 
 /// @nodoc
@@ -180,6 +183,7 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
     Object? lastSentAt = freezed,
     Object? user = freezed,
     Object? creator = freezed,
+    Object? company = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -318,6 +322,10 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
           ? _value.creator
           : creator // ignore: cast_nullable_to_non_nullable
               as User?,
+      company: freezed == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as Company?,
     ) as $Val);
   }
 
@@ -342,6 +350,18 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
 
     return $UserCopyWith<$Res>(_value.creator!, (value) {
       return _then(_value.copyWith(creator: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $CompanyCopyWith<$Res>? get company {
+    if (_value.company == null) {
+      return null;
+    }
+
+    return $CompanyCopyWith<$Res>(_value.company!, (value) {
+      return _then(_value.copyWith(company: value) as $Val);
     });
   }
 }
@@ -388,12 +408,15 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       @JsonKey(name: 'sum_qty') String? sumQty,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
       User? user,
-      User? creator});
+      User? creator,
+      Company? company});
 
   @override
   $UserCopyWith<$Res>? get user;
   @override
   $UserCopyWith<$Res>? get creator;
+  @override
+  $CompanyCopyWith<$Res>? get company;
 }
 
 /// @nodoc
@@ -441,6 +464,7 @@ class __$$QuotationListImplCopyWithImpl<$Res>
     Object? lastSentAt = freezed,
     Object? user = freezed,
     Object? creator = freezed,
+    Object? company = freezed,
   }) {
     return _then(_$QuotationListImpl(
       id: freezed == id
@@ -579,6 +603,10 @@ class __$$QuotationListImplCopyWithImpl<$Res>
           ? _value.creator
           : creator // ignore: cast_nullable_to_non_nullable
               as User?,
+      company: freezed == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as Company?,
     ));
   }
 }
@@ -620,7 +648,8 @@ class _$QuotationListImpl implements _QuotationList {
       @JsonKey(name: 'sum_qty') this.sumQty,
       @JsonKey(name: 'last_sent_at') this.lastSentAt,
       this.user,
-      this.creator});
+      this.creator,
+      this.company});
 
   factory _$QuotationListImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuotationListImplFromJson(json);
@@ -719,10 +748,12 @@ class _$QuotationListImpl implements _QuotationList {
   final User? user;
   @override
   final User? creator;
+  @override
+  final Company? company;
 
   @override
   String toString() {
-    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, lastSentAt: $lastSentAt, user: $user, creator: $creator)';
+    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, lastSentAt: $lastSentAt, user: $user, creator: $creator, company: $company)';
   }
 
   @override
@@ -786,7 +817,8 @@ class _$QuotationListImpl implements _QuotationList {
             (identical(other.lastSentAt, lastSentAt) ||
                 other.lastSentAt == lastSentAt) &&
             (identical(other.user, user) || other.user == user) &&
-            (identical(other.creator, creator) || other.creator == creator));
+            (identical(other.creator, creator) || other.creator == creator) &&
+            (identical(other.company, company) || other.company == company));
   }
 
   @JsonKey(ignore: true)
@@ -826,7 +858,8 @@ class _$QuotationListImpl implements _QuotationList {
         sumQty,
         lastSentAt,
         user,
-        creator
+        creator,
+        company
       ]);
 
   @JsonKey(ignore: true)
@@ -878,7 +911,8 @@ abstract class _QuotationList implements QuotationList {
       @JsonKey(name: 'sum_qty') final String? sumQty,
       @JsonKey(name: 'last_sent_at') final DateTime? lastSentAt,
       final User? user,
-      final User? creator}) = _$QuotationListImpl;
+      final User? creator,
+      final Company? company}) = _$QuotationListImpl;
 
   factory _QuotationList.fromJson(Map<String, dynamic> json) =
       _$QuotationListImpl.fromJson;
@@ -977,6 +1011,8 @@ abstract class _QuotationList implements QuotationList {
   User? get user;
   @override
   User? get creator;
+  @override
+  Company? get company;
   @override
   @JsonKey(ignore: true)
   _$$QuotationListImplCopyWith<_$QuotationListImpl> get copyWith =>

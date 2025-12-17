@@ -22,6 +22,8 @@ Company _$CompanyFromJson(Map<String, dynamic> json) {
 mixin _$Company {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: "user_id")
+  int? get userId => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
   String? get industry => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
@@ -45,6 +47,7 @@ abstract class $CompanyCopyWith<$Res> {
   $Res call(
       {int? id,
       String? name,
+      @JsonKey(name: "user_id") int? userId,
       String? address,
       String? industry,
       String? location,
@@ -71,6 +74,7 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
   $Res call({
     Object? id = freezed,
     Object? name = freezed,
+    Object? userId = freezed,
     Object? address = freezed,
     Object? industry = freezed,
     Object? location = freezed,
@@ -90,6 +94,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -140,6 +148,7 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
   $Res call(
       {int? id,
       String? name,
+      @JsonKey(name: "user_id") int? userId,
       String? address,
       String? industry,
       String? location,
@@ -164,6 +173,7 @@ class __$$CompanyImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? name = freezed,
+    Object? userId = freezed,
     Object? address = freezed,
     Object? industry = freezed,
     Object? location = freezed,
@@ -183,6 +193,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
       freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -229,6 +243,7 @@ class _$CompanyImpl implements _Company {
   _$CompanyImpl(
       this.id,
       this.name,
+      @JsonKey(name: "user_id") this.userId,
       this.address,
       this.industry,
       this.location,
@@ -251,6 +266,9 @@ class _$CompanyImpl implements _Company {
   final int? id;
   @override
   final String? name;
+  @override
+  @JsonKey(name: "user_id")
+  final int? userId;
   @override
   final String? address;
   @override
@@ -311,7 +329,7 @@ class _$CompanyImpl implements _Company {
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp)';
+    return 'Company(id: $id, name: $name, userId: $userId, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp)';
   }
 
   @override
@@ -321,6 +339,7 @@ class _$CompanyImpl implements _Company {
             other is _$CompanyImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.industry, industry) ||
                 other.industry == industry) &&
@@ -340,6 +359,7 @@ class _$CompanyImpl implements _Company {
       runtimeType,
       id,
       name,
+      userId,
       address,
       industry,
       location,
@@ -368,6 +388,7 @@ abstract class _Company implements Company {
   factory _Company(
       final int? id,
       final String? name,
+      @JsonKey(name: "user_id") final int? userId,
       final String? address,
       final String? industry,
       final String? location,
@@ -384,6 +405,9 @@ abstract class _Company implements Company {
   int? get id;
   @override
   String? get name;
+  @override
+  @JsonKey(name: "user_id")
+  int? get userId;
   @override
   String? get address;
   @override

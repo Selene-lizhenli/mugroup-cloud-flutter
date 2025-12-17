@@ -8,6 +8,7 @@ class Company with _$Company {
   factory Company(
     int? id,
     String? name,
+    @JsonKey(name: "user_id") int? userId,
     String? address,
     String? industry,
     String? location,

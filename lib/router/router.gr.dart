@@ -26,10 +26,8 @@ import 'package:cloud/pages/home/home_page.dart' as _i9;
 import 'package:cloud/pages/layout.dart' as _i10;
 import 'package:cloud/pages/login/login_page.dart' as _i11;
 import 'package:cloud/pages/my/my_page.dart' as _i12;
-import 'package:cloud/pages/quote/quote_create_page.dart' as _i13;
+import 'package:cloud/pages/quote/quote_create/quote_create_page.dart' as _i13;
 import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i14;
-import 'package:cloud/pages/quote/quote_detail/tabs/contact.dart' as _i29;
-import 'package:cloud/pages/quote/quote_detail/tabs/info.dart' as _i30;
 import 'package:cloud/pages/quote/quote_page.dart' as _i15;
 import 'package:cloud/pages/scan/scan_page.dart' as _i16;
 import 'package:cloud/pages/selectors/select_user/select_user_page.dart'
@@ -54,6 +52,10 @@ import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_conta
 import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i28;
 import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
     as _i31;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
+    as _i29;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
+    as _i30;
 import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
     as _i32;
 import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i33;
@@ -491,15 +493,20 @@ class QuoteCreateRoute extends _i38.PageRouteInfo<void> {
 class QuoteDetailRoute extends _i38.PageRouteInfo<QuoteDetailRouteArgs> {
   QuoteDetailRoute({
     _i41.Key? key,
+    required int userId,
     required int id,
     List<_i38.PageRouteInfo>? children,
   }) : super(
           QuoteDetailRoute.name,
           args: QuoteDetailRouteArgs(
             key: key,
+            userId: userId,
             id: id,
           ),
-          rawPathParams: {'id': id},
+          rawPathParams: {
+            'userId': userId,
+            'id': id,
+          },
           initialChildren: children,
         );
 
@@ -510,9 +517,13 @@ class QuoteDetailRoute extends _i38.PageRouteInfo<QuoteDetailRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<QuoteDetailRouteArgs>(
-          orElse: () => QuoteDetailRouteArgs(id: pathParams.getInt('id')));
+          orElse: () => QuoteDetailRouteArgs(
+                userId: pathParams.getInt('userId'),
+                id: pathParams.getInt('id'),
+              ));
       return _i14.QuoteDetailPage(
         key: args.key,
+        userId: args.userId,
         id: args.id,
       );
     },
@@ -522,16 +533,19 @@ class QuoteDetailRoute extends _i38.PageRouteInfo<QuoteDetailRouteArgs> {
 class QuoteDetailRouteArgs {
   const QuoteDetailRouteArgs({
     this.key,
+    required this.userId,
     required this.id,
   });
 
   final _i41.Key? key;
 
+  final int userId;
+
   final int id;
 
   @override
   String toString() {
-    return 'QuoteDetailRouteArgs{key: $key, id: $id}';
+    return 'QuoteDetailRouteArgs{key: $key, userId: $userId, id: $id}';
   }
 }
 

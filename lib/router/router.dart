@@ -10,7 +10,6 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes {
     return [
-      // RedirectRoute(path: '/', redirectTo: '/supply/supplier/edit/62364'),
       AutoRoute(
         page: Layout.page,
         initial: true,
@@ -59,6 +58,7 @@ class AppRouter extends RootStackRouter {
           page: SupplySupplierCreateRoute.page,
           path: "/supply/supplier/create"),
       AutoRoute(page: QuoteCreateRoute.page, path: "/quote/create"),
+      AutoRoute(page: QuoteDetailRoute.page, path: "/quote/detail/:id/:userId"),
       AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
       AutoRoute(
