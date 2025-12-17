@@ -18,6 +18,7 @@ class TranslatableInput extends HookConsumerWidget {
   final String fromLanguage;
   final String toLanguage;
   final String? sourceText;
+  final ValueChanged<String>? onTranslateChanged;
 
   const TranslatableInput({
     super.key,
@@ -31,6 +32,7 @@ class TranslatableInput extends HookConsumerWidget {
     this.fromLanguage = 'zh',
     this.toLanguage = 'en',
     this.sourceText,
+    this.onTranslateChanged,
   });
 
   @override
@@ -73,7 +75,7 @@ class TranslatableInput extends HookConsumerWidget {
           'text': sourceText,
         });
 
-        onChanged?.call(result);
+        onTranslateChanged?.call(result);
       } finally {
         loading.value = false;
       }

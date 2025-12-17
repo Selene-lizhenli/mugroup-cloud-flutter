@@ -179,10 +179,16 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         FormBuilderField<String>(
                           name: "name_cn",
                           builder: (field) {
-                            return Input(
+                            return TranslatableInput(
                               label: '中文名称',
+                              sourceText: formKey
+                                  .currentState?.fields['name_cn']?.value,
                               value: field.value ?? '',
                               onChanged: field.didChange,
+                              onTranslateChanged: (value) {
+                                formKey.currentState?.fields['name_en']
+                                    ?.didChange(value);
+                              },
                             );
                           },
                         ),
@@ -190,10 +196,8 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         FormBuilderField<String>(
                           name: "name_en",
                           builder: (field) {
-                            return TranslatableInput(
+                            return Input(
                               label: '英文名称',
-                              sourceText: formKey
-                                  .currentState?.fields['name_cn']?.value,
                               value: field.value ?? '',
                               onChanged: field.didChange,
                             );
