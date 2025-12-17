@@ -177,7 +177,7 @@ class SupplierCard extends StatelessWidget {
                       ),
                     ),
                   const SizedBox(height: 4),
-                  if (supplier.businessScope != null)
+                  if (supplier.shippingAmount != null)
                     Row(
                       children: [
                         Icon(Icons.receipt,
