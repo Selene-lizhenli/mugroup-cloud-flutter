@@ -52,6 +52,7 @@ class SupplySupplierContactEditPage extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: FormBuilder(
             key: formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             initialValue: supplierContact.value!.toJson(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -41,8 +41,8 @@ class ImageUploader extends HookConsumerWidget {
         ? 999
         : maxCount! - currentImages.length;
 
-    // 判断当前是否有错误信息
-    final bool hasError = errorText != null && errorText!.isNotEmpty;
+    final bool hasError =
+        (errorText?.isNotEmpty ?? false) && currentImages.isEmpty;
 
     Future<void> processAndUploadEntities(List<AssetEntity> entities) async {
       final List<TemporaryMedia> uploadedMedias = [];
