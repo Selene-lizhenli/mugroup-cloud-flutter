@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,6 +17,7 @@ class SupplySupplierDetailPage extends HookConsumerWidget {
       const BottomNavigationBarItem(icon: Icon(Icons.people), label: "联系人列表"),
       const BottomNavigationBarItem(icon: Icon(Icons.view_list), label: "产品列表"),
     ];
+    final user = ref.watch(userProvider).user;
 
     return AutoTabsRouter(
       builder: (context, child) {
@@ -28,18 +30,20 @@ class SupplySupplierDetailPage extends HookConsumerWidget {
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.white,
             actions: [
-              TextButton(
-                onPressed: () {
-                  context.router.push(SupplySupplierEditRoute(id: id));
-                },
-                child: Text(
-                  "编辑",
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontSize: 16,
+              if (user?.permissions?.contains('supply.suppliers.update') ??
+                  false)
+                TextButton(
+                  onPressed: () {
+                    context.router.push(SupplySupplierEditRoute(id: id));
+                  },
+                  child: Text(
+                    "编辑",
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(width: 4),
             ],
           ),
