@@ -353,20 +353,16 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                                 final quoteId = item['id'];
 
                                                 if (quoteId != null) {
-                                                  try {
-                                                    EasyLoading.show(
-                                                        status: '删除中...');
-                                                    await deleteSupplyQuote(
-                                                        quoteId);
-                                                    EasyLoading.dismiss();
+                                                  EasyLoading.show(
+                                                      status: '删除中...');
+                                                  await deleteSupplyQuote(
+                                                      quoteId);
+                                                  EasyLoading.dismiss();
 
-                                                    newList.removeAt(index);
-                                                    field.didChange(newList);
-                                                    EasyLoading.showSuccess(
-                                                        '删除成功');
-                                                  } finally {
-                                                    EasyLoading.dismiss();
-                                                  }
+                                                  newList.removeAt(index);
+                                                  field.didChange(newList);
+                                                  EasyLoading.showSuccess(
+                                                      '删除成功');
                                                 } else {
                                                   newList.removeAt(index);
                                                   field.didChange(newList);
