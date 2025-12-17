@@ -32,7 +32,10 @@ class SupplySupplierActivityCreatePage extends HookConsumerWidget {
                 FormBuilderField<List<TemporaryMedia>>(
                   name: "attachments",
                   validator: (value) {
-                    return '必填';
+                    if (value == null || value.isEmpty) {
+                      return '请上传附件';
+                    }
+                    return null;
                   },
                   builder: (field) {
                     return ImageUploader(

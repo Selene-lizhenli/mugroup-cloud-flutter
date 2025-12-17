@@ -33,7 +33,10 @@ class SupplySupplierCertCreatePage extends HookConsumerWidget {
                 FormBuilderField<List<TemporaryMedia>>(
                   name: "media",
                   validator: (value) {
-                    return '必填';
+                    if (value == null || value.isEmpty) {
+                      return '请上传证书文件';
+                    }
+                    return null;
                   },
                   builder: (field) {
                     return ImageUploader(
