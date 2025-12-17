@@ -74,7 +74,7 @@ class ProductCard extends StatelessWidget {
                           TextSpan(
                             text: sample.name,
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.black,
                             ),
@@ -334,7 +334,7 @@ class ProductCard extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                fontSize: 8,
+                fontSize: 9,
                 color: Colors.white,
               ),
             ),
