@@ -622,8 +622,15 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           builder: (field) {
                             return TextArea(
                               label: '中文描述',
+                              showTranslate: true,
+                              sourceText: formKey.currentState
+                                  ?.fields['description_cn']?.value,
                               value: field.value,
                               onChanged: field.didChange,
+                              onTranslateChanged: (value) {
+                                formKey.currentState?.fields['description_en']
+                                    ?.didChange(value);
+                              },
                             );
                           },
                         ),
@@ -633,9 +640,6 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           builder: (field) {
                             return TextArea(
                               label: '英文描述',
-                              showTranslate: true,
-                              sourceText: formKey.currentState
-                                  ?.fields['description_cn']?.value,
                               value: field.value,
                               onChanged: field.didChange,
                             );

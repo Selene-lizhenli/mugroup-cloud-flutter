@@ -16,6 +16,7 @@ class TextArea extends HookConsumerWidget {
   final String? sourceText;
   final String fromLanguage;
   final String toLanguage;
+  final ValueChanged<String>? onTranslateChanged;
 
   const TextArea({
     super.key,
@@ -28,6 +29,7 @@ class TextArea extends HookConsumerWidget {
     this.sourceText,
     this.fromLanguage = 'zh',
     this.toLanguage = 'en',
+    this.onTranslateChanged,
   });
 
   @override
@@ -79,7 +81,7 @@ class TextArea extends HookConsumerWidget {
           'text': sourceText!,
         });
 
-        onChanged?.call(res);
+        onTranslateChanged?.call(res);
       } finally {
         loading.value = false;
       }
@@ -116,11 +118,8 @@ class TextArea extends HookConsumerWidget {
                 filled: true,
                 fillColor:
                     focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
-                contentPadding: EdgeInsets.only(
-                    left: 16,
-                    top: 14,
-                    right: 16,
-                    bottom: showTranslate ? 40 : 14),
+                contentPadding: const EdgeInsets.only(
+                    left: 16, top: 14, right: 16, bottom: 14),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
