@@ -151,12 +151,15 @@ class SupplierCertSelect extends HookConsumerWidget {
           controller: controller,
           readOnly: true,
           onTap: showSelectSheet,
+          style:
+              const TextStyle(fontSize: 14, color: Colors.black87, height: 1),
           decoration: InputDecoration(
+            isDense: true,
             hintText: hintText ?? "请选择$label",
             filled: true,
             fillColor: const Color(0xFFF7F8FA),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Colors.grey.shade300)),
@@ -164,8 +167,17 @@ class SupplierCertSelect extends HookConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                     color: Theme.of(context).colorScheme.primary, width: 1.5)),
-            suffixIcon: Icon(Icons.keyboard_arrow_down_rounded,
-                color: Colors.grey.shade600),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
           ),
         ),
       ],

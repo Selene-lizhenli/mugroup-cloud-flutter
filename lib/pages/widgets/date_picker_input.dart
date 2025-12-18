@@ -115,9 +115,11 @@ class DatePickerInput extends HookWidget {
               controller: controller,
               focusNode: focusNode,
               decoration: InputDecoration(
+                isDense: true,
                 filled: true,
-                fillColor:
-                    value != null ? Colors.white : const Color(0xFFF7F8FA),
+                fillColor: const Color(0xFFF7F8FA),
+                hintText: "请输入$label",
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
@@ -142,7 +144,8 @@ class DatePickerInput extends HookWidget {
                       )
                     : null,
               ),
-              style: const TextStyle(fontSize: 16, color: Colors.black87),
+              style: const TextStyle(
+                  fontSize: 16, color: Colors.black87, height: 1),
             ),
           ),
         ),

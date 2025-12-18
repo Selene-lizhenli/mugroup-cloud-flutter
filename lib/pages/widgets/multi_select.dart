@@ -148,16 +148,16 @@ class MultiSelect extends HookConsumerWidget {
           onTap: showMultiSelectSheet,
           child: Container(
             width: double.infinity, // 占满父容器
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFFF7F8FA),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: selectedValues.value.isEmpty
                 ? Text(
                     hintText ?? "请选择$label",
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
+                    style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                   )
                 : Wrap(
                     spacing: 6,
