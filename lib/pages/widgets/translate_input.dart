@@ -102,17 +102,19 @@ class TranslatableInput extends HookConsumerWidget {
           textInputAction: textInputAction,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
+          style:
+              const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
           cursorColor: colorScheme.primary,
           enabled: !loading.value,
           decoration: InputDecoration(
+            isDense: true,
             hintText: hintText ?? "请输入$label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
             fillColor:
                 focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -134,6 +136,10 @@ class TranslatableInput extends HookConsumerWidget {
                 controller.clear();
                 onChanged?.call('');
               },
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
             ),
           ),
         ),
@@ -162,13 +168,14 @@ class TranslatableInput extends HookConsumerWidget {
         TextButton(
           onPressed: onTranslate,
           style: TextButton.styleFrom(
-            minimumSize: const Size(0, 36),
+            minimumSize: const Size(0, 12),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
             '翻译',
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
