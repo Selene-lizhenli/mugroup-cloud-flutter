@@ -96,7 +96,7 @@ class MultiInput extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
               color: colorScheme.primary.withOpacity(0.08), // 浅色背景
               borderRadius: BorderRadius.circular(12),
@@ -186,15 +186,16 @@ class _MultiInputItem extends HookConsumerWidget {
       controller: controller,
       focusNode: focusNode,
       onChanged: onChanged,
-      style: const TextStyle(fontSize: 16, color: Colors.black87),
+      style: const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
       cursorColor: colorScheme.primary,
       decoration: InputDecoration(
+        isDense: true,
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
         filled: true,
         fillColor: focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -203,9 +204,15 @@ class _MultiInputItem extends HookConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
         ),
+        suffixIconConstraints: const BoxConstraints(
+          maxHeight: 30,
+          minWidth: 40,
+        ),
         // 这里的清除按钮只清除文本，不删除行
         suffixIcon: controller.text.isNotEmpty && focusNode.hasFocus
             ? IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
                 icon: const Icon(Icons.cancel, color: Colors.grey, size: 20),
                 onPressed: () {
                   controller.clear();

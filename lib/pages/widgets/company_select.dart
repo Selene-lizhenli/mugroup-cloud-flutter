@@ -61,13 +61,16 @@ class CompanySelect extends HookConsumerWidget {
         TextField(
           controller: controller,
           readOnly: true,
+          style:
+              const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
           decoration: InputDecoration(
+            isDense: true,
             hintText: "请输入$label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
             fillColor: const Color(0xFFF7F8FA),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red, width: 1),
@@ -85,8 +88,14 @@ class CompanySelect extends HookConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
             ),
+            suffixIconConstraints: const BoxConstraints(
+              maxHeight: 30,
+              minWidth: 40,
+            ),
             suffixIcon: controller.text.isNotEmpty
                 ? IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                     icon:
                         const Icon(Icons.cancel, color: Colors.grey, size: 20),
                     onPressed: () {
