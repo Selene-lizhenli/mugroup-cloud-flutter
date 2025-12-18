@@ -73,9 +73,13 @@ class Input extends HookConsumerWidget {
           textInputAction: textInputAction,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
+          style:
+              const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
           cursorColor: colorScheme.primary,
           decoration: InputDecoration(
+            isDense: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             hintText: hintText ?? "请输入$label",
             errorText: errorText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
@@ -83,8 +87,6 @@ class Input extends HookConsumerWidget {
             // 未选中时是极淡的灰色背景，选中时变白
             fillColor:
                 focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
 
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -104,9 +106,15 @@ class Input extends HookConsumerWidget {
               borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
             ),
 
-            // 清除按钮 (使用 suffixIcon 更加标准)
+            suffixIconConstraints: const BoxConstraints(
+              maxHeight: 30,
+              minWidth: 40,
+            ),
+
             suffixIcon: controller.text.isNotEmpty && focusNode.hasFocus
                 ? IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                     icon:
                         const Icon(Icons.cancel, color: Colors.grey, size: 20),
                     onPressed: () {
