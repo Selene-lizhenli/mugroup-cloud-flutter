@@ -9,6 +9,7 @@ import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
+import 'package:cloud/pages/widgets/spacing_row.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
@@ -196,7 +197,8 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         ),
                       ),
                       children: [
-                        Row(
+                        SpacingRow(
+                          spacing: 12,
                           children: [
                             if (isVisible('product_no'))
                               Expanded(
@@ -529,7 +531,8 @@ class ShowroomSampleForm extends HookConsumerWidget {
                     BuildFormCard(
                       title: '产品规格',
                       children: [
-                        Row(
+                        SpacingRow(
+                          spacing: 12,
                           children: [
                             if (isVisible('unit'))
                               Expanded(
