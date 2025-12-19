@@ -38,7 +38,6 @@ class TranslatableInput extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController(text: value);
-    final focusNode = useFocusNode();
 
     final loading = useState(false);
 
@@ -97,7 +96,6 @@ class TranslatableInput extends HookConsumerWidget {
         ],
         TextField(
           controller: controller,
-          focusNode: focusNode,
           onChanged: onChanged,
           textInputAction: textInputAction,
           keyboardType: keyboardType,
@@ -111,8 +109,7 @@ class TranslatableInput extends HookConsumerWidget {
             hintText: hintText ?? "请输入$label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
-            fillColor:
-                focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
+            fillColor: Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             enabledBorder: OutlineInputBorder(

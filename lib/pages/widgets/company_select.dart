@@ -68,7 +68,7 @@ class CompanySelect extends HookConsumerWidget {
             hintText: "请输入$label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
-            fillColor: const Color(0xFFF7F8FA),
+            fillColor: Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             errorBorder: OutlineInputBorder(

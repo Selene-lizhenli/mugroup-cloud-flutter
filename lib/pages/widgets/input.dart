@@ -30,7 +30,7 @@ class Input extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController(text: value);
-    final focusNode = useFocusNode();
+
     // 监听 controller 变化以刷新 UI (主要用于控制清除按钮的显示)
     useListenable(controller);
 
@@ -68,7 +68,6 @@ class Input extends HookConsumerWidget {
         // 2. 输入框实体
         TextField(
           controller: controller,
-          focusNode: focusNode,
           onChanged: onChanged,
           textInputAction: textInputAction,
           keyboardType: keyboardType,
@@ -84,10 +83,7 @@ class Input extends HookConsumerWidget {
             errorText: errorText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
-            // 未选中时是极淡的灰色背景，选中时变白
-            fillColor:
-                focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
-
+            fillColor: Colors.white,
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red, width: 1),
@@ -105,13 +101,11 @@ class Input extends HookConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
             ),
-
             suffixIconConstraints: const BoxConstraints(
               maxHeight: 30,
               minWidth: 40,
             ),
-
-            suffixIcon: controller.text.isNotEmpty && focusNode.hasFocus
+            suffixIcon: controller.text.isNotEmpty
                 ? IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

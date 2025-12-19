@@ -228,7 +228,7 @@ class CategorySelectPopup extends HookWidget {
           hintText: "搜索分类",
           prefixIcon: const Icon(Icons.search),
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor: Colors.white,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           border: OutlineInputBorder(

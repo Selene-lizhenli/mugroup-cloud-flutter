@@ -27,7 +27,6 @@ class DatePickerInput extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: value ?? '');
-    final focusNode = useFocusNode();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,11 +112,10 @@ class DatePickerInput extends HookWidget {
           child: AbsorbPointer(
             child: TextField(
               controller: controller,
-              focusNode: focusNode,
               decoration: InputDecoration(
                 isDense: true,
                 filled: true,
-                fillColor: const Color(0xFFF7F8FA),
+                fillColor: Colors.white,
                 hintText: "请输入$label",
                 hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                 border: OutlineInputBorder(
@@ -133,7 +131,7 @@ class DatePickerInput extends HookWidget {
                   borderSide: BorderSide(
                       color: Theme.of(context).colorScheme.primary, width: 1.5),
                 ),
-                suffixIcon: value != null && focusNode.hasFocus
+                suffixIcon: value != null
                     ? IconButton(
                         icon: const Icon(Icons.cancel,
                             size: 20, color: Colors.grey),

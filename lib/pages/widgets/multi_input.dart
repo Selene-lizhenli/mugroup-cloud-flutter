@@ -164,9 +164,8 @@ class _MultiInputItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController(text: value);
-    final focusNode = useFocusNode();
+
     useListenable(controller);
-    useListenable(focusNode);
 
     // 同步父组件的值变化
     useEffect(() {
@@ -184,7 +183,6 @@ class _MultiInputItem extends HookConsumerWidget {
 
     return TextField(
       controller: controller,
-      focusNode: focusNode,
       onChanged: onChanged,
       style: const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
       cursorColor: colorScheme.primary,
@@ -193,7 +191,7 @@ class _MultiInputItem extends HookConsumerWidget {
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
         filled: true,
-        fillColor: focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
+        fillColor: Colors.white,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         enabledBorder: OutlineInputBorder(
@@ -209,7 +207,7 @@ class _MultiInputItem extends HookConsumerWidget {
           minWidth: 40,
         ),
         // 这里的清除按钮只清除文本，不删除行
-        suffixIcon: controller.text.isNotEmpty && focusNode.hasFocus
+        suffixIcon: controller.text.isNotEmpty
             ? IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

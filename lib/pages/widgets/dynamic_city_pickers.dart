@@ -23,7 +23,6 @@ class DynamicCityPickers extends HookConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final controller = useTextEditingController(text: value);
-    final focusNode = useFocusNode();
 
     useEffect(() {
       controller.text = value;
@@ -55,7 +54,6 @@ class DynamicCityPickers extends HookConsumerWidget {
 
             onChanged?.call(result);
           },
-          focusNode: focusNode,
           style:
               const TextStyle(fontSize: 16, color: Colors.black87, height: 1),
           cursorColor: colorScheme.primary,
@@ -64,22 +62,17 @@ class DynamicCityPickers extends HookConsumerWidget {
             hintText: "请输入$label",
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
-            // 未选中时是极淡的灰色背景，选中时变白
-            fillColor: colorScheme.surfaceContainer, // 浅灰背景，和 Input 保持一致
+            fillColor: Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            // 边框设置
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12), // 更圆润的圆角
-              borderSide:
-                  BorderSide(color: Colors.grey.shade300), // 平时无边框(配合背景色)
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
             ),
-
-            // 清除按钮 (使用 suffixIcon 更加标准)
           ),
         ),
       ],

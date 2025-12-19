@@ -157,7 +157,7 @@ class SupplierCertSelect extends HookConsumerWidget {
             isDense: true,
             hintText: hintText ?? "请选择$label",
             filled: true,
-            fillColor: const Color(0xFFF7F8FA),
+            fillColor: Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             enabledBorder: OutlineInputBorder(

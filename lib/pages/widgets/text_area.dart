@@ -34,9 +34,6 @@ class TextArea extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final focusNode = useFocusNode();
-    useListenable(focusNode);
-
     final loading = useState(false);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -107,7 +104,6 @@ class TextArea extends HookConsumerWidget {
               controller: controller,
               maxLines: maxLines,
               keyboardType: TextInputType.multiline,
-              focusNode: focusNode,
               onChanged: onChanged,
               enabled: !loading.value,
               style: const TextStyle(fontSize: 16, color: Colors.black87),
@@ -116,8 +112,7 @@ class TextArea extends HookConsumerWidget {
                 hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                 alignLabelWithHint: true,
                 filled: true,
-                fillColor:
-                    focusNode.hasFocus ? Colors.white : const Color(0xFFF7F8FA),
+                fillColor: Colors.white,
                 contentPadding: const EdgeInsets.only(
                     left: 16, top: 14, right: 16, bottom: 14),
                 enabledBorder: OutlineInputBorder(

@@ -112,7 +112,7 @@ class SupplierSelect extends HookConsumerWidget {
                 contentPadding: const EdgeInsets.symmetric(vertical: 8),
                 isDense: true,
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
