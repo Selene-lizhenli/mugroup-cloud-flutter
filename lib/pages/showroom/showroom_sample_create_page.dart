@@ -33,20 +33,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       ),
       body: ShowroomSampleForm(
         initial: null,
-        onSave: (data) async {
-          EasyLoading.show(status: '创建中...');
-          await storeShowroomSample({...data, 'item_type': itemType});
-          EasyLoading.showSuccess(
-            '创建成功',
-            duration: const Duration(seconds: 1),
-          );
-          return true;
-        },
         onSubmit: (data) async {
           EasyLoading.show(status: '创建中...');
 
-          final sample =
-              await storeShowroomSample({...data, 'item_type': itemType});
+          await storeShowroomSample({...data, 'item_type': itemType});
 
           EasyLoading.dismiss();
 
@@ -56,17 +46,13 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
             context,
             title: '创建成功',
             content: '样品已成功创建，您希望接下来做什么？',
-            cancelText: '返回上一页',
-            confirmText: '查看详情',
+            cancelText: '完成并返回',
+            confirmText: '继续创建',
             confirmColor: Colors.blue,
           );
 
           if (isViewDetail) {
-            if (context.mounted) {
-              if (sample != null && sample.id != null) {
-                context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
-              }
-            }
+            return true;
           } else {
             if (context.mounted) {
               Navigator.of(context).pop();
