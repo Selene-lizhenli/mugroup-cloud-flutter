@@ -1,14 +1,19 @@
+import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
+import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +39,25 @@ class ShowroomSampleForm extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+
+    final configParams = useMemoized(() => FieldConfigParams(
+          storageKey: 'sample_form_v1',
+          defaultFields: sampleDefaultFields,
+        ));
+
+    final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
+
+    final notifier = ref.read(fieldConfigProvider(configParams).notifier);
+
+    bool isVisible(String name) {
+      // 在配置列表里找这个 name，找不到默认返回 true (容错)
+      return fieldConfigs
+          .firstWhere((e) => e.name == name,
+              orElse: () => FieldConfig(label: '', name: name, isVisible: true))
+          .isVisible;
+    }
+
+    logger.d(isVisible('image'));
 
     final Map<String, dynamic> initialValues =
         Map<String, dynamic>.from(initial?.toJson() ?? {});
@@ -144,6 +168,38 @@ class ShowroomSampleForm extends HookConsumerWidget {
                     ),
                     BuildFormCard(
                       title: '基本信息',
+                      action: GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // 重要：允许弹窗自定义高度
+                            backgroundColor: Colors.transparent, // 背景透明，为了显示圆角
+                            builder: (ctx) {
+                              return FieldSelector(
+                                // 1. 传入当前的数据
+                                fields: fieldConfigs,
+
+                                // 2. 监听变化
+                                onConfigChanged:
+                                    (List<FieldConfig> newConfigs) {
+                                  // 调用 Provider 更新数据并保存到本地
+                                  notifier.updateConfigs(newConfigs);
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.settings,
+                                size: 16, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Text("设置",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
                       children: [
                         Row(
                           children: [
