@@ -5,6 +5,7 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -14,9 +15,19 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final title = useMemoized(() {
+      if (itemType == 'sample') {
+        return '集团产品创建';
+      }
+      if (itemType == 'market_product') {
+        return '市场产品创建';
+      }
+      return '产品创建';
+    }, [itemType]);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('样品创建'),
+        title: Text(title),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
       ),
