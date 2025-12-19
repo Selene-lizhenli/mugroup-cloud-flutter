@@ -1,5 +1,4 @@
 import 'package:cloud/constants/form_definitions.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -50,14 +49,11 @@ class ShowroomSampleForm extends HookConsumerWidget {
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
     bool isVisible(String name) {
-      // 在配置列表里找这个 name，找不到默认返回 true (容错)
       return fieldConfigs
           .firstWhere((e) => e.name == name,
               orElse: () => FieldConfig(label: '', name: name, isVisible: true))
           .isVisible;
     }
-
-    logger.d(isVisible('image'));
 
     final Map<String, dynamic> initialValues =
         Map<String, dynamic>.from(initial?.toJson() ?? {});
@@ -203,62 +199,63 @@ class ShowroomSampleForm extends HookConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "product_no",
-                                builder: (field) {
-                                  return Input(
-                                    label: '产品货号',
-                                    hintText: '自动生成',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                  );
-                                },
+                            if (isVisible('product_no'))
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "product_no",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '产品货号',
+                                      hintText: '自动生成',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "purchase_cost",
-                                builder: (field) {
-                                  return Input(
-                                    label: '价格',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                  );
-                                },
+                            if (isVisible('purchase_cost'))
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "purchase_cost",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '价格',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        FormBuilderField<String>(
-                          name: "name_cn",
-                          builder: (field) {
-                            return TranslatableInput(
-                              label: '中文名称',
-                              sourceText: formKey
-                                  .currentState?.fields['name_cn']?.value,
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
-                              onTranslateChanged: (value) {
-                                formKey.currentState?.fields['name_en']
-                                    ?.didChange(value);
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        FormBuilderField<String>(
-                          name: "name_en",
-                          builder: (field) {
-                            return Input(
-                              label: '英文名称',
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
+                        if (isVisible('name_cn'))
+                          FormBuilderField<String>(
+                            name: "name_cn",
+                            builder: (field) {
+                              return TranslatableInput(
+                                label: '中文名称',
+                                sourceText: formKey
+                                    .currentState?.fields['name_cn']?.value,
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                                onTranslateChanged: (value) {
+                                  formKey.currentState?.fields['name_en']
+                                      ?.didChange(value);
+                                },
+                              );
+                            },
+                          ),
+                        if (isVisible('name_en'))
+                          FormBuilderField<String>(
+                            name: "name_en",
+                            builder: (field) {
+                              return Input(
+                                label: '英文名称',
+                                value: field.value ?? '',
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
                       ],
                     ),
                     FormBuilderField<List<Map<String, dynamic>>>(
@@ -535,168 +532,176 @@ class ShowroomSampleForm extends HookConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "unit",
-                                builder: (field) {
-                                  return Select(
-                                    label: '单位',
-                                    value: field.value,
-                                    options: [
-                                      SelectOption(label: 'PC', value: 'PC'),
-                                      SelectOption(label: 'SET', value: 'SET'),
-                                      SelectOption(label: 'CTN', value: 'CTN'),
-                                      SelectOption(label: 'KG', value: 'KG'),
-                                      SelectOption(label: 'T', value: 'T'),
-                                      SelectOption(label: 'CBM', value: 'CBM'),
-                                      SelectOption(label: 'M', value: 'M'),
-                                      SelectOption(label: 'L', value: 'L'),
-                                      SelectOption(label: 'BAG', value: 'BAG'),
-                                      SelectOption(
-                                          label: 'PACK', value: 'PACK'),
-                                      SelectOption(
-                                          label: 'CASE', value: 'CASE'),
-                                      SelectOption(
-                                          label: 'PAIR', value: 'PAIR'),
-                                      SelectOption(label: 'BOX', value: 'BOX'),
-                                      SelectOption(label: 'SQM', value: 'SQM'),
-                                      SelectOption(label: 'G', value: 'G'),
-                                      SelectOption(
-                                          label: 'Pieces', value: 'Pieces'),
-                                      SelectOption(
-                                          label: 'Pair', value: 'Pair'),
-                                    ],
-                                    onChanged: field.didChange,
-                                  );
-                                },
+                            if (isVisible('unit'))
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "unit",
+                                  builder: (field) {
+                                    return Select(
+                                      label: '单位',
+                                      value: field.value,
+                                      options: [
+                                        SelectOption(label: 'PC', value: 'PC'),
+                                        SelectOption(
+                                            label: 'SET', value: 'SET'),
+                                        SelectOption(
+                                            label: 'CTN', value: 'CTN'),
+                                        SelectOption(label: 'KG', value: 'KG'),
+                                        SelectOption(label: 'T', value: 'T'),
+                                        SelectOption(
+                                            label: 'CBM', value: 'CBM'),
+                                        SelectOption(label: 'M', value: 'M'),
+                                        SelectOption(label: 'L', value: 'L'),
+                                        SelectOption(
+                                            label: 'BAG', value: 'BAG'),
+                                        SelectOption(
+                                            label: 'PACK', value: 'PACK'),
+                                        SelectOption(
+                                            label: 'CASE', value: 'CASE'),
+                                        SelectOption(
+                                            label: 'PAIR', value: 'PAIR'),
+                                        SelectOption(
+                                            label: 'BOX', value: 'BOX'),
+                                        SelectOption(
+                                            label: 'SQM', value: 'SQM'),
+                                        SelectOption(label: 'G', value: 'G'),
+                                        SelectOption(
+                                            label: 'Pieces', value: 'Pieces'),
+                                        SelectOption(
+                                            label: 'Pair', value: 'Pair'),
+                                      ],
+                                      onChanged: field.didChange,
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "packing",
-                                builder: (field) {
-                                  return Input(
-                                    label: '包装方式',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                  );
-                                },
+                            if (isVisible('packing'))
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "packing",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '包装方式',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "series",
-                                builder: (field) {
-                                  return Input(
-                                    label: '系列',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                  );
-                                },
+                            if (isVisible('series'))
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "series",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '系列',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "length",
-                                builder: (field) {
-                                  return Input(
-                                    label: '长',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d*')),
-                                    ],
-                                  );
-                                },
+                        if (isVisible('spec'))
+                          Row(
+                            children: [
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "length",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '长',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d+\.?\d*')),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "width",
-                                builder: (field) {
-                                  return Input(
-                                    label: '宽',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d*')),
-                                    ],
-                                  );
-                                },
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "width",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '宽',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d+\.?\d*')),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "heigth",
-                                builder: (field) {
-                                  return Input(
-                                    label: '高',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d*')),
-                                    ],
-                                  );
-                                },
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: "heigth",
+                                  builder: (field) {
+                                    return Input(
+                                      label: '高',
+                                      value: field.value ?? '',
+                                      onChanged: field.didChange,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d+\.?\d*')),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                     BuildFormCard(
                       title: '描述',
                       isLast: true,
                       children: [
-                        FormBuilderField<String>(
-                          name: "description_cn",
-                          builder: (field) {
-                            return TextArea(
-                              label: '中文描述',
-                              showTranslate: true,
-                              sourceText: formKey.currentState
-                                  ?.fields['description_cn']?.value,
-                              value: field.value,
-                              onChanged: field.didChange,
-                              onTranslateChanged: (value) {
-                                formKey.currentState?.fields['description_en']
-                                    ?.didChange(value);
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        FormBuilderField<String>(
-                          name: "description_en",
-                          builder: (field) {
-                            return TextArea(
-                              label: '英文描述',
-                              value: field.value,
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
+                        if (isVisible('description_cn'))
+                          FormBuilderField<String>(
+                            name: "description_cn",
+                            builder: (field) {
+                              return TextArea(
+                                label: '中文描述',
+                                showTranslate: true,
+                                sourceText: formKey.currentState
+                                    ?.fields['description_cn']?.value,
+                                value: field.value,
+                                onChanged: field.didChange,
+                                onTranslateChanged: (value) {
+                                  formKey.currentState?.fields['description_en']
+                                      ?.didChange(value);
+                                },
+                              );
+                            },
+                          ),
+                        if (isVisible('description_en'))
+                          FormBuilderField<String>(
+                            name: "description_en",
+                            builder: (field) {
+                              return TextArea(
+                                label: '英文描述',
+                                value: field.value,
+                                onChanged: field.didChange,
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ],

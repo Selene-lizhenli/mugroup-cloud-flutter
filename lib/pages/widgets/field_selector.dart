@@ -34,10 +34,6 @@ class _FieldSelectorState extends State<FieldSelector> {
       // 使用 copyWith 生成新对象
       _localFields[index] = oldItem.copyWith(isVisible: value);
     });
-
-    // 2. 通知父组件（用于保存到硬盘和更新主页面）
-    // 你可以选择在这里实时通知，也可以在“完成”按钮里一次性通知
-    widget.onConfigChanged(_localFields);
   }
 
   @override
@@ -63,7 +59,10 @@ class _FieldSelectorState extends State<FieldSelector> {
                 ),
                 // 关闭按钮
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onConfigChanged(_localFields);
+                  },
                   child: const Text('完成', style: TextStyle(fontSize: 16)),
                 ),
               ],
