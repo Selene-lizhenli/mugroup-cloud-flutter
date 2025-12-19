@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_sample_form.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -25,43 +24,69 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       return '产品创建';
     }, [itemType]);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: ShowroomSampleForm(
-        initial: null,
-        onSubmit: (data) async {
-          EasyLoading.show(status: '创建中...');
+    Future<void> handleBack() async {
+      final isConfirmed = await ConfirmDialog.show(
+        context,
+        title: '确认退出',
+        content: '确定要退出吗？未保存的内容将会丢失。',
+        confirmText: '确定退出',
+        cancelText: '取消',
+        confirmColor: Colors.red,
+      );
 
-          await storeShowroomSample({...data, 'item_type': itemType});
+      if (isConfirmed && context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
 
-          EasyLoading.dismiss();
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) return;
 
-          if (!context.mounted) return false;
-
-          final isViewDetail = await ConfirmDialog.show(
-            context,
-            title: '创建成功',
-            content: '样品已成功创建，您希望接下来做什么？',
-            cancelText: '完成并返回',
-            confirmText: '继续创建',
-            confirmColor: Colors.blue,
-          );
-
-          if (isViewDetail) {
-            return true;
-          } else {
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-          }
-
-          return true;
+          await handleBack();
         },
-      ),
-    );
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: handleBack,
+            ),
+          ),
+          body: ShowroomSampleForm(
+            initial: null,
+            onSubmit: (data) async {
+              EasyLoading.show(status: '创建中...');
+
+              await storeShowroomSample({...data, 'item_type': itemType});
+
+              EasyLoading.dismiss();
+
+              if (!context.mounted) return false;
+
+              final isConfirmed = await ConfirmDialog.show(
+                context,
+                title: '创建成功',
+                content: '样品已成功创建，您希望接下来做什么？',
+                cancelText: '完成并返回',
+                confirmText: '继续创建',
+                confirmColor: Colors.blue,
+              );
+
+              if (isConfirmed) {
+                return true;
+              } else {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              }
+
+              return true;
+            },
+          ),
+        ));
   }
 }
