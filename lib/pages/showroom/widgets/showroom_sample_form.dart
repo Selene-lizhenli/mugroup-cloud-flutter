@@ -168,17 +168,14 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
-                            isScrollControlled: true, // 重要：允许弹窗自定义高度
-                            backgroundColor: Colors.transparent, // 背景透明，为了显示圆角
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
                             builder: (ctx) {
                               return FieldSelector(
-                                // 1. 传入当前的数据
                                 fields: fieldConfigs,
-
-                                // 2. 监听变化
+                                defaultFields: sampleDefaultFields,
                                 onConfigChanged:
                                     (List<FieldConfig> newConfigs) {
-                                  // 调用 Provider 更新数据并保存到本地
                                   notifier.updateConfigs(newConfigs);
                                 },
                               );
@@ -188,11 +185,13 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         child: Row(
                           children: [
                             Icon(Icons.settings,
-                                size: 16, color: Colors.grey[600]),
+                                size: 16,
+                                color: Theme.of(context).primaryColor),
                             const SizedBox(width: 4),
-                            Text("设置",
+                            Text("字段设置",
                                 style: TextStyle(
-                                    fontSize: 14, color: Colors.grey[600])),
+                                    fontSize: 14,
+                                    color: Theme.of(context).primaryColor)),
                           ],
                         ),
                       ),
