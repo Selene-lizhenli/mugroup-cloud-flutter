@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,45 +18,52 @@ class MarketProductInfoPage extends HookConsumerWidget {
         foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _MenuCard(
-              color: Color(0xFF3B82F6),
+            _MenuCard(
+              color: const Color(0xFF3B82F6),
               icon: Icons.person_add_alt_1_outlined,
               title: '客户资料管理',
               subtitle: '管理客户信息、联系人和业务往来',
+              onTap: () {
+                context.router.push(const CrmCompanyRoute());
+              },
             ),
             const SizedBox(height: 12),
-            const _MenuCard(
-              color: Color(0xFF10B981),
+            _MenuCard(
+              color: const Color(0xFF10B981),
               icon: Icons.storefront_outlined,
               title: '供应商资料管理',
               subtitle: '管理供应商信息、档口和产品报价',
+              onTap: () {},
             ),
             const SizedBox(height: 12),
-            const _MenuCard(
-              color: Color(0xFFF97316),
+            _MenuCard(
+              color: const Color(0xFFF97316),
               icon: Icons.search,
               title: '产品管理',
               subtitle: '管理产品信息、库存和价格',
+              onTap: () {},
             ),
             const SizedBox(height: 12),
-            const _MenuCard(
-              color: Color(0xFFEF4444),
+            _MenuCard(
+              color: const Color(0xFFEF4444),
               icon: Icons.assignment_outlined,
               title: '报价单管理',
               subtitle: '创建和管理客户报价单',
+              onTap: () {},
             ),
             const SizedBox(height: 12),
-            const _MenuCard(
-              color: Color(0xFF8B5CF6),
+            _MenuCard(
+              color: const Color(0xFF8B5CF6),
               icon: Icons.check_circle_outline,
               title: '验货任务',
               subtitle: '创建和管理验货任务，上传验货图片',
+              onTap: () {},
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -67,53 +75,66 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     color: Colors.black87,
                   ),
                 ),
-                Icon(Icons.more_horiz, color: Colors.grey[400]),
+                IconButton(
+                  icon: Icon(Icons.more_horiz, color: Colors.grey[400]),
+                  onPressed: () {},
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            const Row(
+            const SizedBox(height: 4),
+            Row(
               children: [
                 Expanded(
                   child: _ActionCard(
                     icon: Icons.person_add_alt_1,
-                    iconColor: Color(0xFF3B82F6),
-                    iconBgColor: Color(0xFFEFF6FF),
+                    iconColor: const Color(0xFF3B82F6),
+                    iconBgColor: const Color(0xFFEFF6FF),
                     enTitle: 'Customers',
                     cnTitle: '新增客户',
+                    onTap: () {
+                      context.router.push(const CrmCompanyCreateRoute());
+                    },
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ActionCard(
                     icon: Icons.storefront,
-                    iconColor: Color(0xFF10B981),
-                    iconBgColor: Color(0xFFECFDF5),
+                    iconColor: const Color(0xFF10B981),
+                    iconBgColor: const Color(0xFFECFDF5),
                     enTitle: 'Suppliers',
                     cnTitle: '新增供应商',
+                    onTap: () {
+                      context.router.push(const SupplySupplierCreateRoute());
+                    },
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            const Row(
+            Row(
               children: [
                 Expanded(
                   child: _ActionCard(
                     icon: Icons.shopping_cart_outlined,
-                    iconColor: Color(0xFFF97316),
-                    iconBgColor: Color(0xFFFFF7ED),
+                    iconColor: const Color(0xFFF97316),
+                    iconBgColor: const Color(0xFFFFF7ED),
                     enTitle: 'Products',
                     cnTitle: '新增产品',
+                    onTap: () {
+                      context.router.push(ShowroomSampleCreateRoute());
+                    },
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ActionCard(
                     icon: Icons.assignment_turned_in_outlined,
-                    iconColor: Color(0xFFEF4444),
-                    iconBgColor: Color(0xFFFEF2F2),
+                    iconColor: const Color(0xFFEF4444),
+                    iconBgColor: const Color(0xFFFEF2F2),
                     enTitle: 'Quotations',
                     cnTitle: '新增报价',
+                    onTap: () {},
                   ),
                 ),
               ],
@@ -131,20 +152,20 @@ class _MenuCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   const _MenuCard({
     required this.color,
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: color,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -154,47 +175,60 @@ class _MenuCard extends StatelessWidget {
           )
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2), // 半透明白色
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          splashColor: Colors.white.withOpacity(0.2),
+          highlightColor: Colors.white.withOpacity(0.1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 12,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ],
             ),
           ),
-          Icon(
-            Icons.chevron_right,
-            color: Colors.white.withOpacity(0.8),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -206,6 +240,7 @@ class _ActionCard extends StatelessWidget {
   final Color iconBgColor;
   final String enTitle;
   final String cnTitle;
+  final VoidCallback? onTap;
 
   const _ActionCard({
     required this.icon,
@@ -213,12 +248,12 @@ class _ActionCard extends StatelessWidget {
     required this.iconBgColor,
     required this.enTitle,
     required this.cnTitle,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -231,41 +266,50 @@ class _ActionCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // 图标
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconBgColor, // 浅色背景
-              shape: BoxShape.circle,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: iconBgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      enTitle,
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      cnTitle,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            child: Icon(icon, color: iconColor, size: 20),
           ),
-          const SizedBox(width: 12),
-          // 文字
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                enTitle,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                cnTitle,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
