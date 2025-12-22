@@ -96,6 +96,25 @@ class AppRouter extends RootStackRouter {
         ],
       ),
       AutoRoute(
+        page: MarketProductRoute.page,
+        guards: [AuthGuard()],
+        path: '/market_product',
+        children: [
+          AutoRoute(
+            page: MarketProductInfoRoute.page,
+            path: "",
+          ),
+          AutoRoute(
+            page: MarketProductQuotationRoute.page,
+            path: "quotation",
+          ),
+          AutoRoute(
+            page: MarketProductInspectionRoute.page,
+            path: "inspection",
+          ),
+        ],
+      ),
+      AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
       // selectors
