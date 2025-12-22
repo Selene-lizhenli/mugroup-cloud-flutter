@@ -165,36 +165,62 @@ class ShowroomSampleForm extends HookConsumerWidget {
                     ),
                     BuildFormCard(
                       title: '基本信息',
-                      action: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (ctx) {
-                              return FieldSelector(
-                                fields: fieldConfigs,
-                                defaultFields: sampleDefaultFields,
-                                onConfigChanged:
-                                    (List<FieldConfig> newConfigs) {
-                                  notifier.updateConfigs(newConfigs);
+                      action: Row(
+                        children: [
+                          if (initial == null) ...[
+                            GestureDetector(
+                              onTap: () {
+                                // TODO: 在这里添加复制上一条数据的逻辑
+                                print("点击了复制上一条");
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(Icons.content_copy,
+                                      size: 16,
+                                      color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 4),
+                                  Text("复制上一条",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6)
+                          ],
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (ctx) {
+                                  return FieldSelector(
+                                    fields: fieldConfigs,
+                                    defaultFields: sampleDefaultFields,
+                                    onConfigChanged:
+                                        (List<FieldConfig> newConfigs) {
+                                      notifier.updateConfigs(newConfigs);
+                                    },
+                                  );
                                 },
                               );
                             },
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Icon(Icons.settings,
-                                size: 16,
-                                color: Theme.of(context).primaryColor),
-                            const SizedBox(width: 4),
-                            Text("字段设置",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(context).primaryColor)),
-                          ],
-                        ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.settings,
+                                    size: 16,
+                                    color: Theme.of(context).primaryColor),
+                                const SizedBox(width: 4),
+                                Text("字段设置",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Theme.of(context).primaryColor)),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       children: [
                         SpacingRow(
