@@ -10,16 +10,13 @@ class MarketProductPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-      const BottomNavigationBarItem(icon: Icon(Icons.people), label: "报价单"),
-      const BottomNavigationBarItem(icon: Icon(Icons.view_list), label: "验货"),
+      const BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: "报价单"),
+      const BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: "验货"),
     ];
     return AutoTabsRouter(
       builder: (context, child) {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F7FA),
-          appBar: AppBar(
-            title: const Text("市场采购"),
-          ),
           body: child,
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
