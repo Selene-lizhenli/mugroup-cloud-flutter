@@ -135,8 +135,7 @@ class SupplierSelect extends HookConsumerWidget {
                         child: Text("暂无数据",
                             style: TextStyle(
                                 color: Colors.grey[400], fontSize: 13)))
-                    : Expanded(
-                        child: Column(
+                    : Column(
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(4),
@@ -264,7 +263,7 @@ class SupplierSelect extends HookConsumerWidget {
                             },
                           )),
                         ],
-                      )),
+                      ),
           ),
         ],
       ),
