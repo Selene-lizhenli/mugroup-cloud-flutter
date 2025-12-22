@@ -112,7 +112,7 @@ class HomeAppBar extends HookConsumerWidget {
     }
 
     return Container(
-      color: colorScheme.primary,
+      color: colorScheme.secondary,
       child: Column(
         children: [
           Row(
@@ -150,7 +150,7 @@ class HomeAppBar extends HookConsumerWidget {
             decoration: BoxDecoration(
               color: colorScheme.onPrimary,
               border: Border.all(
-                color: colorScheme.primary,
+                color: colorScheme.secondary,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(5),
@@ -201,7 +201,7 @@ class HomeAppBar extends HookConsumerWidget {
                       top: 2, bottom: 2, left: 2, right: 0),
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
+                      backgroundColor: colorScheme.secondary,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       shape: RoundedRectangleBorder(

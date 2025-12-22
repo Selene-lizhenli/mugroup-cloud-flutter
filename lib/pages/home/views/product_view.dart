@@ -201,114 +201,114 @@ class ProductView extends HookConsumerWidget {
                       //     ),
                       //   ),
                       // ),
-                      Card(
-                        color: colorScheme.primary,
-                        elevation: 2, // 去除阴影
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          side: BorderSide.none, // 移除边框线
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          child: Row(
-                            children: [
-                              Container(
-                                  height: 73, // 高度限制
-                                  padding: const EdgeInsets.fromLTRB(
-                                      12, 8, 10, 8), // 所有方向的边距都是6
-                                  decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    bottomLeft: Radius.circular(8),
-                                    // topRight: Radius.circular(8),
-                                  )),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text("快",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            height: 1.2, // 行高倍数，默认大约 1.4
-                                            color: colorScheme.onPrimary,
-                                          )),
-                                      Text("捷",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            height: 1.2,
-                                            color: colorScheme.onPrimary,
-                                          )),
-                                      Text("入",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            height: 1.2,
-                                            color: colorScheme.onPrimary,
-                                          )),
-                                      Text("口",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            height: 1.2,
-                                            color: colorScheme.onPrimary,
-                                          )),
-                                    ],
-                                  )),
-                              Expanded(
-                                child: Container(
-                                  height: 72, // 高度限制
-                                  padding: const EdgeInsets.fromLTRB(
-                                      12, 8, 10, 8), // 所有方向的边距都是6
-                                  decoration: BoxDecoration(
-                                      color: colorScheme.onPrimary,
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(8),
-                                        topRight: Radius.circular(8),
-                                        bottomLeft: Radius.circular(8),
-                                        bottomRight: Radius.circular(8),
-                                      )),
-                                  margin: const EdgeInsets.fromLTRB(0, 0, 1, 0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly, // 平均分配空间
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .stretch, // 关键：让子元素高度填满
-                                    children: [
-                                      BuildQuickAction(
-                                        icon: Icons.add,
-                                        title: "新增产品",
-                                        color: colorScheme.secondary,
-                                        needItemType: true,
-                                        route: (itemType) =>
-                                            ShowroomSampleCreateRoute(
-                                                itemType: itemType),
-                                      ),
-                                      BuildQuickAction(
-                                        icon: Icons.add,
-                                        title: "新增供应商",
-                                        color: colorScheme.error,
-                                        route: (itemType) =>
-                                            const SupplySupplierCreateRoute(),
-                                      ),
-                                      BuildQuickAction(
-                                        icon: Icons.add,
-                                        title: "新增客户",
-                                        color: Colors.orange,
-                                        route: (itemType) =>
-                                            const CrmCompanyCreateRoute(),
-                                      ),
-                                      BuildQuickAction(
-                                        icon: Icons.add,
-                                        title: "新增报价单", // 报价单列表页面
-                                        color: Colors.green,
-                                        route: (itemType) =>
-                                            const QuoteCreateRoute(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
+                      // Card(
+                      //   color: colorScheme.primary,
+                      //   elevation: 2, // 去除阴影
+                      //   shape: const RoundedRectangleBorder(
+                      //     borderRadius: BorderRadius.all(Radius.circular(8)),
+                      //     side: BorderSide.none, // 移除边框线
+                      //   ),
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      //     child: Row(
+                      //       children: [
+                      //         Container(
+                      //             height: 73, // 高度限制
+                      //             padding: const EdgeInsets.fromLTRB(
+                      //                 12, 8, 10, 8), // 所有方向的边距都是6
+                      //             decoration: const BoxDecoration(
+                      //                 borderRadius: BorderRadius.only(
+                      //               topLeft: Radius.circular(8),
+                      //               bottomLeft: Radius.circular(8),
+                      //               // topRight: Radius.circular(8),
+                      //             )),
+                      //             child: Column(
+                      //               mainAxisSize: MainAxisSize.min,
+                      //               children: [
+                      //                 Text("快",
+                      //                     style: TextStyle(
+                      //                       fontSize: 12,
+                      //                       height: 1.2, // 行高倍数，默认大约 1.4
+                      //                       color: colorScheme.onPrimary,
+                      //                     )),
+                      //                 Text("捷",
+                      //                     style: TextStyle(
+                      //                       fontSize: 12,
+                      //                       height: 1.2,
+                      //                       color: colorScheme.onPrimary,
+                      //                     )),
+                      //                 Text("入",
+                      //                     style: TextStyle(
+                      //                       fontSize: 12,
+                      //                       height: 1.2,
+                      //                       color: colorScheme.onPrimary,
+                      //                     )),
+                      //                 Text("口",
+                      //                     style: TextStyle(
+                      //                       fontSize: 12,
+                      //                       height: 1.2,
+                      //                       color: colorScheme.onPrimary,
+                      //                     )),
+                      //               ],
+                      //             )),
+                      //         Expanded(
+                      //           child: Container(
+                      //             height: 72, // 高度限制
+                      //             padding: const EdgeInsets.fromLTRB(
+                      //                 12, 8, 10, 8), // 所有方向的边距都是6
+                      //             decoration: BoxDecoration(
+                      //                 color: colorScheme.onPrimary,
+                      //                 borderRadius: const BorderRadius.only(
+                      //                   topLeft: Radius.circular(8),
+                      //                   topRight: Radius.circular(8),
+                      //                   bottomLeft: Radius.circular(8),
+                      //                   bottomRight: Radius.circular(8),
+                      //                 )),
+                      //             margin: const EdgeInsets.fromLTRB(0, 0, 1, 0),
+                      //             child: Row(
+                      //               mainAxisAlignment:
+                      //                   MainAxisAlignment.spaceEvenly, // 平均分配空间
+                      //               crossAxisAlignment: CrossAxisAlignment
+                      //                   .stretch, // 关键：让子元素高度填满
+                      //               children: [
+                      //                 BuildQuickAction(
+                      //                   icon: Icons.add,
+                      //                   title: "新增产品",
+                      //                   color: colorScheme.secondary,
+                      //                   needItemType: true,
+                      //                   route: (itemType) =>
+                      //                       ShowroomSampleCreateRoute(
+                      //                           itemType: itemType),
+                      //                 ),
+                      //                 BuildQuickAction(
+                      //                   icon: Icons.add,
+                      //                   title: "新增供应商",
+                      //                   color: colorScheme.error,
+                      //                   route: (itemType) =>
+                      //                       const SupplySupplierCreateRoute(),
+                      //                 ),
+                      //                 BuildQuickAction(
+                      //                   icon: Icons.add,
+                      //                   title: "新增客户",
+                      //                   color: Colors.orange,
+                      //                   route: (itemType) =>
+                      //                       const CrmCompanyCreateRoute(),
+                      //                 ),
+                      //                 BuildQuickAction(
+                      //                   icon: Icons.add,
+                      //                   title: "新增报价单", // 报价单列表页面
+                      //                   color: Colors.green,
+                      //                   route: (itemType) =>
+                      //                       const QuoteCreateRoute(),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         )
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

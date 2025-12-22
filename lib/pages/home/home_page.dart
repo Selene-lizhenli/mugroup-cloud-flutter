@@ -25,7 +25,7 @@ class HomePage extends HookConsumerWidget {
 
     return Scaffold(
         body: Container(
-      color: colorScheme.primary,
+      color: colorScheme.secondary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
