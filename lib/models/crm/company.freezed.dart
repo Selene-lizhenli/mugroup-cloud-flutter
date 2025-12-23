@@ -33,6 +33,7 @@ mixin _$Company {
   List<String>? get facebook => throw _privateConstructorUsedError;
   List<String>? get linkedin => throw _privateConstructorUsedError;
   List<String>? get whatsapp => throw _privateConstructorUsedError;
+  List<Contact>? get contacts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -56,7 +57,8 @@ abstract class $CompanyCopyWith<$Res> {
       List<String>? email,
       List<String>? facebook,
       List<String>? linkedin,
-      List<String>? whatsapp});
+      List<String>? whatsapp,
+      List<Contact>? contacts});
 }
 
 /// @nodoc
@@ -84,6 +86,7 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
     Object? facebook = freezed,
     Object? linkedin = freezed,
     Object? whatsapp = freezed,
+    Object? contacts = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -134,6 +137,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
           ? _value.whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      contacts: freezed == contacts
+          ? _value.contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<Contact>?,
     ) as $Val);
   }
 }
@@ -157,7 +164,8 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
       List<String>? email,
       List<String>? facebook,
       List<String>? linkedin,
-      List<String>? whatsapp});
+      List<String>? whatsapp,
+      List<Contact>? contacts});
 }
 
 /// @nodoc
@@ -183,6 +191,7 @@ class __$$CompanyImplCopyWithImpl<$Res>
     Object? facebook = freezed,
     Object? linkedin = freezed,
     Object? whatsapp = freezed,
+    Object? contacts = freezed,
   }) {
     return _then(_$CompanyImpl(
       freezed == id
@@ -233,6 +242,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
           ? _value._whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      freezed == contacts
+          ? _value._contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<Contact>?,
     ));
   }
 }
@@ -252,12 +265,14 @@ class _$CompanyImpl implements _Company {
       final List<String>? email,
       final List<String>? facebook,
       final List<String>? linkedin,
-      final List<String>? whatsapp)
+      final List<String>? whatsapp,
+      final List<Contact>? contacts)
       : _domain = domain,
         _email = email,
         _facebook = facebook,
         _linkedin = linkedin,
-        _whatsapp = whatsapp;
+        _whatsapp = whatsapp,
+        _contacts = contacts;
 
   factory _$CompanyImpl.fromJson(Map<String, dynamic> json) =>
       _$$CompanyImplFromJson(json);
@@ -327,9 +342,19 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<Contact>? _contacts;
+  @override
+  List<Contact>? get contacts {
+    final value = _contacts;
+    if (value == null) return null;
+    if (_contacts is EqualUnmodifiableListView) return _contacts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, userId: $userId, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp)';
+    return 'Company(id: $id, name: $name, userId: $userId, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp, contacts: $contacts)';
   }
 
   @override
@@ -350,7 +375,8 @@ class _$CompanyImpl implements _Company {
             const DeepCollectionEquality().equals(other._email, _email) &&
             const DeepCollectionEquality().equals(other._facebook, _facebook) &&
             const DeepCollectionEquality().equals(other._linkedin, _linkedin) &&
-            const DeepCollectionEquality().equals(other._whatsapp, _whatsapp));
+            const DeepCollectionEquality().equals(other._whatsapp, _whatsapp) &&
+            const DeepCollectionEquality().equals(other._contacts, _contacts));
   }
 
   @JsonKey(ignore: true)
@@ -368,7 +394,8 @@ class _$CompanyImpl implements _Company {
       const DeepCollectionEquality().hash(_email),
       const DeepCollectionEquality().hash(_facebook),
       const DeepCollectionEquality().hash(_linkedin),
-      const DeepCollectionEquality().hash(_whatsapp));
+      const DeepCollectionEquality().hash(_whatsapp),
+      const DeepCollectionEquality().hash(_contacts));
 
   @JsonKey(ignore: true)
   @override
@@ -397,7 +424,8 @@ abstract class _Company implements Company {
       final List<String>? email,
       final List<String>? facebook,
       final List<String>? linkedin,
-      final List<String>? whatsapp) = _$CompanyImpl;
+      final List<String>? whatsapp,
+      final List<Contact>? contacts) = _$CompanyImpl;
 
   factory _Company.fromJson(Map<String, dynamic> json) = _$CompanyImpl.fromJson;
 
@@ -426,6 +454,8 @@ abstract class _Company implements Company {
   List<String>? get linkedin;
   @override
   List<String>? get whatsapp;
+  @override
+  List<Contact>? get contacts;
   @override
   @JsonKey(ignore: true)
   _$$CompanyImplCopyWith<_$CompanyImpl> get copyWith =>

@@ -1,4 +1,5 @@
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/crm/contact.dart';
 import 'package:flutter/material.dart';
 
 class CrmCompanyCard extends StatelessWidget {
@@ -15,25 +16,25 @@ class CrmCompanyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasEmail = company.email != null && company.email!.isNotEmpty;
-    final hasPhone = company.whatsapp != null && company.whatsapp!.isNotEmpty;
-    final hasDomain = company.domain != null && company.domain!.isNotEmpty;
-
-    // 只有当至少有一个联系方式时，才显示底部栏
-    final hasContactInfo = hasEmail || hasPhone || hasDomain;
+    // 获取第一个联系人
+    final Contact? firstContact =
+        (company.contacts != null && company.contacts!.isNotEmpty)
+            ? company.contacts!.first
+            : null;
 
     return Card(
       elevation: 0,
       color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 6),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.withOpacity(0.15), width: 1),
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
       ),
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -41,103 +42,85 @@ class CrmCompanyCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 名称与行业
+                  _CompanyAvatar(name: company.name),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          company.name ?? "未命名",
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          company.name ?? "未命名客户",
                           style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                            color: Color(0xFF2D333A),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1F2937),
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        if (company.industry != null &&
-                            company.industry!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            company.industry!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                        const SizedBox(height: 4),
+                        if (company.address != null &&
+                            company.address!.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 14, color: Colors.grey[400]),
+                              const SizedBox(width: 2),
+                              Expanded(
+                                child: Text(
+                                  company.address!,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          )
                       ],
                     ),
                   ),
                   if (onEdit != null)
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: 16,
-                        icon:
-                            Icon(Icons.edit_outlined, color: Colors.grey[500]),
-                        onPressed: onEdit,
-                        alignment: Alignment.center,
+                    Material(
+                      color: Colors.blue.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      child: InkWell(
+                        onTap: onEdit,
+                        borderRadius: BorderRadius.circular(8),
+                        splashColor: Colors.blue.withOpacity(0.2),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: Colors.blue,
+                          ),
+                        ),
                       ),
                     ),
                 ],
               ),
-
-              const SizedBox(height: 12),
-
-              if (_hasTags) ...[
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    if (company.source != null && company.source!.isNotEmpty)
-                      _TagBadge(
-                        text: company.source!,
-                        color: Colors.blue,
+              if (firstContact != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9FAFB),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                  ),
+                  child: Row(
+                    children: [
+                      _ContactPill(
+                        icon: Icons.person,
+                        text: firstContact.name ?? "未知姓名",
+                        isBold: true,
                       ),
-                    if (company.location != null &&
-                        company.location!.isNotEmpty)
-                      _TagBadge(
-                        text: company.location!,
-                        color: Colors.orange,
-                        icon: Icons.location_on_outlined,
-                      ),
-                  ],
-                ),
-              ],
-
-              /// 4. 底部联系方式概览
-              if (hasContactInfo) ...[
-                const SizedBox(height: 12),
-                Container(height: 1, color: Colors.grey.withOpacity(0.08)),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    if (hasEmail) ...[
-                      const _ContactIcon(icon: Icons.email_outlined),
-                      const SizedBox(width: 8),
                     ],
-                    if (hasPhone) ...[
-                      const _ContactIcon(icon: Icons.phone_iphone),
-                      const SizedBox(width: 8),
-                    ],
-                    if (hasDomain) ...[
-                      const _ContactIcon(icon: Icons.language),
-                      const SizedBox(width: 8),
-                    ],
-                    const Spacer(),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: 16,
-                      color: Colors.grey[300],
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ],
@@ -146,75 +129,76 @@ class CrmCompanyCard extends StatelessWidget {
       ),
     );
   }
-
-  bool get _hasTags =>
-      (company.source != null && company.source!.isNotEmpty) ||
-      (company.location != null && company.location!.isNotEmpty);
 }
 
-class _TagBadge extends StatelessWidget {
-  final String text;
-  final MaterialColor color;
-  final IconData? icon;
+class _CompanyAvatar extends StatelessWidget {
+  final String? name;
 
-  const _TagBadge({
-    required this.text,
-    required this.color,
-    this.icon,
-  });
+  const _CompanyAvatar({this.name});
 
   @override
   Widget build(BuildContext context) {
+    final String char = (name != null && name!.isNotEmpty)
+        ? name!.substring(0, 1).toUpperCase()
+        : "?";
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: color.shade50,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.shade100, width: 0.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 10, color: color.shade700),
-            const SizedBox(width: 2),
-          ],
-          Flexible(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 10,
-                color: color.shade700,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+        color: const Color(0xFF3B82F6),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        char,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
 }
 
-class _ContactIcon extends StatelessWidget {
+class _ContactPill extends StatelessWidget {
   final IconData icon;
+  final String text;
+  final bool isBold;
 
-  const _ContactIcon({required this.icon});
+  const _ContactPill({
+    required this.icon,
+    required this.text,
+    this.isBold = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Icon(
-        icon,
-        size: 14,
-        color: Colors.grey[600],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: Colors.grey[500]),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

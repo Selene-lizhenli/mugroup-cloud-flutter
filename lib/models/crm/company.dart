@@ -1,3 +1,4 @@
+import 'package:cloud/models/crm/contact.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'company.freezed.dart';
@@ -18,6 +19,7 @@ class Company with _$Company {
     List<String>? facebook,
     List<String>? linkedin,
     List<String>? whatsapp,
+    List<Contact>? contacts,
   ) = _Company;
 
   factory Company.fromJson(Map<String, dynamic> json) =>

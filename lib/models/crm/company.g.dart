@@ -20,6 +20,9 @@ _$CompanyImpl _$$CompanyImplFromJson(Map<String, dynamic> json) =>
       (json['facebook'] as List<dynamic>?)?.map((e) => e as String).toList(),
       (json['linkedin'] as List<dynamic>?)?.map((e) => e as String).toList(),
       (json['whatsapp'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      (json['contacts'] as List<dynamic>?)
+          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$CompanyImplToJson(_$CompanyImpl instance) =>
@@ -36,4 +39,5 @@ Map<String, dynamic> _$$CompanyImplToJson(_$CompanyImpl instance) =>
       'facebook': instance.facebook,
       'linkedin': instance.linkedin,
       'whatsapp': instance.whatsapp,
+      'contacts': instance.contacts,
     };

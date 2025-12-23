@@ -71,9 +71,8 @@ class CompanyView extends HookConsumerWidget {
             : IndicatorResult.noMore);
       },
       child: MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 5,
+        crossAxisCount: 1,
+        mainAxisSpacing: 0,
         itemCount: companies.value.length,
         padding: const EdgeInsets.all(5),
         shrinkWrap: true,
