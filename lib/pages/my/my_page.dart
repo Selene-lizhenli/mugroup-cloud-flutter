@@ -70,48 +70,6 @@ class MyPage extends HookConsumerWidget {
             ListTile(
               tileColor: colorScheme.surface,
               title: Text(
-                '报价单管理',
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              leading: Icon(
-                Icons.receipt_long,
-                color: colorScheme.primary,
-              ),
-              trailing: Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurface,
-              ),
-              onTap: () {
-                context.router.push(const QuoteRoute());
-              },
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              tileColor: colorScheme.surface,
-              title: Text(
-                '客户管理',
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              leading: const Icon(
-                Icons.people_alt_rounded,
-                color: Colors.amber,
-              ),
-              trailing: Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurface,
-              ),
-              onTap: () {
-                context.router.push(const CrmCompanyRoute());
-              },
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              tileColor: colorScheme.surface,
-              title: Text(
                 '清空缓存',
                 style: TextStyle(
                   color: colorScheme.onSurface,

@@ -142,7 +142,9 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     iconBgColor: const Color(0xFFFEF2F2),
                     enTitle: 'Quotations',
                     cnTitle: '新增报价',
-                    onTap: () {},
+                    onTap: () {
+                      context.router.push(const QuoteCreateRoute());
+                    },
                   ),
                 ),
               ],
