@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/pages/market_product/list/events/search_event.dart';
-import 'package:cloud/pages/market_product/list/product_view.dart';
-import 'package:cloud/pages/market_product/list/providers/home_provider.dart';
+import 'package:cloud/pages/market_product/events/search_event.dart';
+import 'package:cloud/pages/market_product/list/widgets/product_view.dart';
+import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

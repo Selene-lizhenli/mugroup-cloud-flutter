@@ -1,5 +1,5 @@
 import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/pages/market_product/list/providers/home_provider.dart';
+import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/market_product/list/widgets/home_media.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';

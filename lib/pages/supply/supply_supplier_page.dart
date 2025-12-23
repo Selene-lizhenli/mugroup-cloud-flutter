@@ -1,9 +1,9 @@
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
-import 'package:cloud/pages/home/events/search_event.dart';
-import 'package:cloud/pages/home/providers/home_provider.dart';
-import 'package:cloud/pages/home/widgets/supplier_card.dart';
+import 'package:cloud/pages/market_product/events/search_event.dart';
+import 'package:cloud/pages/market_product/providers/home_provider.dart';
+import 'package:cloud/pages/supply/widgets/supplier_card.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
