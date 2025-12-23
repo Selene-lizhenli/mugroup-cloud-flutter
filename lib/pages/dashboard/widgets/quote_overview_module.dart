@@ -58,7 +58,15 @@ class QuoteOverviewSection extends StatelessWidget {
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
-            height: 1.2,
+            height: 1,
+          ),
+        ),
+        const Text(
+          '最近一周新增：3 条\n ',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            height: 1,
           ),
         ),
         // const Text(

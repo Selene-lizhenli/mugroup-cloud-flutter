@@ -109,7 +109,11 @@ class AppRouter extends RootStackRouter {
             path: "",
           ),
           AutoRoute(
-            page: MarketProductQuotationRoute.page,
+            page: MarketProductListRoute.page,
+            path: "market_product_list",
+          ),
+          AutoRoute(
+            page: QuoteRoute.page,
             path: "quotation",
           ),
           AutoRoute(

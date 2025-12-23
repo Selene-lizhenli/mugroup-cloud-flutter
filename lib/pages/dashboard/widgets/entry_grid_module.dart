@@ -32,7 +32,7 @@ class EntryGridModule extends StatelessWidget {
           _EntryItem(
             icon: Icons.store,
             label: '市场采购',
-            route: CrmCompanyRoute(),
+            route: MarketProductRoute(),
           ),
           _EntryItem(
             icon: Icons.inventory_2,
