@@ -45,12 +45,15 @@ class HomeAppBar extends HookConsumerWidget {
   final void Function(TemporaryMedia temporaryMedia)? onSearchMedia;
   final void Function(TemporaryMedia temporaryMedia)? onDeleteMedia;
 
+  final bool enableImageSearch;
+
   const HomeAppBar({
     super.key,
     required this.controller,
     this.onSearchText,
     this.onSearchMedia,
     this.onDeleteMedia,
+    this.enableImageSearch = true,
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -147,20 +150,21 @@ class HomeAppBar extends HookConsumerWidget {
                   },
                 ),
               ),
-              SizedBox(
-                width: 30,
-                height: 30,
-                child: IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.camera,
-                    size: 28,
-                    color: Colors.grey,
+              if (enableImageSearch)
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: IconButton(
+                    icon: const Icon(
+                      CupertinoIcons.camera,
+                      size: 28,
+                      color: Colors.grey,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: handleUploadMedia,
                   ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: handleUploadMedia,
                 ),
-              ),
               Container(
                 color: Colors.grey,
                 margin: const EdgeInsets.symmetric(horizontal: 2),

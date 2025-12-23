@@ -32,6 +32,7 @@ class CrmCompanyPage extends HookConsumerWidget {
               height: 8,
             ),
             HomeAppBar(
+              enableImageSearch: false,
               controller: home.searchTextController,
               onSearchText: (search) {
                 homeNotifier.setSearch(search);
