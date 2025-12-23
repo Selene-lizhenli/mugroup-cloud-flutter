@@ -57,7 +57,9 @@ class MarketProductInfoPage extends HookConsumerWidget {
               icon: Icons.assignment_outlined,
               title: '报价单管理',
               subtitle: '创建和管理客户报价单',
-              onTap: () {},
+              onTap: () {
+                context.router.push(const QuoteRoute());
+              },
             ),
             const SizedBox(height: 12),
             _MenuCard(
