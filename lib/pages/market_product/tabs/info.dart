@@ -37,7 +37,9 @@ class MarketProductInfoPage extends HookConsumerWidget {
               icon: Icons.storefront_outlined,
               title: '供应商资料管理',
               subtitle: '管理供应商信息、档口和产品报价',
-              onTap: () {},
+              onTap: () {
+                context.router.push(const SupplySupplierRoute());
+              },
             ),
             const SizedBox(height: 12),
             _MenuCard(

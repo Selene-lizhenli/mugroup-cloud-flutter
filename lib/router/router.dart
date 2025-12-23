@@ -65,6 +65,7 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: QuoteDetailRoute.page, path: "/quote/detail/:id/:userId"),
       AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
+      AutoRoute(page: SupplySupplierRoute.page, path: "/supply/supplier"),
       AutoRoute(
           page: SupplySupplierEditRoute.page,
           path: "/supply/supplier/edit/:id"),
