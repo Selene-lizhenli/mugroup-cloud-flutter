@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/pages/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -81,6 +82,7 @@ class Layout extends HookConsumerWidget {
 
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
       BottomNavigationBarItem(
         icon: Stack(
           clipBehavior: Clip.none,
@@ -115,15 +117,14 @@ class Layout extends HookConsumerWidget {
             currentIndex: context.tabsRouter.activeIndex,
             onTap: (index) {
               final item = items[index];
-
               if (item.label == "选样车") {
                 app.container.refresh(cartProvider);
               }
-
+              debugPrint(
+                  'activeIndex666: ${context.tabsRouter.activeIndex}${items[index].label}');
               if (item.label == "我的") {
                 app.fetchUser();
               }
-
               context.tabsRouter.setActiveIndex(index);
             },
             items: items,

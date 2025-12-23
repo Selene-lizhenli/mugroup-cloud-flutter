@@ -21,9 +21,9 @@ class AppTabbar extends StatelessWidget {
         router.replace(routes[value]);
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "选样车"),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
+        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "选样车"),
       ],
     );
   }

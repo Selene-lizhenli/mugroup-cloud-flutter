@@ -115,33 +115,6 @@ class HomeAppBar extends HookConsumerWidget {
       color: colorScheme.secondary,
       child: Column(
         children: [
-          Row(
-            children: [
-              const SizedBox(width: 3),
-              HomeAppBarItem(
-                onTap: () {
-                  home.pageController.animateToPage(
-                    0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.ease,
-                  );
-                },
-                text: "样品",
-                active: home.currentPage == 0,
-              ),
-              HomeAppBarItem(
-                onTap: () {
-                  home.pageController.animateToPage(
-                    1,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.ease,
-                  );
-                },
-                text: "供应商",
-                active: home.currentPage == 1,
-              ),
-            ],
-          ),
           Container(
             width: double.infinity,
             margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
