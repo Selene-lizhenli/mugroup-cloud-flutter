@@ -96,8 +96,11 @@ class SupplySupplierPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("供应商列表"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () {
             Navigator.of(context).pop();
           },

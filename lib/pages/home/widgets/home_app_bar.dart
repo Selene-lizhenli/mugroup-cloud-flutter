@@ -111,101 +111,98 @@ class HomeAppBar extends HookConsumerWidget {
       );
     }
 
-    return Container(
-      color: colorScheme.secondary,
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-            padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary,
-              border: Border.all(
-                color: colorScheme.secondary,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(5),
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+          padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
+          height: 40,
+          decoration: BoxDecoration(
+            color: colorScheme.onPrimary,
+            border: Border.all(
+              color: colorScheme.secondary,
+              width: 1,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextField(
-                    autofocus: false,
-                    controller: controller,
-                    onTapOutside: (event) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    focusNode: focusNode,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '',
-                    ),
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (value) {
-                      onSearchText?.call(value);
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: IconButton(
-                    icon: const Icon(
-                      CupertinoIcons.camera,
-                      size: 28,
-                      color: Colors.grey,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: handleUploadMedia,
-                  ),
-                ),
-                Container(
-                  color: Colors.grey,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  width: 0,
-                  height: 0,
-                ),
-                Container(
-                  margin: const EdgeInsets.only(
-                      top: 2, bottom: 2, left: 2, right: 0),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: colorScheme.secondary,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      onSearchText?.call(controller.text);
-                    },
-                    child: Text(
-                      "搜索",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
+            borderRadius: BorderRadius.circular(5),
           ),
-          if (home.currentMediaId != null)
-            HomeMedia(
-              media: home.media,
-              onTapUplod: handleUploadMedia,
-              currentMediaId: home.currentMediaId!,
-              onTapMedia: onSearchMedia,
-              onDeleteMedia: onDeleteMedia,
-            ),
-        ],
-      ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TextField(
+                  autofocus: false,
+                  controller: controller,
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  focusNode: focusNode,
+                  decoration: const InputDecoration.collapsed(
+                    hintText: '',
+                  ),
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (value) {
+                    onSearchText?.call(value);
+                  },
+                ),
+              ),
+              SizedBox(
+                width: 30,
+                height: 30,
+                child: IconButton(
+                  icon: const Icon(
+                    CupertinoIcons.camera,
+                    size: 28,
+                    color: Colors.grey,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: handleUploadMedia,
+                ),
+              ),
+              Container(
+                color: Colors.grey,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                width: 0,
+                height: 0,
+              ),
+              Container(
+                margin: const EdgeInsets.only(
+                    top: 2, bottom: 2, left: 2, right: 0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: colorScheme.secondary,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    onSearchText?.call(controller.text);
+                  },
+                  child: Text(
+                    "搜索",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        if (home.currentMediaId != null)
+          HomeMedia(
+            media: home.media,
+            onTapUplod: handleUploadMedia,
+            currentMediaId: home.currentMediaId!,
+            onTapMedia: onSearchMedia,
+            onDeleteMedia: onDeleteMedia,
+          ),
+      ],
     );
   }
 }

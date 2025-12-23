@@ -47,7 +47,9 @@ class MarketProductInfoPage extends HookConsumerWidget {
               icon: Icons.search,
               title: '产品管理',
               subtitle: '管理产品信息、库存和价格',
-              onTap: () {},
+              onTap: () {
+                context.router.push(const MarketProductListRoute());
+              },
             ),
             const SizedBox(height: 12),
             _MenuCard(

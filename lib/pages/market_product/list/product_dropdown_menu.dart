@@ -28,13 +28,11 @@ class ProductDropdownMenu extends HookWidget {
       "supplier_ids": "供应商",
       "category_id": "产品分类",
       "trade_country": "贸易国别",
-      "item_type": "产品类别",
     };
     final menuOptions = {
       "supplier_ids": (multiple: true, optionsColumns: 1),
       "category_id": (multiple: true, optionsColumns: 2),
       "trade_country": (multiple: false, optionsColumns: 2),
-      "item_type": (multiple: true, optionsColumns: 1)
     };
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);

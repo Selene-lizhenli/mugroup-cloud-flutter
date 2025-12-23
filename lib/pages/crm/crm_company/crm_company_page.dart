@@ -12,6 +12,9 @@ class CrmCompanyPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('客户列表'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
