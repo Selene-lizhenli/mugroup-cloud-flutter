@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/crm_company_card.dart';
+import 'package:cloud/pages/market_product/events/search_event.dart';
+import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 const pageSize = 20;
 
@@ -18,9 +21,11 @@ class CompanyView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final refreshController = useEasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
+    final home = ref.watch(homeProvider);
     final search = useState<String?>(null);
     final page = useRef(1);
     final companies = useState<List<Company>>(<Company>[]);
+    final colorScheme = Theme.of(context).colorScheme;
 
     fetchData(
       String? searchText, {
@@ -52,55 +57,125 @@ class CompanyView extends HookConsumerWidget {
       return resp;
     }
 
-    return EasyRefresh(
-      controller: refreshController,
-      refreshOnStart: true,
-      onRefresh: () async {
-        await fetchData(
-          search.value,
-          init: true,
-        );
-        refreshController.finishRefresh();
-        refreshController.resetFooter();
-      },
-      onLoad: () async {
-        final resp = await fetchData(search.value);
+    useEffect(() {
+      final searchEventSubscription = home.bus.on<SearchEvent>().listen(
+        (SearchEvent event) {
+          final currentHome = ref.read(homeProvider);
+          if (currentHome.currentPage != 0) {
+            return;
+          }
 
-        refreshController.finishLoad(resp.data.length >= pageSize
-            ? IndicatorResult.success
-            : IndicatorResult.noMore);
-      },
-      child: MasonryGridView.count(
-        crossAxisCount: 1,
-        mainAxisSpacing: 0,
-        itemCount: companies.value.length,
-        padding: const EdgeInsets.all(5),
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final company = companies.value[index];
+          if (event.from == SearchEventFrom.tab) {
+            if (search.value == event.search) {
+              return;
+            }
+          }
 
-          return CrmCompanyCard(
-            company: company,
-            onTap: () {
-              context.router.push(CrmCompanyDetailRoute(id: company.id!));
-            },
-            onEdit: () async {
-              final shouldRefresh = await context.router
-                  .push(CrmCompanyEditRoute(id: company.id!));
+          search.value = event.search;
 
-              if (shouldRefresh == true) {
-                await fetchData(
-                  search.value,
-                  init: true,
-                );
-
-                refreshController.finishRefresh();
-                refreshController.resetFooter();
-              }
-            },
-          );
+          refreshController.callRefresh(force: true);
         },
-      ),
-    );
+      );
+
+      return () {
+        searchEventSubscription.cancel();
+      };
+    }, []);
+
+    return Container(
+        padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceTint,
+          borderRadius: home.currentMediaId != null
+              ? null
+              : const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: EasyRefresh(
+          controller: refreshController,
+          refreshOnStart: true,
+          onRefresh: () async {
+            try {
+              await fetchData(
+                search.value,
+                init: true,
+              );
+              refreshController.finishRefresh();
+            } catch (e) {
+              refreshController.finishRefresh(IndicatorResult.fail, false);
+            } finally {
+              refreshController.resetFooter();
+            }
+          },
+          onLoad: () async {
+            final resp = await fetchData(search.value);
+
+            refreshController.finishLoad(resp.data.length >= pageSize
+                ? IndicatorResult.success
+                : IndicatorResult.noMore);
+          },
+          child: CustomScrollView(
+            slivers: [
+              MultiSliver(
+                children: [
+                  Container(
+                    height: 0,
+                  ),
+                  if (companies.value.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Text(
+                          '暂无数据',
+                          style: TextStyle(
+                            color: colorScheme.surfaceContainerHighest,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    MasonryGridView.count(
+                      crossAxisCount: 1,
+                      mainAxisSpacing: 0,
+                      itemCount: companies.value.length,
+                      padding: const EdgeInsets.all(5),
+                      clipBehavior: Clip.none,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final company = companies.value[index];
+
+                        return CrmCompanyCard(
+                          company: company,
+                          onTap: () {
+                            context.router
+                                .push(CrmCompanyDetailRoute(id: company.id!));
+                          },
+                          onEdit: () async {
+                            final shouldRefresh = await context.router
+                                .push(CrmCompanyEditRoute(id: company.id!));
+
+                            if (shouldRefresh == true) {
+                              await fetchData(
+                                search.value,
+                                init: true,
+                              );
+
+                              refreshController.finishRefresh();
+                              refreshController.resetFooter();
+                            }
+                          },
+                        );
+                      },
+                    ),
+                ],
+              )
+            ],
+          ),
+        ));
   }
 }
