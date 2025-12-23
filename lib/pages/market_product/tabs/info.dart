@@ -67,7 +67,9 @@ class MarketProductInfoPage extends HookConsumerWidget {
               icon: Icons.check_circle_outline,
               title: '验货任务',
               subtitle: '创建和管理验货任务，上传验货图片',
-              onTap: () {},
+              onTap: () {
+                context.router.push(const MarketProductInspectionRoute());
+              },
             ),
             const SizedBox(height: 12),
             Row(
