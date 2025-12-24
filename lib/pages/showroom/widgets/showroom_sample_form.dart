@@ -29,15 +29,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ShowroomSampleForm extends HookConsumerWidget {
   final Sample? initial;
   final String? itemType;
+  final ValueChanged<bool>? onDirtyChanged;
+
   final Future<bool?> Function(Map<String, dynamic>)? onDraft;
   final Future<bool?> Function(Map<String, dynamic>) onSubmit;
 
-  const ShowroomSampleForm(
-      {super.key,
-      required this.initial,
-      this.onDraft, //预留草稿操作
-      required this.onSubmit,
-      this.itemType});
+  const ShowroomSampleForm({
+    super.key,
+    required this.initial,
+    this.onDraft, //预留草稿操作
+    required this.onSubmit,
+    this.itemType,
+    this.onDirtyChanged,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,6 +114,9 @@ class ShowroomSampleForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
+                onChanged: () {
+                  onDirtyChanged?.call(true);
+                },
                 initialValue: initialValues,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

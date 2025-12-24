@@ -16,6 +16,8 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final hasValue = useState(false);
+
     final title = useMemoized(() {
       if (itemType == 'sample') {
         return '集团产品创建';
@@ -27,6 +29,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
     }, [itemType]);
 
     Future<void> handleBack() async {
+      if (!hasValue.value) {
+        Navigator.of(context).pop();
+        return;
+      }
       final isConfirmed = await ConfirmDialog.show(
         context,
         title: '确认退出',
@@ -61,6 +67,9 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
           body: ShowroomSampleForm(
             initial: null,
             itemType: itemType,
+            onDirtyChanged: (dirty) {
+              hasValue.value = dirty;
+            },
             onSubmit: (data) async {
               EasyLoading.show(status: '创建中...');
 
@@ -85,6 +94,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
               );
 
               if (isConfirmed) {
+                hasValue.value = false;
                 return true;
               } else {
                 if (context.mounted) {
