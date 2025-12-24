@@ -100,7 +100,7 @@ class TextArea extends HookConsumerWidget {
         ],
         Stack(
           children: [
-            TextFormField(
+            TextField(
               controller: controller,
               maxLines: maxLines,
               keyboardType: TextInputType.multiline,
