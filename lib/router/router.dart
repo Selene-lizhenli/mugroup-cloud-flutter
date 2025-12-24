@@ -65,6 +65,8 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: QuoteDetailRoute.page, path: "/quote/detail/:id/:userId"),
       AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
+      AutoRoute(page: QuoteProductAddRoute.page, path: "/quote/product/add"),
+
       AutoRoute(page: SupplySupplierRoute.page, path: "/supply/supplier"),
       AutoRoute(
           page: SupplySupplierEditRoute.page,
@@ -100,8 +102,12 @@ class AppRouter extends RootStackRouter {
           ),
         ],
       ),
-      AutoRoute(page: MarketProductListRoute.page, path: "/market_product/market_product_list"),
-      AutoRoute(page: MarketProductInspectionRoute.page, path: "/market_product/inspection"),
+      AutoRoute(
+          page: MarketProductListRoute.page,
+          path: "/market_product/market_product_list"),
+      AutoRoute(
+          page: MarketProductInspectionRoute.page,
+          path: "/market_product/inspection"),
       AutoRoute(
         page: MarketProductRoute.page,
         guards: [AuthGuard()],
