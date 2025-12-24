@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -22,7 +23,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class QuoteProductAddPage extends HookConsumerWidget {
-  const QuoteProductAddPage({super.key});
+  final int? quoteId;
+  const QuoteProductAddPage({super.key, this.quoteId});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -506,7 +509,7 @@ class QuoteProductAddPage extends HookConsumerWidget {
                                   ),
                               ],
                             ),
-                            if (isVisible('size'))
+                            if (isVisible('spec'))
                               Row(
                                 children: [
                                   Expanded(
@@ -630,6 +633,8 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             final Map<String, dynamic> submitValues =
                                 Map.from(formState!.value);
 
+                            final supplier = submitValues['supplier'];
+
                             final length =
                                 submitValues['length']?.toString() ?? '';
                             final width =
@@ -637,10 +642,17 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             final height =
                                 submitValues['heigth']?.toString() ?? '';
 
-                            final size = [length, width, height].join('x');
-                            submitValues['size'] = size;
+                            final spec = [length, width, height].join('x');
+                            submitValues['spec'] = spec;
 
-                            //TDODO
+                            logger.d(submitValues);
+
+                            // await storeShowroomSample({
+                            //   ...submitValues,
+                            //   "supplier_id": supplier.id,
+                            //   "quotation_id": quoteId,
+                            //   'item_type': 'market_product'
+                            // });
                           }
                         },
                         child: const Text(

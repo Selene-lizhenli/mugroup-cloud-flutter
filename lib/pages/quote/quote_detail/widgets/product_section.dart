@@ -35,7 +35,8 @@ class ProductSection extends ConsumerWidget {
                       Text('产品列表', style: theme.textTheme.titleMedium),
                       ElevatedButton.icon(
                         onPressed: () {
-                          context.router.push(const QuoteProductAddRoute());
+                          context.router
+                              .push(QuoteProductAddRoute(quoteId: quoteId));
                         },
                         icon: const Icon(Icons.add, size: 12),
                         label: Text('添加产品',

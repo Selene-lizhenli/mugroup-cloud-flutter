@@ -693,10 +693,18 @@ class QuoteRoute extends _i45.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i22.QuoteProductAddPage]
-class QuoteProductAddRoute extends _i45.PageRouteInfo<void> {
-  const QuoteProductAddRoute({List<_i45.PageRouteInfo>? children})
-      : super(
+class QuoteProductAddRoute
+    extends _i45.PageRouteInfo<QuoteProductAddRouteArgs> {
+  QuoteProductAddRoute({
+    _i48.Key? key,
+    int? quoteId,
+    List<_i45.PageRouteInfo>? children,
+  }) : super(
           QuoteProductAddRoute.name,
+          args: QuoteProductAddRouteArgs(
+            key: key,
+            quoteId: quoteId,
+          ),
           initialChildren: children,
         );
 
@@ -705,9 +713,30 @@ class QuoteProductAddRoute extends _i45.PageRouteInfo<void> {
   static _i45.PageInfo page = _i45.PageInfo(
     name,
     builder: (data) {
-      return const _i22.QuoteProductAddPage();
+      final args = data.argsAs<QuoteProductAddRouteArgs>(
+          orElse: () => const QuoteProductAddRouteArgs());
+      return _i22.QuoteProductAddPage(
+        key: args.key,
+        quoteId: args.quoteId,
+      );
     },
   );
+}
+
+class QuoteProductAddRouteArgs {
+  const QuoteProductAddRouteArgs({
+    this.key,
+    this.quoteId,
+  });
+
+  final _i48.Key? key;
+
+  final int? quoteId;
+
+  @override
+  String toString() {
+    return 'QuoteProductAddRouteArgs{key: $key, quoteId: $quoteId}';
+  }
 }
 
 /// generated route for
