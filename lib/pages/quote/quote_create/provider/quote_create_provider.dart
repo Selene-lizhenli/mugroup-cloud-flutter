@@ -1,7 +1,7 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
+import 'package:cloud/services/crm.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,7 +10,6 @@ const _draftKey = 'quote_draft';
 enum QuoteCreateStep {
   baseInfo,
   products,
-  review,
 }
 
 class QuoteCreateState {
@@ -20,7 +19,7 @@ class QuoteCreateState {
   // ================= 报价单表单 =================
   final String? customer; // 最终选中的客户
   final String? contact;
-  final String? language;
+  final LanguageItem? language;
   final String currency;
 
   final DateTime quoteDate;
@@ -35,20 +34,15 @@ class QuoteCreateState {
   // final bool isProductLoading;
   // final bool productError;
   final List<dynamic> productList;
-  // ================= 客户选择（merge 自 customer_select） =================
 
-  /// 客户原始列表
-  final List<String> customers;
+  // ================= 客户选择  =================
 
+  final List<Company> customers;
   final String customerKeyword;
+  final Company? selectedCustomers;
 
-  /// 选择器中的选中（支持多选）
-  final List<String> selectedCustomers;
   QuoteCreateState({
-    // flow
     this.step = QuoteCreateStep.baseInfo,
-
-    // form
     this.customer,
     this.contact,
     this.language,
@@ -70,17 +64,13 @@ class QuoteCreateState {
     // customer select
     this.customers = const [],
     this.customerKeyword = '',
-    this.selectedCustomers = const [],
+    this.selectedCustomers,
   }) : quoteDate = quoteDate ?? DateTime.now();
 
   // ================= 派生状态（只读） =================
-
   int get stepIndex => step.index;
-
   bool get hasPrevious => stepIndex > 0;
-
-  bool get isLastStep => step == QuoteCreateStep.review;
-
+  bool get isLastStep => step == QuoteCreateStep.products;
   String get nextButtonText => isLastStep ? '完成' : '下一步';
 
   bool get canGoNext {
@@ -89,23 +79,12 @@ class QuoteCreateState {
         return true;
       case QuoteCreateStep.products:
         return true;
-      case QuoteCreateStep.review:
-        return true;
     }
   }
 
-  /// 🔥 过滤后的客户列表
-  List<String> get filteredCustomers {
-    if (customerKeyword.isEmpty) return customers;
-    return customers
-        .where(
-          (c) => c.toLowerCase().contains(customerKeyword.toLowerCase()),
-        )
-        .toList();
-  }
-
   bool isCustomerSelected(String value) {
-    return selectedCustomers.contains(value);
+    // return selectedCustomers.contains(value);
+    return false;
   }
 
   QuoteCreateState copyWith({
@@ -114,7 +93,7 @@ class QuoteCreateState {
     // form
     String? customer,
     String? contact,
-    String? language,
+    LanguageItem? language,
     String? currency,
     DateTime? quoteDate,
     String? addPercentage,
@@ -126,9 +105,9 @@ class QuoteCreateState {
     bool? submitting,
 
     // customer select
-    List<String>? customers,
+    List<Company>? customers,
     String? customerKeyword,
-    List<String>? selectedCustomers,
+    Company? selectedCustomers,
     List<dynamic>? productList,
   }) {
     return QuoteCreateState(
@@ -152,28 +131,15 @@ class QuoteCreateState {
 }
 
 class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
-  QuoteCreateNotifier()
-      : super(
-          QuoteCreateState(
-            customers: [
-              '测试客户123',
-              'Walmart',
-              '1111',
-              '批量上传演示',
-            ],
-          ),
-        );
+  QuoteCreateNotifier() : super(QuoteCreateState());
 
-  // ================= step =================
-
+//================= step =================
   void nextStep() {
     if (!state.canGoNext) return;
-
     if (state.isLastStep) {
       submit();
       return;
     }
-
     state = state.copyWith(
       step: QuoteCreateStep.values[state.stepIndex + 1],
     );
@@ -181,18 +147,17 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
 
   void previousStep() {
     if (!state.hasPrevious) return;
-
     state = state.copyWith(
       step: QuoteCreateStep.values[state.stepIndex - 1],
     );
   }
 
-  // ================= 表单 setters =================
+// ================= 表单 setters =================
 
-  void setCustomer(String value) {
+  void setCustomer(Company value) {
     state = state.copyWith(
-      customer: value,
-      selectedCustomers: [value],
+      // customer: value,
+      selectedCustomers: value,
     );
   }
 
@@ -200,7 +165,7 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
     state = state.copyWith(contact: value);
   }
 
-  void setLanguage(String value) {
+  void setLanguage(LanguageItem value) {
     state = state.copyWith(language: value);
   }
 
@@ -220,7 +185,20 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
     state = state.copyWith(addPercentage: value);
   }
 
-  // ================= 客户选择  =================
+//===================== 搜索客户  =================
+  Future<void> loadCustomers() async {
+    final params = {
+      "pageSize": 30,
+      "status": "normal",
+      "page": 1,
+      "search": state.customerKeyword,
+    };
+    final resp = await getCrmCompanies(queryParameters: params);
+    final List<Company> companies = resp.data;
+    state = state.copyWith(
+      customers: companies,
+    );
+  }
 
   void setCustomerKeyword(String value) {
     state = state.copyWith(customerKeyword: value);
@@ -234,77 +212,9 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
     state = state.copyWith(productList: value);
   }
 
-  /// 单选（你现在用这个）
-  void selectCustomerFromList(String value) {
+  void setSelectedCustomer(Company value) {
     state = state.copyWith(
-      customer: value,
-      selectedCustomers: [value],
-    );
-  }
-
-  /// 多选（为以后准备）
-  void toggleCustomer(String value) {
-    final list = [...state.selectedCustomers];
-    if (list.contains(value)) {
-      list.remove(value);
-    } else {
-      list.add(value);
-    }
-
-    state = state.copyWith(
-      selectedCustomers: list,
-      customer: list.isNotEmpty ? list.first : null,
-    );
-  }
-
-  // ================= 草稿 =================
-  Future<void> _loadDraft() async {
-    final prefs = await SharedPreferences.getInstance();
-    final json = prefs.getString(_draftKey);
-    if (json == null) return;
-
-    final map = jsonDecode(json) as Map<String, dynamic>;
-
-    state = state.copyWith(
-      step: QuoteCreateStep.values[map['step'] ?? 0],
-      customer: map['customer'],
-      contact: map['contact'],
-      language: map['language'],
-      currency: map['currency'] ?? state.currency,
-      quoteDate: map['quoteDate'] != null
-          ? DateTime.parse(map['quoteDate'])
-          : state.quoteDate,
-      rate: map['rate'] ?? state.rate,
-      addPercentage: map['addPercentage'] ?? state.addPercentage,
-    );
-  }
-
-  Future<void> saveDraft() async {
-    if (state.savingDraft) return;
-
-    state = state.copyWith(
-      savingDraft: true,
-      draftSaved: false,
-    );
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _draftKey,
-      jsonEncode({
-        'step': state.stepIndex,
-        'customer': state.customer,
-        'contact': state.contact,
-        'language': state.language,
-        'currency': state.currency,
-        'quoteDate': state.quoteDate.toIso8601String(),
-        'rate': state.rate,
-        'addPercentage': state.addPercentage,
-      }),
-    );
-
-    state = state.copyWith(
-      savingDraft: false,
-      draftSaved: true,
+      selectedCustomers: value,
     );
   }
 

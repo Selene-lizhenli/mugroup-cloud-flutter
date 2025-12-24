@@ -1,14 +1,21 @@
+import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SelectCustomerSheet extends ConsumerWidget {
+class SelectCustomerSheet extends HookConsumerWidget {
   const SelectCustomerSheet({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
+
+    useEffect(() {
+      notifier.loadCustomers();
+      return null;
+    }, []);
 
     return SafeArea(
       child: Container(
@@ -28,7 +35,8 @@ class SelectCustomerSheet extends ConsumerWidget {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () =>
+                      {notifier.clearCustomerKeyword(), Navigator.pop(context)},
                   child: const Text('关闭'),
                 ),
               ],
@@ -36,8 +44,12 @@ class SelectCustomerSheet extends ConsumerWidget {
             const SizedBox(height: 12),
             TextField(
               onChanged: notifier.setCustomerKeyword,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) {
+                notifier.loadCustomers();
+              },
               decoration: InputDecoration(
-                hintText: '搜索客户',
+                hintText: '请输入关键字搜索',
                 prefixIcon: const Icon(Icons.search),
                 isDense: true,
                 filled: true,
@@ -54,10 +66,8 @@ class SelectCustomerSheet extends ConsumerWidget {
             Expanded(
               child: _list(
                 context,
-                state.filteredCustomers,
-                state.selectedCustomers.isNotEmpty
-                    ? state.selectedCustomers.first
-                    : null,
+                state.customers,
+                state.selectedCustomers,
                 notifier,
               ),
             ),
@@ -71,8 +81,8 @@ class SelectCustomerSheet extends ConsumerWidget {
 
   Widget _list(
     BuildContext context,
-    List<String> list,
-    String? selected,
+    List<Company> list,
+    Company? selected,
     notifier,
   ) {
     if (list.isEmpty) {
@@ -84,15 +94,15 @@ class SelectCustomerSheet extends ConsumerWidget {
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, index) {
         final item = list[index];
-        final isSelected = item == selected;
+        final isSelected = item.id == selected?.id;
 
         return ListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text(item),
+          title: Text(item.name ?? ""),
           trailing:
               isSelected ? const Icon(Icons.check, color: Colors.blue) : null,
           onTap: () {
-            notifier.selectCustomerFromList(item);
+            notifier.setSelectedCustomer(item);
             Navigator.pop(context);
           },
         );

@@ -25,6 +25,7 @@ mixin _$QuotationSample {
   int? get qty => throw _privateConstructorUsedError;
   @JsonKey(name: 'showroomSample')
   Sample? get showroomSample => throw _privateConstructorUsedError;
+  Quote? get supplyQuote => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -42,9 +43,11 @@ abstract class $QuotationSampleCopyWith<$Res> {
       {int? id,
       String? price,
       int? qty,
-      @JsonKey(name: 'showroomSample') Sample? showroomSample});
+      @JsonKey(name: 'showroomSample') Sample? showroomSample,
+      Quote? supplyQuote});
 
   $SampleCopyWith<$Res>? get showroomSample;
+  $QuoteCopyWith<$Res>? get supplyQuote;
 }
 
 /// @nodoc
@@ -64,6 +67,7 @@ class _$QuotationSampleCopyWithImpl<$Res, $Val extends QuotationSample>
     Object? price = freezed,
     Object? qty = freezed,
     Object? showroomSample = freezed,
+    Object? supplyQuote = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -82,6 +86,10 @@ class _$QuotationSampleCopyWithImpl<$Res, $Val extends QuotationSample>
           ? _value.showroomSample
           : showroomSample // ignore: cast_nullable_to_non_nullable
               as Sample?,
+      supplyQuote: freezed == supplyQuote
+          ? _value.supplyQuote
+          : supplyQuote // ignore: cast_nullable_to_non_nullable
+              as Quote?,
     ) as $Val);
   }
 
@@ -94,6 +102,18 @@ class _$QuotationSampleCopyWithImpl<$Res, $Val extends QuotationSample>
 
     return $SampleCopyWith<$Res>(_value.showroomSample!, (value) {
       return _then(_value.copyWith(showroomSample: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $QuoteCopyWith<$Res>? get supplyQuote {
+    if (_value.supplyQuote == null) {
+      return null;
+    }
+
+    return $QuoteCopyWith<$Res>(_value.supplyQuote!, (value) {
+      return _then(_value.copyWith(supplyQuote: value) as $Val);
     });
   }
 }
@@ -110,10 +130,13 @@ abstract class _$$QuotationSampleImplCopyWith<$Res>
       {int? id,
       String? price,
       int? qty,
-      @JsonKey(name: 'showroomSample') Sample? showroomSample});
+      @JsonKey(name: 'showroomSample') Sample? showroomSample,
+      Quote? supplyQuote});
 
   @override
   $SampleCopyWith<$Res>? get showroomSample;
+  @override
+  $QuoteCopyWith<$Res>? get supplyQuote;
 }
 
 /// @nodoc
@@ -131,6 +154,7 @@ class __$$QuotationSampleImplCopyWithImpl<$Res>
     Object? price = freezed,
     Object? qty = freezed,
     Object? showroomSample = freezed,
+    Object? supplyQuote = freezed,
   }) {
     return _then(_$QuotationSampleImpl(
       id: freezed == id
@@ -149,6 +173,10 @@ class __$$QuotationSampleImplCopyWithImpl<$Res>
           ? _value.showroomSample
           : showroomSample // ignore: cast_nullable_to_non_nullable
               as Sample?,
+      supplyQuote: freezed == supplyQuote
+          ? _value.supplyQuote
+          : supplyQuote // ignore: cast_nullable_to_non_nullable
+              as Quote?,
     ));
   }
 }
@@ -160,7 +188,8 @@ class _$QuotationSampleImpl implements _QuotationSample {
       {this.id,
       this.price,
       this.qty,
-      @JsonKey(name: 'showroomSample') this.showroomSample});
+      @JsonKey(name: 'showroomSample') this.showroomSample,
+      this.supplyQuote});
 
   factory _$QuotationSampleImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuotationSampleImplFromJson(json);
@@ -174,10 +203,12 @@ class _$QuotationSampleImpl implements _QuotationSample {
   @override
   @JsonKey(name: 'showroomSample')
   final Sample? showroomSample;
+  @override
+  final Quote? supplyQuote;
 
   @override
   String toString() {
-    return 'QuotationSample(id: $id, price: $price, qty: $qty, showroomSample: $showroomSample)';
+    return 'QuotationSample(id: $id, price: $price, qty: $qty, showroomSample: $showroomSample, supplyQuote: $supplyQuote)';
   }
 
   @override
@@ -189,12 +220,15 @@ class _$QuotationSampleImpl implements _QuotationSample {
             (identical(other.price, price) || other.price == price) &&
             (identical(other.qty, qty) || other.qty == qty) &&
             (identical(other.showroomSample, showroomSample) ||
-                other.showroomSample == showroomSample));
+                other.showroomSample == showroomSample) &&
+            (identical(other.supplyQuote, supplyQuote) ||
+                other.supplyQuote == supplyQuote));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, price, qty, showroomSample);
+  int get hashCode =>
+      Object.hash(runtimeType, id, price, qty, showroomSample, supplyQuote);
 
   @JsonKey(ignore: true)
   @override
@@ -213,11 +247,11 @@ class _$QuotationSampleImpl implements _QuotationSample {
 
 abstract class _QuotationSample implements QuotationSample {
   factory _QuotationSample(
-          {final int? id,
-          final String? price,
-          final int? qty,
-          @JsonKey(name: 'showroomSample') final Sample? showroomSample}) =
-      _$QuotationSampleImpl;
+      {final int? id,
+      final String? price,
+      final int? qty,
+      @JsonKey(name: 'showroomSample') final Sample? showroomSample,
+      final Quote? supplyQuote}) = _$QuotationSampleImpl;
 
   factory _QuotationSample.fromJson(Map<String, dynamic> json) =
       _$QuotationSampleImpl.fromJson;
@@ -231,6 +265,8 @@ abstract class _QuotationSample implements QuotationSample {
   @override
   @JsonKey(name: 'showroomSample')
   Sample? get showroomSample;
+  @override
+  Quote? get supplyQuote;
   @override
   @JsonKey(ignore: true)
   _$$QuotationSampleImplCopyWith<_$QuotationSampleImpl> get copyWith =>

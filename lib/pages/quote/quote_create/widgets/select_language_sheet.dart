@@ -17,13 +17,13 @@ class LanguageItem {
 /// ================= Language List =================
 /// 可随时换成接口数据
 const List<LanguageItem> _languages = [
-  LanguageItem(name: '英语', code: 'EN'),
-  LanguageItem(name: '日语', code: 'JA'),
-  LanguageItem(name: '西班牙语', code: 'ES'),
-  LanguageItem(name: '葡萄牙语', code: 'PT'),
-  LanguageItem(name: '俄语', code: 'RU'),
-  LanguageItem(name: '法语', code: 'FR'),
-  LanguageItem(name: '德语', code: 'DE'),
+  LanguageItem(name: '英语(EN)', code: 'EN'),
+  LanguageItem(name: '日语(JA)', code: 'JA'),
+  LanguageItem(name: '西班牙语(ES)', code: 'ES'),
+  LanguageItem(name: '葡萄牙语(PT)', code: 'PT'),
+  LanguageItem(name: '俄语(RU)', code: 'RU'),
+  LanguageItem(name: '法语(FR)', code: 'FR'),
+  LanguageItem(name: '德语(DE)', code: 'DE'),
 ];
 
 class SelectLanguageSheet extends ConsumerWidget {
@@ -78,20 +78,17 @@ class SelectLanguageSheet extends ConsumerWidget {
                     const Divider(height: 1, indent: 16),
                 itemBuilder: (context, index) {
                   final item = languages[index];
-                  final selected = state.language == item.code;
+                  final selected = state.language != null &&
+                      state.language?.code == item.code;
 
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     title: Text(item.name),
-                    subtitle: Text(
-                      item.code,
-                      style: TextStyle(color: Colors.grey.shade500),
-                    ),
                     trailing: selected
                         ? const Icon(Icons.check, color: Colors.blue)
                         : null,
                     onTap: () {
-                      notifier.setLanguage(item.code);
+                      notifier.setLanguage(item);
                       Navigator.pop(context);
                     },
                   );

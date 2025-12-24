@@ -1,5 +1,8 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -30,21 +33,21 @@ class ProductSection extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('产品列表', style: theme.textTheme.titleMedium),
-                      // ElevatedButton.icon( //todo
-                      //   onPressed: () {}, //todo
-                      //   icon: const Icon(Icons.add, size: 12),
-                      //   label: Text(
-                      //     '添加产品',
-                      //     style: TextStyle(
-                      //         color: colorScheme.primary, fontSize: 12),
-                      //   ),
-                      //   style: ElevatedButton.styleFrom(
-                      //     padding: const EdgeInsets.symmetric(
-                      //         horizontal: 12, vertical: 8),
-                      //     minimumSize: Size.zero, // 关键：取消最小高度
-                      //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      //   ),
-                      // ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.router.push(ShowroomSampleCreateRoute());
+                        },
+                        icon: const Icon(Icons.add, size: 12),
+                        label: Text('添加产品',
+                            style: TextStyle(
+                                color: colorScheme.primary, fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          minimumSize: Size.zero, // 关键：取消最小高度
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -105,6 +108,7 @@ class ProductSection extends ConsumerWidget {
         if (sample == null) {
           return const SizedBox.shrink();
         }
+        logger.d('Product sample: $sample');
         return Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -131,13 +135,20 @@ class ProductSection extends ConsumerWidget {
                       label: '品名',
                       value: sample.nameCn ?? sample.nameEn ?? '-',
                     ),
-                    if ((sample.spec ?? '').isNotEmpty)
-                      _KeyValue(label: '规格', value: sample.spec!),
-                    if ((sample.packing ?? '').isNotEmpty)
-                      _KeyValue(label: '包装', value: sample.packing!),
+                    Row(children: [
+                      if ((sample.spec ?? '').isNotEmpty)
+                        _KeyValue(label: '规格', value: sample.spec!),
+                      const SizedBox(width: 16),
+                      if ((sample.packing ?? '').isNotEmpty)
+                        _KeyValue(label: '包装', value: sample.packing!),
+                    ]),
                     _KeyValue(
                       label: '客户报价',
                       value: row.price != null ? row.price.toString() : '-',
+                    ),
+                    _KeyValue(
+                      label: '服务商',
+                      value: row.supplyQuote?.supplier?.name ?? '-',
                     ),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/supply/quote.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'quotation_sample.freezed.dart';
@@ -11,11 +12,14 @@ class QuotationSample with _$QuotationSample {
     String? price,
     int? qty,
     @JsonKey(name: 'showroomSample') Sample? showroomSample,
+    Quote? supplyQuote,
   }) = _QuotationSample;
 
   factory QuotationSample.fromJson(Map<String, dynamic> json) =>
       _$QuotationSampleFromJson(json);
 }
+
+
   // demo
   // {
   //   "id": 70964,

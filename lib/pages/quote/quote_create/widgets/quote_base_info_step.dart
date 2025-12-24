@@ -3,11 +3,12 @@ import 'package:cloud/pages/quote/quote_create/widgets/select_currency_sheet.dar
 import 'package:cloud/pages/quote/quote_create/widgets/select_customer_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 
-class QuoteBaseInfoStep extends ConsumerWidget {
+class QuoteBaseInfoStep extends HookConsumerWidget {
   const QuoteBaseInfoStep({
     super.key,
   });
@@ -15,7 +16,6 @@ class QuoteBaseInfoStep extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
 
@@ -36,7 +36,7 @@ class QuoteBaseInfoStep extends ConsumerWidget {
                   _sectionTitle('基本设置'),
                   FormSelectField(
                     label: '选择客户',
-                    value: state.customer ?? '请选择客户',
+                    value: state.selectedCustomers?.name ?? '请选择客户',
                     onTap: () => showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -64,7 +64,7 @@ class QuoteBaseInfoStep extends ConsumerWidget {
                         child: FormSelectField(
                           label: '选择语言',
                           required: false,
-                          value: state.language ?? '',
+                          value: state.language?.name ?? '',
                           onTap: () => {
                             showModalBottomSheet(
                               context: context,

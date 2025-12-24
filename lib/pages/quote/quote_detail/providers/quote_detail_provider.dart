@@ -49,6 +49,7 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
         products: list,
         productPage: page,
         productTotalPages: totalPages,
+        productError: null,
       );
     } catch (e) {
       state = state.copyWith(

@@ -20,9 +20,7 @@ class QuoteProductsPage extends ConsumerWidget {
           child: Column(
             children: [
               _HeaderCard(),
-
               const SizedBox(height: 12),
-
               // ================= 主体（左右两列） =================
               Expanded(
                 child: Row(
@@ -65,13 +63,28 @@ class _HeaderCard extends StatelessWidget {
             // ===== 第一行：标题 + 操作按钮 =====
             Row(
               children: [
-                // const Icon(Icons.shopping_cart_outlined, size: 18),
                 const SizedBox(width: 6),
-                const Text(
-                  '报价产品',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 3,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "报价产品",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Spacer(),

@@ -15,6 +15,9 @@ _$QuotationSampleImpl _$$QuotationSampleImplFromJson(
       showroomSample: json['showroomSample'] == null
           ? null
           : Sample.fromJson(json['showroomSample'] as Map<String, dynamic>),
+      supplyQuote: json['supplyQuote'] == null
+          ? null
+          : Quote.fromJson(json['supplyQuote'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$QuotationSampleImplToJson(
@@ -24,4 +27,5 @@ Map<String, dynamic> _$$QuotationSampleImplToJson(
       'price': instance.price,
       'qty': instance.qty,
       'showroomSample': instance.showroomSample,
+      'supplyQuote': instance.supplyQuote,
     };

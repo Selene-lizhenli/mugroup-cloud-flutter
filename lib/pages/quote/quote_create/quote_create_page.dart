@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
-import 'package:cloud/pages/quote/quote_create/widgets/quote_products_page.dart';
+import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,7 +20,7 @@ class QuoteCreatePage extends StatelessWidget {
       ),
       body: const Column(
         children: [
-          Expanded(child: QuoteCreateStepView()),
+          Expanded(child: QuoteBaseInfoStep()),
           QuoteCreateBottomBar(),
         ],
       ),
@@ -27,25 +28,19 @@ class QuoteCreatePage extends StatelessWidget {
   }
 }
 
-class QuoteCreateStepView extends ConsumerWidget {
-  const QuoteCreateStepView({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(quoteCreateProvider);
-
-    switch (state.step) {
-      case QuoteCreateStep.baseInfo:
-        return const QuoteBaseInfoStep();
-
-      case QuoteCreateStep.products:
-        return const QuoteProductsPage();
-
-      case QuoteCreateStep.review:
-        return const _ReviewStep();
-    }
-  }
-}
+// class QuoteCreateStepView extends ConsumerWidget {
+//   const QuoteCreateStepView({super.key});
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final state = ref.watch(quoteCreateProvider);
+//     switch (state.step) {
+//       case QuoteCreateStep.baseInfo:
+//         return const QuoteBaseInfoStep();
+//       case QuoteCreateStep.products:
+//         return const QuoteProductsPage();
+//     }
+//   }
+// }
 
 class _ReviewStep extends ConsumerWidget {
   const _ReviewStep({super.key});
@@ -59,46 +54,165 @@ class _ReviewStep extends ConsumerWidget {
   }
 }
 
+// class QuoteCreateBottomBar extends ConsumerWidget {
+//   const QuoteCreateBottomBar({super.key});
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final state = ref.watch(quoteCreateProvider);
+//     final notifier = ref.read(quoteCreateProvider.notifier);
+//     return SafeArea(
+//       child: Padding(
+//         padding: const EdgeInsets.all(12),
+//         child: Row(
+//           children: [
+//             if (state.stepIndex > 0)
+//               OutlinedButton(
+//                 onPressed: notifier.previousStep,
+//                 child: const Text('上一步'),
+//               ),
+//             const Spacer(),
+//             if (state.step != QuoteCreateStep.review)
+//               OutlinedButton(
+//                 onPressed: () async {
+//                   await notifier.saveDraft();
+//                   ScaffoldMessenger.of(context).showSnackBar(
+//                     const SnackBar(content: Text('草稿已保存')),
+//                   );
+//                 },
+//                 child: state.savingDraft
+//                     ? const SizedBox(
+//                         width: 16,
+//                         height: 16,
+//                         child: CircularProgressIndicator(strokeWidth: 2),
+//                       )
+//                     : const Text('保存草稿'),
+//               ),
+//             const SizedBox(width: 8),
+//             ElevatedButton(
+//               onPressed: notifier.nextStep,
+//               child: Text(
+//                 state.step == QuoteCreateStep.review ? '完成' : '下一步',
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class QuoteCreateBottomBar extends ConsumerWidget {
   const QuoteCreateBottomBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isLoading = state.savingDraft || state.submitting;
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE5E6EB)),
+          ),
+        ),
         child: Row(
           children: [
-            if (state.stepIndex > 0)
-              OutlinedButton(
-                onPressed: notifier.previousStep,
-                child: const Text('上一步'),
-              ),
-            const Spacer(),
-            if (state.step != QuoteCreateStep.review)
-              OutlinedButton(
-                onPressed: () async {
-                  await notifier.saveDraft();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('草稿已保存')),
-                  );
-                },
-                child: state.savingDraft
+            // ================= 草稿 =================
+            // Expanded(
+            //   child: OutlinedButton(
+            //     onPressed: isLoading
+            //         ? null
+            //         : () async {
+            //             await notifier.saveDraft();
+            //             if (context.mounted) {
+            //               ScaffoldMessenger.of(context).showSnackBar(
+            //                 const SnackBar(content: Text('草稿已保存')),
+            //               );
+            //             }
+            //           },
+            //     style: OutlinedButton.styleFrom(
+            //       side: const BorderSide(color: Color(0xFFD0D5DD)),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(8),
+            //       ),
+            //     ),
+            //     child: state.savingDraft
+            //         ? const SizedBox(
+            //             width: 18,
+            //             height: 18,
+            //             child: CircularProgressIndicator(strokeWidth: 2),
+            //           )
+            //         : const Text('草稿'),
+            //   ),
+            // ),
+
+            const SizedBox(width: 12),
+
+            // ================= 保存 =================
+            Expanded(
+              child: ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        // await notifier.saveDraft();
+                        if (context.mounted) {
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   const SnackBar(content: Text('保存成功')),
+                          // );
+                          final data = {
+                            "sample_items": state.productList
+                                .map((item) => {
+                                      "sample_id": item.sample.id,
+                                      "price": item.price,
+                                      "qty": item.count
+                                    })
+                                .toList(),
+                            "user_id": user?.id,
+                            "curreny": state.currency,
+                            "exchange": state.rate, //汇率
+                            "contact_id": state.contact,
+                            "commission_rate": state.addPercentage, //加点
+                            "quote_at": state.quoteDate.toIso8601String()
+                          };
+
+                          // final res = await storeShowroomQuotation(data);
+                          // if (res?.id != null && context.mounted) {
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   const SnackBar(content: Text('保存成功，正在跳转...')),
+                          // );
+                          // context.router.push(
+                          //     QuoteDetailRoute(id: res!.id!, userId: 0));
+                          context.router
+                              .push(QuoteDetailRoute(id: 307, userId: 0));
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.secondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: state.submitting
                     ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
-                    : const Text('保存草稿'),
-              ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              onPressed: notifier.nextStep,
-              child: Text(
-                state.step == QuoteCreateStep.review ? '完成' : '下一步',
+                    : Text(
+                        '保存',
+                        style: TextStyle(
+                            fontSize: 16, color: colorScheme.onSecondary),
+                      ),
               ),
             ),
           ],
@@ -107,38 +221,6 @@ class QuoteCreateBottomBar extends ConsumerWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // @RoutePage()
 // class QuoteCreatePage extends HookConsumerWidget {

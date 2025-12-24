@@ -39,7 +39,7 @@ class QuoteDetailPage extends HookConsumerWidget {
     // logger.d(userId);
 
     useEffect(() {
-      if (userId == null) return null;
+      if (userId <= 0) return null;
       Future.microtask(() {
         notifier.refresh();
       });
@@ -60,6 +60,7 @@ class QuoteDetailPage extends HookConsumerWidget {
         // quoteDetailNotifier.clear();
       };
     }, [id]);
+
     // ******** 监听 list/id 变化更新 currentIndex ********
     useEffect(() {
       if (state.list.isNotEmpty && id != 0) {
@@ -114,19 +115,20 @@ class QuoteDetailPage extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //  左侧时间轴
-            Container(
-              padding: const EdgeInsets.fromLTRB(4, 20, 4, 20),
-              // color: Theme.of(context).colorScheme.surface,
-              child: SizedBox(
-                width: 42,
-                child: TimelineList(
-                  items: state.list,
-                  currentIndex: currentIndex.value,
-                  controller: scrollController,
-                  onTap: onTimelineTap,
+            if (userId > 0)
+              Container(
+                padding: const EdgeInsets.fromLTRB(4, 20, 4, 20),
+                // color: Theme.of(context).colorScheme.surface,
+                child: SizedBox(
+                  width: 42,
+                  child: TimelineList(
+                    items: state.list,
+                    currentIndex: currentIndex.value,
+                    controller: scrollController,
+                    onTap: onTimelineTap,
+                  ),
                 ),
               ),
-            ),
             //右侧详细信息
             Expanded(
               child: QuoteDetailBody(
