@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_sample_form.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class ShowroomSampleCreatePage extends HookConsumerWidget {
@@ -58,12 +60,18 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
           ),
           body: ShowroomSampleForm(
             initial: null,
+            itemType: itemType,
             onSubmit: (data) async {
               EasyLoading.show(status: '创建中...');
 
               await storeShowroomSample({...data, 'item_type': itemType});
 
               EasyLoading.dismiss();
+
+              final prefs = await SharedPreferences.getInstance();
+              // 序列化数据并存储，Key 可以根据 itemType 区分，防止不同类型产品混用
+              String storageKey = 'last_sample_data_${itemType ?? "default"}';
+              await prefs.setString(storageKey, jsonEncode(data));
 
               if (!context.mounted) return false;
 

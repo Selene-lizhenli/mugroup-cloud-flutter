@@ -130,7 +130,8 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     enTitle: 'Products',
                     cnTitle: '新增产品',
                     onTap: () {
-                      context.router.push(ShowroomSampleCreateRoute());
+                      context.router.push(ShowroomSampleCreateRoute(
+                          itemType: 'market_product'));
                     },
                   ),
                 ),

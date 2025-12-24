@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
@@ -22,18 +24,20 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowroomSampleForm extends HookConsumerWidget {
   final Sample? initial;
+  final String? itemType;
   final Future<bool?> Function(Map<String, dynamic>)? onDraft;
   final Future<bool?> Function(Map<String, dynamic>) onSubmit;
 
-  const ShowroomSampleForm({
-    super.key,
-    required this.initial,
-    this.onDraft, //预留草稿操作
-    required this.onSubmit,
-  });
+  const ShowroomSampleForm(
+      {super.key,
+      required this.initial,
+      this.onDraft, //预留草稿操作
+      required this.onSubmit,
+      this.itemType});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -169,9 +173,35 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         children: [
                           if (initial == null) ...[
                             GestureDetector(
-                              onTap: () {
-                                // TODO: 在这里添加复制上一条数据的逻辑
-                                print("点击了复制上一条");
+                              onTap: () async {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                final jsonStr = prefs.getString(
+                                    'last_sample_data_${itemType ?? "default"}');
+
+                                if (jsonStr != null) {
+                                  final data = jsonDecode(jsonStr);
+                                  data.remove('id');
+                                  data.remove('product_no');
+                                  data.remove('image');
+                                  data.remove('supply_quotes');
+                                  if (data['spec'] != null &&
+                                      data['spec'].toString().isNotEmpty) {
+                                    final parts =
+                                        data['spec'].toString().split('x');
+                                    if (parts.isNotEmpty) {
+                                      data['length'] = parts[0];
+                                    }
+                                    if (parts.length > 1) {
+                                      data['width'] = parts[1];
+                                    }
+                                    if (parts.length > 2) {
+                                      data['heigth'] = parts[2];
+                                    }
+                                  }
+
+                                  formKey.currentState?.patchValue(data);
+                                }
                               },
                               child: Row(
                                 children: [
