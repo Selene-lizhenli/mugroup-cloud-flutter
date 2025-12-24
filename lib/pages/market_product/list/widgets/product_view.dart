@@ -2,13 +2,10 @@ import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/pages/home/widgets/product_card.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
-import 'package:cloud/pages/market_product/list/widgets/product_dropdown_menu.dart';
+import 'package:cloud/pages/market_product/list/widgets/product_card.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/services/sample.dart';
-import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -23,8 +20,6 @@ class MarketProductView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
-    final cart = ref.read(cartProvider.notifier);
-    final cartState = ref.watch(cartProvider);
 
     final refreshController = useEasyRefreshController(
       controlFinishLoad: true,
@@ -157,21 +152,6 @@ class MarketProductView extends HookConsumerWidget {
             slivers: [
               MultiSliver(
                 children: [
-                  // 解决 Header 下拉刷新时不会跟着移动的
-                  Container(
-                    height: 0,
-                  ),
-                  if (facetCounts.value.isNotEmpty)
-                    SliverPinnedHeader(
-                      child: ProductDropdownMenu(
-                        facetCounts: facetCounts.value,
-                        value: query.value,
-                        onChange: (menuQuery) {
-                          query.value = menuQuery;
-                          refreshController.callRefresh(force: true);
-                        },
-                      ),
-                    ),
                   if (samples.value.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
@@ -197,16 +177,10 @@ class MarketProductView extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         final sample = samples.value[index];
-                        final cartItem = cartState.items.firstWhereOrNull(
-                            (element) => element.sample.id == sample.id);
 
                         return ProductCard(
                           key: ValueKey(sample.id),
                           sample: sample,
-                          cartCount: cartItem?.count,
-                          onTapAddSample: () {
-                            cart.addSample(sample, 1);
-                          },
                         );
                       },
                     ),
