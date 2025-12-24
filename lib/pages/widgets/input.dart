@@ -12,6 +12,7 @@ class Input extends HookConsumerWidget {
   final String? hintText;
 
   final String? errorText;
+  final bool showClearButton;
 
   final List<TextInputFormatter>? inputFormatters;
 
@@ -25,6 +26,7 @@ class Input extends HookConsumerWidget {
     this.hintText,
     this.errorText,
     this.inputFormatters,
+    this.showClearButton = true,
   });
 
   @override
@@ -105,7 +107,7 @@ class Input extends HookConsumerWidget {
               maxHeight: 30,
               minWidth: 40,
             ),
-            suffixIcon: controller.text.isNotEmpty
+            suffixIcon: showClearButton && controller.text.isNotEmpty
                 ? IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

@@ -8,6 +8,7 @@ import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/spacing_row.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
@@ -202,6 +203,40 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             ],
                           ),
                           children: [
+                            FormBuilderField<Map<String, dynamic>>(
+                              name: 'supplier',
+                              builder: (field) {
+                                final supplier = field.value;
+                                return GestureDetector(
+                                  onTap: () async {
+                                    final selectedSupplier =
+                                        await showModalBottomSheet<
+                                            Map<String, dynamic>>(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (_) => const SupplierSelect(),
+                                    );
+
+                                    if (selectedSupplier != null) {
+                                      field.didChange(selectedSupplier);
+                                    }
+                                  },
+                                  child: AbsorbPointer(
+                                    child: Input(
+                                      label: '供应商',
+                                      showClearButton: false,
+                                      value: supplier == null
+                                          ? ''
+                                          : (supplier['short_name'] ??
+                                              supplier['name'] ??
+                                              ''),
+                                      hintText: '请选择供应商',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             SpacingRow(
                               spacing: 12,
                               children: [
