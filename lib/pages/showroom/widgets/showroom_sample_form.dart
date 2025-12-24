@@ -174,46 +174,64 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           if (initial == null) ...[
                             GestureDetector(
                               onTap: () async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                final jsonStr = prefs.getString(
-                                    'last_sample_data_${itemType ?? "default"}');
+                                try {
+                                  EasyLoading.show(status: '加载中...');
 
-                                if (jsonStr != null) {
-                                  final data = jsonDecode(jsonStr);
-                                  data.remove('id');
-                                  data.remove('product_no');
-                                  data.remove('image');
-                                  data.remove('supply_quotes');
-                                  if (data['spec'] != null &&
-                                      data['spec'].toString().isNotEmpty) {
-                                    final parts =
-                                        data['spec'].toString().split('x');
-                                    if (parts.isNotEmpty) {
-                                      data['length'] = parts[0];
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  final jsonStr = prefs.getString(
+                                    'last_sample_data_${itemType ?? "default"}',
+                                  );
+
+                                  if (jsonStr != null) {
+                                    final data = jsonDecode(jsonStr);
+
+                                    // 移除不需要复用的字段
+                                    data.remove('id');
+                                    data.remove('product_no');
+                                    data.remove('image');
+                                    data.remove('supply_quotes');
+
+                                    // spec 拆分
+                                    if (data['spec'] != null &&
+                                        data['spec'].toString().isNotEmpty) {
+                                      final parts =
+                                          data['spec'].toString().split('x');
+                                      if (parts.isNotEmpty) {
+                                        data['length'] = parts[0];
+                                      }
+                                      if (parts.length > 1) {
+                                        data['width'] = parts[1];
+                                      }
+                                      if (parts.length > 2) {
+                                        data['heigth'] = parts[2];
+                                      }
                                     }
-                                    if (parts.length > 1) {
-                                      data['width'] = parts[1];
-                                    }
-                                    if (parts.length > 2) {
-                                      data['heigth'] = parts[2];
-                                    }
+
+                                    // 填充表单
+                                    formKey.currentState?.patchValue(data);
                                   }
-
-                                  formKey.currentState?.patchValue(data);
+                                } catch (e) {
+                                  EasyLoading.showError('加载失败');
+                                } finally {
+                                  EasyLoading.dismiss();
                                 }
                               },
                               child: Row(
                                 children: [
-                                  Icon(Icons.content_copy,
-                                      size: 16,
-                                      color: Theme.of(context).primaryColor),
+                                  Icon(
+                                    Icons.content_copy,
+                                    size: 16,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                   const SizedBox(width: 4),
-                                  Text("复制上一条",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color:
-                                              Theme.of(context).primaryColor)),
+                                  Text(
+                                    "复制上一条",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
