@@ -190,7 +190,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                           // context.router.push(
                           //     QuoteDetailRoute(id: res!.id!, userId: 0));
                           context.router
-                              .push(QuoteDetailRoute(id: 307, userId: 0));
+                              .push(QuoteDetailRoute(id: 322, userId: 0));
                         }
                       },
                 style: ElevatedButton.styleFrom(

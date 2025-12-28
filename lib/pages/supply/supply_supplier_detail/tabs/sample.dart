@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';

@@ -4,7 +4,7 @@ import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
-import 'package:cloud/pages/home/models/home_state.dart';
+import 'package:cloud/pages/samples/models/home_state.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

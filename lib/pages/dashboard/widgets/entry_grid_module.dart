@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/samples/samples_list_page.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 
@@ -31,13 +32,13 @@ class EntryGridModule extends StatelessWidget {
         children: const [
           _EntryItem(
             icon: Icons.store,
-            label: '市场采购',
+            label: '市场带客',
             route: MarketProductRoute(),
           ),
           _EntryItem(
             icon: Icons.inventory_2,
             label: '样品间',
-            route: CrmCompanyRoute(),
+            route: SamplesRoute(),
           ),
           _EntryItem(
             icon: Icons.people,
@@ -47,6 +48,11 @@ class EntryGridModule extends StatelessWidget {
           _EntryItem(
             icon: Icons.factory,
             label: '供应商',
+            route: SupplySupplierRoute(),
+          ),
+          _EntryItem(
+            icon: Icons.factory,
+            label: '跟单验货',
             route: SupplySupplierRoute(),
           ),
         ],

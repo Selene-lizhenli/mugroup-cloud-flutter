@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -23,57 +24,64 @@ class ProductSection extends ConsumerWidget {
         color: colorScheme.surface,
         padding: const EdgeInsets.fromLTRB(14, 3, 14, 3),
         child: SizedBox(
-            height: 320,
-            child: Column(
-              children: [
-                // ===== 头部 =====
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('产品列表', style: theme.textTheme.titleMedium),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          context.router
-                              .push(QuoteProductAddRoute(quoteId: quoteId));
-                        },
-                        icon: const Icon(Icons.add, size: 12),
-                        label: Text('添加产品',
-                            style: TextStyle(
-                                color: colorScheme.primary, fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          minimumSize: Size.zero, // 关键：取消最小高度
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          child: Column(
+            children: [
+              // ===== 头部 =====
+              Padding(
+                padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Text('产品列表', style: theme.textTheme.titleMedium),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        ActionPillButton(
+                          label: '批量导入',
+                          icon: Icons.upload_outlined,
+                          backgroundColor: const Color(0xFFFF5A8A), // 粉色
+                          textColor: Colors.white,
+                          onTap: () {
+                            // TODO 批量导入
+                          },
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        ActionPillButton(
+                          label: '新增产品',
+                          icon: Icons.add,
+                          backgroundColor: colorScheme.secondary, // 蓝色
+                          textColor: colorScheme.onSecondary,
+                          onTap: () {
+                            context.router.push(ShowroomSampleCreateRoute());
+                          },
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-                const Divider(height: 1),
-
-                Expanded(
-                  child: _buildBody(context, state, colorScheme),
-                ),
-
-                PaginationBar(
-                  currentPage: state.productPage,
-                  totalPages: state.productTotalPages,
-                  onPageChanged: (page) {
-                    notifier.fetchProductsPage(quoteId!, page);
-                  },
-                ),
-              ],
-            )));
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: _buildBody(context, state, colorScheme, notifier),
+              ),
+              // ===== 分页（固定高度）=====
+              PaginationBar(
+                currentPage: state.productPage,
+                totalPages: state.productTotalPages,
+                onPageChanged: (page) {
+                  notifier.fetchProductsPage(quoteId!, page);
+                },
+              ),
+            ],
+          ),
+        ));
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    QuoteDetailState state,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildBody(BuildContext context, QuoteDetailState state,
+      ColorScheme colorScheme, notifier) {
     if (state.isProductLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -109,65 +117,109 @@ class ProductSection extends ConsumerWidget {
         if (sample == null) {
           return const SizedBox.shrink();
         }
-        logger.d('Product sample: $sample');
         return Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colorScheme.secondary.withOpacity(0.04),
+            color: colorScheme.secondary.withOpacity(0.06),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ===== 图片 =====
-              _ProductImage(imageUrl: imageUrl),
-              const SizedBox(width: 12),
-              // ===== 文本信息 =====
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _KeyValue(
-                      label: '产品编码',
-                      value: sample.productNo ?? '-',
-                      highlight: true,
+              Row(
+                children: [
+                  _KeyValue(
+                    label: '供应商',
+                    value: row.supplyQuote?.supplier?.name ?? '-',
+                  ),
+                  const Spacer(),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      // context.router.push(
+                      //     // ShowroomSampleDetailRoute(id: sample.id!, userId: 0)
+                      //     );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        size: 16,
+                        color: colorScheme.secondary,
+                      ),
                     ),
-                    _KeyValue(
-                      label: '品名',
-                      value: sample.nameCn ?? sample.nameEn ?? '-',
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      // context.router.push(
+                      //     // ShowroomSampleDetailRoute(id: sample.id!, userId: 0)
+                      //     );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: 16,
+                        color: colorScheme.error,
+                      ),
                     ),
-                    Row(children: [
-                      if ((sample.spec ?? '').isNotEmpty)
-                        _KeyValue(label: '规格', value: sample.spec!),
-                      const SizedBox(width: 16),
-                      if ((sample.packing ?? '').isNotEmpty)
-                        _KeyValue(label: '包装', value: sample.packing!),
-                    ]),
-                    _KeyValue(
-                      label: '客户报价',
-                      value: row.price != null ? row.price.toString() : '-',
-                    ),
-                    _KeyValue(
-                      label: '服务商',
-                      value: row.supplyQuote?.supplier?.name ?? '-',
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              // ===== 数量 =====
-              if (row.qty != null)
-                Column(
-                  children: [
-                    Text(
-                      'x${row.qty}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.secondary,
-                            fontWeight: FontWeight.w600,
-                          ),
+              const Divider(height: 1),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  // ===== 图片 =====
+                  _ProductImage(imageUrl: imageUrl),
+                  const SizedBox(width: 12),
+                  // ===== 文本信息 =====
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _KeyValue(
+                          label: '品名',
+                          value: sample.nameCn ?? sample.nameEn ?? '-',
+                        ),
+                        _KeyValue(
+                          label: '产品编码',
+                          value: sample.productNo ?? '-',
+                          highlight: true,
+                        ),
+                        Row(children: [
+                          if ((sample.spec ?? '').isNotEmpty)
+                            _KeyValue(label: '规格', value: sample.spec!),
+                          const SizedBox(width: 16),
+                          // if ((sample.packing ?? '').isNotEmpty)
+                          //   _KeyValue(label: '包装', value: sample.packing!),
+                        ]),
+                        _KeyValue(
+                          label: '客户报价',
+                          value: row.price != null ? row.price.toString() : '-',
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+
+                  // ===== 数量 =====
+                  if (row.qty != null)
+                    Column(
+                      children: [
+                        Text(
+                          'x${row.qty}',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.secondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ],
           ),
         );

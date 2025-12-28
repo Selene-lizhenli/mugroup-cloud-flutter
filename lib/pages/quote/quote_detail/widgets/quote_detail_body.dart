@@ -15,19 +15,23 @@ class QuoteDetailBody extends StatelessWidget {
     if (item == null) {
       return const Center(child: Text('无详情数据'));
     }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Scaffold(
+      body: Column(
         children: [
-          ExportActionBar(item: item),
-          const SizedBox(height: 12),
-          BaseInfoSection(item: item),
-          const SizedBox(height: 12),
-          ProductSection(quoteId: item!.id),
-          const SizedBox(height: 12),
-          SupplierSection(quoteId: item!.id),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ExportActionBar(item: item),
+                const SizedBox(height: 12),
+                BaseInfoSection(item: item),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ProductSection(quoteId: item!.id),
+          ),
         ],
       ),
     );

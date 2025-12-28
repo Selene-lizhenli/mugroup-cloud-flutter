@@ -80,60 +80,62 @@ class Layout extends HookConsumerWidget {
       return null;
     }, [checkVersion]);
 
-    final items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
-      BottomNavigationBarItem(
-        icon: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
-          children: [
-            const Icon(Icons.shopping_cart),
-            Positioned(
-              top: -8,
-              right: -10,
-              child: TDBadge(
-                TDBadgeType.message,
-                color: colorScheme.primary,
-                textColor: colorScheme.tertiary,
-                size: TDBadgeSize.large,
-                showZero: false,
-                count: cartState.items.length.toString(),
-              ),
-            )
-          ],
-        ),
-        label: "选样车",
-      ),
-      const BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
-    ];
+    // final items = [
+    //   const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
+    //   const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
+    //   BottomNavigationBarItem(
+    //     icon: Stack(
+    //       clipBehavior: Clip.none,
+    //       alignment: Alignment.bottomCenter,
+    //       children: [
+    //         const Icon(Icons.shopping_cart),
+    //         Positioned(
+    //           top: -8,
+    //           right: -10,
+    //           child: TDBadge(
+    //             TDBadgeType.message,
+    //             color: colorScheme.primary,
+    //             textColor: colorScheme.tertiary,
+    //             size: TDBadgeSize.large,
+    //             showZero: false,
+    //             count: cartState.items.length.toString(),
+    //           ),
+    //         )
+    //       ],
+    //     ),
+    //     label: "选样车",
+    //   ),
+    //   const BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
+    // ];
 
-    return AutoTabsRouter(
-      builder: (context, child) {
-        return Scaffold(
-          body: child,
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: context.tabsRouter.activeIndex,
-            onTap: (index) {
-              final item = items[index];
-              if (item.label == "选样车") {
-                app.container.refresh(cartProvider);
-              }
-              debugPrint(
-                  'activeIndex666: ${context.tabsRouter.activeIndex}${items[index].label}');
-              if (item.label == "我的") {
-                app.fetchUser();
-              }
-              context.tabsRouter.setActiveIndex(index);
-            },
-            items: items,
-            selectedItemColor: colorScheme.primary, // 选中文字 + 图标颜色
-            unselectedItemColor: colorScheme.surfaceContainerHighest, // 非选中颜色
-            showUnselectedLabels: true, // 未选中也显示文字
-          ),
-        );
-      },
-    );
+    // return AutoTabsRouter(
+    //   builder: (context, child) {
+    //     return Scaffold(
+    //       body: child,
+    //       bottomNavigationBar: BottomNavigationBar(
+    //         type: BottomNavigationBarType.fixed,
+    //         currentIndex: context.tabsRouter.activeIndex,
+    //         onTap: (index) {
+    //           final item = items[index];
+    //           if (item.label == "选样车") {
+    //             app.container.refresh(cartProvider);
+    //           }
+    //           debugPrint(
+    //               'activeIndex666: ${context.tabsRouter.activeIndex}${items[index].label}');
+    //           if (item.label == "我的") {
+    //             app.fetchUser();
+    //           }
+    //           context.tabsRouter.setActiveIndex(index);
+    //         },
+    //         items: items,
+    //         selectedItemColor: colorScheme.primary, // 选中文字 + 图标颜色
+    //         unselectedItemColor: colorScheme.surfaceContainerHighest, // 非选中颜色
+    //         showUnselectedLabels: true, // 未选中也显示文字
+    //       ),
+    //     );
+    //   },
+    // );
+
+    return DashboardPage();
   }
 }

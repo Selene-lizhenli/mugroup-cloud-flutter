@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
-import 'package:cloud/pages/home/widgets/product_card.dart';
+import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_submit_bar.dart';

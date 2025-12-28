@@ -28,13 +28,16 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  fl_chart: ^0.35.0  # 使用一个更旧的版本
   flutter:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  flutter_charts: ^0.5.2
   omni_datetime_picker: ^1.0.9 
   flutter_datetime_picker_plus: ^2.2.0
+  syncfusion_flutter_charts: ^29.1.38
   cupertino_icons: ^1.0.6
   flutter_broadcasts: ^0.4.0
   auto_route: 9.2.2
@@ -160,8 +163,12 @@ flutter:
 
   assets:
     - assets/coming.png
+    - assets/carouse/yiwudong4.jpg
+    - assets/carouse/yiwudong4-2.jpg
     - assets/noImage.png
-    - assets/icons/
+    - assets/icon.png
+    - assets/logo.webp
+    - assets/splash.png
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

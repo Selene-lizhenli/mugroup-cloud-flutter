@@ -43,7 +43,7 @@ class LoginPage extends HookConsumerWidget {
 
       // 默认跳转到首页
       final router = AutoRouter.of(context);
-      router.replace(const HomeRoute());
+      router.replace(const DashboardRoute());
     }, [onLogin]);
 
     final enableLoginWays = useMemoized(() {

@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
-class MarketProductPage extends HookConsumerWidget {
-  const MarketProductPage({super.key});
+class SamplesPage extends HookConsumerWidget {
+  const SamplesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
       const BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_outlined), label: "报价单"),
-      // const BottomNavigationBarItem(
-      //     icon: Icon(Icons.check_circle_outline), label: "验货"),
+          icon: Icon(Icons.assignment_outlined), label: "选样车"),
     ];
     return AutoTabsRouter(
       builder: (context, child) {

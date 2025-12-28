@@ -1,6 +1,6 @@
 import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/pages/home/providers/home_provider.dart';
-import 'package:cloud/pages/home/widgets/home_media.dart';
+import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/pages/samples/widgets/home_media.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
@@ -168,13 +168,13 @@ class HomeAppBar extends HookConsumerWidget {
                 height: 0,
               ),
               Container(
-                margin: const EdgeInsets.only(
-                    top: 2, bottom: 2, left: 2, right: 0),
+                margin:
+                    const EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 0),
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: colorScheme.secondary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

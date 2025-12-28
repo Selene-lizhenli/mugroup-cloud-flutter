@@ -12,7 +12,7 @@ class MarketProductInfoPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: const Text('市场采购首页'),
+        title: const Text('市场带客'),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -61,16 +61,16 @@ class MarketProductInfoPage extends HookConsumerWidget {
                 context.router.push(const QuoteRoute());
               },
             ),
-            const SizedBox(height: 12),
-            _MenuCard(
-              color: const Color(0xFF8B5CF6),
-              icon: Icons.check_circle_outline,
-              title: '验货任务',
-              subtitle: '创建和管理验货任务，上传验货图片',
-              onTap: () {
-                context.router.push(const MarketProductInspectionRoute());
-              },
-            ),
+            // const SizedBox(height: 12),
+            // _MenuCard(
+            //   color: const Color(0xFF8B5CF6),
+            //   icon: Icons.check_circle_outline,
+            //   title: '验货任务',
+            //   subtitle: '创建和管理验货任务，上传验货图片',
+            //   onTap: () {
+            //     context.router.push(const MarketProductInspectionRoute());
+            //   },
+            // ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

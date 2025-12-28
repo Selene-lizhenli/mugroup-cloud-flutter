@@ -17,21 +17,58 @@ class AppRouter extends RootStackRouter {
         children: [
           AutoRoute(
             page: DashboardRoute.page,
+            initial: true,
             path: 'dashboard',
           ),
+        ],
+      ),
+      AutoRoute(
+        page: SamplesRoute.page,
+        path: '/samples',
+        guards: [AuthGuard()],
+        children: [
           AutoRoute(
+            page: SamplesListRoute.page,
+            path: '',
             initial: true,
-            page: HomeRoute.page,
-            path: 'sample',
           ),
           AutoRoute(
             page: CartRoute.page,
-            path: "cart",
+            path: 'cart',
+          ),
+        ],
+      ),
+      AutoRoute(
+        page: MyRoute.page,
+        path: "/my",
+      ),
+      AutoRoute(
+        page: SettingRoute.page,
+        path: "/setting",
+      ),
+      AutoRoute(
+          page: MarketProductListRoute.page,
+          path: "/market_product/market_product_list"),
+      AutoRoute(
+          page: MarketProductInspectionRoute.page,
+          path: "/market_product/inspection"),
+      AutoRoute(
+        page: MarketProductRoute.page,
+        guards: [AuthGuard()],
+        path: '/market_product',
+        children: [
+          AutoRoute(
+            page: MarketProductInfoRoute.page,
+            path: "",
           ),
           AutoRoute(
-            page: MyRoute.page,
-            path: "my",
+            page: QuoteRoute.page,
+            path: "quotation",
           ),
+          // AutoRoute(
+          //   page: MarketProductInspectionRoute.page,
+          //   path: "inspection",
+          // ),
         ],
       ),
 
@@ -63,7 +100,7 @@ class AppRouter extends RootStackRouter {
           path: "/supply/supplier/create"),
       AutoRoute(page: QuoteCreateRoute.page, path: "/quote/create"),
       AutoRoute(page: QuoteDetailRoute.page, path: "/quote/detail/:id/:userId"),
-      AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
+      // AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
       AutoRoute(page: QuoteProductAddRoute.page, path: "/quote/product/add"),
 
@@ -102,31 +139,7 @@ class AppRouter extends RootStackRouter {
           ),
         ],
       ),
-      AutoRoute(
-          page: MarketProductListRoute.page,
-          path: "/market_product/market_product_list"),
-      AutoRoute(
-          page: MarketProductInspectionRoute.page,
-          path: "/market_product/inspection"),
-      AutoRoute(
-        page: MarketProductRoute.page,
-        guards: [AuthGuard()],
-        path: '/market_product',
-        children: [
-          AutoRoute(
-            page: MarketProductInfoRoute.page,
-            path: "",
-          ),
-          AutoRoute(
-            page: QuoteRoute.page,
-            path: "quotation",
-          ),
-          AutoRoute(
-            page: MarketProductInspectionRoute.page,
-            path: "inspection",
-          ),
-        ],
-      ),
+
       AutoRoute(
           page: WmsTransferConfirmRoute.page,
           path: "/wms/transfer/confirm/:code"),
