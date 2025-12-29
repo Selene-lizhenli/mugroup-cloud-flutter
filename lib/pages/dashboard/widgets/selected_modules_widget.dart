@@ -1,10 +1,10 @@
-import 'package:cloud/pages/setting/widgets/line_chart_demo.dart';
-import 'package:cloud/pages/setting/widgets/news_board.dart';
-import 'package:cloud/pages/setting/widgets/market_purchase_chart.dart';
-import 'package:cloud/pages/setting/widgets/sample_room_chart.dart';
-import 'package:cloud/pages/setting/widgets/inspection_chart.dart';
-import 'package:cloud/pages/setting/widgets/customer_chart.dart';
-import 'package:cloud/pages/setting/widgets/supplier_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/line_chart_demo.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/market_purchase_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +30,36 @@ class DashboardModules {
   static List<ModuleInfo> getAllModules() {
     return [
       ModuleInfo(
+        id: 'sample_room',
+        title: '样品间',
+        contentBuilder: () => const SampleRoomChart(),
+        group: '数据统计',
+      ),
+      ModuleInfo(
+        id: 'inspection',
+        title: '验货',
+        contentBuilder: () => const InspectionChart(),
+        group: '数据统计',
+      ),
+        ModuleInfo(
+        id: 'market_purchase',
+        title: '市场采购',
+        contentBuilder: () => const MarketPurchaseChart(),
+        group: '数据统计',
+      ),
+      ModuleInfo(
+        id: 'customer',
+        title: '客户',
+        contentBuilder: () => const CustomerChart(),
+        group: '数据统计',
+      ),
+      ModuleInfo(
+        id: 'supplier',
+        title: '供应商',
+        contentBuilder: () => const SupplierChart(),
+        group: '数据统计',
+      ),
+           ModuleInfo(
         id: 'news',
         title: '集团资讯',
         contentBuilder: () => const NewsBoard(),
@@ -40,36 +70,6 @@ class DashboardModules {
         title: '汇率波动',
         contentBuilder: () => const LineChartDemo(),
         group: '应用',
-      ),
-      ModuleInfo(
-        id: 'market_purchase',
-        title: '市场采购',
-        contentBuilder: () => const MarketPurchaseChart(),
-        group: '数据概览',
-      ),
-      ModuleInfo(
-        id: 'sample_room',
-        title: '样品间',
-        contentBuilder: () => const SampleRoomChart(),
-        group: '数据概览',
-      ),
-      ModuleInfo(
-        id: 'inspection',
-        title: '验货',
-        contentBuilder: () => const InspectionChart(),
-        group: '数据概览',
-      ),
-      ModuleInfo(
-        id: 'customer',
-        title: '客户',
-        contentBuilder: () => const CustomerChart(),
-        group: '数据概览',
-      ),
-      ModuleInfo(
-        id: 'supplier',
-        title: '供应商',
-        contentBuilder: () => const SupplierChart(),
-        group: '数据概览',
       ),
     ];
   }
@@ -108,7 +108,16 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
     _loadSelectedModules();
   }
 
+  /// 刷新模块数据
+  Future<void> refresh() async {
+    await _loadSelectedModules();
+  }
+
   Future<void> _loadSelectedModules() async {
+    setState(() {
+      _loading = true;
+    });
+    
     final modules = await DashboardModules.getSelectedModules();
     if (mounted) {
       setState(() {
@@ -128,78 +137,129 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
       return const SizedBox.shrink();
     }
 
-    // 按组分类
-    final dataOverviewModules = _selectedModules
-        .where((m) => m.group == '数据概览')
-        .toList();
-    final appModules = _selectedModules
-        .where((m) => m.group == '应用')
-        .toList();
-
+    // 直接展示所有选中的模块，不分组
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 数据概览组
-        if (dataOverviewModules.isNotEmpty) ...[
-          _buildGroupSection('数据概览', dataOverviewModules),
-          const SizedBox(height: 12),
-        ],
-        // 应用组
-        if (appModules.isNotEmpty) ...[
-          _buildGroupSection('应用', appModules),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildGroupSection(String groupTitle, List<ModuleInfo> modules) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            groupTitle,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ),
-        ...modules.map((module) => _buildModuleCard(module)),
-      ],
+      children: _selectedModules.map((module) => _buildModuleCard(module)).toList(),
     );
   }
 
   Widget _buildModuleCard(ModuleInfo module) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              module.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 标题行：标题居左，如果是数据统计组则右侧显示维度选择图标
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 模块标题，居左
+              Text(
+                module.title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              // 如果是数据统计组，显示维度选择图标
+              if (module.group == '数据统计')
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.tune,
+                    size: 20,
+                    color: Colors.grey.shade600,
                   ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  offset: const Offset(0, 8), // 在按钮下方显示气泡菜单
+                  itemBuilder: (BuildContext context) => _buildDimensionMenuItems(module.id),
+                  onSelected: (String value) {
+                    // TODO: 处理维度选择，可以根据模块ID和选中的维度值来更新数据
+                    // 这里可以添加回调或状态管理来处理维度切换
+                  },
+                ),
+            ],
+          ),
+        ),
+        // 白色card只包含内容
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: module.contentBuilder(),
+        ),
+      ],
+    );
+  }
+
+  /// 构建维度选择菜单项
+  List<PopupMenuEntry<String>> _buildDimensionMenuItems(String moduleId) {
+    // 根据不同的模块ID返回不同的维度选项
+    // 可以根据实际需求扩展每个模块的维度选项
+    switch (moduleId) {
+      case 'sample_room':
+        return [
+          const PopupMenuItem<String>(
+            value: '产品目录',
+            child: Row(
+              children: [
+                const Icon(Icons.category, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('产品目录'),
+              ],
             ),
           ),
-          module.contentBuilder(),
-        ],
-      ),
-    );
+          const PopupMenuItem<String>(
+            value: '贸易国别',
+            child: Row(
+              children: [
+                const Icon(Icons.public, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('贸易国别'),
+              ],
+            ),
+          ),
+         const PopupMenuItem<String>(
+            value: '样品间',
+            child: Row(
+              children: [
+                const Icon(Icons.warehouse, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('样品间'),
+              ],
+            ),
+          ),
+        ];
+      case 'inspection':
+      case 'market_purchase':
+      case 'customer':
+      case 'supplier':
+        // 其他数据统计模块的维度选项（可以根据实际需求添加）
+        return [
+         const PopupMenuItem<String>(
+            value: '默认',
+            child: Row(
+              children: [
+                const Icon(Icons.analytics, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('默认维度'),
+              ],
+            ),
+          ),
+        ];
+      default:
+        return [];
+    }
   }
 }
 

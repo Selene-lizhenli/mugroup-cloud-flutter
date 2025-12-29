@@ -146,3 +146,40 @@ Future<List<Category>?> getAllShowroomCategories() async {
   }
   return null;
 }
+
+/// 统计数据项
+class SampleStatisticItem {
+  final String name;
+  final int count;
+
+  SampleStatisticItem({
+    required this.name,
+    required this.count,
+  });
+
+  factory SampleStatisticItem.fromJson(Map<String, dynamic> json) {
+    // 支持 'name' 或 'value' 字段作为名称
+    final name = json['name'] ?? json['value'] ?? '';
+    final count = json['count'] ?? 0;
+    return SampleStatisticItem(name: name, count: count);
+  }
+}
+
+/// 获取样品间统计数据（按贸易国别）
+Future<List<SampleStatisticItem>?> getShowroomSampleTradeCountryStats() async {
+  final res = await api.get(
+    "api/tenant/schemas/showroom_samples/trade_country",
+  );
+
+  if (res.data == null) {
+    return null;
+  }
+
+  if (res.data is List) {
+    return (res.data as List)
+        .map((e) => SampleStatisticItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  return null;
+}

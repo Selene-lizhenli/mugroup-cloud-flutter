@@ -14,6 +14,28 @@ enum _MoreAction {
 class HomeUserHeader extends HookConsumerWidget {
   const HomeUserHeader({super.key});
 
+  Widget _buildUpdateItem(BuildContext context, ThemeData theme,
+      ColorScheme colorScheme, String version, List<String> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                item,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.5,
+                  fontSize: 12,
+                  color: item.startsWith('  •') || item.isEmpty
+                      ? colorScheme.onSurface.withOpacity(0.7)
+                      : colorScheme.onSurface,
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -24,8 +46,42 @@ class HomeUserHeader extends HookConsumerWidget {
       showModalBottomSheet(
         context: context,
         showDragHandle: true,
-        builder: (_) => const Center(
-          child: Text('这里展示版本更新内容'),
+        isScrollControlled: true,
+        builder: (_) => Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '版本更新日志：',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildUpdateItem(
+                  context,
+                  theme,
+                  colorScheme,
+                  '2.0最新升级内容',
+                  [
+                    '✨ 新增功能',
+                    '  • 新增首页自定义展示模块',
+                    '  • 新增《验货》模块，记录商品验货图片',
+                    '  • 首页新增数据统计模块',
+                    '🔧 功能改进',
+                    '  • 首页布局优化，展示用户信息、应用模块入口、数据统计等模块',
+                    '  • 商品卡片展示优化，提供更清爽的展示方式',
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
         ),
       );
     }

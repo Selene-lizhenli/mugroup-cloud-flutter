@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/pages/setting/widgets/line_chart_demo.dart';
-import 'package:cloud/pages/setting/widgets/news_board.dart';
-import 'package:cloud/pages/setting/widgets/market_purchase_chart.dart';
-import 'package:cloud/pages/setting/widgets/sample_room_chart.dart';
-import 'package:cloud/pages/setting/widgets/inspection_chart.dart';
-import 'package:cloud/pages/setting/widgets/customer_chart.dart';
-import 'package:cloud/pages/setting/widgets/supplier_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/line_chart_demo.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/market_purchase_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,38 +53,38 @@ class _SettingPageState extends State<SettingPage> {
         selected: selectedIds.contains('rate'),
       ),
       DashboardModule(
-        id: 'market_purchase',
-        title: '市场采购',
-        content: const MarketPurchaseChart(),
-        group: '数据概览', // 添加分组
-        selected: selectedIds.contains('market_purchase'),
-      ),
-      DashboardModule(
         id: 'sample_room',
         title: '样品间',
         content: const SampleRoomChart(),
-        group: '数据概览', // 添加分组
+        group: '数据统计', // 添加分组
         selected: selectedIds.contains('sample_room'),
+      ),
+      DashboardModule(
+        id: 'market_purchase',
+        title: '市场采购',
+        content: const MarketPurchaseChart(),
+        group: '数据统计', // 添加分组
+        selected: selectedIds.contains('market_purchase'),
       ),
       DashboardModule(
         id: 'inspection',
         title: '验货',
         content: const InspectionChart(),
-        group: '数据概览', // 添加分组
+        group: '数据统计', // 添加分组
         selected: selectedIds.contains('inspection'),
       ),
       DashboardModule(
         id: 'customer',
         title: '客户',
         content: const CustomerChart(),
-        group: '数据概览', // 添加分组
+        group: '数据统计', // 添加分组
         selected: selectedIds.contains('customer'),
       ),
       DashboardModule(
         id: 'supplier',
         title: '供应商',
         content: const SupplierChart(),
-        group: '数据概览', // 添加分组
+        group: '数据统计', // 添加分组
         selected: selectedIds.contains('supplier'),
       ),
     ];
@@ -120,20 +120,16 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     // 已选中的模块按组分类
-    final selectedDataOverview = modules
-        .where((e) => e.selected && e.group == '数据概览')
-        .toList();
-    final selectedApp = modules
-        .where((e) => e.selected && e.group == '应用')
-        .toList();
+    final selectedDataOverview =
+        modules.where((e) => e.selected && e.group == '数据统计').toList();
+    final selectedApp =
+        modules.where((e) => e.selected && e.group == '应用').toList();
 
     // 未选中的模块按组分类
-    final unselectedDataOverview = modules
-        .where((e) => !e.selected && e.group == '数据概览')
-        .toList();
-    final unselectedApp = modules
-        .where((e) => !e.selected && e.group == '应用')
-        .toList();
+    final unselectedDataOverview =
+        modules.where((e) => !e.selected && e.group == '数据统计').toList();
+    final unselectedApp =
+        modules.where((e) => !e.selected && e.group == '应用').toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -151,13 +147,14 @@ class _SettingPageState extends State<SettingPage> {
           /// =======================
           /// 已选中的模块
           /// =======================
-          if (selectedDataOverview.isNotEmpty || selectedApp.isNotEmpty) ...[
-            const _SectionTitle(title: '已选中的模块'),
-            const SizedBox(height: 12),
+          const _SectionTitle(title: '已选中的模块'),
+          const SizedBox(height: 12),
 
-            /// 数据概览组（已选中）
+          // 如果有选中的模块，显示模块列表
+          if (selectedDataOverview.isNotEmpty || selectedApp.isNotEmpty) ...[
+            /// 数据统计组（已选中）
             if (selectedDataOverview.isNotEmpty) ...[
-              _GroupTitle(title: '数据概览'),
+              const _GroupTitle(title: '数据统计'),
               const SizedBox(height: 10),
               ...selectedDataOverview.map(
                 (module) => _ModuleCard(
@@ -189,21 +186,26 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
             ],
-
-            const SizedBox(height: 32),
+          ] else ...[
+            // 如果没有选中的模块，显示空状态
+            _EmptyState(),
           ],
-const Divider(),
-   const SizedBox(height: 10),
+
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 10),
+
           /// =======================
           /// 更多模块
           /// =======================
-          if (unselectedDataOverview.isNotEmpty || unselectedApp.isNotEmpty) ...[
+          if (unselectedDataOverview.isNotEmpty ||
+              unselectedApp.isNotEmpty) ...[
             const _SectionTitle(title: '更多模块'),
             const SizedBox(height: 12),
 
-            /// 数据概览组（未选中）
+            /// 数据统计组（未选中）
             if (unselectedDataOverview.isNotEmpty) ...[
-              _GroupTitle(title: '数据概览'),
+              _GroupTitle(title: '数据统计'),
               const SizedBox(height: 10),
               ...unselectedDataOverview.map(
                 (module) => _ModuleCard(
@@ -339,7 +341,7 @@ class _ModuleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _getIconConfig();
-    
+
     return Stack(
       children: [
         Container(
@@ -464,10 +466,7 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         title,
-        style: Theme.of(context)
-            .textTheme
-            .titleLarge
-            ?.copyWith(
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 20,
               height: 1.3,
@@ -491,15 +490,44 @@ class _GroupTitle extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, bottom: 2),
       child: Text(
         title,
-        style: Theme.of(context)
-            .textTheme
-            .titleMedium
-            ?.copyWith(
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 15,
               color: Colors.grey.shade700,
               height: 1.3,
             ),
+      ),
+    );
+  }
+}
+
+/// =======================
+/// 空状态组件
+/// =======================
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.inbox_outlined,
+            size: 20,
+            color: Colors.grey.shade400,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '暂无选中的模块',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+          ),
+        ],
       ),
     );
   }
