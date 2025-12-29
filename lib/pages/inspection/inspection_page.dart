@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/inspection/views/inspection_view.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -18,7 +19,7 @@ class InspectionPage extends HookConsumerWidget {
           actions: [
             TextButton(
               onPressed: () {
-                //TODO新增页面
+                context.router.push(const InspectionAddRoute());
               },
               child: Text(
                 "新增",
