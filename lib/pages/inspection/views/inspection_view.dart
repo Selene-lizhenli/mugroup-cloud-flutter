@@ -1,6 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -75,7 +77,16 @@ class InspectionView extends HookConsumerWidget {
                       itemBuilder: (context, index) {
                         final inspection = Inspections.value[index];
 
-                        return InspectionCard(inspection: inspection);
+                        return InspectionCard(
+                          inspection: inspection,
+                          onTap: () {
+                            context.router
+                                .push(InspectionDetailRoute(id: inspection.id!));
+                          },
+                          onDelete: () async {
+                            //todo
+                          },
+                        );
                       },
                     ),
                 ],

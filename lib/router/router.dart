@@ -51,6 +51,7 @@ class AppRouter extends RootStackRouter {
           path: "/market_product/market_product_list"),
       AutoRoute(page: InspectionRoute.page, path: "/inspection"),
       AutoRoute(page: InspectionAddRoute.page, path: "/inspection/add"),
+      AutoRoute(page: InspectionDetailRoute.page, path: "/inspection/detail"),
       AutoRoute(
         page: MarketProductRoute.page,
         guards: [AuthGuard()],

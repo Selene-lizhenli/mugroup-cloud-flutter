@@ -4,7 +4,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class InspectionCard extends HookConsumerWidget {
   final Inspection inspection;
-  const InspectionCard({super.key, required this.inspection});
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
+
+  const InspectionCard(
+      {super.key, required this.inspection, this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,99 +18,102 @@ class InspectionCard extends HookConsumerWidget {
       fontSize: 13,
     );
     const Color lightBlueBg = Color(0xFFEEF0FF);
-    return Container(
-      margin: const EdgeInsets.all(4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            offset: const Offset(0, 2),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Text(
-                inspection.name ?? '未知',
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const Spacer(),
-              Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
-              const SizedBox(width: 4),
-              Text('测试账号', style: greyTextStyle),
-              const SizedBox(width: 4),
-              Text(
-                '#68',
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(width: 12),
-              InkWell(
-                onTap: () {},
-                child: Icon(Icons.delete_outline,
-                    size: 18, color: Colors.red[300]),
+    return InkWell(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.all(4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                offset: const Offset(0, 2),
+                blurRadius: 6,
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 1, color: Colors.grey[100]),
-          ),
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text('2025-12-29', style: greyTextStyle),
-              const SizedBox(width: 16),
-              Text('手动创建', style: greyTextStyle),
-              const SizedBox(width: 24),
-              Text('暂无协作', style: greyTextStyle),
-              const Spacer(),
-              Container(
-                height: 32,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: lightBlueBg,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(16),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.person_add_alt_1,
-                          size: 14, color: colorScheme.secondary),
-                      const SizedBox(width: 4),
-                      Text(
-                        '协作',
-                        style: TextStyle(
-                          color: colorScheme.secondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+              Row(
+                children: [
+                  Text(
+                    inspection.name ?? '未知',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
+                  const Spacer(),
+                  Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Text('测试账号', style: greyTextStyle),
+                  const SizedBox(width: 4),
+                  Text(
+                    '#68',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () {},
+                    child: Icon(Icons.delete_outline,
+                        size: 18, color: Colors.red[300]),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child:
+                    Divider(height: 1, thickness: 1, color: Colors.grey[100]),
+              ),
+              Row(
+                children: [
+                  Text('2025-12-29', style: greyTextStyle),
+                  const SizedBox(width: 16),
+                  Text('手动创建', style: greyTextStyle),
+                  const SizedBox(width: 24),
+                  Text('暂无协作', style: greyTextStyle),
+                  const Spacer(),
+                  Container(
+                    height: 32,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: lightBlueBg,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.circular(16),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.person_add_alt_1,
+                              size: 14, color: colorScheme.secondary),
+                          const SizedBox(width: 4),
+                          Text(
+                            '协作',
+                            style: TextStyle(
+                              color: colorScheme.secondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }
