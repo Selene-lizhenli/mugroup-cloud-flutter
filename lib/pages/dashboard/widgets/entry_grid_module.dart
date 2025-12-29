@@ -53,7 +53,7 @@ class EntryGridModule extends StatelessWidget {
           _EntryItem(
             icon: Icons.factory,
             label: '跟单验货',
-            route: SupplySupplierRoute(),
+            route: InspectionRoute(),
           ),
         ],
       ),
