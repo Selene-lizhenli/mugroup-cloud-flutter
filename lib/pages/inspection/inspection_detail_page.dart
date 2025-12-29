@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,7 +37,14 @@ class InspectionDetailPage extends HookConsumerWidget {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const InspectionAddSku(),
+              );
+            },
             child: const Text(
               '新增',
               style: TextStyle(color: primaryBlue, fontSize: 16),
