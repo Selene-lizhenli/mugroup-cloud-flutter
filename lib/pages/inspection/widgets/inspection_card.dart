@@ -1,6 +1,8 @@
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class InspectionCard extends HookConsumerWidget {
   final Inspection inspection;
@@ -18,6 +20,10 @@ class InspectionCard extends HookConsumerWidget {
       fontSize: 13,
     );
     const Color lightBlueBg = Color(0xFFEEF0FF);
+
+    final createdAt = inspection.createdAt;
+    final user = ref.watch(userProvider).user;
+
     return InkWell(
         onTap: onTap,
         child: Container(
@@ -51,10 +57,10 @@ class InspectionCard extends HookConsumerWidget {
                   const Spacer(),
                   Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
-                  Text('测试账号', style: greyTextStyle),
+                  Text('${user?.name}', style: greyTextStyle),
                   const SizedBox(width: 4),
                   Text(
-                    '#68',
+                    '#${inspection.id}',
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -76,9 +82,15 @@ class InspectionCard extends HookConsumerWidget {
               ),
               Row(
                 children: [
-                  Text('2025-12-29', style: greyTextStyle),
+                  Text(
+                    createdAt == null
+                        ? ''
+                        : DateFormat('yyyy-MM-dd')
+                            .format(DateTime.parse(createdAt)),
+                    style: greyTextStyle,
+                  ),
                   const SizedBox(width: 16),
-                  Text('手动创建', style: greyTextStyle),
+                  if (inspection.type == 1) Text('手动创建', style: greyTextStyle),
                   const SizedBox(width: 24),
                   Text('暂无协作', style: greyTextStyle),
                   const Spacer(),

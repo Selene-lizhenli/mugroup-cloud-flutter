@@ -21,7 +21,10 @@ Inspection _$InspectionFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Inspection {
   int? get id => throw _privateConstructorUsedError;
+  int? get type => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +38,11 @@ abstract class $InspectionCopyWith<$Res> {
           Inspection value, $Res Function(Inspection) then) =
       _$InspectionCopyWithImpl<$Res, Inspection>;
   @useResult
-  $Res call({int? id, String? name});
+  $Res call(
+      {int? id,
+      int? type,
+      String? name,
+      @JsonKey(name: 'created_at') String? createdAt});
 }
 
 /// @nodoc
@@ -52,16 +59,26 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
   @override
   $Res call({
     Object? id = freezed,
+    Object? type = freezed,
     Object? name = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as int?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -75,7 +92,11 @@ abstract class _$$InspectionImplCopyWith<$Res>
       __$$InspectionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id, String? name});
+  $Res call(
+      {int? id,
+      int? type,
+      String? name,
+      @JsonKey(name: 'created_at') String? createdAt});
 }
 
 /// @nodoc
@@ -90,16 +111,26 @@ class __$$InspectionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? type = freezed,
     Object? name = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_$InspectionImpl(
       freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as int?,
       freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -108,7 +139,8 @@ class __$$InspectionImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$InspectionImpl implements _Inspection {
-  _$InspectionImpl(this.id, this.name);
+  _$InspectionImpl(this.id, this.type, this.name,
+      @JsonKey(name: 'created_at') this.createdAt);
 
   factory _$InspectionImpl.fromJson(Map<String, dynamic> json) =>
       _$$InspectionImplFromJson(json);
@@ -116,11 +148,16 @@ class _$InspectionImpl implements _Inspection {
   @override
   final int? id;
   @override
+  final int? type;
+  @override
   final String? name;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
 
   @override
   String toString() {
-    return 'Inspection(id: $id, name: $name)';
+    return 'Inspection(id: $id, type: $type, name: $name, createdAt: $createdAt)';
   }
 
   @override
@@ -129,12 +166,15 @@ class _$InspectionImpl implements _Inspection {
         (other.runtimeType == runtimeType &&
             other is _$InspectionImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name);
+  int get hashCode => Object.hash(runtimeType, id, type, name, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -151,7 +191,8 @@ class _$InspectionImpl implements _Inspection {
 }
 
 abstract class _Inspection implements Inspection {
-  factory _Inspection(final int? id, final String? name) = _$InspectionImpl;
+  factory _Inspection(final int? id, final int? type, final String? name,
+      @JsonKey(name: 'created_at') final String? createdAt) = _$InspectionImpl;
 
   factory _Inspection.fromJson(Map<String, dynamic> json) =
       _$InspectionImpl.fromJson;
@@ -159,7 +200,12 @@ abstract class _Inspection implements Inspection {
   @override
   int? get id;
   @override
+  int? get type;
+  @override
   String? get name;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
   @override
   @JsonKey(ignore: true)
   _$$InspectionImplCopyWith<_$InspectionImpl> get copyWith =>

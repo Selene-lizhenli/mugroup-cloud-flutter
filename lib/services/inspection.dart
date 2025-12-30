@@ -27,3 +27,15 @@ Future<Inspection?> storeInspection(Map<String, dynamic>? data) async {
     },
   );
 }
+
+Future<Inspection?> showInspection(int id) async {
+  return api.post("api/tenant/inspection/tasks/$id").then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Inspection.fromJson(res.data);
+    },
+  );
+}
