@@ -35,23 +35,8 @@ class InspectionPage extends HookConsumerWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
-              height: 8,
-            ),
             Expanded(
               child: PageView(
-                // controller: home.pageController,
-                // onPageChanged: (page) {
-                //   homeNotifier.setCurrentPage(page);
-                //   currentPageIndex.value = page;
-                //   home.bus.dispatch(
-                //     SearchEvent(
-                //       media: home.currentMedia,
-                //       search: home.search,
-                //       from: SearchEventFrom.tab,
-                //     ),
-                //   );
-                // },
                 allowImplicitScrolling: false,
                 children: const [InspectionView()],
               ),
