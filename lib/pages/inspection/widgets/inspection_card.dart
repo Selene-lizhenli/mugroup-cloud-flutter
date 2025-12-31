@@ -25,6 +25,17 @@ class InspectionCard extends HookConsumerWidget {
     final createdAt = inspection.createdAt;
     final user = ref.watch(userProvider).user;
 
+    final collaborators = inspection.collaborators;
+    final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
+
+    final collabText = hasCollaborators
+        ? collaborators.map((e) => e.name ?? '').join('、')
+        : '暂无协作';
+
+    final collabStyle = hasCollaborators
+        ? const TextStyle(color: Colors.green, fontSize: 13)
+        : greyTextStyle;
+
     return InkWell(
         onTap: onTap,
         child: Container(
@@ -93,8 +104,14 @@ class InspectionCard extends HookConsumerWidget {
                   const SizedBox(width: 16),
                   if (inspection.type == 1) Text('手动创建', style: greyTextStyle),
                   const SizedBox(width: 24),
-                  Text('暂无协作', style: greyTextStyle),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      collabText,
+                      style: collabStyle,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
                   Container(
                     height: 32,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
