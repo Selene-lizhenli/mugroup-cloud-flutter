@@ -1,4 +1,5 @@
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/pages/inspection/widgets/collaboration_dialog.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -102,7 +103,14 @@ class InspectionCard extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CollaborationDialog(
+                            inspectionId: inspection.id!,
+                          ),
+                        );
+                      },
                       borderRadius: BorderRadius.circular(16),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
