@@ -47,7 +47,7 @@ class InspectionView extends HookConsumerWidget {
         inspections.value = [...inspections.value, ...resp.data];
       }
 
-      if (resp.data.length >= 20) {
+      if (resp.data.isNotEmpty) {
         page.value++;
       }
 
