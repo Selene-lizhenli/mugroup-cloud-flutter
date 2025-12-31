@@ -1,6 +1,7 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/models/response.dart';
+import 'package:dio/dio.dart';
 
 Future<ApiResponse<List<Inspection>>> getInspections(
     {Map<String, dynamic>? queryParameters}) async {
@@ -72,6 +73,20 @@ Future<Inspection?> removeCollaborators(
 Future<Inspection?> addInspectionItems(
     int id, Map<String, dynamic>? data) async {
   return api.post("api/tenant/inspection/tasks/$id/items/add", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Inspection.fromJson(res.data);
+    },
+  );
+}
+
+Future<Inspection?> importInspectionItems(int id, FormData formData) async {
+  return api
+      .post("api/tenant/inspection/tasks/$id/import", data: formData)
+      .then(
     (res) {
       if (res.data == null) {
         return null;
