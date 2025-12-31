@@ -41,6 +41,10 @@ Future<Inspection?> showInspection(int id) async {
   );
 }
 
+Future deleteInspection(int id) async {
+  return api.delete("api/tenant/inspection/tasks/$id");
+}
+
 Future<Inspection?> addCollaborators(int id, Map<String, dynamic>? data) async {
   return api
       .post("api/tenant/inspection/tasks/$id/collaborators/add", data: data)
@@ -86,6 +90,21 @@ Future<Inspection?> addInspectionItems(
 Future<Inspection?> importInspectionItems(int id, FormData formData) async {
   return api
       .post("api/tenant/inspection/tasks/$id/import", data: formData)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Inspection.fromJson(res.data);
+    },
+  );
+}
+
+Future<Inspection?> deleteInspectionItem(
+    int id, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/inspection/tasks/$id/items/remove", data: data)
       .then(
     (res) {
       if (res.data == null) {

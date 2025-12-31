@@ -1,7 +1,9 @@
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/collaboration_dialog.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -81,7 +83,10 @@ class InspectionCard extends HookConsumerWidget {
                   ),
                   const SizedBox(width: 12),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      await deleteInspection(inspection.id!);
+                      EasyLoading.showSuccess('删除成功');
+                    },
                     child: Icon(Icons.delete_outline,
                         size: 18, color: Colors.red[300]),
                   ),

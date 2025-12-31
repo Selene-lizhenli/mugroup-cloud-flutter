@@ -4,6 +4,7 @@ import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -367,9 +368,11 @@ class InspectionDetailPage extends HookConsumerWidget {
                                           icon: const Icon(Icons.delete_outline,
                                               color: Colors.redAccent,
                                               size: 18),
-                                          onPressed: () {
-                                            // TODO: 调用删除接口，传入 item.id
-                                            print("Delete item: ${item.id}");
+                                          onPressed: () async {
+                                            await deleteInspectionItem(id, {
+                                              'item_ids': [item.id]
+                                            });
+                                            EasyLoading.showSuccess('删除成功');
                                           },
                                         ),
                                       ),
