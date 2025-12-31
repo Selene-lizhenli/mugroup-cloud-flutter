@@ -1,9 +1,12 @@
+import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class InspectionAddSku extends HookConsumerWidget {
-  const InspectionAddSku({super.key});
+  final int id;
+  const InspectionAddSku({super.key, required this.id});
 
   static const _primaryColor = Color(0xFF3B66F5);
   static const _bgGrey = Color(0xFFF2F4F7);
@@ -16,8 +19,39 @@ class InspectionAddSku extends HookConsumerWidget {
     final controller = useTextEditingController();
     useListenable(controller);
 
+    final isLoading = useState(false);
+
     final isButtonEnabled =
         controller.text.trim().isNotEmpty && tabIndex.value == 0;
+
+    Future<void> handleSubmit() async {
+      FocusScope.of(context).unfocus();
+
+      if (tabIndex.value == 0) {
+        final text = controller.text;
+
+        final List<String> skuList = text
+            .split('\n')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+
+        if (skuList.isEmpty) return;
+
+        isLoading.value = true;
+
+        try {
+          await addInspectionItems(id, {'item_nos': skuList});
+
+          EasyLoading.showSuccess('添加成功');
+        } finally {
+          isLoading.value = false;
+        }
+      } else {
+        // --- 处理上传逻辑 ---
+        // 这里处理文件上传的接口
+      }
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -53,7 +87,8 @@ class InspectionAddSku extends HookConsumerWidget {
                     ),
             ),
           ),
-          _buildBottomButton(context, isButtonEnabled),
+          _buildBottomButton(
+              context, isButtonEnabled, isLoading.value, handleSubmit),
           SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
         ],
       ),
@@ -99,7 +134,12 @@ class InspectionAddSku extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomButton(BuildContext context, bool enabled) {
+  Widget _buildBottomButton(
+    BuildContext context,
+    bool enabled,
+    bool isLoading,
+    VoidCallback onPressed,
+  ) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -107,7 +147,7 @@ class InspectionAddSku extends HookConsumerWidget {
           width: double.infinity,
           height: 50,
           child: ElevatedButton(
-            onPressed: enabled ? () => Navigator.pop(context) : null,
+            onPressed: (enabled && !isLoading) ? onPressed : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryColor,
               disabledBackgroundColor: Colors.grey[200],
@@ -116,13 +156,22 @@ class InspectionAddSku extends HookConsumerWidget {
                 borderRadius: BorderRadius.circular(_radius),
               ),
             ),
-            child: const Text(
-              '确认添加',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white),
-            ),
+            child: isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                : const Text(
+                    '确认添加',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
           ),
         ),
       ),
@@ -249,20 +298,11 @@ class _ManualInput extends StatelessWidget {
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: '请输入 SKU 编号，支持换行输入多个\n例如：\nSKU-001\nSKU-002',
+                hintText: '请输入 SKU 编号，每行一个',
                 hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.info_outline, size: 14, color: Colors.grey[500]),
-              const SizedBox(width: 4),
-              Text('每行输入一个 SKU',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-            ],
-          )
         ],
       ),
     );

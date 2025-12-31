@@ -21,6 +21,10 @@ class InspectionDetailPage extends HookConsumerWidget {
     const Color textDark = Color(0xFF333333);
     const Color textGrey = Color(0xFF999999);
 
+    final currentTab = useState(0);
+    final searchController = useTextEditingController();
+    useListenable(searchController);
+
     Future loadInspection() async {
       try {
         final data = await showInspection(id);
@@ -34,6 +38,28 @@ class InspectionDetailPage extends HookConsumerWidget {
       loadInspection();
       return null;
     }, []);
+
+    final allItems = inspection.value?.items ?? [];
+
+    final filteredItems = allItems.where((item) {
+      // 1. Tab 过滤逻辑
+      bool tabMatch = true;
+      if (currentTab.value == 1) {
+        tabMatch = item.status == 1; // 假设 1 是已验货
+      } else if (currentTab.value == 2) {
+        tabMatch = item.status == 0 || item.status == null; // 假设 0 或 null 是未验货
+      }
+
+      // 2. 搜索 过滤逻辑 (前端搜索)
+      bool searchMatch = true;
+      final keyword = searchController.text.trim().toLowerCase();
+      if (keyword.isNotEmpty) {
+        // 搜索 SKU 编号 (忽略大小写)
+        searchMatch = (item.itemNo?.toLowerCase() ?? '').contains(keyword);
+      }
+
+      return tabMatch && searchMatch;
+    }).toList();
 
     return Scaffold(
       backgroundColor: bgGrey,
@@ -62,7 +88,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (context) => const InspectionAddSku(),
+                builder: (context) => InspectionAddSku(id: id),
               );
             },
             child: const Text(
@@ -161,13 +187,14 @@ class InspectionDetailPage extends HookConsumerWidget {
                                   text: '共 ',
                                   style: TextStyle(
                                       color: Colors.grey[600], fontSize: 13),
-                                  children: const [
+                                  children: [
                                     TextSpan(
-                                        text: '1 / 1',
-                                        style: TextStyle(
-                                            color: textDark,
-                                            fontWeight: FontWeight.bold)),
-                                    TextSpan(text: ' 个SKU'),
+                                      text: '${filteredItems.length}',
+                                      style: const TextStyle(
+                                          color: textDark,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(text: '/${allItems.length} 个SKU'),
                                   ],
                                 ),
                               ),
@@ -179,12 +206,20 @@ class InspectionDetailPage extends HookConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                           child: TextField(
+                            controller: searchController,
                             decoration: InputDecoration(
                               hintText: '搜索SKU',
                               hintStyle: const TextStyle(
                                   color: textGrey, fontSize: 14),
                               prefixIcon: const Icon(Icons.search,
                                   color: textGrey, size: 20),
+                              suffixIcon: searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear,
+                                          size: 16, color: Colors.grey),
+                                      onPressed: () => searchController.clear(),
+                                    )
+                                  : null,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 12),
                               border: OutlineInputBorder(
@@ -210,84 +245,140 @@ class InspectionDetailPage extends HookConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildTabItem('全部', isSelected: true),
-                              _buildTabItem('已验货', isSelected: false),
-                              _buildTabItem('未验货', isSelected: false),
+                              _buildTabItem('全部',
+                                  isSelected: currentTab.value == 0,
+                                  onTap: () => currentTab.value = 0),
+                              _buildTabItem('已验货',
+                                  isSelected: currentTab.value == 1,
+                                  onTap: () => currentTab.value = 1),
+                              _buildTabItem('未验货',
+                                  isSelected: currentTab.value == 2,
+                                  onTap: () => currentTab.value = 2),
                             ],
                           ),
                         ),
                         Divider(
                             height: 1, thickness: 1, color: Colors.grey[100]),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF9F9F9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  '5555',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                const Spacer(),
-                                Row(
-                                  children: [
-                                    Icon(Icons.check_circle_outline,
-                                        size: 14, color: Colors.grey[400]),
-                                    const SizedBox(width: 4),
-                                    Text('未验货',
-                                        style: TextStyle(
-                                            color: Colors.grey[500],
-                                            fontSize: 13)),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    context.router.push(
-                                        InspectionItemConfirmRoute(id: 1));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primaryBlue,
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    minimumSize: const Size(60, 32),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  child: const Text('验货',
-                                      style: TextStyle(fontSize: 13)),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  width: 32,
-                                  height: 32,
+                        if (filteredItems.isEmpty)
+                          Container(
+                            padding: const EdgeInsets.all(32),
+                            child: const Text('暂无相关数据',
+                                style: TextStyle(color: Colors.grey)),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: filteredItems.map((item) {
+                                final isVerified = item.status == 1;
+
+                                return Container(
+                                  // 给每个 item 底部加一点间距
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFEBEE),
-                                    borderRadius: BorderRadius.circular(4),
+                                    color: const Color(0xFFF9F9F9),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(Icons.delete_outline,
-                                        color: Colors.redAccent, size: 18),
-                                    onPressed: () {},
+                                  child: Row(
+                                    children: [
+                                      // 1. 显示 Item No / SKU
+                                      Expanded(
+                                        child: Text(
+                                          item.itemNo ?? '无编号', // 绑定数据
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+
+                                      // 2. 状态显示
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            isVerified
+                                                ? Icons.check_circle
+                                                : Icons.check_circle_outline,
+                                            size: 14,
+                                            color: isVerified
+                                                ? Colors.green
+                                                : Colors.grey[400],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            isVerified ? '已验货' : '未验货',
+                                            style: TextStyle(
+                                              color: isVerified
+                                                  ? Colors.green
+                                                  : Colors.grey[500],
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(width: 12),
+
+                                      // 3. 验货按钮
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          // 跳转时传入当前 item 的 id
+                                          if (item.id != null) {
+                                            context.router.push(
+                                              InspectionItemConfirmRoute(
+                                                  id: item.id!),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryBlue,
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          minimumSize: const Size(60, 32),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: const Text('验货',
+                                            style: TextStyle(fontSize: 13)),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      // 4. 删除按钮
+                                      Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFEBEE),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: IconButton(
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.delete_outline,
+                                              color: Colors.redAccent,
+                                              size: 18),
+                                          onPressed: () {
+                                            // TODO: 调用删除接口，传入 item.id
+                                            print("Delete item: ${item.id}");
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                );
+                              }).toList(),
                             ),
                           ),
-                        ),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -331,22 +422,26 @@ class InspectionDetailPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildTabItem(String text, {required bool isSelected}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: isSelected
-          ? const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Color(0xFF3B66F5), width: 2),
-              ),
-            )
-          : null,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isSelected ? const Color(0xFF3B66F5) : Colors.grey[600],
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 14,
+  Widget _buildTabItem(String text,
+      {required bool isSelected, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        decoration: isSelected
+            ? const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFF3B66F5), width: 2),
+                ),
+              )
+            : null,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF3B66F5) : Colors.grey[600],
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
       ),
     );

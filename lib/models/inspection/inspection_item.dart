@@ -14,9 +14,9 @@ class InspectionItem with _$InspectionItem {
     int? qty,
     @JsonKey(name: 'task_id') int? taskId,
     @JsonKey(name: 'user_id') int? userId,
-    @JsonKey(name: 'sample_id') String? sampleId,
+    @JsonKey(name: 'sample_id') int? sampleId,
     @JsonKey(name: 'item_no') String? itemNo,
-    @JsonKey(name: 'unit_per_ctn') String? unitPerCtn,
+    @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
     @JsonKey(name: 'created_at') String? createdAt,
   ) = _InspectionItem;
 

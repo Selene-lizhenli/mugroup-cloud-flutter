@@ -6,7 +6,7 @@ part of 'inspection_detail_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inspectionDetailHash() => r'50349822090e644c84396b6af10fc4d65dc6d28f';
+String _$inspectionDetailHash() => r'bf715170edd6bacbe8842d00d245a637996990dd';
 
 /// Copied from Dart SDK
 class _SystemHash {

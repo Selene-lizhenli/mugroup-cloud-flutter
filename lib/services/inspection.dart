@@ -68,3 +68,16 @@ Future<Inspection?> removeCollaborators(
     },
   );
 }
+
+Future<Inspection?> addInspectionItems(
+    int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/inspection/tasks/$id/items/add", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return Inspection.fromJson(res.data);
+    },
+  );
+}

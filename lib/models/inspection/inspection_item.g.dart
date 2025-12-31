@@ -16,9 +16,9 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
       (json['qty'] as num?)?.toInt(),
       (json['task_id'] as num?)?.toInt(),
       (json['user_id'] as num?)?.toInt(),
-      json['sample_id'] as String?,
+      (json['sample_id'] as num?)?.toInt(),
       json['item_no'] as String?,
-      json['unit_per_ctn'] as String?,
+      (json['unit_per_ctn'] as num?)?.toInt(),
       json['created_at'] as String?,
     );
 

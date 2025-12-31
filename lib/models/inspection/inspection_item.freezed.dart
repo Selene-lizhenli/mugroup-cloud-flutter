@@ -31,11 +31,11 @@ mixin _$InspectionItem {
   @JsonKey(name: 'user_id')
   int? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_id')
-  String? get sampleId => throw _privateConstructorUsedError;
+  int? get sampleId => throw _privateConstructorUsedError;
   @JsonKey(name: 'item_no')
   String? get itemNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'unit_per_ctn')
-  String? get unitPerCtn => throw _privateConstructorUsedError;
+  int? get unitPerCtn => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
 
@@ -60,9 +60,9 @@ abstract class $InspectionItemCopyWith<$Res> {
       int? qty,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
-      @JsonKey(name: 'sample_id') String? sampleId,
+      @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
-      @JsonKey(name: 'unit_per_ctn') String? unitPerCtn,
+      @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
       @JsonKey(name: 'created_at') String? createdAt});
 }
 
@@ -128,7 +128,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
       sampleId: freezed == sampleId
           ? _value.sampleId
           : sampleId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       itemNo: freezed == itemNo
           ? _value.itemNo
           : itemNo // ignore: cast_nullable_to_non_nullable
@@ -136,7 +136,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
       unitPerCtn: freezed == unitPerCtn
           ? _value.unitPerCtn
           : unitPerCtn // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -162,9 +162,9 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       int? qty,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
-      @JsonKey(name: 'sample_id') String? sampleId,
+      @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
-      @JsonKey(name: 'unit_per_ctn') String? unitPerCtn,
+      @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
       @JsonKey(name: 'created_at') String? createdAt});
 }
 
@@ -228,7 +228,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
       freezed == sampleId
           ? _value.sampleId
           : sampleId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       freezed == itemNo
           ? _value.itemNo
           : itemNo // ignore: cast_nullable_to_non_nullable
@@ -236,7 +236,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
       freezed == unitPerCtn
           ? _value.unitPerCtn
           : unitPerCtn // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -285,13 +285,13 @@ class _$InspectionItemImpl implements _InspectionItem {
   final int? userId;
   @override
   @JsonKey(name: 'sample_id')
-  final String? sampleId;
+  final int? sampleId;
   @override
   @JsonKey(name: 'item_no')
   final String? itemNo;
   @override
   @JsonKey(name: 'unit_per_ctn')
-  final String? unitPerCtn;
+  final int? unitPerCtn;
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -353,9 +353,9 @@ abstract class _InspectionItem implements InspectionItem {
           final int? qty,
           @JsonKey(name: 'task_id') final int? taskId,
           @JsonKey(name: 'user_id') final int? userId,
-          @JsonKey(name: 'sample_id') final String? sampleId,
+          @JsonKey(name: 'sample_id') final int? sampleId,
           @JsonKey(name: 'item_no') final String? itemNo,
-          @JsonKey(name: 'unit_per_ctn') final String? unitPerCtn,
+          @JsonKey(name: 'unit_per_ctn') final int? unitPerCtn,
           @JsonKey(name: 'created_at') final String? createdAt) =
       _$InspectionItemImpl;
 
@@ -382,13 +382,13 @@ abstract class _InspectionItem implements InspectionItem {
   int? get userId;
   @override
   @JsonKey(name: 'sample_id')
-  String? get sampleId;
+  int? get sampleId;
   @override
   @JsonKey(name: 'item_no')
   String? get itemNo;
   @override
   @JsonKey(name: 'unit_per_ctn')
-  String? get unitPerCtn;
+  int? get unitPerCtn;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
