@@ -23,6 +23,8 @@ mixin _$Inspection {
   int? get id => throw _privateConstructorUsedError;
   int? get type => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  List<User>? get collaborators => throw _privateConstructorUsedError;
+  List<InspectionItem>? get items => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
 
@@ -42,6 +44,8 @@ abstract class $InspectionCopyWith<$Res> {
       {int? id,
       int? type,
       String? name,
+      List<User>? collaborators,
+      List<InspectionItem>? items,
       @JsonKey(name: 'created_at') String? createdAt});
 }
 
@@ -61,6 +65,8 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
     Object? id = freezed,
     Object? type = freezed,
     Object? name = freezed,
+    Object? collaborators = freezed,
+    Object? items = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -76,6 +82,14 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      collaborators: freezed == collaborators
+          ? _value.collaborators
+          : collaborators // ignore: cast_nullable_to_non_nullable
+              as List<User>?,
+      items: freezed == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItem>?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -96,6 +110,8 @@ abstract class _$$InspectionImplCopyWith<$Res>
       {int? id,
       int? type,
       String? name,
+      List<User>? collaborators,
+      List<InspectionItem>? items,
       @JsonKey(name: 'created_at') String? createdAt});
 }
 
@@ -113,6 +129,8 @@ class __$$InspectionImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? type = freezed,
     Object? name = freezed,
+    Object? collaborators = freezed,
+    Object? items = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_$InspectionImpl(
@@ -128,6 +146,14 @@ class __$$InspectionImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == collaborators
+          ? _value._collaborators
+          : collaborators // ignore: cast_nullable_to_non_nullable
+              as List<User>?,
+      freezed == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItem>?,
       freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -139,8 +165,15 @@ class __$$InspectionImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$InspectionImpl implements _Inspection {
-  _$InspectionImpl(this.id, this.type, this.name,
-      @JsonKey(name: 'created_at') this.createdAt);
+  _$InspectionImpl(
+      this.id,
+      this.type,
+      this.name,
+      final List<User>? collaborators,
+      final List<InspectionItem>? items,
+      @JsonKey(name: 'created_at') this.createdAt)
+      : _collaborators = collaborators,
+        _items = items;
 
   factory _$InspectionImpl.fromJson(Map<String, dynamic> json) =>
       _$$InspectionImplFromJson(json);
@@ -151,13 +184,33 @@ class _$InspectionImpl implements _Inspection {
   final int? type;
   @override
   final String? name;
+  final List<User>? _collaborators;
+  @override
+  List<User>? get collaborators {
+    final value = _collaborators;
+    if (value == null) return null;
+    if (_collaborators is EqualUnmodifiableListView) return _collaborators;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<InspectionItem>? _items;
+  @override
+  List<InspectionItem>? get items {
+    final value = _items;
+    if (value == null) return null;
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
 
   @override
   String toString() {
-    return 'Inspection(id: $id, type: $type, name: $name, createdAt: $createdAt)';
+    return 'Inspection(id: $id, type: $type, name: $name, collaborators: $collaborators, items: $items, createdAt: $createdAt)';
   }
 
   @override
@@ -168,13 +221,23 @@ class _$InspectionImpl implements _Inspection {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality()
+                .equals(other._collaborators, _collaborators) &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, name, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      type,
+      name,
+      const DeepCollectionEquality().hash(_collaborators),
+      const DeepCollectionEquality().hash(_items),
+      createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -191,7 +254,12 @@ class _$InspectionImpl implements _Inspection {
 }
 
 abstract class _Inspection implements Inspection {
-  factory _Inspection(final int? id, final int? type, final String? name,
+  factory _Inspection(
+      final int? id,
+      final int? type,
+      final String? name,
+      final List<User>? collaborators,
+      final List<InspectionItem>? items,
       @JsonKey(name: 'created_at') final String? createdAt) = _$InspectionImpl;
 
   factory _Inspection.fromJson(Map<String, dynamic> json) =
@@ -203,6 +271,10 @@ abstract class _Inspection implements Inspection {
   int? get type;
   @override
   String? get name;
+  @override
+  List<User>? get collaborators;
+  @override
+  List<InspectionItem>? get items;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
