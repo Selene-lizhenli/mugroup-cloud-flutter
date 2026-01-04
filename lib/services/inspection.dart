@@ -134,3 +134,16 @@ Future<InspectionItem?> showInspectionItem(int id) async {
     },
   );
 }
+
+Future<InspectionItem?> updateInspectionItem(
+    int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/inspection/items/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return InspectionItem.fromJson(res.data);
+    },
+  );
+}

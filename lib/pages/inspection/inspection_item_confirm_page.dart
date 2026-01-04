@@ -1,10 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
+import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'dart:ui' as ui;
 
 @RoutePage()
 class InspectionItemConfirmPage extends HookConsumerWidget {
@@ -20,10 +22,20 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
     final inspectionItem = useState<InspectionItem?>(null);
     final isLoading = useState(true);
 
+    final mediaMap = useState<Map<String, List<TemporaryMedia>>>({});
+    void updateMedia(String key, List<TemporaryMedia> medias) {
+      final newMap = Map<String, List<TemporaryMedia>>.from(mediaMap.value);
+      newMap[key] = medias;
+      mediaMap.value = newMap;
+    }
+
+    final remarkController = useTextEditingController();
+
     Future loadInspection() async {
       try {
         final data = await showInspectionItem(id);
         inspectionItem.value = data;
+        remarkController.text = data?.remark ?? '';
       } finally {
         isLoading.value = false;
       }
@@ -33,6 +45,23 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
       loadInspection();
       return null;
     }, []);
+
+    Future<void> handleSubmit() async {
+      final Map<String, dynamic> submitData = {};
+
+      mediaMap.value.forEach((key, medias) {
+        if (medias.isNotEmpty) {
+          submitData[key] = medias.map((e) => e.toJson()).toList();
+        }
+      });
+
+      submitData['remark'] = remarkController.text;
+
+      await updateInspectionItem(id, submitData);
+
+      EasyLoading.showSuccess('验货完成');
+      if (context.mounted) Navigator.pop(context);
+    }
 
     return Scaffold(
       backgroundColor: _cBg,
@@ -59,28 +88,33 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
                   inspectionItem: inspectionItem.value,
                 ),
                 const SizedBox(height: 12),
-                _PhotoCard(blue: _cBlue, text: _cText),
+                _PhotoCard(
+                  blue: _cBlue,
+                  text: _cText,
+                  mediaMap: mediaMap.value,
+                  onMediaChanged: updateMedia,
+                ),
                 const SizedBox(height: 12),
                 _NoteCard(
                   blue: _cBlue,
                   text: _cText,
-                  inspectionItem: inspectionItem.value,
+                  controller: remarkController,
                 ),
               ],
             ),
           ),
-          _buildBottomBtn(),
+          _buildBottomBtn(onPressed: handleSubmit),
         ],
       ),
     );
   }
 
-  Widget _buildBottomBtn() => Container(
+  Widget _buildBottomBtn({VoidCallback? onPressed}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         color: Colors.white,
         child: SafeArea(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: onPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: _cBlue,
               minimumSize: const Size(double.infinity, 44),
@@ -164,9 +198,24 @@ class _InfoCard extends StatelessWidget {
 class _PhotoCard extends StatelessWidget {
   final Color blue;
   final Color text;
-  const _PhotoCard({required this.blue, required this.text});
+  final Map<String, List<TemporaryMedia>> mediaMap;
+  final void Function(String key, List<TemporaryMedia> list) onMediaChanged;
 
-  static const _labels = ['正唛', '侧唛', '开箱', '条码标签', '产品重量', '产品主图'];
+  const _PhotoCard({
+    required this.blue,
+    required this.text,
+    required this.mediaMap,
+    required this.onMediaChanged,
+  });
+
+  static const Map<String, String> _gridConfig = {
+    'shipping_mark_front': '正唛',
+    'shipping_mark_side': '侧唛',
+    'unboxing': '开箱',
+    'barcode_label': '条码标签',
+    'weight_proof': '产品重量',
+    'cover': '产品主图',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -175,30 +224,29 @@ class _PhotoCard extends StatelessWidget {
         builder: (context, constraints) {
           final double totalWidth = constraints.maxWidth;
           const double spacing = 12.0;
-
           final double itemSize =
               ((totalWidth - (spacing * 2)) / 3).floorToDouble();
 
+          final detailsList = mediaMap['details'] ?? [];
+
           return Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _TitleRow(
-                      icon: Icons.camera_alt_outlined,
-                      title: '验货图片',
-                      color: blue,
-                      textColor: text),
-                  _buildToggle(),
-                ],
-              ),
+              _TitleRow(
+                  icon: Icons.camera_alt_outlined,
+                  title: '验货图片',
+                  color: blue,
+                  textColor: text),
               const SizedBox(height: 16),
               Wrap(
                 spacing: spacing,
                 runSpacing: 16.0,
-                children: _labels
-                    .map((label) => _buildGridItem(label, itemSize))
-                    .toList(),
+                children: _gridConfig.entries.map((entry) {
+                  return _buildGridItem(
+                    apiKey: entry.key,
+                    label: entry.value,
+                    width: itemSize,
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 24),
               Column(
@@ -210,14 +258,17 @@ class _PhotoCard extends StatelessWidget {
                       Text('其他验货图片',
                           style: TextStyle(
                               color: text, fontWeight: FontWeight.w500)),
-                      const Text('0/50张',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text('${detailsList.length}/50张',
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: _dashedBox(itemSize, '添加图片', isPlus: true),
+                  ImageUploader(
+                    label: null,
+                    maxCount: 50,
+                    value: detailsList,
+                    onChanged: (list) => onMediaChanged('details', list),
                   ),
                 ],
               )
@@ -228,9 +279,13 @@ class _PhotoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(String label, double size) {
+  Widget _buildGridItem({
+    required String apiKey,
+    required String label,
+    required double width,
+  }) {
     return SizedBox(
-      width: size,
+      width: width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -243,85 +298,37 @@ class _PhotoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _dashedBox(size, '点击拍摄$label'),
+          SizedBox(
+            width: width,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ImageUploader(
+                label: null,
+                maxCount: 1,
+                value: mediaMap[apiKey] ?? [],
+                onChanged: (list) => onMediaChanged(apiKey, list),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
-  Widget _dashedBox(double size, String label, {bool isPlus = false}) {
-    return CustomPaint(
-      painter: _DashRectPainter(color: Colors.grey[300]!),
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(isPlus ? Icons.add : Icons.camera_alt_outlined,
-                color: Colors.grey[400], size: isPlus ? 28 : 24),
-            const SizedBox(height: 6),
-            Text(label,
-                style: TextStyle(color: Colors.grey[400], fontSize: 10)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggle() => Container(
-        padding: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-            color: const Color(0xFFF5F7FA),
-            borderRadius: BorderRadius.circular(14)),
-        child: Row(
-          children: [
-            _toggleItem('直接拍照', true),
-            _toggleItem('选择来源', false),
-          ],
-        ),
-      );
-
-  Widget _toggleItem(String txt, bool active) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: active ? blue : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            if (active) const Icon(Icons.check, size: 12, color: Colors.white),
-            if (active) const SizedBox(width: 4),
-            Text(txt,
-                style: TextStyle(
-                    fontSize: 12, color: active ? Colors.white : Colors.grey)),
-          ],
-        ),
-      );
 }
 
 class _NoteCard extends HookWidget {
-  final InspectionItem? inspectionItem;
   final Color blue;
   final Color text;
+  final TextEditingController controller;
 
   const _NoteCard({
     required this.blue,
     required this.text,
-    this.inspectionItem,
+    required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController();
-
-    useEffect(() {
-      final initialText = inspectionItem?.remark ?? '';
-
-      controller.text = initialText;
-      return null;
-    }, [inspectionItem]);
-
     return _BaseCard(
       child: Column(
         children: [
@@ -335,9 +342,6 @@ class _NoteCard extends HookWidget {
           TextField(
             controller: controller,
             maxLines: 3,
-            onChanged: (value) {
-              // inspectionItem?.note = value; // 如果需要临时保存
-            },
             decoration: InputDecoration(
               hintText: '请输入验货备注信息（选填）',
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
@@ -389,32 +393,4 @@ class _TitleRow extends StatelessWidget {
                   color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       );
-}
-
-class _DashRectPainter extends CustomPainter {
-  final Color color;
-  _DashRectPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-          Offset.zero & size, const Radius.circular(4)));
-
-    ui.PathMetrics pathMetrics = path.computeMetrics();
-    for (ui.PathMetric pathMetric in pathMetrics) {
-      double distance = 0.0;
-      while (distance < pathMetric.length) {
-        canvas.drawPath(pathMetric.extractPath(distance, distance + 5), paint);
-        distance += 10;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
