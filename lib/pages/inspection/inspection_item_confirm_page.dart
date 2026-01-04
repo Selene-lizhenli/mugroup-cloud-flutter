@@ -1,8 +1,12 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
+import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/inspection.dart';
+import 'package:cloud/constants/form_definitions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -49,7 +53,6 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
             }
             final String key = item.collectionName ?? 'details';
 
-            // 转换为前端组件需要的 TemporaryMedia 模型
             final tempMedia = TemporaryMedia(
               id: item.id!,
               url: item.url!,
@@ -57,14 +60,11 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
               uuid: null,
             );
 
-            // 将图片加入对应分类的列表中
             if (!initMap.containsKey(key)) {
               initMap[key] = [];
             }
             initMap[key]!.add(tempMedia);
           }
-
-          // 4. 更新状态
           mediaMap.value = initMap;
         }
       } finally {
@@ -234,7 +234,7 @@ class _InfoCard extends StatelessWidget {
       );
 }
 
-class _PhotoCard extends StatelessWidget {
+class _PhotoCard extends HookConsumerWidget {
   final Color blue;
   final Color text;
   final Map<String, List<TemporaryMedia>> mediaMap;
@@ -247,17 +247,26 @@ class _PhotoCard extends StatelessWidget {
     required this.onMediaChanged,
   });
 
-  static const Map<String, String> _gridConfig = {
-    'shipping_mark_front': '正唛',
-    'shipping_mark_side': '侧唛',
-    'unboxing': '开箱',
-    'barcode_label': '条码标签',
-    'weight_proof': '产品重量',
-    'cover': '产品主图',
+  // 定义属于此卡片的图片字段key集合，用于过滤
+  static const Set<String> _photoKeys = {
+    'shipping_mark_front',
+    'shipping_mark_side',
+    'unboxing',
+    'barcode_label',
+    'weight_proof',
+    'cover',
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final configParams = useMemoized(() => FieldConfigParams(
+          storageKey: 'inspection_item_confirm_v1',
+          defaultFields: inspectionDefaultFields,
+        ));
+
+    final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
+    final notifier = ref.read(fieldConfigProvider(configParams).notifier);
+
     return _BaseCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -270,19 +279,59 @@ class _PhotoCard extends StatelessWidget {
 
           return Column(
             children: [
-              _TitleRow(
-                  icon: Icons.camera_alt_outlined,
-                  title: '验货图片',
-                  color: blue,
-                  textColor: text),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _TitleRow(
+                    icon: Icons.camera_alt_outlined,
+                    title: '验货图片',
+                    color: blue,
+                    textColor: text,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (ctx) {
+                          return FieldSelector(
+                            fields: fieldConfigs,
+                            defaultFields: inspectionDefaultFields,
+                            onConfigChanged: (List<FieldConfig> newConfigs) {
+                              notifier.updateConfigs(newConfigs);
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.settings,
+                            size: 16, color: Theme.of(context).primaryColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          "字段设置",
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: spacing,
                 runSpacing: 16.0,
-                children: _gridConfig.entries.map((entry) {
+                children: fieldConfigs
+                    .where((field) =>
+                        field.isVisible && _photoKeys.contains(field.name))
+                    .map((field) {
                   return _buildGridItem(
-                    apiKey: entry.key,
-                    label: entry.value,
+                    apiKey: field.name,
+                    label: field.label,
                     width: itemSize,
                   );
                 }).toList(),

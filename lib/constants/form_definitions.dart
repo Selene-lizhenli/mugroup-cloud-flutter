@@ -36,3 +36,12 @@ final List<FieldConfig> quoteSampleDefaultFields = [
   const FieldConfig(label: '中文描述', name: 'description_cn', isVisible: true),
   const FieldConfig(label: '英文描述', name: 'description_en', isVisible: true),
 ];
+
+final List<FieldConfig> inspectionDefaultFields = [
+  const FieldConfig(label: '正唛', name: 'shipping_mark_front', isVisible: true),
+  const FieldConfig(label: '侧唛', name: 'shipping_mark_side', isVisible: true),
+  const FieldConfig(label: '开箱', name: 'unboxing', isVisible: true),
+  const FieldConfig(label: '条码标签', name: 'barcode_label', isVisible: true),
+  const FieldConfig(label: '产品重量', name: 'weight_proof', isVisible: true),
+  const FieldConfig(label: '产品主图', name: 'cover', isVisible: true),
+];
