@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
@@ -7,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 @RoutePage()
 class InspectionDetailPage extends HookConsumerWidget {
@@ -404,7 +407,13 @@ class InspectionDetailPage extends HookConsumerWidget {
         child: SizedBox(
           height: 48,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // 点击背景不关闭（根据需求可选）
+                builder: (context) => ExportInspectionDialog(id: id),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryBlue,
               shape: RoundedRectangleBorder(
@@ -445,6 +454,186 @@ class InspectionDetailPage extends HookConsumerWidget {
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ExportInspectionDialog extends HookWidget {
+  final int id;
+  const ExportInspectionDialog({super.key, required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color primaryBlue = Color(0xFF3B66F5);
+    const Color textDark = Color(0xFF333333);
+    final borderColor = Colors.grey[300]!;
+
+    final emailController = useTextEditingController();
+
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '导出验货清单',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textDark,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Text(
+                  '邮箱',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF666666),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: TextField(
+                      controller: emailController,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: '请输入接收验货清单的邮箱',
+                        hintStyle:
+                            TextStyle(color: Colors.grey[400], fontSize: 13),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: primaryBlue),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '如果不需要发送到邮箱，请点击下载',
+              style: TextStyle(color: Colors.grey[500], fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: textDark,
+                      side: BorderSide(color: Colors.grey[200]!),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      backgroundColor: const Color(0xFFFAFAFA),
+                    ),
+                    child: const Text('取消'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        EasyLoading.show(status: '正在导出...');
+
+                        var response = await exportInspection(id);
+                        List<int> bytes;
+                        if (response.data is List<int>) {
+                          bytes = response.data;
+                        } else if (response.data is List) {
+                          bytes = List<int>.from(response.data);
+                        } else {
+                          throw Exception("数据格式错误");
+                        }
+
+                        final directory = await getTemporaryDirectory();
+                        final fileName =
+                            '验货清单_${id}_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+                        final filePath = '${directory.path}/$fileName';
+                        final file = File(filePath);
+                        await file.writeAsBytes(bytes);
+
+                        EasyLoading.dismiss();
+
+                        final box = context.findRenderObject() as RenderBox?;
+
+                        await Share.shareXFiles(
+                          [XFile(filePath)],
+                          text: '这是验货任务 $id 的清单文件',
+                          subject: fileName,
+                          sharePositionOrigin:
+                              box!.localToGlobal(Offset.zero) & box.size,
+                        );
+
+                        // 4. 分享窗口关闭后，关闭当前的导出弹窗
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      } catch (e) {
+                        EasyLoading.dismiss();
+                        EasyLoading.showError('导出失败: $e');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    child: const Text('下载'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // 邮件发送按钮
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final email = emailController.text;
+                      Navigator.of(context).pop();
+                      // TODO: 处理发送逻辑
+                      // print('Send to: $email');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    child: const Text('邮件发送'),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -115,3 +115,9 @@ Future<Inspection?> deleteInspectionItem(
     },
   );
 }
+
+Future exportInspection(int id) async {
+  return api.get(
+    "api/tenant/inspection/tasks/$id/export",
+  );
+}
