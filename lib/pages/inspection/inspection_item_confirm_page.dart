@@ -443,7 +443,7 @@ class _PhotoCard extends HookConsumerWidget {
                     mediaMap: mediaMap,
                     onMediaChanged: onMediaChanged,
                     // 3. 判断逻辑：只有索引为 0 (第一个) 时开启连拍 并且没有图片
-                    enableContinuous: index == 0 && mediaMap.isEmpty,
+                    enableContinuous: index == 0,
                     onContinuousCapture:
                         index == 0 ? handleAutoDistribute : null,
                   );
