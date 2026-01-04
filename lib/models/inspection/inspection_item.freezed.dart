@@ -26,6 +26,7 @@ mixin _$InspectionItem {
   int? get status => throw _privateConstructorUsedError;
   int? get ctns => throw _privateConstructorUsedError;
   int? get qty => throw _privateConstructorUsedError;
+  String? get remark => throw _privateConstructorUsedError;
   @JsonKey(name: 'task_id')
   int? get taskId => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
@@ -58,6 +59,7 @@ abstract class $InspectionItemCopyWith<$Res> {
       int? status,
       int? ctns,
       int? qty,
+      String? remark,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
@@ -85,6 +87,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? status = freezed,
     Object? ctns = freezed,
     Object? qty = freezed,
+    Object? remark = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
     Object? sampleId = freezed,
@@ -117,6 +120,10 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.qty
           : qty // ignore: cast_nullable_to_non_nullable
               as int?,
+      remark: freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
       taskId: freezed == taskId
           ? _value.taskId
           : taskId // ignore: cast_nullable_to_non_nullable
@@ -160,6 +167,7 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       int? status,
       int? ctns,
       int? qty,
+      String? remark,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
@@ -185,6 +193,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? status = freezed,
     Object? ctns = freezed,
     Object? qty = freezed,
+    Object? remark = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
     Object? sampleId = freezed,
@@ -217,6 +226,10 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value.qty
           : qty // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == taskId
           ? _value.taskId
           : taskId // ignore: cast_nullable_to_non_nullable
@@ -255,6 +268,7 @@ class _$InspectionItemImpl implements _InspectionItem {
       this.status,
       this.ctns,
       this.qty,
+      this.remark,
       @JsonKey(name: 'task_id') this.taskId,
       @JsonKey(name: 'user_id') this.userId,
       @JsonKey(name: 'sample_id') this.sampleId,
@@ -278,6 +292,8 @@ class _$InspectionItemImpl implements _InspectionItem {
   @override
   final int? qty;
   @override
+  final String? remark;
+  @override
   @JsonKey(name: 'task_id')
   final int? taskId;
   @override
@@ -298,7 +314,7 @@ class _$InspectionItemImpl implements _InspectionItem {
 
   @override
   String toString() {
-    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
+    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
   }
 
   @override
@@ -312,6 +328,7 @@ class _$InspectionItemImpl implements _InspectionItem {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.ctns, ctns) || other.ctns == ctns) &&
             (identical(other.qty, qty) || other.qty == qty) &&
+            (identical(other.remark, remark) || other.remark == remark) &&
             (identical(other.taskId, taskId) || other.taskId == taskId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.sampleId, sampleId) ||
@@ -326,7 +343,7 @@ class _$InspectionItemImpl implements _InspectionItem {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, type, name, status, ctns,
-      qty, taskId, userId, sampleId, itemNo, unitPerCtn, createdAt);
+      qty, remark, taskId, userId, sampleId, itemNo, unitPerCtn, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -351,6 +368,7 @@ abstract class _InspectionItem implements InspectionItem {
           final int? status,
           final int? ctns,
           final int? qty,
+          final String? remark,
           @JsonKey(name: 'task_id') final int? taskId,
           @JsonKey(name: 'user_id') final int? userId,
           @JsonKey(name: 'sample_id') final int? sampleId,
@@ -374,6 +392,8 @@ abstract class _InspectionItem implements InspectionItem {
   int? get ctns;
   @override
   int? get qty;
+  @override
+  String? get remark;
   @override
   @JsonKey(name: 'task_id')
   int? get taskId;

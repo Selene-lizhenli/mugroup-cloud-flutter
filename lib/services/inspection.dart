@@ -1,5 +1,6 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/models/response.dart';
 import 'package:dio/dio.dart';
 
@@ -119,5 +120,17 @@ Future<Inspection?> deleteInspectionItem(
 Future exportInspection(int id) async {
   return api.get(
     "api/tenant/inspection/tasks/$id/export",
+  );
+}
+
+Future<InspectionItem?> showInspectionItem(int id) async {
+  return api.get("api/tenant/inspection/items/$id").then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return InspectionItem.fromJson(res.data);
+    },
   );
 }

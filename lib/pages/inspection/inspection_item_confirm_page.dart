@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/inspection/inspection_item.dart';
+import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:ui' as ui;
 
@@ -14,6 +17,23 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final inspectionItem = useState<InspectionItem?>(null);
+    final isLoading = useState(true);
+
+    Future loadInspection() async {
+      try {
+        final data = await showInspectionItem(id);
+        inspectionItem.value = data;
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    useEffect(() {
+      loadInspection();
+      return null;
+    }, []);
+
     return Scaffold(
       backgroundColor: _cBg,
       appBar: AppBar(
@@ -32,12 +52,20 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(12),
-              children: const [
-                _InfoCard(blue: _cBlue, text: _cText),
-                SizedBox(height: 12),
+              children: [
+                _InfoCard(
+                  blue: _cBlue,
+                  text: _cText,
+                  inspectionItem: inspectionItem.value,
+                ),
+                const SizedBox(height: 12),
                 _PhotoCard(blue: _cBlue, text: _cText),
-                SizedBox(height: 12),
-                _NoteCard(blue: _cBlue, text: _cText),
+                const SizedBox(height: 12),
+                _NoteCard(
+                  blue: _cBlue,
+                  text: _cText,
+                  inspectionItem: inspectionItem.value,
+                ),
               ],
             ),
           ),
@@ -70,9 +98,11 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 }
 
 class _InfoCard extends StatelessWidget {
+  final InspectionItem? inspectionItem;
   final Color blue;
   final Color text;
-  const _InfoCard({required this.blue, required this.text});
+  const _InfoCard(
+      {required this.blue, required this.text, this.inspectionItem});
 
   @override
   Widget build(BuildContext context) {
@@ -87,18 +117,18 @@ class _InfoCard extends StatelessWidget {
                   title: '产品验货',
                   color: blue,
                   textColor: text),
-              Text('SKU: 10908',
+              Text('SKU: ${inspectionItem?.itemNo}',
                   style: TextStyle(color: blue, fontWeight: FontWeight.w500)),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              _item('采购箱数', '0', false),
+              _item('采购箱数', '${inspectionItem?.ctns ?? 0}', false),
               const SizedBox(width: 8),
-              _item('装箱量', '0', false),
+              _item('装箱量', '${inspectionItem?.unitPerCtn ?? 0}', false),
               const SizedBox(width: 8),
-              _item('总数量', '0', true),
+              _item('总数量', '${inspectionItem?.qty ?? 0}', true),
             ],
           )
         ],
@@ -270,24 +300,44 @@ class _PhotoCard extends StatelessWidget {
       );
 }
 
-class _NoteCard extends StatelessWidget {
+class _NoteCard extends HookWidget {
+  final InspectionItem? inspectionItem;
   final Color blue;
   final Color text;
-  const _NoteCard({required this.blue, required this.text});
+
+  const _NoteCard({
+    required this.blue,
+    required this.text,
+    this.inspectionItem,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController();
+
+    useEffect(() {
+      final initialText = inspectionItem?.remark ?? '';
+
+      controller.text = initialText;
+      return null;
+    }, [inspectionItem]);
+
     return _BaseCard(
       child: Column(
         children: [
           _TitleRow(
-              icon: Icons.edit_note,
-              title: '验货备注',
-              color: blue,
-              textColor: text),
+            icon: Icons.edit_note,
+            title: '验货备注',
+            color: blue,
+            textColor: text,
+          ),
           const SizedBox(height: 12),
           TextField(
+            controller: controller,
             maxLines: 3,
+            onChanged: (value) {
+              // inspectionItem?.note = value; // 如果需要临时保存
+            },
             decoration: InputDecoration(
               hintText: '请输入验货备注信息（选填）',
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),

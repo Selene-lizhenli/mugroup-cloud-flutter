@@ -12,6 +12,7 @@ class InspectionItem with _$InspectionItem {
     int? status,
     int? ctns,
     int? qty,
+    String? remark,
     @JsonKey(name: 'task_id') int? taskId,
     @JsonKey(name: 'user_id') int? userId,
     @JsonKey(name: 'sample_id') int? sampleId,
