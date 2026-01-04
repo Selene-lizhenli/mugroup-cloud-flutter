@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
@@ -372,10 +373,18 @@ class InspectionDetailPage extends HookConsumerWidget {
                                               color: Colors.redAccent,
                                               size: 18),
                                           onPressed: () async {
-                                            await deleteInspectionItem(id, {
-                                              'item_ids': [item.id]
-                                            });
-                                            EasyLoading.showSuccess('删除成功');
+                                            final bool isConfirmed =
+                                                await ConfirmDialog.show(
+                                              context,
+                                              content:
+                                                  '是否确定要删除SKU: ${item.itemNo}？',
+                                            );
+                                            if (isConfirmed) {
+                                              await deleteInspectionItem(id, {
+                                                'item_ids': [item.id]
+                                              });
+                                              EasyLoading.showSuccess('删除成功');
+                                            }
                                           },
                                         ),
                                       ),
