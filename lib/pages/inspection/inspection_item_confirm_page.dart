@@ -35,7 +35,38 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
       try {
         final data = await showInspectionItem(id);
         inspectionItem.value = data;
-        remarkController.text = data?.remark ?? '';
+
+        if (data?.remark != null) {
+          remarkController.text = data!.remark!;
+        }
+
+        if (data?.media != null && data!.media!.isNotEmpty) {
+          final Map<String, List<TemporaryMedia>> initMap = {};
+
+          for (var item in data.media!) {
+            if (item.id == null || item.url == null) {
+              continue;
+            }
+            final String key = item.collectionName ?? 'details';
+
+            // 转换为前端组件需要的 TemporaryMedia 模型
+            final tempMedia = TemporaryMedia(
+              id: item.id!,
+              url: item.url!,
+              thumbUrl: item.thumbUrl ?? item.url,
+              uuid: null,
+            );
+
+            // 将图片加入对应分类的列表中
+            if (!initMap.containsKey(key)) {
+              initMap[key] = [];
+            }
+            initMap[key]!.add(tempMedia);
+          }
+
+          // 4. 更新状态
+          mediaMap.value = initMap;
+        }
       } finally {
         isLoading.value = false;
       }
@@ -51,7 +82,14 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 
       mediaMap.value.forEach((key, medias) {
         if (medias.isNotEmpty) {
-          submitData[key] = medias.map((e) => e.toJson()).toList();
+          submitData[key] = medias
+              .map((e) => {
+                    'id': e.id,
+                    'url': e.url,
+                    'thumb_url': e.thumbUrl,
+                    if (e.uuid != null) 'uuid': e.uuid,
+                  })
+              .toList();
         }
       });
 

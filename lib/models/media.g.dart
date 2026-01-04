@@ -12,6 +12,7 @@ _$MediaImpl _$$MediaImplFromJson(Map<String, dynamic> json) => _$MediaImpl(
       url: json['url'] as String?,
       filename: json['filename'] as String?,
       thumbUrl: json['thumb_url'] as String?,
+      collectionName: json['collection_name'] as String?,
     );
 
 Map<String, dynamic> _$$MediaImplToJson(_$MediaImpl instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$$MediaImplToJson(_$MediaImpl instance) =>
       'url': instance.url,
       'filename': instance.filename,
       'thumb_url': instance.thumbUrl,
+      'collection_name': instance.collectionName,
     };

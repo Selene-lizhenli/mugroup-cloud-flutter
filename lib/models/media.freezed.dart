@@ -26,6 +26,8 @@ mixin _$Media {
   String? get filename => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumb_url')
   String? get thumbUrl => throw _privateConstructorUsedError;
+  @JsonKey(name: 'collection_name')
+  String? get collectionName => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -42,7 +44,8 @@ abstract class $MediaCopyWith<$Res> {
       String? name,
       String? url,
       String? filename,
-      @JsonKey(name: 'thumb_url') String? thumbUrl});
+      @JsonKey(name: 'thumb_url') String? thumbUrl,
+      @JsonKey(name: 'collection_name') String? collectionName});
 }
 
 /// @nodoc
@@ -63,6 +66,7 @@ class _$MediaCopyWithImpl<$Res, $Val extends Media>
     Object? url = freezed,
     Object? filename = freezed,
     Object? thumbUrl = freezed,
+    Object? collectionName = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -85,6 +89,10 @@ class _$MediaCopyWithImpl<$Res, $Val extends Media>
           ? _value.thumbUrl
           : thumbUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      collectionName: freezed == collectionName
+          ? _value.collectionName
+          : collectionName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -101,7 +109,8 @@ abstract class _$$MediaImplCopyWith<$Res> implements $MediaCopyWith<$Res> {
       String? name,
       String? url,
       String? filename,
-      @JsonKey(name: 'thumb_url') String? thumbUrl});
+      @JsonKey(name: 'thumb_url') String? thumbUrl,
+      @JsonKey(name: 'collection_name') String? collectionName});
 }
 
 /// @nodoc
@@ -120,6 +129,7 @@ class __$$MediaImplCopyWithImpl<$Res>
     Object? url = freezed,
     Object? filename = freezed,
     Object? thumbUrl = freezed,
+    Object? collectionName = freezed,
   }) {
     return _then(_$MediaImpl(
       id: freezed == id
@@ -142,6 +152,10 @@ class __$$MediaImplCopyWithImpl<$Res>
           ? _value.thumbUrl
           : thumbUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      collectionName: freezed == collectionName
+          ? _value.collectionName
+          : collectionName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -154,7 +168,8 @@ class _$MediaImpl extends _Media {
       this.name,
       this.url,
       this.filename,
-      @JsonKey(name: 'thumb_url') this.thumbUrl})
+      @JsonKey(name: 'thumb_url') this.thumbUrl,
+      @JsonKey(name: 'collection_name') this.collectionName})
       : super._();
 
   factory _$MediaImpl.fromJson(Map<String, dynamic> json) =>
@@ -171,10 +186,13 @@ class _$MediaImpl extends _Media {
   @override
   @JsonKey(name: 'thumb_url')
   final String? thumbUrl;
+  @override
+  @JsonKey(name: 'collection_name')
+  final String? collectionName;
 
   @override
   String toString() {
-    return 'Media(id: $id, name: $name, url: $url, filename: $filename, thumbUrl: $thumbUrl)';
+    return 'Media(id: $id, name: $name, url: $url, filename: $filename, thumbUrl: $thumbUrl, collectionName: $collectionName)';
   }
 
   @override
@@ -188,13 +206,15 @@ class _$MediaImpl extends _Media {
             (identical(other.filename, filename) ||
                 other.filename == filename) &&
             (identical(other.thumbUrl, thumbUrl) ||
-                other.thumbUrl == thumbUrl));
+                other.thumbUrl == thumbUrl) &&
+            (identical(other.collectionName, collectionName) ||
+                other.collectionName == collectionName));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, url, filename, thumbUrl);
+  int get hashCode => Object.hash(
+      runtimeType, id, name, url, filename, thumbUrl, collectionName);
 
   @JsonKey(ignore: true)
   @override
@@ -212,11 +232,13 @@ class _$MediaImpl extends _Media {
 
 abstract class _Media extends Media {
   const factory _Media(
-      {final int? id,
-      final String? name,
-      final String? url,
-      final String? filename,
-      @JsonKey(name: 'thumb_url') final String? thumbUrl}) = _$MediaImpl;
+          {final int? id,
+          final String? name,
+          final String? url,
+          final String? filename,
+          @JsonKey(name: 'thumb_url') final String? thumbUrl,
+          @JsonKey(name: 'collection_name') final String? collectionName}) =
+      _$MediaImpl;
   const _Media._() : super._();
 
   factory _Media.fromJson(Map<String, dynamic> json) = _$MediaImpl.fromJson;
@@ -232,6 +254,9 @@ abstract class _Media extends Media {
   @override
   @JsonKey(name: 'thumb_url')
   String? get thumbUrl;
+  @override
+  @JsonKey(name: 'collection_name')
+  String? get collectionName;
   @override
   @JsonKey(ignore: true)
   _$$MediaImplCopyWith<_$MediaImpl> get copyWith =>

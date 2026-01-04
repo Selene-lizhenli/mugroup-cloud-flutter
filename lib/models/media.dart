@@ -13,6 +13,7 @@ abstract class Media with _$Media {
     String? url,
     String? filename,
     @JsonKey(name: 'thumb_url') String? thumbUrl,
+    @JsonKey(name: 'collection_name') String? collectionName,
   }) = _Media;
 
   factory Media.fromJson(Map<String, Object?> json) => _$MediaFromJson(json);

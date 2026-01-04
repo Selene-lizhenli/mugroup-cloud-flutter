@@ -27,6 +27,7 @@ mixin _$InspectionItem {
   int? get ctns => throw _privateConstructorUsedError;
   int? get qty => throw _privateConstructorUsedError;
   String? get remark => throw _privateConstructorUsedError;
+  List<Media>? get media => throw _privateConstructorUsedError;
   @JsonKey(name: 'task_id')
   int? get taskId => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
@@ -60,6 +61,7 @@ abstract class $InspectionItemCopyWith<$Res> {
       int? ctns,
       int? qty,
       String? remark,
+      List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
@@ -88,6 +90,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? ctns = freezed,
     Object? qty = freezed,
     Object? remark = freezed,
+    Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
     Object? sampleId = freezed,
@@ -124,6 +127,10 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
               as String?,
+      media: freezed == media
+          ? _value.media
+          : media // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
       taskId: freezed == taskId
           ? _value.taskId
           : taskId // ignore: cast_nullable_to_non_nullable
@@ -168,6 +175,7 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       int? ctns,
       int? qty,
       String? remark,
+      List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
@@ -194,6 +202,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? ctns = freezed,
     Object? qty = freezed,
     Object? remark = freezed,
+    Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
     Object? sampleId = freezed,
@@ -230,6 +239,10 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == media
+          ? _value._media
+          : media // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
       freezed == taskId
           ? _value.taskId
           : taskId // ignore: cast_nullable_to_non_nullable
@@ -269,12 +282,14 @@ class _$InspectionItemImpl implements _InspectionItem {
       this.ctns,
       this.qty,
       this.remark,
+      final List<Media>? media,
       @JsonKey(name: 'task_id') this.taskId,
       @JsonKey(name: 'user_id') this.userId,
       @JsonKey(name: 'sample_id') this.sampleId,
       @JsonKey(name: 'item_no') this.itemNo,
       @JsonKey(name: 'unit_per_ctn') this.unitPerCtn,
-      @JsonKey(name: 'created_at') this.createdAt);
+      @JsonKey(name: 'created_at') this.createdAt)
+      : _media = media;
 
   factory _$InspectionItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$InspectionItemImplFromJson(json);
@@ -293,6 +308,16 @@ class _$InspectionItemImpl implements _InspectionItem {
   final int? qty;
   @override
   final String? remark;
+  final List<Media>? _media;
+  @override
+  List<Media>? get media {
+    final value = _media;
+    if (value == null) return null;
+    if (_media is EqualUnmodifiableListView) return _media;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'task_id')
   final int? taskId;
@@ -314,7 +339,7 @@ class _$InspectionItemImpl implements _InspectionItem {
 
   @override
   String toString() {
-    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
+    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
   }
 
   @override
@@ -329,6 +354,7 @@ class _$InspectionItemImpl implements _InspectionItem {
             (identical(other.ctns, ctns) || other.ctns == ctns) &&
             (identical(other.qty, qty) || other.qty == qty) &&
             (identical(other.remark, remark) || other.remark == remark) &&
+            const DeepCollectionEquality().equals(other._media, _media) &&
             (identical(other.taskId, taskId) || other.taskId == taskId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.sampleId, sampleId) ||
@@ -342,8 +368,22 @@ class _$InspectionItemImpl implements _InspectionItem {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, name, status, ctns,
-      qty, remark, taskId, userId, sampleId, itemNo, unitPerCtn, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      type,
+      name,
+      status,
+      ctns,
+      qty,
+      remark,
+      const DeepCollectionEquality().hash(_media),
+      taskId,
+      userId,
+      sampleId,
+      itemNo,
+      unitPerCtn,
+      createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -369,6 +409,7 @@ abstract class _InspectionItem implements InspectionItem {
           final int? ctns,
           final int? qty,
           final String? remark,
+          final List<Media>? media,
           @JsonKey(name: 'task_id') final int? taskId,
           @JsonKey(name: 'user_id') final int? userId,
           @JsonKey(name: 'sample_id') final int? sampleId,
@@ -394,6 +435,8 @@ abstract class _InspectionItem implements InspectionItem {
   int? get qty;
   @override
   String? get remark;
+  @override
+  List<Media>? get media;
   @override
   @JsonKey(name: 'task_id')
   int? get taskId;
