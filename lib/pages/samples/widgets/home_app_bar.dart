@@ -1,6 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/home_media.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
@@ -115,82 +117,112 @@ class HomeAppBar extends HookConsumerWidget {
       children: [
         Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-          padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
-          height: 40,
-          decoration: BoxDecoration(
-            color: colorScheme.onPrimary,
-            border: Border.all(
-              color: colorScheme.secondary,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(5),
-          ),
+          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // 搜索输入框
               Expanded(
-                child: TextField(
-                  autofocus: false,
-                  controller: controller,
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  focusNode: focusNode,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: '',
+                child: Container(
+                  height: 40,
+                  padding: const EdgeInsets.only(left: 12, right: 0),
+                  decoration: BoxDecoration(
+                    color: colorScheme.onPrimary,
+                    border: Border.all(
+                      color: colorScheme.secondary,
+                      width: 1,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                      topRight: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
                   ),
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (value) {
-                    onSearchText?.call(value);
-                  },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          autofocus: false,
+                          controller: controller,
+                          onTapOutside: (event) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          focusNode: focusNode,
+                          decoration: const InputDecoration.collapsed(
+                            hintText: '',
+                          ),
+                          textInputAction: TextInputAction.search,
+                          onSubmitted: (value) {
+                            onSearchText?.call(value);
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: IconButton(
+                          icon:   Icon(
+                            CupertinoIcons.camera,
+                            size: 28,
+                            color: colorScheme.outline,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: handleUploadMedia,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        height: 40,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: colorScheme.secondary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 0),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(0),
+                                bottomLeft: Radius.circular(0),
+                                topRight: Radius.circular(5),
+                                bottomRight: Radius.circular(5),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            onSearchText?.call(controller.text);
+                          },
+                          child: Text(
+                            "搜索",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
+
+              // 购物车图标
               SizedBox(
-                width: 30,
-                height: 30,
+                width: 40,
+                height: 40,
                 child: IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.camera,
-                    size: 28,
-                    color: Colors.grey,
+                  icon: Icon(
+                    Icons.shopping_cart,
+                    size: 25,
+                    color: colorScheme.secondary,
                   ),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: handleUploadMedia,
-                ),
-              ),
-              Container(
-                color: Colors.grey,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                width: 0,
-                height: 0,
-              ),
-              Container(
-                margin:
-                    const EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 0),
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: colorScheme.secondary,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                   onPressed: () {
-                    onSearchText?.call(controller.text);
+                    context.router.push(const CartRoute());
                   },
-                  child: Text(
-                    "搜索",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: colorScheme.onPrimary,
-                    ),
-                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),

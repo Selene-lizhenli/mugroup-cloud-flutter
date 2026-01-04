@@ -9,26 +9,31 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class SamplesListPage extends HookConsumerWidget {
-  const SamplesListPage({
-    super.key,
-  });
+  const SamplesListPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
-    final colorScheme = Theme.of(context).colorScheme;
-    final statusBarHeight = MediaQuery.of(context).padding.top;
+
+    // 使用 provider 中的 currentSelectedWarehouse
+    final currentWarehouse = home.currentSelectedWarehouse;
 
     return Scaffold(
-        body: Container(
-      color: colorScheme.secondary,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: statusBarHeight),
-          HomeAppBar(
+      appBar: AppBar(
+        title: Text(currentWarehouse?.name ?? '样品间'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Container(
+        // color: colorScheme.secondary, 
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            HomeAppBar(
             controller: home.searchTextController,
             onSearchText: (search) {
               homeNotifier.setSearch(search);

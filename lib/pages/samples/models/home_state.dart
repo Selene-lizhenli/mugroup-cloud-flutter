@@ -2,6 +2,7 @@ import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,11 @@ abstract class HomeState with _$HomeState {
     @Default([]) List<Supplier> suppliers,
     @Default(1) int supplierPages,
     @Default(false) bool supplierNoMore,
+
+    // ----------  样品间 ----------
+    @Default([]) List<Warehouse> warehouses,
+    @Default(false) bool isLoadingWarehouses,
+    Warehouse? currentSelectedWarehouse,
   }) = _HomeState;
   TemporaryMedia? get currentMedia {
     return media.firstWhereOrNull((item) => item.id == currentMediaId);

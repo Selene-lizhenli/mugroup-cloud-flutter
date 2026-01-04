@@ -32,7 +32,11 @@ mixin _$HomeState {
       throw _privateConstructorUsedError; // ----------  服务商 ----------
   List<Supplier> get suppliers => throw _privateConstructorUsedError;
   int get supplierPages => throw _privateConstructorUsedError;
-  bool get supplierNoMore => throw _privateConstructorUsedError;
+  bool get supplierNoMore =>
+      throw _privateConstructorUsedError; // ----------  样品间 ----------
+  List<Warehouse> get warehouses => throw _privateConstructorUsedError;
+  bool get isLoadingWarehouses => throw _privateConstructorUsedError;
+  Warehouse? get currentSelectedWarehouse => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -58,7 +62,12 @@ abstract class $HomeStateCopyWith<$Res> {
       bool sampleNoMore,
       List<Supplier> suppliers,
       int supplierPages,
-      bool supplierNoMore});
+      bool supplierNoMore,
+      List<Warehouse> warehouses,
+      bool isLoadingWarehouses,
+      Warehouse? currentSelectedWarehouse});
+
+  $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
 }
 
 /// @nodoc
@@ -88,6 +97,9 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? suppliers = null,
     Object? supplierPages = null,
     Object? supplierNoMore = null,
+    Object? warehouses = null,
+    Object? isLoadingWarehouses = null,
+    Object? currentSelectedWarehouse = freezed,
   }) {
     return _then(_value.copyWith(
       bus: null == bus
@@ -146,7 +158,31 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.supplierNoMore
           : supplierNoMore // ignore: cast_nullable_to_non_nullable
               as bool,
+      warehouses: null == warehouses
+          ? _value.warehouses
+          : warehouses // ignore: cast_nullable_to_non_nullable
+              as List<Warehouse>,
+      isLoadingWarehouses: null == isLoadingWarehouses
+          ? _value.isLoadingWarehouses
+          : isLoadingWarehouses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentSelectedWarehouse: freezed == currentSelectedWarehouse
+          ? _value.currentSelectedWarehouse
+          : currentSelectedWarehouse // ignore: cast_nullable_to_non_nullable
+              as Warehouse?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WarehouseCopyWith<$Res>? get currentSelectedWarehouse {
+    if (_value.currentSelectedWarehouse == null) {
+      return null;
+    }
+
+    return $WarehouseCopyWith<$Res>(_value.currentSelectedWarehouse!, (value) {
+      return _then(_value.copyWith(currentSelectedWarehouse: value) as $Val);
+    });
   }
 }
 
@@ -172,7 +208,13 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       bool sampleNoMore,
       List<Supplier> suppliers,
       int supplierPages,
-      bool supplierNoMore});
+      bool supplierNoMore,
+      List<Warehouse> warehouses,
+      bool isLoadingWarehouses,
+      Warehouse? currentSelectedWarehouse});
+
+  @override
+  $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
 }
 
 /// @nodoc
@@ -200,6 +242,9 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? suppliers = null,
     Object? supplierPages = null,
     Object? supplierNoMore = null,
+    Object? warehouses = null,
+    Object? isLoadingWarehouses = null,
+    Object? currentSelectedWarehouse = freezed,
   }) {
     return _then(_$HomeStateImpl(
       bus: null == bus
@@ -258,6 +303,18 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.supplierNoMore
           : supplierNoMore // ignore: cast_nullable_to_non_nullable
               as bool,
+      warehouses: null == warehouses
+          ? _value._warehouses
+          : warehouses // ignore: cast_nullable_to_non_nullable
+              as List<Warehouse>,
+      isLoadingWarehouses: null == isLoadingWarehouses
+          ? _value.isLoadingWarehouses
+          : isLoadingWarehouses // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentSelectedWarehouse: freezed == currentSelectedWarehouse
+          ? _value.currentSelectedWarehouse
+          : currentSelectedWarehouse // ignore: cast_nullable_to_non_nullable
+              as Warehouse?,
     ));
   }
 }
@@ -279,11 +336,15 @@ class _$HomeStateImpl extends _HomeState {
       this.sampleNoMore = false,
       final List<Supplier> suppliers = const [],
       this.supplierPages = 1,
-      this.supplierNoMore = false})
+      this.supplierNoMore = false,
+      final List<Warehouse> warehouses = const [],
+      this.isLoadingWarehouses = false,
+      this.currentSelectedWarehouse})
       : _media = media,
         _samples = samples,
         _facetCounts = facetCounts,
         _suppliers = suppliers,
+        _warehouses = warehouses,
         super._();
 
   @override
@@ -351,10 +412,26 @@ class _$HomeStateImpl extends _HomeState {
   @override
   @JsonKey()
   final bool supplierNoMore;
+// ----------  样品间 ----------
+  final List<Warehouse> _warehouses;
+// ----------  样品间 ----------
+  @override
+  @JsonKey()
+  List<Warehouse> get warehouses {
+    if (_warehouses is EqualUnmodifiableListView) return _warehouses;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_warehouses);
+  }
+
+  @override
+  @JsonKey()
+  final bool isLoadingWarehouses;
+  @override
+  final Warehouse? currentSelectedWarehouse;
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse)';
   }
 
   @override
@@ -385,7 +462,14 @@ class _$HomeStateImpl extends _HomeState {
             (identical(other.supplierPages, supplierPages) ||
                 other.supplierPages == supplierPages) &&
             (identical(other.supplierNoMore, supplierNoMore) ||
-                other.supplierNoMore == supplierNoMore));
+                other.supplierNoMore == supplierNoMore) &&
+            const DeepCollectionEquality()
+                .equals(other._warehouses, _warehouses) &&
+            (identical(other.isLoadingWarehouses, isLoadingWarehouses) ||
+                other.isLoadingWarehouses == isLoadingWarehouses) &&
+            (identical(
+                    other.currentSelectedWarehouse, currentSelectedWarehouse) ||
+                other.currentSelectedWarehouse == currentSelectedWarehouse));
   }
 
   @override
@@ -404,7 +488,10 @@ class _$HomeStateImpl extends _HomeState {
       sampleNoMore,
       const DeepCollectionEquality().hash(_suppliers),
       supplierPages,
-      supplierNoMore);
+      supplierNoMore,
+      const DeepCollectionEquality().hash(_warehouses),
+      isLoadingWarehouses,
+      currentSelectedWarehouse);
 
   @JsonKey(ignore: true)
   @override
@@ -428,7 +515,10 @@ abstract class _HomeState extends HomeState {
       final bool sampleNoMore,
       final List<Supplier> suppliers,
       final int supplierPages,
-      final bool supplierNoMore}) = _$HomeStateImpl;
+      final bool supplierNoMore,
+      final List<Warehouse> warehouses,
+      final bool isLoadingWarehouses,
+      final Warehouse? currentSelectedWarehouse}) = _$HomeStateImpl;
   const _HomeState._() : super._();
 
   @override
@@ -460,6 +550,12 @@ abstract class _HomeState extends HomeState {
   int get supplierPages;
   @override
   bool get supplierNoMore;
+  @override // ----------  样品间 ----------
+  List<Warehouse> get warehouses;
+  @override
+  bool get isLoadingWarehouses;
+  @override
+  Warehouse? get currentSelectedWarehouse;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>

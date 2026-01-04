@@ -71,6 +71,7 @@ class ProductView extends HookConsumerWidget {
         "includes": 'supplyQuotes.supplier',
         ...query.value,
       };
+
       final resp = await getSamples(queryParameters: queryParameters);
 
       if (init == true || page.value == 1) {

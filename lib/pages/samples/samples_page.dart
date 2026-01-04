@@ -1,5 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/models/wms.dart';
+import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -8,26 +13,138 @@ class SamplesPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
-      const BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_outlined), label: "选样车"),
-    ];
-    return AutoTabsRouter(
-      builder: (context, child) {
-        return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
-          body: child,
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: context.tabsRouter.activeIndex,
-            onTap: (index) {
-              context.tabsRouter.setActiveIndex(index);
-            },
-            items: items,
-          ),
-        );
+    final home = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
+
+    useEffect(() {
+      Future.microtask(() async {
+        try {
+          EasyLoading.show(status: '加载中...');
+          await homeNotifier.fetchWarehouses();
+          EasyLoading.dismiss();
+        } catch (e) {
+          EasyLoading.dismiss();
+        }
+      });
+
+      return null;
+    }, []);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      appBar: AppBar(
+        title: const Text('样品间'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: _buildContent(context, ref, home.warehouses, home.isLoadingWarehouses),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, WidgetRef ref,
+      List<Warehouse> warehouses, bool isLoading) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (warehouses.isEmpty) {
+      return const Center(
+        child: Text('暂无样品间数据'),
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // 两列
+        crossAxisSpacing: 12, // 列间距
+        mainAxisSpacing: 12, // 行间距
+        childAspectRatio: 0.85, // 宽高比，调整卡片比例
+      ),
+      itemCount: warehouses.length,
+      itemBuilder: (context, index) {
+        final warehouse = warehouses[index];
+        return _buildWarehouseCard(context, warehouse, ref);
       },
+    );
+  }
+
+  Widget _buildWarehouseCard(
+      BuildContext context, Warehouse warehouse, WidgetRef ref) {
+    final homeNotifier = ref.read(homeProvider.notifier);
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            // 设置当前选中的样品间并导航到 SamplesListPage
+            homeNotifier.setCurrentSelectedWarehouse(warehouse);
+            context.router.push(SamplesListRoute());
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 顶部：图片
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                  ),
+                  child: _buildImagePlaceholder(),
+                ),
+              ),
+              // 底部：文本标签
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                child: Text(
+                  warehouse.name ?? '-',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+      ),
+      child: Image.asset(
+        'assets/carouse/yiwudong4.jpg', // 使用占位图片
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey.shade300,
+            child: const Icon(
+              Icons.image,
+              color: Colors.grey,
+              size: 48,
+            ),
+          );
+        },
+      ),
     );
   }
 }

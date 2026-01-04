@@ -47,7 +47,7 @@ class _SettingPageState extends State<SettingPage> {
       ),
       DashboardModule(
         id: 'rate',
-        title: '汇率波动',
+        title: '今日汇率',
         content: const LineChartDemo(),
         group: '应用', // 添加分组
         selected: selectedIds.contains('rate'),

@@ -138,7 +138,7 @@ class MyApp extends ConsumerWidget {
           },
         ),
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 240, 239, 240),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFFFA338A), //玫粉色
           onPrimary: Colors.white, //玫粉色上的颜色
@@ -157,6 +157,7 @@ class MyApp extends ConsumerWidget {
           surfaceContainer: Color(0xFFF7F8FA),
           onTertiaryContainer: Color(0xFF4A3A00),
         ),
+        // 补充主题色：橘色(Color(0xFFFF9800))、绿色(Color(0xFF4CAF50))已添加到tdTheme.colorMap
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6),
           centerTitle: true,

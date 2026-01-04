@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/samples/samples_list_page.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/theme/color.dart';
 import 'package:flutter/material.dart';
 
 class EntryGridModule extends StatelessWidget {
@@ -11,43 +12,47 @@ class EntryGridModule extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 22, 12, 6),
+      padding: const EdgeInsets.fromLTRB(12, 20, 12, 6),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-    
       ),
       child: GridView.count(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        children: const [
-          _EntryItem(
-            icon: Icons.store,
-            label: '市场带客',
-            route: MarketProductRoute(),
-          ),
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 6,
+        children: [
           _EntryItem(
             icon: Icons.inventory_2,
             label: '样品间',
-            route: SamplesRoute(),
+            route: const SamplesRoute(),
+            color: colorScheme.primary,
+          ),
+          _EntryItem(
+            icon: Icons.store,
+            label: '市场带客',
+            route: const MarketProductRoute(),
+            color: colorScheme.primary,
+          ),
+          _EntryItem(
+            icon: Icons.factory,
+            label: '验货',
+            route: const InspectionRoute(),
+            color: colorScheme.primary,
           ),
           _EntryItem(
             icon: Icons.people,
             label: '客户',
-            route: CrmCompanyRoute(),
+            route: const CrmCompanyRoute(),
+            color: colorScheme.primary,
           ),
           _EntryItem(
             icon: Icons.factory,
             label: '供应商',
-            route: SupplySupplierRoute(),
-          ),
-          _EntryItem(
-            icon: Icons.factory,
-            label: '跟单验货',
-            route: InspectionRoute(),
+            route: const SupplySupplierRoute(),
+            color: colorScheme.primary,
           ),
         ],
       ),
@@ -58,11 +63,13 @@ class EntryGridModule extends StatelessWidget {
 class _EntryItem extends StatelessWidget {
   final IconData icon;
   final String label;
+  final Color color;
   final route;
 
   const _EntryItem({
     required this.icon,
     required this.label,
+    required this.color,
     this.route,
   });
 
@@ -76,15 +83,17 @@ class _EntryItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 48,
-            height: 36,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: color.withOpacity(0.07),
+              borderRadius: BorderRadius.circular(8),
             ),
+            width: 62,
+            height: 44,
             child: Icon(
               icon,
-              color: Theme.of(context).colorScheme.primary,
+              size:32,
+              color: color,
             ),
           ),
           const SizedBox(height: 6),

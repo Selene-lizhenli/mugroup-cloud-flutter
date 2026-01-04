@@ -6,7 +6,7 @@ part of 'home_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homeHash() => r'45e45ab86eae95083f803b4c51341304d0bdd4f1';
+String _$homeHash() => r'f6e58dc0e3b17e8af2d3b604ba15523022208e19';
 
 /// See also [Home].
 @ProviderFor(Home)

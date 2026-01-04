@@ -1,10 +1,11 @@
 import 'package:cloud/core/rx_bus.dart';
 import 'package:cloud/models/response.dart';
-import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/samples/models/home_state.dart';
+import 'package:cloud/services/wms.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -29,6 +30,8 @@ class Home extends _$Home {
       sampleNoMore: false,
       supplierPages: 0,
       supplierNoMore: false,
+      warehouses: [],
+      isLoadingWarehouses: false,
     );
 
     return homeState;
@@ -106,5 +109,28 @@ class Home extends _$Home {
     );
 
     return state;
+  }
+
+  Future<void> fetchWarehouses() async {
+    state = state.copyWith(isLoadingWarehouses: true);
+
+    final resp = await getWarehouses();
+    final warehouses = resp.data;
+    
+    // 在所有样品间列表前面添加"所有样品间"选项
+    const allWarehouse = Warehouse(
+      id: 0,
+      name: '所有样品间',
+      address: '',
+    );
+    
+    state = state.copyWith(
+      warehouses: [allWarehouse, ...warehouses],
+      isLoadingWarehouses: false,
+    );
+  }
+
+  void setCurrentSelectedWarehouse(Warehouse? warehouse) {
+    state = state.copyWith(currentSelectedWarehouse: warehouse);
   }
 }

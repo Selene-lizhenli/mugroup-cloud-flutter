@@ -25,18 +25,14 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
         page: SamplesRoute.page,
         path: '/samples',
-        guards: [AuthGuard()],
-        children: [
-          AutoRoute(
-            page: SamplesListRoute.page,
-            path: '',
-            initial: true,
-          ),
-          AutoRoute(
-            page: CartRoute.page,
-            path: 'cart',
-          ),
-        ],
+      ),
+      AutoRoute(
+        page: CartRoute.page,
+        path: '/samples/cart',
+      ),
+      AutoRoute(
+        page: SamplesListRoute.page,
+        path: '/samples/list', 
       ),
       AutoRoute(
         page: MyRoute.page,
@@ -168,6 +164,12 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
         page: ConfirmRoute.page,
         path: "/cart/confirm",
+        guards: [AuthGuard()],
+      ),
+
+      AutoRoute(
+        page: NewsRoute.page,
+        path: "/news/detail",
         guards: [AuthGuard()],
       ),
     ];

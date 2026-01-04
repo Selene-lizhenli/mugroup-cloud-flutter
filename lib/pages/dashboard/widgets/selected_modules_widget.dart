@@ -67,7 +67,7 @@ class DashboardModules {
       ),
       ModuleInfo(
         id: 'rate',
-        title: '汇率波动',
+        title: '今日汇率',
         contentBuilder: () => const LineChartDemo(),
         group: '应用',
       ),
@@ -219,16 +219,6 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
               ],
             ),
           ),
-          const PopupMenuItem<String>(
-            value: '贸易国别',
-            child: Row(
-              children: [
-                const Icon(Icons.public, size: 18, color: Colors.grey),
-                const SizedBox(width: 12),
-                const Text('贸易国别'),
-              ],
-            ),
-          ),
          const PopupMenuItem<String>(
             value: '样品间',
             child: Row(
@@ -241,22 +231,54 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
           ),
         ];
       case 'inspection':
-      case 'market_purchase':
       case 'customer':
       case 'supplier':
-        // 其他数据统计模块的维度选项（可以根据实际需求添加）
+      case 'market_purchase':
+        // 验货、客户、供应商的时间维度选项
         return [
-         const PopupMenuItem<String>(
-            value: '默认',
+          const PopupMenuItem<String>(
+            value: '最近一个月',
             child: Row(
               children: [
-                const Icon(Icons.analytics, size: 18, color: Colors.grey),
+                const Icon(Icons.access_time, size: 18, color: Colors.grey),
                 const SizedBox(width: 12),
-                const Text('默认维度'),
+                const Text('最近一个月'),
+              ],
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: '最近半年',
+            child: Row(
+              children: [
+                const Icon(Icons.access_time, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('最近半年'),
+              ],
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: '最近一年',
+            child: Row(
+              children: [
+                const Icon(Icons.access_time, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('最近一年'),
+              ],
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: '所有时间',
+            child: Row(
+              children: [
+                const Icon(Icons.all_inclusive, size: 18, color: Colors.grey),
+                const SizedBox(width: 12),
+                const Text('所有时间'),
               ],
             ),
           ),
         ];
+        // 市场采购模块的维度选项（可以根据实际需求添加）
+     
       default:
         return [];
     }

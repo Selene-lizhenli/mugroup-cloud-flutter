@@ -19,7 +19,7 @@ class _SampleRoomChartState extends State<SampleRoomChart> {
   String _selectedDimension = '样品间'; // 当前选中的维度（用于后续扩展不同维度的数据展示）
   List<_SampleRoomItem> _productCatalogData = []; // 产品目录数据（从API获取）
   bool _isLoadingProductCatalog = false; // 产品目录数据加载状态
-  int? _touchedIndex; // 当前点击的扇形索引
+  int? _selectedIndex; // 当前选中的扇区索引
 
   // 颜色列表，用于分配颜色
   static const List<Color> _colorPalette = [
@@ -115,10 +115,22 @@ class _SampleRoomChartState extends State<SampleRoomChart> {
         ),
       ];
     }
+    
+    // 如果当前选中的索引无效，重置为 null
+    if (_selectedIndex != null && 
+        (_selectedIndex! < 0 || _selectedIndex! >= sampleRoomData.length)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _selectedIndex = null;
+          });
+        }
+      });
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
-      clipBehavior: Clip.none, // 允许内容超出padding边界
+      clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -152,97 +164,161 @@ class _SampleRoomChartState extends State<SampleRoomChart> {
 
   /// 构建图表内容
   Widget _buildChartContent(List<_SampleRoomItem> sampleRoomData) {
-    final total = sampleRoomData.fold<int>(0, (sum, item) => sum + item.count);
-    final maxItem = sampleRoomData.reduce(
-      (a, b) => a.count > b.count ? a : b,
-    );
+    // 计算总数量
+    final totalCount = sampleRoomData.fold<int>(0, (sum, item) => sum + item.count);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 上方图例
         Wrap(
-          spacing: 16,
-          runSpacing: 12,
-          children: sampleRoomData.map((item) {
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: item.color,
-                    borderRadius: BorderRadius.circular(2),
+          spacing: 12,
+          runSpacing: 8,
+          children: sampleRoomData.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            final isSelected = _selectedIndex == index;
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  // 确保索引有效
+                  if (isSelected) {
+                    _selectedIndex = null;
+                  } else if (index >= 0 && index < sampleRoomData.length) {
+                    _selectedIndex = index;
+                  }
+                });
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: item.color,
+                      borderRadius: BorderRadius.circular(2),
+                  
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  item.name,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontSize: 10,
-                        color: Colors.grey.shade700,
-                      ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    item.name,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: 10,
+                          color: isSelected
+                              ? item.color
+                              : Colors.grey.shade700,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                  ),
+                ],
+              ),
             );
           }).toList(),
         ),
-       
-        // 下方圆饼图 - 增加容器尺寸以容纳badge
-        Center(
-          child: SizedBox(
-            height: 260, // 从200增加到260，为badge留出空间
-            width: 260, // 从200增加到260，为badge留出空间
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none, // 允许内容超出边界，避免裁剪
-              children: [
-                PieChart(
-                  PieChartData(
-                    sectionsSpace: 2,
-                    centerSpaceRadius: 50,
-                    sections: sampleRoomData.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-                      final isMaxItem = item.name == maxItem.name;
-                      final isTouched = _touchedIndex == index;
-                      return PieChartSectionData(
-                        value: item.count.toDouble(),
-                        title: '',
-                        color: item.color,
-                        radius: isTouched
-                            ? 75 // 点击时稍微放大
-                            : (isMaxItem ? 70 : 60),
-                        badgeWidget: isMaxItem && _touchedIndex == null
-                            ? _buildBadge(item, total)
-                            : null,
-                        badgePositionPercentageOffset: 1.3,
-                      );
-                    }).toList(),
-                    pieTouchData: PieTouchData(
-                      touchCallback: (PieTouchResponse? touchResponse) {
-                        setState(() {
-                          if (touchResponse == null ||
-                              touchResponse.touchedSection == null) {
-                            _touchedIndex = null;
-                            return;
-                          }
-                          _touchedIndex = touchResponse.touchedSection!.touchedSectionIndex;
-                        });
-                      },
-                    ),
+        const SizedBox(height: 16),
+        // 圆饼图
+        SizedBox(
+          height: 250,
+          width: double.infinity,
+          child: PieChart(
+            PieChartData(
+              pieTouchData: PieTouchData(
+                enabled: true,
+                touchCallback: (pieTouchResponse) {
+                  if (pieTouchResponse.touchedSection == null) {
+                    setState(() {
+                      _selectedIndex = null;
+                    });
+                    return;
+                  }
+                  final touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                  // 确保索引在有效范围内
+                  if (touchedIndex >= 0 && touchedIndex < sampleRoomData.length) {
+                    setState(() {
+                      _selectedIndex = touchedIndex;
+                    });
+                  } else {
+                    setState(() {
+                      _selectedIndex = null;
+                    });
+                  }
+                },
+              ),
+              sectionsSpace: 2, // 扇区之间的间隔
+              centerSpaceRadius: 40, // 中心空白半径
+              sections: sampleRoomData.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final percentage = totalCount > 0
+                    ? (item.count / totalCount * 100).toStringAsFixed(1)
+                    : '0.0';
+                final isSelected = _selectedIndex == index;
+                
+                return PieChartSectionData(
+                  value: item.count.toDouble(),
+                  color: item.color,
+                  title: '${percentage}%',
+                  radius: isSelected ? 60 : 50, // 选中时突出显示
+                  titleStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        // 下方显示当前选中数据
+        if (_selectedIndex != null && 
+            _selectedIndex! >= 0 && 
+            _selectedIndex! < sampleRoomData.length)
+          Container(
+            margin: const EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: sampleRoomData[_selectedIndex!].color,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${sampleRoomData[_selectedIndex!].name}：',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                Text(
+                  _formatNumber(sampleRoomData[_selectedIndex!].count),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '(${((sampleRoomData[_selectedIndex!].count / totalCount) * 100).toStringAsFixed(1)}%)',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
                 ),
               ],
             ),
           ),
-        ),
-        // 底部显示选中的数据信息
-        // if (_touchedIndex != null && _touchedIndex! < sampleRoomData.length) ...[
-        //   const SizedBox(height: 20),
-        //   _buildSelectedInfo(sampleRoomData[_touchedIndex!], total),
-        // ],
       ],
     );
   }
@@ -255,106 +331,6 @@ class _SampleRoomChartState extends State<SampleRoomChart> {
     );
   }
 
-  /// 构建底部选中的信息显示
-  Widget _buildSelectedInfo(_SampleRoomItem item, int total) {
-    final percentage = (item.count / total * 100).toStringAsFixed(1);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 颜色指示器
-          Row(
-            children: [
-              Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: item.color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // 名称
-              Text(
-                item.name,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade800,
-                    ),
-              ),
-            ],
-          ),
-          // 数量和百分比
-          Row(
-            children: [
-              Text(
-                '共计${_formatNumber(item.count)}条',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                '$percentage%',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: item.color,
-                    ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 构建标签（显示最大项的详细信息）
-  Widget _buildBadge(_SampleRoomItem item, int total) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            item.name,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            '共计${_formatNumber(item.count)}条',
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// 样品间数据项

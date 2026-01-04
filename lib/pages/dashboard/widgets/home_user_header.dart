@@ -99,7 +99,7 @@ class HomeUserHeader extends HookConsumerWidget {
         children: [
           Image.asset(
             'assets/logo.webp',
-            width: 100,
+            width: 110,
             fit: BoxFit.contain,
           ),
           const Spacer(),

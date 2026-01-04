@@ -166,7 +166,6 @@ flutter:
   assets:
     - assets/coming.png
     - assets/carouse/yiwudong4.jpg
-    - assets/carouse/yiwudong4-2.jpg
     - assets/noImage.png
     - assets/icon.png
     - assets/logo.webp
