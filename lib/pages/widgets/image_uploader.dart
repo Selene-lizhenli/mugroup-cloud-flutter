@@ -34,6 +34,8 @@ class ImageUploader extends HookConsumerWidget {
   /// false => 长按无效果
   final bool enableContinuous;
 
+  final void Function(List<File> files)? onContinuousCapture;
+
   const ImageUploader({
     super.key,
     this.label,
@@ -47,6 +49,7 @@ class ImageUploader extends HookConsumerWidget {
     // 默认设置：保留弹窗，关闭连拍
     this.directCamera = false,
     this.enableContinuous = false,
+    this.onContinuousCapture,
   });
 
   @override
@@ -128,7 +131,12 @@ class ImageUploader extends HookConsumerWidget {
           );
           if (result != null && result.isNotEmpty) {
             final List<File> files = result.map((e) => File(e.path)).toList();
-            await uploadFiles(files);
+
+            if (onContinuousCapture != null) {
+              onContinuousCapture!(files); // 交给父组件处理分发
+            } else {
+              await uploadFiles(files);
+            }
           }
         }
       } catch (e) {

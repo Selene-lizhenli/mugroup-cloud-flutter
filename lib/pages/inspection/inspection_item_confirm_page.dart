@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
@@ -7,6 +9,7 @@ import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/services/media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -269,6 +272,61 @@ class _PhotoCard extends HookConsumerWidget {
     // 状态：是否直接拍照 (默认为 true)
     final isDirectCamera = useState(true);
 
+    Future<void> handleAutoDistribute(List<File> files) async {
+      if (files.isEmpty) return;
+
+      try {
+        EasyLoading.show(status: '正在智能分发...');
+
+        // 1. 找出所有需要在网格显示的字段（按顺序）
+        final gridFields = fieldConfigs
+            .where((f) => f.isVisible && _photoKeys.contains(f.name))
+            .toList();
+
+        int fileIndex = 0;
+
+        // 2. 遍历网格，填空
+        for (final field in gridFields) {
+          if (fileIndex >= files.length) break; // 照片分完了
+
+          final key = field.name;
+          final currentImages = mediaMap[key] ?? [];
+
+          // 策略：如果该格子是空的，就填进去；如果有图了，就跳过（保留原图）
+          if (currentImages.isEmpty) {
+            final file = files[fileIndex];
+            // 上传
+            final media = await upload(file: file);
+            // 更新状态
+            onMediaChanged(key, [media]);
+            fileIndex++;
+          }
+        }
+
+        // 3. 剩下的照片 -> 全部堆到 details
+        if (fileIndex < files.length) {
+          final remainingFiles = files.sublist(fileIndex);
+          final List<TemporaryMedia> newDetails = [];
+
+          for (var file in remainingFiles) {
+            final media = await upload(file: file);
+            newDetails.add(media);
+          }
+
+          // 获取当前的 details 并追加
+          final currentDetails = mediaMap['details'] ?? [];
+          onMediaChanged('details', [...currentDetails, ...newDetails]);
+        }
+
+        EasyLoading.showSuccess('分发完成');
+      } catch (e) {
+        EasyLoading.showError('处理失败');
+        debugPrint(e.toString());
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }
+
     return _BaseCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -386,6 +444,8 @@ class _PhotoCard extends HookConsumerWidget {
                     onMediaChanged: onMediaChanged,
                     // 3. 判断逻辑：只有索引为 0 (第一个) 时开启连拍 并且没有图片
                     enableContinuous: index == 0 && mediaMap.isEmpty,
+                    onContinuousCapture:
+                        index == 0 ? handleAutoDistribute : null,
                   );
                 }).toList(),
               ),
@@ -473,6 +533,7 @@ class _PhotoCard extends HookConsumerWidget {
     required Map<String, List<TemporaryMedia>> mediaMap,
     required void Function(String key, List<TemporaryMedia> list)
         onMediaChanged,
+    void Function(List<File>)? onContinuousCapture,
   }) {
     return SizedBox(
       width: width,
@@ -499,6 +560,7 @@ class _PhotoCard extends HookConsumerWidget {
                 directCamera: isDirectCamera,
                 enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
+                onContinuousCapture: onContinuousCapture,
               ),
             ),
           ),
