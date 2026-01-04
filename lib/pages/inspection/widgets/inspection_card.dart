@@ -39,6 +39,15 @@ class InspectionCard extends HookConsumerWidget {
         ? const TextStyle(color: Colors.green, fontSize: 13)
         : greyTextStyle;
 
+    final items = inspection.items ?? [];
+    final int total = items.length;
+    final int finished = items.where((item) => item.status == 1).length;
+
+    // 进度百分比 (0.0 - 1.0)
+    final double progress = total > 0 ? (finished / total) : 0.0;
+    // 显示文本
+    final String progressText = '$finished/$total';
+
     return InkWell(
         onTap: onTap,
         child: Container(
@@ -160,6 +169,40 @@ class InspectionCard extends HookConsumerWidget {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 24,
+                  width: double.infinity,
+                  color: const Color(0xFFE0E0E0),
+                  child: Stack(
+                    children: [
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final double currentWidth =
+                              constraints.maxWidth * progress;
+                          return Container(
+                            width: currentWidth,
+                            color: const Color(0xFF3B68D8),
+                          );
+                        },
+                      ),
+                      Center(
+                        child: Text(
+                          progressText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
