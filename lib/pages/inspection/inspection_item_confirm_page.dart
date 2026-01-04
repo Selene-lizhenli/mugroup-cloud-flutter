@@ -56,6 +56,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
       });
 
       submitData['remark'] = remarkController.text;
+      submitData['status'] = 1;
 
       await updateInspectionItem(id, submitData);
 
