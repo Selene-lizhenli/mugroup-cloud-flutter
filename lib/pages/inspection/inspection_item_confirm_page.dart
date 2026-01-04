@@ -247,7 +247,6 @@ class _PhotoCard extends HookConsumerWidget {
     required this.onMediaChanged,
   });
 
-  // 定义属于此卡片的图片字段key集合，用于过滤
   static const Set<String> _photoKeys = {
     'shipping_mark_front',
     'shipping_mark_side',
@@ -267,6 +266,9 @@ class _PhotoCard extends HookConsumerWidget {
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
+    // 状态：是否直接拍照 (默认为 true)
+    final isDirectCamera = useState(true);
+
     return _BaseCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -279,42 +281,81 @@ class _PhotoCard extends HookConsumerWidget {
 
           return Column(
             children: [
+              // 顶部行：标题 + (切换按钮 & 字段设置)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // 左侧：标题
                   _TitleRow(
                     icon: Icons.camera_alt_outlined,
                     title: '验货图片',
                     color: blue,
                     textColor: text,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (ctx) {
-                          return FieldSelector(
-                            fields: fieldConfigs,
-                            defaultFields: inspectionDefaultFields,
-                            onConfigChanged: (List<FieldConfig> newConfigs) {
-                              notifier.updateConfigs(newConfigs);
-                            },
-                          );
-                        },
-                      );
-                    },
+
+                  Flexible(
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.settings,
-                            size: 16, color: Theme.of(context).primaryColor),
-                        const SizedBox(width: 4),
-                        Text(
-                          "字段设置",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).primaryColor),
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F6FA),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildToggleItem(
+                                label: '拍照',
+                                isActive: isDirectCamera.value,
+                                icon: Icons.check,
+                                color: blue,
+                                onTap: () => isDirectCamera.value = true,
+                              ),
+                              _buildToggleItem(
+                                label: '相册',
+                                isActive: !isDirectCamera.value,
+                                icon: Icons.radio_button_unchecked,
+                                color: blue,
+                                onTap: () => isDirectCamera.value = false,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (ctx) {
+                                return FieldSelector(
+                                  fields: fieldConfigs,
+                                  defaultFields: inspectionDefaultFields,
+                                  onConfigChanged:
+                                      (List<FieldConfig> newConfigs) {
+                                    notifier.updateConfigs(newConfigs);
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor),
+                              const SizedBox(width: 4),
+                              Text(
+                                "设置",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -322,21 +363,35 @@ class _PhotoCard extends HookConsumerWidget {
                 ],
               ),
               const SizedBox(height: 16),
+
               Wrap(
                 spacing: spacing,
                 runSpacing: 16.0,
                 children: fieldConfigs
                     .where((field) =>
                         field.isVisible && _photoKeys.contains(field.name))
-                    .map((field) {
+                    .toList()
+                    .asMap()
+                    .entries
+                    .map((entry) {
+                  final int index = entry.key;
+                  final FieldConfig field = entry.value;
+
                   return _buildGridItem(
                     apiKey: field.name,
                     label: field.label,
                     width: itemSize,
+                    isDirectCamera: isDirectCamera.value,
+                    mediaMap: mediaMap,
+                    onMediaChanged: onMediaChanged,
+                    // 3. 判断逻辑：只有索引为 0 (第一个) 时开启连拍 并且没有图片
+                    enableContinuous: index == 0 && mediaMap.isEmpty,
                   );
                 }).toList(),
               ),
+
               const SizedBox(height: 24),
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -356,6 +411,8 @@ class _PhotoCard extends HookConsumerWidget {
                     label: null,
                     maxCount: 50,
                     value: detailsList,
+                    directCamera: isDirectCamera.value,
+                    enableContinuous: false,
                     onChanged: (list) => onMediaChanged('details', list),
                   ),
                 ],
@@ -367,10 +424,55 @@ class _PhotoCard extends HookConsumerWidget {
     );
   }
 
+  Widget _buildToggleItem({
+    required String label,
+    required bool isActive,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 8, vertical: 4), // 减小padding防止过宽
+        decoration: BoxDecoration(
+          color: isActive ? color : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            if (isActive) ...[
+              Icon(
+                icon,
+                size: 12,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11, // 稍微调小字体
+                color: isActive ? Colors.white : Colors.grey[600],
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildGridItem({
     required String apiKey,
     required String label,
     required double width,
+    required bool isDirectCamera,
+    required bool enableContinuous,
+    required Map<String, List<TemporaryMedia>> mediaMap,
+    required void Function(String key, List<TemporaryMedia> list)
+        onMediaChanged,
   }) {
     return SizedBox(
       width: width,
@@ -394,6 +496,8 @@ class _PhotoCard extends HookConsumerWidget {
                 label: null,
                 maxCount: 1,
                 value: mediaMap[apiKey] ?? [],
+                directCamera: isDirectCamera,
+                enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
               ),
             ),
