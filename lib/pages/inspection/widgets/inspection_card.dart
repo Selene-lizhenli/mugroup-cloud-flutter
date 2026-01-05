@@ -94,14 +94,7 @@ class InspectionCard extends HookConsumerWidget {
                   const SizedBox(width: 12),
                   InkWell(
                     onTap: () async {
-                      final bool isConfirmed = await ConfirmDialog.show(
-                        context,
-                        content: '确定要删除验货任务${inspection.name}？',
-                      );
-                      if (isConfirmed) {
-                        await deleteInspection(inspection.id!);
-                        EasyLoading.showSuccess('删除成功');
-                      }
+                      onDelete!();
                     },
                     child: Icon(Icons.delete_outline,
                         size: 18, color: Colors.red[300]),

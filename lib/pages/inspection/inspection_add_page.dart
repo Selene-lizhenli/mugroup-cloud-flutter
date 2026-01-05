@@ -162,7 +162,7 @@ class InspectionAddPage extends HookConsumerWidget {
 
                             if (context.mounted) {
                               EasyLoading.showSuccess('创建成功');
-                              Navigator.of(context).pop();
+                              Navigator.pop(context, true);
                             }
                           } catch (e) {
                             if (context.mounted) {

@@ -2,11 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,7 +17,9 @@ import 'package:sliver_tools/sliver_tools.dart';
 const pageSize = 20;
 
 class InspectionView extends HookConsumerWidget {
-  const InspectionView({super.key});
+  final void Function(Future<void> Function())? setRefreshFn;
+
+  const InspectionView({super.key, this.setRefreshFn});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -117,6 +121,13 @@ class InspectionView extends HookConsumerWidget {
         locale: LocaleType.zh,
       );
     }
+
+    useEffect(() {
+      setRefreshFn?.call(() async {
+        await refreshController.callRefresh();
+      });
+      return null;
+    }, []);
 
     return Container(
       decoration: const BoxDecoration(
@@ -272,6 +283,17 @@ class InspectionView extends HookConsumerWidget {
                             context.router.push(
                               InspectionDetailRoute(id: inspection.id!),
                             );
+                          },
+                          onDelete: () async {
+                            final bool isConfirmed = await ConfirmDialog.show(
+                              context,
+                              content: '确定要删除验货任务${inspection.name}？',
+                            );
+                            if (isConfirmed) {
+                              await deleteInspection(inspection.id!);
+                              EasyLoading.showSuccess('删除成功');
+                              await refreshController.callRefresh();
+                            }
                           },
                         );
                       },
