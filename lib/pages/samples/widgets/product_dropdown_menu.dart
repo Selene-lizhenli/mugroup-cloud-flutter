@@ -26,15 +26,18 @@ class ProductDropdownMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final query = useState<Map<String, dynamic>>({});
+    const String warehousesIdField = "warehouse_id";
     final supportFacet = {
       "supplier_ids": "供应商",
       "category_id": "产品分类",
-      "trade_country": "贸易国别", 
+      "trade_country": "贸易国别",
+      warehousesIdField: "样品间",
     };
     final menuOptions = {
       "supplier_ids": (multiple: true, optionsColumns: 1),
       "category_id": (multiple: true, optionsColumns: 2),
-      "trade_country": (multiple: false, optionsColumns: 2), 
+      "trade_country": (multiple: false, optionsColumns: 2),
+      warehousesIdField: (multiple: false, optionsColumns: 2),
     };
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);
@@ -114,19 +117,72 @@ class ProductDropdownMenu extends HookConsumerWidget {
 
       return null;
     }, [fetchCategories, facetCounts]);
-
+    
     final menus = <TDDropdownItem>[];
+    //添加样品间筛选
+    final home = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
+    final warehouses = home.warehouses;
+    final currentSelectedWarehouse = home.currentSelectedWarehouse;
+    final lable = supportFacet[warehousesIdField] ?? "";
+    final option = menuOptions[warehousesIdField];
+
+    if (warehouses.isNotEmpty) {
+      // 构建样品间选项
+      final warehouseOptions = <TDDropdownItemOption>[];
+      for (var warehouse in warehouses) {
+        warehouseOptions.add(TDDropdownItemOption(
+          label: warehouse.name ?? '-',
+          value: warehouse.id.toString(),
+          selected: currentSelectedWarehouse?.id == warehouse.id,
+        ));
+      }
+
+      // 创建样品间菜单项
+      final warehouseItem = TDDropdownItem(
+        label: lable,
+        multiple: option?.multiple,
+        optionsColumns: option?.optionsColumns,
+        options: warehouseOptions,
+        onChange: (value) {
+          // 单选时，value  是数组，需要取第一个元素
+          final selectedValue =
+              value is List ? (value.isNotEmpty ? value.first : null) : value;
+          if (selectedValue == null ||
+              selectedValue == '0' ||
+              selectedValue == 0) {
+            query.value = {...query.value}..remove(warehousesIdField);
+            homeNotifier.setCurrentSelectedWarehouse(null);
+            return;
+          }
+
+          final selectedWarehouse = warehouses.firstWhereOrNull(
+            (w) => w.id.toString() == selectedValue.toString(),
+          );
+          homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
+
+          query.value = {...query.value, warehousesIdField: selectedValue};
+        },
+        onConfirm: (value) {},
+        onReset: () {
+          homeNotifier.setCurrentSelectedWarehouse(null);
+          query.value = {...query.value}..remove(warehousesIdField);
+        },
+      );
+
+      menus.add(warehouseItem);
+    }
+
+
     logger.d(facetCounts);
     for (var facetCount in facetCounts) {
       final field = facetCount.fieldName;
       if (!supportFacet.containsKey(field)) {
         continue;
       }
-
       if (facetCount.counts.length <= 1) {
         continue;
       }
-
       TDDropdownItem? item;
       final option = menuOptions[field];
       final options = <TDDropdownItemOption>[];
@@ -151,8 +207,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
               .firstWhereOrNull((item) => item.id.toString() == count.value);
 
           label = category?.name ?? label;
-        } 
-    
+        }
 
         options.add(TDDropdownItemOption(
           label: label,
@@ -190,87 +245,25 @@ class ProductDropdownMenu extends HookConsumerWidget {
       menus.add(item);
     }
 
-    // 在贸易国别后添加样品间筛选
-    final home = ref.watch(homeProvider);
-    final homeNotifier = ref.read(homeProvider.notifier);
-    final warehouses = home.warehouses;
-    final currentSelectedWarehouse = home.currentSelectedWarehouse;
-
-    if (warehouses.isNotEmpty) {
-      // 找到贸易国别菜单的索引
-      int tradeCountryIndex = -1;
-      for (int i = 0; i < menus.length; i++) {
-        if (menus[i].label == "贸易国别") {
-          tradeCountryIndex = i;
-          break;
-        }
-      }
-
-      // 构建样品间选项
-      final warehouseOptions = <TDDropdownItemOption>[];
-      for (var warehouse in warehouses) {
-        warehouseOptions.add(TDDropdownItemOption(
-          label: warehouse.name ?? '-',
-          value: warehouse.id.toString(),
-          selected: currentSelectedWarehouse?.id == warehouse.id,
-        ));
-      }
-
-      // 创建样品间菜单项
-      final warehouseItem = TDDropdownItem(
-        label: "样品间",
-        multiple: false,
-        optionsColumns: 2,
-        options: warehouseOptions,
-        onChange: (value) {
-          // onChange 不需要处理，只在 onConfirm 时处理
-        },
-        onConfirm: (value) {
-          final selectedWarehouse = warehouses.firstWhereOrNull(
-            (w) => w.id.toString() == value.toString(),
-          );
-          homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
-          // 通知查询变更
-          query.value = {...query.value};
-          onChange(query.value);
-        },
-        onReset: () {
-          homeNotifier.setCurrentSelectedWarehouse(null);
-          query.value = {...query.value};
-          onChange(query.value);
-        },
-      );
-
-      // 在贸易国别后插入样品间菜单
-      if (tradeCountryIndex >= 0) {
-        menus.insert(tradeCountryIndex + 1, warehouseItem);
-      } else {
-        // 如果没找到贸易国别，就添加到末尾
-        menus.add(warehouseItem);
-      }
-    }
-
     if (menus.isEmpty) return const SizedBox.shrink();
 
     return Container(
-        color: Colors.white,
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            TDDropdownMenu(
-              direction: TDDropdownMenuDirection.down,
-              isScrollable: true,
-              onMenuClosed: (index) {
-                if (const DeepCollectionEquality().equals(query.value, value)) {
-                  return;
-                }
-                onChange(query.value);
-              },
-              items: menus,
-            ),
-            // Text(query.value.toString()),
-          ],
-        ));
+      color: Colors.white,
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Center(
+        child: TDDropdownMenu(
+          direction: TDDropdownMenuDirection.down,
+          isScrollable: true,
+          onMenuClosed: (index) {
+            if (const DeepCollectionEquality().equals(query.value, value)) {
+              return;
+            }
+            onChange(query.value);
+          },
+          items: menus,
+        ),
+      ),
+    );
   }
 }

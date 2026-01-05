@@ -15,7 +15,7 @@ class SamplesPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
-
+    final colorScheme = Theme.of(context).colorScheme;
     useEffect(() {
       Future.microtask(() async {
         try {
@@ -31,10 +31,10 @@ class SamplesPage extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: colorScheme.surfaceTint,
       appBar: AppBar(
-        title: const Text('样品间'),
-        backgroundColor: Colors.white,
+        title: const Text('样品间'), 
+        backgroundColor: colorScheme.surfaceTint,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),

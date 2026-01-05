@@ -28,7 +28,7 @@ class CartPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(cartProvider);
     final cart = ref.read(cartProvider.notifier);
-
+    final colorScheme = Theme.of(context).colorScheme;
     final barcodeTextController = useTextEditingController();
 
     final items = state.items;
@@ -634,115 +634,162 @@ class CartPage extends HookConsumerWidget {
           return StatefulBuilder(
             builder: (context, setState) {
               return Dialog(
+                backgroundColor: colorScheme.surface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 insetPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 6,
+                  horizontal: 24,
+                  vertical: 24,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "报价单设置",
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.onSurface,
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Icon(Icons.info,
-                                  //     size: 12, color: Color(0xFF555555)),
-                                  Text(
-                                    " 注：以下设置将对选样车中的所有样品生效！",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        height: 1,
-                                        color: Color(0xFF555555)),
+                            const SizedBox(height: 14),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                           
+                                Text(
+                                  "以下设置将对选样车中的所有样品生效",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                          color:
+                                        colorScheme.onSurface.withOpacity(0.6),
                                   ),
-                                ]),
+                                ),
+                              ],
+                            ),
                             const SizedBox(height: 10),
-                            const Text(
-                              "是否显示价格",
+
+                            Row(
+                              children: [
+                                Text(
+                                  "是否显示价格",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                Radio<bool>(
+                                  value: true,
+                                  groupValue: showPrice,
+                                  fillColor: MaterialStateProperty.all(
+                                    colorScheme.secondary,
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      showPrice = value;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  '是',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Radio<bool>(
+                                  value: false,
+                                  groupValue: showPrice,
+                                  fillColor: MaterialStateProperty.all(
+                                    colorScheme.secondary,
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      showPrice = value;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  '否',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                         
+                            Row(
+                              children: [
+                                Text(
+                                  '采购价是否含税',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                Radio<bool>(
+                                  value: true,
+                                  groupValue: showTaxRatePrice,
+                                  fillColor: MaterialStateProperty.all(
+                                    colorScheme.secondary,
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      showTaxRatePrice = value;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  '是',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Radio<bool>(
+                                  value: false,
+                                  groupValue: showTaxRatePrice,
+                                  fillColor: MaterialStateProperty.all(
+                                    colorScheme.secondary,
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      showTaxRatePrice = value;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  '否',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "报价币种",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurface,
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Radio<bool>(
-                                  value: true,
-                                  groupValue: showPrice,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showPrice = value;
-                                    });
-                                  },
-                                ),
-                                const Text('是', style: TextStyle(fontSize: 14)),
-                                const SizedBox(width: 20),
-                                Radio<bool>(
-                                  value: false,
-                                  groupValue: showPrice,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showPrice = value;
-                                    });
-                                  },
-                                ),
-                                const Text('否', style: TextStyle(fontSize: 14)),
-                              ],
-                            ),
                             const SizedBox(height: 10),
-                            const Text(
-                              '采购价是否含税',
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Radio<bool>(
-                                  value: true,
-                                  groupValue: showTaxRatePrice,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showTaxRatePrice = value;
-                                    });
-                                  },
-                                ),
-                                const Text('是', style: TextStyle(fontSize: 14)),
-                                const SizedBox(width: 20),
-                                Radio<bool>(
-                                  value: false,
-                                  groupValue: showTaxRatePrice,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showTaxRatePrice = value;
-                                    });
-                                  },
-                                ),
-                                const Text('否', style: TextStyle(fontSize: 14)),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            const Text("报价币种",
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 8),
                             GestureDetector(
                               onTap: () {
                                 showFlanActionSheet(
@@ -759,12 +806,16 @@ class CartPage extends HookConsumerWidget {
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 14),
+                                  horizontal: 16,
+                                  vertical: 16,
+                                ),
                                 decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade400),
+                                  border: Border.all(
+                                    color: colorScheme.outline.withOpacity(0.30),
+                                    width: 0.5,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey.shade100,
+                                  color: colorScheme.surfaceContainer,
                                 ),
                                 child: Row(
                                   children: [
@@ -774,72 +825,118 @@ class CartPage extends HookConsumerWidget {
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: currency == null
-                                              ? Colors.grey.shade600
-                                              : Colors.black87,
+                                              ? colorScheme.onSurface
+                                                  .withOpacity(0.5)
+                                              : colorScheme.onSurface,
                                         ),
                                       ),
                                     ),
-                                    const Icon(Icons.keyboard_arrow_right,
-                                        color: Colors.grey),
+                                    Icon(
+                                      Icons.keyboard_arrow_right,
+                                      color: colorScheme.onSurface
+                                          .withOpacity(0.5),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            const Text("汇率",
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 20),
+                            Text(
+                              "汇率",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
                             Container(
                               key: exchangeFieldKey,
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
+                                border: Border.all(
+                                  color: colorScheme.outline.withOpacity(0.3),
+                                  width: 0.5,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
+                                color: colorScheme.surfaceContainer,
                               ),
                               child: TextField(
                                 controller: exchangeController,
+                                cursorColor: colorScheme.secondary,
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                  decimal: true,
+                                ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d+\.?\d{0,2}')),
+                                    RegExp(r'^\d+\.?\d{0,2}'),
+                                  ),
                                 ],
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 14,
+                                ),
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "请输入汇率",
+                                  hintStyle: TextStyle(
+                                    color:
+                                        colorScheme.onSurface.withOpacity(0.5),
+                                  ),
+                                ),
                                 onTap: () {
                                   scrollToField(exchangeFieldKey);
                                 },
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            const Text("佣金比率(%)",
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 20),
+                            Text(
+                              "佣金比率(%)",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
                             Container(
                               key: commissionRateFieldKey,
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
+                                border: Border.all(
+                                  color: colorScheme.outline.withOpacity(0.3),
+                                  width: 0.5,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade100,
+                                color: colorScheme.surfaceContainer,
                               ),
                               child: TextField(
                                 controller: commissionRateController,
+                                cursorColor: colorScheme.secondary,
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                  decimal: true,
+                                ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d+\.?\d{0,2}')),
+                                    RegExp(r'^\d+\.?\d{0,2}'),
+                                  ),
                                 ],
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 14,
+                                ),
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "请输入佣金比率",
+                                  hintStyle: TextStyle(
+                                    color:
+                                        colorScheme.onSurface.withOpacity(0.5),
+                                  ),
+                                ),
                                 onTap: () {
                                   scrollToField(commissionRateFieldKey);
                                 },
@@ -852,17 +949,27 @@ class CartPage extends HookConsumerWidget {
 
                     /// 固定底部按钮区域
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text("取消",
-                                style: TextStyle(color: Colors.grey)),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: Text(
+                              "取消",
+                              style: TextStyle(
+                                color: colorScheme.onSurface.withOpacity(0.7),
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: () {
                               cart.quotationInfo = null;
@@ -879,13 +986,22 @@ class CartPage extends HookConsumerWidget {
                               Navigator.of(context).pop();
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: colorScheme.secondary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal:24,
+                                vertical: 12,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text("提交",
-                                style: TextStyle(color: Colors.white)),
+                            child: Text(
+                              "提交",
+                              style: TextStyle(
+                                color: colorScheme.onSecondary,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -988,49 +1104,96 @@ class CartPage extends HookConsumerWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
+            backgroundColor: colorScheme.surface,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(8),
             ),
-            title: const Text(
+            title: Text(
               "填写产品条码",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                color: colorScheme.onSurface,
+              ),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "产品条码",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: barcodeTextController,
-                  decoration: InputDecoration(
-                    hintText: "请输入产品条码",
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 14),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade400),
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+            content: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "产品条码",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
                     ),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: barcodeTextController,
+                    autofocus: true,
+                    cursorColor: colorScheme.secondary,
+                    decoration: InputDecoration(
+                      hintText: "请输入产品条码",
+                      hintStyle: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          width: 0.5,
+                          color: colorScheme.secondary,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          width: 0.5,
+                          color: colorScheme.outline.withOpacity(0.5),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: colorScheme.secondary,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surfaceContainer,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            actionsPadding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                   barcodeTextController.clear();
                 },
-                child: const Text(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+                child: Text(
                   "取消",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                    fontSize: 16,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: () async {
                   final input = barcodeTextController.text.trim();
@@ -1044,14 +1207,21 @@ class CartPage extends HookConsumerWidget {
                   Navigator.of(context).pop();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: colorScheme.secondary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "提交",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: colorScheme.onSecondary,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -1506,6 +1676,7 @@ class CartPage extends HookConsumerWidget {
                 },
                 icon: const Icon(Icons.settings_outlined)),
           MenuAnchor(
+            alignmentOffset: const Offset(-80, -5),
             builder: (BuildContext context, MenuController controller,
                 Widget? child) {
               return IconButton(
@@ -1580,9 +1751,11 @@ class CartPage extends HookConsumerWidget {
                 },
                 child: const Row(
                   children: [
+                    SizedBox(width: 4),
                     Icon(Icons.camera_alt),
                     SizedBox(width: 8),
                     Text('扫一扫'),
+                    SizedBox(width: 8),
                   ],
                 ),
               ),
@@ -1592,9 +1765,11 @@ class CartPage extends HookConsumerWidget {
                 },
                 child: const Row(
                   children: [
+                    SizedBox(width: 4),
                     Icon(Icons.edit),
                     SizedBox(width: 8),
                     Text('手填条码'),
+                    SizedBox(width: 8),
                   ],
                 ),
               )

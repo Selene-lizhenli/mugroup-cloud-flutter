@@ -36,7 +36,9 @@ mixin _$HomeState {
       throw _privateConstructorUsedError; // ----------  样品间 ----------
   List<Warehouse> get warehouses => throw _privateConstructorUsedError;
   bool get isLoadingWarehouses => throw _privateConstructorUsedError;
-  Warehouse? get currentSelectedWarehouse => throw _privateConstructorUsedError;
+  Warehouse? get currentSelectedWarehouse =>
+      throw _privateConstructorUsedError; // ----------  视图模式 ----------
+  bool get isDetailedMode => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -65,7 +67,8 @@ abstract class $HomeStateCopyWith<$Res> {
       bool supplierNoMore,
       List<Warehouse> warehouses,
       bool isLoadingWarehouses,
-      Warehouse? currentSelectedWarehouse});
+      Warehouse? currentSelectedWarehouse,
+      bool isDetailedMode});
 
   $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
 }
@@ -100,6 +103,7 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? warehouses = null,
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
+    Object? isDetailedMode = null,
   }) {
     return _then(_value.copyWith(
       bus: null == bus
@@ -170,6 +174,10 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.currentSelectedWarehouse
           : currentSelectedWarehouse // ignore: cast_nullable_to_non_nullable
               as Warehouse?,
+      isDetailedMode: null == isDetailedMode
+          ? _value.isDetailedMode
+          : isDetailedMode // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -211,7 +219,8 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       bool supplierNoMore,
       List<Warehouse> warehouses,
       bool isLoadingWarehouses,
-      Warehouse? currentSelectedWarehouse});
+      Warehouse? currentSelectedWarehouse,
+      bool isDetailedMode});
 
   @override
   $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
@@ -245,6 +254,7 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? warehouses = null,
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
+    Object? isDetailedMode = null,
   }) {
     return _then(_$HomeStateImpl(
       bus: null == bus
@@ -315,6 +325,10 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.currentSelectedWarehouse
           : currentSelectedWarehouse // ignore: cast_nullable_to_non_nullable
               as Warehouse?,
+      isDetailedMode: null == isDetailedMode
+          ? _value.isDetailedMode
+          : isDetailedMode // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -339,7 +353,8 @@ class _$HomeStateImpl extends _HomeState {
       this.supplierNoMore = false,
       final List<Warehouse> warehouses = const [],
       this.isLoadingWarehouses = false,
-      this.currentSelectedWarehouse})
+      this.currentSelectedWarehouse,
+      this.isDetailedMode = false})
       : _media = media,
         _samples = samples,
         _facetCounts = facetCounts,
@@ -428,10 +443,14 @@ class _$HomeStateImpl extends _HomeState {
   final bool isLoadingWarehouses;
   @override
   final Warehouse? currentSelectedWarehouse;
+// ----------  视图模式 ----------
+  @override
+  @JsonKey()
+  final bool isDetailedMode;
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse, isDetailedMode: $isDetailedMode)';
   }
 
   @override
@@ -469,7 +488,9 @@ class _$HomeStateImpl extends _HomeState {
                 other.isLoadingWarehouses == isLoadingWarehouses) &&
             (identical(
                     other.currentSelectedWarehouse, currentSelectedWarehouse) ||
-                other.currentSelectedWarehouse == currentSelectedWarehouse));
+                other.currentSelectedWarehouse == currentSelectedWarehouse) &&
+            (identical(other.isDetailedMode, isDetailedMode) ||
+                other.isDetailedMode == isDetailedMode));
   }
 
   @override
@@ -491,7 +512,8 @@ class _$HomeStateImpl extends _HomeState {
       supplierNoMore,
       const DeepCollectionEquality().hash(_warehouses),
       isLoadingWarehouses,
-      currentSelectedWarehouse);
+      currentSelectedWarehouse,
+      isDetailedMode);
 
   @JsonKey(ignore: true)
   @override
@@ -518,7 +540,8 @@ abstract class _HomeState extends HomeState {
       final bool supplierNoMore,
       final List<Warehouse> warehouses,
       final bool isLoadingWarehouses,
-      final Warehouse? currentSelectedWarehouse}) = _$HomeStateImpl;
+      final Warehouse? currentSelectedWarehouse,
+      final bool isDetailedMode}) = _$HomeStateImpl;
   const _HomeState._() : super._();
 
   @override
@@ -556,6 +579,8 @@ abstract class _HomeState extends HomeState {
   bool get isLoadingWarehouses;
   @override
   Warehouse? get currentSelectedWarehouse;
+  @override // ----------  视图模式 ----------
+  bool get isDetailedMode;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>

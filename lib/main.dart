@@ -138,7 +138,7 @@ class MyApp extends ConsumerWidget {
           },
         ),
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color.fromARGB(255, 240, 239, 240),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 240, 239, 240),//纸张背景色
         colorScheme: const ColorScheme.light(
           primary: Color(0xFFFA338A), //玫粉色
           onPrimary: Colors.white, //玫粉色上的颜色
@@ -159,11 +159,13 @@ class MyApp extends ConsumerWidget {
         ),
         // 补充主题色：橘色(Color(0xFFFF9800))、绿色(Color(0xFF4CAF50))已添加到tdTheme.colorMap
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF3F4F6),
+          backgroundColor: Color(0xFFF3F4F6), 
           centerTitle: true,
-          titleTextStyle: TextStyle(color: Colors.black, fontSize: 18),
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 17),
           scrolledUnderElevation: 0,
           elevation: 0,
+          foregroundColor:Color.fromARGB(255, 74, 74, 74) ,
+          toolbarHeight: 50,
         ),
       ),
       builder: EasyLoading.init(),

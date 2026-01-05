@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCardDetailed extends StatelessWidget {
   final Sample sample;
 
   final GestureTapCallback? onTapAddSample;
 
   final int? cartCount;
 
-  const ProductCard({
+  const ProductCardDetailed({
     super.key,
     required this.sample,
     this.onTapAddSample,

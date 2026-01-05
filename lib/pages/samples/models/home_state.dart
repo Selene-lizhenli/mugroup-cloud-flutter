@@ -38,6 +38,9 @@ abstract class HomeState with _$HomeState {
     @Default([]) List<Warehouse> warehouses,
     @Default(false) bool isLoadingWarehouses,
     Warehouse? currentSelectedWarehouse,
+    
+    // ----------  视图模式 ----------
+    @Default(false) bool isDetailedMode, // false: 精简模式, true: 详细模式
   }) = _HomeState;
   TemporaryMedia? get currentMedia {
     return media.firstWhereOrNull((item) => item.id == currentMediaId);

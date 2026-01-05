@@ -16,20 +16,46 @@ class SamplesListPage extends HookConsumerWidget {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
-
+    final colorScheme = Theme.of(context).colorScheme;
     // 使用 provider 中的 currentSelectedWarehouse
     final currentWarehouse = home.currentSelectedWarehouse;
 
     return Scaffold(
+      backgroundColor: colorScheme.surfaceTint,
       appBar: AppBar(
         title: Text(currentWarehouse?.name ?? '样品间'),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            offset: const Offset(-8, 38),
+            color: colorScheme.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            onSelected: (String value) {
+              if (value == 'detailed') {
+                homeNotifier.setViewMode(true);
+              } else if (value == 'simple') {
+                homeNotifier.setViewMode(false);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: home.isDetailedMode ? 'simple' : 'detailed',
+                  child: Text(home.isDetailedMode ? '精简模式' : '详细模式'),
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: Container(
         // color: colorScheme.secondary, 
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+        padding: const EdgeInsets.fromLTRB(2, 16, 2, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

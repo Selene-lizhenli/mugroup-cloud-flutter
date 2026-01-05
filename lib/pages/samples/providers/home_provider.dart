@@ -118,7 +118,7 @@ class Home extends _$Home {
     final warehouses = resp.data;
     
     // 在所有样品间列表前面添加"所有样品间"选项
-    const allWarehouse = Warehouse(
+    const allWarehouse = Warehouse( 
       id: 0,
       name: '所有样品间',
       address: '',
@@ -132,5 +132,13 @@ class Home extends _$Home {
 
   void setCurrentSelectedWarehouse(Warehouse? warehouse) {
     state = state.copyWith(currentSelectedWarehouse: warehouse);
+  }
+
+  void toggleViewMode() {
+    state = state.copyWith(isDetailedMode: !state.isDetailedMode);
+  }
+
+  void setViewMode(bool isDetailed) {
+    state = state.copyWith(isDetailedMode: isDetailed);
   }
 }
