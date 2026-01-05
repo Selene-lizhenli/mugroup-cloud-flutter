@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -60,8 +62,8 @@ class SelectCustomerSheet extends HookConsumerWidget {
                 ),
               ),
             ),
-            // const SizedBox(height: 12),
-            // _createCustomer(context),
+            const SizedBox(height: 12),
+            _buildCreateCustomerCard(context, ref, notifier),
             const SizedBox(height: 12),
             Expanded(
               child: _list(
@@ -69,6 +71,70 @@ class SelectCustomerSheet extends HookConsumerWidget {
                 state.customers,
                 state.selectedCustomers,
                 notifier,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================= 创建新客户卡片 =================
+  Widget _buildCreateCustomerCard(
+    BuildContext context,
+    WidgetRef ref,
+    notifier,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: () async {
+        // 跳转到创建客户页面
+        await context.router.push(const CrmCompanyCreateRoute());
+        // 如果创建成功，刷新客户列表
+        if (context.mounted) {
+          notifier.loadCustomers();
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: colorScheme.primary,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.add_circle_outline,
+              color: colorScheme.primary,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '创建新客户',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '添加一个新的客户',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

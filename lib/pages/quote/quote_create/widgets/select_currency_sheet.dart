@@ -1,49 +1,85 @@
+import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/services/dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// ================= Currency =================
-
-class CurrencyItem {
-  final String display; // 美元 (USD)
-  final String code; // USD
-  final String rate; // 汇率字符串
-
-  const CurrencyItem({
-    required this.display,
-    required this.code,
-    required this.rate,
-  });
-}
-
-/// ================= Currency List =================
-/// 这里以后可以直接换成接口数据
-const List<CurrencyItem> _currencies = [
-  CurrencyItem(display: '人民币 (CNY)', code: 'CNY', rate: '1.00'),
-  CurrencyItem(display: '美元 (USD)', code: 'USD', rate: '7.25'),
-  CurrencyItem(display: '欧元 (EUR)', code: 'EUR', rate: '7.86'),
-  CurrencyItem(display: '日元 (JPY)', code: 'JPY', rate: '0.048'),
-  CurrencyItem(display: '英镑 (GBP)', code: 'GBP', rate: '9.15'),
-  CurrencyItem(display: '澳元 (AUD)', code: 'AUD', rate: '4.78'),
-  CurrencyItem(display: '港币 (HKD)', code: 'HKD', rate: '0.92'),
-  CurrencyItem(display: '加币 (CAD)', code: 'CAD', rate: '0.92'),
-  CurrencyItem(display: '新元 (SGD)', code: 'SGD', rate: '0.92'),
-  CurrencyItem(display: '卢布 (RUB)', code: 'RUB', rate: '0.92'),
-  CurrencyItem(display: '沙特里亚尔 (SAR)', code: 'SAR', rate: '1.92'),
-];
-
-class SelectCurrencySheet extends ConsumerWidget {
+class SelectCurrencySheet extends HookConsumerWidget {
   const SelectCurrencySheet({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(quoteCreateProvider.notifier);
     final state = ref.watch(quoteCreateProvider);
-    const currencies = _currencies;
     final halfHeight = MediaQuery.of(context).size.height * 0.6;
 
+    final exchangeRates = useState<List<ExchangeRate>>([]);
+    final isLoading = useState<bool>(true);
+    final error = useState<String?>(null);
+
+    useEffect(() {
+      Future<void> loadCurrencies() async {
+        isLoading.value = true;
+        error.value = null;
+
+        final rates = await getExchangesList();
+        if (rates == null || rates.isEmpty) {
+          error.value = '暂无货币数据';
+          exchangeRates.value = [];
+        } else {
+          exchangeRates.value = rates;
+        } 
+        isLoading.value = false;
+      }
+
+      loadCurrencies();
+      return null;
+    }, []);
+
+    // 构建显示文本：name (shortName)，如 "美元 (USD)"
+    String buildDisplayText(ExchangeRate rate) {
+      final name = rate.name ?? '';
+      final shortName = rate.shortName ?? '';
+      if (name.isEmpty && shortName.isEmpty) {
+        return '';
+      }
+      if (shortName.isEmpty) {
+        return name;
+      }
+      if (name.isEmpty) {
+        return shortName;
+      }
+      return '$name ($shortName)';
+    }
+
+    // 判断是否选中：比较 shortName 或完整的显示文本
+    bool isSelected(ExchangeRate rate) {
+      final shortName = rate.shortName ?? '';
+      final displayText = buildDisplayText(rate);
+      // 兼容旧数据：可能是 code 格式（如 "USD"）或 display 格式（如 "人民币 (CNY)"）
+      return state.currency == shortName || state.currency == displayText;
+    }
+
+    // 获取存储值：优先使用 shortName，如果没有则使用显示文本
+    String getStorageValue(ExchangeRate rate) {
+      return rate.shortName ?? buildDisplayText(rate);
+    }
+
+    // 获取汇率字符串：exchangeRate 表示 100 单位该货币 = 多少人民币，需要除以 100
+    String getRateValue(ExchangeRate rate) {
+      final rateStr = rate.exchangeRate ?? '0';
+      final rateValue = double.tryParse(rateStr) ?? 0.0;
+      if (rateValue == 0.0) {
+        return '0';
+      }
+      // 除以100并格式化为5位小数
+      final convertedRate = rateValue / 100.0;
+      return convertedRate.toStringAsFixed(4);
+    }
+
     return Container(
-      height: halfHeight, // 👈 关键：固定为屏幕一半
+      height: halfHeight,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -77,31 +113,63 @@ class SelectCurrencySheet extends ConsumerWidget {
               ),
             ),
 
-            // ================= List =================
-            Flexible(
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: currencies.length,
-                separatorBuilder: (_, __) =>
-                    const Divider(height: 1, indent: 10),
-                itemBuilder: (context, index) {
-                  final item = currencies[index];
-                  final selected = state.currency == item.code;
+            // ================= Content =================
+            if (isLoading.value)
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (error.value != null)
+              Expanded(
+                child: Center(
+                  child: Text(
+                    error.value!,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
+            else
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: exchangeRates.value.length,
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, indent: 10),
+                  itemBuilder: (context, index) {
+                    final rate = exchangeRates.value[index];
+                    final displayText = buildDisplayText(rate);
+                    final selected = isSelected(rate);
+                    final rateValue = getRateValue(rate);
 
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    title: Text(item.display),
-                    trailing: selected
-                        ? const Icon(Icons.check, color: Colors.blue)
-                        : null,
-                    onTap: () {
-                      notifier.setCurrency(item.code);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
+                    return ListTile(
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 16),
+                      title: Row(
+                        children: [
+                          Text(displayText),
+                        const SizedBox(width: 8),
+                          Text(
+                            rateValue,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: selected
+                          ? const Icon(Icons.check, color: Colors.blue)
+                          : null,
+                      onTap: () {
+                        final currencyValue = getStorageValue(rate);
+                        notifier.setCurrencyWithRate(currencyValue, rateValue);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),

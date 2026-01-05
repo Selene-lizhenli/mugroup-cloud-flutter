@@ -161,7 +161,7 @@ class MyApp extends ConsumerWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF3F4F6), 
           centerTitle: true,
-          titleTextStyle: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 17),
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 18),
           scrolledUnderElevation: 0,
           elevation: 0,
           foregroundColor:Color.fromARGB(255, 74, 74, 74) ,

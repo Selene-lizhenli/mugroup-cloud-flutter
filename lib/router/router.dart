@@ -32,7 +32,7 @@ class AppRouter extends RootStackRouter {
       ),
       AutoRoute(
         page: SamplesListRoute.page,
-        path: '/samples/list', 
+        path: '/samples/list',
       ),
       AutoRoute(
         page: MyRoute.page,
@@ -58,16 +58,13 @@ class AppRouter extends RootStackRouter {
         children: [
           AutoRoute(
             page: MarketProductInfoRoute.page,
-            path: "",
+            path: "index",
           ),
           AutoRoute(
             page: QuoteRoute.page,
             path: "quotation",
+            initial: true,
           ),
-          // AutoRoute(
-          //   page: MarketProductInspectionRoute.page,
-          //   path: "inspection",
-          // ),
         ],
       ),
 

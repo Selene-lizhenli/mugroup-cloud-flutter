@@ -28,31 +28,18 @@ class QuoteCreatePage extends StatelessWidget {
   }
 }
 
-// class QuoteCreateStepView extends ConsumerWidget {
-//   const QuoteCreateStepView({super.key});
+ 
+
+// class _ReviewStep extends ConsumerWidget {
+//   const _ReviewStep({super.key});
 //   @override
 //   Widget build(BuildContext context, WidgetRef ref) {
 //     final state = ref.watch(quoteCreateProvider);
-//     switch (state.step) {
-//       case QuoteCreateStep.baseInfo:
-//         return const QuoteBaseInfoStep();
-//       case QuoteCreateStep.products:
-//         return const QuoteProductsPage();
-//     }
+//     return Center(
+//       child: Text('确认创建：${state.customer ?? '-'}'),
+//     );
 //   }
 // }
-
-class _ReviewStep extends ConsumerWidget {
-  const _ReviewStep({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(quoteCreateProvider);
-    return Center(
-      child: Text('确认创建：${state.customer ?? '-'}'),
-    );
-  }
-}
 
 // class QuoteCreateBottomBar extends ConsumerWidget {
 //   const QuoteCreateBottomBar({super.key});

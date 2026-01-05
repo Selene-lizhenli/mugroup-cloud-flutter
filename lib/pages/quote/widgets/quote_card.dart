@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:flutter/material.dart';
 
@@ -33,8 +32,12 @@ class QuoteCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(colorScheme),
-                // const SizedBox(height: 4),
-                // _buildFooter(colorScheme),
+                // const SizedBox(height: 3),
+                // const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                const SizedBox(height: 6),
+                _buildMiddleRow(colorScheme),
+                const SizedBox(height: 8),
+                _buildFooter(colorScheme),
               ],
             ),
           ),
@@ -73,17 +76,41 @@ class QuoteCard extends StatelessWidget {
   // }
 
   Widget _buildHeader(ColorScheme colorScheme) {
+    // 格式化日期：从 "2025-12-23 11:23:15" 提取 "2025-12-23"
+    String formatDate(String? dateStr) {
+      if (dateStr == null || dateStr.isEmpty) return '';
+      try {
+        final parts = dateStr.split(' ');
+        return parts.isNotEmpty ? parts[0] : '';
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    final formattedDate = formatDate(item.quoteAt);
+    final customerName = item.company?.name ?? item.user?.name ?? '';
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // 左侧原有内容
+        // 左侧：日期 + 客户名
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              if (formattedDate.isNotEmpty) ...[
                 Text(
-                  item.user?.name ?? "",
+                  formattedDate,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Text(
+                  customerName,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -92,78 +119,146 @@ class QuoteCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(
-                  width: 4,
-                ),
-                // Text(
-                //   item.quoteAt ?? '',
-                //   style: TextStyle(
-                //     color: colorScheme.surfaceContainerHighest,
-                //     fontWeight: FontWeight.w500,
-                //     fontSize: 11,
-                //   ),
-                // ),
-              ]),
-              const SizedBox(
-                height: 2,
               ),
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  item.quoteNo ?? '',
-                  style: TextStyle(
-                    color: colorScheme.surfaceContainerHighest,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 11,
-                  ),
-                ),
-                const SizedBox(
-                  width: 14,
-                ),
-                Text(
-                  item.quoteAt ?? '',
-                  style: TextStyle(
-                    color: colorScheme.surfaceContainerHighest,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 11,
-                  ),
-                ),
-              ]),
             ],
           ),
         ),
-        // 👉 右侧箭头
-        Icon(
-          Icons.chevron_right,
-          size: 20,
-          color: colorScheme.onSurfaceVariant,
-        ),
+        // 右侧：协作按钮
+        _buildCollaborateButton(colorScheme),
       ],
     );
   }
 
-  /// 底部：数量 & 金额
-  Widget _buildFooter(ColorScheme colorScheme) {
+  Widget _buildCollaborateButton(ColorScheme colorScheme) {
+    return Material(
+      color: colorScheme.primaryContainer.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(6),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () {
+          // TODO: 实现协作功能
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 14,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '协作',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMiddleRow(ColorScheme colorScheme) {
+    // 格式化编号：添加 # 前缀
+    String formatQuoteNo(String? quoteNo) {
+      if (quoteNo == null || quoteNo.isEmpty) return '';
+      return quoteNo.startsWith('#') ? quoteNo : '#$quoteNo';
+    }
+
+    final quoteNo = formatQuoteNo(item.quoteNo);
+    final creatorName = item.creator?.name ?? '';
+
     return Row(
       children: [
-        _buildTag('${item.productCount} 种产品', colorScheme),
-        const SizedBox(width: 12),
-        _buildTag('总数: ${item.sumQty ?? ""}', colorScheme),
+        if (quoteNo.isNotEmpty) ...[
+          Text(
+            quoteNo,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.surfaceContainerHighest,
+            ),
+          ),
+          if (creatorName.isNotEmpty) ...[
+            const SizedBox(width: 14),
+            Text(
+              '创建人: $creatorName',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: colorScheme.surfaceContainerHighest,
+              ),
+            ),
+          ],
+        ] else if (creatorName.isNotEmpty) ...[
+          Text(
+            '创建人: $creatorName',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.surfaceContainerHighest,
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildTag(String text, ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style:
-            TextStyle(fontSize: 11, color: colorScheme.surfaceContainerHighest),
-      ),
+  /// 底部：产品数量、总数量、总金额
+  Widget _buildFooter(ColorScheme colorScheme) {
+    final productCount = item.productCount ?? 0;
+    final sumQty = item.sumQty ?? '';
+
+    // TODO: 如果有总金额字段，在这里使用
+    // 目前模型中没有总金额字段，暂时不显示
+    // final currency = item.curreny ?? 'JPY';
+    // final totalAmount = item.sumAmount ?? '0.00';
+
+    return Row(
+      children: [
+        // 左侧：产品数量标签
+        if (productCount > 0)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '$productCount个产品',
+              style: TextStyle(
+                fontSize: 11,
+                color: colorScheme.surfaceContainerHighest,
+              ),
+            ),
+          ),
+        if (productCount > 0 && sumQty.isNotEmpty) const SizedBox(width: 12),
+        // 中间：总数量
+        if (sumQty.isNotEmpty)
+          Text(
+            '总数量: $sumQty',
+            style: TextStyle(
+              fontSize: 11,
+              color: colorScheme.surfaceContainerHighest,
+            ),
+          ),
+        // 右侧：总金额（暂时不显示，因为模型中没有该字段）
+        // 如果将来添加了总金额字段，取消下面的注释并删除 currency 变量的注释
+        // const Spacer(),
+        // Text(
+        //   '总金额($currency): $totalAmount',
+        //   style: TextStyle(
+        //     fontSize: 11,
+        //     color: colorScheme.surfaceContainerHighest,
+        //   ),
+        // ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,6 +42,11 @@ class QuoteCreateState {
   final String customerKeyword;
   final Company? selectedCustomers;
 
+  // ================= 联系人选择  =================
+
+  final Contact? selectedContact;
+  final String contactKeyword;
+
   QuoteCreateState({
     this.step = QuoteCreateStep.baseInfo,
     this.customer,
@@ -65,6 +71,10 @@ class QuoteCreateState {
     this.customers = const [],
     this.customerKeyword = '',
     this.selectedCustomers,
+
+    // contact select
+    this.selectedContact,
+    this.contactKeyword = '',
   }) : quoteDate = quoteDate ?? DateTime.now();
 
   // ================= 派生状态（只读） =================
@@ -109,6 +119,10 @@ class QuoteCreateState {
     String? customerKeyword,
     Company? selectedCustomers,
     List<dynamic>? productList,
+
+    // contact select
+    Contact? selectedContact,
+    String? contactKeyword,
   }) {
     return QuoteCreateState(
       step: step ?? this.step,
@@ -126,6 +140,8 @@ class QuoteCreateState {
       customerKeyword: customerKeyword ?? this.customerKeyword,
       selectedCustomers: selectedCustomers ?? this.selectedCustomers,
       productList: productList ?? this.productList,
+      selectedContact: selectedContact ?? this.selectedContact,
+      contactKeyword: contactKeyword ?? this.contactKeyword,
     );
   }
 }
@@ -158,11 +174,26 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
     state = state.copyWith(
       // customer: value,
       selectedCustomers: value,
+      // 切换客户时，清空已选的联系人
+      selectedContact: null,
+      contact: null,
     );
+    logger.d("state$state");
   }
 
   void setContact(String value) {
     state = state.copyWith(contact: value);
+  }
+
+  void setSelectedContact(Contact value) {
+    state = state.copyWith(
+      selectedContact: value,
+      contact: value.id?.toString(),
+    );
+  }
+
+  void clearContactKeyword() {
+    state = state.copyWith(contactKeyword: '');
   }
 
   void setLanguage(LanguageItem value) {
@@ -171,6 +202,14 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
 
   void setCurrency(String value) {
     state = state.copyWith(currency: value);
+  }
+
+  /// 设置货币和汇率
+  void setCurrencyWithRate(String currency, String rate) {
+    state = state.copyWith(
+      currency: currency,
+      rate: rate,
+    );
   }
 
   void setQuoteDate(DateTime value) {
@@ -202,6 +241,13 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
 
   void setCustomerKeyword(String value) {
     state = state.copyWith(customerKeyword: value);
+    //     state = state.copyWith(
+    //   // customer: value,
+    //   selectedCustomers: value,
+    //   // 切换客户时，清空已选的联系人
+    //   selectedContact: null,
+    //   contact: null,
+    // );
   }
 
   void clearCustomerKeyword() {
@@ -213,9 +259,28 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
   }
 
   void setSelectedCustomer(Company value) {
-    state = state.copyWith(
+    // 强制清空联系人，即使选择的是同一个客户
+    // 直接创建新状态对象，明确设置 null 值，避免 copyWith 的 null 处理问题
+    final newState = QuoteCreateState(
+      step: state.step,
+      customer: state.customer,
+      contact: null, // 明确设置为 null
+      language: state.language,
+      currency: state.currency,
+      quoteDate: state.quoteDate,
+      rate: state.rate,
+      addPercentage: state.addPercentage,
+      customers: state.customers,
+      customerKeyword: state.customerKeyword,
       selectedCustomers: value,
+      productList: state.productList,
+      selectedContact: null, // 明确设置为 null
+      contactKeyword: state.contactKeyword,
+      savingDraft: state.savingDraft,
+      draftSaved: state.draftSaved,
+      submitting: state.submitting,
     );
+    state = newState;
   }
 
   void clearDraftSavedFlag() {

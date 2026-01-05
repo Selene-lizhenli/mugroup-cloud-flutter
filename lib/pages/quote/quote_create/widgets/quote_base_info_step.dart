@@ -1,4 +1,5 @@
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/pages/quote/quote_create/widgets/select_contact_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_currency_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_customer_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
@@ -44,16 +45,18 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       builder: (_) => const SelectCustomerSheet(),
                     ),
                   ),
-                  // FormSelectField(
-                  //   label: '选择联系人',
-                  //   value: '请选择联系人',
-                  //   onTap: () => showModalBottomSheet(
-                  //     context: context,
-                  //     isScrollControlled: true,
-                  //     backgroundColor: Colors.transparent,
-                  //     builder: (_) => const SelectCustomerSheet(),
-                  //   ),
-                  // ),
+                  FormSelectField(
+                    label: '选择联系人',
+                    value: state.selectedContact?.name ?? '请选择联系人',
+                    onTap: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => SelectContactSheet(
+                        companyId: state.selectedCustomers?.id,
+                      ),
+                    ),
+                  ),
                   const FormDateTimeField(
                     requiredField: false,
                     label: '报价日期',
@@ -95,20 +98,20 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                     children: [
                       Expanded(
                         child: FormInputField(
-                          label: '汇率',
-                          value: state.rate,
+                          label: '报价单加点 (%)',
                           requiredField: false,
-                          onChanged: (value) => notifier.setRate(value),
+                          value: state.addPercentage ?? '0.0',
+                          onChanged: (value) =>
+                              notifier.setAddPercentage(value),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: FormInputField(
-                          label: '报价单加点 (%)',
+                          label: '汇率',
+                          value: state.rate,
                           requiredField: false,
-                          value: state.addPercentage ?? '0',
-                          onChanged: (value) =>
-                              notifier.setAddPercentage(value),
+                          onChanged: (value) => notifier.setRate(value),
                         ),
                       ),
                     ],
@@ -117,8 +120,8 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
               ),
             ),
           ),
-          // const SizedBox(height: 12),
-          // const InfoTip(),
+          const SizedBox(height: 10),
+          const InfoTip(),
         ],
       ),
     );
@@ -175,22 +178,21 @@ class InfoTip extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: colorScheme.primary.withOpacity(0.03),
+        color: colorScheme.secondary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
-            color: colorScheme.primary.withOpacity(0.68),
+            color: colorScheme.secondary.withOpacity(0.68),
             size: 16,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '可稍后再补全基本信息',
-              style: TextStyle(
-                  color: colorScheme.primary.withOpacity(0.68), fontSize: 12),
+              '创建报价单后，可通过详情页添加商品',
+              style: TextStyle(color: colorScheme.secondary, fontSize: 12),
             ),
           ),
         ],

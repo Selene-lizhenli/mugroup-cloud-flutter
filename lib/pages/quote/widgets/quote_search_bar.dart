@@ -15,7 +15,7 @@ class QuoteSearchBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
@@ -27,17 +27,10 @@ class QuoteSearchBar extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-          // 激活状态的边框
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(
-              color: colorScheme.primary, // 激活时边框颜色
-              width: 2,
-            ),
-          ),
+   
         ),
       ),
     );

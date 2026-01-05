@@ -33,7 +33,7 @@ class EntryGridModule extends StatelessWidget {
           _EntryItem(
             icon: Icons.store,
             label: '市场带客',
-            route: const MarketProductRoute(),
+            route: const QuoteRoute(),
             color: colorScheme.primary,
           ),
           _EntryItem(
