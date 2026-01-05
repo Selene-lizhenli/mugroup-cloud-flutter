@@ -5,7 +5,8 @@ import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DatePickerTheme;
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -82,6 +83,39 @@ class InspectionView extends HookConsumerWidget {
               : IndicatorResult.noMore,
         );
       }
+    }
+
+    // 显示年月选择器
+    void showYearMonthPicker() {
+      final now = DateTime.now();
+      // 当前选中时间，默认为当前时间
+      final currentTime = filterDate.value ?? now;
+
+      DatePicker.showPicker(
+        context,
+        showTitleActions: true,
+        // 使用自定义 Model 只显示年月
+        pickerModel: YearMonthModel(
+          currentTime: currentTime,
+          minTime: DateTime(2020, 1, 1),
+          maxTime: DateTime(now.year + 1, 12, 31),
+          locale: LocaleType.zh,
+        ),
+        theme: DatePickerTheme(
+          headerColor: Colors.white,
+          backgroundColor: Colors.white,
+          itemStyle: const TextStyle(
+              color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+          doneStyle: TextStyle(color: colorScheme.primary, fontSize: 16),
+          cancelStyle: const TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+        onConfirm: (date) async {
+          // 更新状态并刷新
+          filterDate.value = date;
+          await fetchPage(init: true);
+        },
+        locale: LocaleType.zh,
+      );
     }
 
     return Container(
@@ -170,6 +204,36 @@ class InspectionView extends HookConsumerWidget {
                                   ),
                                 );
                               }),
+                              // 日历选择器按钮
+                              GestureDetector(
+                                onTap: showYearMonthPicker,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: (filterDate.value != null &&
+                                            !getRecentMonths().any((d) =>
+                                                d.year ==
+                                                    filterDate.value!.year &&
+                                                d.month ==
+                                                    filterDate.value!.month))
+                                        ? colorScheme.primary.withOpacity(0.1)
+                                        : Colors.grey[100],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.calendar_month_outlined,
+                                    size: 20,
+                                    color: (filterDate.value != null &&
+                                            !getRecentMonths().any((d) =>
+                                                d.year ==
+                                                    filterDate.value!.year &&
+                                                d.month ==
+                                                    filterDate.value!.month))
+                                        ? colorScheme.primary
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -246,5 +310,21 @@ class InspectionView extends HookConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class YearMonthModel extends DatePickerModel {
+  YearMonthModel({
+    super.currentTime,
+    super.minTime,
+    super.maxTime,
+    super.locale,
+  });
+
+  @override
+  List<int> layoutProportions() {
+    // 数组分别代表 [年, 月, 日] 的宽度比例
+    // 将日设为 0 即可隐藏
+    return [1, 1, 0];
   }
 }
