@@ -109,6 +109,11 @@ Future deleteInspectionItem(int id, Map<String, dynamic>? data) async {
 Future exportInspection(int id) async {
   return api.get(
     "api/tenant/inspection/tasks/$id/export",
+    options: Options(
+      responseType: ResponseType.bytes,
+      followRedirects: false,
+      receiveTimeout: const Duration(seconds: 60),
+    ),
   );
 }
 
