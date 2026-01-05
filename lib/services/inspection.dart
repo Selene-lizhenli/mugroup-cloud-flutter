@@ -102,19 +102,8 @@ Future<Inspection?> importInspectionItems(int id, FormData formData) async {
   );
 }
 
-Future<Inspection?> deleteInspectionItem(
-    int id, Map<String, dynamic>? data) async {
-  return api
-      .post("api/tenant/inspection/tasks/$id/items/remove", data: data)
-      .then(
-    (res) {
-      if (res.data == null) {
-        return null;
-      }
-
-      return Inspection.fromJson(res.data);
-    },
-  );
+Future deleteInspectionItem(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/inspection/tasks/$id/items/remove", data: data);
 }
 
 Future exportInspection(int id) async {
