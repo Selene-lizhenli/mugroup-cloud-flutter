@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
@@ -55,7 +54,8 @@ class ProductSection extends ConsumerWidget {
                           backgroundColor: colorScheme.secondary, // 蓝色
                           textColor: colorScheme.onSecondary,
                           onTap: () {
-                            context.router.push(ShowroomSampleCreateRoute());
+                            context.router
+                                .push(QuoteProductAddRoute(quoteId: quoteId));
                           },
                         ),
                       ],

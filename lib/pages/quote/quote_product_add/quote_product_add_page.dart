@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/form_definitions.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -14,12 +15,14 @@ import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/openai.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class QuoteProductAddPage extends HookConsumerWidget {
@@ -207,7 +210,7 @@ class QuoteProductAddPage extends HookConsumerWidget {
                           ),
                           children: [
                             FormBuilderField<Map<String, dynamic>>(
-                              name: 'supplier',
+                              name: 'supplyQuote',
                               builder: (field) {
                                 final supplier = field.value;
                                 return GestureDetector(
@@ -633,7 +636,7 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             final Map<String, dynamic> submitValues =
                                 Map.from(formState!.value);
 
-                            final supplier = submitValues['supplier'];
+                            final supplier = submitValues['supplyQuote'];
 
                             final length =
                                 submitValues['length']?.toString() ?? '';
@@ -645,14 +648,35 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             final spec = [length, width, height].join('x');
                             submitValues['spec'] = spec;
 
-                            logger.d(submitValues);
+                            await storeShowroomSample({
+                              ...submitValues,
+                              "supplier_id": supplier?['id'],
+                              "quotation_id": quoteId,
+                              'item_type': 'market_product'
+                            });
+                            final prefs = await SharedPreferences.getInstance();
 
-                            // await storeShowroomSample({
-                            //   ...submitValues,
-                            //   "supplier_id": supplier.id,
-                            //   "quotation_id": quoteId,
-                            //   'item_type': 'market_product'
-                            // });
+                            String storageKey = 'last_quote_product_add';
+                            await prefs.setString(
+                                storageKey, jsonEncode(submitValues));
+
+                            if (!context.mounted) return;
+
+                            final isContinue = await ConfirmDialog.show(
+                              context,
+                              title: '创建成功',
+                              content: '样品已成功创建，您希望接下来做什么？',
+                              cancelText: '完成并返回',
+                              confirmText: '继续创建',
+                              confirmColor: Colors.blue,
+                            );
+                            if (isContinue == true) {
+                              formState.reset();
+                            } else {
+                              if (context.mounted) {
+                                Navigator.of(context).pop(true);
+                              }
+                            }
                           }
                         },
                         child: const Text(
