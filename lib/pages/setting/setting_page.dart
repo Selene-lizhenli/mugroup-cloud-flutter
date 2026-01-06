@@ -39,18 +39,18 @@ class _SettingPageState extends State<SettingPage> {
     /// 所有模块（固定定义）
     modules = [
       DashboardModule(
-        id: 'news',
-        title: '集团资讯',
-        content: const NewsBoard(),
-        group: '应用', // 添加分组
-        selected: selectedIds.contains('news'),
-      ),
-      DashboardModule(
         id: 'rate',
         title: '今日汇率',
         content: const LineChartDemo(),
         group: '应用', // 添加分组
         selected: selectedIds.contains('rate'),
+      ),
+      DashboardModule(
+        id: 'news',
+        title: '集团资讯',
+        content: const NewsBoard(),
+        group: '应用', // 添加分组
+        selected: selectedIds.contains('news'),
       ),
       DashboardModule(
         id: 'sample_room',
@@ -67,13 +67,6 @@ class _SettingPageState extends State<SettingPage> {
         selected: selectedIds.contains('market_purchase'),
       ),
       DashboardModule(
-        id: 'inspection',
-        title: '验货',
-        content: const InspectionChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains('inspection'),
-      ),
-      DashboardModule(
         id: 'customer',
         title: '客户',
         content: const CustomerChart(),
@@ -86,6 +79,13 @@ class _SettingPageState extends State<SettingPage> {
         content: const SupplierChart(),
         group: '数据统计', // 添加分组
         selected: selectedIds.contains('supplier'),
+      ),
+      DashboardModule(
+        id: 'inspection',
+        title: '验货',
+        content: const InspectionChart(),
+        group: '数据统计', // 添加分组
+        selected: selectedIds.contains('inspection'),
       ),
     ];
 

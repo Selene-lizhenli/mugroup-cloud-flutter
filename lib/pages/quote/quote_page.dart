@@ -340,7 +340,7 @@ class _QuotePageState extends State<QuotePage>
           // 新增按钮：跳转到市场产品列表页
           TextButton(
             onPressed: () {
-              context.router.push(const QuoteCreateRoute());
+              context.router.push(  QuoteCreateRoute());
             },
             child: const Text(
               '新增',

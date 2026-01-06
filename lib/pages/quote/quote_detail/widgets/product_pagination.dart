@@ -6,6 +6,7 @@ class PaginationBar extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
 
   const PaginationBar({
+    super.key, 
     required this.currentPage,
     required this.totalPages,
     required this.onPageChanged,

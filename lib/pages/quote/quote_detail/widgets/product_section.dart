@@ -3,12 +3,18 @@ import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product_edit_dialog.dart';
+import 'package:cloud/pages/quote/batch_import/product_batch_import_page.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 
-class ProductSection extends ConsumerWidget {
+class ProductSection extends HookConsumerWidget {
   final int? quoteId;
   const ProductSection({super.key, this.quoteId});
 
@@ -16,6 +22,7 @@ class ProductSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quoteDetailProvider);
     final notifier = ref.read(quoteDetailProvider.notifier);
+    final selectedTab = useState(1); // 0: 供应商列表/验货, 1: 产品清单
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -31,20 +38,20 @@ class ProductSection extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      children: [
-                        Text('产品列表', style: theme.textTheme.titleMedium),
-                      ],
-                    ),
+                    Text('报价产品', style: theme.textTheme.titleMedium),
                     Row(
                       children: [
                         ActionPillButton(
                           label: '批量导入',
-                          icon: Icons.upload_outlined,
-                          backgroundColor: const Color(0xFFFF5A8A), // 粉色
+                          icon: Icons.download,
+                          backgroundColor:  colorScheme.primary, 
                           textColor: Colors.white,
                           onTap: () {
-                            // TODO 批量导入
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const ProductBatchImportPage(),
+                              ),
+                            );
                           },
                         ),
                         const SizedBox(width: 8),
@@ -63,25 +70,44 @@ class ProductSection extends ConsumerWidget {
                   ],
                 ),
               ),
+              // ===== 标签页导航 =====
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _TabButton(
+                    label: '供应商列表',
+                    // icon: Icons.store_mall_directory_outlined,
+                    icon: Icons.factory_outlined,
+                    isSelected: selectedTab.value == 0,
+                    onTap: () => selectedTab.value = 0,
+                    colorScheme: colorScheme,
+                  ),
+                  const SizedBox(width: 8),
+                  _TabButton(
+                    label: '产品清单',
+                    icon: Icons.view_list,
+                    isSelected: selectedTab.value == 1,
+                    onTap: () => selectedTab.value = 1,
+                    colorScheme: colorScheme,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               const Divider(height: 1),
               Expanded(
-                child: _buildBody(context, state, colorScheme, notifier),
-              ),
-              // ===== 分页（固定高度）=====
-              PaginationBar(
-                currentPage: state.productPage,
-                totalPages: state.productTotalPages,
-                onPageChanged: (page) {
-                  notifier.fetchProductsPage(quoteId!, page);
-                },
+                child: selectedTab.value == 1
+                    ? _buildProductList(
+                        context, state, colorScheme, notifier, quoteId)
+                    : _buildSupplierList(context, state, colorScheme, notifier),
               ),
             ],
           ),
         ));
   }
 
-  Widget _buildBody(BuildContext context, QuoteDetailState state,
-      ColorScheme colorScheme, notifier) {
+  Widget _buildProductList(BuildContext context, QuoteDetailState state,
+      ColorScheme colorScheme, notifier, int? quoteId) {
+    final theme = Theme.of(context);
     if (state.isProductLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -104,10 +130,31 @@ class ProductSection extends ConsumerWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-      itemCount: state.products.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+      itemCount: state.products.length + 1, // +1 for pagination
+      separatorBuilder: (_, index) {
+        // 最后一个分隔符用于分页组件
+        if (index == state.products.length - 1) {
+          return const SizedBox(height: 8);
+        }
+        return const SizedBox(height: 10);
+      },
       itemBuilder: (context, index) {
+        // 如果是最后一项，显示分页组件
+        if (index == state.products.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: PaginationBar(
+              currentPage: state.productPage,
+              totalPages: state.productTotalPages,
+              onPageChanged: (page) {
+                if (quoteId != null) {
+                  notifier.fetchProductsPage(quoteId, page);
+                }
+              },
+            ),
+          );
+        }
         final row = state.products[index];
         final sample = row.showroomSample;
 
@@ -117,113 +164,216 @@ class ProductSection extends ConsumerWidget {
         if (sample == null) {
           return const SizedBox.shrink();
         }
+        // 获取供应商编号
+        final supplierNo = row.supplyQuote?.supplier?.supplierNo ?? '';
+        final supplierName = row.supplyQuote?.supplier?.name ?? '';
+        final supplierDisplay = supplierNo.isNotEmpty
+            ? '供应商:$supplierNo'
+            : (supplierName.isNotEmpty ? '供应商:$supplierName' : '供应商:-');
+
         return Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colorScheme.secondary.withOpacity(0.06),
+            color: colorScheme.outlineVariant.withOpacity(0.4),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ===== 供应商信息和操作按钮 =====
               Row(
                 children: [
-                  _KeyValue(
-                    label: '供应商',
-                    value: row.supplyQuote?.supplier?.name ?? '-',
+                  Text(
+                    supplierDisplay,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 12,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   const Spacer(),
                   InkWell(
                     borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      // context.router.push(
-                      //     // ShowroomSampleDetailRoute(id: sample.id!, userId: 0)
-                      //     );
+                    onTap: () async {
+                      await showDialog(
+                        context: context,
+                        builder: (_) => ProductEditDialog(row: row),
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(4),
                       child: Icon(
                         Icons.edit_outlined,
-                        size: 16,
+                        size: 18,
                         color: colorScheme.secondary,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
+                  // 移除产品
                   InkWell(
                     borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      // context.router.push(
-                      //     // ShowroomSampleDetailRoute(id: sample.id!, userId: 0)
-                      //     );
+                    onTap: () async {
+                      await _handleDeleteProductFromList(
+                        context: context,
+                        quoteId: quoteId,
+                        productId: row.id,
+                        notifier: notifier,
+                        page: state.productPage,
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(4),
                       child: Icon(
                         Icons.delete_outline,
-                        size: 16,
+                        size: 18,
                         color: colorScheme.error,
                       ),
                     ),
                   ),
                 ],
               ),
-              const Divider(height: 1),
-              const SizedBox(height: 6),
+              const SizedBox(height: 10),
+              // ===== 产品信息 =====
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ===== 图片 =====
+                  // ===== 产品图片 =====
                   _ProductImage(imageUrl: imageUrl),
                   const SizedBox(width: 12),
-                  // ===== 文本信息 =====
+                  // ===== 产品信息 =====
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _KeyValue(
-                          label: '品名',
-                          value: sample.nameCn ?? sample.nameEn ?? '-',
-                        ),
-                        _KeyValue(
-                          label: '产品编码',
+                          label: '公司货号',
                           value: sample.productNo ?? '-',
-                          highlight: true,
+                          highlight: false,
                         ),
-                        Row(children: [
-                          if ((sample.spec ?? '').isNotEmpty)
-                            _KeyValue(label: '规格', value: sample.spec!),
-                          const SizedBox(width: 16),
-                          // if ((sample.packing ?? '').isNotEmpty)
-                          //   _KeyValue(label: '包装', value: sample.packing!),
-                        ]),
+                        const SizedBox(height: 4),
                         _KeyValue(
-                          label: '客户报价',
+                          label: '客户报价(CNY)',
                           value: row.price != null ? row.price.toString() : '-',
+                          highlight: true,
+                          priceStyle: true,
+                        ),
+                        const SizedBox(height: 4),
+                        _KeyValue(
+                          label: '采购数量',
+                          value: row.qty != null ? row.qty.toString() : '-',
+                          highlight: false,
                         ),
                       ],
                     ),
                   ),
-
-                  // ===== 数量 =====
-                  if (row.qty != null)
-                    Column(
-                      children: [
-                        Text(
-                          'x${row.qty}',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.secondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                        ),
-                      ],
-                    ),
                 ],
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSupplierList(BuildContext context, QuoteDetailState state,
+      ColorScheme colorScheme, notifier) {
+    // TODO: 实现供应商列表/验货标签页
+    return Center(
+      child: Text(
+        '供应商列表',
+        style: TextStyle(color: colorScheme.onSurfaceVariant),
+      ),
+    );
+  }
+
+  Future<void> _handleDeleteProductFromList({
+    required BuildContext context,
+    required int? quoteId,
+    required int? productId,
+    required dynamic notifier,
+    required int page,
+  }) async {
+    if (productId == null || quoteId == null) return;
+    final confirmed = await ConfirmDialog.show(
+      context,
+      title: '确认删除',
+      content: '确定要删除该产品吗？',
+      cancelText: '取消',
+      confirmText: '确定',
+    );
+    if (!confirmed || !context.mounted) return;
+
+    EasyLoading.show(status: '删除中...');
+    final params = {
+      'ids': [productId],
+      "quotation_id": quoteId,
+    };
+    try {
+      await removeQuotationSamples(params);
+      await notifier.fetchProductsPage(quoteId, page);
+      EasyLoading.showSuccess('删除成功');
+    } catch (e) {
+      EasyLoading.showError('删除失败：$e');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final ColorScheme colorScheme;
+
+  const _TabButton({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? colorScheme.secondary : Colors.transparent,
+              width: 2,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected
+                  ? colorScheme.secondary
+                  : colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected
+                    ? colorScheme.secondary
+                    : colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -238,16 +388,48 @@ class _ProductImage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: 72,
-      height: 72,
+      width: 80,
+      height: 80,
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: colorScheme.surfaceVariant.withOpacity(0.2),
         borderRadius: BorderRadius.circular(6),
       ),
       clipBehavior: Clip.hardEdge,
       child: imageUrl != null
-          ? Image.network(imageUrl!, fit: BoxFit.cover)
-          : const Icon(Icons.image_not_supported),
+          ? Image.network(
+              imageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.image_not_supported, size: 24),
+                      SizedBox(height: 4),
+                      Text(
+                        'IMAGE\nNOT AVAILABLE',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 8),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            )
+          : const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.image_not_supported, size: 24),
+                  SizedBox(height: 4),
+                  Text(
+                    'IMAGE\nNOT AVAILABLE',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 8),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -256,11 +438,13 @@ class _KeyValue extends StatelessWidget {
   final String label;
   final String value;
   final bool highlight;
+  final bool priceStyle;
 
   const _KeyValue({
     required this.label,
     required this.value,
     this.highlight = false,
+    this.priceStyle = false,
   });
 
   @override
@@ -268,33 +452,33 @@ class _KeyValue extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 2),
-      child: RichText(
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        softWrap: false,
-        text: TextSpan(
-          style: theme.textTheme.bodySmall,
-          children: [
-            TextSpan(
-              text: '$label：',
-              style: TextStyle(
-                fontSize: 9,
-                color: colorScheme.onSurfaceVariant,
-              ),
+    return RichText(
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
+      text: TextSpan(
+        style: theme.textTheme.bodySmall,
+        children: [
+          TextSpan(
+            text: '$label: ',
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurfaceVariant,
             ),
-            TextSpan(
-              text: value,
-              style: TextStyle(
-                fontSize: 9,
-                color:
-                    highlight ? colorScheme.secondary : colorScheme.onSurface,
-                fontWeight: highlight ? FontWeight.w600 : FontWeight.normal,
-              ),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+              fontSize: 12,
+              color: priceStyle
+                  ? colorScheme.secondary
+                  : (highlight ? colorScheme.secondary : colorScheme.onSurface),
+              fontWeight: (priceStyle || highlight)
+                  ? FontWeight.w600
+                  : FontWeight.normal,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

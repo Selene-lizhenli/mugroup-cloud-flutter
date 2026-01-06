@@ -144,7 +144,7 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     enTitle: 'Quotations',
                     cnTitle: '新增报价',
                     onTap: () {
-                      context.router.push(const QuoteCreateRoute());
+                      context.router.push(  QuoteCreateRoute());
                     },
                   ),
                 ),

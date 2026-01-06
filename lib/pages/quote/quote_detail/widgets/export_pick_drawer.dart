@@ -1,12 +1,37 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
-import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud/pages/widgets/input.dart';
 
 enum ExportTemplateType {
   normal, // 出货清单
   encrypt, // 出货清单（含加密信息）
+  quote, // 报价单
+}
+
+enum ExportChannel {
+  email, // 邮箱
+  wework, // 企微
+}
+
+class EmailExportSheet extends StatefulWidget {
+  final int? quoteId;
+  const EmailExportSheet(this.quoteId);
+
+  @override
+  State<EmailExportSheet> createState() => _EmailExportSheetState();
+}
+
+class _EmailExportSheetState extends State<EmailExportSheet> {
+  @override
+  Widget build(BuildContext context) {
+    return ExportShareSheet(
+      quoteId: widget.quoteId,
+      channel: ExportChannel.email,
+    );
+  }
 }
 
 class EmployeePickerSheet extends StatefulWidget {
@@ -18,260 +43,385 @@ class EmployeePickerSheet extends StatefulWidget {
 }
 
 class _EmployeePickerSheetState extends State<EmployeePickerSheet> {
-  final TextEditingController _controller = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return ExportShareSheet(
+      quoteId: widget.quoteId,
+      channel: ExportChannel.wework,
+    );
+  }
+}
 
-  List<User> _list = [];
+class ExportShareSheet extends StatefulWidget {
+  final int? quoteId;
+  final ExportChannel channel;
+  const ExportShareSheet({
+    required this.quoteId,
+    required this.channel,
+  });
+
+  @override
+  State<ExportShareSheet> createState() => _ExportShareSheetState();
+}
+
+class _ExportShareSheetState extends State<ExportShareSheet> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _ccController = TextEditingController();
   User? _selected;
-  bool _loading = false;
-  bool _searched = false;
   ExportTemplateType _templateType = ExportTemplateType.normal;
+  bool _submitting = false;
 
   @override
   void dispose() {
-    _controller.dispose();
+    _emailController.dispose();
+    _ccController.dispose();
     super.dispose();
   }
 
-  Future<void> _search() async {
-    final keyword = _controller.text.trim();
+  bool _isValidEmail(String email) {
+    if (email.isEmpty) return false;
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
 
-    if (keyword.isEmpty || _loading) return;
+  Future<void> _handleConfirm() async {
+    // 邮箱渠道验证
+    if (widget.channel == ExportChannel.email) {
+      final email = _emailController.text.trim();
+
+      if (email.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('请输入邮箱地址'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
+
+      if (!_isValidEmail(email)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('请输入有效的邮箱地址'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
+    }
+
+    // 企微渠道验证
+    if (widget.channel == ExportChannel.wework) {
+      if (_selected == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('请选择用户'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
+    }
 
     setState(() {
-      _loading = true;
-      _searched = true;
-      _list = [];
-      _selected = null;
+      _submitting = true;
     });
 
     try {
-      final result = await fetchCurrentUsers(queryParameters: {
-        "search": keyword,
-        "pageSize": 50,
-      });
+      final params = <String, dynamic>{
+        "channel": widget.channel == ExportChannel.email ? "email" : "wework",
+        "template": _getTemplateString(_templateType),
+      };
 
-      if (!mounted) return;
+      if (widget.channel == ExportChannel.email) {
+        params["email"] = _emailController.text.trim();
+        if (_ccController.text.trim().isNotEmpty) {
+          params["cc"] = _ccController.text.trim();
+        }
+      } else {
+        params["user_id"] = _selected?.id;
+      }
 
-      setState(() {
-        _list = result ?? [];
-      });
+      final result = await exportQuotationFile(
+        widget.quoteId ?? 0,
+        params,
+      );
+
+      if (!context.mounted) return;
+
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.channel == ExportChannel.email
+                ? '导出成功，邮件已发送！'
+                : '导出成功，请到企微查看！'),
+            backgroundColor: Colors.green.shade600,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.message ?? '导出失败'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } catch (e, s) {
-      if (!mounted) return;
-
-      debugPrint('搜索员工失败: $e\n$s');
-
+      if (!context.mounted) return;
+      debugPrint('导出失败: $e\n$s');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('搜索失败，请稍后重试'),
+          content: const Text('导出失败，请稍后重试'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isEmail = widget.channel == ExportChannel.email;
 
-    return SafeArea(
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.65,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+          maxWidth: 500,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // ===== 顶部操作栏 =====
+            // ===== 标题 =====
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(12, 15, 12, 6),
+              child: Text(
+                isEmail ? '分享到邮箱' : '分享至企微',
+                textAlign: TextAlign.left,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+            // ===== 表单内容 =====
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ===== 模板选择 =====
+                    Text(
+                      '模板',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 0,
+                      children: [
+                        _RadioItem(
+                          title: '出货清单',
+                          value: ExportTemplateType.normal,
+                          groupValue: _templateType,
+                          onChanged: (v) {
+                            setState(() => _templateType = v);
+                          },
+                        ),
+                        _RadioItem(
+                          title: '出货清单（含加密信息）',
+                          value: ExportTemplateType.encrypt,
+                          groupValue: _templateType,
+                          onChanged: (v) {
+                            setState(() => _templateType = v);
+                          },
+                        ),
+                        _RadioItem(
+                          title: '报价单',
+                          value: ExportTemplateType.quote,
+                          groupValue: _templateType,
+                          onChanged: (v) {
+                            setState(() => _templateType = v);
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // ===== 根据渠道显示不同的表单 =====
+                    const SizedBox(height: 8),
+                    if (isEmail) ...[
+                      // ===== 邮箱输入框 =====
+
+                      Input(
+                        label: '邮箱',
+                        value: _emailController.text,
+                        hintText: '请输入邮箱地址',
+                        onChanged: (value) {
+                          setState(() {
+                            _emailController.text = value;
+                          });
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      // ===== 抄送输入框 =====
+                      const SizedBox(height: 8),
+                      Input(
+                        label: '抄送',
+                        hintText: '抄送地址',
+                        value: _ccController.text,
+                        onChanged: (value) {
+                          setState(() {
+                            _ccController.text = value;
+                          });
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                    ] else ...[
+                      // ===== 员工搜索选择 =====
+                      const Text("用户"),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () async {
+                          final selectedUser = await context.router
+                              .push<User>(const SelectUserRoute());
+                          if (selectedUser != null && mounted) {
+                            setState(() {
+                              _selected = selectedUser;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: colorScheme.surfaceTint,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _selected == null
+                                      ? "请选择用户"
+                                      : "${_selected!.name} (${_selected!.department?.name ?? '暂无部门'})",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: _selected == null
+                                        ? Colors.grey.shade600
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              const Icon(Icons.keyboard_arrow_right,
+                                  color: Colors.grey),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            // ===== 底部操作按钮 =====
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('取消'),
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        '发送到企微',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                  // 取消按钮：白色背景，黑色文字
+                  Material(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: _submitting ? null : () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Text(
+                          '取消',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      if (_selected == null) {
-                        return;
-                      }
-                      final params = {
-                        "channel": "wework",
-                        "template": _templateType == ExportTemplateType.encrypt
-                            ? "chqd_secret"
-                            : "chqd",
-                        "user_id": _selected?.id,
-                      };
-
-                      params;
-
-                      final result = await exportQuotationFile(
-                        widget.quoteId ?? 0,
-                        params,
-                      );
-
-                      if (!context.mounted) return;
-                      if (result.success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('导出成功，请到企微查看！'),
-                            backgroundColor: Colors.green.shade600,
-                            duration: const Duration(seconds: 3),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(result.message ?? '导出失败'),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.error,
-                          ),
-                        );
-                      }
-
-                      Navigator.pop(context);
-                    },
-                    child: const Text('确认'),
-                  ),
-                ],
-              ),
-            ),
-
-            const Divider(height: 1),
-            // ===== 模板选择（单选）=====
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '请选择模板',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: [
-                      _RadioItem(
-                        title: '出货清单',
-                        value: ExportTemplateType.normal,
-                        groupValue: _templateType,
-                        onChanged: (v) {
-                          setState(() => _templateType = v);
-                        },
-                      ),
-                      _RadioItem(
-                        title: '出货清单（含加密信息）',
-                        value: ExportTemplateType.encrypt,
-                        groupValue: _templateType,
-                        onChanged: (v) {
-                          setState(() => _templateType = v);
-                        },
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-
-            // ===== 搜索框 =====
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  '请选择目标员工',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ]),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: TextField(
-                controller: _controller,
-                enabled: !_loading, //   loading 时禁用
-                decoration: InputDecoration(
-                  hintText: '根据关键字搜索员工',
-                  // prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _loading
-                      ? const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: _search,
+                  const SizedBox(width: 12),
+                  Material(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(8),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: _submitting ? null : _handleConfirm,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 10,
                         ),
-                  border: const OutlineInputBorder(),
-                  isDense: true,
-                ),
-                textInputAction: TextInputAction.search,
-                onSubmitted: (_) => _search(),
+                        child: _submitting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                '确认',
+                                style: TextStyle(
+                                  color: colorScheme.onPrimary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            // ===== 内容区 =====
-            Expanded(child: _buildBody()),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildBody() {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (!_searched) {
-      return const Center(child: Text('请输入关键词搜索员工'));
-    }
-
-    if (_list.isEmpty) {
-      return const Center(child: Text('未搜索到员工'));
-    }
-
-    return ListView.separated(
-      itemCount: _list.length,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final emp = _list[index];
-        final selected = _selected?.id == emp.id;
-
-        return ListTile(
-          title: Text(emp?.name ?? "-"),
-          trailing: selected
-              ? Icon(Icons.check, color: Theme.of(context).primaryColor)
-              : null,
-          onTap: () {
-            setState(() {
-              _selected = emp;
-            });
-          },
-        );
-      },
-    );
+/// 将模板类型转换为字符串
+String _getTemplateString(ExportTemplateType type) {
+  switch (type) {
+    case ExportTemplateType.normal:
+      return "chqd";
+    case ExportTemplateType.encrypt:
+      return "chqd_secret";
+    case ExportTemplateType.quote:
+      return "bjd";
   }
 }
 
@@ -297,7 +447,7 @@ class _RadioItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(6),
       onTap: () => onChanged(value),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
         decoration: BoxDecoration(
           color: selected
               ? colorScheme.primary.withOpacity(0.08)
@@ -312,6 +462,14 @@ class _RadioItem extends StatelessWidget {
               onChanged: (v) => onChanged(v!),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               visualDensity: VisualDensity.compact,
+              fillColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return colorScheme.primary; // 选中时使用主题主色
+                  }
+                  return colorScheme.onSurface.withOpacity(0.45); // 未选中时使用灰色
+                },
+              ),
             ),
             Expanded(
               child: Text(
@@ -320,6 +478,7 @@ class _RadioItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  color: colorScheme.onSurface.withOpacity(0.92),
                   fontWeight: selected ? FontWeight.w500 : FontWeight.normal,
                 ),
               ),

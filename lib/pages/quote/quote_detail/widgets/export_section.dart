@@ -1,9 +1,7 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/export_pick_drawer.dart';
-import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ExportActionBar extends StatelessWidget {
   final QuotationList? item;
@@ -16,17 +14,15 @@ class ExportActionBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    Future<User?> showEmployeePicker() {
-      return showModalBottomSheet<User>(
+    Future<void> showEmployeePicker() {
+      return showDialog(
         context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
         builder: (_) => EmployeePickerSheet(item?.id),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal:12, vertical: 15),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -46,7 +42,7 @@ class ExportActionBar extends StatelessWidget {
               ),
               const SizedBox(width: 3),
               Text(
-                '${item?.sumQty ?? "-"}',
+                item?.sumQty ?? "-",
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -78,33 +74,43 @@ class ExportActionBar extends StatelessWidget {
           Row(
             children: [
               Text(
-                '导出到：',
+                '分享至',
                 style: TextStyle(
                   fontSize: 12,
                   color: colorScheme.onSurface,
                 ),
               ),
+              const SizedBox(width: 8),
               InkWell(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(4),
                 onTap: () {
                   showEmployeePicker();
                 },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '企微',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colorScheme.primary,
-                    ),
+                child: SvgPicture.asset(
+                  'assets/icons/wxwork.svg',
+                  width: 17,
+                  height: 17,
+                ),
+              ),
+              const SizedBox(width: 12),
+              InkWell(
+                borderRadius: BorderRadius.circular(4),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => EmailExportSheet(item?.id),
+                  );
+                },
+                child: SvgPicture.asset(
+                  'assets/icons/email.svg',
+                  width: 18,
+                  height: 18,
+                  colorFilter: ColorFilter.mode(
+                    colorScheme.secondary,
+                    BlendMode.srcIn,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ],

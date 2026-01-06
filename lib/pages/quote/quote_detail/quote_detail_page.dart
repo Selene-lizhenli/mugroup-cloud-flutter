@@ -104,7 +104,7 @@ class QuoteDetailPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('报价单详情'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.surfaceTint,
       ),
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
@@ -115,21 +115,21 @@ class QuoteDetailPage extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //  左侧时间轴
-            if (userId > 0)
-              Container(
-                padding: const EdgeInsets.fromLTRB(4, 20, 4, 20),
-                // color: Theme.of(context).colorScheme.surface,
-                child: SizedBox(
-                  width: 42,
-                  child: TimelineList(
-                    items: state.list,
-                    currentIndex: currentIndex.value,
-                    controller: scrollController,
-                    onTap: onTimelineTap,
-                  ),
-                ),
-              ),
-            //右侧详细信息
+            // if (userId > 0)
+            //   Container(
+            //     padding: const EdgeInsets.fromLTRB(4, 20, 4, 20),
+            //     // color: Theme.of(context).colorScheme.surface,
+            //     child: SizedBox(
+            //       width: 42,
+            //       child: TimelineList(
+            //         items: state.list,
+            //         currentIndex: currentIndex.value,
+            //         controller: scrollController,
+            //         onTap: onTimelineTap,
+            //       ),
+            //     ),
+            //   ),
+            //  右侧详细信息
             Expanded(
               child: QuoteDetailBody(
                 item: quoteDetailState.baseInfo,

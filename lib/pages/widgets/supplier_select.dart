@@ -13,6 +13,7 @@ class SupplierSelect extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final double height = MediaQuery.of(context).size.height * 0.75;
     final searchController = useTextEditingController();
     useListenable(searchController);
@@ -50,6 +51,7 @@ class SupplierSelect extends HookConsumerWidget {
 
     return Container(
       height: height,
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -90,7 +92,7 @@ class SupplierSelect extends HookConsumerWidget {
               onChanged: onSearchChanged,
               style: const TextStyle(fontSize: 14),
               decoration: InputDecoration(
-                hintText: '搜索名称或编号...',
+                hintText: '搜索名称、编号或相关产品...',
                 hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
                 prefixIcon:
                     const Icon(Icons.search, size: 18, color: Colors.grey),
@@ -138,13 +140,15 @@ class SupplierSelect extends HookConsumerWidget {
                     : Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(4),
+                            padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
                             child: Container(
+                              padding: const EdgeInsets.fromLTRB(24,17, 30, 17),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                    color: Colors.blue.withOpacity(0.6)),
+                                  color: colorScheme.secondary,
+                                ),
                               ),
                               child: Material(
                                 color: Colors.transparent,
@@ -157,26 +161,63 @@ class SupplierSelect extends HookConsumerWidget {
                                       return;
                                     }
                                   },
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 18),
-                                    child: Center(
-                                      child: Icon(
+                                  child: Row(
+                                    children: [
+                                      Icon(
                                         Icons.add,
+                                        color: colorScheme.secondary,
                                         size: 24,
-                                        color: Colors.blue,
                                       ),
-                                    ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '创建新供应商',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: colorScheme.secondary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                         
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
+
+                                  //  Padding(
+                                  //   padding: const EdgeInsets.symmetric(vertical: 18),
+                                  //   child: Center(
+                                  //     child: Icon(
+                                  //       Icons.add,
+                                  //       size: 24,
+                                  //       color: colorScheme.secondary,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ),
                               ),
                             ),
                           ),
                           Expanded(
                               child: ListView.separated(
-                            padding: EdgeInsets.all(4),
+                            padding: const EdgeInsets.all(4),
                             itemCount: suppliers.value!.length,
-                            separatorBuilder: (context, index) =>
+                            separatorBuilder: (context, index) => Column(
+                              children: [
                                 const SizedBox(height: 4),
+                                Divider(
+                                  height: 1,
+                                  color: Colors.grey.shade200,
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
                             itemBuilder: (context, index) {
                               final supplier = suppliers.value![index];
 
@@ -192,8 +233,6 @@ class SupplierSelect extends HookConsumerWidget {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: Colors.grey.withOpacity(0.2)),
                                   ),
                                   child: Material(
                                     color: Colors.transparent,
@@ -204,7 +243,8 @@ class SupplierSelect extends HookConsumerWidget {
                                             .pop(supplier.toJson());
                                       },
                                       child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            12, 8, 12, 8),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -219,9 +259,8 @@ class SupplierSelect extends HookConsumerWidget {
                                                     supplierName,
                                                     style: const TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
                                                       color: Colors.black87,
+                                                      // color: colorScheme.secondary,
                                                     ),
                                                     maxLines: 1,
                                                     overflow:
@@ -231,8 +270,10 @@ class SupplierSelect extends HookConsumerWidget {
                                                 Text(
                                                   "$supplierNo",
                                                   style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey[600]),
+                                                    fontSize: 12,
+                                                    color: colorScheme
+                                                        .surfaceContainerHighest,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -243,10 +284,9 @@ class SupplierSelect extends HookConsumerWidget {
                                                   child: Text(
                                                     address ?? '',
                                                     style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.grey[400],
+                                                      fontSize: 11,
+                                                      color: colorScheme
+                                                          .surfaceContainerHighest,
                                                     ),
                                                     maxLines: 1,
                                                     overflow:

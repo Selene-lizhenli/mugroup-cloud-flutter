@@ -170,6 +170,7 @@ flutter:
     - assets/icon.png
     - assets/logo.webp
     - assets/splash.png
+    - assets/icons/
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

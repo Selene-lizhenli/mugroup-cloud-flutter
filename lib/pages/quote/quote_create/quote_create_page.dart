@@ -1,34 +1,130 @@
+ 
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
-import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
-class QuoteCreatePage extends StatelessWidget {
-  const QuoteCreatePage({super.key});
+class QuoteCreatePage extends ConsumerStatefulWidget {
+  final int? quoteId; // 编辑模式时传递报价单ID
+
+  const QuoteCreatePage({
+    super.key,
+    this.quoteId,
+  });
+
+  @override
+  ConsumerState<QuoteCreatePage> createState() => _QuoteCreatePageState();
+}
+
+class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
+  QuotationList? _editData;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 如果是编辑模式，加载数据
+    if (widget.quoteId != null) {
+      _loadEditData();
+    }
+  }
+
+  Future<void> _loadEditData() async {
+    if (widget.quoteId == null) return;
+    
+    setState(() => _isLoading = true);
+    try {
+      final data = await getQuotationListById(widget.quoteId!);
+      setState(() {
+        _editData = data;
+        _isLoading = false;
+      });
+      
+      // 初始化表单数据
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeEditData();
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _initializeEditData() {
+    if (_editData == null) return;
+    
+    final notifier = ref.read(quoteCreateProvider.notifier);
+    final data = _editData!;
+    
+    // 设置客户
+    if (data.company != null) {
+      notifier.setSelectedCustomer(data.company!);
+    }
+    
+    // 设置联系人
+    if (data.company?.contacts?.isNotEmpty == true) {
+      final contact = data.company!.contacts!.first;
+      notifier.setSelectedContact(contact);
+    }
+    
+    // 设置货币
+    if (data.curreny != null) {
+      notifier.setCurrency(data.curreny!);
+    }
+    
+    // 设置汇率
+    if (data.exchange != null) {
+      notifier.setRate(data.exchange!);
+    }
+    
+    // 设置报价日期
+    if (data.quoteAt != null) {
+      try {
+        final date = DateTime.parse(data.quoteAt!);
+        notifier.setQuoteDate(date);
+      } catch (e) {
+        // 解析失败，使用当前日期
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isEditMode = widget.quoteId != null;
+    
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isEditMode ? '编辑报价单' : '新增报价单'),
+          backgroundColor: colorScheme.surface,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('新增报价单'),
+        title: Text(isEditMode ? '编辑报价单' : '新增报价单'),
         backgroundColor: colorScheme.surface,
       ),
-      body: const Column(
+      body: Column(
         children: [
           Expanded(child: QuoteBaseInfoStep()),
-          QuoteCreateBottomBar(),
+          QuoteCreateBottomBar(quoteId: widget.quoteId),
         ],
       ),
     );
   }
 }
 
- 
+
 
 // class _ReviewStep extends ConsumerWidget {
 //   const _ReviewStep({super.key});
@@ -89,13 +185,18 @@ class QuoteCreatePage extends StatelessWidget {
 // }
 
 class QuoteCreateBottomBar extends ConsumerWidget {
-  const QuoteCreateBottomBar({super.key});
+  final int? quoteId; // 编辑模式时的报价单ID
+
+  const QuoteCreateBottomBar({
+    super.key,
+    this.quoteId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider).user;
+    // final user = ref.watch(userProvider).user; // TODO: 保存时使用
     final state = ref.watch(quoteCreateProvider);
-    final notifier = ref.read(quoteCreateProvider.notifier);
+    final stateReaded = ref.read(quoteCreateProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = state.savingDraft || state.submitting;
 
@@ -149,11 +250,8 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                     ? null
                     : () async {
                         // await notifier.saveDraft();
-                        if (context.mounted) {
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   const SnackBar(content: Text('保存成功')),
-                          // );
-                          final data = {
+                        if (context.mounted) { 
+                          final submitData = {
                             "sample_items": state.productList
                                 .map((item) => {
                                       "sample_id": item.sample.id,
@@ -161,23 +259,30 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                                       "qty": item.count
                                     })
                                 .toList(),
-                            "user_id": user?.id,
-                            "curreny": state.currency,
-                            "exchange": state.rate, //汇率
-                            "contact_id": state.contact,
+                            "user_id":  null,//外銷員
+                            "contact_id": state.selectedContact?.id,
+                            "customer":state.selectedCustomers?.id ,
+                            "curreny": state.currency,  //货币
+                            "exchange": state.rate,  //汇率 
                             "commission_rate": state.addPercentage, //加点
                             "quote_at": state.quoteDate.toIso8601String()
                           };
-
-                          // final res = await storeShowroomQuotation(data);
-                          // if (res?.id != null && context.mounted) {
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   const SnackBar(content: Text('保存成功，正在跳转...')),
-                          // );
-                          // context.router.push(
-                          //     QuoteDetailRoute(id: res!.id!, userId: 0));
+                          logger.d('state${submitData }');
+                          // TODO: 调用保存接口
+                          if (quoteId != null) { //接口需要调整参数
+                            // 编辑模式：更新
+                            // await updateQuotation(quoteId, submitData);
+                          } else {
+                            // 创建模式：新建
+                            // final res = await storeShowroomQuotation(submitData);
+                          }
+ 
+                           ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(backgroundColor: Colors.green,content: Text('保存成功')),
+                          );
+                          // 临时quoteId跳转
                           context.router
-                              .push(QuoteDetailRoute(id: 322, userId: 0));
+                              .push(QuoteDetailRoute(id: quoteId ?? 658, userId: 0));
                         }
                       },
                 style: ElevatedButton.styleFrom(

@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/quote/quote_supplier_group.dart';
@@ -79,4 +78,21 @@ Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
           },
         ),
       );
+}
+
+Future<void> deleteQuotation(int id) async {
+  await api.delete("api/tenant/showroom/quotations/$id");
+}
+
+
+// 移除样品明细中的商品
+Future removeQuotationSamples(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/quotations/quotationSamples/remove", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return res;
+    },
+  );
 }

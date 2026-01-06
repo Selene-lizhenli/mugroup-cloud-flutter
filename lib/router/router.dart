@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/router/guards/auth_guard.dart';
+import 'package:cloud/pages/quote/batch_import/product_batch_import_page.dart';
 import 'router.gr.dart';
 
 @AutoRouterConfig()
@@ -99,6 +100,10 @@ class AppRouter extends RootStackRouter {
       // AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
       AutoRoute(page: QuoteProductAddRoute.page, path: "/quote/product/add"),
+      AutoRoute(
+        page: ProductBatchImportRoute.page,
+        path: "/quote/product/batch_import",
+      ),
 
       AutoRoute(page: SupplySupplierRoute.page, path: "/supply/supplier"),
       AutoRoute(
