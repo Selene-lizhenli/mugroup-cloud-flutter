@@ -42,6 +42,8 @@ import 'package:cloud/pages/quote/batch_import/product_batch_import_page.dart'
     as _i23;
 import 'package:cloud/pages/quote/quote_create/quote_create_page.dart' as _i24;
 import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i25;
+import 'package:cloud/pages/quote/supplier_products_related/supplier_products_page.dart'
+    as _i41;
 import 'package:cloud/pages/quote/quote_page.dart' as _i26;
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_page.dart'
     as _i27;

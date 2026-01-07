@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 
 class SupplierCard extends StatelessWidget {
   final Supplier supplier;
-  final VoidCallback onClick;
+  final VoidCallback? onClick;
 
   const SupplierCard({
     super.key,
     required this.supplier,
-    required this.onClick,
+    this.onClick,
   });
 
   Widget _buildTagChip(IconData icon, String label, Color color) {

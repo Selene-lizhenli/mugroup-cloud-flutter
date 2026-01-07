@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/supplier/supplier_list.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product_edit_dialog.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/product_edit_dialog.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -22,6 +23,7 @@ class ProductSection extends HookConsumerWidget {
     final state = ref.watch(quoteDetailProvider);
     final notifier = ref.read(quoteDetailProvider.notifier);
     final selectedTab = useState(1); // 0: 供应商列表/验货, 1: 产品清单
+    final selectedSupplierIds = useState<Set<int>>({});
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -101,7 +103,8 @@ class ProductSection extends HookConsumerWidget {
                 child: selectedTab.value == 1
                     ? _buildProductList(
                         context, state, colorScheme, notifier, quoteId)
-                    : _buildSupplierList(context, state, colorScheme, notifier),
+                    : _buildSupplierList(
+                        context, state, colorScheme, notifier, selectedSupplierIds, quoteId),
               ),
             ],
           ),
@@ -278,14 +281,53 @@ class ProductSection extends HookConsumerWidget {
     );
   }
 
-  Widget _buildSupplierList(BuildContext context, QuoteDetailState state,
-      ColorScheme colorScheme, notifier) {
-    // TODO: 实现供应商列表/验货标签页
-    return Center(
-      child: Text(
-        '供应商列表',
-        style: TextStyle(color: colorScheme.onSurfaceVariant),
-      ),
+  Widget _buildSupplierList(
+    BuildContext context,
+    QuoteDetailState state,
+    ColorScheme colorScheme,
+    notifier,
+    ValueNotifier<Set<int>> selectedSupplierIds,
+    int? quoteId,
+  ) {
+    if (state.isSupplierLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.supplierError != null) {
+      return Center(
+        child: Text(
+          '供应商加载失败',
+          style: TextStyle(color: colorScheme.error),
+        ),
+      );
+    }
+
+    return SupplierListWidget(
+      suppliers: state.suppliers,
+      products: state.products,
+      selectedSupplierIds: selectedSupplierIds.value,
+      onSupplierToggle: (supplierId) {
+        if (supplierId == null) return;
+        final newSet = Set<int>.from(selectedSupplierIds.value);
+        if (newSet.contains(supplierId)) {
+          newSet.remove(supplierId);
+        } else {
+          newSet.add(supplierId);
+        }
+        selectedSupplierIds.value = newSet;
+      },
+      onSupplierTap: (supplier) {
+        if (quoteId != null && supplier.supplier?.id != null) {
+          context.router.push(
+            SupplierProductsRoute(
+              quotationId: quoteId,
+              supplierId: supplier.supplier!.id!,
+              supplierNo: supplier.supplier?.supplierNo ?? '',
+              supplierName: supplier.supplier?.name ?? '',
+            ),
+          );
+        }
+      },
     );
   }
 

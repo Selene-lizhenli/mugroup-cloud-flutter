@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/base_info_section.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/export_section.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product_section.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/export/export_section.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/product_section.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';

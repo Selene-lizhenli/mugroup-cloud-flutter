@@ -104,6 +104,10 @@ class AppRouter extends RootStackRouter {
         page: ProductBatchImportRoute.page,
         path: "/quote/product/batch_import",
       ),
+      AutoRoute(
+        page: SupplierProductsRoute.page,
+        path: "/quote/supplier/:quotationId/:supplierId/:supplierNo/:supplierName/products",
+      ),
 
       AutoRoute(page: SupplySupplierRoute.page, path: "/supply/supplier"),
       AutoRoute(

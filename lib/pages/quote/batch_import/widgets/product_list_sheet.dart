@@ -80,8 +80,12 @@ class ProductListSheet extends HookConsumerWidget {
                   checkColor: Colors.white,
                   overlayColor: WidgetStateProperty.resolveWith<Color?>(
                     (Set<WidgetState> states) {
-                      return colorScheme.outlineVariant;
+                      return colorScheme.surface;
                     },
+                  ),
+                  side: BorderSide(
+                    color: colorScheme.outline,
+                    width: 1.5,
                   ),
                   onChanged: (checked) {
                     if (validIds.isEmpty) return;
@@ -153,6 +157,10 @@ class ProductListSheet extends HookConsumerWidget {
                               value: isSelected,
                               checkColor: Colors.white,
                               onChanged: (_) => notifier.toggleSelect(item),
+                              side: BorderSide(
+                                color: colorScheme.outline,
+                                width: 1.5,
+                              ),
                             ),
                           ),
                           GestureDetector(
@@ -226,7 +234,6 @@ class ProductListSheet extends HookConsumerWidget {
                   },
                 ),
               ),
-        
           ],
         ),
       ),
@@ -238,7 +245,11 @@ Widget _buildCover(String? url) {
   if (url == null ||
       url.isEmpty ||
       !(url.startsWith('http://') || url.startsWith('https://'))) {
-    return const Icon(Icons.image_not_supported_outlined,size:60,color: Color.fromARGB(255, 129, 129, 129),);
+    return const Icon(
+      Icons.image_not_supported_outlined,
+      size: 60,
+      color: Color.fromARGB(255, 129, 129, 129),
+    );
   }
   return Image.network(
     url,

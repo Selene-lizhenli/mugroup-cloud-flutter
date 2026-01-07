@@ -282,7 +282,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                           );
                           // 临时quoteId跳转
                           context.router
-                              .push(QuoteDetailRoute(id: quoteId ?? 658, userId: 0));
+                              .push(QuoteDetailRoute(id: quoteId ?? 306, userId: 0));
                         }
                       },
                 style: ElevatedButton.styleFrom(
