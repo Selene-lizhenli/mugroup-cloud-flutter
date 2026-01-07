@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quote_supplier_group.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 
 class QuoteListSupplierCard extends StatelessWidget {
@@ -7,6 +9,7 @@ class QuoteListSupplierCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onToggle;
   final VoidCallback? onTap;
+  final int? productId;
 
   const QuoteListSupplierCard({
     super.key,
@@ -15,6 +18,7 @@ class QuoteListSupplierCard extends StatelessWidget {
     required this.isSelected,
     required this.onToggle,
     this.onTap,
+    this.productId,
   });
 
   @override
@@ -116,6 +120,7 @@ class QuoteListSupplierCard extends StatelessWidget {
                 ),
               ],
             ),
+           
           ],
         ),
       ),

@@ -76,6 +76,10 @@ mixin _$QuotationList {
   int? get productCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'sum_qty')
   String? get sumQty => throw _privateConstructorUsedError;
+  @JsonKey(name: 'language')
+  String? get language => throw _privateConstructorUsedError;
+  @JsonKey(name: 'contact_id')
+  String? get contactId => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_sent_at')
   DateTime? get lastSentAt => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
@@ -126,6 +130,8 @@ abstract class $QuotationListCopyWith<$Res> {
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
       @JsonKey(name: 'product_count') int? productCount,
       @JsonKey(name: 'sum_qty') String? sumQty,
+      @JsonKey(name: 'language') String? language,
+      @JsonKey(name: 'contact_id') String? contactId,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
       User? user,
       User? creator,
@@ -180,6 +186,8 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
     Object? isTaxInclusive = freezed,
     Object? productCount = freezed,
     Object? sumQty = freezed,
+    Object? language = freezed,
+    Object? contactId = freezed,
     Object? lastSentAt = freezed,
     Object? user = freezed,
     Object? creator = freezed,
@@ -310,6 +318,14 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
           ? _value.sumQty
           : sumQty // ignore: cast_nullable_to_non_nullable
               as String?,
+      language: freezed == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contactId: freezed == contactId
+          ? _value.contactId
+          : contactId // ignore: cast_nullable_to_non_nullable
+              as String?,
       lastSentAt: freezed == lastSentAt
           ? _value.lastSentAt
           : lastSentAt // ignore: cast_nullable_to_non_nullable
@@ -406,6 +422,8 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
       @JsonKey(name: 'product_count') int? productCount,
       @JsonKey(name: 'sum_qty') String? sumQty,
+      @JsonKey(name: 'language') String? language,
+      @JsonKey(name: 'contact_id') String? contactId,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
       User? user,
       User? creator,
@@ -461,6 +479,8 @@ class __$$QuotationListImplCopyWithImpl<$Res>
     Object? isTaxInclusive = freezed,
     Object? productCount = freezed,
     Object? sumQty = freezed,
+    Object? language = freezed,
+    Object? contactId = freezed,
     Object? lastSentAt = freezed,
     Object? user = freezed,
     Object? creator = freezed,
@@ -591,6 +611,14 @@ class __$$QuotationListImplCopyWithImpl<$Res>
           ? _value.sumQty
           : sumQty // ignore: cast_nullable_to_non_nullable
               as String?,
+      language: freezed == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String?,
+      contactId: freezed == contactId
+          ? _value.contactId
+          : contactId // ignore: cast_nullable_to_non_nullable
+              as String?,
       lastSentAt: freezed == lastSentAt
           ? _value.lastSentAt
           : lastSentAt // ignore: cast_nullable_to_non_nullable
@@ -646,6 +674,8 @@ class _$QuotationListImpl implements _QuotationList {
       @JsonKey(name: 'is_tax_inclusive') this.isTaxInclusive,
       @JsonKey(name: 'product_count') this.productCount,
       @JsonKey(name: 'sum_qty') this.sumQty,
+      @JsonKey(name: 'language') this.language,
+      @JsonKey(name: 'contact_id') this.contactId,
       @JsonKey(name: 'last_sent_at') this.lastSentAt,
       this.user,
       this.creator,
@@ -742,6 +772,12 @@ class _$QuotationListImpl implements _QuotationList {
   @JsonKey(name: 'sum_qty')
   final String? sumQty;
   @override
+  @JsonKey(name: 'language')
+  final String? language;
+  @override
+  @JsonKey(name: 'contact_id')
+  final String? contactId;
+  @override
   @JsonKey(name: 'last_sent_at')
   final DateTime? lastSentAt;
   @override
@@ -753,7 +789,7 @@ class _$QuotationListImpl implements _QuotationList {
 
   @override
   String toString() {
-    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, lastSentAt: $lastSentAt, user: $user, creator: $creator, company: $company)';
+    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, user: $user, creator: $creator, company: $company)';
   }
 
   @override
@@ -814,6 +850,10 @@ class _$QuotationListImpl implements _QuotationList {
             (identical(other.productCount, productCount) ||
                 other.productCount == productCount) &&
             (identical(other.sumQty, sumQty) || other.sumQty == sumQty) &&
+            (identical(other.language, language) ||
+                other.language == language) &&
+            (identical(other.contactId, contactId) ||
+                other.contactId == contactId) &&
             (identical(other.lastSentAt, lastSentAt) ||
                 other.lastSentAt == lastSentAt) &&
             (identical(other.user, user) || other.user == user) &&
@@ -856,6 +896,8 @@ class _$QuotationListImpl implements _QuotationList {
         isTaxInclusive,
         productCount,
         sumQty,
+        language,
+        contactId,
         lastSentAt,
         user,
         creator,
@@ -909,6 +951,8 @@ abstract class _QuotationList implements QuotationList {
       @JsonKey(name: 'is_tax_inclusive') final bool? isTaxInclusive,
       @JsonKey(name: 'product_count') final int? productCount,
       @JsonKey(name: 'sum_qty') final String? sumQty,
+      @JsonKey(name: 'language') final String? language,
+      @JsonKey(name: 'contact_id') final String? contactId,
       @JsonKey(name: 'last_sent_at') final DateTime? lastSentAt,
       final User? user,
       final User? creator,
@@ -1004,6 +1048,12 @@ abstract class _QuotationList implements QuotationList {
   @override
   @JsonKey(name: 'sum_qty')
   String? get sumQty;
+  @override
+  @JsonKey(name: 'language')
+  String? get language;
+  @override
+  @JsonKey(name: 'contact_id')
+  String? get contactId;
   @override
   @JsonKey(name: 'last_sent_at')
   DateTime? get lastSentAt;

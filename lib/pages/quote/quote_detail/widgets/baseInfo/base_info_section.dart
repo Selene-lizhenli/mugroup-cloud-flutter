@@ -30,11 +30,7 @@ class BaseInfoSection extends HookConsumerWidget {
     final contact = company?.contacts?.isNotEmpty == true
         ? company!.contacts!.first
         : null;
-    final contactName = contact?.name ?? '-';
-    final contactTel = contact?.telNumber ?? '';
-    final contactDisplay = contactName != '-' && contactTel.isNotEmpty
-        ? '$contactName $contactTel'
-        : contactName;
+  
 
     return Card(
       elevation: 0,
@@ -111,7 +107,7 @@ class BaseInfoSection extends HookConsumerWidget {
                     width: (constraints.maxWidth - 16) / 2,
                     child: _InfoItem(
                       label: '联系人',
-                      value: contactDisplay,
+                      value: item?.contactId??"",
                     ),
                   ),
                   // 外销员
@@ -133,10 +129,11 @@ class BaseInfoSection extends HookConsumerWidget {
                   // 报价语言
                   SizedBox(
                     width: (constraints.maxWidth - 16) / 2,
-                    child: const _InfoItem(
+                    child:   _InfoItem(
                       label: '报价语言',
-                      value: 'EN', // TODO: 从数据中获取
+                      value: item?.language??'', // TODO: 从数据中获取
                     ),
+
                   ),
                   // 报价货币
                   SizedBox(

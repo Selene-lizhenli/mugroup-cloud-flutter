@@ -2,8 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 enum ExportTemplateType {
   normal, // 出货清单
@@ -69,7 +70,14 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
   final TextEditingController _ccController = TextEditingController();
   User? _selected;
   ExportTemplateType _templateType = ExportTemplateType.normal;
+  late ExportChannel _channel;
   bool _submitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _channel = widget.channel;
+  }
 
   @override
   void dispose() {
@@ -86,7 +94,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
 
   Future<void> _handleConfirm() async {
     // 邮箱渠道验证
-    if (widget.channel == ExportChannel.email) {
+    if (_channel == ExportChannel.email) {
       final email = _emailController.text.trim();
 
       if (email.isEmpty) {
@@ -111,7 +119,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
     }
 
     // 企微渠道验证
-    if (widget.channel == ExportChannel.wework) {
+    if (_channel == ExportChannel.wework) {
       if (_selected == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -129,11 +137,11 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
 
     try {
       final params = <String, dynamic>{
-        "channel": widget.channel == ExportChannel.email ? "email" : "wework",
+        "channel": _channel == ExportChannel.email ? "email" : "wework",
         "template": _getTemplateString(_templateType),
       };
 
-      if (widget.channel == ExportChannel.email) {
+      if (_channel == ExportChannel.email) {
         params["email"] = _emailController.text.trim();
         if (_ccController.text.trim().isNotEmpty) {
           params["cc"] = _ccController.text.trim();
@@ -152,7 +160,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
       if (result.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.channel == ExportChannel.email
+            content: Text(_channel == ExportChannel.email
                 ? '导出成功，邮件已发送！'
                 : '导出成功，请到企微查看！'),
             backgroundColor: Colors.green.shade600,
@@ -189,7 +197,8 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isEmail = widget.channel == ExportChannel.email;
+    final isEmail = _channel == ExportChannel.email;
+    final isWework = _channel == ExportChannel.wework;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -205,12 +214,12 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // ===== 标题 =====
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 15, 12, 6),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
               child: Text(
-                isEmail ? '分享到邮箱' : '分享至企微',
+                '分享',
                 textAlign: TextAlign.left,
-                style: const TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18),
               ),
             ),
             // ===== 表单内容 =====
@@ -220,15 +229,47 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '渠道',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(width: 12),
+                        _ChannelOption(
+                          label: '企微',
+                          assetPath: 'assets/icons/wxwork.svg',
+                          selected: isWework,
+                          onTap: () {
+                            setState(() {
+                              _channel = ExportChannel.wework;
+                            });
+                          },
+                        ), 
+                        const SizedBox(width: 12),
+                        _ChannelOption(
+                          label: '邮箱',
+                          assetPath: 'assets/icons/email.svg',
+                          selected: isEmail,
+                          color: colorScheme.secondary,
+                          onTap: () {
+                            setState(() {
+                              _channel = ExportChannel.email;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
                     // ===== 模板选择 =====
                     Text(
                       '模板',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 0,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _RadioItem(
                           title: '出货清单',
@@ -238,6 +279,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                             setState(() => _templateType = v);
                           },
                         ),
+                        const SizedBox(width: 12),
                         _RadioItem(
                           title: '出货清单（含加密信息）',
                           value: ExportTemplateType.encrypt,
@@ -246,6 +288,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                             setState(() => _templateType = v);
                           },
                         ),
+                        const SizedBox(height: 4),
                         _RadioItem(
                           title: '报价单',
                           value: ExportTemplateType.quote,
@@ -330,7 +373,6 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                           ),
                         ),
                       ),
-                   
                     ],
                   ],
                 ),
@@ -482,6 +524,65 @@ class _RadioItem extends StatelessWidget {
                   color: colorScheme.onSurface.withOpacity(0.92),
                   fontWeight: selected ? FontWeight.w500 : FontWeight.normal,
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChannelOption extends StatelessWidget {
+  final String label;
+  final String assetPath;
+  final bool selected;
+  final Color? color;
+  final VoidCallback onTap;
+
+  const _ChannelOption({
+    required this.label,
+    required this.assetPath,
+    required this.selected,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final fgColor = selected ? colorScheme.primary : colorScheme.onSurface;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(12),
+          // border: Border.all(color: borderColor, width: 1),
+          color: selected
+              ? colorScheme.primary.withOpacity(0.06)
+              : colorScheme.surface,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              assetPath,
+              width: 20,
+              height: 20,
+              colorFilter: color != null
+                  ? ColorFilter.mode(color!, BlendMode.srcIn)
+                  : null,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: fgColor,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
           ],

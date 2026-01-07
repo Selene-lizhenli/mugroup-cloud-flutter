@@ -39,6 +39,8 @@ class QuotationList with _$QuotationList {
     @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
     @JsonKey(name: 'product_count') int? productCount,
     @JsonKey(name: 'sum_qty') String? sumQty,
+    @JsonKey(name: 'language') String? language,
+    @JsonKey(name: 'contact_id') String? contactId,
     @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
     User? user,
     User? creator,

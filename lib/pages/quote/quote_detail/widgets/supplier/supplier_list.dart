@@ -34,6 +34,17 @@ class SupplierListWidget extends StatelessWidget {
     return total;
   }
 
+  // 获取当前供应商下第一个产品的 ID，作为“当前产品 id”
+  int? _findFirstProductIdForSupplier(QuoteSupplierGroup supplier) {
+    if (supplier.supplier?.id == null) return null;
+    for (final product in products) {
+      if (product.supplyQuote?.supplierId == supplier.supplier?.id) {
+        return product.id;
+      }
+    }
+    return null;
+  }
+
   // 计算总的产品种类数
   int _calculateTotalProductTypes() {
     return suppliers.fold(0, (sum, supplier) => sum + (supplier.count ?? 0));
@@ -70,6 +81,7 @@ class SupplierListWidget extends StatelessWidget {
               final supplierId = supplier.supplier?.id;
               final isSelected = supplierId != null && selectedSupplierIds.contains(supplierId);
               final totalAmount = _calculateTotalAmount(supplier);
+              final productId = _findFirstProductIdForSupplier(supplier);
 
               return QuoteListSupplierCard(
                 supplier: supplier,
@@ -79,6 +91,7 @@ class SupplierListWidget extends StatelessWidget {
                 onTap: onSupplierTap != null
                     ? () => onSupplierTap!(supplier)
                     : null,
+                productId: productId,
               );
             },
           ),

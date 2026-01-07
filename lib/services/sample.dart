@@ -109,6 +109,18 @@ Future<Quotation?> storeShowroomQuotation(Map<String, dynamic>? data) async {
   );
 }
 
+// 更新报价单
+Future updateShowroomQuotation(String id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/quotations/${id}", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return false;
+      }
+      return true;
+    },
+  );
+}
+
 Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
     Map<String, dynamic>? data) async {
   return api.get("api/tenant/showroom/quotations", data: data).then(

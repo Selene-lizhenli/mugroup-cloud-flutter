@@ -43,6 +43,8 @@ _$QuotationListImpl _$$QuotationListImplFromJson(Map<String, dynamic> json) =>
       isTaxInclusive: json['is_tax_inclusive'] as bool?,
       productCount: (json['product_count'] as num?)?.toInt(),
       sumQty: json['sum_qty'] as String?,
+      language: json['language'] as String?,
+      contactId: json['contact_id'] as String?,
       lastSentAt: json['last_sent_at'] == null
           ? null
           : DateTime.parse(json['last_sent_at'] as String),
@@ -90,6 +92,8 @@ Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
       'is_tax_inclusive': instance.isTaxInclusive,
       'product_count': instance.productCount,
       'sum_qty': instance.sumQty,
+      'language': instance.language,
+      'contact_id': instance.contactId,
       'last_sent_at': instance.lastSentAt?.toIso8601String(),
       'user': instance.user,
       'creator': instance.creator,

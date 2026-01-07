@@ -1,4 +1,3 @@
- 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
@@ -38,7 +37,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
 
   Future<void> _loadEditData() async {
     if (widget.quoteId == null) return;
-    
+
     setState(() => _isLoading = true);
     try {
       final data = await getQuotationListById(widget.quoteId!);
@@ -46,7 +45,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
         _editData = data;
         _isLoading = false;
       });
-      
+
       // 初始化表单数据
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeEditData();
@@ -58,31 +57,31 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
 
   void _initializeEditData() {
     if (_editData == null) return;
-    
+
     final notifier = ref.read(quoteCreateProvider.notifier);
     final data = _editData!;
-    
+
     // 设置客户
     if (data.company != null) {
       notifier.setSelectedCustomer(data.company!);
     }
-    
+
     // 设置联系人
     if (data.company?.contacts?.isNotEmpty == true) {
       final contact = data.company!.contacts!.first;
       notifier.setSelectedContact(contact);
     }
-    
+
     // 设置货币
     if (data.curreny != null) {
       notifier.setCurrency(data.curreny!);
     }
-    
+
     // 设置汇率
     if (data.exchange != null) {
       notifier.setRate(data.exchange!);
     }
-    
+
     // 设置报价日期
     if (data.quoteAt != null) {
       try {
@@ -98,7 +97,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isEditMode = widget.quoteId != null;
-    
+
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -108,7 +107,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditMode ? '编辑报价单' : '新增报价单'),
@@ -123,8 +122,6 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
     );
   }
 }
-
-
 
 // class _ReviewStep extends ConsumerWidget {
 //   const _ReviewStep({super.key});
@@ -196,7 +193,6 @@ class QuoteCreateBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final user = ref.watch(userProvider).user; // TODO: 保存时使用
     final state = ref.watch(quoteCreateProvider);
-    final stateReaded = ref.read(quoteCreateProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = state.savingDraft || state.submitting;
 
@@ -250,7 +246,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                     ? null
                     : () async {
                         // await notifier.saveDraft();
-                        if (context.mounted) { 
+                        if (context.mounted) {
                           final submitData = {
                             "sample_items": state.productList
                                 .map((item) => {
@@ -259,30 +255,58 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                                       "qty": item.count
                                     })
                                 .toList(),
-                            "user_id":  null,//外銷員
-                            "contact_id": state.selectedContact?.id,
-                            "customer":state.selectedCustomers?.id ,
-                            "curreny": state.currency,  //货币
-                            "exchange": state.rate,  //汇率 
+                            "user_id": null, //外銷員
+                            "curreny": state.currency, //货币
+                            "exchange": state.rate, //汇率
                             "commission_rate": state.addPercentage, //加点
-                            "quote_at": state.quoteDate.toIso8601String()
+                            "quote_at": state.quoteDate.toIso8601String(),
+                            "contact_id": state.selectedContact?.id, //联系人
+                            "company_id": state.selectedCustomers?.id, //客户
+                            "language": state.language?.name,
                           };
-                          logger.d('state${submitData }');
-                          // TODO: 调用保存接口
-                          if (quoteId != null) { //接口需要调整参数
-                            // 编辑模式：更新
-                            // await updateQuotation(quoteId, submitData);
+                          logger.d('state${submitData}');
+                          bool isSuccess = false;
+                          if (quoteId != null) {
+                            // 接口需要调整参数：编辑模式更新
+                            final result = await updateShowroomQuotation(
+                              quoteId.toString(),
+                              submitData,
+                            );
+                            isSuccess = result == true;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  backgroundColor: Colors.green,
+                                  content: Text('保存成功')),
+                            );
+                            context.router.push(
+                                QuoteDetailRoute(id: quoteId!, userId: 0));
                           } else {
                             // 创建模式：新建
-                            // final res = await storeShowroomQuotation(submitData);
+                            final result = await storeShowroomQuotation(
+                              submitData,
+                            );
+                            isSuccess = result != null;
+                            if (result != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    backgroundColor: Colors.green,
+                                    content: Text('保存成功')),
+                              );
+
+                              context.router.push(
+                                  QuoteDetailRoute(id: result!.id!, userId: 0));
+                            }
                           }
- 
-                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(backgroundColor: Colors.green,content: Text('保存成功')),
-                          );
-                          // 临时quoteId跳转
-                          context.router
-                              .push(QuoteDetailRoute(id: quoteId ?? 306, userId: 0));
+
+                          if (!isSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.error,
+                                content: const Text('保存失败，请稍后重试'),
+                              ),
+                            );
+                          }
                         }
                       },
                 style: ElevatedButton.styleFrom(

@@ -353,43 +353,9 @@ class SupplierProductsPage extends HookConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // 验货状态标签
-              // Container(
-              //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              //   decoration: BoxDecoration(
-              //     color: Colors.red,
-              //     borderRadius: BorderRadius.circular(4),
-              //   ),
-              //   child: const Text(
-              //     '未验货',
-              //     style: TextStyle(
-              //       color: Colors.white,
-              //       fontSize: 12,
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(width: 8),
-              // 开始验货按钮
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: 实现验货功能
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal:12, vertical: 3),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap, 
-                ),
-                child: const Text(
-                  '开始验货',
-                  style: TextStyle(fontSize: 11),
-                ),
-              ),
+         
             ],
-          ), 
+          ),
           // 产品信息
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,5 +480,4 @@ class SupplierProductsPage extends HookConsumerWidget {
       EasyLoading.dismiss();
     }
   }
-
 }

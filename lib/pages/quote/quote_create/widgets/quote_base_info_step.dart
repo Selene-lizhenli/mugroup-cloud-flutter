@@ -45,6 +45,7 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       builder: (_) => const SelectCustomerSheet(),
                     ),
                   ),
+                  // TODO 添加外销员 字段: user_id
                   FormSelectField(
                     label: '选择联系人',
                     value: state.selectedContact?.name ?? '请选择联系人',
