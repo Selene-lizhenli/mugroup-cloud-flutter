@@ -43,7 +43,7 @@ class ProductSection extends HookConsumerWidget {
                         ActionPillButton(
                           label: '批量导入',
                           icon: Icons.download,
-                          backgroundColor:  colorScheme.primary, 
+                          backgroundColor: colorScheme.primary,
                           textColor: Colors.white,
                           onTap: () {
                             context.router.push(
@@ -61,8 +61,11 @@ class ProductSection extends HookConsumerWidget {
                           backgroundColor: colorScheme.secondary, // 蓝色
                           textColor: colorScheme.onSecondary,
                           onTap: () {
-                            context.router
-                                .push(QuoteProductPadAddRoute(quoteId: quoteId));
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  AddProductModeDialog(quoteId: quoteId),
+                            );
                           },
                         ),
                       ],
@@ -479,6 +482,143 @@ class _KeyValue extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class AddProductModeDialog extends HookWidget {
+  final int? quoteId;
+
+  const AddProductModeDialog({super.key, required this.quoteId});
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedMode = useState(0);
+    final theme = Theme.of(context);
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Container(
+        width: 400,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('添加产品', style: theme.textTheme.titleLarge),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text('界面模式',
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: Colors.grey[600])),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _ModeSelectionCard(
+                    label: '手机模式',
+                    isSelected: selectedMode.value == 0,
+                    onTap: () => selectedMode.value = 0,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ModeSelectionCard(
+                    label: '平板横屏',
+                    isSelected: selectedMode.value == 1,
+                    onTap: () => selectedMode.value = 1,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+
+                  if (selectedMode.value == 0) {
+                    context.router.push(QuoteProductAddRoute(quoteId: quoteId));
+                  } else {
+                    context.router
+                        .push(QuoteProductPadAddRoute(quoteId: quoteId));
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                ),
+                child: const Text('继续创建产品'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ModeSelectionCard extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ModeSelectionCard({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? colorScheme.primary.withOpacity(0.05) : Colors.white,
+          border: Border.all(
+            color: isSelected ? colorScheme.primary : Colors.grey.shade300,
+            width: isSelected ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: isSelected ? colorScheme.primary : Colors.grey.shade400,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? colorScheme.primary : Colors.black87,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
