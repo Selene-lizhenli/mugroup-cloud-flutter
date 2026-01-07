@@ -62,7 +62,7 @@ class ProductSection extends HookConsumerWidget {
                           textColor: colorScheme.onSecondary,
                           onTap: () {
                             context.router
-                                .push(QuoteProductAddRoute(quoteId: quoteId));
+                                .push(QuoteProductPadAddRoute(quoteId: quoteId));
                           },
                         ),
                       ],
