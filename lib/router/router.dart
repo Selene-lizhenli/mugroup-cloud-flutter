@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/router/guards/auth_guard.dart';
-import 'package:cloud/pages/quote/batch_import/product_batch_import_page.dart';
 import 'router.gr.dart';
 
 @AutoRouterConfig()
@@ -155,6 +154,12 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
         page: SelectUserRoute.page,
         path: "/selectors/user",
+        guards: [AuthGuard()],
+      ),
+
+      AutoRoute(
+        page: SelectProductRoute.page,
+        path: "/selectors/product",
         guards: [AuthGuard()],
       ),
 

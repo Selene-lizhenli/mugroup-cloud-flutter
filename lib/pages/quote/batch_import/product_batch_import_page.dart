@@ -1,12 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route.dart' show PageInfo;
+import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers/product_batch_import_provider.dart';
-import 'widgets/product_list_sheet.dart';
+import 'widgets/selected_product_card.dart';
 
 @RoutePage()
 class ProductBatchImportPage extends HookConsumerWidget {
@@ -16,19 +18,79 @@ class ProductBatchImportPage extends HookConsumerWidget {
     builder: (data) => const ProductBatchImportPage(),
   );
 
-  const ProductBatchImportPage({super.key});
+  final int? quotationId;
+  final int? userId;
+
+  const ProductBatchImportPage({
+    super.key,
+    this.quotationId,
+    this.userId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(productBatchImportProvider);
     final notifier = ref.read(productBatchImportProvider.notifier);
-
+    final colorScheme = Theme.of(context).colorScheme;
     final batchQtyController = useTextEditingController(text: '1');
 
     void applyBatchQty() {
       final newQty = batchQtyController.text;
       for (final item in state.selected) {
         notifier.updateSelectedQty(item.id, newQty.isEmpty ? item.qty : newQty);
+      }
+    }
+
+    Future<void> handleSave() async {
+      if (quotationId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('报价单ID不能为空')),
+        );
+        return;
+      }
+
+      final sampleItems = state.selected.map((e) {
+        final qty = int.tryParse(e.qty) ?? 1;
+        // final supplierPrice = double.tryParse(e.supplierPrice) ?? 0.0;
+        return {
+          "sample_id": e.id,
+          "qty": qty,
+          // TODO 待调试接口加上
+          // "supplier_price": supplierPrice,
+        };
+      }).toList();
+
+      final data = {
+        'quotation_id': quotationId,
+        'sample_items': sampleItems,
+      };
+
+      final result = await addQuotationSamples(data);
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('添加成功')),
+        );
+        // 保存成功后，跳转到报价单详情页面
+        if (quotationId != null) {
+          if (context.mounted) {
+            // 先清空当前数据，然后关闭当前页面，再跳转到报价单详情页面
+            notifier.clean();
+            Navigator.of(context).pop();
+            context.router.push(
+              QuoteDetailRoute(
+                id: quotationId!,
+                userId: userId!,
+              ),
+            );
+          }
+        } else {
+          Navigator.of(context).pop();
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('添加失败')),
+        );
+        Navigator.of(context).pop();
       }
     }
 
@@ -69,8 +131,8 @@ class ProductBatchImportPage extends HookConsumerWidget {
                             );
                             if (result is Map<String, dynamic>) {
                               final name = (result['short_name'] ??
-                                      result['name'] ??
-                                      '') as String;
+                                  result['name'] ??
+                                  '') as String;
                               final id = result['id'] as int?;
                               if (id != null && name.isNotEmpty) {
                                 await notifier.setSupplier(id, name);
@@ -87,75 +149,69 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               ?.copyWith(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _SelectTile(
-                          label: '已选 ${state.selected.length} 个产品',
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.white,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(16),
-                                ),
-                              ),
-                              builder: (_) => const ProductListSheet(),
-                            );
+                        GestureDetector(
+                          onTap: () async {
+                            await context.router
+                                .push(const SelectProductRoute());
                           },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _SectionCard(
-                    title: '已选产品 (${state.selected.length}个)',
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '批量设置数量',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 14,
                             ),
-                            const Spacer(),
-                            SizedBox(
-                              width: 80,
-                              child: Input(
-                                label: '',
-                                value: batchQtyController.text,
-                                onChanged: (v) => batchQtyController.text = v,
-                                keyboardType: TextInputType.number,
-                                showClearButton: false,
-                              ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: colorScheme.surfaceTint,
                             ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              onPressed: applyBatchQty,
-                              child: const Text('应用'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        ...state.selected.map(
-                          (item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _ProductCard(
-                              item: item,
-                              onQtyChanged: (v) {
-                                notifier.updateSelectedQty(item.id, v);
-                              },
-                              onPriceChanged: (v) {
-                                notifier.updateSelectedPrice(item.id, v);
-                              },
-                              onDelete: () {
-                                notifier.removeSelected(item.id);
-                              },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '已选 ${state.selected.length} 个产品',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                const Icon(Icons.keyboard_arrow_right,
+                                    color: Colors.grey),
+                              ],
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  if (state.selected.isNotEmpty)
+                    _SectionCard(
+                      title: '已选产品 (${state.selected.length}个)',
+                      batchQtyController: batchQtyController,
+                      onBatchQtyChanged: applyBatchQty,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          ...state.selected.map(
+                            (item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: SelectedProductCard(
+                                item: item,
+                                onQtyChanged: (v) {
+                                  notifier.updateSelectedQty(item.id, v);
+                                },
+                                onPriceChanged: (v) {
+                                  notifier.updateSelectedPrice(item.id, v);
+                                },
+                                onDelete: () {
+                                  notifier.removeSelected(item.id);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -168,9 +224,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
                 width: double.infinity,
                 height: 48,
                 child: FilledButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: handleSave,
                   child: Text('保存添加 (${state.selected.length}个产品)'),
                 ),
               ),
@@ -182,24 +236,18 @@ class ProductBatchImportPage extends HookConsumerWidget {
   }
 }
 
-Widget _buildCover(String? url) {
-  if (url == null ||
-      url.isEmpty ||
-      !(url.startsWith('http://') || url.startsWith('https://'))) {
-    return const Icon(Icons.image_not_supported);
-  }
-  return Image.network(
-    url,
-    fit: BoxFit.cover,
-    errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
-  );
-}
-
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
+  final TextEditingController? batchQtyController;
+  final VoidCallback? onBatchQtyChanged;
 
-  const _SectionCard({required this.title, required this.child});
+  const _SectionCard({
+    required this.title,
+    required this.child,
+    this.batchQtyController,
+    this.onBatchQtyChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,12 +262,38 @@ class _SectionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
+            Row(
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                if (batchQtyController != null &&
+                    onBatchQtyChanged != null) ...[
+                  const Spacer(),
+                  Text(
+                    '批量设置数量',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 75,
+                    child: Input(
+                      label: '',
+                      value: batchQtyController!.text,
+                      onChanged: (v) {
+                        batchQtyController!.text = v;
+                        onBatchQtyChanged!();
+                      },
+                      keyboardType: TextInputType.number,
+                      showClearButton: false,
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 12),
             child,
@@ -239,114 +313,31 @@ class _SelectTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
-          border:
-              Border.all(color: colorScheme.outlineVariant.withOpacity(0.6)),
+          borderRadius: BorderRadius.circular(10),
+          color: colorScheme.surfaceTint,
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
               ),
             ),
-            Icon(Icons.chevron_right, color: colorScheme.outline),
+            const Icon(Icons.keyboard_arrow_right, color: Colors.grey),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ProductCard extends StatelessWidget {
-  final SelectedProduct item;
-  final ValueChanged<String> onQtyChanged;
-  final ValueChanged<String> onPriceChanged;
-  final VoidCallback onDelete;
-
-  const _ProductCard({
-    required this.item,
-    required this.onQtyChanged,
-    required this.onPriceChanged,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.6)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // 图片
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: _buildCover(item.image),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'SKU: ${item.sku}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Input(
-                  label: '数量',
-                  value: item.qty,
-                  keyboardType: TextInputType.number,
-                  showClearButton: false,
-                  onChanged: onQtyChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Input(
-                  label: '供应商报价 (CNY)',
-                  value: item.supplierPrice,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  showClearButton: false,
-                  onChanged: onPriceChanged,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

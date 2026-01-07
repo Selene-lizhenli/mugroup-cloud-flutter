@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'quotation_sample.freezed.dart';
 part 'quotation_sample.g.dart';
 
+//  TODO :添加供应商报价字段
 @freezed
 class QuotationSample with _$QuotationSample {
   factory QuotationSample({

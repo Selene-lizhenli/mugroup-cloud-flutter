@@ -5,7 +5,6 @@ import 'package:cloud/pages/quote/quote_detail/widgets/product_pagination.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product_edit_dialog.dart';
-import 'package:cloud/pages/quote/batch_import/product_batch_import_page.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -47,9 +46,10 @@ class ProductSection extends HookConsumerWidget {
                           backgroundColor:  colorScheme.primary, 
                           textColor: Colors.white,
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ProductBatchImportPage(),
+                            context.router.push(
+                              ProductBatchImportRoute(
+                                quotationId: quoteId,
+                                userId: state.baseInfo?.user?.id,
                               ),
                             );
                           },

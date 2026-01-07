@@ -770,6 +770,11 @@ class ProductBatchImportRoute extends _i54.PageRouteInfo<void> {
   const ProductBatchImportRoute({List<_i54.PageRouteInfo>? children})
       : super(
           ProductBatchImportRoute.name,
+          args: ProductBatchImportRouteArgs(
+            key: key,
+            quotationId: quotationId,
+            userId: userId,
+          ),
           initialChildren: children,
         );
 
@@ -778,9 +783,34 @@ class ProductBatchImportRoute extends _i54.PageRouteInfo<void> {
   static _i54.PageInfo page = _i54.PageInfo(
     name,
     builder: (data) {
-      return const _i23.ProductBatchImportPage();
+      final args = data.argsAs<ProductBatchImportRouteArgs>(
+          orElse: () => const ProductBatchImportRouteArgs());
+      return _i23.ProductBatchImportPage(
+        key: args.key,
+        quotationId: args.quotationId,
+        userId: args.userId,
+      );
     },
   );
+}
+
+class ProductBatchImportRouteArgs {
+  const ProductBatchImportRouteArgs({
+    this.key,
+    this.quotationId,
+    this.userId,
+  });
+
+  final _i57.Key? key;
+
+  final int? quotationId;
+
+  final int? userId;
+
+  @override
+  String toString() {
+    return 'ProductBatchImportRouteArgs{key: $key, quotationId: $quotationId, userId: $userId}';
+  }
 }
 
 /// generated route for

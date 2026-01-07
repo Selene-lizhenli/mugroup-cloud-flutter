@@ -154,6 +154,20 @@ class ProductBatchImportNotifier
       selected: state.selected.where((e) => e.id != id).toList(growable: false),
     );
   }
+
+
+void clean(){
+  state=  state.copyWith(
+      supplierId: null,
+      supplierName: "",
+      isLoading: false,
+      error: null,
+      products: [],
+      selected: [],
+    );
+}
+
+
 }
 
 final productBatchImportProvider =

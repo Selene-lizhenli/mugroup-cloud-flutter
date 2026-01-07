@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:cloud/pages/quote/batch_import/providers/product_batch_import_provider.dart';
 
 class ProductListSheet extends HookConsumerWidget {
@@ -13,10 +14,11 @@ class ProductListSheet extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final products = state.products;
     final selectedIds = state.selected.map((e) => e.id).toSet();
-    final validIds = products.where((s) => s.id != null).map((s) => s.id!).toList();
-    final allSelected = validIds.isNotEmpty &&
-        validIds.every((id) => selectedIds.contains(id));
-
+    final validIds =
+        products.where((s) => s.id != null).map((s) => s.id!).toList();
+    final allSelected =
+        validIds.isNotEmpty && validIds.every((id) => selectedIds.contains(id));
+    final colorScheme = Theme.of(context).colorScheme;
     Future<void> handleSearch() async {
       await notifier.fetchProducts(search: searchController.text.trim());
     }
@@ -73,6 +75,14 @@ class ProductListSheet extends HookConsumerWidget {
               children: [
                 Checkbox(
                   value: allSelected && validIds.isNotEmpty,
+                  focusColor: colorScheme.primary,
+                  hoverColor: colorScheme.primary,
+                  checkColor: Colors.white,
+                  overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                    (Set<WidgetState> states) {
+                      return colorScheme.outlineVariant;
+                    },
+                  ),
                   onChanged: (checked) {
                     if (validIds.isEmpty) return;
                     final setIds = selectedIds.toSet();
@@ -132,21 +142,91 @@ class ProductListSheet extends HookConsumerWidget {
                       );
                     }
                     final isSelected = selectedIds.contains(item.id);
-                    return CheckboxListTile(
-                      value: isSelected,
-                      onChanged: (_) => notifier.toggleSelect(item),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      secondary: SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: _buildCover(item.cover),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => notifier.toggleSelect(item),
+                            child: Checkbox(
+                              value: isSelected,
+                              checkColor: Colors.white,
+                              onChanged: (_) => notifier.toggleSelect(item),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (item.cover != null &&
+                                  item.cover!.isNotEmpty &&
+                                  (item.cover!.startsWith('http://') ||
+                                      item.cover!.startsWith('https://'))) {
+                                showFlanImagePreview(
+                                  context,
+                                  images: [item.cover!],
+                                  startPosition: 0,
+                                  loop: false,
+                                );
+                              }
+                            },
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: _buildCover(item.cover),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => notifier.toggleSelect(item),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item.productNo ?? '',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          colorScheme.surfaceContainerHighest,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          if (item.purchaseCost != null &&
+                              item.purchaseCost!.isNotEmpty)
+                            GestureDetector(
+                              onTap: () => notifier.toggleSelect(item),
+                              child: Text(
+                                item.purchaseCost ?? '',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      title: Text(item.productNo ?? ''),
-                      subtitle: Text(item.name),
                     );
                   },
                 ),
               ),
+        
           ],
         ),
       ),
@@ -158,7 +238,7 @@ Widget _buildCover(String? url) {
   if (url == null ||
       url.isEmpty ||
       !(url.startsWith('http://') || url.startsWith('https://'))) {
-    return const Icon(Icons.image_not_supported);
+    return const Icon(Icons.image_not_supported_outlined,size:60,color: Color.fromARGB(255, 129, 129, 129),);
   }
   return Image.network(
     url,

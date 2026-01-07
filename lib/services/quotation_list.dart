@@ -84,15 +84,31 @@ Future<void> deleteQuotation(int id) async {
   await api.delete("api/tenant/showroom/quotations/$id");
 }
 
-
 // 移除样品明细中的商品
 Future removeQuotationSamples(Map<String, dynamic>? data) async {
-  return api.post("api/tenant/showroom/quotations/quotationSamples/remove", data: data).then(
+  return api
+      .post("api/tenant/showroom/quotations/quotationSamples/remove",
+          data: data)
+      .then(
     (res) {
       if (res.data == null) {
         return null;
       }
       return res;
+    },
+  );
+}
+
+// 添加b报价单样品明细中的商品
+Future addQuotationSamples(data) async {
+  return api
+      .post("api/tenant/showroom/quotations/quotationSamples/add", data: data)
+      .then(
+    (res) {
+      if (res.statusCode == 200 && res.statusMessage == "OK") {
+        return true;
+      }
+      return false;
     },
   );
 }
