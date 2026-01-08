@@ -29,19 +29,17 @@ Future<List<ExchangeRate>?> getExchangesList() async {
 Future<StatsSummary?> getStatsSummary({
   Map<String, dynamic>? params,
 }) async {
-   logger.d('bbbbb${params?.toString()}');
   try {
     StatsSummary? returnedData;
-    final res = await api.get('api/core/stats/summary', data: params);
+    final res = await api.get('api/tenant/stats/summary', data: params);
     if (res.data == null) {
       returnedData = null;
     }
     returnedData = StatsSummary.fromJson(res.data as Map<String, dynamic>);
-    logger.d('returnedData ${returnedData}');
+    logger.d('returnedData ${returnedData.toString()}');
     return returnedData;
-  } catch (e) {
-    logger.d('ddddddd${e}${params?.toString()}');
-  }
+    // ignore: empty_catches
+  } catch (e) {}
   return null;
 }
 

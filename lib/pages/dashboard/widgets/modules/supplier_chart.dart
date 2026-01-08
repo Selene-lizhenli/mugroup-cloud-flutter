@@ -69,7 +69,7 @@ class _SupplierChartState extends ConsumerState<SupplierChart> {
           titlesData: FlTitlesData(
             leftTitles: SideTitles(
               showTitles: true,
-              reservedSize: 40,
+              reservedSize: 30,
               getTitles: (value) {
                 // 纵轴：显示数量（整数），根据数据范围动态调整间隔
                 final interval = maxY > 10000 ? 10000 : (maxY > 1000 ? 1000 : 100);

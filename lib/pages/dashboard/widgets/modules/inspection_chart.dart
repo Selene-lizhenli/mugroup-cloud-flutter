@@ -69,7 +69,7 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
           titlesData: FlTitlesData(
             leftTitles: SideTitles(
               showTitles: true,
-              reservedSize: 30,
+              reservedSize: 20,
               getTitles: (value) {
                 if (value % 10 == 0 && value >= 0) {
                   return value.toInt().toString();
@@ -83,7 +83,7 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
             ),
             bottomTitles: SideTitles(
               showTitles: true,
-              reservedSize: 30,
+              reservedSize:12,
               getTitles: (value) {
                 final index = value.toInt();
                 if (index >= 0 && index < timeLabels.length) {

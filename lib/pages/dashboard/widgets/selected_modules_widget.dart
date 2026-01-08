@@ -5,7 +5,10 @@ import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
+import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
+import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 模块信息类
@@ -91,14 +94,14 @@ class DashboardModules {
 }
 
 /// 已选中的模块展示组件
-class SelectedModulesWidget extends StatefulWidget {
+class SelectedModulesWidget extends ConsumerStatefulWidget {
   const SelectedModulesWidget({super.key});
 
   @override
-  State<SelectedModulesWidget> createState() => _SelectedModulesWidgetState();
+  ConsumerState<SelectedModulesWidget> createState() => _SelectedModulesWidgetState();
 }
 
-class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
+class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
   List<ModuleInfo> _selectedModules = [];
   bool _loading = true;
 
@@ -175,8 +178,7 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
                   offset: const Offset(0, 8), // 在按钮下方显示气泡菜单
                   itemBuilder: (BuildContext context) => _buildDimensionMenuItems(module.id),
                   onSelected: (String value) {
-                    // TODO: 处理维度选择，可以根据模块ID和选中的维度值来更新数据
-                    // 这里可以添加回调或状态管理来处理维度切换
+                    _handleDimensionSelection(module.id, value);
                   },
                 ),
             ],
@@ -235,44 +237,85 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
       case 'supplier':
       case 'market_purchase':
         // 验货、客户、供应商的时间维度选项
-        return [
-          const PopupMenuItem<String>(
-            value: '最近一个月',
-            child: Row(
-              children: [
-                const Icon(Icons.access_time, size: 18, color: Colors.grey),
-                const SizedBox(width: 12),
-                const Text('最近一个月'),
-              ],
-            ),
-          ),
-          const PopupMenuItem<String>(
+        final currentStats = ref.watch(dashboardStatsProvider);
+        final currentDimension = currentStats.timeDimension;
+        
+        return [ 
+          PopupMenuItem<String>(
             value: '最近半年',
             child: Row(
               children: [
-                const Icon(Icons.access_time, size: 18, color: Colors.grey),
+                Icon(
+                  Icons.access_time, 
+                  size: 18, 
+                  color: currentDimension == TimeDimension.last6Months 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Colors.grey,
+                ),
                 const SizedBox(width: 12),
-                const Text('最近半年'),
+                Text(
+                  '最近半年',
+                  style: TextStyle(
+                    color: currentDimension == TimeDimension.last6Months 
+                        ? Theme.of(context).colorScheme.primary 
+                        : null,
+                    fontWeight: currentDimension == TimeDimension.last6Months 
+                        ? FontWeight.w600 
+                        : FontWeight.normal,
+                  ),
+                ),
               ],
             ),
           ),
-          const PopupMenuItem<String>(
+          PopupMenuItem<String>(
             value: '最近一年',
             child: Row(
               children: [
-                const Icon(Icons.access_time, size: 18, color: Colors.grey),
+                Icon(
+                  Icons.access_time, 
+                  size: 18, 
+                  color: currentDimension == TimeDimension.last12Months 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Colors.grey,
+                ),
                 const SizedBox(width: 12),
-                const Text('最近一年'),
+                Text(
+                  '最近一年',
+                  style: TextStyle(
+                    color: currentDimension == TimeDimension.last12Months 
+                        ? Theme.of(context).colorScheme.primary 
+                        : null,
+                    fontWeight: currentDimension == TimeDimension.last12Months 
+                        ? FontWeight.w600 
+                        : FontWeight.normal,
+                  ),
+                ),
               ],
             ),
           ),
-          const PopupMenuItem<String>(
+          PopupMenuItem<String>(
             value: '所有时间',
             child: Row(
               children: [
-                const Icon(Icons.all_inclusive, size: 18, color: Colors.grey),
+                Icon(
+                  Icons.all_inclusive, 
+                  size: 18, 
+                  color: currentDimension == TimeDimension.allTime 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Colors.grey,
+                ),
                 const SizedBox(width: 12),
-                const Text('所有时间'),
+                Text(
+                  '所有时间',
+                  style: TextStyle(
+                    color: currentDimension == TimeDimension.allTime 
+                        ? Theme.of(context).colorScheme.primary 
+                        : null,
+                    fontWeight: currentDimension == TimeDimension.allTime 
+                        ? FontWeight.w600 
+                        : FontWeight.normal,
+                  ),
+                ),
               ],
             ),
           ),
@@ -282,6 +325,34 @@ class _SelectedModulesWidgetState extends State<SelectedModulesWidget> {
       default:
         return [];
     }
+  }
+
+  /// 处理维度选择
+  void _handleDimensionSelection(String moduleId, String value) {
+    // 只处理时间维度相关的模块
+    if (moduleId == 'inspection' || 
+        moduleId == 'customer' || 
+        moduleId == 'supplier' || 
+        moduleId == 'market_purchase') {
+      TimeDimension? dimension;
+      
+      switch (value) {
+        case '最近半年':
+          dimension = TimeDimension.last6Months;
+          break;
+        case '最近一年':
+          dimension = TimeDimension.last12Months;
+          break;
+        case '所有时间':
+          dimension = TimeDimension.allTime;
+          break;
+      }
+      
+      if (dimension != null) {
+        ref.read(dashboardStatsProvider.notifier).setTimeDimension(dimension);
+      }
+    }
+    // 其他模块的维度选择可以在这里扩展
   }
 }
 

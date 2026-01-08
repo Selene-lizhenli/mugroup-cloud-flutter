@@ -43,7 +43,6 @@ class MarketPurchaseChart extends HookConsumerWidget {
 
     // 计算最大数量用于设置Y轴范围，确保所有数据都能完整显示
     final allData = [...productData, ...customerData, ...serviceProviderData];
-     logger.d('allData${allData}');
     if (allData.isEmpty) {
       return Container(
         height: 100,
@@ -84,7 +83,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
                 titlesData: FlTitlesData(
                   leftTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 40,
+                    reservedSize: 20,
                     getTitles: (value) {
                       // 纵轴：显示数量（整数），根据计算出的间隔显示刻度
                       if (value % yAxisInterval == 0 && value >= 0) {
@@ -98,8 +97,8 @@ class MarketPurchaseChart extends HookConsumerWidget {
                     ),
                   ),
                   bottomTitles: SideTitles(
-                    showTitles: timeLabels.isNotEmpty ? false : true,
-                    reservedSize: 30,
+                    showTitles: timeLabels.isNotEmpty ? true : false,
+                    reservedSize: 12,
                     getTitles: (value) {
                       // 横轴：显示时间标签
                       final index = value.toInt();

@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -33,12 +35,13 @@ class SamplesPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: colorScheme.surfaceTint,
       appBar: AppBar(
-        title: const Text('样品间'), 
+        title: const Text('样品间'),
         backgroundColor: colorScheme.surfaceTint,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      body: _buildContent(context, ref, home.warehouses, home.isLoadingWarehouses),
+      body: _buildContent(
+          context, ref, home.warehouses, home.isLoadingWarehouses),
     );
   }
 
@@ -99,7 +102,7 @@ class SamplesPage extends HookConsumerWidget {
                     topLeft: Radius.circular(8),
                     topRight: Radius.circular(8),
                   ),
-                  child: _buildImagePlaceholder(),
+                  child: _buildImagePlaceholder(warehouse),
                 ),
               ),
               // 底部：文本标签
@@ -124,27 +127,34 @@ class SamplesPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(Warehouse? warehouse) {
+    // 安全获取图片 URL：优先使用缩略图，其次使用原图
+    String? imageUrl;
+    if (warehouse?.image != null && warehouse!.image!.isNotEmpty) {
+      final firstImage = warehouse.image!.first;
+      imageUrl = firstImage.thumbUrl ?? firstImage.url ?? firstImage.whiteUrl;
+    }
+    logger.d('imageUrl${imageUrl}${warehouse}');
+    
     return Container(
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
       ),
-      child: Image.asset(
-        'assets/carouse/yiwudong4.jpg', // 使用占位图片
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey.shade300,
-            child: const Icon(
-              Icons.image,
-              color: Colors.grey,
-              size: 48,
+      child: imageUrl != null && imageUrl.isNotEmpty
+          ? ImageShow(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+            )
+          : Container(
+              color: Colors.grey.shade300,
+              child: const Icon(
+                Icons.warehouse,
+                color: Colors.grey,
+                size: 48,
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 }

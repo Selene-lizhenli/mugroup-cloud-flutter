@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -6,10 +7,26 @@ part 'dashboard_provider.g.dart';
 
 /// 构建日期范围参数
 /// 返回包含 start_date 和 end_date 的参数字典
-Map<String, String> _buildDateRangeParams() {
+Map<String, String> _buildDateRangeParams(TimeDimension timeDimension) {
   final now = DateTime.now();
-  final startDate = DateTime(now.year, now.month - 7, 1); // 获取最近8个月
+  late DateTime startDate;
   final endDate = DateTime(now.year, now.month + 1, 0); // 当前月的最后一天
+
+  switch (timeDimension) {
+    case TimeDimension.last6Months:
+      // 最近半年（6个月）
+      startDate = DateTime(now.year, now.month - 5, 1);
+      break;
+    case TimeDimension.last12Months:
+      // 最近一年（12个月）
+      startDate = DateTime(now.year, now.month - 11, 1);
+      break;
+    case TimeDimension.allTime:
+      // 所有时间（从很久以前开始，比如2020年）
+      startDate = DateTime(2020, 1, 1);
+      break;
+  }
+
   return {
     'start_date':
         '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}',
@@ -44,6 +61,7 @@ class DashboardStats extends _$DashboardStats {
       serviceProviderData: [],
       inspectionData: [],
       isLoading: false,
+      timeDimension: TimeDimension.last6Months,
     );
 
     return dashboardStatsState;
@@ -61,19 +79,37 @@ class DashboardStats extends _$DashboardStats {
     await load();
   }
 
-  Future<DashboardStatsState> _fetch() async {
-    // 获取统计数据（默认获取最近几个月的数据）
-    final params = _buildDateRangeParams();
-    final summary = await getStatsSummary(params: params);
+  /// 设置时间维度并重新加载数据
+  Future<void> setTimeDimension(TimeDimension dimension) async {
+    state = state.copyWith(timeDimension: dimension);
+    await load();
+  }
 
+  Future<DashboardStatsState> _fetch() async {
+    // 获取统计数据（根据当前时间维度）
+    final params = _buildDateRangeParams(state.timeDimension);
+    final summary = await getStatsSummary(params: params);
+    logger.d('params${params}');
     if (summary?.data == null || summary!.data!.isEmpty) {
-      // 返回空数据
-      return const DashboardStatsState(
+      return DashboardStatsState(
         timeLabels: [],
         productData: [],
         customerData: [],
         serviceProviderData: [],
         inspectionData: [],
+        timeDimension: state.timeDimension,
+      );
+    }
+
+    if (summary.data == null || summary.data!.isEmpty) {
+      // 返回空数据
+      return DashboardStatsState(
+        timeLabels: [],
+        productData: [],
+        customerData: [],
+        serviceProviderData: [],
+        inspectionData: [],
+        timeDimension: state.timeDimension,
       );
     }
 
@@ -96,16 +132,15 @@ class DashboardStats extends _$DashboardStats {
       serviceProviderData.add(entry.value.supplySupplier ?? 0);
       inspectionData.add(entry.value.inspectionTask ?? 0);
     }
-
-    return DashboardStatsState(
+    final sa = DashboardStatsState(
       timeLabels: timeLabels,
       productData: productData,
       customerData: customerData,
       serviceProviderData: serviceProviderData,
       inspectionData: inspectionData,
+      timeDimension: state.timeDimension,
     );
+    logger.d('sa${sa.toString()}');
+    return sa;
   }
-
-
-
 }

@@ -6,7 +6,7 @@ part of 'quote_detail_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$quoteDetailHash() => r'bd43de5d1fdbbe87b43ba35331717f8136269c0b';
+String _$quoteDetailHash() => r'4ae421891ee4f22f4d25e5f212c3b13650d2a5e0';
 
 /// Copied from Dart SDK
 class _SystemHash {

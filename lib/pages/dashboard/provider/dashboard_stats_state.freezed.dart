@@ -23,7 +23,8 @@ mixin _$DashboardStatsState {
   List<int> get serviceProviderData =>
       throw _privateConstructorUsedError; // 服务商数量
   List<int> get inspectionData => throw _privateConstructorUsedError; // 验货任务数量
-  bool get isLoading => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError; // 是否正在加载
+  TimeDimension get timeDimension => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $DashboardStatsStateCopyWith<DashboardStatsState> get copyWith =>
@@ -42,7 +43,8 @@ abstract class $DashboardStatsStateCopyWith<$Res> {
       List<int> customerData,
       List<int> serviceProviderData,
       List<int> inspectionData,
-      bool isLoading});
+      bool isLoading,
+      TimeDimension timeDimension});
 }
 
 /// @nodoc
@@ -64,6 +66,7 @@ class _$DashboardStatsStateCopyWithImpl<$Res, $Val extends DashboardStatsState>
     Object? serviceProviderData = null,
     Object? inspectionData = null,
     Object? isLoading = null,
+    Object? timeDimension = null,
   }) {
     return _then(_value.copyWith(
       timeLabels: null == timeLabels
@@ -90,6 +93,10 @@ class _$DashboardStatsStateCopyWithImpl<$Res, $Val extends DashboardStatsState>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      timeDimension: null == timeDimension
+          ? _value.timeDimension
+          : timeDimension // ignore: cast_nullable_to_non_nullable
+              as TimeDimension,
     ) as $Val);
   }
 }
@@ -108,7 +115,8 @@ abstract class _$$DashboardStatsStateImplCopyWith<$Res>
       List<int> customerData,
       List<int> serviceProviderData,
       List<int> inspectionData,
-      bool isLoading});
+      bool isLoading,
+      TimeDimension timeDimension});
 }
 
 /// @nodoc
@@ -128,6 +136,7 @@ class __$$DashboardStatsStateImplCopyWithImpl<$Res>
     Object? serviceProviderData = null,
     Object? inspectionData = null,
     Object? isLoading = null,
+    Object? timeDimension = null,
   }) {
     return _then(_$DashboardStatsStateImpl(
       timeLabels: null == timeLabels
@@ -154,6 +163,10 @@ class __$$DashboardStatsStateImplCopyWithImpl<$Res>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      timeDimension: null == timeDimension
+          ? _value.timeDimension
+          : timeDimension // ignore: cast_nullable_to_non_nullable
+              as TimeDimension,
     ));
   }
 }
@@ -167,7 +180,8 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       final List<int> customerData = const [],
       final List<int> serviceProviderData = const [],
       final List<int> inspectionData = const [],
-      this.isLoading = false})
+      this.isLoading = false,
+      this.timeDimension = TimeDimension.last6Months})
       : _timeLabels = timeLabels,
         _productData = productData,
         _customerData = customerData,
@@ -233,10 +247,14 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
   @override
   @JsonKey()
   final bool isLoading;
+// 是否正在加载
+  @override
+  @JsonKey()
+  final TimeDimension timeDimension;
 
   @override
   String toString() {
-    return 'DashboardStatsState(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData, inspectionData: $inspectionData, isLoading: $isLoading)';
+    return 'DashboardStatsState(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData, inspectionData: $inspectionData, isLoading: $isLoading, timeDimension: $timeDimension)';
   }
 
   @override
@@ -255,7 +273,9 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
             const DeepCollectionEquality()
                 .equals(other._inspectionData, _inspectionData) &&
             (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading));
+                other.isLoading == isLoading) &&
+            (identical(other.timeDimension, timeDimension) ||
+                other.timeDimension == timeDimension));
   }
 
   @override
@@ -266,7 +286,8 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       const DeepCollectionEquality().hash(_customerData),
       const DeepCollectionEquality().hash(_serviceProviderData),
       const DeepCollectionEquality().hash(_inspectionData),
-      isLoading);
+      isLoading,
+      timeDimension);
 
   @JsonKey(ignore: true)
   @override
@@ -283,7 +304,8 @@ abstract class _DashboardStatsState extends DashboardStatsState {
       final List<int> customerData,
       final List<int> serviceProviderData,
       final List<int> inspectionData,
-      final bool isLoading}) = _$DashboardStatsStateImpl;
+      final bool isLoading,
+      final TimeDimension timeDimension}) = _$DashboardStatsStateImpl;
   const _DashboardStatsState._() : super._();
 
   @override
@@ -298,6 +320,8 @@ abstract class _DashboardStatsState extends DashboardStatsState {
   List<int> get inspectionData;
   @override // 验货任务数量
   bool get isLoading;
+  @override // 是否正在加载
+  TimeDimension get timeDimension;
   @override
   @JsonKey(ignore: true)
   _$$DashboardStatsStateImplCopyWith<_$DashboardStatsStateImpl> get copyWith =>

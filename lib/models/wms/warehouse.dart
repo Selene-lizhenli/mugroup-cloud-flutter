@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud/models/wms/warehouse_image.dart';
 
 part 'warehouse.freezed.dart';
 part 'warehouse.g.dart';
@@ -9,6 +10,9 @@ abstract class Warehouse with _$Warehouse {
     int? id,
     String? name,
     String? address,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+    @Default([]) List<WarehouseImage>? image,
   }) = _Warehouse;
 
   factory Warehouse.fromJson(Map<String, Object?> json) =>
