@@ -299,8 +299,13 @@ class InspectionDetailPage extends HookConsumerWidget {
                   style: const TextStyle(
                       fontSize: 15, color: Color(0xFF333333))), // 修复颜色引用
               const Spacer(),
-              Text('${inspection?.createdAt}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+              Text(
+                (inspection?.createdAt != null &&
+                        inspection!.createdAt!.length >= 10)
+                    ? inspection.createdAt!.substring(0, 10)
+                    : '${inspection?.createdAt}',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
               const SizedBox(width: 12),
               if (inspection?.type == 1)
                 Container(
