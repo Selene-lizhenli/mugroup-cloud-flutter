@@ -183,13 +183,14 @@ class SupplierCard extends StatelessWidget {
                         Icon(Icons.receipt,
                             size: 14, color: Colors.grey.shade500),
                         const SizedBox(width: 6),
-                        Text(
+                        Expanded(
+                            child: Text(
                           '出货总额: $shippingAmount',
                           style: TextStyle(
                               fontSize: 13, color: Colors.grey.shade600),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                        ),
+                        )),
                       ],
                     ),
 
