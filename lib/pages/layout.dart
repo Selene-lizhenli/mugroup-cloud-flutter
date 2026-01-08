@@ -5,6 +5,8 @@ import 'package:cloud/app/app.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/dashboard/dashboard.dart';
+import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -79,6 +81,18 @@ class Layout extends HookConsumerWidget {
 
       return null;
     }, [checkVersion]);
+
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? [];
+    final marketUser = permissions.contains('showroom.market_product.show');
+
+    useEffect(() {
+      if (marketUser) {
+        context.router.push(const QuoteRoute());
+      }
+
+      return null;
+    }, [marketUser]);
 
     // final items = [
     //   const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
