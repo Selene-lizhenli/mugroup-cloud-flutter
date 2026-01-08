@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/services/dashboard.dart';
+import 'package:cloud/models/dashboard/public_news_article.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -12,7 +15,7 @@ class NewsBoard extends StatefulWidget {
 }
 
 class _NewsBoardState extends State<NewsBoard> {
-  List<NewsArticle>? _articles;
+  List<PublicNewsArticle>? _articles;
   bool _isLoading = true;
   String? _error;
 
@@ -59,13 +62,13 @@ class _NewsBoardState extends State<NewsBoard> {
     if (_isLoading) {
       return Container(
         height: 70,
-        margin: const  EdgeInsets.fromLTRB(10,10, 10, 10),
+        margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: const Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
- 
+
     if (_error != null) {
       return Container(
         height: 70,
@@ -98,124 +101,145 @@ class _NewsBoardState extends State<NewsBoard> {
         final index = entry.key;
         final article = entry.value;
         final isLast = index == _articles!.length - 1;
-        
+        final isFirst = index == 0;
+        logger.d('article.media: ${article}');
+        // 获取第一张图片URL（优先使用thumb_url，其次url）
+        final imageUrl = _getImageUrl(article);
+        logger.d('imageUrl: ${article},${imageUrl}');
         return GestureDetector(
           onTap: () {
             context.router.push(NewsRoute(article: article));
           },
           child: Container(
-            margin: EdgeInsets.fromLTRB(12,  12, 12, isLast ? 12 : 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.fromLTRB(12, 6, 12,6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // 图片
-                if (article.imageUrl != null && article.imageUrl!.isNotEmpty)
-                  _buildImage(article.imageUrl!, 50, 50)
-                else
-                  Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.grey.shade200,
-                    child: Icon(
-                      Icons.image_not_supported,
-                      color: Colors.grey.shade400,
-                    ),
-                  ),
-                const SizedBox(width: 10),
-                // 标题和内容
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
+              margin: EdgeInsets.fromLTRB(12, isFirst?12:0, 12, isLast ? 12 : 0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        article.title,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodyMedium!.fontSize,
-                          color: colorScheme.onSurface,
+                      // 图片
+                      if (imageUrl != null && imageUrl.isNotEmpty)
+                        ImageShow(
+                          imageUrl: imageUrl,
+                          width:80,
+                          fit: BoxFit.cover,
+                          errorIconSize: 32,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        article.content,
-                        style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                          color: colorScheme.surfaceContainerHighest,
+                      const SizedBox(width: 10),
+                      // 标题和内容
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              article.title ?? '',
+                              style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .fontSize,
+                                color: colorScheme.onSurface,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              article.content ?? '',
+                              style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .fontSize,
+                                color: colorScheme.surfaceContainerHighest,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                          ],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
                       ),
                     ],
                   ),
-                ),
-              
-              ],
-            ),
-          ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                 if(!isLast) Divider(
+                      height: 0.5, color: colorScheme.outline.withOpacity(0.15))
+                ],
+              )
+
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     // 图片
+              //     if (imageUrl != null && imageUrl.isNotEmpty)
+              //         ImageShow(
+              //         imageUrl: imageUrl,
+              //         width: 80,
+              //         fit: BoxFit.cover,
+              //         errorIconSize: 32,
+              //       ),
+              //     const SizedBox(width: 10),
+              //     // 标题和内容
+              //     Expanded(
+              //       child: Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         mainAxisSize: MainAxisSize.min,
+              //         children: [
+              //           Text(
+              //             article.title ?? '',
+              //             style: TextStyle(
+              //               fontSize:
+              //                   Theme.of(context).textTheme.bodyMedium!.fontSize,
+              //               color: colorScheme.onSurface,
+              //             ),
+              //             maxLines: 1,
+              //             overflow: TextOverflow.ellipsis,
+              //           ),
+              //           const SizedBox(height: 4),
+              //           Text(
+              //             article.content ?? '',
+              //             style: TextStyle(
+              //               fontSize:
+              //                   Theme.of(context).textTheme.bodySmall!.fontSize,
+              //               color: colorScheme.surfaceContainerHighest,
+              //             ),
+              //             maxLines: 2,
+              //             overflow: TextOverflow.ellipsis,
+              //             softWrap: true,
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+
+              //   ],
+              // ),
+
+              ),
         );
       }).toList(),
     );
   }
 
-  /// 构建图片组件，支持网络图片和本地资源
-  Widget _buildImage(String imageUrl, double width, double height) {
-    // 判断是否为网络 URL
-    final isNetworkUrl =
-        imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
-
-    if (isNetworkUrl) {
-      // 网络图片
-      return CachedNetworkImage(
-        imageUrl: imageUrl,
-        width: width,
-        height: height,
-        fit: BoxFit.contain,
-        placeholder: (context, url) => Container(
-          width: width,
-          height: height,
-          color: Colors.grey.shade100,
-          child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          width: width,
-          height: height,
-          color: Colors.grey.shade200,
-          child: Icon(
-            Icons.image_not_supported,
-            color: Colors.grey.shade400,
-          ),
-        ),
-      );
-    } else {
-      // 本地资源
-      return Image.asset(
-        imageUrl,
-        width: width,
-        height: height,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: width,
-            height: height,
-            color: Colors.grey.shade200,
-            child: Icon(
-              Icons.image_not_supported,
-              color: Colors.grey.shade400,
-            ),
-          );
-        },
-      );
+  /// 获取文章的第一张图片URL
+  String? _getImageUrl(PublicNewsArticle article) {
+    if (article.media == null || article.media!.isEmpty) {
+      return null;
     }
+
+    final firstMedia = article.media!.first;
+    // 优先使用缩略图，其次使用原始URL
+    final res = firstMedia.thumbUrl ?? firstMedia.url ?? firstMedia.whiteUrl;
+
+    return res;
   }
 }

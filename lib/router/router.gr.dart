@@ -9,6 +9,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i56;
+import 'package:cloud/models/dashboard/public_news_article.dart' as _i60;
 import 'package:cloud/models/wms/warehouse.dart' as _i58;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
@@ -89,7 +90,6 @@ import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i53;
 import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.dart'
     as _i54;
 import 'package:cloud/pages/wms/wms_transfer_page.dart' as _i55;
-import 'package:cloud/services/dashboard.dart' as _i60;
 import 'package:flutter/material.dart' as _i59;
 
 /// generated route for
@@ -727,7 +727,7 @@ class MyRoute extends _i56.PageRouteInfo<void> {
 class NewsRoute extends _i56.PageRouteInfo<NewsRouteArgs> {
   NewsRoute({
     _i59.Key? key,
-    required _i60.NewsArticle article,
+    required _i60.PublicNewsArticle article,
     List<_i56.PageRouteInfo>? children,
   }) : super(
           NewsRoute.name,
@@ -760,7 +760,7 @@ class NewsRouteArgs {
 
   final _i59.Key? key;
 
-  final _i60.NewsArticle article;
+  final _i60.PublicNewsArticle article;
 
   @override
   String toString() {
