@@ -4,6 +4,7 @@ import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/list/widgets/product_card.dart';
+import 'package:cloud/pages/market_product/list/widgets/product_dropdown_menu.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -152,6 +153,19 @@ class MarketProductView extends HookConsumerWidget {
             slivers: [
               MultiSliver(
                 children: [
+                  Container(
+                    height: 0,
+                  ),
+                  SliverPinnedHeader(
+                    child: ProductDropdownMenu(
+                      facetCounts: facetCounts.value,
+                      value: query.value,
+                      onChange: (menuQuery) {
+                        query.value = menuQuery;
+                        refreshController.callRefresh(force: true);
+                      },
+                    ),
+                  ),
                   if (samples.value.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
