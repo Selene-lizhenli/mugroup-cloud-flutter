@@ -15,8 +15,7 @@ class NewsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    logger.d('article.media222: ${article.media}');
+    final colorScheme = Theme.of(context).colorScheme; 
     final media = article.media;
     return Scaffold(
         appBar: AppBar(
@@ -48,29 +47,29 @@ class NewsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       // 文章图片（显示所有媒体中的图片）
-                      if (media != null && media.isNotEmpty) ...[
-                        ...media.where((m) => m.type == 'image').map((media) {
-                          final imageUrl =
-                              media.url ?? media.whiteUrl ?? media.thumbUrl;
-                          if (imageUrl == null || imageUrl.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 20),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: ImageShow(
-                                imageUrl: imageUrl, 
-                                enablePreview:true,
-                                height: 100,
-                                fit: BoxFit.contain,
-                                errorIconSize: 38,
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
+                      // if (media != null && media.isNotEmpty) ...[
+                      //   ...media.where((m) => m.type == 'image').map((media) {
+                      //     final imageUrl =
+                      //         media.url ?? media.whiteUrl ?? media.thumbUrl;
+                      //     if (imageUrl == null || imageUrl.isEmpty) {
+                      //       return const SizedBox.shrink();
+                      //     }
+                      //     return Padding(
+                      //       padding: const EdgeInsets.symmetric(
+                      //           vertical: 0, horizontal: 20),
+                      //       child: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         child: ImageShow(
+                      //           imageUrl: imageUrl, 
+                      //           enablePreview:true,
+                      //           height: 100,
+                      //           fit: BoxFit.contain,
+                      //           errorIconSize: 38,
+                      //         ),
+                      //       ),
+                      //     );
+                      //   }),
+                      // ],
                       // 文章内容
                       Text(
                         article.content ?? '',

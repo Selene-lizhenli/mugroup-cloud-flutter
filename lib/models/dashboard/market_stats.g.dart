@@ -21,6 +21,9 @@ _$MarketPurchaseStatsImpl _$$MarketPurchaseStatsImplFromJson(
       serviceProviderData: (json['service_provider_data'] as List<dynamic>?)
           ?.map((e) => (e as num).toInt())
           .toList(),
+      inspectionData: (json['inspection_data'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$$MarketPurchaseStatsImplToJson(
@@ -30,4 +33,5 @@ Map<String, dynamic> _$$MarketPurchaseStatsImplToJson(
       'product_data': instance.productData,
       'customer_data': instance.customerData,
       'service_provider_data': instance.serviceProviderData,
+      'inspection_data': instance.inspectionData,
     };

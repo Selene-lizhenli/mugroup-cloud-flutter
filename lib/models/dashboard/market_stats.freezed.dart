@@ -28,7 +28,10 @@ mixin _$MarketPurchaseStats {
   @JsonKey(name: 'customer_data')
   List<int>? get customerData => throw _privateConstructorUsedError; // 客户数量
   @JsonKey(name: 'service_provider_data')
-  List<int>? get serviceProviderData => throw _privateConstructorUsedError;
+  List<int>? get serviceProviderData =>
+      throw _privateConstructorUsedError; // 服务商数量
+  @JsonKey(name: 'inspection_data')
+  List<int>? get inspectionData => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -46,7 +49,8 @@ abstract class $MarketPurchaseStatsCopyWith<$Res> {
       {@JsonKey(name: 'time_labels') List<String>? timeLabels,
       @JsonKey(name: 'product_data') List<int>? productData,
       @JsonKey(name: 'customer_data') List<int>? customerData,
-      @JsonKey(name: 'service_provider_data') List<int>? serviceProviderData});
+      @JsonKey(name: 'service_provider_data') List<int>? serviceProviderData,
+      @JsonKey(name: 'inspection_data') List<int>? inspectionData});
 }
 
 /// @nodoc
@@ -66,6 +70,7 @@ class _$MarketPurchaseStatsCopyWithImpl<$Res, $Val extends MarketPurchaseStats>
     Object? productData = freezed,
     Object? customerData = freezed,
     Object? serviceProviderData = freezed,
+    Object? inspectionData = freezed,
   }) {
     return _then(_value.copyWith(
       timeLabels: freezed == timeLabels
@@ -84,6 +89,10 @@ class _$MarketPurchaseStatsCopyWithImpl<$Res, $Val extends MarketPurchaseStats>
           ? _value.serviceProviderData
           : serviceProviderData // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      inspectionData: freezed == inspectionData
+          ? _value.inspectionData
+          : inspectionData // ignore: cast_nullable_to_non_nullable
+              as List<int>?,
     ) as $Val);
   }
 }
@@ -100,7 +109,8 @@ abstract class _$$MarketPurchaseStatsImplCopyWith<$Res>
       {@JsonKey(name: 'time_labels') List<String>? timeLabels,
       @JsonKey(name: 'product_data') List<int>? productData,
       @JsonKey(name: 'customer_data') List<int>? customerData,
-      @JsonKey(name: 'service_provider_data') List<int>? serviceProviderData});
+      @JsonKey(name: 'service_provider_data') List<int>? serviceProviderData,
+      @JsonKey(name: 'inspection_data') List<int>? inspectionData});
 }
 
 /// @nodoc
@@ -118,6 +128,7 @@ class __$$MarketPurchaseStatsImplCopyWithImpl<$Res>
     Object? productData = freezed,
     Object? customerData = freezed,
     Object? serviceProviderData = freezed,
+    Object? inspectionData = freezed,
   }) {
     return _then(_$MarketPurchaseStatsImpl(
       timeLabels: freezed == timeLabels
@@ -136,6 +147,10 @@ class __$$MarketPurchaseStatsImplCopyWithImpl<$Res>
           ? _value._serviceProviderData
           : serviceProviderData // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      inspectionData: freezed == inspectionData
+          ? _value._inspectionData
+          : inspectionData // ignore: cast_nullable_to_non_nullable
+              as List<int>?,
     ));
   }
 }
@@ -148,11 +163,13 @@ class _$MarketPurchaseStatsImpl implements _MarketPurchaseStats {
       @JsonKey(name: 'product_data') final List<int>? productData,
       @JsonKey(name: 'customer_data') final List<int>? customerData,
       @JsonKey(name: 'service_provider_data')
-      final List<int>? serviceProviderData})
+      final List<int>? serviceProviderData,
+      @JsonKey(name: 'inspection_data') final List<int>? inspectionData})
       : _timeLabels = timeLabels,
         _productData = productData,
         _customerData = customerData,
-        _serviceProviderData = serviceProviderData;
+        _serviceProviderData = serviceProviderData,
+        _inspectionData = inspectionData;
 
   factory _$MarketPurchaseStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$MarketPurchaseStatsImplFromJson(json);
@@ -208,9 +225,22 @@ class _$MarketPurchaseStatsImpl implements _MarketPurchaseStats {
     return EqualUnmodifiableListView(value);
   }
 
+// 服务商数量
+  final List<int>? _inspectionData;
+// 服务商数量
+  @override
+  @JsonKey(name: 'inspection_data')
+  List<int>? get inspectionData {
+    final value = _inspectionData;
+    if (value == null) return null;
+    if (_inspectionData is EqualUnmodifiableListView) return _inspectionData;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'MarketPurchaseStats(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData)';
+    return 'MarketPurchaseStats(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData, inspectionData: $inspectionData)';
   }
 
   @override
@@ -225,7 +255,9 @@ class _$MarketPurchaseStatsImpl implements _MarketPurchaseStats {
             const DeepCollectionEquality()
                 .equals(other._customerData, _customerData) &&
             const DeepCollectionEquality()
-                .equals(other._serviceProviderData, _serviceProviderData));
+                .equals(other._serviceProviderData, _serviceProviderData) &&
+            const DeepCollectionEquality()
+                .equals(other._inspectionData, _inspectionData));
   }
 
   @JsonKey(ignore: true)
@@ -235,7 +267,8 @@ class _$MarketPurchaseStatsImpl implements _MarketPurchaseStats {
       const DeepCollectionEquality().hash(_timeLabels),
       const DeepCollectionEquality().hash(_productData),
       const DeepCollectionEquality().hash(_customerData),
-      const DeepCollectionEquality().hash(_serviceProviderData));
+      const DeepCollectionEquality().hash(_serviceProviderData),
+      const DeepCollectionEquality().hash(_inspectionData));
 
   @JsonKey(ignore: true)
   @override
@@ -254,11 +287,13 @@ class _$MarketPurchaseStatsImpl implements _MarketPurchaseStats {
 
 abstract class _MarketPurchaseStats implements MarketPurchaseStats {
   const factory _MarketPurchaseStats(
-      {@JsonKey(name: 'time_labels') final List<String>? timeLabels,
-      @JsonKey(name: 'product_data') final List<int>? productData,
-      @JsonKey(name: 'customer_data') final List<int>? customerData,
-      @JsonKey(name: 'service_provider_data')
-      final List<int>? serviceProviderData}) = _$MarketPurchaseStatsImpl;
+          {@JsonKey(name: 'time_labels') final List<String>? timeLabels,
+          @JsonKey(name: 'product_data') final List<int>? productData,
+          @JsonKey(name: 'customer_data') final List<int>? customerData,
+          @JsonKey(name: 'service_provider_data')
+          final List<int>? serviceProviderData,
+          @JsonKey(name: 'inspection_data') final List<int>? inspectionData}) =
+      _$MarketPurchaseStatsImpl;
 
   factory _MarketPurchaseStats.fromJson(Map<String, dynamic> json) =
       _$MarketPurchaseStatsImpl.fromJson;
@@ -275,6 +310,9 @@ abstract class _MarketPurchaseStats implements MarketPurchaseStats {
   @override // 客户数量
   @JsonKey(name: 'service_provider_data')
   List<int>? get serviceProviderData;
+  @override // 服务商数量
+  @JsonKey(name: 'inspection_data')
+  List<int>? get inspectionData;
   @override
   @JsonKey(ignore: true)
   _$$MarketPurchaseStatsImplCopyWith<_$MarketPurchaseStatsImpl> get copyWith =>

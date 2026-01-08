@@ -11,6 +11,7 @@ class MarketPurchaseStats with _$MarketPurchaseStats {
     @JsonKey(name: 'product_data') List<int>? productData, // 产品数量
     @JsonKey(name: 'customer_data') List<int>? customerData, // 客户数量
     @JsonKey(name: 'service_provider_data') List<int>? serviceProviderData, // 服务商数量
+    @JsonKey(name: 'inspection_data') List<int>? inspectionData, // 验货任务数量
   }) = _MarketPurchaseStats;
 
   factory MarketPurchaseStats.fromJson(Map<String, dynamic> json) =>

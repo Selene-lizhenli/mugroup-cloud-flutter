@@ -1,112 +1,37 @@
 import 'dart:math' as math;
-import 'package:cloud/models/dashboard/market_stats.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud/services/dashboard.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 市场采购模块 - 柱状图
-class MarketPurchaseChart extends StatefulWidget {
+class MarketPurchaseChart extends HookConsumerWidget {
   const MarketPurchaseChart({super.key});
 
   @override
-  State<MarketPurchaseChart> createState() => _MarketPurchaseChartState();
-}
-
-class _MarketPurchaseChartState extends State<MarketPurchaseChart> {
-  MarketPurchaseStats? _stats;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  /// 加载市场采购统计数据
-  Future<void> _loadData() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
-
-      // 获取统计数据（默认获取最近几个月的数据）
-      final now = DateTime.now();
-      final startDate = DateTime(now.year, now.month - 7, 1); // 获取最近8个月
-      final endDate = DateTime(now.year, now.month + 1, 0); // 当前月的最后一天
-      final params = {
-        'start_date':
-            '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}',
-        'end_date':
-            '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}',
-      };
-      final summary = await getStatsSummary(params: params);
-
-      if (summary?.data == null || summary!.data!.isEmpty) {
-        setState(() {
-          _isLoading = false;
-          _error = '暂无数据';
-        });
-        return;
-      }
-
-      // 转换数据格式为图表需要的格式
-      final sortedEntries = summary.data!.entries.toList()
-        ..sort((a, b) => a.key.compareTo(b.key)); // 按月份排序
-
-      final timeLabels = <String>[];
-      final productData = <int>[];
-      final customerData = <int>[];
-      final serviceProviderData = <int>[];
-
-      for (final entry in sortedEntries) {
-        // 将 "2026-01" 格式转换为 "1月" 格式
-        final monthStr = _formatMonthLabel(entry.key);
-        timeLabels.add(monthStr);
-        productData.add(entry.value.marketProduct ?? 0);
-        customerData.add(entry.value.crmCompany ?? 0);
-        serviceProviderData.add(entry.value.supplySupplier ?? 0);
-      }
-
-      final stats = MarketPurchaseStats(
-        timeLabels: timeLabels,
-        productData: productData,
-        customerData: customerData,
-        serviceProviderData: serviceProviderData,
-      );
-
-      setState(() {
-        _stats = stats;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _error = '加载数据失败: $e';
-      });
-    }
-  }
-
-  /// 格式化月份标签，将 "2026-01" 转换为 "1月"
-  String _formatMonthLabel(String monthKey) {
-    try {
-      final parts = monthKey.split('-');
-      if (parts.length >= 2) {
-        final month = int.parse(parts[1]);
-        return '${month}月';
-      }
-      return monthKey;
-    } catch (e) {
-      return monthKey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final stats = ref.watch(dashboardStatsProvider);
+    final statsNotifier = ref.read(dashboardStatsProvider.notifier);
+    final timeLabels = stats.timeLabels;
+    final productData = stats.productData;
+    final customerData = stats.customerData;
+    final serviceProviderData = stats.serviceProviderData;
 
-    if (_isLoading) {
+    // 页面加载后调用 load
+    useEffect(() {
+      if (!stats.isLoading && stats.timeLabels.isEmpty) {
+        Future.microtask(() {
+          statsNotifier.load();
+        });
+      }
+      return null;
+    }, []); 
+   
+    // 显示加载状态
+    if (stats.isLoading) {
       return Container(
         padding: const EdgeInsets.all(16),
         height: 200,
@@ -116,46 +41,12 @@ class _MarketPurchaseChartState extends State<MarketPurchaseChart> {
       );
     }
 
-    if (_error != null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _error!,
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: _loadData,
-                child: const Text('重试'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (_stats == null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: const Center(
-          child: Text('暂无数据'),
-        ),
-      );
-    }
-
-    final timeLabels = _stats!.timeLabels ?? [];
-    final productData = _stats!.productData ?? [];
-    final customerData = _stats!.customerData ?? [];
-    final serviceProviderData = _stats!.serviceProviderData ?? [];
-
     // 计算最大数量用于设置Y轴范围，确保所有数据都能完整显示
     final allData = [...productData, ...customerData, ...serviceProviderData];
+     logger.d('allData${allData}');
     if (allData.isEmpty) {
       return Container(
+        height: 100,
         padding: const EdgeInsets.all(16),
         child: const Center(
           child: Text('暂无数据'),

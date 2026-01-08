@@ -29,54 +29,21 @@ Future<List<ExchangeRate>?> getExchangesList() async {
 Future<StatsSummary?> getStatsSummary({
   Map<String, dynamic>? params,
 }) async {
+   logger.d('bbbbb${params?.toString()}');
   try {
+    StatsSummary? returnedData;
     final res = await api.get('api/core/stats/summary', data: params);
-
     if (res.data == null) {
-      return null;
+      returnedData = null;
     }
-
-    return StatsSummary.fromJson(res.data as Map<String, dynamic>);
+    returnedData = StatsSummary.fromJson(res.data as Map<String, dynamic>);
+    logger.d('returnedData ${returnedData}');
+    return returnedData;
   } catch (e) {
-    // 如果 API 调用失败，返回 null
-    return null;
+    logger.d('ddddddd${e}${params?.toString()}');
   }
+  return null;
 }
-
-/// 获取市场采购的统计数据（已废弃，使用 getStatsSummary 代替）
-// @Deprecated('使用 getStatsSummary 代替')
-// Future<MarketPurchaseStats?> getMarketPurchasesStats() async {
-//   // 调用新接口获取数据
-//   final summary = await getStatsSummary();
-//   if (summary?.data == null || summary!.data!.isEmpty) {
-//     return null;
-//   }
-
-//   // 转换数据格式
-//   final sortedEntries = summary.data!.entries.toList()
-//     ..sort((a, b) => a.key.compareTo(b.key)); // 按月份排序
-
-//   final timeLabels = <String>[];
-//   final productData = <int>[];
-//   final customerData = <int>[];
-//   final serviceProviderData = <int>[];
-
-//   for (final entry in sortedEntries) {
-//     // 将 "2026-01" 格式转换为 "1月" 格式
-//     final monthStr = _formatMonthLabel(entry.key);
-//     timeLabels.add(monthStr);
-//     productData.add(entry.value.marketProduct ?? 0);
-//     customerData.add(entry.value.crmCompany ?? 0);
-//     serviceProviderData.add(entry.value.supplySupplier ?? 0);
-//   }
-
-//   return MarketPurchaseStats(
-//     timeLabels: timeLabels,
-//     productData: productData,
-//     customerData: customerData,
-//     serviceProviderData: serviceProviderData,
-//   );
-// }
 
 /// 格式化月份标签，将 "2026-01" 转换为 "1月"
 String _formatMonthLabel(String monthKey) {
@@ -118,8 +85,6 @@ Future<List<PublicNewsArticle>?> getNewsArticles() async {
     final result = articlesList
         .map((e) => PublicNewsArticle.fromJson(e as Map<String, dynamic>))
         .toList();
-    logger.d('result9999: ${result[0].media}');
-    logger.d('result9999: ${result[1].media}');
     return result;
   } catch (e) {
     // 如果 API 调用失败，返回空列表而不是抛出异常

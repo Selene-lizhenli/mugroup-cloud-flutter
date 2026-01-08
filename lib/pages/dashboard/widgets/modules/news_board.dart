@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
@@ -122,13 +121,13 @@ class _NewsBoardState extends State<NewsBoard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // 图片
-                      if (imageUrl != null && imageUrl.isNotEmpty)
-                        ImageShow(
-                          imageUrl: imageUrl,
-                          width:80,
-                          fit: BoxFit.cover,
-                          errorIconSize: 32,
-                        ),
+                      // if (imageUrl != null && imageUrl.isNotEmpty)
+                      //   ImageShow(
+                      //     imageUrl: imageUrl,
+                      //     width:80,
+                      //     fit: BoxFit.cover,
+                      //     errorIconSize: 32,
+                      //   ),
                       const SizedBox(width: 10),
                       // 标题和内容
                       Expanded(
