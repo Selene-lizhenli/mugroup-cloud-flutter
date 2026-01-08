@@ -1,4 +1,5 @@
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
 import 'package:flutter/material.dart';
 
 class QuoteCard extends StatelessWidget {
@@ -31,7 +32,7 @@ class QuoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(colorScheme),
+                _buildHeader(colorScheme, context, item),
                 // const SizedBox(height: 3),
                 // const Divider(height: 1, color: Color(0xFFF0F0F0)),
                 const SizedBox(height: 6),
@@ -75,7 +76,8 @@ class QuoteCard extends StatelessWidget {
   //   );
   // }
 
-  Widget _buildHeader(ColorScheme colorScheme) {
+  Widget _buildHeader(
+      ColorScheme colorScheme, BuildContext context, QuotationList item) {
     // 格式化日期：从 "2025-12-23 11:23:15" 提取 "2025-12-23"
     String formatDate(String? dateStr) {
       if (dateStr == null || dateStr.isEmpty) return '';
@@ -124,19 +126,25 @@ class QuoteCard extends StatelessWidget {
           ),
         ),
         // 右侧：协作按钮
-        _buildCollaborateButton(colorScheme),
+        _buildCollaborateButton(colorScheme, context, item),
       ],
     );
   }
 
-  Widget _buildCollaborateButton(ColorScheme colorScheme) {
+  Widget _buildCollaborateButton(
+      ColorScheme colorScheme, BuildContext context, QuotationList item) {
     return Material(
       color: colorScheme.primaryContainer.withOpacity(0.08),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
         onTap: () {
-          // TODO: 实现协作功能
+          showDialog(
+            context: context,
+            builder: (context) => CollaborationDialog(
+              quoteId: item.id!,
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -171,8 +179,23 @@ class QuoteCard extends StatelessWidget {
       return quoteNo.startsWith('#') ? quoteNo : '#$quoteNo';
     }
 
+    final TextStyle greyTextStyle = TextStyle(
+      color: Colors.grey[600],
+      fontSize: 11,
+    );
+
     final quoteNo = formatQuoteNo(item.quoteNo);
     final creatorName = item.creator?.name ?? '';
+
+    final collaborators = item.collaborators;
+    final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
+    final collabText = hasCollaborators
+        ? collaborators.map((e) => e.name ?? '').join('、')
+        : '暂无协作';
+
+    final collabStyle = hasCollaborators
+        ? const TextStyle(color: Colors.green, fontSize: 11)
+        : greyTextStyle;
 
     return Row(
       children: [
@@ -196,6 +219,15 @@ class QuoteCard extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              '协作: $collabText',
+              style: collabStyle,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ] else if (creatorName.isNotEmpty) ...[
           Text(
             '创建人: $creatorName',

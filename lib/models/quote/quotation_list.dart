@@ -42,6 +42,7 @@ class QuotationList with _$QuotationList {
     @JsonKey(name: 'language') String? language,
     @JsonKey(name: 'contact_id') String? contactId,
     @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
+    List<User>? collaborators,
     User? user,
     User? creator,
     Company? company,

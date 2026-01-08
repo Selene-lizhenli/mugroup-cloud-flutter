@@ -112,3 +112,34 @@ Future addQuotationSamples(data) async {
     },
   );
 }
+
+Future<QuotationList?> addQuoteCollaborators(
+    int id, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/showroom/quotations/$id/collaborators/add", data: data)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return QuotationList.fromJson(res.data);
+    },
+  );
+}
+
+Future<QuotationList?> removeQuoteCollaborators(
+    int id, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/showroom/quotations/$id/collaborators/remove",
+          data: data)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+
+      return QuotationList.fromJson(res.data);
+    },
+  );
+}

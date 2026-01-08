@@ -82,6 +82,7 @@ mixin _$QuotationList {
   String? get contactId => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_sent_at')
   DateTime? get lastSentAt => throw _privateConstructorUsedError;
+  List<User>? get collaborators => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
   User? get creator => throw _privateConstructorUsedError;
   Company? get company => throw _privateConstructorUsedError;
@@ -133,6 +134,7 @@ abstract class $QuotationListCopyWith<$Res> {
       @JsonKey(name: 'language') String? language,
       @JsonKey(name: 'contact_id') String? contactId,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
+      List<User>? collaborators,
       User? user,
       User? creator,
       Company? company});
@@ -189,6 +191,7 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
     Object? language = freezed,
     Object? contactId = freezed,
     Object? lastSentAt = freezed,
+    Object? collaborators = freezed,
     Object? user = freezed,
     Object? creator = freezed,
     Object? company = freezed,
@@ -330,6 +333,10 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
           ? _value.lastSentAt
           : lastSentAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      collaborators: freezed == collaborators
+          ? _value.collaborators
+          : collaborators // ignore: cast_nullable_to_non_nullable
+              as List<User>?,
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -425,6 +432,7 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       @JsonKey(name: 'language') String? language,
       @JsonKey(name: 'contact_id') String? contactId,
       @JsonKey(name: 'last_sent_at') DateTime? lastSentAt,
+      List<User>? collaborators,
       User? user,
       User? creator,
       Company? company});
@@ -482,6 +490,7 @@ class __$$QuotationListImplCopyWithImpl<$Res>
     Object? language = freezed,
     Object? contactId = freezed,
     Object? lastSentAt = freezed,
+    Object? collaborators = freezed,
     Object? user = freezed,
     Object? creator = freezed,
     Object? company = freezed,
@@ -623,6 +632,10 @@ class __$$QuotationListImplCopyWithImpl<$Res>
           ? _value.lastSentAt
           : lastSentAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      collaborators: freezed == collaborators
+          ? _value._collaborators
+          : collaborators // ignore: cast_nullable_to_non_nullable
+              as List<User>?,
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -677,9 +690,11 @@ class _$QuotationListImpl implements _QuotationList {
       @JsonKey(name: 'language') this.language,
       @JsonKey(name: 'contact_id') this.contactId,
       @JsonKey(name: 'last_sent_at') this.lastSentAt,
+      final List<User>? collaborators,
       this.user,
       this.creator,
-      this.company});
+      this.company})
+      : _collaborators = collaborators;
 
   factory _$QuotationListImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuotationListImplFromJson(json);
@@ -780,6 +795,16 @@ class _$QuotationListImpl implements _QuotationList {
   @override
   @JsonKey(name: 'last_sent_at')
   final DateTime? lastSentAt;
+  final List<User>? _collaborators;
+  @override
+  List<User>? get collaborators {
+    final value = _collaborators;
+    if (value == null) return null;
+    if (_collaborators is EqualUnmodifiableListView) return _collaborators;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final User? user;
   @override
@@ -789,7 +814,7 @@ class _$QuotationListImpl implements _QuotationList {
 
   @override
   String toString() {
-    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, user: $user, creator: $creator, company: $company)';
+    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, collaborators: $collaborators, user: $user, creator: $creator, company: $company)';
   }
 
   @override
@@ -856,6 +881,8 @@ class _$QuotationListImpl implements _QuotationList {
                 other.contactId == contactId) &&
             (identical(other.lastSentAt, lastSentAt) ||
                 other.lastSentAt == lastSentAt) &&
+            const DeepCollectionEquality()
+                .equals(other._collaborators, _collaborators) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.creator, creator) || other.creator == creator) &&
             (identical(other.company, company) || other.company == company));
@@ -899,6 +926,7 @@ class _$QuotationListImpl implements _QuotationList {
         language,
         contactId,
         lastSentAt,
+        const DeepCollectionEquality().hash(_collaborators),
         user,
         creator,
         company
@@ -954,6 +982,7 @@ abstract class _QuotationList implements QuotationList {
       @JsonKey(name: 'language') final String? language,
       @JsonKey(name: 'contact_id') final String? contactId,
       @JsonKey(name: 'last_sent_at') final DateTime? lastSentAt,
+      final List<User>? collaborators,
       final User? user,
       final User? creator,
       final Company? company}) = _$QuotationListImpl;
@@ -1057,6 +1086,8 @@ abstract class _QuotationList implements QuotationList {
   @override
   @JsonKey(name: 'last_sent_at')
   DateTime? get lastSentAt;
+  @override
+  List<User>? get collaborators;
   @override
   User? get user;
   @override
