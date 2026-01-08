@@ -144,7 +144,7 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     enTitle: 'Quotations',
                     cnTitle: '新增报价',
                     onTap: () {
-                      context.router.push(  QuoteCreateRoute());
+                      context.router.push(QuoteCreateRoute());
                     },
                   ),
                 ),
@@ -296,7 +296,8 @@ class _ActionCard extends StatelessWidget {
                   child: Icon(icon, color: iconColor, size: 20),
                 ),
                 const SizedBox(width: 12),
-                Column(
+                Expanded(
+                    child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -305,6 +306,8 @@ class _ActionCard extends StatelessWidget {
                         color: Colors.grey[400],
                         fontSize: 12,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -314,9 +317,11 @@ class _ActionCard extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
+                )),
               ],
             ),
           ),
