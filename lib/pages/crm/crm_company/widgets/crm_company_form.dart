@@ -124,7 +124,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                           },
                         ),
                         FormBuilderField<String>(
-                          name: "country",
+                          name: "location",
                           builder: (field) {
                             return Input(
                               label: '国家/地区',
