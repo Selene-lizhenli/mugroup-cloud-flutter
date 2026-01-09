@@ -23,16 +23,30 @@ class SupplySupplierEditPage extends HookConsumerWidget {
     final supplier = useState<Supplier?>(null);
     final isLoading = useState(true);
     final tab = useState(0);
+    // 1. 增加刷新 Key，用于强制子组件重建
+    final refreshKey = useState(0);
+
+    // 2. 封装加载方法，支持手动刷新
+    Future<void> loadData({bool isRefresh = false}) async {
+      try {
+        if (isRefresh) EasyLoading.show(status: '刷新中...');
+
+        final resp = await getSupplier(id);
+        supplier.value = resp;
+
+        if (isRefresh) {
+          refreshKey.value++; // 改变 Key，触发子页面 useEffect
+          EasyLoading.showSuccess('刷新成功');
+        }
+      } catch (e) {
+        if (isRefresh) EasyLoading.showError('刷新失败: $e');
+      } finally {
+        if (!isRefresh) isLoading.value = false;
+      }
+    }
 
     useEffect(() {
-      () async {
-        try {
-          final resp = await getSupplier(id);
-          supplier.value = resp;
-        } finally {
-          isLoading.value = false;
-        }
-      }();
+      loadData();
       return null;
     }, [id]);
 
@@ -44,23 +58,44 @@ class SupplySupplierEditPage extends HookConsumerWidget {
       );
     }
 
+    // 文字样式构建器（适配灰底白块风格：选中黑，未选中灰）
     Widget buildTabText(String text, int index) {
       final isSelected = tab.value == index;
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Text(
           text,
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.grey[600],
             fontWeight: FontWeight.w600,
-            fontSize: 14,
+            fontSize: 13, // 稍微调小一点字体防止5个字挤不下
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('供应商编辑')),
+      appBar: AppBar(
+        title: const Text('供应商编辑'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        actions: [
+          // 3. 添加刷新按钮
+          TextButton(
+            onPressed: () => loadData(isRefresh: true),
+            child: const Text(
+              "刷新",
+              style: TextStyle(
+                color: Color(0xFF999999),
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           const SizedBox(height: 8),
@@ -71,40 +106,36 @@ class SupplySupplierEditPage extends HookConsumerWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(2),
-                child: CustomSlidingSegmentedControl<int>(
-                  initialValue: tab.value,
-                  isStretch: false,
-                  children: {
-                    0: buildTabText("基本信息", 0),
-                    1: buildTabText("联系人", 1),
-                    2: buildTabText("证书", 2),
-                    3: buildTabText("动态", 3),
-                    4: buildTabText("验厂", 4),
-                  },
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  thumbDecoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.white,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  innerPadding: const EdgeInsets.all(2),
-                  duration: const Duration(milliseconds: 200),
-                  onValueChanged: (v) => tab.value = v,
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: CustomSlidingSegmentedControl<int>(
+                initialValue: tab.value,
+                isStretch: true,
+                children: {
+                  0: buildTabText("基本信息", 0),
+                  1: buildTabText("联系人", 1),
+                  2: buildTabText("证书", 2),
+                  3: buildTabText("动态", 3),
+                  4: buildTabText("验厂", 4),
+                },
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                thumbDecoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                innerPadding: const EdgeInsets.all(2),
+                duration: const Duration(milliseconds: 200),
+                onValueChanged: (v) => tab.value = v,
               ),
             ),
           ),
@@ -112,17 +143,35 @@ class SupplySupplierEditPage extends HookConsumerWidget {
             child: IndexedStack(
               index: tab.value,
               children: [
+                /// 基本资料
                 SupplySupplierForm(
+                  key: ValueKey('info_${refreshKey.value}'),
                   initial: supplier.value,
                   onSubmit: (data) async {
                     await updateSupplySupplier(id, data);
                     EasyLoading.showSuccess("编辑成功");
                   },
                 ),
-                SupplySupplierContactPage(supplierId: id),
-                SupplySupplierCertPage(supplierId: id),
-                SupplySupplierActivityPage(supplierId: id),
-                SupplySupplierYanchangPage(supplierId: id)
+
+                SupplySupplierContactPage(
+                  key: ValueKey('contact_${refreshKey.value}'),
+                  supplierId: id,
+                ),
+
+                SupplySupplierCertPage(
+                  key: ValueKey('cert_${refreshKey.value}'),
+                  supplierId: id,
+                ),
+
+                SupplySupplierActivityPage(
+                  key: ValueKey('activity_${refreshKey.value}'),
+                  supplierId: id,
+                ),
+
+                SupplySupplierYanchangPage(
+                  key: ValueKey('yanchang_${refreshKey.value}'),
+                  supplierId: id,
+                )
               ],
             ),
           ),

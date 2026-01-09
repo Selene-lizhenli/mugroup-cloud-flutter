@@ -7,6 +7,7 @@ import 'package:custom_sliding_segmented_control/custom_sliding_segmented_contro
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -46,8 +47,9 @@ class CrmCompanyEditPage extends HookConsumerWidget {
     }, []);
 
     if (isLoading.value) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: Skeleton(
+            isLoading: true, skeleton: SkeletonListView(), child: Container()),
       );
     }
 

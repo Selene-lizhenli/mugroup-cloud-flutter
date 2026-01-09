@@ -31,7 +31,6 @@ class SupplySupplierCertPage extends HookConsumerWidget {
 
     if (isLoading.value) {
       return Scaffold(
-        appBar: AppBar(title: const Text('供应商证书列表')),
         body: Skeleton(
             isLoading: true, skeleton: SkeletonListView(), child: Container()),
       );

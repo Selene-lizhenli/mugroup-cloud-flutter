@@ -29,7 +29,6 @@ class SupplySupplierActivityPage extends HookConsumerWidget {
 
     if (isLoading.value) {
       return Scaffold(
-        appBar: AppBar(title: const Text('供应商动态列表')),
         body: Skeleton(
             isLoading: true, skeleton: SkeletonListView(), child: Container()),
       );
