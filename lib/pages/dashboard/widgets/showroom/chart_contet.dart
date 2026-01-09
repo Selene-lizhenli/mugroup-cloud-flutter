@@ -148,7 +148,7 @@ class _ChartContentState extends State<ChartContent> {
                             : 1000.0, // 使用足够大的值而不是 infinity
                       ),
                       child: Container(
-                        decoration: const BoxDecoration(    ),
+                        decoration: const BoxDecoration(),
                         child: Padding(
                           padding: EdgeInsets.only(
                             bottom:
@@ -179,7 +179,8 @@ class _ChartContentState extends State<ChartContent> {
                       },
                       child: Container(
                         width: double.infinity, // 宽度占满父容器
-                        padding: const EdgeInsets.fromLTRB(12, 24, 2, 2),
+                        padding: EdgeInsets.fromLTRB(
+                            12, _isLegendExpanded ? 12 : 24, 2, 2),
                         alignment: Alignment.centerRight, // 文本整体靠右
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.only(
@@ -191,10 +192,10 @@ class _ChartContentState extends State<ChartContent> {
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Color.fromRGBO(255, 255, 255, 1), // 下方 
-                              Color.fromRGBO(255, 255, 255, 0.85),  
-                              Color.fromRGBO(255, 255, 255, 0.6),  
-                              Color.fromRGBO(255, 255, 255, 0.0), // 上方 
+                              Color.fromRGBO(255, 255, 255, 1), // 下方
+                              Color.fromRGBO(255, 255, 255, 0.85),
+                              Color.fromRGBO(255, 255, 255, 0.6),
+                              Color.fromRGBO(255, 255, 255, 0.0), // 上方
                             ],
                           ),
                         ),
