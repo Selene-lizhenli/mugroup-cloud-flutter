@@ -17,6 +17,7 @@ _$WarehouseImpl _$$WarehouseImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => WarehouseImage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      abandoned: json['abandoned'] as bool?,
     );
 
 Map<String, dynamic> _$$WarehouseImplToJson(_$WarehouseImpl instance) =>
@@ -27,4 +28,5 @@ Map<String, dynamic> _$$WarehouseImplToJson(_$WarehouseImpl instance) =>
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
       'image': instance.image,
+      'abandoned': instance.abandoned,
     };

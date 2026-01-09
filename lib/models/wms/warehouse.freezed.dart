@@ -28,6 +28,7 @@ mixin _$Warehouse {
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
   List<WarehouseImage>? get image => throw _privateConstructorUsedError;
+  bool? get abandoned => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -46,7 +47,8 @@ abstract class $WarehouseCopyWith<$Res> {
       String? address,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
-      List<WarehouseImage>? image});
+      List<WarehouseImage>? image,
+      bool? abandoned});
 }
 
 /// @nodoc
@@ -68,6 +70,7 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? image = freezed,
+    Object? abandoned = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -94,6 +97,10 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as List<WarehouseImage>?,
+      abandoned: freezed == abandoned
+          ? _value.abandoned
+          : abandoned // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -112,7 +119,8 @@ abstract class _$$WarehouseImplCopyWith<$Res>
       String? address,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
-      List<WarehouseImage>? image});
+      List<WarehouseImage>? image,
+      bool? abandoned});
 }
 
 /// @nodoc
@@ -132,6 +140,7 @@ class __$$WarehouseImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? image = freezed,
+    Object? abandoned = freezed,
   }) {
     return _then(_$WarehouseImpl(
       id: freezed == id
@@ -158,6 +167,10 @@ class __$$WarehouseImplCopyWithImpl<$Res>
           ? _value._image
           : image // ignore: cast_nullable_to_non_nullable
               as List<WarehouseImage>?,
+      abandoned: freezed == abandoned
+          ? _value.abandoned
+          : abandoned // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -171,7 +184,8 @@ class _$WarehouseImpl implements _Warehouse {
       this.address,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
-      final List<WarehouseImage>? image = const []})
+      final List<WarehouseImage>? image = const [],
+      this.abandoned})
       : _image = image;
 
   factory _$WarehouseImpl.fromJson(Map<String, dynamic> json) =>
@@ -201,8 +215,11 @@ class _$WarehouseImpl implements _Warehouse {
   }
 
   @override
+  final bool? abandoned;
+
+  @override
   String toString() {
-    return 'Warehouse(id: $id, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt, image: $image)';
+    return 'Warehouse(id: $id, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt, image: $image, abandoned: $abandoned)';
   }
 
   @override
@@ -217,13 +234,15 @@ class _$WarehouseImpl implements _Warehouse {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            const DeepCollectionEquality().equals(other._image, _image));
+            const DeepCollectionEquality().equals(other._image, _image) &&
+            (identical(other.abandoned, abandoned) ||
+                other.abandoned == abandoned));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, address, createdAt,
-      updatedAt, const DeepCollectionEquality().hash(_image));
+      updatedAt, const DeepCollectionEquality().hash(_image), abandoned);
 
   @JsonKey(ignore: true)
   @override
@@ -246,7 +265,8 @@ abstract class _Warehouse implements Warehouse {
       final String? address,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
-      final List<WarehouseImage>? image}) = _$WarehouseImpl;
+      final List<WarehouseImage>? image,
+      final bool? abandoned}) = _$WarehouseImpl;
 
   factory _Warehouse.fromJson(Map<String, dynamic> json) =
       _$WarehouseImpl.fromJson;
@@ -265,6 +285,8 @@ abstract class _Warehouse implements Warehouse {
   String? get updatedAt;
   @override
   List<WarehouseImage>? get image;
+  @override
+  bool? get abandoned;
   @override
   @JsonKey(ignore: true)
   _$$WarehouseImplCopyWith<_$WarehouseImpl> get copyWith =>

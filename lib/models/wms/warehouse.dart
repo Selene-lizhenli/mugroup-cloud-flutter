@@ -13,6 +13,7 @@ abstract class Warehouse with _$Warehouse {
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @Default([]) List<WarehouseImage>? image,
+    bool? abandoned,
   }) = _Warehouse;
 
   factory Warehouse.fromJson(Map<String, Object?> json) =>

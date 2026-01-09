@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
@@ -53,7 +52,12 @@ class SamplesPage extends HookConsumerWidget {
       );
     }
 
-    if (warehouses.isEmpty) {
+    // 过滤掉 abandoned 为 true 的样品间
+    final filteredWarehouses = warehouses
+        .where((warehouse) => warehouse.abandoned != true)
+        .toList();
+
+    if (filteredWarehouses.isEmpty) {
       return const Center(
         child: Text('暂无样品间数据'),
       );
@@ -67,9 +71,9 @@ class SamplesPage extends HookConsumerWidget {
         mainAxisSpacing: 12, // 行间距
         childAspectRatio: 0.85, // 宽高比，调整卡片比例
       ),
-      itemCount: warehouses.length,
+      itemCount: filteredWarehouses.length,
       itemBuilder: (context, index) {
-        final warehouse = warehouses[index];
+        final warehouse = filteredWarehouses[index];
         return _buildWarehouseCard(context, warehouse, ref);
       },
     );
@@ -133,8 +137,7 @@ class SamplesPage extends HookConsumerWidget {
     if (warehouse?.image != null && warehouse!.image!.isNotEmpty) {
       final firstImage = warehouse.image!.first;
       imageUrl = firstImage.thumbUrl ?? firstImage.url ?? firstImage.whiteUrl;
-    }
-    logger.d('imageUrl${imageUrl}${warehouse}');
+    } 
     
     return Container(
       width: double.infinity,
