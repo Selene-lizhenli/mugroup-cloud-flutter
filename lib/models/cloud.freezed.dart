@@ -22,6 +22,7 @@ Cloud _$CloudFromJson(Map<String, dynamic> json) {
 mixin _$Cloud {
   int? get currentTenantId => throw _privateConstructorUsedError;
   List<Tenant> get tenants => throw _privateConstructorUsedError;
+  String? get prePath => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -33,7 +34,7 @@ abstract class $CloudCopyWith<$Res> {
   factory $CloudCopyWith(Cloud value, $Res Function(Cloud) then) =
       _$CloudCopyWithImpl<$Res, Cloud>;
   @useResult
-  $Res call({int? currentTenantId, List<Tenant> tenants});
+  $Res call({int? currentTenantId, List<Tenant> tenants, String? prePath});
 }
 
 /// @nodoc
@@ -51,6 +52,7 @@ class _$CloudCopyWithImpl<$Res, $Val extends Cloud>
   $Res call({
     Object? currentTenantId = freezed,
     Object? tenants = null,
+    Object? prePath = freezed,
   }) {
     return _then(_value.copyWith(
       currentTenantId: freezed == currentTenantId
@@ -61,6 +63,10 @@ class _$CloudCopyWithImpl<$Res, $Val extends Cloud>
           ? _value.tenants
           : tenants // ignore: cast_nullable_to_non_nullable
               as List<Tenant>,
+      prePath: freezed == prePath
+          ? _value.prePath
+          : prePath // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -72,7 +78,7 @@ abstract class _$$CloudImplCopyWith<$Res> implements $CloudCopyWith<$Res> {
       __$$CloudImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? currentTenantId, List<Tenant> tenants});
+  $Res call({int? currentTenantId, List<Tenant> tenants, String? prePath});
 }
 
 /// @nodoc
@@ -88,6 +94,7 @@ class __$$CloudImplCopyWithImpl<$Res>
   $Res call({
     Object? currentTenantId = freezed,
     Object? tenants = null,
+    Object? prePath = freezed,
   }) {
     return _then(_$CloudImpl(
       currentTenantId: freezed == currentTenantId
@@ -98,6 +105,10 @@ class __$$CloudImplCopyWithImpl<$Res>
           ? _value._tenants
           : tenants // ignore: cast_nullable_to_non_nullable
               as List<Tenant>,
+      prePath: freezed == prePath
+          ? _value.prePath
+          : prePath // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -105,7 +116,8 @@ class __$$CloudImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$CloudImpl extends _Cloud {
-  _$CloudImpl({this.currentTenantId, required final List<Tenant> tenants})
+  _$CloudImpl(
+      {this.currentTenantId, required final List<Tenant> tenants, this.prePath})
       : _tenants = tenants,
         super._();
 
@@ -123,8 +135,11 @@ class _$CloudImpl extends _Cloud {
   }
 
   @override
+  final String? prePath;
+
+  @override
   String toString() {
-    return 'Cloud(currentTenantId: $currentTenantId, tenants: $tenants)';
+    return 'Cloud(currentTenantId: $currentTenantId, tenants: $tenants, prePath: $prePath)';
   }
 
   @override
@@ -134,13 +149,14 @@ class _$CloudImpl extends _Cloud {
             other is _$CloudImpl &&
             (identical(other.currentTenantId, currentTenantId) ||
                 other.currentTenantId == currentTenantId) &&
-            const DeepCollectionEquality().equals(other._tenants, _tenants));
+            const DeepCollectionEquality().equals(other._tenants, _tenants) &&
+            (identical(other.prePath, prePath) || other.prePath == prePath));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, currentTenantId,
-      const DeepCollectionEquality().hash(_tenants));
+      const DeepCollectionEquality().hash(_tenants), prePath);
 
   @JsonKey(ignore: true)
   @override
@@ -159,7 +175,8 @@ class _$CloudImpl extends _Cloud {
 abstract class _Cloud extends Cloud {
   factory _Cloud(
       {final int? currentTenantId,
-      required final List<Tenant> tenants}) = _$CloudImpl;
+      required final List<Tenant> tenants,
+      final String? prePath}) = _$CloudImpl;
   _Cloud._() : super._();
 
   factory _Cloud.fromJson(Map<String, dynamic> json) = _$CloudImpl.fromJson;
@@ -168,6 +185,8 @@ abstract class _Cloud extends Cloud {
   int? get currentTenantId;
   @override
   List<Tenant> get tenants;
+  @override
+  String? get prePath;
   @override
   @JsonKey(ignore: true)
   _$$CloudImplCopyWith<_$CloudImpl> get copyWith =>

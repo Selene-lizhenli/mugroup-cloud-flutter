@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/line_chart_demo.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/market_purchase_chart.dart';
@@ -7,6 +8,7 @@ import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,7 +47,7 @@ class DashboardModules {
         contentBuilder: () => const InspectionChart(),
         group: '数据统计',
       ),
-        ModuleInfo(
+      ModuleInfo(
         id: 'market_purchase',
         title: '市场采购',
         contentBuilder: () => const MarketPurchaseChart(),
@@ -63,7 +65,7 @@ class DashboardModules {
         contentBuilder: () => const SupplierChart(),
         group: '数据统计',
       ),
-           ModuleInfo(
+      ModuleInfo(
         id: 'news',
         title: '集团资讯',
         contentBuilder: () => const NewsBoard(),
@@ -83,7 +85,7 @@ class DashboardModules {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds = prefs.getStringList(_storageKey) ?? [];
     final orderIds = prefs.getStringList(_orderKey) ?? [];
-    
+
     if (selectedIds.isEmpty) {
       return [];
     }
@@ -126,7 +128,8 @@ class SelectedModulesWidget extends ConsumerStatefulWidget {
   const SelectedModulesWidget({super.key});
 
   @override
-  ConsumerState<SelectedModulesWidget> createState() => _SelectedModulesWidgetState();
+  ConsumerState<SelectedModulesWidget> createState() =>
+      _SelectedModulesWidgetState();
 }
 
 class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
@@ -139,27 +142,10 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     _loadSelectedModules();
   }
 
-  /// 刷新模块数据
-  Future<void> refresh() async {
-    await _loadSelectedModules();
-  }
-
-  Future<void> _loadSelectedModules() async {
-    setState(() {
-      _loading = true;
-    });
-    
-    final modules = await DashboardModules.getSelectedModules();
-    if (mounted) {
-      setState(() {
-        _selectedModules = modules;
-        _loading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+   
+
     if (_loading) {
       return const SizedBox.shrink();
     }
@@ -171,8 +157,34 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     // 直接展示所有选中的模块，不分组
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: _selectedModules.map((module) => _buildModuleCard(module)).toList(),
+      children:
+          _selectedModules.map((module) => _buildModuleCard(module)).toList(),
     );
+  }
+
+  /// 刷新模块数据
+  Future<void> refresh() async {
+    await _loadSelectedModules();
+  }
+
+  Future<void> _loadSelectedModules() async {
+    setState(() {
+      _loading = true;
+    });
+
+    final modules = await DashboardModules.getSelectedModules();
+    if (mounted) {
+      setState(() {
+        _selectedModules = modules;
+        _loading = false;
+      });
+      
+      final coreAsync = ref.watch(coreProvider);
+      final notifier = ref.read(coreProvider.notifier);
+      if (coreAsync.value?.prePath == 'setting') { 
+        notifier.setPrePath(null);
+      }
+    }
   }
 
   Widget _buildModuleCard(ModuleInfo module) {
@@ -204,7 +216,8 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   offset: const Offset(-10, 45), // 在按钮下方显示气泡菜单
-                  itemBuilder: (BuildContext context) => _buildDimensionMenuItems(module.id),
+                  itemBuilder: (BuildContext context) =>
+                      _buildDimensionMenuItems(module.id),
                   onSelected: (String value) {
                     _handleDimensionSelection(module.id, value);
                   },
@@ -249,7 +262,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
               ],
             ),
           ),
-         const PopupMenuItem<String>(
+          const PopupMenuItem<String>(
             value: '样品间',
             child: Row(
               children: [
@@ -267,28 +280,28 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
         // 验货、客户、供应商的时间维度选项
         final currentStats = ref.watch(moduleStatsProvider(moduleId));
         final currentDimension = currentStats.timeDimension;
-        
-        return [ 
+
+        return [
           PopupMenuItem<String>(
             value: '最近半年',
             child: Row(
               children: [
                 Icon(
-                  Icons.access_time, 
-                  size: 18, 
-                  color: currentDimension == TimeDimension.last6Months 
-                      ? Theme.of(context).colorScheme.primary 
+                  Icons.access_time,
+                  size: 18,
+                  color: currentDimension == TimeDimension.last6Months
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.grey,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   '最近半年',
                   style: TextStyle(
-                    color: currentDimension == TimeDimension.last6Months 
-                        ? Theme.of(context).colorScheme.primary 
+                    color: currentDimension == TimeDimension.last6Months
+                        ? Theme.of(context).colorScheme.primary
                         : null,
-                    fontWeight: currentDimension == TimeDimension.last6Months 
-                        ? FontWeight.w600 
+                    fontWeight: currentDimension == TimeDimension.last6Months
+                        ? FontWeight.w600
                         : FontWeight.normal,
                   ),
                 ),
@@ -300,21 +313,21 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.access_time, 
-                  size: 18, 
-                  color: currentDimension == TimeDimension.last12Months 
-                      ? Theme.of(context).colorScheme.primary 
+                  Icons.access_time,
+                  size: 18,
+                  color: currentDimension == TimeDimension.last12Months
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.grey,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   '最近一年',
                   style: TextStyle(
-                    color: currentDimension == TimeDimension.last12Months 
-                        ? Theme.of(context).colorScheme.primary 
+                    color: currentDimension == TimeDimension.last12Months
+                        ? Theme.of(context).colorScheme.primary
                         : null,
-                    fontWeight: currentDimension == TimeDimension.last12Months 
-                        ? FontWeight.w600 
+                    fontWeight: currentDimension == TimeDimension.last12Months
+                        ? FontWeight.w600
                         : FontWeight.normal,
                   ),
                 ),
@@ -326,21 +339,21 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.all_inclusive, 
-                  size: 18, 
-                  color: currentDimension == TimeDimension.allTime 
-                      ? Theme.of(context).colorScheme.primary 
+                  Icons.all_inclusive,
+                  size: 18,
+                  color: currentDimension == TimeDimension.allTime
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.grey,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   '所有时间',
                   style: TextStyle(
-                    color: currentDimension == TimeDimension.allTime 
-                        ? Theme.of(context).colorScheme.primary 
+                    color: currentDimension == TimeDimension.allTime
+                        ? Theme.of(context).colorScheme.primary
                         : null,
-                    fontWeight: currentDimension == TimeDimension.allTime 
-                        ? FontWeight.w600 
+                    fontWeight: currentDimension == TimeDimension.allTime
+                        ? FontWeight.w600
                         : FontWeight.normal,
                   ),
                 ),
@@ -348,8 +361,8 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             ),
           ),
         ];
-        // 市场采购模块的维度选项（可以根据实际需求添加）
-     
+      // 市场采购模块的维度选项（可以根据实际需求添加）
+
       default:
         return [];
     }
@@ -358,12 +371,12 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
   /// 处理维度选择
   void _handleDimensionSelection(String moduleId, String value) {
     // 只处理时间维度相关的模块
-    if (moduleId == 'inspection' || 
-        moduleId == 'customer' || 
-        moduleId == 'supplier' || 
+    if (moduleId == 'inspection' ||
+        moduleId == 'customer' ||
+        moduleId == 'supplier' ||
         moduleId == 'market_purchase') {
       TimeDimension? dimension;
-      
+
       switch (value) {
         case '最近半年':
           dimension = TimeDimension.last6Months;
@@ -375,19 +388,24 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
           dimension = TimeDimension.allTime;
           break;
       }
-      
+
       if (dimension != null) {
         // 针对特定模块设置时间维度并刷新数据
-        ref.read(moduleStatsProvider(moduleId).notifier).setTimeDimension(dimension);
-        
+        ref
+            .read(moduleStatsProvider(moduleId).notifier)
+            .setTimeDimension(dimension);
+
         // 市场采购模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
         if (moduleId == 'market_purchase') {
-          ref.read(moduleStatsProvider('customer').notifier).setTimeDimension(dimension);
-          ref.read(moduleStatsProvider('supplier').notifier).setTimeDimension(dimension);
+          ref
+              .read(moduleStatsProvider('customer').notifier)
+              .setTimeDimension(dimension);
+          ref
+              .read(moduleStatsProvider('supplier').notifier)
+              .setTimeDimension(dimension);
         }
       }
     }
     // 其他模块的维度选择可以在这里扩展
   }
 }
-

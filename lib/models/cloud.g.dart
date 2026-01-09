@@ -11,10 +11,12 @@ _$CloudImpl _$$CloudImplFromJson(Map<String, dynamic> json) => _$CloudImpl(
       tenants: (json['tenants'] as List<dynamic>)
           .map((e) => Tenant.fromJson(e as Map<String, dynamic>))
           .toList(),
+      prePath: json['prePath'] as String?,
     );
 
 Map<String, dynamic> _$$CloudImplToJson(_$CloudImpl instance) =>
     <String, dynamic>{
       'currentTenantId': instance.currentTenantId,
       'tenants': instance.tenants,
+      'prePath': instance.prePath,
     };

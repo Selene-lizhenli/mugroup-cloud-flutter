@@ -1,18 +1,18 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
-import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/dashboard/dashboard.dart';
+import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'package:version/version.dart';
 
 @RoutePage()
@@ -21,9 +21,9 @@ class Layout extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final cartState = ref.watch(cartProvider);
-
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? [];
+    final marketUser = permissions.contains('showroom.market_product.show'); 
     final checkVersion = useCallback(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final checkResp = await silentApi
@@ -75,81 +75,55 @@ class Layout extends HookConsumerWidget {
         );
       }
     }, []);
-
+    final hasRedirected = useRef(false);
     useEffect(() {
       checkVersion();
 
       return null;
     }, [checkVersion]);
 
-    final user = ref.watch(userProvider).user;
-    final permissions = user?.permissions ?? [];
-    final marketUser = permissions.contains('showroom.market_product.show');
-
     useEffect(() {
-      if (marketUser) {
+      // 只在首次检测到 marketUser 为 true 时跳转 
+      if (marketUser && !hasRedirected.value) {
+        hasRedirected.value = true;
         context.router.push(const QuoteRoute());
       }
-
       return null;
     }, [marketUser]);
 
-    // final items = [
-    //   const BottomNavigationBarItem(icon: Icon(Icons.home), label: "首页"),
-    //   const BottomNavigationBarItem(icon: Icon(Icons.home), label: "样品"),
-    //   BottomNavigationBarItem(
-    //     icon: Stack(
-    //       clipBehavior: Clip.none,
-    //       alignment: Alignment.bottomCenter,
-    //       children: [
-    //         const Icon(Icons.shopping_cart),
-    //         Positioned(
-    //           top: -8,
-    //           right: -10,
-    //           child: TDBadge(
-    //             TDBadgeType.message,
-    //             color: colorScheme.primary,
-    //             textColor: colorScheme.tertiary,
-    //             size: TDBadgeSize.large,
-    //             showZero: false,
-    //             count: cartState.items.length.toString(),
-    //           ),
-    //         )
-    //       ],
-    //     ),
-    //     label: "选样车",
-    //   ),
-    //   const BottomNavigationBarItem(icon: Icon(Icons.person), label: "我的"),
-    // ];
+    // 创建用于刷新 DashboardPage 的 key
+    final dashboardModulesKey = useMemoized(
+      () => GlobalKey<State<SelectedModulesWidget>>(),
+    );
 
-    // return AutoTabsRouter(
-    //   builder: (context, child) {
-    //     return Scaffold(
-    //       body: child,
-    //       bottomNavigationBar: BottomNavigationBar(
-    //         type: BottomNavigationBarType.fixed,
-    //         currentIndex: context.tabsRouter.activeIndex,
-    //         onTap: (index) {
-    //           final item = items[index];
-    //           if (item.label == "选样车") {
-    //             app.container.refresh(cartProvider);
-    //           }
-    //           debugPrint(
-    //               'activeIndex666: ${context.tabsRouter.activeIndex}${items[index].label}');
-    //           if (item.label == "我的") {
-    //             app.fetchUser();
-    //           }
-    //           context.tabsRouter.setActiveIndex(index);
-    //         },
-    //         items: items,
-    //         selectedItemColor: colorScheme.primary, // 选中文字 + 图标颜色
-    //         unselectedItemColor: colorScheme.surfaceContainerHighest, // 非选中颜色
-    //         showUnselectedLabels: true, // 未选中也显示文字
-    //       ),
-    //     );
-    //   },
-    // );
+    // 监听 coreProvider 的 prePath，当值为 'setting' 时刷新 DashboardPage
+    final coreAsync = ref.watch(coreProvider);
+    final processedPrePath = useRef<String?>(null);
+    useEffect(() {
+      final prePath = coreAsync.value?.prePath;
+      // 只有当 prePath 为 'setting' 且之前未处理过时才执行
+      if (prePath == 'setting' && processedPrePath.value != 'setting') {
+        processedPrePath.value = prePath;
+        // 使用 Future.microtask 延迟执行，确保在构建完成后再修改 provider
+        Future.microtask(() { 
+          final state = dashboardModulesKey.currentState;
+          if (state != null) {
+            try {
+              final dynamic stateDynamic = state; 
+              stateDynamic.refresh().catchError((e) {   });
+            } catch (e) {
+              logger.e('刷新 DashboardPage 失败: $e');
+            }
+          } 
+          ref.read(coreProvider.notifier).setPrePath(null); 
+          processedPrePath.value = null;
+        });
+      } else if (prePath != 'setting') { 
+        processedPrePath.value = null;
+      }
+      return null;
+    }, [coreAsync.value?.prePath]);
 
-    return DashboardPage();
+    return DashboardPage(selectedModulesKey: dashboardModulesKey);
   }
 }

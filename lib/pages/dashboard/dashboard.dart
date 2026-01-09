@@ -1,67 +1,62 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/widgets/entry_grid_module.dart';
 import 'package:cloud/pages/dashboard/widgets/home_user_header.dart';
 import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
-class DashboardPage extends ConsumerStatefulWidget {
-  const DashboardPage({super.key});
+class DashboardPage extends HookConsumerWidget {
+  final GlobalKey<State<SelectedModulesWidget>>? selectedModulesKey;
+
+  const DashboardPage({super.key, this.selectedModulesKey});
 
   @override
-  ConsumerState<DashboardPage> createState() => _DashboardPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final internalKey = useMemoized(
+      () => GlobalKey<State<SelectedModulesWidget>>(),
+    );
+    final selectedModulesKey = this.selectedModulesKey ?? internalKey;
+    final scrollController = useScrollController();
 
-class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindingObserver {
-  late GlobalKey<State<SelectedModulesWidget>> _selectedModulesKey;
-  late ScrollController _scrollController;
+    // 使用 useRef 保存 refresh 函数，确保生命周期回调能访问到最新的函数
+    final refreshModulesRef = useRef<Future<void> Function()?>(null);
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedModulesKey = GlobalKey<State<SelectedModulesWidget>>();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  // 监听应用生命周期，当应用从后台恢复时刷新
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _refreshModules();
-    }
-  }
-
-  // 刷新模块
-  Future<void> _refreshModules() async {
-    final state = _selectedModulesKey.currentState;
-    // 使用 dynamic 类型访问 refresh 方法
-    if (state != null) {
-      try {
-        final dynamic stateDynamic = state;
-        await stateDynamic.refresh();
-      } catch (e) {
-        // 忽略错误
+    // 刷新模块的函数
+    Future<void> refreshModules() async {
+      final state = selectedModulesKey.currentState;
+      // 使用 dynamic 类型访问 refresh 方法
+      if (state != null) {
+        try {
+          final dynamic stateDynamic = state;
+          await stateDynamic.refresh();
+        } catch (e) {
+          // 忽略错误
+        }
       }
     }
-  }
 
-  Future<void> _onRefresh() async {
-    await _refreshModules();
-  }
+    // 更新 ref 中的函数引用
+    refreshModulesRef.value = refreshModules;
 
-  @override
-  Widget build(BuildContext context) {
-    
-    final colorScheme = Theme.of(context).colorScheme;
+    // 监听应用生命周期，当应用从后台恢复时刷新
+    useEffect(() {
+      final observer = _LifecycleObserver(() async {
+        await refreshModulesRef.value?.call();
+      });
+      WidgetsBinding.instance.addObserver(observer);
+      return () {
+        WidgetsBinding.instance.removeObserver(observer);
+      };
+    }, []);
+
+    Future<void> onRefresh() async {
+      logger.d('onRefresh');
+      await refreshModules();
+    }
 
     return SafeArea(
       child: Container(
@@ -69,9 +64,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindi
           color: colorScheme.surfaceTint,
         ),
         child: RefreshIndicator(
-          onRefresh: _onRefresh,
+          onRefresh: onRefresh,
           child: ListView(
-            controller: _scrollController,
+            controller: scrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
@@ -80,11 +75,25 @@ class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindi
               const SizedBox(height: 12),
               const EntryGridModule(),
               const SizedBox(height: 12),
-              SelectedModulesWidget(key: _selectedModulesKey),
+              SelectedModulesWidget(key: selectedModulesKey),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+// 生命周期观察者类
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final Future<void> Function() onResumed;
+
+  _LifecycleObserver(this.onResumed);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      onResumed();
+    }
   }
 }

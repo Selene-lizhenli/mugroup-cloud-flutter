@@ -12,6 +12,7 @@ abstract class Cloud with _$Cloud {
   factory Cloud({
     int? currentTenantId,
     required List<Tenant> tenants,
+    String? prePath,
   }) = _Cloud;
 
   factory Cloud.fromJson(Map<String, dynamic> json) => _$CloudFromJson(json);

@@ -6,18 +6,20 @@ import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
-class SettingPage extends StatefulWidget {
+class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({super.key});
 
   @override
-  State<SettingPage> createState() => _SettingPageState();
+  ConsumerState<SettingPage> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> {
+class _SettingPageState extends ConsumerState<SettingPage> {
   static const _storageKey = 'selected_module_ids';
   static const _orderKey = 'module_order_ids';
 
@@ -135,7 +137,10 @@ class _SettingPageState extends State<SettingPage> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('模块配置已保存')),
+      const SnackBar(
+          content: Text('模块配置已保存'),
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.all(30)),
     );
   }
 
@@ -147,7 +152,7 @@ class _SettingPageState extends State<SettingPage> {
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
-      
+
       // 获取该组已选中的模块，保持它们在 modules 列表中的原始顺序
       final selectedInGroup = <DashboardModule>[];
       for (final module in modules) {
@@ -155,22 +160,22 @@ class _SettingPageState extends State<SettingPage> {
           selectedInGroup.add(module);
         }
       }
-      
-      if (oldIndex >= selectedInGroup.length || 
+
+      if (oldIndex >= selectedInGroup.length ||
           newIndex >= selectedInGroup.length ||
-          oldIndex < 0 || 
+          oldIndex < 0 ||
           newIndex < 0) {
         return;
       }
-      
+
       // 在组内重新排序
       final item = selectedInGroup.removeAt(oldIndex);
       selectedInGroup.insert(newIndex, item);
-      
+
       // 重新构建整个 modules 列表，保持组之间的相对位置
       final newModules = <DashboardModule>[];
       int selectedIndex = 0; // 用于跟踪已选中的新顺序索引
-      
+
       // 遍历原始列表，保持相对位置，只更新该组已选中的顺序
       for (final module in modules) {
         if (module.group == group && module.selected) {
@@ -182,7 +187,7 @@ class _SettingPageState extends State<SettingPage> {
           newModules.add(module);
         }
       }
-      
+
       modules = newModules;
     });
   }
@@ -195,7 +200,7 @@ class _SettingPageState extends State<SettingPage> {
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
-      
+
       // 获取该组未选中的模块，保持它们在 modules 列表中的原始顺序
       final unselectedInGroup = <DashboardModule>[];
       for (final module in modules) {
@@ -203,22 +208,22 @@ class _SettingPageState extends State<SettingPage> {
           unselectedInGroup.add(module);
         }
       }
-      
-      if (oldIndex >= unselectedInGroup.length || 
+
+      if (oldIndex >= unselectedInGroup.length ||
           newIndex >= unselectedInGroup.length ||
-          oldIndex < 0 || 
+          oldIndex < 0 ||
           newIndex < 0) {
         return;
       }
-      
+
       // 在组内重新排序
       final item = unselectedInGroup.removeAt(oldIndex);
       unselectedInGroup.insert(newIndex, item);
-      
+
       // 重新构建整个 modules 列表，保持组之间的相对位置
       final newModules = <DashboardModule>[];
       int unselectedIndex = 0; // 用于跟踪未选中的新顺序索引
-      
+
       // 遍历原始列表，保持相对位置，只更新该组未选中的顺序
       for (final module in modules) {
         if (module.group == group && !module.selected) {
@@ -230,7 +235,7 @@ class _SettingPageState extends State<SettingPage> {
           newModules.add(module);
         }
       }
-      
+
       modules = newModules;
     });
   }
@@ -238,6 +243,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final notifier = ref.read(coreProvider.notifier);
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -259,7 +265,15 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('模块管理'),
-        backgroundColor: colorScheme.surfaceTint, 
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // 设置 prePath 为 'setting'，然后返回
+            notifier.setPrePath('setting');
+            context.router.back();
+          },
+        ),
+        backgroundColor: colorScheme.surfaceTint,
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -574,7 +588,7 @@ class _ModuleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              
+
               /// 左侧 icon
               Container(
                 width: 48,

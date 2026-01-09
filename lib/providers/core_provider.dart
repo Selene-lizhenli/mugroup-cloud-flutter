@@ -42,4 +42,13 @@ class Core extends _$Core {
       app.prefs.setInt(cacheCurrentTenantIdKey, currentTenant);
     }
   }
+
+  /// 设置上一个路由页面路径
+  void setPrePath(String? prePath) {
+    final current = state.value;
+    if (current == null) return;
+
+    final updated = current.copyWith(prePath: prePath);
+    state = AsyncData(updated);
+  }
 }
