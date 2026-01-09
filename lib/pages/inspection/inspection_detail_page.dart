@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -159,101 +160,10 @@ class InspectionDetailPage extends HookConsumerWidget {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: filteredItems.map((item) {
-                                final isVerified = item.status == 1;
-
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF9F9F9),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          item.itemNo ?? '无编号',
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      _buildStatusTag(isVerified),
-                                      const SizedBox(width: 12),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          if (item.id != null) {
-                                            await context.router.push(
-                                              InspectionItemConfirmRoute(
-                                                  id: item.id!),
-                                            );
-
-                                            refreshData(isSilent: true);
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: primaryBlue,
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          minimumSize: const Size(60, 32),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        child: const Text('验货',
-                                            style: TextStyle(fontSize: 13)),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFFFEBEE),
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: IconButton(
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(Icons.delete_outline,
-                                              color: Colors.redAccent,
-                                              size: 18),
-                                          onPressed: () async {
-                                            final bool isConfirmed =
-                                                await ConfirmDialog.show(
-                                              context,
-                                              content:
-                                                  '是否确定要删除SKU: ${item.itemNo}？',
-                                            );
-
-                                            if (!isConfirmed) return;
-
-                                            try {
-                                              await EasyLoading.show(
-                                                  status: '删除中...');
-
-                                              await deleteInspectionItem(id, {
-                                                'item_ids': [item.id]
-                                              });
-
-                                              await refreshData(isSilent: true);
-
-                                              EasyLoading.showSuccess('删除成功');
-                                            } finally {
-                                              EasyLoading.dismiss();
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                return _InspectionListItem(
+                                  item: item,
+                                  primaryBlue: primaryBlue,
+                                  onRefresh: () => refreshData(isSilent: true),
                                 );
                               }).toList(),
                             ),
@@ -440,26 +350,6 @@ class InspectionDetailPage extends HookConsumerWidget {
                   isSelected: currentTab.value == 2,
                   onTap: () => currentTab.value = 2),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusTag(bool isVerified) {
-    return Row(
-      children: [
-        Icon(
-          isVerified ? Icons.check_circle : Icons.check_circle_outline,
-          size: 14,
-          color: isVerified ? Colors.green : Colors.grey[400],
-        ),
-        const SizedBox(width: 4),
-        Text(
-          isVerified ? '已验货' : '未验货',
-          style: TextStyle(
-            color: isVerified ? Colors.green : Colors.grey[500],
-            fontSize: 13,
           ),
         ),
       ],
@@ -701,6 +591,210 @@ class ExportInspectionDialog extends HookWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InspectionListItem extends HookWidget {
+  final InspectionItem item;
+  final Color primaryBlue;
+  final VoidCallback onRefresh;
+
+  const _InspectionListItem({
+    super.key,
+    required this.item,
+    required this.primaryBlue,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isExpanded = useState(false);
+    final isVerified = item.status == 1;
+
+    final mediaList = item.media ?? [];
+
+    bool hasMedia(String collectionName) {
+      return mediaList.any((m) => m.collectionName == collectionName);
+    }
+
+    final int detailsCount =
+        mediaList.where((m) => m.collectionName == 'details').length;
+
+    // 4. 生成动态检查项数据
+    final checkPoints = [
+      {'label': '验货', 'checked': hasMedia('original')},
+      {'label': '重量', 'checked': hasMedia('weight_proof')},
+      {'label': '条码', 'checked': hasMedia('barcode_label')},
+      {'label': '开箱', 'checked': hasMedia('unboxing')},
+      {'label': '正唛', 'checked': hasMedia('shipping_mark_front')},
+      {'label': '侧唛', 'checked': hasMedia('shipping_mark_side')},
+      {'label': '主图', 'checked': hasMedia('cover')},
+      {'label': '其他($detailsCount)', 'checked': detailsCount > 0},
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F9F9),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                    child: Text(
+                  item.itemNo ?? '无编号',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF333333),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
+                InkWell(
+                  onTap: () => isExpanded.value = !isExpanded.value,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: AnimatedRotation(
+                      turns: isExpanded.value ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: const Icon(Icons.keyboard_arrow_down,
+                          color: Color(0xFF666666), size: 20),
+                    ),
+                  ),
+                ),
+                _buildStatusTag(isVerified),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (item.id != null) {
+                      await context.router.push(
+                        InspectionItemConfirmRoute(id: item.id!),
+                      );
+                      onRefresh();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B66F5),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    minimumSize: const Size(64, 32),
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    item.status == 1 ? '查看' : '验货',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF0F0),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.delete_outline,
+                        color: Color(0xFFFF4D4F), size: 18),
+                    onPressed: () async {
+                      final bool isConfirmed = await ConfirmDialog.show(
+                        context,
+                        content: '是否确定要删除SKU: ${item.itemNo}？',
+                      );
+
+                      if (!isConfirmed) return;
+
+                      try {
+                        EasyLoading.show(status: '删除中...');
+
+                        if (item.id != null) {
+                          await deleteInspectionItem(item.id!, {
+                            'item_ids': [item.id]
+                          });
+                          onRefresh();
+                          EasyLoading.showSuccess('删除成功');
+                        }
+                      } catch (e) {
+                        EasyLoading.showError('删除失败');
+                      } finally {
+                        EasyLoading.dismiss();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isExpanded.value)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 12,
+                children: checkPoints.map((point) {
+                  return _buildCheckPointItem(
+                    point['label'] as String,
+                    point['checked'] as bool,
+                  );
+                }).toList(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusTag(bool isVerified) {
+    return Row(
+      children: [
+        Icon(
+          isVerified ? Icons.check_circle : Icons.check_circle_outline,
+          size: 16,
+          color: isVerified ? const Color(0xFF52C41A) : Colors.grey[400],
+        ),
+        const SizedBox(width: 4),
+        Text(
+          isVerified ? '已验货' : '未验货',
+          style: TextStyle(
+            color: isVerified ? const Color(0xFF52C41A) : Colors.grey[500],
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckPointItem(String label, bool isChecked) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isChecked ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 16,
+          color: isChecked ? const Color(0xFF52C41A) : const Color(0xFFCCCCCC),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color:
+                isChecked ? const Color(0xFF333333) : const Color(0xFF999999),
+          ),
+        ),
+      ],
     );
   }
 }
