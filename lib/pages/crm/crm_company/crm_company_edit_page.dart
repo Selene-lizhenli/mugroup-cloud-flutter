@@ -63,13 +63,11 @@ class CrmCompanyEditPage extends HookConsumerWidget {
               children: {
                 0: Text("基本信息",
                     style: TextStyle(
-                        color:
-                            tab.value == 0 ? Colors.black87 : Colors.grey[600],
+                        color: tab.value == 0 ? Colors.white : Colors.grey[600],
                         fontWeight: FontWeight.w600)),
                 1: Text("联系人信息",
                     style: TextStyle(
-                        color:
-                            tab.value == 1 ? Colors.black87 : Colors.grey[600],
+                        color: tab.value == 1 ? Colors.white : Colors.grey[600],
                         fontWeight: FontWeight.w600)),
               },
               decoration: BoxDecoration(
