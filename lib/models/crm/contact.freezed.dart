@@ -23,6 +23,8 @@ mixin _$Contact {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
+  String? get position => throw _privateConstructorUsedError;
+  String? get birthday => throw _privateConstructorUsedError;
   @JsonKey(name: 'tel_number')
   String? get telNumber => throw _privateConstructorUsedError;
   @JsonKey(name: 'company_id')
@@ -49,6 +51,8 @@ abstract class $ContactCopyWith<$Res> {
       {int? id,
       String? name,
       String? location,
+      String? position,
+      String? birthday,
       @JsonKey(name: 'tel_number') String? telNumber,
       @JsonKey(name: 'company_id') int? companyId,
       Company? company,
@@ -79,6 +83,8 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
     Object? id = freezed,
     Object? name = freezed,
     Object? location = freezed,
+    Object? position = freezed,
+    Object? birthday = freezed,
     Object? telNumber = freezed,
     Object? companyId = freezed,
     Object? company = freezed,
@@ -101,6 +107,14 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
       location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      birthday: freezed == birthday
+          ? _value.birthday
+          : birthday // ignore: cast_nullable_to_non_nullable
               as String?,
       telNumber: freezed == telNumber
           ? _value.telNumber
@@ -177,6 +191,8 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
       {int? id,
       String? name,
       String? location,
+      String? position,
+      String? birthday,
       @JsonKey(name: 'tel_number') String? telNumber,
       @JsonKey(name: 'company_id') int? companyId,
       Company? company,
@@ -207,6 +223,8 @@ class __$$ContactImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? location = freezed,
+    Object? position = freezed,
+    Object? birthday = freezed,
     Object? telNumber = freezed,
     Object? companyId = freezed,
     Object? company = freezed,
@@ -229,6 +247,14 @@ class __$$ContactImplCopyWithImpl<$Res>
       freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == birthday
+          ? _value.birthday
+          : birthday // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == telNumber
           ? _value.telNumber
@@ -277,6 +303,8 @@ class _$ContactImpl implements _Contact {
       this.id,
       this.name,
       this.location,
+      this.position,
+      this.birthday,
       @JsonKey(name: 'tel_number') this.telNumber,
       @JsonKey(name: 'company_id') this.companyId,
       this.company,
@@ -301,6 +329,10 @@ class _$ContactImpl implements _Contact {
   final String? name;
   @override
   final String? location;
+  @override
+  final String? position;
+  @override
+  final String? birthday;
   @override
   @JsonKey(name: 'tel_number')
   final String? telNumber;
@@ -363,7 +395,7 @@ class _$ContactImpl implements _Contact {
 
   @override
   String toString() {
-    return 'Contact(id: $id, name: $name, location: $location, telNumber: $telNumber, companyId: $companyId, company: $company, whatsapp: $whatsapp, email: $email, linkedin: $linkedin, facebook: $facebook, head: $head, logs: $logs)';
+    return 'Contact(id: $id, name: $name, location: $location, position: $position, birthday: $birthday, telNumber: $telNumber, companyId: $companyId, company: $company, whatsapp: $whatsapp, email: $email, linkedin: $linkedin, facebook: $facebook, head: $head, logs: $logs)';
   }
 
   @override
@@ -375,6 +407,10 @@ class _$ContactImpl implements _Contact {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.location, location) ||
                 other.location == location) &&
+            (identical(other.position, position) ||
+                other.position == position) &&
+            (identical(other.birthday, birthday) ||
+                other.birthday == birthday) &&
             (identical(other.telNumber, telNumber) ||
                 other.telNumber == telNumber) &&
             (identical(other.companyId, companyId) ||
@@ -395,6 +431,8 @@ class _$ContactImpl implements _Contact {
       id,
       name,
       location,
+      position,
+      birthday,
       telNumber,
       companyId,
       company,
@@ -424,6 +462,8 @@ abstract class _Contact implements Contact {
       final int? id,
       final String? name,
       final String? location,
+      final String? position,
+      final String? birthday,
       @JsonKey(name: 'tel_number') final String? telNumber,
       @JsonKey(name: 'company_id') final int? companyId,
       final Company? company,
@@ -442,6 +482,10 @@ abstract class _Contact implements Contact {
   String? get name;
   @override
   String? get location;
+  @override
+  String? get position;
+  @override
+  String? get birthday;
   @override
   @JsonKey(name: 'tel_number')
   String? get telNumber;

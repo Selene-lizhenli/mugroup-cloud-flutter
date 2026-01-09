@@ -12,6 +12,8 @@ class Contact with _$Contact {
     int? id,
     String? name,
     String? location,
+    String? position,
+    String? birthday,
     @JsonKey(name: 'tel_number') String? telNumber,
     @JsonKey(name: 'company_id') int? companyId,
     Company? company,

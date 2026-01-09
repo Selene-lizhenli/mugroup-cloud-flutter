@@ -11,6 +11,8 @@ _$ContactImpl _$$ContactImplFromJson(Map<String, dynamic> json) =>
       (json['id'] as num?)?.toInt(),
       json['name'] as String?,
       json['location'] as String?,
+      json['position'] as String?,
+      json['birthday'] as String?,
       json['tel_number'] as String?,
       (json['company_id'] as num?)?.toInt(),
       json['company'] == null
@@ -33,6 +35,8 @@ Map<String, dynamic> _$$ContactImplToJson(_$ContactImpl instance) =>
       'id': instance.id,
       'name': instance.name,
       'location': instance.location,
+      'position': instance.position,
+      'birthday': instance.birthday,
       'tel_number': instance.telNumber,
       'company_id': instance.companyId,
       'company': instance.company,
