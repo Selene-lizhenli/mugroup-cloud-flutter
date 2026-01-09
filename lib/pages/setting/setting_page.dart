@@ -19,6 +19,7 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   static const _storageKey = 'selected_module_ids';
+  static const _orderKey = 'module_order_ids';
 
   late List<DashboardModule> modules;
   bool _loading = true;
@@ -30,14 +31,15 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   /// =======================
-  /// 初始化：从本地读取选中模块
+  /// 初始化：从本地读取选中模块和排序顺序
   /// =======================
   Future<void> _initModules() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds = prefs.getStringList(_storageKey) ?? [];
+    final orderIds = prefs.getStringList(_orderKey) ?? [];
 
     /// 所有模块（固定定义）
-    modules = [
+    final allModules = [
       DashboardModule(
         id: 'rate',
         title: '今日汇率',
@@ -89,26 +91,148 @@ class _SettingPageState extends State<SettingPage> {
       ),
     ];
 
+    // 如果存在排序顺序，按照保存的顺序重新排列
+    if (orderIds.isNotEmpty) {
+      final orderedModules = <DashboardModule>[];
+      final moduleMap = {for (var m in allModules) m.id: m};
+
+      // 首先添加已排序的模块
+      for (final id in orderIds) {
+        if (moduleMap.containsKey(id)) {
+          orderedModules.add(moduleMap[id]!);
+        }
+      }
+
+      // 然后添加未排序的新模块
+      for (final module in allModules) {
+        if (!orderIds.contains(module.id)) {
+          orderedModules.add(module);
+        }
+      }
+
+      modules = orderedModules;
+    } else {
+      modules = allModules;
+    }
+
     setState(() {
       _loading = false;
     });
   }
 
   /// =======================
-  /// 保存当前选中模块
+  /// 保存当前选中模块和排序顺序
   /// =======================
   Future<void> _saveSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds =
         modules.where((e) => e.selected).map((e) => e.id).toList();
+    final orderIds = modules.map((e) => e.id).toList();
 
     await prefs.setStringList(_storageKey, selectedIds);
+    await prefs.setStringList(_orderKey, orderIds);
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('模块配置已保存')),
     );
+  }
+
+  /// =======================
+  /// 处理组内拖拽排序（已选中模块）
+  /// =======================
+  void _onReorderSelected(String group, int oldIndex, int newIndex) {
+    setState(() {
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      
+      // 获取该组已选中的模块，保持它们在 modules 列表中的原始顺序
+      final selectedInGroup = <DashboardModule>[];
+      for (final module in modules) {
+        if (module.group == group && module.selected) {
+          selectedInGroup.add(module);
+        }
+      }
+      
+      if (oldIndex >= selectedInGroup.length || 
+          newIndex >= selectedInGroup.length ||
+          oldIndex < 0 || 
+          newIndex < 0) {
+        return;
+      }
+      
+      // 在组内重新排序
+      final item = selectedInGroup.removeAt(oldIndex);
+      selectedInGroup.insert(newIndex, item);
+      
+      // 重新构建整个 modules 列表，保持组之间的相对位置
+      final newModules = <DashboardModule>[];
+      int selectedIndex = 0; // 用于跟踪已选中的新顺序索引
+      
+      // 遍历原始列表，保持相对位置，只更新该组已选中的顺序
+      for (final module in modules) {
+        if (module.group == group && module.selected) {
+          // 使用新的顺序
+          newModules.add(selectedInGroup[selectedIndex]);
+          selectedIndex++;
+        } else {
+          // 其他模块保持原位置
+          newModules.add(module);
+        }
+      }
+      
+      modules = newModules;
+    });
+  }
+
+  /// =======================
+  /// 处理组内拖拽排序（未选中模块）
+  /// =======================
+  void _onReorderUnselected(String group, int oldIndex, int newIndex) {
+    setState(() {
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      
+      // 获取该组未选中的模块，保持它们在 modules 列表中的原始顺序
+      final unselectedInGroup = <DashboardModule>[];
+      for (final module in modules) {
+        if (module.group == group && !module.selected) {
+          unselectedInGroup.add(module);
+        }
+      }
+      
+      if (oldIndex >= unselectedInGroup.length || 
+          newIndex >= unselectedInGroup.length ||
+          oldIndex < 0 || 
+          newIndex < 0) {
+        return;
+      }
+      
+      // 在组内重新排序
+      final item = unselectedInGroup.removeAt(oldIndex);
+      unselectedInGroup.insert(newIndex, item);
+      
+      // 重新构建整个 modules 列表，保持组之间的相对位置
+      final newModules = <DashboardModule>[];
+      int unselectedIndex = 0; // 用于跟踪未选中的新顺序索引
+      
+      // 遍历原始列表，保持相对位置，只更新该组未选中的顺序
+      for (final module in modules) {
+        if (module.group == group && !module.selected) {
+          // 使用新的顺序
+          newModules.add(unselectedInGroup[unselectedIndex]);
+          unselectedIndex++;
+        } else {
+          // 其他模块保持原位置
+          newModules.add(module);
+        }
+      }
+      
+      modules = newModules;
+    });
   }
 
   @override
@@ -156,39 +280,39 @@ class _SettingPageState extends State<SettingPage> {
             if (selectedDataOverview.isNotEmpty) ...[
               const _GroupTitle(title: '数据统计'),
               const SizedBox(height: 10),
-              ...selectedDataOverview.map(
-                (module) => _ModuleCard(
-                  title: module.title,
-                  selected: true,
-                  onAction: () {
-                    setState(() {
-                      module.selected = false;
-                    });
-                  },
-                ),
+              _ReorderableModuleList(
+                modules: selectedDataOverview,
+                selected: true,
+                group: '数据统计',
+                onReorder: _onReorderSelected,
+                onToggle: (module) {
+                  setState(() {
+                    module.selected = false;
+                  });
+                },
               ),
               const SizedBox(height: 20),
             ],
 
             /// 应用组（已选中）
             if (selectedApp.isNotEmpty) ...[
-              _GroupTitle(title: '应用'),
+              const _GroupTitle(title: '应用'),
               const SizedBox(height: 10),
-              ...selectedApp.map(
-                (module) => _ModuleCard(
-                  title: module.title,
-                  selected: true,
-                  onAction: () {
-                    setState(() {
-                      module.selected = false;
-                    });
-                  },
-                ),
+              _ReorderableModuleList(
+                modules: selectedApp,
+                selected: true,
+                group: '应用',
+                onReorder: _onReorderSelected,
+                onToggle: (module) {
+                  setState(() {
+                    module.selected = false;
+                  });
+                },
               ),
             ],
           ] else ...[
             // 如果没有选中的模块，显示空状态
-            _EmptyState(),
+            const _EmptyState(),
           ],
 
           const SizedBox(height: 32),
@@ -205,36 +329,36 @@ class _SettingPageState extends State<SettingPage> {
 
             /// 数据统计组（未选中）
             if (unselectedDataOverview.isNotEmpty) ...[
-              _GroupTitle(title: '数据统计'),
+              const _GroupTitle(title: '数据统计'),
               const SizedBox(height: 10),
-              ...unselectedDataOverview.map(
-                (module) => _ModuleCard(
-                  title: module.title,
-                  selected: false,
-                  onAction: () {
-                    setState(() {
-                      module.selected = true;
-                    });
-                  },
-                ),
+              _ReorderableModuleList(
+                modules: unselectedDataOverview,
+                selected: false,
+                group: '数据统计',
+                onReorder: _onReorderUnselected,
+                onToggle: (module) {
+                  setState(() {
+                    module.selected = true;
+                  });
+                },
               ),
               const SizedBox(height: 20),
             ],
 
             /// 应用组（未选中）
             if (unselectedApp.isNotEmpty) ...[
-              _GroupTitle(title: '应用'),
+              const _GroupTitle(title: '应用'),
               const SizedBox(height: 10),
-              ...unselectedApp.map(
-                (module) => _ModuleCard(
-                  title: module.title,
-                  selected: false,
-                  onAction: () {
-                    setState(() {
-                      module.selected = true;
-                    });
-                  },
-                ),
+              _ReorderableModuleList(
+                modules: unselectedApp,
+                selected: false,
+                group: '应用',
+                onReorder: _onReorderUnselected,
+                onToggle: (module) {
+                  setState(() {
+                    module.selected = true;
+                  });
+                },
               ),
             ],
           ],
@@ -264,17 +388,90 @@ class DashboardModule {
 }
 
 /// =======================
+/// 可拖拽排序的模块列表
+/// =======================
+class _ReorderableModuleList extends StatelessWidget {
+  final List<DashboardModule> modules;
+  final bool selected;
+  final String group;
+  final Function(String, int, int) onReorder;
+  final Function(DashboardModule) onToggle;
+
+  const _ReorderableModuleList({
+    required this.modules,
+    required this.selected,
+    required this.group,
+    required this.onReorder,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (modules.length == 1) {
+      // 只有一个模块时，不需要拖拽功能，直接显示
+      final module = modules[0];
+      return _ModuleCard(
+        key: ValueKey(module.id),
+        title: module.title,
+        selected: selected,
+        onAction: () => onToggle(module),
+        dragIndex: null, // 单个模块不需要拖拽
+      );
+    }
+
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: modules.length,
+      onReorder: (oldIndex, newIndex) {
+        onReorder(group, oldIndex, newIndex);
+      },
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            final animValue = Curves.easeInOut.transform(animation.value);
+            final elevation = 0.0 + (6.0 - 0.0) * animValue;
+            return Material(
+              elevation: elevation,
+              color: Colors.transparent,
+              shadowColor: Colors.black26,
+              borderRadius: BorderRadius.circular(14),
+              child: child,
+            );
+          },
+          child: child,
+        );
+      },
+      itemBuilder: (context, index) {
+        final module = modules[index];
+        return _ModuleCard(
+          key: ValueKey(module.id),
+          title: module.title,
+          selected: selected,
+          onAction: () => onToggle(module),
+          dragIndex: index, // 传递索引用于拖拽
+        );
+      },
+    );
+  }
+}
+
+/// =======================
 /// 模块卡片
 /// =======================
 class _ModuleCard extends StatelessWidget {
   final String title;
   final bool selected;
   final VoidCallback onAction;
+  final int? dragIndex; // 用于拖拽的索引
 
   const _ModuleCard({
+    super.key,
     required this.title,
     required this.selected,
     required this.onAction,
+    this.dragIndex,
   });
 
   /// 根据标题获取图标和颜色
@@ -361,6 +558,21 @@ class _ModuleCard extends StatelessWidget {
           ),
           child: Row(
             children: [
+              /// 拖拽手柄（仅在可拖拽时显示）
+              if (dragIndex != null)
+                ReorderableDragStartListener(
+                  index: dragIndex!,
+                  child: Container(
+                    padding: const EdgeInsets.only(right: 8),
+                    color: Colors.transparent,
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: Colors.grey.shade400,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              
               /// 左侧 icon
               Container(
                 width: 48,

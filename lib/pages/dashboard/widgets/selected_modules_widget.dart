@@ -29,6 +29,7 @@ class ModuleInfo {
 /// 所有可用的模块定义
 class DashboardModules {
   static const String _storageKey = 'selected_module_ids';
+  static const String _orderKey = 'module_order_ids';
 
   static List<ModuleInfo> getAllModules() {
     return [
@@ -77,19 +78,46 @@ class DashboardModules {
     ];
   }
 
-  /// 获取已选中的模块
+  /// 获取已选中的模块（按照设置页面中保存的排序顺序）
   static Future<List<ModuleInfo>> getSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds = prefs.getStringList(_storageKey) ?? [];
+    final orderIds = prefs.getStringList(_orderKey) ?? [];
     
     if (selectedIds.isEmpty) {
       return [];
     }
 
     final allModules = getAllModules();
-    return allModules
-        .where((module) => selectedIds.contains(module.id))
-        .toList();
+    final moduleMap = {for (var m in allModules) m.id: m};
+
+    // 如果存在排序顺序，按照保存的顺序排列
+    if (orderIds.isNotEmpty) {
+      final orderedModules = <ModuleInfo>[];
+      final processedIds = <String>{};
+
+      // 先按照排序顺序添加已选中的模块
+      for (final id in orderIds) {
+        if (selectedIds.contains(id) && moduleMap.containsKey(id)) {
+          orderedModules.add(moduleMap[id]!);
+          processedIds.add(id);
+        }
+      }
+
+      // 如果排序列表中还有已选中但未处理的模块（不应该发生，但为了健壮性保留）
+      for (final id in selectedIds) {
+        if (!processedIds.contains(id) && moduleMap.containsKey(id)) {
+          orderedModules.add(moduleMap[id]!);
+        }
+      }
+
+      return orderedModules;
+    } else {
+      // 如果没有保存排序顺序，使用默认顺序（按 getAllModules 的顺序）
+      return allModules
+          .where((module) => selectedIds.contains(module.id))
+          .toList();
+    }
   }
 }
 
