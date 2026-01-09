@@ -30,7 +30,6 @@ class CrmContactPage extends HookConsumerWidget {
 
     if (isLoading.value) {
       return Scaffold(
-        appBar: AppBar(title: const Text('客户联系人列表')),
         body: Skeleton(
             isLoading: true, skeleton: SkeletonListView(), child: Container()),
       );

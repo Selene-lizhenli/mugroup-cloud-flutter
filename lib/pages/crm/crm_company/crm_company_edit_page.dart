@@ -20,12 +20,23 @@ class CrmCompanyEditPage extends HookConsumerWidget {
     final isLoading = useState(true);
     final tab = useState(0);
 
-    Future loadCompany() async {
+    final refreshKey = useState(0);
+
+    Future loadCompany({bool isRefresh = false}) async {
       try {
+        if (isRefresh) EasyLoading.show(status: '刷新中...');
+
         final data = await showCrmCompany(id);
         company.value = data;
+
+        if (isRefresh) {
+          refreshKey.value++;
+          EasyLoading.showSuccess('刷新成功');
+        }
+      } catch (e) {
+        if (isRefresh) EasyLoading.showError('刷新失败');
       } finally {
-        isLoading.value = false;
+        if (!isRefresh) isLoading.value = false;
       }
     }
 
@@ -51,6 +62,20 @@ class CrmCompanyEditPage extends HookConsumerWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await loadCompany(isRefresh: true);
+            },
+            child: const Text(
+              "刷新",
+              style: TextStyle(
+                color: Color(0xFF999999),
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -103,7 +128,9 @@ class CrmCompanyEditPage extends HookConsumerWidget {
                     }
                   },
                 ),
-                CrmContactPage(companyId: id),
+                CrmContactPage(
+                    key: ValueKey('contact_${refreshKey.value}'),
+                    companyId: id),
               ],
             ),
           ),
