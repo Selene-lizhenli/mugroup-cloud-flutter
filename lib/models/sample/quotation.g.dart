@@ -12,12 +12,12 @@ _$QuotationImpl _$$QuotationImplFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      exchange: (json['exchange'] as num?)?.toDouble(),
+      exchange: json['exchange'] as String?,
       showPrice: json['showPrice'] as bool?,
       quotationSamples: (json['quotationSamples'] as List<dynamic>?)
           ?.map((e) => QuotationSample.fromJson(e as Map<String, dynamic>))
           .toList(),
-      commissionRate: (json['commission_rate'] as num?)?.toDouble(),
+      commissionRate: json['commission_rate'] as String?,
       inquiryAt: json['inquiry_at'] == null
           ? null
           : DateTime.parse(json['inquiry_at'] as String),

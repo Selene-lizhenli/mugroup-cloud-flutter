@@ -22,12 +22,12 @@ Quotation _$QuotationFromJson(Map<String, dynamic> json) {
 mixin _$Quotation {
   int? get id => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
-  double? get exchange => throw _privateConstructorUsedError;
+  String? get exchange => throw _privateConstructorUsedError;
   bool? get showPrice => throw _privateConstructorUsedError;
   List<QuotationSample>? get quotationSamples =>
       throw _privateConstructorUsedError;
   @JsonKey(name: 'commission_rate')
-  double? get commissionRate => throw _privateConstructorUsedError;
+  String? get commissionRate => throw _privateConstructorUsedError;
   @JsonKey(name: 'inquiry_at')
   DateTime? get inquiryAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'quote_at')
@@ -47,10 +47,10 @@ abstract class $QuotationCopyWith<$Res> {
   $Res call(
       {int? id,
       User? user,
-      double? exchange,
+      String? exchange,
       bool? showPrice,
       List<QuotationSample>? quotationSamples,
-      @JsonKey(name: 'commission_rate') double? commissionRate,
+      @JsonKey(name: 'commission_rate') String? commissionRate,
       @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') DateTime? quoteAt});
 
@@ -91,7 +91,7 @@ class _$QuotationCopyWithImpl<$Res, $Val extends Quotation>
       exchange: freezed == exchange
           ? _value.exchange
           : exchange // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       showPrice: freezed == showPrice
           ? _value.showPrice
           : showPrice // ignore: cast_nullable_to_non_nullable
@@ -103,7 +103,7 @@ class _$QuotationCopyWithImpl<$Res, $Val extends Quotation>
       commissionRate: freezed == commissionRate
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       inquiryAt: freezed == inquiryAt
           ? _value.inquiryAt
           : inquiryAt // ignore: cast_nullable_to_non_nullable
@@ -139,10 +139,10 @@ abstract class _$$QuotationImplCopyWith<$Res>
   $Res call(
       {int? id,
       User? user,
-      double? exchange,
+      String? exchange,
       bool? showPrice,
       List<QuotationSample>? quotationSamples,
-      @JsonKey(name: 'commission_rate') double? commissionRate,
+      @JsonKey(name: 'commission_rate') String? commissionRate,
       @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') DateTime? quoteAt});
 
@@ -182,7 +182,7 @@ class __$$QuotationImplCopyWithImpl<$Res>
       exchange: freezed == exchange
           ? _value.exchange
           : exchange // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       showPrice: freezed == showPrice
           ? _value.showPrice
           : showPrice // ignore: cast_nullable_to_non_nullable
@@ -194,7 +194,7 @@ class __$$QuotationImplCopyWithImpl<$Res>
       commissionRate: freezed == commissionRate
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       inquiryAt: freezed == inquiryAt
           ? _value.inquiryAt
           : inquiryAt // ignore: cast_nullable_to_non_nullable
@@ -229,7 +229,7 @@ class _$QuotationImpl implements _Quotation {
   @override
   final User? user;
   @override
-  final double? exchange;
+  final String? exchange;
   @override
   final bool? showPrice;
   final List<QuotationSample>? _quotationSamples;
@@ -245,7 +245,7 @@ class _$QuotationImpl implements _Quotation {
 
   @override
   @JsonKey(name: 'commission_rate')
-  final double? commissionRate;
+  final String? commissionRate;
   @override
   @JsonKey(name: 'inquiry_at')
   final DateTime? inquiryAt;
@@ -309,10 +309,10 @@ abstract class _Quotation implements Quotation {
   factory _Quotation(
       {final int? id,
       final User? user,
-      final double? exchange,
+      final String? exchange,
       final bool? showPrice,
       final List<QuotationSample>? quotationSamples,
-      @JsonKey(name: 'commission_rate') final double? commissionRate,
+      @JsonKey(name: 'commission_rate') final String? commissionRate,
       @JsonKey(name: 'inquiry_at') final DateTime? inquiryAt,
       @JsonKey(name: 'quote_at') final DateTime? quoteAt}) = _$QuotationImpl;
 
@@ -324,14 +324,14 @@ abstract class _Quotation implements Quotation {
   @override
   User? get user;
   @override
-  double? get exchange;
+  String? get exchange;
   @override
   bool? get showPrice;
   @override
   List<QuotationSample>? get quotationSamples;
   @override
   @JsonKey(name: 'commission_rate')
-  double? get commissionRate;
+  String? get commissionRate;
   @override
   @JsonKey(name: 'inquiry_at')
   DateTime? get inquiryAt;

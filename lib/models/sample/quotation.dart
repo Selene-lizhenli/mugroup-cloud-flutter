@@ -10,10 +10,10 @@ class Quotation with _$Quotation {
   factory Quotation({
     int? id,
     User? user,
-    double? exchange,
+    String? exchange,
     bool? showPrice,
     List<QuotationSample>? quotationSamples,
-    @JsonKey(name: 'commission_rate') double? commissionRate,
+    @JsonKey(name: 'commission_rate') String? commissionRate,
     @JsonKey(name: 'inquiry_at') DateTime? inquiryAt,
     @JsonKey(name: 'quote_at') DateTime? quoteAt,
   }) = _Quotation;
