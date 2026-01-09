@@ -127,7 +127,7 @@ class _ChartContentState extends State<ChartContent> {
             // 估算：每行约显示 4-5 项（根据容器宽度和项的平均宽度）
             // 两行约 8-10 项，使用 8 作为阈值
             // 两行的高度：12px (图标) + 8px (runSpacing) + 12px (第二行图标) ≈ 32px，加上文本高度约 14px，总计约 46px
-            const double twoLineHeight = 50;
+            const double twoLineHeight = 60;
             const int itemsPerRow = 4;
             const int maxItemsWhenCollapsed = itemsPerRow * 2;
             final bool needsExpansionButton =
@@ -148,20 +148,11 @@ class _ChartContentState extends State<ChartContent> {
                             : 1000.0, // 使用足够大的值而不是 infinity
                       ),
                       child: Container(
-                        decoration: BoxDecoration(
-                          // boxShadow: isCollapsed
-                          //     ? [
-                          //         BoxShadow(
-                          //           color: Colors.black.withOpacity(0.3),
-                          //           blurRadius: 10,
-                          //           offset: const Offset(0, 40),
-                          //         ),
-                          //       ]
-                          //     : [],
-                        ),
+                        decoration: const BoxDecoration(    ),
                         child: Padding(
                           padding: EdgeInsets.only(
-                            bottom: needsExpansionButton && !isCollapsed ? 30 : 0,
+                            bottom:
+                                needsExpansionButton && !isCollapsed ? 30 : 0,
                           ),
                           child: Wrap(
                             spacing: 12,
@@ -188,47 +179,49 @@ class _ChartContentState extends State<ChartContent> {
                       },
                       child: Container(
                         width: double.infinity, // 宽度占满父容器
+                        padding: const EdgeInsets.fromLTRB(12, 24, 2, 2),
                         alignment: Alignment.centerRight, // 文本整体靠右
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(4),
-                            boxShadow: isCollapsed
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 0),
-                                    ),
-                                  ]
-                                : [],
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _isLegendExpanded ? '收起' : '展开',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      fontSize: 10,
-                                      color: colorScheme.secondary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                _isLegendExpanded
-                                    ? Icons.keyboard_arrow_up
-                                    : Icons.keyboard_arrow_down,
-                                size: 16,
-                                color: colorScheme.secondary,
-                              ),
+                          // 背景使用从下到上的渐变：越往上透明度越低
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Color.fromRGBO(255, 255, 255, 1), // 下方 
+                              Color.fromRGBO(255, 255, 255, 0.85),  
+                              Color.fromRGBO(255, 255, 255, 0.6),  
+                              Color.fromRGBO(255, 255, 255, 0.0), // 上方 
                             ],
                           ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              _isLegendExpanded ? '收起' : '展开',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontSize: 11,
+                                    color: colorScheme.secondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                            const SizedBox(width: 2),
+                            Icon(
+                              _isLegendExpanded
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: colorScheme.secondary,
+                            ),
+                          ],
                         ),
                       ),
                     ),
