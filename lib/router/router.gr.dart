@@ -9,7 +9,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i56;
-import 'package:cloud/models/dashboard/public_news_article.dart' as _i60;
+import 'package:cloud/models/dashboard/public_news_article.dart' as _i61;
 import 'package:cloud/models/wms/warehouse.dart' as _i58;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
@@ -25,6 +25,8 @@ import 'package:cloud/pages/crm/crm_contact/crm_contact_create_page.dart'
 import 'package:cloud/pages/crm/crm_contact/crm_contact_edit_page.dart' as _i8;
 import 'package:cloud/pages/dashboard/dashboard.dart' as _i9;
 import 'package:cloud/pages/dashboard/pages/news_pages.dart' as _i22;
+import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart'
+    as _i60;
 import 'package:cloud/pages/inspection/inspection_add_page.dart' as _i10;
 import 'package:cloud/pages/inspection/inspection_detail_page.dart' as _i11;
 import 'package:cloud/pages/inspection/inspection_item_confirm_page.dart'
@@ -393,10 +395,17 @@ class CrmContactEditRouteArgs {
 
 /// generated route for
 /// [_i9.DashboardPage]
-class DashboardRoute extends _i56.PageRouteInfo<void> {
-  const DashboardRoute({List<_i56.PageRouteInfo>? children})
-      : super(
+class DashboardRoute extends _i56.PageRouteInfo<DashboardRouteArgs> {
+  DashboardRoute({
+    _i59.Key? key,
+    _i59.GlobalKey<_i59.State<_i60.SelectedModulesWidget>>? selectedModulesKey,
+    List<_i56.PageRouteInfo>? children,
+  }) : super(
           DashboardRoute.name,
+          args: DashboardRouteArgs(
+            key: key,
+            selectedModulesKey: selectedModulesKey,
+          ),
           initialChildren: children,
         );
 
@@ -405,9 +414,31 @@ class DashboardRoute extends _i56.PageRouteInfo<void> {
   static _i56.PageInfo page = _i56.PageInfo(
     name,
     builder: (data) {
-      return const _i9.DashboardPage();
+      final args = data.argsAs<DashboardRouteArgs>(
+          orElse: () => const DashboardRouteArgs());
+      return _i9.DashboardPage(
+        key: args.key,
+        selectedModulesKey: args.selectedModulesKey,
+      );
     },
   );
+}
+
+class DashboardRouteArgs {
+  const DashboardRouteArgs({
+    this.key,
+    this.selectedModulesKey,
+  });
+
+  final _i59.Key? key;
+
+  final _i59.GlobalKey<_i59.State<_i60.SelectedModulesWidget>>?
+      selectedModulesKey;
+
+  @override
+  String toString() {
+    return 'DashboardRouteArgs{key: $key, selectedModulesKey: $selectedModulesKey}';
+  }
 }
 
 /// generated route for
@@ -727,7 +758,7 @@ class MyRoute extends _i56.PageRouteInfo<void> {
 class NewsRoute extends _i56.PageRouteInfo<NewsRouteArgs> {
   NewsRoute({
     _i59.Key? key,
-    required _i60.PublicNewsArticle article,
+    required _i61.PublicNewsArticle article,
     List<_i56.PageRouteInfo>? children,
   }) : super(
           NewsRoute.name,
@@ -760,7 +791,7 @@ class NewsRouteArgs {
 
   final _i59.Key? key;
 
-  final _i60.PublicNewsArticle article;
+  final _i61.PublicNewsArticle article;
 
   @override
   String toString() {
