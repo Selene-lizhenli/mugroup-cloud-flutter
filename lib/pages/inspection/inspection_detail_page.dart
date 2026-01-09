@@ -623,7 +623,7 @@ class _InspectionListItem extends HookWidget {
 
     // 4. 生成动态检查项数据
     final checkPoints = [
-      {'label': '验货', 'checked': mediaList.isNotEmpty},
+      {'label': '验货', 'checked': isVerified},
       {'label': '重量', 'checked': hasMedia('weight_proof')},
       {'label': '条码', 'checked': hasMedia('barcode_label')},
       {'label': '开箱', 'checked': hasMedia('unboxing')},
