@@ -5,7 +5,7 @@ import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
+import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -203,7 +203,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  offset: const Offset(0, 8), // 在按钮下方显示气泡菜单
+                  offset: const Offset(-10, 45), // 在按钮下方显示气泡菜单
                   itemBuilder: (BuildContext context) => _buildDimensionMenuItems(module.id),
                   onSelected: (String value) {
                     _handleDimensionSelection(module.id, value);
@@ -265,7 +265,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
       case 'supplier':
       case 'market_purchase':
         // 验货、客户、供应商的时间维度选项
-        final currentStats = ref.watch(dashboardStatsProvider);
+        final currentStats = ref.watch(moduleStatsProvider(moduleId));
         final currentDimension = currentStats.timeDimension;
         
         return [ 
@@ -377,7 +377,14 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
       }
       
       if (dimension != null) {
-        ref.read(dashboardStatsProvider.notifier).setTimeDimension(dimension);
+        // 针对特定模块设置时间维度并刷新数据
+        ref.read(moduleStatsProvider(moduleId).notifier).setTimeDimension(dimension);
+        
+        // 市场采购模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
+        if (moduleId == 'market_purchase') {
+          ref.read(moduleStatsProvider('customer').notifier).setTimeDimension(dimension);
+          ref.read(moduleStatsProvider('supplier').notifier).setTimeDimension(dimension);
+        }
       }
     }
     // 其他模块的维度选择可以在这里扩展

@@ -237,6 +237,7 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -258,6 +259,7 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('模块管理'),
+        backgroundColor: colorScheme.surfaceTint, 
         actions: [
           IconButton(
             icon: const Icon(Icons.check),

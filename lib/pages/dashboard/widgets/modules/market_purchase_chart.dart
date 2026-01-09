@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
+import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,28 +10,41 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class MarketPurchaseChart extends HookConsumerWidget {
   const MarketPurchaseChart({super.key});
 
+  static const String _moduleId = 'market_purchase';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final stats = ref.watch(dashboardStatsProvider);
-    final statsNotifier = ref.read(dashboardStatsProvider.notifier);
+    final stats = ref.watch(moduleStatsProvider(_moduleId));
+    final statsNotifier = ref.read(moduleStatsProvider(_moduleId).notifier);
     final timeLabels = stats.timeLabels;
-    final productData = stats.productData;
-    final customerData = stats.customerData;
-    final serviceProviderData = stats.serviceProviderData;
+    final productData = stats.data;
+    
+    // 市场采购模块需要显示多个数据系列，所以还需要获取其他模块的数据
+    final customerStats = ref.watch(moduleStatsProvider('customer'));
+    final supplierStats = ref.watch(moduleStatsProvider('supplier'));
+    final customerData = customerStats.data;
+    final serviceProviderData = supplierStats.data;
 
     // 页面加载后调用 load
     useEffect(() {
       if (!stats.isLoading && stats.timeLabels.isEmpty) {
         Future.microtask(() {
           statsNotifier.load();
+          // 同时加载客户和供应商数据（如果它们还没有加载）
+          if (customerStats.timeLabels.isEmpty) {
+            ref.read(moduleStatsProvider('customer').notifier).load();
+          }
+          if (supplierStats.timeLabels.isEmpty) {
+            ref.read(moduleStatsProvider('supplier').notifier).load();
+          }
         });
       }
       return null;
     }, []); 
    
     // 显示加载状态
-    if (stats.isLoading) {
+    if (stats.isLoading || customerStats.isLoading || supplierStats.isLoading) {
       return Container(
         padding: const EdgeInsets.all(16),
         height: 200,

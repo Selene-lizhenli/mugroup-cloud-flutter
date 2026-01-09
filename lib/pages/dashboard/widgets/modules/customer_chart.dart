@@ -1,4 +1,4 @@
-import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
+import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,17 +13,18 @@ class CustomerChart extends ConsumerStatefulWidget {
 
 class _CustomerChartState extends ConsumerState<CustomerChart> {
   bool _hasLoaded = false;
+  static const String _moduleId = 'customer';
 
   @override
   Widget build(BuildContext context) {
-    final stats = ref.watch(dashboardStatsProvider);
+    final stats = ref.watch(moduleStatsProvider(_moduleId));
     
     // 初始化时加载数据（仅在首次且未加载时）
     if (!_hasLoaded && !stats.isLoading && stats.timeLabels.isEmpty) {
       _hasLoaded = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ref.read(dashboardStatsProvider.notifier).load();
+          ref.read(moduleStatsProvider(_moduleId).notifier).load();
         }
       });
     }
@@ -40,7 +41,7 @@ class _CustomerChartState extends ConsumerState<CustomerChart> {
     }
 
     final timeLabels = stats.timeLabels;
-    final customerData = stats.customerData;
+    final customerData = stats.data;
 
         if (customerData.isEmpty) {
           return Container(

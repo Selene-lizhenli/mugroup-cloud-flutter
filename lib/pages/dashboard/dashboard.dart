@@ -16,7 +16,6 @@ class DashboardPage extends ConsumerStatefulWidget {
 class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindingObserver {
   late GlobalKey<State<SelectedModulesWidget>> _selectedModulesKey;
   late ScrollController _scrollController;
-  String? _previousRoute;
 
   @override
   void initState() {
@@ -31,25 +30,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindi
     _scrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 当页面显示时刷新（包括从其他页面返回时）
-    final router = context.router;
-    final currentRoute = router.current.name;
-    
-    // 首次显示或路由变化时刷新
-    if (_previousRoute == null || _previousRoute != currentRoute) {
-      _previousRoute = currentRoute;
-      // 延迟刷新，确保页面已经构建完成
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && router.current.name == 'DashboardRoute') {
-          _refreshModules();
-        }
-      });
-    }
   }
 
   // 监听应用生命周期，当应用从后台恢复时刷新
@@ -80,6 +60,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> with WidgetsBindi
 
   @override
   Widget build(BuildContext context) {
+    
     final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
