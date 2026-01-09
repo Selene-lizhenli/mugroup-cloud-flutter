@@ -23,6 +23,7 @@ class EntryGridModule extends StatelessWidget {
         crossAxisCount: 5,
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
+        childAspectRatio: 0.75,
         children: [
           _EntryItem(
             icon: Icons.inventory_2,
@@ -64,7 +65,7 @@ class _EntryItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  final route;
+  final dynamic route;
 
   const _EntryItem({
     required this.icon,
@@ -77,29 +78,34 @@ class _EntryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.router.push(route);
+        if (route != null) {
+          context.router.push(route);
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
               color: color.withOpacity(0.07),
               borderRadius: BorderRadius.circular(8),
             ),
-            width: 62,
-            height: 44,
             child: Icon(
               icon,
-              size:32,
+              size: 28,
               color: color,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
