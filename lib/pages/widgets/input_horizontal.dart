@@ -54,14 +54,14 @@ class HorizontalInput extends HookConsumerWidget {
     final contentPaddingHorizontalValue = contentPaddingHorizontal ?? 16;
     final contentPaddingVerticalValue = contentPaddingVertical ?? 10;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SizedBox(
           width: 100, // 固定宽度，以"供应商报价 (CNY)"为准
           child: Text(
             label,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(
               color: labelTextColor,
               fontSize: 11,
@@ -76,7 +76,7 @@ class HorizontalInput extends HookConsumerWidget {
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(
               fontSize: inputFontSize,
               color: Colors.black87,
