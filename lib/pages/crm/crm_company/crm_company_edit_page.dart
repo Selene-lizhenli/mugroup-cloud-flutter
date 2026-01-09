@@ -46,37 +46,55 @@ class CrmCompanyEditPage extends HookConsumerWidget {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('客户编辑')),
+      appBar: AppBar(
+        title: const Text('客户编辑'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+      ),
       body: Column(
         children: [
-          CustomSlidingSegmentedControl<int>(
-            initialValue: tab.value,
-            children: const {
-              0: Text("基本信息"),
-              1: Text("联系人信息"),
-            },
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: CustomSlidingSegmentedControl<int>(
+              initialValue: tab.value,
+              isStretch: true,
+              children: {
+                0: Text("基本信息",
+                    style: TextStyle(
+                        color:
+                            tab.value == 0 ? Colors.black87 : Colors.grey[600],
+                        fontWeight: FontWeight.w600)),
+                1: Text("联系人信息",
+                    style: TextStyle(
+                        color:
+                            tab.value == 1 ? Colors.black87 : Colors.grey[600],
+                        fontWeight: FontWeight.w600)),
+              },
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              thumbDecoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              innerPadding: const EdgeInsets.all(4),
+              onValueChanged: (v) => tab.value = v,
             ),
-            thumbDecoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            onValueChanged: (v) => tab.value = v,
           ),
           Expanded(
             child: IndexedStack(
               index: tab.value,
               children: [
-                /// 基本资料
                 CrmCompanyForm(
                   initial: company.value,
                   onSubmit: (data) async {
@@ -87,7 +105,6 @@ class CrmCompanyEditPage extends HookConsumerWidget {
                     }
                   },
                 ),
-
                 CrmContactPage(companyId: id),
               ],
             ),
