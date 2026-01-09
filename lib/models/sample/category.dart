@@ -10,7 +10,9 @@ abstract class Category with _$Category {
     String? name,
     @JsonKey(name: 'name_en') String? nameEn,
     List<Category>? children,
-    List<Category>? ancestors,
+    List<Category>? ancestors, 
+    @JsonKey(name: 'parent_id') int? parentId,
+    @JsonKey(name: 'products_count') int? productsCount, 
   }) = _Category;
 
   factory Category.fromJson(Map<String, Object?> json) =>

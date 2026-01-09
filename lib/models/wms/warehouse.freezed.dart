@@ -29,6 +29,8 @@ mixin _$Warehouse {
   String? get updatedAt => throw _privateConstructorUsedError;
   List<WarehouseImage>? get image => throw _privateConstructorUsedError;
   bool? get abandoned => throw _privateConstructorUsedError;
+  @JsonKey(name: 'sample_count')
+  int? get sampleCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -48,7 +50,8 @@ abstract class $WarehouseCopyWith<$Res> {
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       List<WarehouseImage>? image,
-      bool? abandoned});
+      bool? abandoned,
+      @JsonKey(name: 'sample_count') int? sampleCount});
 }
 
 /// @nodoc
@@ -71,6 +74,7 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
     Object? updatedAt = freezed,
     Object? image = freezed,
     Object? abandoned = freezed,
+    Object? sampleCount = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -101,6 +105,10 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
           ? _value.abandoned
           : abandoned // ignore: cast_nullable_to_non_nullable
               as bool?,
+      sampleCount: freezed == sampleCount
+          ? _value.sampleCount
+          : sampleCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -120,7 +128,8 @@ abstract class _$$WarehouseImplCopyWith<$Res>
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       List<WarehouseImage>? image,
-      bool? abandoned});
+      bool? abandoned,
+      @JsonKey(name: 'sample_count') int? sampleCount});
 }
 
 /// @nodoc
@@ -141,6 +150,7 @@ class __$$WarehouseImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? image = freezed,
     Object? abandoned = freezed,
+    Object? sampleCount = freezed,
   }) {
     return _then(_$WarehouseImpl(
       id: freezed == id
@@ -171,6 +181,10 @@ class __$$WarehouseImplCopyWithImpl<$Res>
           ? _value.abandoned
           : abandoned // ignore: cast_nullable_to_non_nullable
               as bool?,
+      sampleCount: freezed == sampleCount
+          ? _value.sampleCount
+          : sampleCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -185,7 +199,8 @@ class _$WarehouseImpl implements _Warehouse {
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       final List<WarehouseImage>? image = const [],
-      this.abandoned})
+      this.abandoned,
+      @JsonKey(name: 'sample_count') this.sampleCount})
       : _image = image;
 
   factory _$WarehouseImpl.fromJson(Map<String, dynamic> json) =>
@@ -216,10 +231,13 @@ class _$WarehouseImpl implements _Warehouse {
 
   @override
   final bool? abandoned;
+  @override
+  @JsonKey(name: 'sample_count')
+  final int? sampleCount;
 
   @override
   String toString() {
-    return 'Warehouse(id: $id, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt, image: $image, abandoned: $abandoned)';
+    return 'Warehouse(id: $id, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt, image: $image, abandoned: $abandoned, sampleCount: $sampleCount)';
   }
 
   @override
@@ -236,13 +254,23 @@ class _$WarehouseImpl implements _Warehouse {
                 other.updatedAt == updatedAt) &&
             const DeepCollectionEquality().equals(other._image, _image) &&
             (identical(other.abandoned, abandoned) ||
-                other.abandoned == abandoned));
+                other.abandoned == abandoned) &&
+            (identical(other.sampleCount, sampleCount) ||
+                other.sampleCount == sampleCount));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, address, createdAt,
-      updatedAt, const DeepCollectionEquality().hash(_image), abandoned);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      address,
+      createdAt,
+      updatedAt,
+      const DeepCollectionEquality().hash(_image),
+      abandoned,
+      sampleCount);
 
   @JsonKey(ignore: true)
   @override
@@ -266,7 +294,8 @@ abstract class _Warehouse implements Warehouse {
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       final List<WarehouseImage>? image,
-      final bool? abandoned}) = _$WarehouseImpl;
+      final bool? abandoned,
+      @JsonKey(name: 'sample_count') final int? sampleCount}) = _$WarehouseImpl;
 
   factory _Warehouse.fromJson(Map<String, dynamic> json) =
       _$WarehouseImpl.fromJson;
@@ -287,6 +316,9 @@ abstract class _Warehouse implements Warehouse {
   List<WarehouseImage>? get image;
   @override
   bool? get abandoned;
+  @override
+  @JsonKey(name: 'sample_count')
+  int? get sampleCount;
   @override
   @JsonKey(ignore: true)
   _$$WarehouseImplCopyWith<_$WarehouseImpl> get copyWith =>

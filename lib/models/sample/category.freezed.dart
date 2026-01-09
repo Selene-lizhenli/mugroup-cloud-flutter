@@ -26,6 +26,10 @@ mixin _$Category {
   String? get nameEn => throw _privateConstructorUsedError;
   List<Category>? get children => throw _privateConstructorUsedError;
   List<Category>? get ancestors => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id')
+  int? get parentId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'products_count')
+  int? get productsCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +47,9 @@ abstract class $CategoryCopyWith<$Res> {
       String? name,
       @JsonKey(name: 'name_en') String? nameEn,
       List<Category>? children,
-      List<Category>? ancestors});
+      List<Category>? ancestors,
+      @JsonKey(name: 'parent_id') int? parentId,
+      @JsonKey(name: 'products_count') int? productsCount});
 }
 
 /// @nodoc
@@ -64,6 +70,8 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
     Object? nameEn = freezed,
     Object? children = freezed,
     Object? ancestors = freezed,
+    Object? parentId = freezed,
+    Object? productsCount = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -86,6 +94,14 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
           ? _value.ancestors
           : ancestors // ignore: cast_nullable_to_non_nullable
               as List<Category>?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      productsCount: freezed == productsCount
+          ? _value.productsCount
+          : productsCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -103,7 +119,9 @@ abstract class _$$CategoryImplCopyWith<$Res>
       String? name,
       @JsonKey(name: 'name_en') String? nameEn,
       List<Category>? children,
-      List<Category>? ancestors});
+      List<Category>? ancestors,
+      @JsonKey(name: 'parent_id') int? parentId,
+      @JsonKey(name: 'products_count') int? productsCount});
 }
 
 /// @nodoc
@@ -122,6 +140,8 @@ class __$$CategoryImplCopyWithImpl<$Res>
     Object? nameEn = freezed,
     Object? children = freezed,
     Object? ancestors = freezed,
+    Object? parentId = freezed,
+    Object? productsCount = freezed,
   }) {
     return _then(_$CategoryImpl(
       id: null == id
@@ -144,6 +164,14 @@ class __$$CategoryImplCopyWithImpl<$Res>
           ? _value._ancestors
           : ancestors // ignore: cast_nullable_to_non_nullable
               as List<Category>?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      productsCount: freezed == productsCount
+          ? _value.productsCount
+          : productsCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -156,7 +184,9 @@ class _$CategoryImpl implements _Category {
       this.name,
       @JsonKey(name: 'name_en') this.nameEn,
       final List<Category>? children,
-      final List<Category>? ancestors})
+      final List<Category>? ancestors,
+      @JsonKey(name: 'parent_id') this.parentId,
+      @JsonKey(name: 'products_count') this.productsCount})
       : _children = children,
         _ancestors = ancestors;
 
@@ -191,8 +221,15 @@ class _$CategoryImpl implements _Category {
   }
 
   @override
+  @JsonKey(name: 'parent_id')
+  final int? parentId;
+  @override
+  @JsonKey(name: 'products_count')
+  final int? productsCount;
+
+  @override
   String toString() {
-    return 'Category(id: $id, name: $name, nameEn: $nameEn, children: $children, ancestors: $ancestors)';
+    return 'Category(id: $id, name: $name, nameEn: $nameEn, children: $children, ancestors: $ancestors, parentId: $parentId, productsCount: $productsCount)';
   }
 
   @override
@@ -205,7 +242,11 @@ class _$CategoryImpl implements _Category {
             (identical(other.nameEn, nameEn) || other.nameEn == nameEn) &&
             const DeepCollectionEquality().equals(other._children, _children) &&
             const DeepCollectionEquality()
-                .equals(other._ancestors, _ancestors));
+                .equals(other._ancestors, _ancestors) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.productsCount, productsCount) ||
+                other.productsCount == productsCount));
   }
 
   @JsonKey(ignore: true)
@@ -216,7 +257,9 @@ class _$CategoryImpl implements _Category {
       name,
       nameEn,
       const DeepCollectionEquality().hash(_children),
-      const DeepCollectionEquality().hash(_ancestors));
+      const DeepCollectionEquality().hash(_ancestors),
+      parentId,
+      productsCount);
 
   @JsonKey(ignore: true)
   @override
@@ -234,11 +277,14 @@ class _$CategoryImpl implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-      {required final int id,
-      final String? name,
-      @JsonKey(name: 'name_en') final String? nameEn,
-      final List<Category>? children,
-      final List<Category>? ancestors}) = _$CategoryImpl;
+          {required final int id,
+          final String? name,
+          @JsonKey(name: 'name_en') final String? nameEn,
+          final List<Category>? children,
+          final List<Category>? ancestors,
+          @JsonKey(name: 'parent_id') final int? parentId,
+          @JsonKey(name: 'products_count') final int? productsCount}) =
+      _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
       _$CategoryImpl.fromJson;
@@ -254,6 +300,12 @@ abstract class _Category implements Category {
   List<Category>? get children;
   @override
   List<Category>? get ancestors;
+  @override
+  @JsonKey(name: 'parent_id')
+  int? get parentId;
+  @override
+  @JsonKey(name: 'products_count')
+  int? get productsCount;
   @override
   @JsonKey(ignore: true)
   _$$CategoryImplCopyWith<_$CategoryImpl> get copyWith =>

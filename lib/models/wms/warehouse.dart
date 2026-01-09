@@ -14,6 +14,7 @@ abstract class Warehouse with _$Warehouse {
     @JsonKey(name: 'updated_at') String? updatedAt,
     @Default([]) List<WarehouseImage>? image,
     bool? abandoned,
+    @JsonKey(name: 'sample_count') int? sampleCount,
   }) = _Warehouse;
 
   factory Warehouse.fromJson(Map<String, Object?> json) =>

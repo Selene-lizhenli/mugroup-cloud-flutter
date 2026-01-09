@@ -18,6 +18,7 @@ _$WarehouseImpl _$$WarehouseImplFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       abandoned: json['abandoned'] as bool?,
+      sampleCount: (json['sample_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$WarehouseImplToJson(_$WarehouseImpl instance) =>
@@ -29,4 +30,5 @@ Map<String, dynamic> _$$WarehouseImplToJson(_$WarehouseImpl instance) =>
       'updated_at': instance.updatedAt,
       'image': instance.image,
       'abandoned': instance.abandoned,
+      'sample_count': instance.sampleCount,
     };

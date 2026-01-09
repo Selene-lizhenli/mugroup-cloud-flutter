@@ -1,8 +1,7 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/line_chart_demo.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/market_purchase_chart.dart';
-import 'package:cloud/pages/dashboard/widgets/modules/sample_room_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_module.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
@@ -144,8 +143,6 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
 
   @override
   Widget build(BuildContext context) {
-   
-
     if (_loading) {
       return const SizedBox.shrink();
     }
@@ -178,10 +175,10 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
         _selectedModules = modules;
         _loading = false;
       });
-      
+
       final coreAsync = ref.watch(coreProvider);
       final notifier = ref.read(coreProvider.notifier);
-      if (coreAsync.value?.prePath == 'setting') { 
+      if (coreAsync.value?.prePath == 'setting') {
         notifier.setPrePath(null);
       }
     }
@@ -256,9 +253,9 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             value: '产品目录',
             child: Row(
               children: [
-                const Icon(Icons.category, size: 18, color: Colors.grey),
-                const SizedBox(width: 12),
-                const Text('产品目录'),
+                Icon(Icons.category, size: 18, color: Colors.grey),
+                SizedBox(width: 12),
+                Text('产品目录'),
               ],
             ),
           ),
@@ -266,9 +263,9 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             value: '样品间',
             child: Row(
               children: [
-                const Icon(Icons.warehouse, size: 18, color: Colors.grey),
-                const SizedBox(width: 12),
-                const Text('样品间'),
+                Icon(Icons.warehouse, size: 18, color: Colors.grey),
+                SizedBox(width: 12),
+                Text('样品间'),
               ],
             ),
           ),
@@ -370,7 +367,14 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
 
   /// 处理维度选择
   void _handleDimensionSelection(String moduleId, String value) {
-    // 只处理时间维度相关的模块
+    // 处理样品间模块的维度选择
+    if (moduleId == 'sample_room') {
+      ref.read(sampleRoomDimensionProvider.notifier).state = value;
+      return;
+    }
+    //TODo
+
+    // 处理时间维度相关的模块
     if (moduleId == 'inspection' ||
         moduleId == 'customer' ||
         moduleId == 'supplier' ||

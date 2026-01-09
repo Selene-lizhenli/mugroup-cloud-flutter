@@ -17,6 +17,8 @@ _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
       ancestors: (json['ancestors'] as List<dynamic>?)
           ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
           .toList(),
+      parentId: (json['parent_id'] as num?)?.toInt(),
+      productsCount: (json['products_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
@@ -26,4 +28,6 @@ Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
       'name_en': instance.nameEn,
       'children': instance.children,
       'ancestors': instance.ancestors,
+      'parent_id': instance.parentId,
+      'products_count': instance.productsCount,
     };
