@@ -63,9 +63,8 @@ class SupplySupplierYanchangPage extends HookConsumerWidget {
     }, [supplierId]);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         children: supplierMedias.map((item) {
           final String title = item['title']!;
           final String collectionName = item['collection_name']!;

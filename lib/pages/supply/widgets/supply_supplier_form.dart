@@ -66,7 +66,7 @@ class SupplySupplierForm extends HookConsumerWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
