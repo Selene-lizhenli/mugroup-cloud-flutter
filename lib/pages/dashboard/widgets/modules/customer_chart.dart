@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -74,9 +75,10 @@ class _CustomerChartState extends ConsumerState<CustomerChart> {
               getTitles: (value) {
                 // 纵轴：显示数量（整数）
                 if (value % 10 == 0 && value >= 0) {
-                  return value.toInt().toString();
+                  return formatNumberWithK(value);
                 }
                 return '';
+                
               },
               getTextStyles: (value) => TextStyle(
                 fontSize: 9,

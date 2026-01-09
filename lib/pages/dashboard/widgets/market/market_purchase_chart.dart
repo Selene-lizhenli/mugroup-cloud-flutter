@@ -68,8 +68,8 @@ class MarketPurchaseChart extends HookConsumerWidget {
     final maxValue = allData.reduce((a, b) => a > b ? a : b);
     // 使用1.15倍的上边距，确保所有柱子都能完整显示
     final maxY = maxValue.toDouble() * 1.15;
-    // 计算合适的Y轴刻度间隔，使刻度更合理
-    final yAxisInterval = _calculateYAxisInterval(maxY);
+    // 计算合适的Y轴刻度间隔，确保最多显示10个刻度点（包括0）
+    final yAxisInterval = _calculateYAxisInterval(maxY, maxTicks: 10);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -98,9 +98,10 @@ class MarketPurchaseChart extends HookConsumerWidget {
                     showTitles: true,
                     reservedSize: 20,
                     getTitles: (value) {
-                      // 纵轴：显示数量（整数），根据计算出的间隔显示刻度
+                      // 纵轴：显示数量，根据计算出的间隔显示刻度
+                      // 大于999的数字使用k格式显示
                       if (value % yAxisInterval == 0 && value >= 0) {
-                        return value.toInt().toString();
+                        return formatNumberWithK(value);
                       }
                       return '';
                     },
@@ -170,6 +171,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
               ),
             ),
           ),
+       
         ],
       ),
     );
@@ -177,21 +179,68 @@ class MarketPurchaseChart extends HookConsumerWidget {
 
   /// 计算合适的Y轴刻度间隔
   /// 根据最大值动态计算，使刻度显示更合理
-  double _calculateYAxisInterval(double maxY) {
+  /// [maxTicks] 最大刻度点数量（包括0），默认10个
+  double _calculateYAxisInterval(double maxY, {int maxTicks = 10}) {
     if (maxY <= 0) return 50;
 
-    // 根据最大值范围选择合适的间隔
-    if (maxY <= 50) return 10;
-    if (maxY <= 100) return 20;
-    if (maxY <= 200) return 50;
-    if (maxY <= 500) return 100;
-    if (maxY <= 1000) return 200;
-    if (maxY <= 2000) return 500;
-    if (maxY <= 5000) return 1000;
-    // 对于更大的值，使用科学计数法风格的间隔
-    final magnitude = maxY.toStringAsFixed(0).length - 1;
-    final base = math.pow(10, magnitude).toDouble();
-    return base / 2; // 例如：5000 -> 1000, 50000 -> 10000
+    // 先计算一个合理的初始间隔
+    double initialInterval;
+    if (maxY <= 50) {
+      initialInterval = 10;
+    } else if (maxY <= 100) {
+      initialInterval = 20;
+    } else if (maxY <= 200) {
+      initialInterval = 50;
+    } else if (maxY <= 500) {
+      initialInterval = 100;
+    } else if (maxY <= 1000) {
+      initialInterval = 200;
+    } else if (maxY <= 2000) {
+      initialInterval = 500;
+    } else if (maxY <= 5000) {
+      initialInterval = 1000;
+    } else {
+      // 对于更大的值，使用科学计数法风格的间隔
+      final magnitude = maxY.toStringAsFixed(0).length - 1;
+      final base = math.pow(10, magnitude).toDouble();
+      initialInterval = base / 2; // 例如：5000 -> 1000, 50000 -> 10000
+    }
+
+    // 检查使用初始间隔会有多少个刻度点（包括0）
+    final tickCount = (maxY / initialInterval).ceil() + 1;
+    
+    // 如果刻度点数量超过限制，调整间隔
+    if (tickCount > maxTicks) {
+      // 计算最大允许的间隔（确保最多 maxTicks 个刻度点）
+      final maxAllowedInterval = maxY / (maxTicks - 1);
+      // 将间隔向上取整到合理的数字
+      return _roundToNiceNumber(maxAllowedInterval);
+    }
+    
+    return initialInterval;
+  }
+
+  /// 将数字向上取整到合理的间隔值（如 10, 20, 50, 100, 200, 500, 1000 等）
+  double _roundToNiceNumber(double value) {
+    if (value <= 0) return 10;
+    
+    // 计算数量级
+    final magnitude = math.pow(10, (math.log(value) / math.ln10).floor()).toDouble();
+    final normalized = value / magnitude;
+    
+    // 向上取整到 1, 2, 5, 10
+    double multiplier;
+    if (normalized <= 1) {
+      multiplier = 1;
+    } else if (normalized <= 2) {
+      multiplier = 2;
+    } else if (normalized <= 5) {
+      multiplier = 5;
+    } else {
+      multiplier = 10;
+    }
+    
+    return magnitude * multiplier;
   }
 
   /// 构建图例项
@@ -218,4 +267,5 @@ class MarketPurchaseChart extends HookConsumerWidget {
       ],
     );
   }
+
 }

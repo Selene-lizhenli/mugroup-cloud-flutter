@@ -186,7 +186,7 @@ class _LineChartDemoState extends State<LineChartDemo> {
                 titlesData: FlTitlesData(
                   leftTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 40,
+                    reservedSize: 20,
                     getTitles: (value) {
                       // 纵轴：显示汇率（保留2位小数）
                       if (value % 2 == 0 && value >= 0) {

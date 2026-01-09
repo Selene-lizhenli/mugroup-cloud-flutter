@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(moduleStatsProvider(_moduleId));
-    
+
     // 初始化时加载数据（仅在首次且未加载时）
     if (!_hasLoaded && !stats.isLoading && stats.timeLabels.isEmpty) {
       _hasLoaded = true;
@@ -43,25 +44,26 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
     final timeLabels = stats.timeLabels;
     final inspectionData = stats.data;
 
-        if (inspectionData.isEmpty) {
-          return Container(
-            height: 100,
-            padding: const EdgeInsets.all(16),
-            child: const Center(
-              child: Text('暂无数据'),
-            ),
-          );
-        }
+    if (inspectionData.isEmpty) {
+      return Container(
+        height: 100,
+        padding: const EdgeInsets.all(16),
+        child: const Center(
+          child: Text('暂无数据'),
+        ),
+      );
+    }
 
-        // 将验货任务数量转换为 FlSpot
-        final spots = inspectionData.asMap().entries.map((entry) {
-          return FlSpot(entry.key.toDouble(), entry.value.toDouble());
-        }).toList();
+    // 将验货任务数量转换为 FlSpot
+    final spots = inspectionData.asMap().entries.map((entry) {
+      return FlSpot(entry.key.toDouble(), entry.value.toDouble());
+    }).toList();
 
-        // 计算最大数量用于设置Y轴范围
-        final maxY = inspectionData.reduce((a, b) => a > b ? a : b).toDouble() * 1.2;
+    // 计算最大数量用于设置Y轴范围
+    final maxY =
+        inspectionData.reduce((a, b) => a > b ? a : b).toDouble() * 1.2;
 
-        return Container(
+    return Container(
       height: 100,
       padding: const EdgeInsets.all(16),
       child: LineChart(
@@ -73,7 +75,7 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
               reservedSize: 20,
               getTitles: (value) {
                 if (value % 10 == 0 && value >= 0) {
-                  return value.toInt().toString();
+                  return formatNumberWithK(value);
                 }
                 return '';
               },
@@ -84,7 +86,7 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
             ),
             bottomTitles: SideTitles(
               showTitles: true,
-              reservedSize:12,
+              reservedSize: 12,
               getTitles: (value) {
                 final index = value.toInt();
                 if (index >= 0 && index < timeLabels.length) {
@@ -121,4 +123,3 @@ class _InspectionChartState extends ConsumerState<InspectionChart> {
     );
   }
 }
-

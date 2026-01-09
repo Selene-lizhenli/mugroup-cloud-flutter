@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class _SupplierChartState extends ConsumerState<SupplierChart> {
                 // 纵轴：显示数量（整数），根据数据范围动态调整间隔
                 final interval = maxY > 10000 ? 10000 : (maxY > 1000 ? 1000 : 100);
                 if (value % interval == 0 && value >= 0) {
-                  return value.toInt().toString();
+                    return formatNumberWithK(value);
                 }
                 return '';
               },
