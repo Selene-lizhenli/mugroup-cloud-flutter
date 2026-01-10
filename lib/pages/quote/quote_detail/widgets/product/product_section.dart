@@ -200,10 +200,23 @@ class ProductSection extends HookConsumerWidget {
                   InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: () async {
+                      if (quoteId == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('报价单ID不能为空')),
+                        );
+                        return;
+                      }
                       await showDialog(
                         context: context,
-                        builder: (_) => ProductEditDialog(row: row),
+                        builder: (_) => ProductEditDialog(
+                          row: row,
+                          quotationId: quoteId,
+                        ),
                       );
+                      // 刷新产品列表
+                      if (context.mounted) {
+                        await notifier.fetchProductsPage(quoteId, state.productPage);
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(4),

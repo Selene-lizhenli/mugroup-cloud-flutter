@@ -1,16 +1,29 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/pages/quote/batch_import/widgets/product_list_sheet.dart';
+import 'package:cloud/pages/selectors/select_product/widgets/product_list_sheet.dart';
+import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
 
-// TODO 待优化
 @RoutePage()
 class SelectProductPage extends StatelessWidget {
-  const SelectProductPage({super.key});
+  final int? supplierId;
+
+  const SelectProductPage({
+    super.key,
+    @QueryParam() this.supplierId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: ProductListSheet(),
+    
+
+    return Scaffold(
+      body: ProductListSheet(
+        supplierId: supplierId,
+        onConfirm: (selectedProducts) {
+          // 通过路由返回选中的产品列表
+          context.router.maybePop(selectedProducts);
+        },
+      ),
     );
   }
 }

@@ -1,6 +1,4 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/services/sample.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SelectedProduct {
@@ -36,36 +34,24 @@ class SelectedProduct {
 }
 
 class ProductBatchImportState {
-  final bool isLoading;
-  final String? error;
   final int? supplierId;
   final String? supplierName;
-  final List<Sample> products;
   final List<SelectedProduct> selected;
 
   const ProductBatchImportState({
-    this.isLoading = false,
-    this.error,
     this.supplierId,
     this.supplierName,
-    this.products = const [],
     this.selected = const [],
   });
 
   ProductBatchImportState copyWith({
-    bool? isLoading,
-    String? error,
     int? supplierId,
     String? supplierName,
-    List<Sample>? products,
     List<SelectedProduct>? selected,
   }) {
     return ProductBatchImportState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
       supplierId: supplierId ?? this.supplierId,
       supplierName: supplierName ?? this.supplierName,
-      products: products ?? this.products,
       selected: selected ?? this.selected,
     );
   }
@@ -75,40 +61,12 @@ class ProductBatchImportNotifier
     extends StateNotifier<ProductBatchImportState> {
   ProductBatchImportNotifier() : super(const ProductBatchImportState());
 
-  Future<void> setSupplier(int id, String name) async {
+  void setSupplier(int id, String name) {
     state = state.copyWith(
       supplierId: id,
       supplierName: name,
-      isLoading: true,
-      error: null,
-      products: [],
       selected: [],
     );
-    await fetchProducts();
-  }
-
-  Future<void> fetchProducts({String? search}) async {
-    if (state.supplierId == null) return;
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-        // final res = await getMarketProducts(queryParameters: {
-      //   'supplier_id': supplierId,
-      //   'pageSize': 30,
-      //   'page': 1,
-      // });
- 
-      final res = await getSamples(queryParameters: {
-        'supplier_id': state.supplierId,
-        'search': search,
-        'pageSize': 30,
-        'page': 1,
-      });
-      final products = res.data;
-      logger.d('fetchProducts: loaded ${products.length} items');
-      state = state.copyWith(products: products, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(error: e.toString(), isLoading: false);
-    }
   }
 
   void toggleSelect(Sample sample) {
@@ -156,16 +114,13 @@ class ProductBatchImportNotifier
   }
 
 
-void clean(){
-  state=  state.copyWith(
+  void clean() {
+    state = state.copyWith(
       supplierId: null,
-      supplierName: "",
-      isLoading: false,
-      error: null,
-      products: [],
+      supplierName: null,
       selected: [],
     );
-}
+  }
 
 
 }

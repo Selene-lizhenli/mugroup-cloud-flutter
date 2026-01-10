@@ -2,32 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flant/components/image_preview.dart';
-import 'package:cloud/pages/quote/batch_import/providers/product_batch_import_provider.dart';
+import 'package:cloud/pages/selectors/select_product/providers/product_selector_provider.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
+import 'package:cloud/models/sample/sample.dart';
 
 class ProductListSheet extends HookConsumerWidget {
-  const ProductListSheet({super.key});
+  final int? supplierId;
+  final Function(List<Sample> selected)? onConfirm;
+  final Set<int>? initialSelectedIds;
+
+  const ProductListSheet({
+    super.key,
+    this.supplierId,
+    this.onConfirm,
+    this.initialSelectedIds,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(productBatchImportProvider);
-    final notifier = ref.read(productBatchImportProvider.notifier);
+    final state = ref.watch(productSelectorProvider(supplierId));
+    final notifier = ref.read(productSelectorProvider(supplierId).notifier);
     final searchController = useTextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
+    // 初始化选中状态
+    useEffect(() {
+      if (initialSelectedIds != null && initialSelectedIds!.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifier.selectAll(initialSelectedIds!.toList());
+        });
+      }
+      return null;
+    }, []);
+
     final products = state.products;
-    final selectedIds = state.selected.map((e) => e.id).toSet();
+    final selectedIds = state.selectedIds;
     final validIds =
         products.where((s) => s.id != null).map((s) => s.id!).toList();
     final allSelected =
         validIds.isNotEmpty && validIds.every((id) => selectedIds.contains(id));
-    final colorScheme = Theme.of(context).colorScheme;
+
     Future<void> handleSearch() async {
       await notifier.fetchProducts(search: searchController.text.trim());
     }
 
-    final selectedCount = state.selected.length;
+    final selectedCount = selectedIds.length;
 
     void handleConfirm() {
-      Navigator.pop(context);
+      if (onConfirm != null) {
+        final selectedProducts = products
+            .where((p) => p.id != null && selectedIds.contains(p.id))
+            .toList();
+        onConfirm!(selectedProducts);
+      } else {
+        // 如果没有提供 onConfirm，通过 Navigator 返回结果
+        final selectedProducts = products
+            .where((p) => p.id != null && selectedIds.contains(p.id))
+            .toList();
+        Navigator.pop(context, selectedProducts);
+      }
     }
 
     return SafeArea(
@@ -59,7 +91,6 @@ class ProductListSheet extends HookConsumerWidget {
                     buttonText: '搜索',
                     onSearch: handleSearch,
                   ),
-                
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -90,19 +121,10 @@ class ProductListSheet extends HookConsumerWidget {
                         ),
                         onChanged: (checked) {
                           if (validIds.isEmpty) return;
-                          final setIds = selectedIds.toSet();
                           if (checked == true) {
-                            for (final s in products) {
-                              if (s.id != null && !setIds.contains(s.id)) {
-                                notifier.toggleSelect(s);
-                              }
-                            }
+                            notifier.selectAll(validIds);
                           } else {
-                            for (final s in products) {
-                              if (s.id != null && setIds.contains(s.id)) {
-                                notifier.toggleSelect(s);
-                              }
-                            }
+                            notifier.deselectAll();
                           }
                         },
                       ),
@@ -199,11 +221,11 @@ class ProductListSheet extends HookConsumerWidget {
   }
 
   Widget _buildProductList({
-    required ProductBatchImportState state,
-    required List products,
+    required ProductSelectorState state,
+    required List<Sample> products,
     required Set<int> selectedIds,
     required ColorScheme colorScheme,
-    required ProductBatchImportNotifier notifier,
+    required ProductSelectorNotifier notifier,
     required BuildContext context,
   }) {
     if (state.isLoading) {
@@ -224,10 +246,10 @@ class ProductListSheet extends HookConsumerWidget {
         ),
       );
     } else if (products.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: Text('暂无产品'),
+          child: Text('暂无产品', style: TextStyle(color: colorScheme.outline)),
         ),
       );
     } else {
@@ -263,13 +285,13 @@ class ProductListSheet extends HookConsumerWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(0, 12, 12, 12),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 248, 248, 248),
+                color: const Color.fromARGB(255, 248, 248, 248),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => notifier.toggleSelect(item),
+                    onTap: () => notifier.toggleSelect(item.id!),
                     child: Checkbox(
                       value: isSelected,
                       checkColor: colorScheme.onSecondary,
@@ -283,7 +305,7 @@ class ProductListSheet extends HookConsumerWidget {
                       ),
                       focusColor: colorScheme.secondary,
                       hoverColor: colorScheme.secondary,
-                      onChanged: (_) => notifier.toggleSelect(item),
+                      onChanged: (_) => notifier.toggleSelect(item.id!),
                       side: BorderSide(
                         color: colorScheme.secondary,
                         width: 1.5,
@@ -324,7 +346,7 @@ class ProductListSheet extends HookConsumerWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => notifier.toggleSelect(item),
+                      onTap: () => notifier.toggleSelect(item.id!),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -352,7 +374,7 @@ class ProductListSheet extends HookConsumerWidget {
                   if (item.purchaseCost != null &&
                       item.purchaseCost!.isNotEmpty)
                     GestureDetector(
-                      onTap: () => notifier.toggleSelect(item),
+                      onTap: () => notifier.toggleSelect(item.id!),
                       child: Text(
                         item.purchaseCost ?? '',
                         style: TextStyle(

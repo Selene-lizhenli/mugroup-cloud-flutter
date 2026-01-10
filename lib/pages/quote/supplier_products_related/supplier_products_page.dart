@@ -324,10 +324,17 @@ class SupplierProductsPage extends HookConsumerWidget {
               InkWell(
                 borderRadius: BorderRadius.circular(6),
                 onTap: () async {
-                  await showDialog(
+                  final result = await showDialog(
                     context: context,
-                    builder: (_) => ProductEditDialog(row: row),
+                    builder: (_) => ProductEditDialog(
+                      row: row,
+                      quotationId: quotationId,
+                    ),
                   );
+                  // 如果保存成功，刷新产品列表
+                  if (result != null && context.mounted) {
+                    onRefresh();
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(4),

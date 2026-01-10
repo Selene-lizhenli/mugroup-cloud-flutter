@@ -2,13 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route.dart' show PageInfo;
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
+import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers/product_batch_import_provider.dart';
-import 'widgets/selected_product_card.dart';
+import 'widgets/selected_product_card.dart'; 
 
 @RoutePage()
 class ProductBatchImportPage extends HookConsumerWidget {
@@ -57,6 +58,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
           "qty": qty,
           // TODO 待调试接口加上
           // "supplier_price": supplierPrice,
+          // 客户报价
         };
       }).toList();
 
@@ -98,6 +100,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
       appBar: AppBar(
         title: const Text('添加报价产品'),
         centerTitle: true,
+        backgroundColor: colorScheme.surfaceTint,
       ),
       body: Column(
         children: [
@@ -135,7 +138,19 @@ class ProductBatchImportPage extends HookConsumerWidget {
                                   '') as String;
                               final id = result['id'] as int?;
                               if (id != null && name.isNotEmpty) {
-                                await notifier.setSupplier(id, name);
+                                notifier.setSupplier(id, name);
+                                // 选择完供应商后，自动打开产品选择弹窗
+                                if (context.mounted) {
+                                  final result = await context.router.push<List<Sample>>(SelectProductRoute(supplierId: id));
+                                  if (result != null) {
+                                    // 将选中的产品添加到批量导入列表中
+                                    for (final sample in result) {
+                                      if (sample.id != null) {
+                                        notifier.toggleSelect(sample);
+                                      }
+                                    }
+                                  }
+                                }
                               }
                             }
                           },
@@ -151,8 +166,23 @@ class ProductBatchImportPage extends HookConsumerWidget {
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () async {
-                            await context.router
-                                .push(const SelectProductRoute());
+                            if (state.supplierId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('请先选择供应商')),
+                              );
+                              return;
+                            }
+                            final result = await context.router.pushNamed<List<Sample>>(
+                              '/selectors/product?supplierId=${state.supplierId}',
+                            );
+                            if (result != null) {
+                              // 将选中的产品添加到批量导入列表中
+                              for (final sample in result) {
+                                if (sample.id != null) {
+                                  notifier.toggleSelect(sample);
+                                }
+                              }
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -225,6 +255,13 @@ class ProductBatchImportPage extends HookConsumerWidget {
                 height: 48,
                 child: FilledButton(
                   onPressed: handleSave,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.secondary,
+                    foregroundColor: colorScheme.onSecondary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
                   child: Text('保存添加 (${state.selected.length}个产品)'),
                 ),
               ),

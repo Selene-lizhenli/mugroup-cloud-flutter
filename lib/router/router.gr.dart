@@ -1135,10 +1135,18 @@ class ScanRoute extends _i56.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i32.SelectProductPage]
-class SelectProductRoute extends _i56.PageRouteInfo<void> {
-  const SelectProductRoute({List<_i56.PageRouteInfo>? children})
-      : super(
+class SelectProductRoute extends _i56.PageRouteInfo<SelectProductRouteArgs> {
+  SelectProductRoute({
+    _i59.Key? key,
+    int? supplierId,
+    List<_i56.PageRouteInfo>? children,
+  }) : super(
           SelectProductRoute.name,
+          args: SelectProductRouteArgs(
+            key: key,
+            supplierId: supplierId,
+          ),
+          rawQueryParams: {'supplierId': supplierId},
           initialChildren: children,
         );
 
@@ -1147,9 +1155,32 @@ class SelectProductRoute extends _i56.PageRouteInfo<void> {
   static _i56.PageInfo page = _i56.PageInfo(
     name,
     builder: (data) {
-      return const _i32.SelectProductPage();
+      final queryParams = data.queryParams;
+      final args = data.argsAs<SelectProductRouteArgs>(
+          orElse: () => SelectProductRouteArgs(
+              supplierId: queryParams.optInt('supplierId')));
+      return _i32.SelectProductPage(
+        key: args.key,
+        supplierId: args.supplierId,
+      );
     },
   );
+}
+
+class SelectProductRouteArgs {
+  const SelectProductRouteArgs({
+    this.key,
+    this.supplierId,
+  });
+
+  final _i59.Key? key;
+
+  final int? supplierId;
+
+  @override
+  String toString() {
+    return 'SelectProductRouteArgs{key: $key, supplierId: $supplierId}';
+  }
 }
 
 /// generated route for
