@@ -55,20 +55,44 @@ class SelectUserPage extends HookConsumerWidget {
       return null;
     }, [debouncedInput]);
 
-    return Scaffold(
-      backgroundColor:   Colors.white,
-      appBar: AppBar(
-        title: SearchAppTabbar(onSearch: handleSearch),
-        elevation: 0,
+    // 页面关闭时清空搜索文本和员工列表
+    void clearSearchAndUsers() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(searchTextProvider.notifier).state = '';
+        users.value = null;
+        error.value = null;
+      });
+    }
+
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          clearSearchAndUsers();
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-      ),
-      body: SafeArea(
-        child: _buildBody(
-          context,
-          users.value,
-          isLoading.value,
-          error.value,
-          colorScheme,
+        appBar: AppBar(
+          title: SearchAppTabbar(onSearch: handleSearch),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              clearSearchAndUsers();
+              context.router.maybePop();
+            },
+          ),
+        ),
+        body: SafeArea(
+          child: _buildBody(
+            context,
+            users.value,
+            isLoading.value,
+            error.value,
+            colorScheme,
+            clearSearchAndUsers,
+          ),
         ),
       ),
     );
@@ -80,6 +104,7 @@ class SelectUserPage extends HookConsumerWidget {
     bool isLoading,
     String? error,
     ColorScheme colorScheme,
+    VoidCallback clearSearchAndUsers,
   ) {
     if (isLoading) {
       return const Center(
@@ -182,7 +207,10 @@ class SelectUserPage extends HookConsumerWidget {
           child: UserItem(
             user: user,
           ),
-          onTap: () => context.router.maybePop(user),
+          onTap: () {
+            clearSearchAndUsers();
+            context.router.maybePop(user);
+          },
         );
       },
     );
