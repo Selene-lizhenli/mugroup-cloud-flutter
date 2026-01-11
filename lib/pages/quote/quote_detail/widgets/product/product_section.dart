@@ -605,12 +605,10 @@ class AddProductModeDialog extends HookWidget {
                 onPressed: () {
                   Navigator.of(context).pop();
 
-                  if (selectedMode.value == 0) {
-                    context.router.push(QuoteProductAddRoute(quoteId: quoteId));
-                  } else {
-                    context.router
-                        .push(QuoteProductPadAddRoute(quoteId: quoteId));
-                  }
+                  context.router.push(QuoteProductAddAdaptiveRoute(
+                    quoteId: quoteId,
+                    initialMode: selectedMode.value,
+                  ));
                 },
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(

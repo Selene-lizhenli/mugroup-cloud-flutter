@@ -14,12 +14,14 @@ import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
+import 'package:cloud/providers/quote_product_form_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'dart:async';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,12 +29,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 @RoutePage()
 class QuoteProductAddPage extends HookConsumerWidget {
   final int? quoteId;
-  const QuoteProductAddPage({super.key, this.quoteId});
+  
+  const QuoteProductAddPage({
+    super.key,
+    this.quoteId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+    final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
+    final savedFormData = ref.watch(quoteProductFormDataProvider);
+    final hasInitialized = useRef(false);
 
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_add_form_v1',
@@ -42,6 +51,31 @@ class QuoteProductAddPage extends HookConsumerWidget {
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
 
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
+
+    // 初始化时从 provider 恢复表单数据
+    useEffect(() {
+      if (!hasInitialized.value && savedFormData != null && formKey.currentState != null) {
+        hasInitialized.value = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          formKey.currentState?.patchValue(savedFormData);
+        });
+      }
+      return null;
+    }, [savedFormData]);
+
+    // 使用定时器定期保存表单数据到 provider
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+        if (formKey.currentState != null) {
+          formKey.currentState!.save();
+          final currentValue = formKey.currentState!.value;
+          if (currentValue.isNotEmpty) {
+            formDataNotifier.saveFormData(currentValue);
+          }
+        }
+      });
+      return timer.cancel;
+    }, []);
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -662,6 +696,9 @@ class QuoteProductAddPage extends HookConsumerWidget {
 
                             if (!context.mounted) return;
 
+                            // 清除保存的表单数据
+                            formDataNotifier.clearFormData();
+
                             final isContinue = await ConfirmDialog.show(
                               context,
                               title: '创建成功',
@@ -672,6 +709,7 @@ class QuoteProductAddPage extends HookConsumerWidget {
                             );
                             if (isContinue == true) {
                               formState.reset();
+                              formDataNotifier.clearFormData();
                             } else {
                               if (context.mounted) {
                                 Navigator.of(context).pop(true);
