@@ -6,7 +6,7 @@ part of 'dashboard_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dashboardStatsHash() => r'69863625e6cf28c5f18e43b7e3a3652fe46f5a65';
+String _$dashboardStatsHash() => r'fc2184069f9cf7b89f1bb851e98e395c2eb2c6ad';
 
 /// Dashboard 统计数据 Provider
 ///

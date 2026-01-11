@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
+import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 
 part 'module_stats_state.freezed.dart';
 
@@ -13,7 +13,7 @@ class ModuleStatsState with _$ModuleStatsState {
     @Default([]) List<String> timeLabels, // 时间轴标签（月份）
     @Default([]) List<int> data, // 模块数据
     @Default(false) bool isLoading, // 是否正在加载
-    @Default(TimeDimension.last6Months) TimeDimension timeDimension, // 时间维度
+    @Default(TimeDimension.last6Months) TimeDimension timeDimension, // 时间维度 
   }) = _ModuleStatsState;
 }
 

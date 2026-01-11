@@ -6,7 +6,8 @@ import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
+import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
+import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -186,11 +187,11 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
 
   Widget _buildModuleCard(ModuleInfo module) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // 标题行：标题居左，如果是数据统计组则右侧显示维度选择图标
         Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.only(bottom: 4, left: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -198,9 +199,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
               // 模块标题，居左
               Text(
                 module.title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(),
               ),
               // 如果是数据统计组，显示维度选择图标
               if (module.group == '数据统计')
@@ -248,24 +247,57 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     // 可以根据实际需求扩展每个模块的维度选项
     switch (moduleId) {
       case 'sample_room':
+        final currentDimension = ref.watch(dashboardStatsProvider.select((state) => state.sampleRoomDimension));
         return [
-          const PopupMenuItem<String>(
+          PopupMenuItem<String>(
             value: '产品目录',
             child: Row(
               children: [
-                Icon(Icons.category, size: 18, color: Colors.grey),
-                SizedBox(width: 12),
-                Text('产品目录'),
+                Icon(
+                  Icons.category,
+                  size: 18,
+                  color: currentDimension == '产品目录'
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.grey,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '产品目录',
+                  style: TextStyle(
+                    color: currentDimension == '产品目录'
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    fontWeight: currentDimension == '产品目录'
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
               ],
             ),
           ),
-          const PopupMenuItem<String>(
+          PopupMenuItem<String>(
             value: '样品间',
             child: Row(
               children: [
-                Icon(Icons.warehouse, size: 18, color: Colors.grey),
-                SizedBox(width: 12),
-                Text('样品间'),
+                Icon(
+                  Icons.warehouse,
+                  size: 18,
+                  color: currentDimension == '样品间'
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.grey,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '样品间',
+                  style: TextStyle(
+                    color: currentDimension == '样品间'
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    fontWeight: currentDimension == '样品间'
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
               ],
             ),
           ),
@@ -369,10 +401,9 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
   void _handleDimensionSelection(String moduleId, String value) {
     // 处理样品间模块的维度选择
     if (moduleId == 'sample_room') {
-      ref.read(sampleRoomDimensionProvider.notifier).state = value;
+      ref.read(dashboardStatsProvider.notifier).setSampleRoomDimension(value);
       return;
-    }
-    //TODo
+    } 
 
     // 处理时间维度相关的模块
     if (moduleId == 'inspection' ||

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class EntryGridModule extends StatelessWidget {
   const EntryGridModule({super.key});
@@ -13,7 +14,7 @@ class EntryGridModule extends StatelessWidget {
     const double spacing = 6.0;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 20, 12, 6),
+      padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -45,7 +46,7 @@ class EntryGridModule extends StatelessWidget {
               ),
               _EntryItem(
                 width: itemWidth,
-                icon: Icons.factory,
+                icon: FontAwesomeIcons.fileCircleCheck,
                 label: '验货',
                 route: const InspectionRoute(),
                 color: colorScheme.primary,

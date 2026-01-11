@@ -19,7 +19,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
     final statsNotifier = ref.read(moduleStatsProvider(_moduleId).notifier);
     final timeLabels = stats.timeLabels;
     final productData = stats.data;
-    
+
     // 市场采购模块需要显示多个数据系列，所以还需要获取其他模块的数据
     final customerStats = ref.watch(moduleStatsProvider('customer'));
     final supplierStats = ref.watch(moduleStatsProvider('supplier'));
@@ -41,8 +41,8 @@ class MarketPurchaseChart extends HookConsumerWidget {
         });
       }
       return null;
-    }, []); 
-   
+    }, []);
+
     // 显示加载状态
     if (stats.isLoading || customerStats.isLoading || supplierStats.isLoading) {
       return Container(
@@ -60,8 +60,11 @@ class MarketPurchaseChart extends HookConsumerWidget {
       return Container(
         height: 100,
         padding: const EdgeInsets.all(16),
-        child: const Center(
-          child: Text('暂无数据'),
+        child: Center(
+          child: Text(
+            '暂无数据',
+            style: TextStyle(color: colorScheme.surfaceContainerHighest),
+          ),
         ),
       );
     }
@@ -171,7 +174,6 @@ class MarketPurchaseChart extends HookConsumerWidget {
               ),
             ),
           ),
-       
         ],
       ),
     );
@@ -208,7 +210,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
 
     // 检查使用初始间隔会有多少个刻度点（包括0）
     final tickCount = (maxY / initialInterval).ceil() + 1;
-    
+
     // 如果刻度点数量超过限制，调整间隔
     if (tickCount > maxTicks) {
       // 计算最大允许的间隔（确保最多 maxTicks 个刻度点）
@@ -216,18 +218,19 @@ class MarketPurchaseChart extends HookConsumerWidget {
       // 将间隔向上取整到合理的数字
       return _roundToNiceNumber(maxAllowedInterval);
     }
-    
+
     return initialInterval;
   }
 
   /// 将数字向上取整到合理的间隔值（如 10, 20, 50, 100, 200, 500, 1000 等）
   double _roundToNiceNumber(double value) {
     if (value <= 0) return 10;
-    
+
     // 计算数量级
-    final magnitude = math.pow(10, (math.log(value) / math.ln10).floor()).toDouble();
+    final magnitude =
+        math.pow(10, (math.log(value) / math.ln10).floor()).toDouble();
     final normalized = value / magnitude;
-    
+
     // 向上取整到 1, 2, 5, 10
     double multiplier;
     if (normalized <= 1) {
@@ -239,7 +242,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
     } else {
       multiplier = 10;
     }
-    
+
     return magnitude * multiplier;
   }
 
@@ -267,5 +270,4 @@ class MarketPurchaseChart extends HookConsumerWidget {
       ],
     );
   }
-
 }

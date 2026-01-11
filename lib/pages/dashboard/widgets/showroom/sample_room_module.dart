@@ -3,11 +3,9 @@ import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/chart_contet.dart';
+import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-// Provider 用于管理样品间模块的维度选择
-final sampleRoomDimensionProvider = StateProvider<String>((ref) => '样品间');
 
 /// 统计结果：一级目录信息 + 该一级目录下累计数量
 /// 需要在其他文件中使用，所以保持 public
@@ -50,11 +48,11 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   static const List<Color> _colorPalette = [
     Color(0xFF4A90E2), // 蓝色
     Color(0xFF2E7D32), // 深绿色
-    Color(0xFF2196F3), // 浅蓝色
+    Color.fromARGB(255, 15, 76, 125), // 浅蓝色
     Color(0xFFFF9800), // 橙色
     Color(0xFFFFC107), // 黄色
-    Color(0xFF9C27B0), // 紫色
-    Color(0xFFFA338A), //玫粉色
+    Color.fromARGB(255, 195, 89, 213), // 紫色
+    Color.fromARGB(255, 160, 70, 109), //玫粉色
     Color(0xFF00BCD4), // 青色
   ];
 
@@ -66,7 +64,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     // 初始化时强制将维度设置为「样品间」，并根据该维度加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
       const defaultDimension = '样品间';
-      ref.read(sampleRoomDimensionProvider.notifier).state = defaultDimension;
+      ref.read(dashboardStatsProvider.notifier).setSampleRoomDimension(defaultDimension);
       _lastLoadedDimension = defaultDimension;
       _loadDimensionData(defaultDimension);
     });
@@ -219,15 +217,15 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   @override
   Widget build(BuildContext context) {
     // 监听维度变化并重新加载数据
-    ref.listen<String>(sampleRoomDimensionProvider, (previous, next) {
-      if (previous != next && next != _lastLoadedDimension) {
-        _lastLoadedDimension = next;
-        _loadDimensionData(next);
-      }
-    });
-
-    // 确保监听 provider（即使不使用值）
-    ref.watch(sampleRoomDimensionProvider);
+    ref.listen<String>(
+      dashboardStatsProvider.select((state) => state.sampleRoomDimension),
+      (previous, next) {
+        if (previous != next && next != _lastLoadedDimension) {
+          _lastLoadedDimension = next;
+          _loadDimensionData(next);
+        }
+      },
+    );
 
     // 使用从API获取的维度数据
     final sampleRoomData = _dimensionData;
@@ -237,8 +235,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
+        children: [ 
           // 根据数据状态显示内容
           if (_isLoading)
             const Center(

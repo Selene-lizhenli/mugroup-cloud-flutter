@@ -1,6 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/services/dashboard.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
+import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_provider.g.dart';
@@ -61,7 +61,8 @@ class DashboardStats extends _$DashboardStats {
       serviceProviderData: [],
       inspectionData: [],
       isLoading: false,
-      timeDimension: TimeDimension.last6Months,
+      timeDimension: TimeDimension.last6Months, 
+      sampleRoomDimension: '样品间',
     );
 
     return dashboardStatsState;
@@ -85,6 +86,11 @@ class DashboardStats extends _$DashboardStats {
     await load();
   }
 
+  /// 设置样品间维度
+  void setSampleRoomDimension(String dimension) {
+    state = state.copyWith(sampleRoomDimension: dimension);
+  }
+
   Future<DashboardStatsState> _fetch() async {
     // 获取统计数据（根据当前时间维度）
     final params = _buildDateRangeParams(state.timeDimension);
@@ -98,6 +104,7 @@ class DashboardStats extends _$DashboardStats {
         serviceProviderData: [],
         inspectionData: [],
         timeDimension: state.timeDimension,
+        sampleRoomDimension: state.sampleRoomDimension,
       );
     }
 
@@ -110,6 +117,7 @@ class DashboardStats extends _$DashboardStats {
         serviceProviderData: [],
         inspectionData: [],
         timeDimension: state.timeDimension,
+        sampleRoomDimension: state.sampleRoomDimension,
       );
     }
 
@@ -139,6 +147,7 @@ class DashboardStats extends _$DashboardStats {
       serviceProviderData: serviceProviderData,
       inspectionData: inspectionData,
       timeDimension: state.timeDimension,
+      sampleRoomDimension: state.sampleRoomDimension,
     );
     logger.d('sa${sa.toString()}');
     return sa;

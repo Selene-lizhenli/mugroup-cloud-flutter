@@ -1,7 +1,7 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/services/dashboard.dart';
-import 'package:cloud/pages/dashboard/provider/module_stats_state.dart';
-import 'package:cloud/pages/dashboard/provider/dashboard_stats_state.dart';
+import 'package:cloud/pages/dashboard/modal/module_stats_state.dart';
+import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'module_stats_provider.g.dart';
@@ -46,7 +46,7 @@ class ModuleStats extends _$ModuleStats {
       timeLabels: [],
       data: [],
       isLoading: false,
-      timeDimension: TimeDimension.last6Months,
+      timeDimension: TimeDimension.last6Months, 
     );
   }
 
@@ -60,6 +60,7 @@ class ModuleStats extends _$ModuleStats {
   /// 刷新数据
   Future<void> refresh() async {
     await load();
+    // await ref.read(dashboardStatsProvider.notifier).refresh();
   }
 
   /// 设置时间维度并重新加载数据
@@ -75,7 +76,7 @@ class ModuleStats extends _$ModuleStats {
     logger.d('Module ${state.moduleId} params: ${params}');
     
     if (summary?.data == null || summary!.data!.isEmpty) {
-      return ModuleStatsState(
+      return state.copyWith(
         moduleId: state.moduleId,
         timeLabels: [],
         data: [],

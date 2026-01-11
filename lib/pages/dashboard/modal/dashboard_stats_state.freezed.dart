@@ -24,7 +24,8 @@ mixin _$DashboardStatsState {
       throw _privateConstructorUsedError; // 服务商数量
   List<int> get inspectionData => throw _privateConstructorUsedError; // 验货任务数量
   bool get isLoading => throw _privateConstructorUsedError; // 是否正在加载
-  TimeDimension get timeDimension => throw _privateConstructorUsedError;
+  TimeDimension get timeDimension => throw _privateConstructorUsedError; // 时间维度
+  String get sampleRoomDimension => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $DashboardStatsStateCopyWith<DashboardStatsState> get copyWith =>
@@ -44,7 +45,8 @@ abstract class $DashboardStatsStateCopyWith<$Res> {
       List<int> serviceProviderData,
       List<int> inspectionData,
       bool isLoading,
-      TimeDimension timeDimension});
+      TimeDimension timeDimension,
+      String sampleRoomDimension});
 }
 
 /// @nodoc
@@ -67,6 +69,7 @@ class _$DashboardStatsStateCopyWithImpl<$Res, $Val extends DashboardStatsState>
     Object? inspectionData = null,
     Object? isLoading = null,
     Object? timeDimension = null,
+    Object? sampleRoomDimension = null,
   }) {
     return _then(_value.copyWith(
       timeLabels: null == timeLabels
@@ -97,6 +100,10 @@ class _$DashboardStatsStateCopyWithImpl<$Res, $Val extends DashboardStatsState>
           ? _value.timeDimension
           : timeDimension // ignore: cast_nullable_to_non_nullable
               as TimeDimension,
+      sampleRoomDimension: null == sampleRoomDimension
+          ? _value.sampleRoomDimension
+          : sampleRoomDimension // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -116,7 +123,8 @@ abstract class _$$DashboardStatsStateImplCopyWith<$Res>
       List<int> serviceProviderData,
       List<int> inspectionData,
       bool isLoading,
-      TimeDimension timeDimension});
+      TimeDimension timeDimension,
+      String sampleRoomDimension});
 }
 
 /// @nodoc
@@ -137,6 +145,7 @@ class __$$DashboardStatsStateImplCopyWithImpl<$Res>
     Object? inspectionData = null,
     Object? isLoading = null,
     Object? timeDimension = null,
+    Object? sampleRoomDimension = null,
   }) {
     return _then(_$DashboardStatsStateImpl(
       timeLabels: null == timeLabels
@@ -167,6 +176,10 @@ class __$$DashboardStatsStateImplCopyWithImpl<$Res>
           ? _value.timeDimension
           : timeDimension // ignore: cast_nullable_to_non_nullable
               as TimeDimension,
+      sampleRoomDimension: null == sampleRoomDimension
+          ? _value.sampleRoomDimension
+          : sampleRoomDimension // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -181,7 +194,8 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       final List<int> serviceProviderData = const [],
       final List<int> inspectionData = const [],
       this.isLoading = false,
-      this.timeDimension = TimeDimension.last6Months})
+      this.timeDimension = TimeDimension.last6Months,
+      this.sampleRoomDimension = '样品间'})
       : _timeLabels = timeLabels,
         _productData = productData,
         _customerData = customerData,
@@ -251,10 +265,14 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
   @override
   @JsonKey()
   final TimeDimension timeDimension;
+// 时间维度
+  @override
+  @JsonKey()
+  final String sampleRoomDimension;
 
   @override
   String toString() {
-    return 'DashboardStatsState(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData, inspectionData: $inspectionData, isLoading: $isLoading, timeDimension: $timeDimension)';
+    return 'DashboardStatsState(timeLabels: $timeLabels, productData: $productData, customerData: $customerData, serviceProviderData: $serviceProviderData, inspectionData: $inspectionData, isLoading: $isLoading, timeDimension: $timeDimension, sampleRoomDimension: $sampleRoomDimension)';
   }
 
   @override
@@ -275,7 +293,9 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.timeDimension, timeDimension) ||
-                other.timeDimension == timeDimension));
+                other.timeDimension == timeDimension) &&
+            (identical(other.sampleRoomDimension, sampleRoomDimension) ||
+                other.sampleRoomDimension == sampleRoomDimension));
   }
 
   @override
@@ -287,7 +307,8 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       const DeepCollectionEquality().hash(_serviceProviderData),
       const DeepCollectionEquality().hash(_inspectionData),
       isLoading,
-      timeDimension);
+      timeDimension,
+      sampleRoomDimension);
 
   @JsonKey(ignore: true)
   @override
@@ -305,7 +326,8 @@ abstract class _DashboardStatsState extends DashboardStatsState {
       final List<int> serviceProviderData,
       final List<int> inspectionData,
       final bool isLoading,
-      final TimeDimension timeDimension}) = _$DashboardStatsStateImpl;
+      final TimeDimension timeDimension,
+      final String sampleRoomDimension}) = _$DashboardStatsStateImpl;
   const _DashboardStatsState._() : super._();
 
   @override
@@ -322,6 +344,8 @@ abstract class _DashboardStatsState extends DashboardStatsState {
   bool get isLoading;
   @override // 是否正在加载
   TimeDimension get timeDimension;
+  @override // 时间维度
+  String get sampleRoomDimension;
   @override
   @JsonKey(ignore: true)
   _$$DashboardStatsStateImplCopyWith<_$DashboardStatsStateImpl> get copyWith =>

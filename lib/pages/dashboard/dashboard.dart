@@ -58,25 +58,28 @@ class DashboardPage extends HookConsumerWidget {
       await refreshModules();
     }
 
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceTint,
-        ),
-        child: RefreshIndicator(
-          onRefresh: onRefresh,
-          child: ListView(
-            controller: scrollController,
-            shrinkWrap: true,
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            children: [
-              const HomeUserHeader(),
-              const SizedBox(height: 12),
-              const EntryGridModule(),
-              const SizedBox(height: 12),
-              SelectedModulesWidget(key: selectedModulesKey),
-            ],
+    return Container(
+      color: colorScheme.surfaceTint,
+      child: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceTint,
+          ),
+          child: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ListView(
+              controller: scrollController,
+              shrinkWrap: true,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              children: [
+                const HomeUserHeader(),
+                const SizedBox(height: 12),
+                const EntryGridModule(),
+                const SizedBox(height: 12),
+                SelectedModulesWidget(key: selectedModulesKey),
+              ],
+            ),
           ),
         ),
       ),

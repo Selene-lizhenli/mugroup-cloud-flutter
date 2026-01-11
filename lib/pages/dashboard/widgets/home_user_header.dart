@@ -72,6 +72,7 @@ class HomeUserHeader extends HookConsumerWidget {
                     '✨ 新增功能',
                     '  • 新增首页自定义展示模块',
                     '  • 新增《验货》模块，记录商品验货图片',
+                    '  • 新增《市场采购》模块，记录市场采购数据',
                     '  • 首页新增数据统计模块',
                     '🔧 功能改进',
                     '  • 首页布局优化，展示用户信息、应用模块入口、数据统计等模块',
@@ -91,7 +92,7 @@ class HomeUserHeader extends HookConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -99,7 +100,7 @@ class HomeUserHeader extends HookConsumerWidget {
         children: [
           Image.asset(
             'assets/logo.webp',
-            width: 110,
+            width: 116,
             fit: BoxFit.contain,
           ),
           const Spacer(),
@@ -115,8 +116,8 @@ class HomeUserHeader extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(Icons.person,
-                      size: 24, color: colorScheme.onSurface.withOpacity(0.7)),
-                  const SizedBox(width: 6),
+                      size: 24, color: colorScheme.onSurface.withOpacity(0.72)),
+                  const SizedBox(width: 6), 
                   Text(
                     user?.name ?? "",
                     maxLines: 1,
