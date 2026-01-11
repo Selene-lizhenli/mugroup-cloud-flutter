@@ -18,7 +18,7 @@ class Scan extends _$Scan {
   /// You can also freely define parameters on this method.
   @override
   List<String> build() {
-    logger.d("scan 初始化 拉");
+    logger.d("scan 初始化 啦");
 
     BroadcastReceiver receiver = BroadcastReceiver(
       names: [
@@ -44,7 +44,7 @@ class Scan extends _$Scan {
     });
 
     ref.onDispose(() {
-      logger.d("scan dispos 拉");
+      logger.d("scan dispos 啦");
 
       sub.cancel();
       receiver.stop();
@@ -101,6 +101,8 @@ class Scan extends _$Scan {
       return;
     }
 
+    // 普通条形码：设置state后跳转到购物车页面
     state = [barcodeString];
+    app.router.push(const CartRoute());
   }
 }

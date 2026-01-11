@@ -126,8 +126,7 @@ class HomeAppBar extends HookConsumerWidget {
                 child: Container(
                   height: 40,
                   padding: const EdgeInsets.only(left: 12, right: 0),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onPrimary,
+                  decoration: BoxDecoration( 
                     border: Border.all(
                       color: colorScheme.secondary,
                       width: 1,

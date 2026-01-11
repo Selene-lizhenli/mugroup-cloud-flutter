@@ -30,7 +30,7 @@ class OperateBar extends HookConsumerWidget {
 
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       child: Row(
         children: [
           Expanded(
@@ -42,7 +42,10 @@ class OperateBar extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.ideographic,
                   children: [
-                    Text("已选: $totalCount 件"),
+                    Text(
+                      "已选: $totalCount 件",
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     const SizedBox(
                       width: 1,
                     ),

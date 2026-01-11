@@ -24,7 +24,7 @@ class SamplesListPage extends HookConsumerWidget {
       backgroundColor: colorScheme.surfaceTint,
       appBar: AppBar(
         title: Text(currentWarehouse?.name ?? '样品间'),
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceTint,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -55,7 +55,7 @@ class SamplesListPage extends HookConsumerWidget {
       ),
       body: Container(
         // color: colorScheme.secondary, 
-        padding: const EdgeInsets.fromLTRB(2, 16, 2, 0),
+        padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
