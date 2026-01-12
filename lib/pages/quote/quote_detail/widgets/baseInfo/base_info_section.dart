@@ -64,8 +64,8 @@ class BaseInfoSection extends HookConsumerWidget {
                   ActionPillButton(
                     label: '编辑',
                     icon: Icons.edit_outlined,
-                    textColor: colorScheme.secondary,
-                    borderColor: colorScheme.secondary,
+                    textColor: colorScheme.primary,
+                    borderColor: colorScheme.primary,
                     onTap: onEdit!,
                   ),
                 if (onEdit != null && onDelete != null)
@@ -131,7 +131,7 @@ class BaseInfoSection extends HookConsumerWidget {
                     width: (constraints.maxWidth - 16) / 2,
                     child:   _InfoItem(
                       label: '报价语言',
-                      value: item?.language??'', // TODO: 从数据中获取
+                      value: item?.language??'',  
                     ),
 
                   ),

@@ -241,6 +241,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                           label: '企微',
                           assetPath: 'assets/icons/wxwork.svg',
                           selected: isWework,
+                          iconColor: colorScheme.outline,
                           onTap: () {
                             setState(() {
                               _channel = ExportChannel.wework;
@@ -252,7 +253,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                           label: '邮箱',
                           assetPath: 'assets/icons/email.svg',
                           selected: isEmail,
-                          color: colorScheme.secondary,
+                          iconColor: colorScheme.outline,
                           onTap: () {
                             setState(() {
                               _channel = ExportChannel.email;
@@ -537,7 +538,7 @@ class _ChannelOption extends StatelessWidget {
   final String label;
   final String assetPath;
   final bool selected;
-  final Color? color;
+  final Color? iconColor;
   final VoidCallback onTap;
 
   const _ChannelOption({
@@ -545,7 +546,7 @@ class _ChannelOption extends StatelessWidget {
     required this.assetPath,
     required this.selected,
     required this.onTap,
-    this.color,
+    this.iconColor,
   });
 
   @override
@@ -571,10 +572,8 @@ class _ChannelOption extends StatelessWidget {
             SvgPicture.asset(
               assetPath,
               width: 20,
-              height: 20,
-              colorFilter: color != null
-                  ? ColorFilter.mode(color!, BlendMode.srcIn)
-                  : null,
+              height: 20, 
+              colorFilter: ColorFilter.mode(iconColor??fgColor, BlendMode.srcIn)  
             ),
             const SizedBox(width: 8),
             Text(

@@ -96,27 +96,27 @@ class ProductListSheet extends HookConsumerWidget {
                     children: [
                       Checkbox(
                         value: allSelected && validIds.isNotEmpty,
-                        checkColor: colorScheme.onSecondary,
+                        checkColor: colorScheme.onPrimary,
                         fillColor: WidgetStateProperty.resolveWith<Color?>(
                           (Set<WidgetState> states) {
                             if (states.contains(WidgetState.selected)) {
-                              return colorScheme.secondary;
+                              return colorScheme.primary;
                             }
                             return null;
                           },
                         ),
-                        focusColor: colorScheme.secondary,
-                        hoverColor: colorScheme.secondary,
+                        focusColor: colorScheme.primary,
+                        hoverColor: colorScheme.primary,
                         overlayColor: WidgetStateProperty.resolveWith<Color?>(
                           (Set<WidgetState> states) {
                             if (!states.contains(WidgetState.selected)) {
-                              return colorScheme.secondary.withOpacity(0.04);
+                              return colorScheme.primary.withOpacity(0.04);
                             }
                             return null;
                           },
                         ),
                         side: BorderSide(
-                          color: colorScheme.secondary,
+                          color: colorScheme.primary,
                           width: 1.5,
                         ),
                         onChanged: (checked) {
@@ -178,7 +178,7 @@ class ProductListSheet extends HookConsumerWidget {
                           text: '$selectedCount',
                           style: TextStyle(
                             fontSize: 15,
-                            color: colorScheme.secondary,
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -200,8 +200,8 @@ class ProductListSheet extends HookConsumerWidget {
                       onPressed: handleConfirm,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
-                        backgroundColor: colorScheme.secondary,
-                        foregroundColor: colorScheme.onSecondary,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(3),
@@ -294,26 +294,26 @@ class ProductListSheet extends HookConsumerWidget {
                     onTap: () => notifier.toggleSelect(item.id!),
                     child: Checkbox(
                       value: isSelected,
-                      checkColor: colorScheme.onSecondary,
+                      checkColor: colorScheme.onPrimary,
                       fillColor: WidgetStateProperty.resolveWith<Color?>(
                         (Set<WidgetState> states) {
                           if (states.contains(WidgetState.selected)) {
-                            return colorScheme.secondary;
+                            return colorScheme.primary;
                           }
                           return null;
                         },
                       ),
-                      focusColor: colorScheme.secondary,
-                      hoverColor: colorScheme.secondary,
+                      focusColor: colorScheme.primary,
+                      hoverColor: colorScheme.primary,
                       onChanged: (_) => notifier.toggleSelect(item.id!),
                       side: BorderSide(
-                        color: colorScheme.secondary,
+                        color: colorScheme.primary,
                         width: 1.5,
                       ),
                       overlayColor: WidgetStateProperty.resolveWith<Color?>(
                         (Set<WidgetState> states) {
                           if (!states.contains(WidgetState.selected)) {
-                            return colorScheme.secondary.withOpacity(0.04);
+                            return colorScheme.primary.withOpacity(0.04);
                           }
                           return null;
                         },
@@ -380,7 +380,7 @@ class ProductListSheet extends HookConsumerWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: colorScheme.secondary,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),

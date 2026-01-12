@@ -210,7 +210,7 @@ class _ChartContentState extends State<ChartContent> {
                                   .bodySmall
                                   ?.copyWith(
                                     fontSize: 11,
-                                    color: colorScheme.secondary,
+                                    color: colorScheme.primary,
                                     fontWeight: FontWeight.w500,
                                   ),
                             ),
@@ -220,7 +220,7 @@ class _ChartContentState extends State<ChartContent> {
                                   ? Icons.keyboard_arrow_up
                                   : Icons.keyboard_arrow_down,
                               size: 16,
-                              color: colorScheme.secondary,
+                              color: colorScheme.primary,
                             ),
                           ],
                         ),

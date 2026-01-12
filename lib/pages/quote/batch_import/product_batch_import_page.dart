@@ -256,8 +256,8 @@ class ProductBatchImportPage extends HookConsumerWidget {
                 child: FilledButton(
                   onPressed: handleSave,
                   style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.secondary,
-                    foregroundColor: colorScheme.onSecondary,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),

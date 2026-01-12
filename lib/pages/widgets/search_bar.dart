@@ -23,7 +23,7 @@ class MuSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final effectiveThemeColor = themeColor ?? colorScheme.secondary;
+    final effectiveThemeColor = themeColor ?? colorScheme.primary;
     final effectiveFillColor =
         fillColor ?? const Color.fromARGB(255, 247, 247, 247);
     

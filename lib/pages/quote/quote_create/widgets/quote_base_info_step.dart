@@ -3,11 +3,9 @@ import 'package:cloud/pages/quote/quote_create/widgets/select_contact_sheet.dart
 import 'package:cloud/pages/quote/quote_create/widgets/select_currency_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_customer_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter/material.dart'; 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart'; 
 
 class QuoteBaseInfoStep extends HookConsumerWidget {
   const QuoteBaseInfoStep({
@@ -15,8 +13,7 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) { 
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
 
@@ -179,21 +176,21 @@ class InfoTip extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: colorScheme.secondary.withOpacity(0.08),
+        color: colorScheme.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
-            color: colorScheme.secondary.withOpacity(0.68),
+            color: colorScheme.primary.withOpacity(0.68),
             size: 16,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               '创建报价单后，可通过详情页添加商品',
-              style: TextStyle(color: colorScheme.secondary, fontSize: 12),
+              style: TextStyle(color: colorScheme.primary, fontSize: 12),
             ),
           ),
         ],
@@ -439,103 +436,3 @@ class FormDateTimeField extends ConsumerWidget {
         '${two(dt.hour)}:${two(dt.minute)}:${two(dt.second)}';
   }
 }
-
-// class FormDateTimeField extends ConsumerWidget {
-//   final String label;
-//   final bool requiredField;
-
-//   const FormDateTimeField({
-//     super.key,
-//     required this.label,
-//     this.requiredField = false,
-//   });
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final state = ref.watch(quoteCreateProvider);
-//     final notifier = ref.read(quoteCreateProvider.notifier);
-
-//     final dateTime = state.quoteDate;
-
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 12),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           _FieldLabel(text: label, requiredField: requiredField),
-//           const SizedBox(height: 6),
-//           InkWell(
-//             borderRadius: BorderRadius.circular(8),
-//             onTap: () async {
-//               // 1️⃣ 选日期
-//               final pickedDate = await showDatePicker(
-//                 context: context,
-//                 initialDate: dateTime,
-//                 firstDate: DateTime(2020),
-//                 lastDate: DateTime(2100),
-//               );
-//               if (pickedDate == null) return;
-//               // 2️⃣ 选时间（时分）
-//               final pickedTime = await showTimePicker(
-//                 context: context,
-//                 initialTime: TimeOfDay.fromDateTime(dateTime),
-//               );
-//               if (pickedTime == null) return;
-
-//               // 3️⃣ 合并成 DateTime（秒这里默认 0）
-//               final newDateTime = DateTime(
-//                 pickedDate.year,
-//                 pickedDate.month,
-//                 pickedDate.day,
-//                 pickedTime.hour,
-//                 pickedTime.minute,
-//                 0, // 秒
-//               );
-//               notifier.setQuoteDate(newDateTime);
-//             },
-//             child: Container(
-//               height: 44,
-//               padding: const EdgeInsets.symmetric(horizontal: 12),
-//               decoration: BoxDecoration(
-//                 color: Colors.grey.shade100,
-//                 borderRadius: BorderRadius.circular(8),
-//               ),
-//               child: Row(
-//                 children: [
-//                   const Icon(Icons.calendar_today, size: 18),
-//                   const SizedBox(width: 8),
-//                   Text(_formatDateTime(dateTime)),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   String _formatDateTime(DateTime dt) {
-//     String two(int n) => n.toString().padLeft(2, '0');
-//     return '${dt.year}-${two(dt.month)}-${two(dt.day)} '
-//         '${two(dt.hour)}:${two(dt.minute)}:${two(dt.second)}';
-//   }
-// }
-
-// class _FieldLabel extends StatelessWidget {
-//   final String text;
-//   final bool requiredField;
-//   const _FieldLabel({
-//     required this.text,
-//     required this.requiredField,
-//   });
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: [
-//         if (requiredField)
-//           const Text('* ', style: TextStyle(color: Colors.red)),
-//         Text(text, style: const TextStyle(fontSize: 13)),
-//       ],
-//     );
-//   }
-// }

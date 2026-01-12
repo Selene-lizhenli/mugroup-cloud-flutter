@@ -16,10 +16,9 @@ class SearchAppTabbar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final colorScheme = Theme.of(context).colorScheme;
     final textController = useTextEditingController();
-    final themeColorValue = themeColor??colorScheme.secondary;
+    final themeColorValue = themeColor ?? colorScheme.primary;
 
     useEffect(() {
       textController.addListener(() {
@@ -40,6 +39,8 @@ class SearchAppTabbar extends HookConsumerWidget {
       width: double.infinity,
       height: 38,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
               child: Container(

@@ -65,7 +65,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       ),
       DashboardModule(
         id: 'market_purchase',
-        title: '市场采购',
+        title: '市场带客',
         content: const MarketPurchaseChart(),
         group: '数据统计', // 添加分组
         selected: selectedIds.contains('market_purchase'),
@@ -511,7 +511,7 @@ class _ModuleCard extends StatelessWidget {
         iconBgColor: const Color(0xFFF3E5F5), // 浅紫色
         iconColor: const Color(0xFF7B1FA2), // 深紫色
       );
-    } else if (title.contains('市场采购')) {
+    } else if (title.contains('市场带客')) {
       return _ModuleIconConfig(
         icon: Icons.shopping_cart_outlined,
         iconBgColor: const Color(0xFFFFF3E0), // 浅橙色

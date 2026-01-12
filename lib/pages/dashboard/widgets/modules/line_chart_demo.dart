@@ -130,7 +130,7 @@ class _LineChartDemoState extends State<LineChartDemo> {
                 _error!,
                 style: TextStyle(color: Colors.grey.shade600),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: _loadExchangeRates,
                 child: const Text('重试'),

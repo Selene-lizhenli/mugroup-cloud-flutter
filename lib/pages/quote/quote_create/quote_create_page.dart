@@ -3,6 +3,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
@@ -115,7 +116,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
       ),
       body: Column(
         children: [
-          Expanded(child: QuoteBaseInfoStep()),
+          const Expanded(child: QuoteBaseInfoStep()),
           QuoteCreateBottomBar(quoteId: widget.quoteId),
         ],
       ),
@@ -191,7 +192,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final user = ref.watch(userProvider).user; // TODO: 保存时使用
+    final user = ref.watch(userProvider).user; // TODO: 保存时使用
     final state = ref.watch(quoteCreateProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = state.savingDraft || state.submitting;
@@ -208,36 +209,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            // ================= 草稿 =================
-            // Expanded(
-            //   child: OutlinedButton(
-            //     onPressed: isLoading
-            //         ? null
-            //         : () async {
-            //             await notifier.saveDraft();
-            //             if (context.mounted) {
-            //               ScaffoldMessenger.of(context).showSnackBar(
-            //                 const SnackBar(content: Text('草稿已保存')),
-            //               );
-            //             }
-            //           },
-            //     style: OutlinedButton.styleFrom(
-            //       side: const BorderSide(color: Color(0xFFD0D5DD)),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //     ),
-            //     child: state.savingDraft
-            //         ? const SizedBox(
-            //             width: 18,
-            //             height: 18,
-            //             child: CircularProgressIndicator(strokeWidth: 2),
-            //           )
-            //         : const Text('草稿'),
-            //   ),
-            // ),
-
-            const SizedBox(width: 12),
+            const SizedBox(width: 6),
 
             // ================= 保存 =================
             Expanded(
@@ -255,7 +227,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                                       "qty": item.count
                                     })
                                 .toList(),
-                            "user_id": null, //外銷員
+                            "user_id": user?.id, //外銷員
                             "curreny": state.currency, //货币
                             "exchange": state.rate, //汇率
                             "commission_rate": state.addPercentage, //加点
@@ -310,7 +282,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                         }
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.secondary,
+                  backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -327,10 +299,11 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                     : Text(
                         '保存',
                         style: TextStyle(
-                            fontSize: 16, color: colorScheme.onSecondary),
+                            fontSize: 16, color: colorScheme.onPrimary),
                       ),
               ),
             ),
+            const SizedBox(width: 6),
           ],
         ),
       ),

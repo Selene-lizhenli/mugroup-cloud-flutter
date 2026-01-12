@@ -20,12 +20,15 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
   final int id;
   const InspectionItemConfirmPage({super.key, required this.id});
 
-  static const _cBlue = Color(0xFF3B68D8);
+ 
   static const _cBg = Color(0xFFF5F6FA);
   static const _cText = Color(0xFF333333);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color primaryColor = colorScheme.primary; 
+
     final inspectionItem = useState<InspectionItem?>(null);
     final isLoading = useState(true);
 
@@ -125,40 +128,44 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
               padding: const EdgeInsets.all(12),
               children: [
                 _InfoCard(
-                  blue: _cBlue,
+                  blue: primaryColor,
                   text: _cText,
                   inspectionItem: inspectionItem.value,
                 ),
                 const SizedBox(height: 12),
                 _PhotoCard(
-                  blue: _cBlue,
+                  blue: primaryColor,
                   text: _cText,
                   mediaMap: mediaMap.value,
                   onMediaChanged: updateMedia,
                 ),
                 const SizedBox(height: 12),
                 _NoteCard(
-                  blue: _cBlue,
+                  blue: primaryColor,
                   text: _cText,
                   controller: remarkController,
                 ),
               ],
             ),
           ),
-          _buildBottomBtn(onPressed: handleSubmit),
+          _buildBottomBtn(onPressed: handleSubmit, primaryColor: primaryColor),
         ],
       ),
     );
   }
 
-  Widget _buildBottomBtn({VoidCallback? onPressed}) => Container(
+  Widget _buildBottomBtn({
+    VoidCallback? onPressed,
+    required Color primaryColor,
+  }) =>
+      Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         color: Colors.white,
         child: SafeArea(
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _cBlue,
+              backgroundColor: primaryColor,
               minimumSize: const Size(double.infinity, 44),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),

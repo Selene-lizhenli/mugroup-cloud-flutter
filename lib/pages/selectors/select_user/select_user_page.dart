@@ -74,6 +74,7 @@ class SelectUserPage extends HookConsumerWidget {
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: SearchAppTabbar(onSearch: handleSearch),
+          titleSpacing: 0,
           elevation: 0,
           backgroundColor: Colors.white,
           leading: IconButton(
@@ -198,9 +199,9 @@ class SelectUserPage extends HookConsumerWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       itemCount: users.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final user = users[index];
         return UserCard(

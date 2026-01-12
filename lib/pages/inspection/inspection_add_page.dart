@@ -11,8 +11,11 @@ class InspectionAddPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color primaryColor = colorScheme.primary;
+    final redColor = colorScheme.error;
+
     const Color backgroundColor = Color(0xFFF5F7FA);
-    const Color primaryBlue = Color(0xFF3B66F5);
     const Color labelColor = Color(0xFF333333);
     final Color borderColor = Colors.grey[300]!;
     const Color hintColor = Color(0xFF999999);
@@ -59,12 +62,12 @@ class InspectionAddPage extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.check_circle_outline,
-                            color: primaryBlue, size: 22),
-                        SizedBox(width: 8),
-                        Text(
+                            color: primaryColor, size: 22),
+                        const SizedBox(width: 8),
+                        const Text(
                           '新增验货任务',
                           style: TextStyle(
                             fontSize: 16,
@@ -79,11 +82,11 @@ class InspectionAddPage extends HookConsumerWidget {
                         height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
                     const SizedBox(height: 20),
                     RichText(
-                      text: const TextSpan(
+                      text: TextSpan(
                         text: '*',
-                        style: TextStyle(color: Colors.red, fontSize: 14),
-                        children: [
-                          TextSpan(
+                        style: TextStyle(color: redColor, fontSize: 14),
+                        children: const [
+                            TextSpan(
                             text: ' 任务标题',
                             style: TextStyle(color: labelColor, fontSize: 14),
                           ),
@@ -118,11 +121,11 @@ class InspectionAddPage extends HookConsumerWidget {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: const BorderSide(color: primaryBlue),
+                          borderSide: BorderSide(color: primaryColor),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: const BorderSide(color: Colors.red),
+                          borderSide: BorderSide(color: redColor),
                         ),
                         isDense: true,
                       ),
@@ -176,8 +179,8 @@ class InspectionAddPage extends HookConsumerWidget {
                         }
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  disabledBackgroundColor: primaryBlue.withOpacity(0.6),
+                  backgroundColor: primaryColor,
+                  disabledBackgroundColor: primaryColor.withOpacity(0.6),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

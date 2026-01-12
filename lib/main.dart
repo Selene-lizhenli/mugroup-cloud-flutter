@@ -49,8 +49,8 @@ Future<void> main() async {
 
   try {
     await app.loadCoreProvider();
-  } catch (e) {
-    logger.d("出错");
+  } catch (e, stackTrace) {
+    logger.e("加载核心Provider失败", error: e, stackTrace: stackTrace);
   }
   runApp(
     UncontrolledProviderScope(

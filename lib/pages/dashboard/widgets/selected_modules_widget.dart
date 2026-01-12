@@ -49,7 +49,7 @@ class DashboardModules {
       ),
       ModuleInfo(
         id: 'market_purchase',
-        title: '市场采购',
+        title: '市场带客',
         contentBuilder: () => const MarketPurchaseChart(),
         group: '数据统计',
       ),
@@ -390,7 +390,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             ),
           ),
         ];
-      // 市场采购模块的维度选项（可以根据实际需求添加）
+      // 市场带客模块的维度选项（可以根据实际需求添加）
 
       default:
         return [];
@@ -430,7 +430,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             .read(moduleStatsProvider(moduleId).notifier)
             .setTimeDimension(dimension);
 
-        // 市场采购模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
+        // 市场带客模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
         if (moduleId == 'market_purchase') {
           ref
               .read(moduleStatsProvider('customer').notifier)

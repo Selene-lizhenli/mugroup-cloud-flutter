@@ -128,7 +128,7 @@ class HomeAppBar extends HookConsumerWidget {
                   padding: const EdgeInsets.only(left: 12, right: 0),
                   decoration: BoxDecoration( 
                     border: Border.all(
-                      color: colorScheme.secondary,
+                      color: colorScheme.primary,
                       width: 1,
                     ),
                     borderRadius: const BorderRadius.only(
@@ -176,7 +176,7 @@ class HomeAppBar extends HookConsumerWidget {
                         height: 40,
                         child: TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor: colorScheme.secondary,
+                            backgroundColor: colorScheme.primary,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 0),
                             shape: const RoundedRectangleBorder(
@@ -214,7 +214,7 @@ class HomeAppBar extends HookConsumerWidget {
                   icon: Icon(
                     Icons.shopping_cart,
                     size: 25,
-                    color: colorScheme.secondary,
+                    color: colorScheme.primary,
                   ),
                   padding: EdgeInsets.zero,
                   onPressed: () {

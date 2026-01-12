@@ -24,8 +24,10 @@ class InspectionDetailPage extends HookConsumerWidget {
     final isLoading = useState(true);
     final currentTab = useState(0);
     final searchController = useTextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color primaryColor = colorScheme.primary;
+    final Color secondaryColor = colorScheme.secondary;
 
-    const Color primaryBlue = Color(0xFF3B66F5);
     const Color bgGrey = Color(0xFFF5F7FA);
     const Color textDark = Color(0xFF333333);
     const Color textGrey = Color(0xFF999999);
@@ -115,9 +117,9 @@ class InspectionDetailPage extends HookConsumerWidget {
 
               refreshData(isSilent: true);
             },
-            child: const Text(
+            child: Text(
               '新增',
-              style: TextStyle(color: primaryBlue, fontSize: 16),
+              style: TextStyle(color: primaryColor, fontSize: 16),
             ),
           ),
         ],
@@ -128,7 +130,7 @@ class InspectionDetailPage extends HookConsumerWidget {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _buildInfoCard(context, inspection.value, primaryBlue,
+                  _buildInfoCard(context, inspection.value, primaryColor,
                       textDark, progress, progressText),
                   const SizedBox(height: 12),
                   Container(
@@ -144,7 +146,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                             allItems.length,
                             textDark,
                             textGrey,
-                            primaryBlue,
+                            primaryColor,
                             searchController,
                             currentTab),
                         Divider(
@@ -162,7 +164,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                               children: filteredItems.map((item) {
                                 return _InspectionListItem(
                                   item: item,
-                                  primaryBlue: primaryBlue,
+                                  primaryColor: primaryColor,
                                   onRefresh: () => refreshData(isSilent: true),
                                 );
                               }).toList(),
@@ -175,12 +177,17 @@ class InspectionDetailPage extends HookConsumerWidget {
                 ],
               ),
             ),
-      bottomNavigationBar: _buildBottomBar(context, id, primaryBlue),
+      bottomNavigationBar: _buildBottomBar(context, id, primaryColor),
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, Inspection? inspection,
-      Color primaryBlue, Color textDark, double progress, String progressText) {
+  Widget _buildInfoCard(
+      BuildContext context,
+      Inspection? inspection,
+      Color primaryColor,
+      Color textDark,
+      double progress,
+      String progressText) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -191,7 +198,7 @@ class InspectionDetailPage extends HookConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle_outline, color: primaryBlue, size: 20),
+              Icon(Icons.check_circle_outline, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text('任务信息',
                   style: TextStyle(
@@ -242,7 +249,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                   LayoutBuilder(builder: (context, constraints) {
                     return Container(
                       width: constraints.maxWidth * progress,
-                      color: const Color(0xFF3B68D8),
+                      color: primaryColor,
                     );
                   }),
                   Center(
@@ -268,7 +275,7 @@ class InspectionDetailPage extends HookConsumerWidget {
       int totalCount,
       Color textDark,
       Color textGrey,
-      Color primaryBlue,
+      Color primaryColor,
       TextEditingController controller,
       ValueNotifier<int> currentTab) {
     return Column(
@@ -277,8 +284,7 @@ class InspectionDetailPage extends HookConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              const Icon(Icons.format_list_bulleted,
-                  color: Color(0xFF3B66F5), size: 20),
+              Icon(Icons.format_list_bulleted, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               const Text('验货SKU列表',
                   style: TextStyle(
@@ -340,15 +346,24 @@ class InspectionDetailPage extends HookConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildTabItem('全部',
-                  isSelected: currentTab.value == 0,
-                  onTap: () => currentTab.value = 0),
-              _buildTabItem('已验货',
-                  isSelected: currentTab.value == 1,
-                  onTap: () => currentTab.value = 1),
-              _buildTabItem('未验货',
-                  isSelected: currentTab.value == 2,
-                  onTap: () => currentTab.value = 2),
+              _buildTabItem(
+                '全部',
+                isSelected: currentTab.value == 0,
+                onTap: () => currentTab.value = 0,
+                primaryColor: primaryColor,
+              ),
+              _buildTabItem(
+                '已验货',
+                isSelected: currentTab.value == 1,
+                onTap: () => currentTab.value = 1,
+                primaryColor: primaryColor,
+              ),
+              _buildTabItem(
+                '未验货',
+                isSelected: currentTab.value == 2,
+                onTap: () => currentTab.value = 2,
+                primaryColor: primaryColor,
+              ),
             ],
           ),
         ),
@@ -356,7 +371,7 @@ class InspectionDetailPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, int id, Color primaryBlue) {
+  Widget _buildBottomBar(BuildContext context, int id, Color primaryColor) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: BoxDecoration(
@@ -379,7 +394,7 @@ class InspectionDetailPage extends HookConsumerWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryBlue,
+            backgroundColor: primaryColor,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             elevation: 0,
@@ -395,19 +410,21 @@ class InspectionDetailPage extends HookConsumerWidget {
   }
 
   Widget _buildTabItem(String text,
-      {required bool isSelected, required VoidCallback onTap}) {
+      {required bool isSelected,
+      required VoidCallback onTap,
+      required Color primaryColor}) {
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: isSelected
-            ? const BoxDecoration(
+            ?   BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(color: Color(0xFF3B66F5), width: 2)))
+                    bottom: BorderSide(color: primaryColor, width: 2)))
             : null,
         child: Text(text,
             style: TextStyle(
-                color: isSelected ? const Color(0xFF3B66F5) : Colors.grey[600],
+                color: isSelected ? primaryColor : Colors.grey[600],
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14)),
       ),
@@ -421,7 +438,7 @@ class ExportInspectionDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryBlue = Color(0xFF3B66F5);
+    const Color primaryColor = Color(0xFF3B66F5);
     const Color textDark = Color(0xFF333333);
     final borderColor = Colors.grey[300]!;
 
@@ -473,7 +490,7 @@ class ExportInspectionDialog extends HookWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: primaryBlue),
+                          borderSide: const BorderSide(color: primaryColor),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -552,7 +569,7 @@ class ExportInspectionDialog extends HookWidget {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
+                      backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -575,7 +592,7 @@ class ExportInspectionDialog extends HookWidget {
                       // print('Send to: $email');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
+                      backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -597,13 +614,13 @@ class ExportInspectionDialog extends HookWidget {
 
 class _InspectionListItem extends HookWidget {
   final InspectionItem item;
-  final Color primaryBlue;
+  final Color primaryColor;
   final VoidCallback onRefresh;
 
   const _InspectionListItem({
     super.key,
     required this.item,
-    required this.primaryBlue,
+    required this.primaryColor,
     required this.onRefresh,
   });
 
@@ -611,6 +628,9 @@ class _InspectionListItem extends HookWidget {
   Widget build(BuildContext context) {
     final isExpanded = useState(false);
     final isVerified = item.status == 1;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color errorColor = colorScheme.error;
 
     final mediaList = item.media ?? [];
 
@@ -680,7 +700,7 @@ class _InspectionListItem extends HookWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B66F5),
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     minimumSize: const Size(64, 32),
@@ -705,8 +725,8 @@ class _InspectionListItem extends HookWidget {
                   ),
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.delete_outline,
-                        color: Color(0xFFFF4D4F), size: 18),
+                    icon:
+                        Icon(Icons.delete_outline, color: errorColor, size: 18),
                     onPressed: () async {
                       final bool isConfirmed = await ConfirmDialog.show(
                         context,

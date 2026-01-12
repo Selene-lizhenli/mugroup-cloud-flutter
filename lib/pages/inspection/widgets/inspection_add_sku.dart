@@ -10,7 +10,6 @@ class InspectionAddSku extends HookConsumerWidget {
   final int id;
   const InspectionAddSku({super.key, required this.id});
 
-  static const _primaryColor = Color(0xFF3B66F5);
   static const _bgGrey = Color(0xFFF2F4F7);
 
   static const _contentHeight = 220.0;
@@ -20,6 +19,7 @@ class InspectionAddSku extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tabIndex = useState(0);
     final controller = useTextEditingController();
+    final primaryColor = Theme.of(context).colorScheme.primary;
     useListenable(controller);
 
     final selectedFile = useState<PlatformFile?>(null);
@@ -123,6 +123,7 @@ class InspectionAddSku extends HookConsumerWidget {
             isLoading.value,
             handleSubmit,
             tabIndex.value == 1,
+            primaryColor,
           ),
         ],
       ),
@@ -164,13 +165,8 @@ class InspectionAddSku extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomButton(
-    BuildContext context,
-    bool enabled,
-    bool isLoading,
-    VoidCallback onPressed,
-    bool isUploadMode,
-  ) {
+  Widget _buildBottomButton(BuildContext context, bool enabled, bool isLoading,
+      VoidCallback onPressed, bool isUploadMode, Color primaryColor) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -180,7 +176,7 @@ class InspectionAddSku extends HookConsumerWidget {
           child: ElevatedButton(
             onPressed: (enabled && !isLoading) ? onPressed : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _primaryColor,
+              backgroundColor: primaryColor,
               disabledBackgroundColor: Colors.grey[200],
               disabledForegroundColor: Colors.grey[400],
               shape: RoundedRectangleBorder(
@@ -332,6 +328,8 @@ class _UploadContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final primaryColor = colorScheme.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -347,19 +345,19 @@ class _UploadContent extends StatelessWidget {
                   border: Border.all(
                       color: Colors.grey[300]!, style: BorderStyle.solid),
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.cloud_upload_outlined,
-                        size: 32, color: InspectionAddSku._primaryColor),
-                    SizedBox(height: 8),
-                    Text('点击选择表格文件',
+                        size: 32, color: primaryColor),
+                    const SizedBox(height: 8),
+                    const Text('点击选择表格文件',
                         style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF333333))),
-                    SizedBox(height: 4),
-                    Text('支持 Excel (.xlsx, .xls) 格式',
+                    const SizedBox(height: 4),
+                    const Text('支持 Excel (.xlsx, .xls) 格式',
                         style:
                             TextStyle(fontSize: 12, color: Color(0xFF999999))),
                   ],

@@ -24,9 +24,8 @@ class MyPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 
-    return Scaffold( 
+    return Scaffold(
       appBar: AppBar(
-      
         title: Text(tenant?.title ?? "我的"),
       ),
       body: SafeArea(

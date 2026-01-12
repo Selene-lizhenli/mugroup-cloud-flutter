@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// 市场采购模块 - 柱状图
+/// 市场带客模块 - 柱状图
 class MarketPurchaseChart extends HookConsumerWidget {
   const MarketPurchaseChart({super.key});
 
@@ -20,7 +20,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
     final timeLabels = stats.timeLabels;
     final productData = stats.data;
 
-    // 市场采购模块需要显示多个数据系列，所以还需要获取其他模块的数据
+    // 市场带客模块需要显示多个数据系列，所以还需要获取其他模块的数据
     final customerStats = ref.watch(moduleStatsProvider('customer'));
     final supplierStats = ref.watch(moduleStatsProvider('supplier'));
     final customerData = customerStats.data;

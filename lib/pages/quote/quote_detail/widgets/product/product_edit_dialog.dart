@@ -73,15 +73,15 @@ class ProductEditDialog extends HookWidget {
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text('取消',
-                          style: TextStyle(color: colorScheme.secondary)),
+                          style: TextStyle(color: colorScheme.primary)),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.secondary,
-                        foregroundColor: colorScheme.onSecondary,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

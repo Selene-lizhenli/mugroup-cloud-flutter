@@ -55,7 +55,7 @@ import 'package:cloud/pages/quote/quote_product_add/quote_product_pad_add_page.d
 import 'package:cloud/pages/quote/supplier_products_related/supplier_products_page.dart'
     as _i42;
 import 'package:cloud/pages/samples/samples_list_page.dart' as _i30;
-import 'package:cloud/pages/samples/samples_page.dart' as _i31;
+import 'package:cloud/pages/samples/showroom_page.dart' as _i31;
 import 'package:cloud/pages/scan/scan_page.dart' as _i32;
 import 'package:cloud/pages/selectors/select_product/select_product_page.dart'
     as _i33;

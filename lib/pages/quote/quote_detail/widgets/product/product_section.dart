@@ -226,7 +226,7 @@ class ProductSection extends HookConsumerWidget {
                       child: Icon(
                         Icons.edit_outlined,
                         size: 18,
-                        color: colorScheme.secondary,
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -276,8 +276,7 @@ class ProductSection extends HookConsumerWidget {
                         _KeyValue(
                           label: '客户报价(CNY)',
                           value: row.price != null ? row.price.toString() : '-',
-                          highlight: true,
-                          priceStyle: true,
+                          highlight: false, 
                         ),
                         const SizedBox(height: 4),
                         _KeyValue(
@@ -477,16 +476,17 @@ class _ProductImage extends StatelessWidget {
                 );
               },
             )
-          : const Center(
+          : Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.image_not_supported, size: 24),
-                  SizedBox(height: 4),
+                  Icon(Icons.image_not_supported,
+                      size: 24, color: colorScheme.outline),
+                  const SizedBox(height: 4),
                   Text(
-                    'IMAGE\nNOT AVAILABLE',
+                    'IMAGE NOT AVAILABLE',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 8),
+                    style: TextStyle(fontSize: 8, color: colorScheme.outline),
                   ),
                 ],
               ),
@@ -532,8 +532,8 @@ class _KeyValue extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               color: priceStyle
-                  ? colorScheme.secondary
-                  : (highlight ? colorScheme.secondary : colorScheme.onSurface),
+                  ? colorScheme.primary
+                  : (highlight ? colorScheme.primary : colorScheme.onSurface),
               fontWeight: (priceStyle || highlight)
                   ? FontWeight.w600
                   : FontWeight.normal,
