@@ -95,7 +95,7 @@ class MyPage extends HookConsumerWidget {
                         cart.clear();
                         EasyLoading.showSuccess("清理成功");
                       },
-                    ),
+                    ), 
                   ],
                   closeable: false,
                   safeAreaInsetBottom: true,
@@ -174,14 +174,19 @@ class MyPage extends HookConsumerWidget {
   void _showThemeSelector(BuildContext context, WidgetRef ref,
       ThemeData theme, ColorScheme colorScheme) {
     final currentTheme = ref.read(appThemeProvider);
-    showModalBottomSheet(
-      context: context,
-      showDragHandle: true,
-      builder: (_) => Container(
+  showModalBottomSheet(
+     context: context,
+     showDragHandle: true,
+     constraints: BoxConstraints(
+       maxWidth: MediaQuery.of(context).size.width,
+       minHeight: 200,
+       maxHeight: 320,
+     ),
+     builder: (_) => Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(

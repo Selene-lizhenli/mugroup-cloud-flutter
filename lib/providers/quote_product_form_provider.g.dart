@@ -13,8 +13,8 @@ String _$quoteProductFormDataHash() =>
 ///
 /// Copied from [QuoteProductFormData].
 @ProviderFor(QuoteProductFormData)
-final quoteProductFormDataProvider = AutoDisposeNotifierProvider<
-    QuoteProductFormData, Map<String, dynamic>?>.internal(
+final quoteProductFormDataProvider =
+    NotifierProvider<QuoteProductFormData, Map<String, dynamic>?>.internal(
   QuoteProductFormData.new,
   name: r'quoteProductFormDataProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -24,6 +24,6 @@ final quoteProductFormDataProvider = AutoDisposeNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$QuoteProductFormData = AutoDisposeNotifier<Map<String, dynamic>?>;
+typedef _$QuoteProductFormData = Notifier<Map<String, dynamic>?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

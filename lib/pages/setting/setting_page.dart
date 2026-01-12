@@ -140,7 +140,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       const SnackBar(
           content: Text('模块配置已保存'),
           backgroundColor: Colors.green,
-          padding: EdgeInsets.all(30)),
+          padding: EdgeInsets.all(20)),
     );
   }
 

@@ -1,9 +1,7 @@
 import 'package:auto_route/auto_route.dart'; 
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/export/export_pick_drawer.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/quote_detail_body.dart';
-import 'package:cloud/pages/quote/quote_page.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/quote_detail_body.dart'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

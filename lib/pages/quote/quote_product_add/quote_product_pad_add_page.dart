@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'package:auto_route/auto_route.dart';
+import 'dart:convert'; 
 import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -26,13 +26,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-@RoutePage()
-class QuoteProductPadAddPage extends HookConsumerWidget {
+class QuoteProductAddLandscapeView extends HookConsumerWidget {
   final int? quoteId;
-  
-  const QuoteProductPadAddPage({
+  final bool isActive;
+
+  const QuoteProductAddLandscapeView({
     super.key,
     this.quoteId,
+    required this.isActive,
   });
 
   @override
@@ -41,7 +42,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
     final savedFormData = ref.watch(quoteProductFormDataProvider);
-    final hasInitialized = useRef(false);
 
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_add_form_v1',
@@ -51,21 +51,22 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
-    // 初始化时从 provider 恢复表单数据
+    // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
     useEffect(() {
-      if (!hasInitialized.value &&
+      logger.d('savedFormData$savedFormData');
+      if (!isActive &&
           savedFormData != null &&
           formKey.currentState != null) {
-        hasInitialized.value = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           formKey.currentState?.patchValue(savedFormData);
         });
       }
       return null;
-    }, [savedFormData]);
+    }, [savedFormData, isActive]);
 
-    // 使用定时器定期保存表单数据到 provider
+    //使用定时器定期保存表单数据到 provider，仅在当前激活时运行
     useEffect(() {
+      if (!isActive) return null;
       final timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
         if (formKey.currentState != null) {
           formKey.currentState!.save();
@@ -76,12 +77,14 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
         }
       });
       return timer.cancel;
-    }, []);
+    }, [isActive]);
 
     bool isVisible(String name) {
       return fieldConfigs
-          .firstWhere((e) => e.name == name,
-              orElse: () => FieldConfig(label: '', name: name, isVisible: true))
+          .firstWhere(
+            (e) => e.name == name,
+            orElse: () => FieldConfig(label: '', name: name, isVisible: true),
+          )
           .isVisible;
     }
 
@@ -140,7 +143,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
 
           if (!context.mounted) return;
 
-          // 清除保存的表单数据
           formDataNotifier.clearFormData();
 
           final isContinue = await ConfirmDialog.show(
@@ -222,8 +224,7 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                   }
 
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         "上传图片",
@@ -247,12 +248,12 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
-                          border:
-                              Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+                          border: Border(
+                              top: BorderSide(color: Color(0xFFEEEEEE))),
                         ),
                         child: SizedBox(
                           width: double.infinity,
-                          height: 56, // 统一高度
+                          height: 56,
                           child: ElevatedButton.icon(
                             onPressed: handleSmartRecognize,
                             icon: const Icon(Icons.center_focus_weak, size: 22),
@@ -298,92 +299,42 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                             children: [
                               BuildFormCard(
                                 title: '基本信息',
-                                action: PopupMenuButton<String>(
-                                  icon: Icon(Icons.more_horiz,
-                                      color: colorScheme.primary),
-                                  onSelected: (value) {
-                                    if (value == 'copy') {
-                                      // 执行复制逻辑
-                                    } else if (value == 'setting') {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (ctx) => FieldSelector(
-                                          fields: fieldConfigs,
-                                          defaultFields: sampleDefaultFields,
-                                          onConfigChanged:
-                                              notifier.updateConfigs,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) {
-                                    final colorScheme =
-                                        Theme.of(context).colorScheme;
-                                    final textStyle = TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.onSurface,
-                                    );
-
-                                    return <PopupMenuEntry<String>>[
-                                      PopupMenuItem<String>(
-                                        value: 'copy',
-                                        height: 44,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(
-                                                color: colorScheme.primary
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Icon(
-                                                Icons.content_copy_rounded,
-                                                size: 16,
-                                                color: colorScheme.primary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Text('复制上一条', style: textStyle),
-                                          ],
-                                        ),
-                                      ),
-                                      const PopupMenuDivider(height: 1),
-                                      PopupMenuItem<String>(
-                                        value: 'setting',
-                                        height: 44,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(
-                                                color: colorScheme.secondary
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Icon(
-                                                Icons.settings_rounded,
-                                                size: 16,
-                                                color: colorScheme.secondary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Text('字段设置', style: textStyle),
-                                          ],
-                                        ),
-                                      ),
-                                    ];
-                                  },
+                                action: Wrap(
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.content_copy,
+                                          size: 16, color: colorScheme.primary),
+                                      label: Text("复制上一条",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: colorScheme.primary)),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (ctx) => FieldSelector(
+                                            fields: fieldConfigs,
+                                            defaultFields: sampleDefaultFields,
+                                            onConfigChanged:
+                                                notifier.updateConfigs,
+                                          ),
+                                        );
+                                      },
+                                      icon: Icon(Icons.settings,
+                                          size: 16, color: colorScheme.primary),
+                                      label: Text("字段设置",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: colorScheme.primary)),
+                                    ),
+                                  ],
                                 ),
                                 children: [
-                                  // 供应商
                                   FormBuilderField<Map<String, dynamic>>(
                                     name: 'supplyQuote',
                                     builder: (field) {
@@ -399,8 +350,9 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                             builder: (_) =>
                                                 const SupplierSelect(),
                                           );
-                                          if (selected != null)
+                                          if (selected != null) {
                                             field.didChange(selected);
+                                          }
                                         },
                                         child: AbsorbPointer(
                                           child: Input(
@@ -417,7 +369,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                       );
                                     },
                                   ),
-                                  // 货号与品牌
                                   SpacingRow(
                                     spacing: 12,
                                     children: [
@@ -445,7 +396,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                         ),
                                     ],
                                   ),
-                                  // SKU
                                   SpacingRow(
                                     spacing: 12,
                                     children: [
@@ -473,7 +423,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                         ),
                                     ],
                                   ),
-                                  // 供应商数据
                                   SpacingRow(
                                     spacing: 12,
                                     children: [
@@ -512,7 +461,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                         ),
                                     ],
                                   ),
-                                  // 客户数据
                                   SpacingRow(
                                     spacing: 12,
                                     children: [
@@ -551,7 +499,6 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                         ),
                                     ],
                                   ),
-                                  // 名称翻译
                                   if (isVisible('product_name_cn'))
                                     FormBuilderField<String>(
                                       name: "product_name_cn",
@@ -666,13 +613,12 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                               label: '长',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType: const TextInputType
-                                                  .numberWithOptions(
-                                                  decimal: true),
+                                              keyboardType:
+                                                  const TextInputType.numberWithOptions(
+                                                      decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .allow(
-                                                        RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter.allow(
+                                                    RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -685,13 +631,12 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                               label: '宽',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType: const TextInputType
-                                                  .numberWithOptions(
-                                                  decimal: true),
+                                              keyboardType:
+                                                  const TextInputType.numberWithOptions(
+                                                      decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .allow(
-                                                        RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter.allow(
+                                                    RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -704,13 +649,12 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                                               label: '高',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType: const TextInputType
-                                                  .numberWithOptions(
-                                                  decimal: true),
+                                              keyboardType:
+                                                  const TextInputType.numberWithOptions(
+                                                      decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .allow(
-                                                        RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter.allow(
+                                                    RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -759,12 +703,12 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
-                          border:
-                              Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+                          border: Border(
+                              top: BorderSide(color: Color(0xFFEEEEEE))),
                         ),
                         child: SizedBox(
                           width: double.infinity,
-                          height: 56, // 统一高度
+                          height: 56,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFF53F85),
@@ -794,3 +738,4 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
     );
   }
 }
+

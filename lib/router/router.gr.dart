@@ -48,10 +48,6 @@ import 'package:cloud/pages/quote/quote_detail/quote_detail_page.dart' as _i25;
 import 'package:cloud/pages/quote/quote_page.dart' as _i26;
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart'
     as _i27;
-import 'package:cloud/pages/quote/quote_product_add/quote_product_add_page.dart'
-    as _i28;
-import 'package:cloud/pages/quote/quote_product_add/quote_product_pad_add_page.dart'
-    as _i29;
 import 'package:cloud/pages/quote/supplier_products_related/supplier_products_page.dart'
     as _i42;
 import 'package:cloud/pages/samples/samples_list_page.dart' as _i30;
@@ -1033,102 +1029,6 @@ class QuoteProductAddAdaptiveRouteArgs {
   @override
   String toString() {
     return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode}';
-  }
-}
-
-/// generated route for
-/// [_i28.QuoteProductAddPage]
-class QuoteProductAddRoute
-    extends _i57.PageRouteInfo<QuoteProductAddRouteArgs> {
-  QuoteProductAddRoute({
-    _i60.Key? key,
-    int? quoteId,
-    List<_i57.PageRouteInfo>? children,
-  }) : super(
-          QuoteProductAddRoute.name,
-          args: QuoteProductAddRouteArgs(
-            key: key,
-            quoteId: quoteId,
-          ),
-          initialChildren: children,
-        );
-
-  static const String name = 'QuoteProductAddRoute';
-
-  static _i57.PageInfo page = _i57.PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<QuoteProductAddRouteArgs>(
-          orElse: () => const QuoteProductAddRouteArgs());
-      return _i28.QuoteProductAddPage(
-        key: args.key,
-        quoteId: args.quoteId,
-      );
-    },
-  );
-}
-
-class QuoteProductAddRouteArgs {
-  const QuoteProductAddRouteArgs({
-    this.key,
-    this.quoteId,
-  });
-
-  final _i60.Key? key;
-
-  final int? quoteId;
-
-  @override
-  String toString() {
-    return 'QuoteProductAddRouteArgs{key: $key, quoteId: $quoteId}';
-  }
-}
-
-/// generated route for
-/// [_i29.QuoteProductPadAddPage]
-class QuoteProductPadAddRoute
-    extends _i57.PageRouteInfo<QuoteProductPadAddRouteArgs> {
-  QuoteProductPadAddRoute({
-    _i60.Key? key,
-    int? quoteId,
-    List<_i57.PageRouteInfo>? children,
-  }) : super(
-          QuoteProductPadAddRoute.name,
-          args: QuoteProductPadAddRouteArgs(
-            key: key,
-            quoteId: quoteId,
-          ),
-          initialChildren: children,
-        );
-
-  static const String name = 'QuoteProductPadAddRoute';
-
-  static _i57.PageInfo page = _i57.PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<QuoteProductPadAddRouteArgs>(
-          orElse: () => const QuoteProductPadAddRouteArgs());
-      return _i29.QuoteProductPadAddPage(
-        key: args.key,
-        quoteId: args.quoteId,
-      );
-    },
-  );
-}
-
-class QuoteProductPadAddRouteArgs {
-  const QuoteProductPadAddRouteArgs({
-    this.key,
-    this.quoteId,
-  });
-
-  final _i60.Key? key;
-
-  final int? quoteId;
-
-  @override
-  String toString() {
-    return 'QuoteProductPadAddRouteArgs{key: $key, quoteId: $quoteId}';
   }
 }
 
