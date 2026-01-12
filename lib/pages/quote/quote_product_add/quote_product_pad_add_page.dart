@@ -53,7 +53,9 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
 
     // 初始化时从 provider 恢复表单数据
     useEffect(() {
-      if (!hasInitialized.value && savedFormData != null && formKey.currentState != null) {
+      if (!hasInitialized.value &&
+          savedFormData != null &&
+          formKey.currentState != null) {
         hasInitialized.value = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           formKey.currentState?.patchValue(savedFormData);
@@ -296,40 +298,89 @@ class QuoteProductPadAddPage extends HookConsumerWidget {
                             children: [
                               BuildFormCard(
                                 title: '基本信息',
-                                action: Wrap(
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: () {},
-                                      icon: Icon(Icons.content_copy,
-                                          size: 16, color: colorScheme.primary),
-                                      label: Text("复制上一条",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: colorScheme.primary)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    TextButton.icon(
-                                      onPressed: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (ctx) => FieldSelector(
-                                            fields: fieldConfigs,
-                                            defaultFields: sampleDefaultFields,
-                                            onConfigChanged:
-                                                notifier.updateConfigs,
-                                          ),
-                                        );
-                                      },
-                                      icon: Icon(Icons.settings,
-                                          size: 16, color: colorScheme.primary),
-                                      label: Text("字段设置",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: colorScheme.primary)),
-                                    ),
-                                  ],
+                                action: PopupMenuButton<String>(
+                                  icon: Icon(Icons.more_horiz,
+                                      color: colorScheme.primary),
+                                  onSelected: (value) {
+                                    if (value == 'copy') {
+                                      // 执行复制逻辑
+                                    } else if (value == 'setting') {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (ctx) => FieldSelector(
+                                          fields: fieldConfigs,
+                                          defaultFields: sampleDefaultFields,
+                                          onConfigChanged:
+                                              notifier.updateConfigs,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    final colorScheme =
+                                        Theme.of(context).colorScheme;
+                                    final textStyle = TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: colorScheme.onSurface,
+                                    );
+
+                                    return <PopupMenuEntry<String>>[
+                                      PopupMenuItem<String>(
+                                        value: 'copy',
+                                        height: 44,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.primary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Icon(
+                                                Icons.content_copy_rounded,
+                                                size: 16,
+                                                color: colorScheme.primary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text('复制上一条', style: textStyle),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuDivider(height: 1),
+                                      PopupMenuItem<String>(
+                                        value: 'setting',
+                                        height: 44,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.secondary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Icon(
+                                                Icons.settings_rounded,
+                                                size: 16,
+                                                color: colorScheme.secondary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text('字段设置', style: textStyle),
+                                          ],
+                                        ),
+                                      ),
+                                    ];
+                                  },
                                 ),
                                 children: [
                                   // 供应商
