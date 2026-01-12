@@ -28,6 +28,11 @@ _$QuoteImpl _$$QuoteImplFromJson(Map<String, dynamic> json) => _$QuoteImpl(
       json['purchase_cost'] as String?,
       json['currency'] as String?,
       json['supplier_product_no'] as String?,
+      (json['shipping_qty'] as num?)?.toInt(),
+      json['customer_price'] as String?,
+      json['internal_sku'] as String?,
+      json['supplier_sku'] as String?,
+      json['customer_sku'] as String?,
     );
 
 Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
@@ -49,4 +54,9 @@ Map<String, dynamic> _$$QuoteImplToJson(_$QuoteImpl instance) =>
       'purchase_cost': instance.purchaseCost,
       'currency': instance.currency,
       'supplier_product_no': instance.supplierProductNo,
+      'shipping_qty': instance.shippingQty,
+      'customer_price': instance.customerPrice,
+      'internal_sku': instance.internalSku,
+      'supplier_sku': instance.supplierSku,
+      'customer_sku': instance.customerSku,
     };

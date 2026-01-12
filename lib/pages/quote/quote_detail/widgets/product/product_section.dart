@@ -206,7 +206,7 @@ class ProductSection extends HookConsumerWidget {
                         );
                         return;
                       }
-                      final data = await showDialog(
+                      final Map<String, String>? data = await showDialog(
                         context: context,
                         builder: (_) => ProductEditDialog(
                           row: row,
@@ -214,7 +214,21 @@ class ProductSection extends HookConsumerWidget {
                         ),
                       );
 
-                      await updateShowroomQuotationSample(row.id!, data);
+                      if (data != null) {
+                        final values = {
+                          "supply_quote": {
+                            "shipping_qty": data['shipping_qty'],
+                            "purchase_cost": data['purchase_cost'],
+                            "customer_price": data['customer_price'],
+                            "internal_sku": data['internal_sku'],
+                            "supplier_sku": data['supplier_sku'],
+                            "customer_sku": data['customer_sku']
+                          }
+                        };
+
+                        await updateShowroomQuotationSample(row.id!, values);
+                      }
+
                       // 刷新产品列表
                       if (context.mounted) {
                         await notifier.fetchProductsPage(

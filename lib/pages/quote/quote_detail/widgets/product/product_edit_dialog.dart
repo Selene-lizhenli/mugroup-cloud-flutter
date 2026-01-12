@@ -17,9 +17,16 @@ class ProductEditDialog extends HookWidget {
   Widget build(BuildContext context) {
     final supplierName = row.supplyQuote?.supplier?.name ?? '-';
     final colorScheme = Theme.of(context).colorScheme;
-    final qty = useState(row.qty?.toString() ?? '');
-    final customerPrice = useState(row.price ?? '');
-    final customerProductNo = useState(row.customerProductNo ?? '');
+
+    final shippingQty =
+        useState(row.supplyQuote?.shippingQty?.toString() ?? '');
+    final purchaseCost =
+        useState(row.supplyQuote?.purchaseCost?.toString() ?? '');
+    final customerPrice =
+        useState<String>(row.supplyQuote?.customerPrice?.toString() ?? '');
+    final internalSku = useState(row.supplyQuote?.internalSku ?? '');
+    final supplierSku = useState(row.supplyQuote?.supplierSku ?? '');
+    final customerSku = useState(row.supplyQuote?.customerSku ?? '');
 
     return Dialog(
       child: Padding(
@@ -44,9 +51,29 @@ class ProductEditDialog extends HookWidget {
               const SizedBox(height: 12),
               Input(
                 label: '采购数量',
-                value: qty.value,
+                value: shippingQty.value,
                 keyboardType: TextInputType.number,
-                onChanged: (v) => qty.value = v,
+                onChanged: (v) => shippingQty.value = v,
+              ),
+              const SizedBox(height: 10),
+              Input(
+                label: '供应商报价(CNY)',
+                value: purchaseCost.value,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                onChanged: (v) => purchaseCost.value = v,
+              ),
+              const SizedBox(height: 10),
+              Input(
+                label: '公司货号',
+                value: internalSku.value,
+                onChanged: (v) => internalSku.value = v,
+              ),
+              const SizedBox(height: 10),
+              Input(
+                label: '供应商货号',
+                value: supplierSku.value,
+                onChanged: (v) => supplierSku.value = v,
               ),
               const SizedBox(height: 10),
               Input(
@@ -59,8 +86,8 @@ class ProductEditDialog extends HookWidget {
               const SizedBox(height: 10),
               Input(
                 label: '客户货号(选填)',
-                value: customerProductNo.value,
-                onChanged: (v) => customerProductNo.value = v,
+                value: customerSku.value,
+                onChanged: (v) => customerSku.value = v,
               ),
               const SizedBox(height: 16),
               Row(
@@ -91,9 +118,12 @@ class ProductEditDialog extends HookWidget {
                           EasyLoading.showSuccess('保存成功');
                           if (context.mounted) {
                             Navigator.of(context).pop(<String, String>{
-                              'qty': qty.value,
-                              'price': customerPrice.value,
-                              'customer_sku': customerProductNo.value,
+                              'shipping_qty': shippingQty.value,
+                              'purchase_cost': purchaseCost.value,
+                              'customer_price': customerPrice.value,
+                              'internal_sku': internalSku.value,
+                              'supplier_sku': supplierSku.value,
+                              'customer_sku': customerSku.value,
                             });
                           }
                         } finally {
