@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/dashboard/widgets/entry_grid_module.dart';
 import 'package:cloud/pages/dashboard/widgets/home_user_header.dart';
 import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart';
@@ -15,6 +16,7 @@ class DashboardPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(cartProvider); //禁止删除，监听Pda扫描动作
     final colorScheme = Theme.of(context).colorScheme;
     final internalKey = useMemoized(
       () => GlobalKey<State<SelectedModulesWidget>>(),

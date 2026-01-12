@@ -103,6 +103,9 @@ class Scan extends _$Scan {
 
     // 普通条形码：设置state后跳转到购物车页面
     state = [barcodeString];
-    app.router.push(const CartRoute());
+    // 如果当前已经在购物车页面，就不需要跳转了  
+    if (app.router.current.name != CartRoute.name) { 
+      app.router.push(const CartRoute());
+    }
   }
 }

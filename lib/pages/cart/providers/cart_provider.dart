@@ -24,6 +24,7 @@ class Cart extends _$Cart {
   State build() {
     final cloud = ref.watch(coreProvider).value!;
     final user = authNotifier.user;
+    //监听红外线扫描事件
     final scanProviderSubscription = ref.listen(
       scanProvider,
       (previous, next) {
