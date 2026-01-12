@@ -25,6 +25,8 @@ class CompanyView extends HookConsumerWidget {
     final search = useState<String?>(null);
     final page = useRef(1);
     final companies = useState<List<Company>>(<Company>[]);
+
+    final hasSearched = useState(false);
     final colorScheme = Theme.of(context).colorScheme;
 
     fetchData(
@@ -32,6 +34,10 @@ class CompanyView extends HookConsumerWidget {
       bool? init = false,
     }) async {
       search.value = searchText;
+
+      if (init == true) {
+        hasSearched.value = true;
+      }
 
       if (init == true) {
         page.value = 1;
@@ -44,11 +50,7 @@ class CompanyView extends HookConsumerWidget {
       };
       final resp = await getCrmCompanies(queryParameters: queryParameters);
 
-      if (init == true) {
-        companies.value = resp.data;
-      } else {
-        companies.value = [...companies.value, ...resp.data];
-      }
+      companies.value = resp.data;
 
       if (resp.data.length >= 20) {
         page.value++;
@@ -96,7 +98,7 @@ class CompanyView extends HookConsumerWidget {
         clipBehavior: Clip.hardEdge,
         child: EasyRefresh(
           controller: refreshController,
-          refreshOnStart: true,
+          refreshOnStart: false,
           onRefresh: () async {
             try {
               await fetchData(
@@ -121,15 +123,12 @@ class CompanyView extends HookConsumerWidget {
             slivers: [
               MultiSliver(
                 children: [
-                  Container(
-                    height: 0,
-                  ),
                   if (companies.value.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
                         child: Text(
-                          '暂无数据',
+                          hasSearched.value ? '暂无数据' : '请输入关键词搜索',
                           style: TextStyle(
                             color: colorScheme.surfaceContainerHighest,
                             fontSize: 16,
@@ -138,39 +137,37 @@ class CompanyView extends HookConsumerWidget {
                       ),
                     )
                   else
-                    MasonryGridView.count(
-                      crossAxisCount: 1,
-                      mainAxisSpacing: 0,
-                      itemCount: companies.value.length,
+                    SliverPadding(
                       padding: const EdgeInsets.all(5),
-                      clipBehavior: Clip.none,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final company = companies.value[index];
+                      sliver: SliverMasonryGrid.count(
+                        crossAxisCount: 1,
+                        mainAxisSpacing: 0,
+                        childCount: companies.value.length,
+                        itemBuilder: (context, index) {
+                          final company = companies.value[index];
+                          return CrmCompanyCard(
+                            company: company,
+                            onTap: () {
+                              context.router
+                                  .push(CrmCompanyDetailRoute(id: company.id!));
+                            },
+                            onEdit: () async {
+                              final shouldRefresh = await context.router
+                                  .push(CrmCompanyEditRoute(id: company.id!));
 
-                        return CrmCompanyCard(
-                          company: company,
-                          onTap: () {
-                            context.router
-                                .push(CrmCompanyDetailRoute(id: company.id!));
-                          },
-                          onEdit: () async {
-                            final shouldRefresh = await context.router
-                                .push(CrmCompanyEditRoute(id: company.id!));
+                              if (shouldRefresh == true) {
+                                await fetchData(
+                                  search.value,
+                                  init: true,
+                                );
 
-                            if (shouldRefresh == true) {
-                              await fetchData(
-                                search.value,
-                                init: true,
-                              );
-
-                              refreshController.finishRefresh();
-                              refreshController.resetFooter();
-                            }
-                          },
-                        );
-                      },
+                                refreshController.finishRefresh();
+                                refreshController.resetFooter();
+                              }
+                            },
+                          );
+                        },
+                      ),
                     ),
                 ],
               )
