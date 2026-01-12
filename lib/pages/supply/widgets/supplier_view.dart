@@ -32,10 +32,10 @@ class SupplierView extends HookConsumerWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
 
-    var crossAxisCount = 2;
-
     final page = useRef(1);
     final suppliers = useState<List<Supplier>>(<Supplier>[]);
+
+    final hasSearched = useState(false);
 
     fetchData(
       String? searchText, {
@@ -44,7 +44,9 @@ class SupplierView extends HookConsumerWidget {
     }) async {
       search.value = searchText;
       media.value = searchMedia;
+
       if (init == true) {
+        hasSearched.value = true;
         page.value = 1;
       }
 
@@ -110,7 +112,7 @@ class SupplierView extends HookConsumerWidget {
         clipBehavior: Clip.hardEdge,
         child: EasyRefresh(
           controller: refreshController,
-          refreshOnStart: true,
+          refreshOnStart: false,
           onRefresh: () async {
             try {
               await fetchData(
@@ -137,16 +139,12 @@ class SupplierView extends HookConsumerWidget {
             slivers: [
               MultiSliver(
                 children: [
-                  // 解决 Header 下拉刷新时不会跟着移动的
-                  Container(
-                    height: 0,
-                  ),
                   if (suppliers.value.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
                         child: Text(
-                          '暂无数据',
+                          hasSearched.value ? '暂无数据' : '请输入关键词搜索',
                           style: TextStyle(
                             color: colorScheme.surfaceContainerHighest,
                             fontSize: 16,
@@ -155,23 +153,21 @@ class SupplierView extends HookConsumerWidget {
                       ),
                     )
                   else
-                    MasonryGridView.count(
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 5,
-                      crossAxisSpacing: 5,
-                      itemCount: suppliers.value.length,
-                      padding: const EdgeInsets.all(5),
-                      clipBehavior: Clip.none,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final supplier = suppliers.value[index];
+                    SliverPadding(
+                      padding: const EdgeInsets.all(0),
+                      sliver: SliverMasonryGrid.count(
+                        crossAxisCount: 1,
+                        mainAxisSpacing: 5,
+                        childCount: suppliers.value.length,
+                        itemBuilder: (context, index) {
+                          final supplier = suppliers.value[index];
 
-                        return SupplierCard(
-                          supplier: supplier,
-                          onClick: () {},
-                        );
-                      },
+                          return SupplierCard(
+                            supplier: supplier,
+                            onClick: () {},
+                          );
+                        },
+                      ),
                     ),
                 ],
               )

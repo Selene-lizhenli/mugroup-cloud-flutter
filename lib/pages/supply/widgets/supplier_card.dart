@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/supply/contact.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -16,23 +15,24 @@ class SupplierCard extends StatelessWidget {
 
   Widget _buildTagChip(IconData icon, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withOpacity(0.3), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 10, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: 3),
           Text(
             label,
             style: TextStyle(
-              fontSize: 8,
+              fontSize: 9,
               fontWeight: FontWeight.w500,
               color: color,
+              height: 1.1,
             ),
           ),
         ],
@@ -42,217 +42,163 @@ class SupplierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Contact? mainContact = supplier.contacts?.first;
-
     final bool isCore = supplier.isCore ?? false;
     final bool canBill = supplier.canBill ?? false;
     final shippingAmount = supplier.shippingAmount;
 
-    return InkWell(
-      onTap: () {
-        if (context.mounted) {
-          context.router.push(SupplySupplierDetailRoute(id: supplier.id!));
+    String locationText = '';
+    if (supplier.city?.isNotEmpty ?? false) {
+      locationText = supplier.city!;
+      if (supplier.province?.isNotEmpty ?? false) {
+        locationText += ' · ${supplier.province}';
+      }
+    } else if (supplier.province?.isNotEmpty ?? false) {
+      locationText = supplier.province!;
+    }
 
-          return;
-        }
-      },
-      borderRadius: BorderRadius.circular(16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: Colors.grey.shade100, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 卡片主体
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          if (context.mounted) {
+            context.router.push(SupplySupplierDetailRoute(id: supplier.id!));
+          }
+          onClick?.call();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 标题
-                  Text(
-                    (supplier.name ?? supplier.shortName) ?? '',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade800,
+                  Expanded(
+                    child: Text(
+                      (supplier.name ?? supplier.shortName) ?? '无名称',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade800,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  if (supplier.supplierNo != '')
-                    Row(
-                      children: [
-                        const Icon(Icons.numbers, size: 14, color: Colors.grey),
-                        const SizedBox(width: 6),
-                        Text(
-                          supplier.supplierNo ?? '暂无',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue.shade600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 4),
-                  if ((supplier.city?.isNotEmpty ?? false) ||
-                      (supplier.province?.isNotEmpty ?? false))
-                    Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 14, color: Colors.grey),
-                        if (supplier.city?.isNotEmpty ?? false)
-                          Text(
-                            supplier.city!,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey),
-                          ),
-                        if (supplier.province?.isNotEmpty ?? false)
-                          Text(
-                            (supplier.city?.isNotEmpty ?? false)
-                                ? ' · ${supplier.province}'
-                                : '${supplier.province}',
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey),
-                          ),
-                      ],
-                    ),
-                  const SizedBox(height: 4),
-                  if (mainContact != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.person_outline,
-                                  size: 14, color: Colors.grey.shade500),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  '联系人: ${mainContact.name ?? '暂无'}',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(Icons.phone_iphone,
-                                  size: 12, color: Colors.grey.shade500),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  '电话: ${mainContact.mobile ?? '暂无'}',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
+                  const SizedBox(width: 8),
+                  if (supplier.supplierNo != null &&
+                      supplier.supplierNo!.isNotEmpty)
+                    Text(
+                      '#${supplier.supplierNo}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade400,
+                        fontFamily: "monospace",
                       ),
                     ),
-                  const SizedBox(height: 4),
-                  if (supplier.shippingAmount != null)
-                    Row(
-                      children: [
-                        Icon(Icons.receipt,
-                            size: 14, color: Colors.grey.shade500),
-                        const SizedBox(width: 6),
-                        Expanded(
-                            child: Text(
-                          '出货总额: $shippingAmount',
-                          style: TextStyle(
-                              fontSize: 13, color: Colors.grey.shade600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                      ],
-                    ),
-
-                  // 主营产品
-                  if (supplier.businessScope != null)
-                    _buildDetailRow(
-                      Icons.inventory_2_outlined,
-                      supplier.businessScope!,
-                    ),
-
-                  const Padding(
-                    padding: EdgeInsets.only(top: 6),
-                    child: Divider(color: Color(0xFFF5F5F5), height: 1),
-                  ),
-                  const SizedBox(height: 6),
-
-                  Wrap(
-                    spacing: 4.0,
-                    runSpacing: 4.0,
-                    children: [
-                      if (isCore)
-                        _buildTagChip(Icons.star, '核心供应商', Colors.red.shade700)
-                      else
-                        _buildTagChip(Icons.category_outlined, '普通供应商',
-                            Colors.orange.shade700),
-                      if (canBill)
-                        _buildTagChip(
-                            Icons.receipt_long, '可开票', Colors.green.shade700)
-                      else
-                        _buildTagChip(
-                            Icons.receipt_long, '不可开票', Colors.grey.shade600),
-                    ],
-                  )
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String text) {
-    if (text.contains('（未提供）') || text.isEmpty || text.contains(': （未提供）')) {
-      return const SizedBox.shrink();
-    }
-    return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 14, color: Colors.grey.shade400),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  if (locationText.isNotEmpty) ...[
+                    Icon(Icons.location_on_outlined,
+                        size: 13, color: Colors.grey.shade400),
+                    const SizedBox(width: 2),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 100),
+                      child: Text(
+                        locationText,
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey.shade500),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (shippingAmount != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Container(
+                            width: 1, height: 10, color: Colors.grey.shade300),
+                      ),
+                  ],
+                  if (shippingAmount != null) ...[
+                    Expanded(
+                      child: Row(children: [
+                        Text(
+                          '出货总额: ',
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade500),
+                        ),
+                        Expanded(
+                          child: Text(
+                            shippingAmount,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade700,
+                                fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
+                      ]),
+                    ),
+                  ],
+                ],
+              ),
+              if (supplier.businessScope != null &&
+                  supplier.businessScope!.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.inventory_2_outlined,
+                        size: 13, color: Colors.grey.shade400),
+                    const SizedBox(width: 2),
+                    Expanded(
+                      child: Text(
+                        supplier.businessScope!,
+                        style: TextStyle(
+                            fontSize: 11, color: Colors.grey.shade500),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+              if (isCore || canBill) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6.0,
+                  runSpacing: 4.0,
+                  children: [
+                    if (isCore)
+                      _buildTagChip(Icons.star, '核心', Colors.red.shade700),
+                    if (canBill)
+                      _buildTagChip(
+                          Icons.receipt_long, '可开票', Colors.green.shade700)
+                    else
+                      _buildTagChip(
+                          Icons.receipt_long, '不可开票', Colors.grey.shade500),
+                    if (!isCore)
+                      _buildTagChip(
+                          Icons.store, '普通', Colors.blueGrey.shade600),
+                  ],
+                ),
+              ],
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
