@@ -2,6 +2,7 @@ import 'package:cloud/app/app.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
+import 'package:cloud/providers/theme_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,9 @@ class MyApp extends ConsumerWidget {
 
     TDTheme.needMultiTheme();
 
+    // 监听主题变化
+    final themeType = ref.watch(appThemeProvider);
+
     final tdTheme = TDThemeData.defaultData().copyWith(
       name: 'default',
       colorMap: {
@@ -125,6 +129,14 @@ class MyApp extends ConsumerWidget {
       },
     );
 
+    // 根据主题类型设置颜色
+    final primaryColor = themeType == ThemeType.pink
+        ? const Color(0xFFFA338A) // 玫粉色
+        : const Color(0xFF355EBF); // 蓝色
+    final secondaryColor = themeType == ThemeType.pink
+        ? const Color(0xFF355EBF) // 蓝色
+        : const Color(0xFFFA338A); // 玫粉色
+
     return MaterialApp.router(
       routerConfig: app.router.config(
         reevaluateListenable: authNotifier,
@@ -139,23 +151,23 @@ class MyApp extends ConsumerWidget {
         ),
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color.fromARGB(255, 240, 239, 240),//纸张背景色
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFFFA338A), //玫粉色
+        colorScheme: ColorScheme.light(
+          primary: primaryColor,
           onPrimary: Colors.white, //玫粉色上的颜色
-          secondary: Color(0xFF355EBF), //蓝色
+          secondary: secondaryColor,
           onSecondary: Colors.white, //蓝色上的颜色
-          surfaceTint: Color.fromARGB(255, 240, 239, 240), //纸张背景色
+          surfaceTint: const Color.fromARGB(255, 240, 239, 240), //纸张背景色
           surface: Colors.white, //卡片背景颜色
           onSurface: Colors.black, //字体颜色 黑色
           surfaceContainerHighest: Colors.grey, //灰色 不重要的文字
-          error: Color(0xFFDC3545), //错误提示
-          errorContainer: Color(0xFFF8D7DA),
-          onErrorContainer: Color(0xFF58151C),
+          error: const Color(0xFFDC3545), //错误提示
+          errorContainer: const Color(0xFFF8D7DA),
+          onErrorContainer: const Color(0xFF58151C),
           outline: Colors.grey, //分割线  灰色
-          outlineVariant: Color.fromARGB(235, 230, 230, 230), //分割线 淡淡
-          tertiary: Color.fromARGB(255, 248, 227, 164), //提醒色 淡淡
-          surfaceContainer: Color(0xFFF7F8FA),
-          onTertiaryContainer: Color(0xFF4A3A00),
+          outlineVariant: const Color.fromARGB(235, 230, 230, 230), //分割线 淡淡
+          tertiary: const Color.fromARGB(255, 248, 227, 164), //提醒色 淡淡
+          surfaceContainer: const Color(0xFFF7F8FA),
+          onTertiaryContainer: const Color(0xFF4A3A00),
         ),
         // 补充主题色：橘色(Color(0xFFFF9800))、绿色(Color(0xFF4CAF50))已添加到tdTheme.colorMap
         appBarTheme: const AppBarTheme(
