@@ -143,3 +143,14 @@ Future<QuotationList?> removeQuoteCollaborators(
     },
   );
 }
+
+Future updateShowroomQuotationSample(int id, Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/quotationSamples/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return false;
+      }
+      return true;
+    },
+  );
+}

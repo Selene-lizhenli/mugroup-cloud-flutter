@@ -103,8 +103,8 @@ class ProductSection extends HookConsumerWidget {
                 child: selectedTab.value == 1
                     ? _buildProductList(
                         context, state, colorScheme, notifier, quoteId)
-                    : _buildSupplierList(
-                        context, state, colorScheme, notifier, selectedSupplierIds, quoteId),
+                    : _buildSupplierList(context, state, colorScheme, notifier,
+                        selectedSupplierIds, quoteId),
               ),
             ],
           ),
@@ -206,16 +206,19 @@ class ProductSection extends HookConsumerWidget {
                         );
                         return;
                       }
-                      await showDialog(
+                      final data = await showDialog(
                         context: context,
                         builder: (_) => ProductEditDialog(
                           row: row,
                           quotationId: quoteId,
                         ),
                       );
+
+                      await updateShowroomQuotationSample(row.id!, data);
                       // 刷新产品列表
                       if (context.mounted) {
-                        await notifier.fetchProductsPage(quoteId, state.productPage);
+                        await notifier.fetchProductsPage(
+                            quoteId, state.productPage);
                       }
                     },
                     child: Padding(

@@ -11,6 +11,7 @@ _$QuotationSampleImpl _$$QuotationSampleImplFromJson(
     _$QuotationSampleImpl(
       id: (json['id'] as num?)?.toInt(),
       price: json['price'] as String?,
+      customerProductNo: json['customer_product_no'] as String?,
       qty: (json['qty'] as num?)?.toInt(),
       showroomSample: json['showroomSample'] == null
           ? null
@@ -25,6 +26,7 @@ Map<String, dynamic> _$$QuotationSampleImplToJson(
     <String, dynamic>{
       'id': instance.id,
       'price': instance.price,
+      'customer_product_no': instance.customerProductNo,
       'qty': instance.qty,
       'showroomSample': instance.showroomSample,
       'supplyQuote': instance.supplyQuote,
