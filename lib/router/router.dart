@@ -51,21 +51,25 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: InspectionItemConfirmRoute.page,
           path: "/inspection/item/confirm"),
+      // AutoRoute(
+      //   page: MarketProductRoute.page,
+      //   guards: [AuthGuard()],
+      //   path: '/market_product',
+      //   children: [
+      //     AutoRoute(
+      //       page: MarketProductInfoRoute.page,
+      //       path: "index",
+      //     ),
+      //     AutoRoute(
+      //       page: QuoteRoute.page,
+      //       path: "quotation",
+      //       initial: true,
+      //     ),
+      //   ],
+      // ),
       AutoRoute(
-        page: MarketProductRoute.page,
-        guards: [AuthGuard()],
-        path: '/market_product',
-        children: [
-          AutoRoute(
-            page: MarketProductInfoRoute.page,
-            path: "index",
-          ),
-          AutoRoute(
-            page: QuoteRoute.page,
-            path: "quotation",
-            initial: true,
-          ),
-        ],
+        page: QuoteRoute.page,
+        path: "/quotation",
       ),
 
       AutoRoute(page: LoginRoute.page, path: "/login"),
@@ -98,15 +102,18 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: QuoteDetailRoute.page, path: "/quote/detail/:id/:userId"),
       // AutoRoute(page: QuoteRoute.page, path: "/quote"), //报价单列表页面
 
-      AutoRoute(page: QuoteProductAddAdaptiveRoute.page, path: "/quote/product/add"),
-      AutoRoute(page: QuoteProductPadAddRoute.page, path: "/quote/product/pad/add"),
+      AutoRoute(
+          page: QuoteProductAddAdaptiveRoute.page, path: "/quote/product/add"),
+      AutoRoute(
+          page: QuoteProductPadAddRoute.page, path: "/quote/product/pad/add"),
       AutoRoute(
         page: ProductBatchImportRoute.page,
         path: "/quote/product/batch_import",
       ),
       AutoRoute(
         page: SupplierProductsRoute.page,
-        path: "/quote/supplier/:quotationId/:supplierId/:supplierNo/:supplierName/products",
+        path:
+            "/quote/supplier/:quotationId/:supplierId/:supplierNo/:supplierName/products",
       ),
 
       AutoRoute(page: SupplySupplierRoute.page, path: "/supply/supplier"),
