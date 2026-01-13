@@ -16,6 +16,7 @@ class CrmCompanyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     // 获取第一个联系人
     final Contact? firstContact =
         (company.contacts != null && company.contacts!.isNotEmpty)
@@ -84,18 +85,18 @@ class CrmCompanyCard extends StatelessWidget {
                   ),
                   if (onEdit != null)
                     Material(
-                      color: Colors.blue.withOpacity(0.08),
+                      color: colorScheme.primary.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(8),
                       child: InkWell(
                         onTap: onEdit,
                         borderRadius: BorderRadius.circular(8),
-                        splashColor: Colors.blue.withOpacity(0.2),
+                        splashColor: colorScheme.primary.withOpacity(0.2),
                         child: Container(
                           padding: const EdgeInsets.all(6),
-                          child: const Icon(
+                          child: Icon(
                             Icons.edit_outlined,
                             size: 16,
-                            color: Colors.blue,
+                            color: colorScheme.primary,
                           ),
                         ),
                       ),
@@ -138,6 +139,7 @@ class _CompanyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final String char = (name != null && name!.isNotEmpty)
         ? name!.substring(0, 1).toUpperCase()
         : "?";
@@ -146,11 +148,11 @@ class _CompanyAvatar extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: const Color(0xFF3B82F6),
+        color: colorScheme.primary,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.2),
+            color: colorScheme.primary.withOpacity(0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
