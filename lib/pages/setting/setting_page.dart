@@ -37,7 +37,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   /// =======================
   Future<void> _initModules() async {
     final prefs = await SharedPreferences.getInstance();
-    final selectedIds = prefs.getStringList(_storageKey) ?? [];
+    final selectedIds = prefs.getStringList(_storageKey) ?? ['rate', 'news'];
     final orderIds = prefs.getStringList(_orderKey) ?? [];
 
     /// 所有模块（固定定义）
