@@ -340,40 +340,89 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                             children: [
                               BuildFormCard(
                                 title: '基本信息',
-                                action: Wrap(
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: handleCopyLastItem,
-                                      icon: Icon(Icons.content_copy,
-                                          size: 16, color: colorScheme.primary),
-                                      label: Text("复制上一条",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: colorScheme.primary)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    TextButton.icon(
-                                      onPressed: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (ctx) => FieldSelector(
-                                            fields: fieldConfigs,
-                                            defaultFields: sampleDefaultFields,
-                                            onConfigChanged:
-                                                notifier.updateConfigs,
-                                          ),
-                                        );
-                                      },
-                                      icon: Icon(Icons.settings,
-                                          size: 16, color: colorScheme.primary),
-                                      label: Text("字段设置",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: colorScheme.primary)),
-                                    ),
-                                  ],
+                                action: PopupMenuButton<String>(
+                                  icon: Icon(Icons.more_horiz,
+                                      color: colorScheme.primary),
+                                  onSelected: (value) {
+                                    if (value == 'copy') {
+                                      handleCopyLastItem();
+                                    } else if (value == 'setting') {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (ctx) => FieldSelector(
+                                          fields: fieldConfigs,
+                                          defaultFields: sampleDefaultFields,
+                                          onConfigChanged:
+                                              notifier.updateConfigs,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    final colorScheme =
+                                        Theme.of(context).colorScheme;
+                                    final textStyle = TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: colorScheme.onSurface,
+                                    );
+
+                                    return <PopupMenuEntry<String>>[
+                                      PopupMenuItem<String>(
+                                        value: 'copy',
+                                        height: 44,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.primary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Icon(
+                                                Icons.content_copy_rounded,
+                                                size: 16,
+                                                color: colorScheme.primary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text('复制上一条', style: textStyle),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuDivider(height: 1),
+                                      PopupMenuItem<String>(
+                                        value: 'setting',
+                                        height: 44,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.secondary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Icon(
+                                                Icons.settings_rounded,
+                                                size: 16,
+                                                color: colorScheme.secondary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text('字段设置', style: textStyle),
+                                          ],
+                                        ),
+                                      ),
+                                    ];
+                                  },
                                 ),
                                 children: [
                                   FormBuilderField<Map<String, dynamic>>(
