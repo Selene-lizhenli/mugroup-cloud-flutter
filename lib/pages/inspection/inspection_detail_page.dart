@@ -163,6 +163,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                             child: Column(
                               children: filteredItems.map((item) {
                                 return _InspectionListItem(
+                                  id: id,
                                   item: item,
                                   primaryColor: primaryColor,
                                   onRefresh: () => refreshData(isSilent: true),
@@ -418,9 +419,9 @@ class InspectionDetailPage extends HookConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: isSelected
-            ?   BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(color: primaryColor, width: 2)))
+            ? BoxDecoration(
+                border:
+                    Border(bottom: BorderSide(color: primaryColor, width: 2)))
             : null,
         child: Text(text,
             style: TextStyle(
@@ -613,12 +614,14 @@ class ExportInspectionDialog extends HookWidget {
 }
 
 class _InspectionListItem extends HookWidget {
+  final int id;
   final InspectionItem item;
   final Color primaryColor;
   final VoidCallback onRefresh;
 
   const _InspectionListItem({
     super.key,
+    required this.id,
     required this.item,
     required this.primaryColor,
     required this.onRefresh,
@@ -739,7 +742,7 @@ class _InspectionListItem extends HookWidget {
                         EasyLoading.show(status: '删除中...');
 
                         if (item.id != null) {
-                          await deleteInspectionItem(item.id!, {
+                          await deleteInspectionItem(id, {
                             'item_ids': [item.id]
                           });
                           onRefresh();
