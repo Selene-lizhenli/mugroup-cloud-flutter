@@ -14,90 +14,90 @@ class SelectCustomerSheet extends HookConsumerWidget {
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
 
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     useEffect(() {
       notifier.loadCustomers();
       return null;
     }, []);
 
-    return SafeArea(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Text(
-                  '选择客户',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () =>
-                      {notifier.clearCustomerKeyword(), Navigator.pop(context)},
-                  child: const Text('关闭'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              onChanged: notifier.setCustomerKeyword,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) {
-                notifier.loadCustomers();
-              },
-              decoration: InputDecoration(
-                hintText: '请输入关键字搜索',
-                prefixIcon: const Icon(Icons.search),
-                isDense: true,
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text(
+                '选择客户',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () =>
+                    {notifier.clearCustomerKeyword(), Navigator.pop(context)},
+                child: const Text('关闭'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            onChanged: notifier.setCustomerKeyword,
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) {
+              notifier.loadCustomers();
+            },
+            decoration: InputDecoration(
+              hintText: '请输入关键字搜索',
+              prefixIcon: const Icon(Icons.search),
+              isDense: true,
+              filled: true,
+              fillColor: Colors.grey.shade100,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: BorderSide.none,
               ),
             ),
-            const SizedBox(height: 12),
-            _buildCreateCustomerCard(context, ref, notifier),
-            const SizedBox(height: 12),
-            Expanded(
-              child: _list(
-                context,
-                state.customers,
-                state.selectedCustomers,
-                notifier,
-              ),
+          ),
+          const SizedBox(height: 12),
+          _buildCreateCustomerCard(context, ref, notifier),
+          const SizedBox(height: 12),
+          Expanded(
+            child: _list(
+              context,
+              state.customers,
+              state.selectedCustomers,
+              notifier,
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: bottomPadding),
+        ],
       ),
     );
   }
 
-  // ================= 创建新客户卡片 =================
   Widget _buildCreateCustomerCard(
     BuildContext context,
     WidgetRef ref,
-    notifier,
+    dynamic notifier,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () async {
-        // 跳转到创建客户页面
         await context.router.push(const CrmCompanyCreateRoute());
-        // 如果创建成功，刷新客户列表
         if (context.mounted) {
           notifier.loadCustomers();
         }
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: BoxDecoration(
           border: Border.all(
             color: colorScheme.primary,
@@ -111,7 +111,7 @@ class SelectCustomerSheet extends HookConsumerWidget {
             Icon(
               Icons.add_circle_outline,
               color: colorScheme.primary,
-              size: 24,
+              size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -143,19 +143,18 @@ class SelectCustomerSheet extends HookConsumerWidget {
     );
   }
 
-  // ================= list =================
-
   Widget _list(
     BuildContext context,
     List<Company> list,
     Company? selected,
-    notifier,
+    dynamic notifier,
   ) {
     if (list.isEmpty) {
       return const Center(child: Text('暂无客户'));
     }
 
     return ListView.separated(
+      padding: EdgeInsets.zero,
       itemCount: list.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, index) {
@@ -163,10 +162,17 @@ class SelectCustomerSheet extends HookConsumerWidget {
         final isSelected = item.id == selected?.id;
 
         return ListTile(
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          minVerticalPadding: 2,
           contentPadding: EdgeInsets.zero,
-          title: Text(item.name ?? ""),
-          trailing:
-              isSelected ? const Icon(Icons.check, color: Colors.blue) : null,
+          title: Text(
+            item.name ?? "",
+            style: const TextStyle(fontSize: 14),
+          ),
+          trailing: isSelected
+              ? const Icon(Icons.check, color: Colors.blue, size: 20)
+              : null,
           onTap: () {
             notifier.setSelectedCustomer(item);
             Navigator.pop(context);
