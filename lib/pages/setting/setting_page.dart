@@ -63,34 +63,34 @@ class _SettingPageState extends ConsumerState<SettingPage> {
         group: '数据统计', // 添加分组
         selected: selectedIds.contains('sample_room'),
       ),
-      DashboardModule(
-        id: 'market_purchase',
-        title: '市场带客',
-        content: const MarketPurchaseChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains('market_purchase'),
-      ),
-      DashboardModule(
-        id: 'customer',
-        title: '客户',
-        content: const CustomerChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains('customer'),
-      ),
-      DashboardModule(
-        id: 'supplier',
-        title: '供应商',
-        content: const SupplierChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains('supplier'),
-      ),
-      DashboardModule(
-        id: 'inspection',
-        title: '验货',
-        content: const InspectionChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains('inspection'),
-      ),
+      // DashboardModule(
+      //   id: 'market_purchase',
+      //   title: '市场带客',
+      //   content: const MarketPurchaseChart(),
+      //   group: '数据统计', // 添加分组
+      //   selected: selectedIds.contains('market_purchase'),
+      // ),
+      // DashboardModule(
+      //   id: 'customer',
+      //   title: '客户',
+      //   content: const CustomerChart(),
+      //   group: '数据统计', // 添加分组
+      //   selected: selectedIds.contains('customer'),
+      // ),
+      // DashboardModule(
+      //   id: 'supplier',
+      //   title: '供应商',
+      //   content: const SupplierChart(),
+      //   group: '数据统计', // 添加分组
+      //   selected: selectedIds.contains('supplier'),
+      // ),
+      // DashboardModule(
+      //   id: 'inspection',
+      //   title: '验货',
+      //   content: const InspectionChart(),
+      //   group: '数据统计', // 添加分组
+      //   selected: selectedIds.contains('inspection'),
+      // ),
     ];
 
     // 如果存在排序顺序，按照保存的顺序重新排列
