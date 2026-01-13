@@ -204,24 +204,24 @@ class HomeAppBar extends HookConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              // const SizedBox(width: 8),
 
-              // 购物车图标
-              SizedBox(
-                width: 40,
-                height: 40,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.shopping_cart,
-                    size: 25,
-                    color: colorScheme.primary,
-                  ),
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    context.router.push(const CartRoute());
-                  },
-                ),
-              ),
+              // // 购物车图标
+              // SizedBox(
+              //   width: 40,
+              //   height: 40,
+              //   child: IconButton(
+              //     icon: Icon(
+              //       Icons.shopping_cart,
+              //       size: 25,
+              //       color: colorScheme.primary,
+              //     ),
+              //     padding: EdgeInsets.zero,
+              //     onPressed: () {
+              //       context.router.push(const CartRoute());
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ),

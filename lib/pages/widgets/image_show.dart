@@ -33,6 +33,9 @@ class ImageShow extends StatelessWidget {
   /// 是否允许点击预览大图
   final bool enablePreview;
 
+  final int? memCacheWidth;
+  final int? memCacheHeight;
+
   const ImageShow({
     super.key,
     required this.imageUrl,
@@ -44,6 +47,8 @@ class ImageShow extends StatelessWidget {
     this.errorIconSize = 12,
     this.showErrorText = true,
     this.enablePreview = false,
+    this.memCacheWidth,
+    this.memCacheHeight,
   });
 
   @override
@@ -124,6 +129,8 @@ class ImageShow extends StatelessWidget {
         final networkImage = CachedNetworkImage(
           imageUrl: imageUrl,
           fit: fit,
+          memCacheWidth: memCacheWidth,
+          memCacheHeight: memCacheHeight,
           placeholder: (context, url) => buildPlaceholder(),
           errorWidget: (context, url, error) => buildErrorWidget(error),
         );

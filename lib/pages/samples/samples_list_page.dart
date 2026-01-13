@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/views/product_view.dart';
+import 'package:cloud/pages/samples/views/showroom_view.dart';
 import 'package:cloud/pages/samples/widgets/home_app_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,9 @@ class SamplesListPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
-    final currentPageIndex = useState<int>(0);
+    // 本地保存当前 PageView 索引，初始值来自全局状态
+    final currentPageIndex = useState<int>(home.currentPage);
     final colorScheme = Theme.of(context).colorScheme;
-    // 使用 provider 中的 currentSelectedWarehouse
     final currentWarehouse = home.currentSelectedWarehouse;
 
     return Scaffold(
@@ -29,16 +30,19 @@ class SamplesListPage extends HookConsumerWidget {
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           actions: [
-            TextButton(
-              onPressed: () async {
-                context.router.push(ShowroomSampleCreateRoute());
-              },
-              child: Text(
-                "新增",
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 16,
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.shopping_cart,
+                  size: 25,
+                  // color: colorScheme.secondary,
                 ),
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  context.router.push(const CartRoute());
+                },
               ),
             ),
             PopupMenuButton<String>(
@@ -75,17 +79,29 @@ class SamplesListPage extends HookConsumerWidget {
               HomeAppBar(
                 controller: home.searchTextController,
                 onSearchText: (search) {
+                  final text = search.trim();
+                  // 文本为空时，使用样品间列表页（SamplesPageView）
+                  if (text.isEmpty) {
+                    homeNotifier.switchToPage(0);
+                  } else {
+                    // 有搜索内容时，切换到商品列表页（ProductView）
+                    homeNotifier.switchToProductView();
+                  }
                   homeNotifier.setSearch(search);
                   home.bus.dispatch(
-                      SearchEvent(search: search, media: home.currentMedia));
+                    SearchEvent(search: search, media: home.currentMedia),
+                  );
                 },
                 onSearchMedia: (temporaryMedia) {
                   homeNotifier.addMedia(temporaryMedia);
                   if (temporaryMedia.id == home.currentMediaId) {
                     return;
                   }
+                  // 图片搜索后切换到商品列表页（ProductView）
+                  homeNotifier.switchToProductView();
                   home.bus.dispatch(
-                      SearchEvent(search: home.search, media: temporaryMedia));
+                    SearchEvent(search: home.search, media: temporaryMedia),
+                  );
                 },
                 onDeleteMedia: (temporaryMedia) {
                   final nextState = homeNotifier.deleteMedia(temporaryMedia);
@@ -93,17 +109,19 @@ class SamplesListPage extends HookConsumerWidget {
                     return;
                   }
 
-                  home.bus.dispatch(SearchEvent(
-                    media: nextState.currentMedia,
-                    search: nextState.search,
-                  ));
+                  home.bus.dispatch(
+                    SearchEvent(
+                      media: nextState.currentMedia,
+                      search: nextState.search,
+                    ),
+                  );
                 },
               ),
               Expanded(
                 child: PageView(
                   controller: home.pageController,
                   onPageChanged: (page) {
-                    homeNotifier.setCurrentPage(page);
+                    homeNotifier.switchToPage(page);
                     currentPageIndex.value = page;
                     home.bus.dispatch(
                       SearchEvent(
@@ -114,7 +132,7 @@ class SamplesListPage extends HookConsumerWidget {
                     );
                   },
                   allowImplicitScrolling: false,
-                  children: const [ProductView()],
+                  children: const [SamplesPageView(), ProductView()],
                 ),
               ),
             ],

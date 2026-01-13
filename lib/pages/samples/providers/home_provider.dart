@@ -45,8 +45,17 @@ class Home extends _$Home {
     state = state.copyWith(supplierPages: page);
   }
 
-  void setCurrentPage(int page) {
+
+  /// 切换到指定的 PageView 页面（全局控制 PageView）
+  void switchToPage(int page) {
+    // 使用全局的 PageController 来切换页面
+    state.pageController.jumpToPage(page);
     state = state.copyWith(currentPage: page);
+  }
+
+  /// 切换到商品列表页（ProductView）
+  void switchToProductView() {
+    switchToPage(1);
   }
 
   void setSearch(String search) {
@@ -117,15 +126,8 @@ class Home extends _$Home {
     final resp = await getWarehouses();
     final warehouses = resp.data;
     
-    // 在所有样品间列表前面添加"所有样品间"选项
-    const allWarehouse = Warehouse( 
-      id: 0,
-      name: '所有样品间',
-      address: '',
-    );
-    
     state = state.copyWith(
-      warehouses: [allWarehouse, ...warehouses],
+      warehouses: warehouses,
       isLoadingWarehouses: false,
     );
   }

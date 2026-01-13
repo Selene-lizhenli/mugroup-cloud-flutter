@@ -34,7 +34,7 @@ class EntryGridModule extends StatelessWidget {
                 width: itemWidth,
                 icon: Icons.inventory_2,
                 label: '样品间',
-                route: const SamplesRoute(),
+                route: const SamplesListRoute(),
                 color: colorScheme.primary,
               ),
               _EntryItem(

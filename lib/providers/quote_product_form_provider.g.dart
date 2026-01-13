@@ -7,7 +7,7 @@ part of 'quote_product_form_provider.dart';
 // **************************************************************************
 
 String _$quoteProductFormDataHash() =>
-    r'2ecdd3fa791410d50d59e2457d62a06e99af5948';
+    r'0e69cf59e0d78b70c7d9a51901ded095bb3dc382';
 
 /// 报价产品表单数据 Provider - 用于在横竖屏切换时保持表单数据
 ///

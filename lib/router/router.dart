@@ -21,11 +21,7 @@ class AppRouter extends RootStackRouter {
             path: 'dashboard',
           ),
         ],
-      ),
-      AutoRoute(
-        page: SamplesRoute.page,
-        path: '/samples',
-      ),
+      ), 
       AutoRoute(
         page: CartRoute.page,
         path: '/samples/cart',

@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/hooks/useUpdateEffect/hook.dart';
 import 'package:cloud/models/response.dart';
@@ -149,7 +148,8 @@ class ProductView extends HookConsumerWidget {
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
         (SearchEvent event) {
           final currentHome = ref.read(homeProvider);
-          if (currentHome.currentPage != 0) {
+          // 只有在当前处于商品列表页（PageView 第 2 页，索引为 1）时才响应搜索事件
+          if (currentHome.currentPage != 1) {
             return;
           }
 

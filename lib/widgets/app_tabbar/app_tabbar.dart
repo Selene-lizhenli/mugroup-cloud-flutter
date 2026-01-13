@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 class AppTabbar extends StatelessWidget {
   AppTabbar({super.key});
 
-  final routes = [const SamplesRoute(), const CartRoute()];
+  final routes = [const SamplesListRoute(), const CartRoute()];
 
   @override
   Widget build(BuildContext context) {
     var router = context.router;
-    const routes = [SamplesRoute(), CartRoute(), MyRoute()];
+    const routes = [SamplesListRoute(), CartRoute(), MyRoute()];
     final currentIndex =
         routes.indexWhere((item) => item.routeName == router.current.name);
 
