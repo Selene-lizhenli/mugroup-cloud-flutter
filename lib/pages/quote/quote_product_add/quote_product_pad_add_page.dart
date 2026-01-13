@@ -1,4 +1,4 @@
-import 'dart:convert'; 
+import 'dart:convert';
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
@@ -54,9 +54,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
     useEffect(() {
       logger.d('savedFormData$savedFormData');
-      if (!isActive &&
-          savedFormData != null &&
-          formKey.currentState != null) {
+      if (!isActive && savedFormData != null && formKey.currentState != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           formKey.currentState?.patchValue(savedFormData);
         });
@@ -165,6 +163,48 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       }
     }
 
+    Future<void> handleCopyLastItem() async {
+      try {
+        EasyLoading.show(status: '加载中...');
+        final prefs = await SharedPreferences.getInstance();
+
+        const storageKey = 'last_quote_product_add';
+        final jsonStr = prefs.getString(storageKey);
+
+        if (jsonStr != null) {
+          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+
+          data.remove('id');
+          data.remove('product_no');
+          data.remove('image');
+          data.remove('images');
+
+          if (data['spec'] != null && data['spec'].toString().isNotEmpty) {
+            final parts = data['spec'].toString().split('x');
+            if (parts.isNotEmpty) {
+              data['length'] = parts[0];
+            }
+            if (parts.length > 1) {
+              data['width'] = parts[1];
+            }
+            if (parts.length > 2) {
+              data['heigth'] = parts[2];
+            }
+          }
+
+          // 3. 填充表单
+          formKey.currentState?.patchValue(data);
+          EasyLoading.showSuccess('已复制上一条数据');
+        } else {
+          EasyLoading.showInfo('暂无历史数据');
+        }
+      } catch (e) {
+        EasyLoading.showError('加载失败');
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F3F5),
       appBar: AppBar(
@@ -224,7 +264,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                   }
 
                                   return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         "上传图片",
@@ -248,8 +289,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
-                          border: Border(
-                              top: BorderSide(color: Color(0xFFEEEEEE))),
+                          border:
+                              Border(top: BorderSide(color: Color(0xFFEEEEEE))),
                         ),
                         child: SizedBox(
                           width: double.infinity,
@@ -302,7 +343,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                 action: Wrap(
                                   children: [
                                     TextButton.icon(
-                                      onPressed: () {},
+                                      onPressed: handleCopyLastItem,
                                       icon: Icon(Icons.content_copy,
                                           size: 16, color: colorScheme.primary),
                                       label: Text("复制上一条",
@@ -613,12 +654,13 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                               label: '长',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType:
-                                                  const TextInputType.numberWithOptions(
-                                                      decimal: true),
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.allow(
-                                                    RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter
+                                                    .allow(
+                                                        RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -631,12 +673,13 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                               label: '宽',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType:
-                                                  const TextInputType.numberWithOptions(
-                                                      decimal: true),
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.allow(
-                                                    RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter
+                                                    .allow(
+                                                        RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -649,12 +692,13 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                               label: '高',
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
-                                              keyboardType:
-                                                  const TextInputType.numberWithOptions(
-                                                      decimal: true),
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.allow(
-                                                    RegExp(r'^\d+\.?\d*')),
+                                                FilteringTextInputFormatter
+                                                    .allow(
+                                                        RegExp(r'^\d+\.?\d*')),
                                               ],
                                             ),
                                           ),
@@ -703,8 +747,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
-                          border: Border(
-                              top: BorderSide(color: Color(0xFFEEEEEE))),
+                          border:
+                              Border(top: BorderSide(color: Color(0xFFEEEEEE))),
                         ),
                         child: SizedBox(
                           width: double.infinity,
@@ -738,4 +782,3 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     );
   }
 }
-

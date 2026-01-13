@@ -1,6 +1,5 @@
-import 'dart:convert'; 
+import 'dart:convert';
 import 'package:cloud/constants/form_definitions.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -25,7 +24,6 @@ import 'dart:async';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class QuoteProductAddPortraitView extends HookConsumerWidget {
   final int? quoteId;
@@ -54,9 +52,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
     // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
     useEffect(() {
-      if (!isActive &&
-          savedFormData != null &&
-          formKey.currentState != null) {
+      if (!isActive && savedFormData != null && formKey.currentState != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           formKey.currentState?.patchValue(savedFormData);
         });
@@ -70,7 +66,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       final timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
         if (formKey.currentState != null) {
           formKey.currentState!.save();
-          final currentValue = formKey.currentState!.value; 
+          final currentValue = formKey.currentState!.value;
           if (currentValue.isNotEmpty) {
             formDataNotifier.saveFormData(currentValue);
           }
@@ -112,6 +108,48 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
         }
       } catch (e) {
         EasyLoading.showError('识别失败');
+      }
+    }
+
+    Future<void> handleCopyLastItem() async {
+      try {
+        EasyLoading.show(status: '加载中...');
+        final prefs = await SharedPreferences.getInstance();
+
+        const storageKey = 'last_quote_product_add';
+        final jsonStr = prefs.getString(storageKey);
+
+        if (jsonStr != null) {
+          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+
+          data.remove('id');
+          data.remove('product_no');
+          data.remove('image');
+          data.remove('images');
+
+          if (data['spec'] != null && data['spec'].toString().isNotEmpty) {
+            final parts = data['spec'].toString().split('x');
+            if (parts.isNotEmpty) {
+              data['length'] = parts[0];
+            }
+            if (parts.length > 1) {
+              data['width'] = parts[1];
+            }
+            if (parts.length > 2) {
+              data['heigth'] = parts[2];
+            }
+          }
+
+          // 3. 填充表单
+          formKey.currentState?.patchValue(data);
+          EasyLoading.showSuccess('已复制上一条数据');
+        } else {
+          EasyLoading.showInfo('暂无历史数据');
+        }
+      } catch (e) {
+        EasyLoading.showError('加载失败');
+      } finally {
+        EasyLoading.dismiss();
       }
     }
 
@@ -190,9 +228,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         action: Row(
                           children: [
                             GestureDetector(
-                              onTap: () async {
-                                //todo
-                              },
+                              onTap: handleCopyLastItem,
                               child: Row(
                                 children: [
                                   Icon(
@@ -239,8 +275,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   Text("字段设置",
                                       style: TextStyle(
                                           fontSize: 14,
-                                          color: Theme.of(context)
-                                              .primaryColor)),
+                                          color:
+                                              Theme.of(context).primaryColor)),
                                 ],
                               ),
                             ),
@@ -438,13 +474,12 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                 return TranslatableInput(
                                   label: '中文名称',
                                   sourceText: formKey.currentState
-                                      ?.fields['product_name_cn']
-                                      ?.value,
+                                      ?.fields['product_name_cn']?.value,
                                   value: field.value ?? '',
                                   onChanged: field.didChange,
                                   onTranslateChanged: (value) {
-                                    formKey.currentState
-                                        ?.fields['product_name_en']
+                                    formKey
+                                        .currentState?.fields['product_name_en']
                                         ?.didChange(value);
                                   },
                                 );
@@ -562,9 +597,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                         label: '长',
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
-                                        keyboardType:
-                                            const TextInputType.numberWithOptions(
-                                                decimal: true),
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(decimal: true),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.allow(
                                               RegExp(r'^\d+\.?\d*')),
@@ -582,9 +616,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                         label: '宽',
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
-                                        keyboardType:
-                                            const TextInputType.numberWithOptions(
-                                                decimal: true),
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(decimal: true),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.allow(
                                               RegExp(r'^\d+\.?\d*')),
@@ -602,9 +635,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                         label: '高',
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
-                                        keyboardType:
-                                            const TextInputType.numberWithOptions(
-                                                decimal: true),
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(decimal: true),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.allow(
                                               RegExp(r'^\d+\.?\d*')),
@@ -629,13 +661,12 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   label: '中文描述',
                                   showTranslate: true,
                                   sourceText: formKey.currentState
-                                      ?.fields['description_cn']
-                                      ?.value,
+                                      ?.fields['description_cn']?.value,
                                   value: field.value,
                                   onChanged: field.didChange,
                                   onTranslateChanged: (value) {
-                                    formKey.currentState
-                                        ?.fields['description_en']
+                                    formKey
+                                        .currentState?.fields['description_en']
                                         ?.didChange(value);
                                   },
                                 );
@@ -681,9 +712,11 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
                           final supplier = submitValues['supplyQuote'];
 
-                          final length = submitValues['length']?.toString() ?? '';
+                          final length =
+                              submitValues['length']?.toString() ?? '';
                           final width = submitValues['width']?.toString() ?? '';
-                          final height = submitValues['heigth']?.toString() ?? '';
+                          final height =
+                              submitValues['heigth']?.toString() ?? '';
 
                           final spec = [length, width, height].join('x');
                           submitValues['spec'] = spec;
