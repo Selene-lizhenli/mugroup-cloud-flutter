@@ -5,6 +5,7 @@ import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/models/dashboard/public_news_article.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class NewsBoard extends StatefulWidget {
   const NewsBoard({super.key});
@@ -110,7 +111,8 @@ class _NewsBoardState extends State<NewsBoard> {
             context.router.push(NewsRoute(article: article));
           },
           child: Container(
-              margin: EdgeInsets.fromLTRB(12, isFirst?12:0, 12, isLast ? 12 : 0),
+              margin: EdgeInsets.fromLTRB(
+                  12, isFirst ? 12 : 0, 12, isLast ? 12 : 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -124,7 +126,8 @@ class _NewsBoardState extends State<NewsBoard> {
                       if (imageUrl != null && imageUrl.isNotEmpty)
                         ImageShow(
                           imageUrl: imageUrl,
-                          width:80,
+                          height: 80,
+                          width: 80,
                           fit: BoxFit.cover,
                           errorIconSize: 32,
                         ),
@@ -149,18 +152,44 @@ class _NewsBoardState extends State<NewsBoard> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              article.content ?? '',
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .fontSize,
-                                color: colorScheme.surfaceContainerHighest,
+                            // 使用富文本加载器，限制2行显示
+                            SizedBox(
+                              height: (Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .fontSize! *
+                                  2.4), // 2行高度 + 行间距
+                              child: ClipRect(
+                                child: Html(
+                                  data: article.content ?? '',
+                                  style: {
+                                    'body': Style(
+                                      margin: Margins.zero,
+                                      padding: HtmlPaddings.zero,
+                                      fontSize: FontSize(
+                                        Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .fontSize!,
+                                      ),
+                                      color: colorScheme.surfaceContainerHighest,
+                                      display: Display.block,
+                                    ),
+                                    'p': Style(
+                                      margin: Margins.zero,
+                                      padding: HtmlPaddings.zero,
+                                      fontSize: FontSize(
+                                        Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .fontSize!,
+                                      ),
+                                      color: colorScheme.surfaceContainerHighest,
+                                      display: Display.block,
+                                    ),
+                                  },
+                                ),
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
                             ),
                           ],
                         ),
@@ -170,8 +199,10 @@ class _NewsBoardState extends State<NewsBoard> {
                   const SizedBox(
                     height: 12,
                   ),
-                 if(!isLast) Divider(
-                      height: 0.5, color: colorScheme.outline.withOpacity(0.15))
+                  if (!isLast)
+                    Divider(
+                        height: 0.5,
+                        color: colorScheme.outline.withOpacity(0.15))
                 ],
               )
 

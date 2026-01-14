@@ -104,22 +104,37 @@ class ImageShow extends StatelessWidget {
         return placeholderBuilder!(context, imageUrl);
       }
       // 如果有固定尺寸，使用固定尺寸的占位符
-      if (width != null || height != null) {
+      if (width != null && height == null) {
         return SizedBox(
-          width: width ?? height,
-          height: height ?? width,
+          width: width,
           child: const Center(
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        );
+      } else if (width == null && height != null) {
+        return SizedBox(
+          height: height,
+          child: const Center(
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        );
+      } else if (width != null && height != null) {
+        return SizedBox(
+          width: width,
+          height: height,
+          child: const Center(
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        );
+      } else {
+        return const AspectRatio(
+          aspectRatio: 1,
+          child: Center(
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
         );
       }
       // 否则使用 AspectRatio
-      return const AspectRatio(
-        aspectRatio: 1,
-        child: Center(
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      );
     }
 
     // 构建实际展示的图片 widget
@@ -135,10 +150,20 @@ class ImageShow extends StatelessWidget {
           errorWidget: (context, url, error) => buildErrorWidget(error),
         );
 
-        if (width != null || height != null) {
+        if (width != null && height != null) {
           return SizedBox(
-            width: width ?? height,
-            height: height ?? width,
+            width: width ,
+            height: height  ,
+            child: networkImage,
+          );
+        } else if (width != null && height == null) {
+          return SizedBox(
+            width: width,
+            child: networkImage,
+          );
+        } else if (width == null && height != null) {
+          return SizedBox(
+            height: height,
             child: networkImage,
           );
         }

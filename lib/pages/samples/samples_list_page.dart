@@ -45,7 +45,8 @@ class SamplesListPage extends HookConsumerWidget {
                 },
               ),
             ),
-            PopupMenuButton<String>(
+            if(currentPageIndex.value == 1)
+            ...[PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               offset: const Offset(-8, 38),
               color: colorScheme.surface,
@@ -67,9 +68,26 @@ class SamplesListPage extends HookConsumerWidget {
                   ),
                 ];
               },
-            ),
+            )],
           ],
-        ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if( currentPageIndex.value == 1 ){
+                 //清空搜索内容
+                 home.searchTextController.clear();
+                 homeNotifier.setSearch('');
+                 home.bus.dispatch(
+                   SearchEvent(search: '', media: null),
+                 ); 
+                 homeNotifier.switchToPage(0);
+              } else {
+                context.router.maybePop();
+              }
+            
+            },
+          ),
+        ) ,
         body: Container(
           // color: colorScheme.secondary,
           padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
