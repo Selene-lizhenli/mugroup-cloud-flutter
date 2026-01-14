@@ -181,7 +181,7 @@ class _LineChartDemoState extends State<LineChartDemo> {
                       return '';
                     },
                     getTextStyles: (_) =>
-                        TextStyle(fontSize: 9, color: Colors.grey.shade600),
+                        TextStyle(fontSize: 8.2, color: Colors.grey.shade600),
                   ),
                   topTitles: SideTitles(showTitles: false),
                   rightTitles: SideTitles(showTitles: false),

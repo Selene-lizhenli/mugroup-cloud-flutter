@@ -200,7 +200,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
             }
           });
         }
-      } else if (dimension == '选样排行') {
+      } else if (dimension == '选样排行') { 
         // 加载选样排行数据
         final resp = await getQuoteStatsSummary(
             params: {"start": null, "end": null}); //获取排行数据

@@ -258,7 +258,7 @@ class _TopChartContentState extends State<TopChartContent> {
                       },
                       getTextStyles: (_) => TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.5),
-                        fontSize: 9,
+                        fontSize: 8,
                       ),
                     ),
                     leftTitles: SideTitles(

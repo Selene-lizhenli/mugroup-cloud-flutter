@@ -34,10 +34,10 @@ class SamplesListPage extends HookConsumerWidget {
               width: 40,
               height: 40,
               child: IconButton(
-                icon: const Icon(
-                  Icons.shopping_cart,
+                icon: Icon(
+                  Icons.shopping_cart_outlined,
                   size: 25,
-                  // color: colorScheme.secondary,
+                  color: colorScheme.primary,
                 ),
                 padding: EdgeInsets.zero,
                 onPressed: () {
@@ -45,49 +45,49 @@ class SamplesListPage extends HookConsumerWidget {
                 },
               ),
             ),
-            if(currentPageIndex.value == 1)
-            ...[PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              offset: const Offset(-8, 38),
-              color: colorScheme.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              onSelected: (String value) {
-                if (value == 'detailed') {
-                  homeNotifier.setViewMode(true);
-                } else if (value == 'simple') {
-                  homeNotifier.setViewMode(false);
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  PopupMenuItem<String>(
-                    value: home.isDetailedMode ? 'simple' : 'detailed',
-                    child: Text(home.isDetailedMode ? '精简模式' : '详细模式'),
-                  ),
-                ];
-              },
-            )],
+            if (currentPageIndex.value == 1) ...[
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                offset: const Offset(-8, 38),
+                color: colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                onSelected: (String value) {
+                  if (value == 'detailed') {
+                    homeNotifier.setViewMode(true);
+                  } else if (value == 'simple') {
+                    homeNotifier.setViewMode(false);
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem<String>(
+                      value: home.isDetailedMode ? 'simple' : 'detailed',
+                      child: Text(home.isDetailedMode ? '精简模式' : '详细模式'),
+                    ),
+                  ];
+                },
+              )
+            ],
           ],
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              if( currentPageIndex.value == 1 ){
-                 //清空搜索内容
-                 home.searchTextController.clear();
-                 homeNotifier.setSearch('');
-                 home.bus.dispatch(
-                   SearchEvent(search: '', media: null),
-                 ); 
-                 homeNotifier.switchToPage(0);
+              if (currentPageIndex.value == 1) {
+                //清空搜索内容
+                home.searchTextController.clear();
+                homeNotifier.setSearch('');
+                home.bus.dispatch(
+                  SearchEvent(search: '', media: null),
+                );
+                homeNotifier.switchToPage(0);
               } else {
                 context.router.maybePop();
               }
-            
             },
           ),
-        ) ,
+        ),
         body: Container(
           // color: colorScheme.secondary,
           padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
