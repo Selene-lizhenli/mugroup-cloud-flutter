@@ -255,7 +255,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.category,
+                  Icons.leaderboard,
                   size: 18,
                   color: currentDimension == '选样排行'
                       ? Theme.of(context).colorScheme.primary
