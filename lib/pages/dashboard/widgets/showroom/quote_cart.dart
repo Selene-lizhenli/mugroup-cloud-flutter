@@ -74,7 +74,7 @@ class _TopChartContentState extends State<TopChartContent> {
                         _isExpanded ? '收起' : '展开',
                         style: TextStyle(
                           fontSize: 11,
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.primary,
                         ),
                       ),
                       const SizedBox(width: 2),
@@ -83,7 +83,7 @@ class _TopChartContentState extends State<TopChartContent> {
                             ? Icons.keyboard_arrow_up
                             : Icons.keyboard_arrow_down,
                         size: 18,
-                        color: colorScheme.onSurface.withOpacity(0.6),
+                        color: colorScheme.primary,
                       ),
                     ],
                   ),
@@ -201,8 +201,7 @@ class _TopChartContentState extends State<TopChartContent> {
     final maxY = maxCount > 0 ? (maxCount * 1.2).ceil().toDouble() : 10.0;
 
     return Container(
-      height: 200,
-      padding: const EdgeInsets.all(16),
+      height: 200, 
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -276,10 +275,7 @@ class _TopChartContentState extends State<TopChartContent> {
                         color: colorScheme.outline.withOpacity(0.2),
                         width: 1,
                       ),
-                      left: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.2),
-                        width: 1,
-                      ),
+                      left: BorderSide.none,
                     ),
                   ),
                   barGroups: displayData.asMap().entries.map((entry) {

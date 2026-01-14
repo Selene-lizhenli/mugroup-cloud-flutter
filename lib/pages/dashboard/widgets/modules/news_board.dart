@@ -112,7 +112,7 @@ class _NewsBoardState extends State<NewsBoard> {
           },
           child: Container(
               margin: EdgeInsets.fromLTRB(
-                  12, isFirst ? 12 : 0, 12, isLast ? 12 : 0),
+                  12, isFirst ? 10 : 0, 12, isLast ? 10 : 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -172,7 +172,8 @@ class _NewsBoardState extends State<NewsBoard> {
                                             .bodySmall!
                                             .fontSize!,
                                       ),
-                                      color: colorScheme.surfaceContainerHighest,
+                                      color:
+                                          colorScheme.surfaceContainerHighest,
                                       display: Display.block,
                                     ),
                                     'p': Style(
@@ -184,7 +185,8 @@ class _NewsBoardState extends State<NewsBoard> {
                                             .bodySmall!
                                             .fontSize!,
                                       ),
-                                      color: colorScheme.surfaceContainerHighest,
+                                      color:
+                                          colorScheme.surfaceContainerHighest,
                                       display: Display.block,
                                     ),
                                   },
@@ -196,9 +198,10 @@ class _NewsBoardState extends State<NewsBoard> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  if (!isLast)
+                    const SizedBox(
+                      height: 12,
+                    ),
                   if (!isLast)
                     Divider(
                         height: 0.5,
