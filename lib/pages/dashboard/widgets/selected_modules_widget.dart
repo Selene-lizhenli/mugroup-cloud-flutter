@@ -83,7 +83,7 @@ class DashboardModules {
   /// 获取已选中的模块（按照设置页面中保存的排序顺序）
   static Future<List<ModuleInfo>> getSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
-    final selectedIds = prefs.getStringList(_storageKey) ?? [];
+    final selectedIds = prefs.getStringList(_storageKey) ?? ['rate', 'news'];
     final orderIds = prefs.getStringList(_orderKey) ?? [];
 
     if (selectedIds.isEmpty) {
