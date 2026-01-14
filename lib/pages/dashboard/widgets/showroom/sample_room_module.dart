@@ -1,8 +1,11 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/category.dart';
+import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/chart_contet.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,7 +36,7 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 
   const SampleRoomChart({
     super.key,
-    this.moduleTitle = '样品间', // 默认值
+    this.moduleTitle = '选样排行', // 默认值
   });
 
   @override
@@ -41,7 +44,8 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 }
 
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
-  List<Level1CategoryStat> _dimensionData = []; // 维度数据（从API获取）
+  List<Level1CategoryStat> _dimensionData = []; // 数据（从API获取）
+  List<QuoteTopStats> _topDimensionData = []; //  数据 排行
   bool _isLoading = false; // 数据加载状态
 
   // 颜色列表，用于分配颜色
@@ -64,14 +68,15 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     // 初始化时强制将维度设置为「样品间」，并根据该维度加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
       const defaultDimension = '样品间';
-      ref.read(dashboardStatsProvider.notifier).setSampleRoomDimension(defaultDimension);
+      ref
+          .read(dashboardStatsProvider.notifier)
+          .setSampleRoomDimension(defaultDimension);
       _lastLoadedDimension = defaultDimension;
       _loadDimensionData(defaultDimension);
     });
   }
 
- 
-  /// 将扁平 categories 归并到一级目录并统计每个一级目录下包含的总 productsCount 
+  /// 将扁平 categories 归并到一级目录并统计每个一级目录下包含的总 productsCount
   List<Level1CategoryStat> buildLevel1Stats(
     List<Category> categories, {
     int rootId = 1,
@@ -124,7 +129,8 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       }
 
       // 记录 name（如果 ancestors 里 name 为空，尝试从 byId 取）
-      names[level1Id] = level1Name ?? byId[level1Id]?.name ?? 'Unknown($level1Id)';
+      names[level1Id] =
+          level1Name ?? byId[level1Id]?.name ?? 'Unknown($level1Id)';
       totals[level1Id] = (totals[level1Id] ?? 0) + safeCount(c);
     }
 
@@ -138,7 +144,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
         color: _colorPalette[id % _colorPalette.length],
       ));
     });
- 
+
     // 按数量降序（你也可以按名称/ID 排序）
     result.sort((a, b) => b.totalProductsCount.compareTo(a.totalProductsCount));
     return result;
@@ -149,12 +155,12 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     setState(() {
       _isLoading = true;
     });
-
+    logger.d('dimension: $dimension');
     try {
       if (dimension == '产品目录') {
         // 加载产品目录数据（使用包含 count 的方法）
         final categoriesData = await getAllShowroomCategories();
-        
+
         logger.d('categoriesData: $categoriesData');
         if (mounted) {
           setState(() {
@@ -168,7 +174,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
         }
       } else if (dimension == '样品间') {
         // 加载样品间数据
-        final resp = await getWarehouses(); 
+        final resp = await getWarehouses();
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -178,7 +184,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
               final activeWarehouses = warehouses
                   .where((warehouse) => warehouse.abandoned != true)
                   .toList();
-              
+
               _dimensionData = activeWarehouses.asMap().entries.map((entry) {
                 final index = entry.key;
                 final warehouse = entry.value;
@@ -189,10 +195,19 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                   color: _colorPalette[index % _colorPalette.length],
                 );
               }).toList();
-          
             } else {
               _dimensionData = [];
             }
+          });
+        }
+      } else if (dimension == '选样排行') {
+        // 加载选样排行数据
+        final resp = await getQuoteStatsSummary(
+            params: {"start": null, "end": null}); //获取排行数据
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _topDimensionData = resp ?? [];
           });
         }
       } else {
@@ -227,6 +242,11 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       },
     );
 
+    // 获取当前维度
+    final currentDimension = ref.watch(
+      dashboardStatsProvider.select((state) => state.sampleRoomDimension),
+    );
+
     // 使用从API获取的维度数据
     final sampleRoomData = _dimensionData;
 
@@ -235,7 +255,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [ 
+        children: [
           // 根据数据状态显示内容
           if (_isLoading)
             const Center(
@@ -244,23 +264,12 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                 child: CircularProgressIndicator(),
               ),
             )
-          else if (sampleRoomData.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Text(
-                  '暂无数据',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                ),
-              ),
-            )
-          else if (sampleRoomData.isNotEmpty)
+          else if (currentDimension == '选样排行')
+            TopChartContent(data: _topDimensionData)
+          else
             ChartContent(sampleRoomData: sampleRoomData),
         ],
       ),
     );
   }
-
 }

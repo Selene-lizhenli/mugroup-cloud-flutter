@@ -92,7 +92,7 @@ class DashboardStats extends _$DashboardStats {
   }
 
   Future<DashboardStatsState> _fetch() async {
-    // 获取统计数据（根据当前时间维度）
+    // 获取市场采购相关统计数据（根据当前时间维度）
     final params = _buildDateRangeParams(state.timeDimension);
     final summary = await getStatsSummary(params: params);
     logger.d('params${params}');
@@ -107,20 +107,7 @@ class DashboardStats extends _$DashboardStats {
         sampleRoomDimension: state.sampleRoomDimension,
       );
     }
-
-    if (summary.data == null || summary.data!.isEmpty) {
-      // 返回空数据
-      return DashboardStatsState(
-        timeLabels: [],
-        productData: [],
-        customerData: [],
-        serviceProviderData: [],
-        inspectionData: [],
-        timeDimension: state.timeDimension,
-        sampleRoomDimension: state.sampleRoomDimension,
-      );
-    }
-
+  
     // 转换数据格式为图表需要的格式
     final sortedEntries = summary.data!.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key)); // 按月份排序

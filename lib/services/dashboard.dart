@@ -3,6 +3,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/models/dashboard/market_stats.dart';
 import 'package:cloud/models/dashboard/public_news_article.dart';
+import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/models/dashboard/stats.dart';
 
 /// 类型别名，用于向后兼容路由系统
@@ -43,19 +44,33 @@ Future<StatsSummary?> getStatsSummary({
   return null;
 }
 
-/// 格式化月份标签，将 "2026-01" 转换为 "1月"
-String _formatMonthLabel(String monthKey) {
-  try {
-    final parts = monthKey.split('-');
-    if (parts.length >= 2) {
-      final month = int.parse(parts[1]);
-      return '${month}月';
+ 
+Future<List<QuoteTopStats>?> getQuoteStatsSummary({
+  Map<String, dynamic>? params,
+}) async { 
+    List<QuoteTopStats>? returnedData;
+    final res = await api.get('api/tenant/showroom/quotations/charts/sample', data: params); 
+    if (res.data == null) {
+      returnedData = null;
     }
-    return monthKey;
-  } catch (e) {
-    return monthKey;
-  }
+    returnedData = (res.data as List).map((e) => QuoteTopStats.fromJson(e as Map<String, dynamic>)).toList();
+    logger.d(' returnedData ${returnedData}'); 
+    return returnedData;  
 }
+
+/// 格式化月份标签，将 "2026-01" 转换为 "1月"
+// String _formatMonthLabel(String monthKey) {
+//   try {
+//     final parts = monthKey.split('-');
+//     if (parts.length >= 2) {
+//       final month = int.parse(parts[1]);
+//       return '${month}月';
+//     }
+//     return monthKey;
+//   } catch (e) {
+//     return monthKey;
+//   }
+// }
 
 /// 获取新闻文章列表
 Future<List<PublicNewsArticle>?> getNewsArticles() async {

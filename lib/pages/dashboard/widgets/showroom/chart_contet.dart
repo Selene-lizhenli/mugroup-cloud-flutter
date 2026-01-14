@@ -1,3 +1,4 @@
+import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -5,11 +6,11 @@ import 'sample_room_module.dart';
 
 /// 图表内容组件
 class ChartContent extends StatefulWidget {
-  final List<Level1CategoryStat> sampleRoomData;
+  final List<Level1CategoryStat> sampleRoomData; 
 
   const ChartContent({
     super.key,
-    required this.sampleRoomData,
+    required this.sampleRoomData, 
   });
 
   @override

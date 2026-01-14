@@ -247,8 +247,35 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     // 可以根据实际需求扩展每个模块的维度选项
     switch (moduleId) {
       case 'sample_room':
-        final currentDimension = ref.watch(dashboardStatsProvider.select((state) => state.sampleRoomDimension));
+        final currentDimension = ref.watch(dashboardStatsProvider
+            .select((state) => state.sampleRoomDimension));
         return [
+          PopupMenuItem<String>(
+            value: '选样排行',
+            child: Row(
+              children: [
+                Icon(
+                  Icons.category,
+                  size: 18,
+                  color: currentDimension == '选样排行'
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.grey,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '选样排行',
+                  style: TextStyle(
+                    color: currentDimension == '选样排行'
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    fontWeight: currentDimension == '选样排行'
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
           PopupMenuItem<String>(
             value: '产品目录',
             child: Row(
@@ -403,7 +430,7 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     if (moduleId == 'sample_room') {
       ref.read(dashboardStatsProvider.notifier).setSampleRoomDimension(value);
       return;
-    } 
+    }
 
     // 处理时间维度相关的模块
     if (moduleId == 'inspection' ||
