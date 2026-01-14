@@ -293,22 +293,29 @@ class ProductSection extends HookConsumerWidget {
                           children: [
                             _KeyValue(
                               label: '公司货号',
-                              value: sample.productNo ?? '-',
+                              value: (row.supplyQuote?.internalSku ?? 0)
+                                  .toString(),
                               highlight: false,
                             ),
                             const SizedBox(height: 4),
                             _KeyValue(
                               label: '客户报价(CNY)',
-                              value: row.price != null
-                                  ? row.price.toString()
-                                  : '-',
+                              value: (row.supplyQuote?.customerPrice ?? 0)
+                                  .toString(),
+                              highlight: false,
+                            ),
+                            const SizedBox(height: 4),
+                            _KeyValue(
+                              label: '供应商报价(CNY)',
+                              value: (row.supplyQuote?.purchaseCost ?? 0)
+                                  .toString(),
                               highlight: false,
                             ),
                             const SizedBox(height: 4),
                             _KeyValue(
                               label: '采购数量',
-                              value:
-                                  row.qty != null ? row.qty.toString() : '-',
+                              value: (row.supplyQuote?.shippingQty ?? 0)
+                                  .toString(),
                               highlight: false,
                             ),
                           ],
