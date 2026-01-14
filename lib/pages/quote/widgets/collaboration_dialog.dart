@@ -6,181 +6,217 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class CollaborationDialog extends HookConsumerWidget {
+class CollaborationBottomSheet extends HookConsumerWidget {
   final int quoteId;
 
-  const CollaborationDialog({super.key, required this.quoteId});
+  const CollaborationBottomSheet({super.key, required this.quoteId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. 监听 Provider 数据
     final quoteAsync = ref.watch(quoteDetailProvider(quoteId));
     final notifier = ref.read(quoteDetailProvider(quoteId).notifier);
 
-    // 2. 本地搜索状态
     final searchController = useTextEditingController();
     useListenable(searchController);
 
     final searchResults = useState<List<User>>([]);
     final isSearching = useState(false);
-    final hasSearched = useState(false);
-
-    final showSearchResults = useState(false);
-
-    useEffect(() {
-      void listener() {
-        if (showSearchResults.value) {
-          showSearchResults.value = false;
-        }
-      }
-
-      searchController.addListener(listener);
-      return () => searchController.removeListener(listener);
-    }, [searchController]);
 
     Future<void> handleSearch() async {
       final query = searchController.text.trim();
-      if (query.isEmpty) return;
+      if (query.isEmpty) {
+        searchResults.value = [];
+        return;
+      }
 
       isSearching.value = true;
-      hasSearched.value = true;
-
-      showSearchResults.value = true;
-
       try {
-        final result = await fetchCurrentUsers(queryParameters: {
-          "search": query,
-        });
+        final result =
+            await fetchCurrentUsers(queryParameters: {"search": query});
+
         searchResults.value = result ?? [];
-      } catch (e) {
-        searchResults.value = [];
       } finally {
         isSearching.value = false;
       }
     }
 
-    final bool isSearchMode = showSearchResults.value;
+    useEffect(() {
+      if (searchController.text.isEmpty) {
+        searchResults.value = [];
+      }
+      return null;
+    }, [searchController.text]);
 
     final currentCollaborators = quoteAsync.value?.collaborators ?? [];
-    final bool isProviderLoading = quoteAsync.isLoading;
+    final bool hasSearchText = searchController.text.trim().isNotEmpty;
 
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      backgroundColor: Colors.white,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SizedBox(
-        height: 500,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('协作分享',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  InkWell(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: TextField(
-                        controller: searchController,
-                        onSubmitted: (_) => handleSearch(),
-                        decoration: const InputDecoration(
-                          hintText: '搜索用户姓名',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          _buildHeader(context),
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
                     height: 40,
-                    width: 48,
-                    child: ElevatedButton(
-                      onPressed: (isSearching.value ||
-                              searchController.text.trim().isEmpty)
-                          ? null
-                          : handleSearch,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3D66D6),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2F3F5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextField(
+                      controller: searchController,
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (_) => handleSearch(),
+                      decoration: InputDecoration(
+                        hintText: '搜索姓名/工号',
+                        hintStyle: const TextStyle(
+                            color: Color(0xFFC9CDD4), fontSize: 14),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Color(0xFFC9CDD4)),
+                        suffixIcon: hasSearchText
+                            ? IconButton(
+                                icon: const Icon(Icons.cancel,
+                                    color: Colors.grey, size: 18),
+                                onPressed: () {
+                                  searchController.clear();
+                                  searchResults.value = [];
+
+                                  FocusScope.of(context).unfocus();
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10),
+                        isDense: true,
                       ),
-                      child: isSearching.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
-                          : const Icon(Icons.search, color: Colors.white),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: const Color(0xFFF5F5F5),
-              child: Text(
-                isSearchMode ? '搜索结果' : '已协作用户',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-              ),
-            ),
-            Expanded(
-              child: isSearchMode
-                  ? _buildUserList(
-                      users: searchResults.value,
-                      isLoading: isSearching.value,
-                      emptyText: hasSearched.value ? '未找到相关用户' : '请输入关键词搜索',
-                      actionText: '添加',
-                      isDestructive: false,
-                      isActionLoading: isProviderLoading,
-                      onAction: (user) async {
-                        await notifier.addCollaborator(user);
-                        EasyLoading.showSuccess('添加成功');
-                      },
-                    )
-                  : _buildUserList(
-                      users: currentCollaborators,
-                      isLoading: false,
-                      emptyText: '暂无协作用户',
-                      actionText: '移除',
-                      isDestructive: true,
-                      isActionLoading: isProviderLoading,
-                      onAction: (user) async {
-                        await notifier.removeCollaborator(user);
-                        EasyLoading.showSuccess('移除成功');
-                      },
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: hasSearchText ? handleSearch : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3D66D6),
+                      disabledBackgroundColor: const Color(0xFFE5E6EB),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
+                    child: Text(
+                      '搜索',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: hasSearchText
+                            ? Colors.white
+                            : const Color(0xFF86909C),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: const Color(0xFFF5F5F5),
-              child: Text(
-                '已协作用户 (${currentCollaborators.length})',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+          ),
+          if (hasSearchText) ...[
+            _buildSectionHeader('搜索结果'),
+            Flexible(
+              flex: 1,
+              child: _buildUserList(
+                users: searchResults.value,
+                isLoading: isSearching.value,
+                emptyText: '未找到相关用户',
+                actionType: ActionType.add,
+                onAction: (user) async {
+                  final exists =
+                      currentCollaborators.any((u) => u.id == user.id);
+                  if (exists) {
+                    EasyLoading.showToast('该用户已在协作列表中');
+                    return;
+                  }
+                  await notifier.addCollaborator(user);
+                  EasyLoading.showSuccess('添加成功');
+                },
               ),
             ),
           ],
-        ),
+          _buildSectionHeader('已协作用户 (${currentCollaborators.length})'),
+          Expanded(
+            flex: 2,
+            child: _buildUserList(
+              users: currentCollaborators,
+              isLoading: quoteAsync.isLoading,
+              emptyText: '暂无协作人员',
+              actionType: ActionType.remove,
+              onAction: (user) async {
+                await notifier.removeCollaborator(user);
+                EasyLoading.showSuccess('移除成功');
+              },
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: const Color(0xFFF7F8FA),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 12, color: Color(0xFF86909C)),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        Stack(
+          children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  '添加协作成员',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.grey),
+                onPressed: () => Navigator.pop(context),
+              ),
+            )
+          ],
+        ),
+      ],
     );
   }
 
@@ -188,47 +224,76 @@ class CollaborationDialog extends HookConsumerWidget {
     required List<User> users,
     required bool isLoading,
     required String emptyText,
-    required String actionText,
-    required bool isDestructive,
+    required ActionType actionType,
     required Function(User) onAction,
-    required bool isActionLoading,
   }) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) {
+      return const Center(
+          child: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ));
+    }
 
     if (users.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.person_off_outlined, size: 48, color: Colors.grey[300]),
-            const SizedBox(height: 8),
-            Text(emptyText, style: TextStyle(color: Colors.grey[500])),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30),
+          child: Text(emptyText, style: const TextStyle(color: Colors.grey)),
         ),
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
+      padding: EdgeInsets.zero,
       itemCount: users.length,
+      separatorBuilder: (c, i) =>
+          const Divider(height: 1, indent: 66, color: Color(0xFFF2F3F5)),
       itemBuilder: (context, index) {
         final user = users[index];
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundColor:
-                isDestructive ? Colors.grey[200] : Colors.blue[100],
-            child: Text(
-              user.name?.substring(0, 1) ?? "U",
-              style:
-                  TextStyle(color: isDestructive ? Colors.grey : Colors.blue),
-            ),
-          ),
-          title: Text(user.name ?? ""),
-          trailing: TextButton(
-            onPressed: isActionLoading ? null : () => onAction(user),
-            child: Text(
-              actionText,
-              style: TextStyle(
-                  color: isDestructive ? Colors.red : const Color(0xFF3D66D6)),
+        final isAdd = actionType == ActionType.add;
+
+        return InkWell(
+          onTap: () => onAction(user),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: const Color(0xFF3D66D6),
+                  child: Text(
+                    user.name?.substring(0, 1) ?? "U",
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name ?? "未知",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF1D2129),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => onAction(user),
+                  icon: isAdd
+                      ? const Icon(Icons.add,
+                          color: Color(0xFF3D66D6), size: 24)
+                      : const Icon(Icons.delete_outline,
+                          color: Color(0xFFF53F3F), size: 22),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
             ),
           ),
         );
@@ -236,3 +301,5 @@ class CollaborationDialog extends HookConsumerWidget {
     );
   }
 }
+
+enum ActionType { add, remove }

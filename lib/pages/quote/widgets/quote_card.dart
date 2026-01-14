@@ -139,11 +139,12 @@ class QuoteCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
         onTap: () {
-          showDialog(
+          showModalBottomSheet(
             context: context,
-            builder: (context) => CollaborationDialog(
-              quoteId: item.id!,
-            ),
+            isScrollControlled: true,
+            useSafeArea: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
           );
         },
         child: Padding(
