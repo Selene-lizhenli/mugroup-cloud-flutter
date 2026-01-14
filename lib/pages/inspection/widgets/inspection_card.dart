@@ -1,10 +1,7 @@
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/collaboration_dialog.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/providers/app_provider.dart';
-import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -135,11 +132,13 @@ class InspectionCard extends HookConsumerWidget {
                     ),
                     child: InkWell(
                       onTap: () {
-                        showDialog(
+                        showModalBottomSheet(
                           context: context,
-                          builder: (context) => CollaborationDialog(
-                            inspectionId: inspection.id!,
-                          ),
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => CollaborationBottomSheet(
+                              inspectionId: inspection.id!),
                         );
                       },
                       borderRadius: BorderRadius.circular(16),
