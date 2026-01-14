@@ -65,9 +65,9 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   @override
   void initState() {
     super.initState();
-    // 初始化时强制将维度设置为「样品间」，并根据该维度加载数据
+    // 初始化时强制将维度设置为「选样排行」，并根据该维度加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      const defaultDimension = '样品间';
+      const defaultDimension = '选样排行';
       ref
           .read(dashboardStatsProvider.notifier)
           .setSampleRoomDimension(defaultDimension);

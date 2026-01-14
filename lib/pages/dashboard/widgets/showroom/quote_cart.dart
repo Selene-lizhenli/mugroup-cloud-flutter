@@ -54,7 +54,7 @@ class _TopChartContentState extends State<TopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '挑样次数排行',
+                  '选样次数排行',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
