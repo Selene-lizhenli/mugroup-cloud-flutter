@@ -17,7 +17,7 @@ class NewsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme; 
     final media = article.media; 
-    final screenWidth = MediaQuery.of(context).size.width; 
+    final contextWidth = MediaQuery.of(context).size.width; 
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -57,13 +57,13 @@ class NewsPage extends StatelessWidget {
                           }
                           return Padding(
                             padding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 20),
+                                vertical: 0, horizontal: 0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: ImageShow(
                                 imageUrl: imageUrl, 
                                 enablePreview:true, 
-                                width: screenWidth * 94,
+                                width: contextWidth,
                                 fit: BoxFit.contain,
                                 errorIconSize: 38,
                               ),

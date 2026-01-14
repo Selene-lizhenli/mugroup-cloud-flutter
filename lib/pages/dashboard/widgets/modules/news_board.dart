@@ -111,8 +111,8 @@ class _NewsBoardState extends State<NewsBoard> {
             context.router.push(NewsRoute(article: article));
           },
           child: Container(
-              margin: EdgeInsets.fromLTRB(
-                  12, isFirst ? 10 : 0, 12, isLast ? 10 : 0),
+              margin:
+                  EdgeInsets.fromLTRB(8, isFirst ? 10 : 0, 8, isLast ? 10 : 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -122,15 +122,18 @@ class _NewsBoardState extends State<NewsBoard> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // 图片
+                      // 图片 
                       if (imageUrl != null && imageUrl.isNotEmpty)
-                        ImageShow(
-                          imageUrl: imageUrl,
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.cover,
-                          errorIconSize: 32,
-                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: ImageShow(
+                            imageUrl: imageUrl,
+                            height: 80,
+                            width: 80,
+                            fit: BoxFit.cover,
+                            errorIconSize: 32,
+                          ),
+                        ), 
                       const SizedBox(width: 10),
                       // 标题和内容
                       Expanded(
@@ -158,7 +161,7 @@ class _NewsBoardState extends State<NewsBoard> {
                                       .textTheme
                                       .bodySmall!
                                       .fontSize! *
-                                  2.4), // 2行高度 + 行间距
+                                  4), // 3行高度 + 行间距
                               child: ClipRect(
                                 child: Html(
                                   data: article.content ?? '',
