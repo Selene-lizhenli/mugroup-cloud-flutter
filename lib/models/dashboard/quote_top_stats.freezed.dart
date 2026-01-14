@@ -28,7 +28,9 @@ mixin _$QuoteTopStats {
   @JsonKey(name: 'sample_name')
   String? get sampleName => throw _privateConstructorUsedError;
   @JsonKey(name: 'id')
-  int? get id => throw _privateConstructorUsedError;
+  int? get id => throw _privateConstructorUsedError; // 样品ID，用于跳转详情页
+  @JsonKey(name: 'thumb_url')
+  String? get thumbUrl => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,7 +49,8 @@ abstract class $QuoteTopStatsCopyWith<$Res> {
       @JsonKey(name: 'sample_no') String? sampleNo,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
-      @JsonKey(name: 'id') int? id});
+      @JsonKey(name: 'id') int? id,
+      @JsonKey(name: 'thumb_url') String? thumbUrl});
 }
 
 /// @nodoc
@@ -68,6 +71,7 @@ class _$QuoteTopStatsCopyWithImpl<$Res, $Val extends QuoteTopStats>
     Object? count = freezed,
     Object? sampleName = freezed,
     Object? id = freezed,
+    Object? thumbUrl = freezed,
   }) {
     return _then(_value.copyWith(
       name: freezed == name
@@ -90,6 +94,10 @@ class _$QuoteTopStatsCopyWithImpl<$Res, $Val extends QuoteTopStats>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      thumbUrl: freezed == thumbUrl
+          ? _value.thumbUrl
+          : thumbUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -107,7 +115,8 @@ abstract class _$$QuoteTopStatsImplCopyWith<$Res>
       @JsonKey(name: 'sample_no') String? sampleNo,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
-      @JsonKey(name: 'id') int? id});
+      @JsonKey(name: 'id') int? id,
+      @JsonKey(name: 'thumb_url') String? thumbUrl});
 }
 
 /// @nodoc
@@ -126,6 +135,7 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
     Object? count = freezed,
     Object? sampleName = freezed,
     Object? id = freezed,
+    Object? thumbUrl = freezed,
   }) {
     return _then(_$QuoteTopStatsImpl(
       name: freezed == name
@@ -148,6 +158,10 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      thumbUrl: freezed == thumbUrl
+          ? _value.thumbUrl
+          : thumbUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -160,7 +174,8 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
       @JsonKey(name: 'sample_no') this.sampleNo,
       @JsonKey(name: 'count') this.count,
       @JsonKey(name: 'sample_name') this.sampleName,
-      @JsonKey(name: 'id') this.id});
+      @JsonKey(name: 'id') this.id,
+      @JsonKey(name: 'thumb_url') this.thumbUrl});
 
   factory _$QuoteTopStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuoteTopStatsImplFromJson(json);
@@ -179,10 +194,14 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
   @override
   @JsonKey(name: 'id')
   final int? id;
+// 样品ID，用于跳转详情页
+  @override
+  @JsonKey(name: 'thumb_url')
+  final String? thumbUrl;
 
   @override
   String toString() {
-    return 'QuoteTopStats(name: $name, sampleNo: $sampleNo, count: $count, sampleName: $sampleName, id: $id)';
+    return 'QuoteTopStats(name: $name, sampleNo: $sampleNo, count: $count, sampleName: $sampleName, id: $id, thumbUrl: $thumbUrl)';
   }
 
   @override
@@ -196,13 +215,15 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
             (identical(other.count, count) || other.count == count) &&
             (identical(other.sampleName, sampleName) ||
                 other.sampleName == sampleName) &&
-            (identical(other.id, id) || other.id == id));
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.thumbUrl, thumbUrl) ||
+                other.thumbUrl == thumbUrl));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, name, sampleNo, count, sampleName, id);
+      Object.hash(runtimeType, name, sampleNo, count, sampleName, id, thumbUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -220,11 +241,13 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
 abstract class _QuoteTopStats implements QuoteTopStats {
   const factory _QuoteTopStats(
-      {final String? name,
-      @JsonKey(name: 'sample_no') final String? sampleNo,
-      @JsonKey(name: 'count') final int? count,
-      @JsonKey(name: 'sample_name') final String? sampleName,
-      @JsonKey(name: 'id') final int? id}) = _$QuoteTopStatsImpl;
+          {final String? name,
+          @JsonKey(name: 'sample_no') final String? sampleNo,
+          @JsonKey(name: 'count') final int? count,
+          @JsonKey(name: 'sample_name') final String? sampleName,
+          @JsonKey(name: 'id') final int? id,
+          @JsonKey(name: 'thumb_url') final String? thumbUrl}) =
+      _$QuoteTopStatsImpl;
 
   factory _QuoteTopStats.fromJson(Map<String, dynamic> json) =
       _$QuoteTopStatsImpl.fromJson;
@@ -243,6 +266,9 @@ abstract class _QuoteTopStats implements QuoteTopStats {
   @override
   @JsonKey(name: 'id')
   int? get id;
+  @override // 样品ID，用于跳转详情页
+  @JsonKey(name: 'thumb_url')
+  String? get thumbUrl;
   @override
   @JsonKey(ignore: true)
   _$$QuoteTopStatsImplCopyWith<_$QuoteTopStatsImpl> get copyWith =>

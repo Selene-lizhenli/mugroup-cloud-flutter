@@ -12,6 +12,7 @@ class QuoteTopStats with _$QuoteTopStats {
     @JsonKey(name: 'count') int? count, 
     @JsonKey(name: 'sample_name') String? sampleName,
     @JsonKey(name: 'id') int? id, // 样品ID，用于跳转详情页
+    @JsonKey(name: 'thumb_url') String? thumbUrl, // 样品缩略图
   }) = _QuoteTopStats;
 
   factory QuoteTopStats.fromJson(Map<String, dynamic> json) =>

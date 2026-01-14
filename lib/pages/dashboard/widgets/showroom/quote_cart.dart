@@ -3,6 +3,7 @@ import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud/pages/widgets/image_show.dart';
 
 /// 样品间---统计排行图表&列表组件
 class TopChartContent extends StatefulWidget {
@@ -47,7 +48,7 @@ class _TopChartContentState extends State<TopChartContent> {
       children: [
         // 柱状图
         buildBarChart(context, displayData),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
@@ -58,7 +59,7 @@ class _TopChartContentState extends State<TopChartContent> {
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
-                      ?.copyWith(fontSize: 12, color: colorScheme.onSurface),
+                      ?.copyWith(fontSize: 13, color: colorScheme.onSurface),
                 ),
               ),
               InkWell(
@@ -73,7 +74,7 @@ class _TopChartContentState extends State<TopChartContent> {
                       Text(
                         _isExpanded ? '收起' : '展开',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           color: colorScheme.primary,
                         ),
                       ),
@@ -117,22 +118,19 @@ class _TopChartContentState extends State<TopChartContent> {
                   borderRadius: BorderRadius.circular(8),
                   child: Row(
                     children: [
-                      // 排名
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
+                      // 缩略图
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: SizedBox(
+                          width: 55, 
+                          height: 55,
+                          child: ImageShow(
+                            imageUrl: item.thumbUrl ?? '',
+                            fit: BoxFit.contain,
+                            enablePreview: false,
+                            showErrorText: true,
+                            errorIconSize: 18,
+                            errorTextSize: 7,
                           ),
                         ),
                       ),

@@ -195,7 +195,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       final List<int> inspectionData = const [],
       this.isLoading = false,
       this.timeDimension = TimeDimension.last6Months,
-      this.sampleRoomDimension = '样品间'})
+      this.sampleRoomDimension = '选样排行'})
       : _timeLabels = timeLabels,
         _productData = productData,
         _customerData = customerData,

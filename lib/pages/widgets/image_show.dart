@@ -36,6 +36,8 @@ class ImageShow extends StatelessWidget {
   final int? memCacheWidth;
   final int? memCacheHeight;
 
+  final double errorTextSize;
+
   const ImageShow({
     super.key,
     required this.imageUrl,
@@ -49,6 +51,7 @@ class ImageShow extends StatelessWidget {
     this.enablePreview = false,
     this.memCacheWidth,
     this.memCacheHeight,
+    this.errorTextSize = 9,
   });
 
   @override
@@ -65,6 +68,7 @@ class ImageShow extends StatelessWidget {
         color: Colors.grey.shade200,
         width: width ?? height,
         height: height ?? width,
+        padding: const EdgeInsets.all(4),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -80,7 +84,7 @@ class ImageShow extends StatelessWidget {
                 '图片加载失败',
                 style: TextStyle(
                   color: colorScheme.outline,
-                  fontSize: 9,
+                  fontSize: errorTextSize,
                 ),
               ),
             ],
