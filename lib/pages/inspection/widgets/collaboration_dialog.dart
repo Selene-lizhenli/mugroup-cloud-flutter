@@ -67,9 +67,9 @@ class CollaborationBottomSheet extends HookConsumerWidget {
                 Expanded(
                   child: Container(
                     height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF2F3F5),
-                      borderRadius: BorderRadius.circular(8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF2F3F5), 
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)), 
                     ),
                     child: TextField(
                       controller: searchController,
@@ -100,8 +100,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                ), 
                 SizedBox(
                   height: 40,
                   child: ElevatedButton(
@@ -111,8 +110,8 @@ class CollaborationBottomSheet extends HookConsumerWidget {
                       disabledBackgroundColor: const Color(0xFFE5E6EB),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(8), bottomRight: Radius.circular(8)),
                       ),
                     ),
                     child: Text(

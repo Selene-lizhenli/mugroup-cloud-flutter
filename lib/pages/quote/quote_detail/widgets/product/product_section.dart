@@ -270,38 +270,53 @@ class ProductSection extends HookConsumerWidget {
               ),
               const SizedBox(height: 10),
               // ===== 产品信息 =====
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ===== 产品图片 =====
-                  _ProductImage(imageUrl: imageUrl),
-                  const SizedBox(width: 12),
-                  // ===== 产品信息 =====
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _KeyValue(
-                          label: '公司货号',
-                          value: sample.productNo ?? '-',
-                          highlight: false,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    final id = sample.id;
+                    if (id == null) return;
+                    if (!context.mounted) return;
+                    context.router.push(ShowroomSampleDetailRoute(id: id));
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ===== 产品图片 =====
+                      _ProductImage(imageUrl: imageUrl),
+                      const SizedBox(width: 12),
+                      // ===== 产品信息 =====
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _KeyValue(
+                              label: '公司货号',
+                              value: sample.productNo ?? '-',
+                              highlight: false,
+                            ),
+                            const SizedBox(height: 4),
+                            _KeyValue(
+                              label: '客户报价(CNY)',
+                              value: row.price != null
+                                  ? row.price.toString()
+                                  : '-',
+                              highlight: false,
+                            ),
+                            const SizedBox(height: 4),
+                            _KeyValue(
+                              label: '采购数量',
+                              value:
+                                  row.qty != null ? row.qty.toString() : '-',
+                              highlight: false,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        _KeyValue(
-                          label: '客户报价(CNY)',
-                          value: row.price != null ? row.price.toString() : '-',
-                          highlight: false, 
-                        ),
-                        const SizedBox(height: 4),
-                        _KeyValue(
-                          label: '采购数量',
-                          value: row.qty != null ? row.qty.toString() : '-',
-                          highlight: false,
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           ),
