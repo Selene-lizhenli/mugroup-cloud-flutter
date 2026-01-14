@@ -267,14 +267,12 @@ class InspectionView extends HookConsumerWidget {
                     ),
                   )
                 else
-                  SliverToBoxAdapter(
-                    child: MasonryGridView.count(
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    sliver: SliverMasonryGrid.count(
                       crossAxisCount: 1,
                       mainAxisSpacing: 4,
-                      itemCount: inspections.value.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 1),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      childCount: inspections.value.length,
                       itemBuilder: (context, index) {
                         final inspection = inspections.value[index];
                         return InspectionCard(
