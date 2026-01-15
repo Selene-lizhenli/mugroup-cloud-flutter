@@ -28,7 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowroomSampleForm extends HookConsumerWidget {
   final Sample? initial;
-  final String? itemType;
+
   final ValueChanged<bool>? onDirtyChanged;
 
   final Future<bool?> Function(Map<String, dynamic>)? onDraft;
@@ -39,7 +39,6 @@ class ShowroomSampleForm extends HookConsumerWidget {
     required this.initial,
     this.onDraft, //预留草稿操作
     required this.onSubmit,
-    this.itemType,
     this.onDirtyChanged,
   });
 
@@ -187,7 +186,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                   final prefs =
                                       await SharedPreferences.getInstance();
                                   final jsonStr = prefs.getString(
-                                    'last_sample_data_${itemType ?? "default"}',
+                                    'last_sample_data_market_product',
                                   );
 
                                   if (jsonStr != null) {

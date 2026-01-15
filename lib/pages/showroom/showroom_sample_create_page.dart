@@ -11,22 +11,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class ShowroomSampleCreatePage extends HookConsumerWidget {
-  final String? itemType;
-  const ShowroomSampleCreatePage({super.key, this.itemType});
+  const ShowroomSampleCreatePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hasValue = useState(false);
-
-    final title = useMemoized(() {
-      if (itemType == 'sample') {
-        return '集团产品创建';
-      }
-      if (itemType == 'market_product') {
-        return '市场产品创建';
-      }
-      return '产品创建';
-    }, [itemType]);
 
     Future<void> handleBack() async {
       if (!hasValue.value) {
@@ -56,7 +45,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(title),
+            title: const Text('市场产品创建'),
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
@@ -66,20 +55,20 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
           ),
           body: ShowroomSampleForm(
             initial: null,
-            itemType: itemType,
             onDirtyChanged: (dirty) {
               hasValue.value = dirty;
             },
             onSubmit: (data) async {
               EasyLoading.show(status: '创建中...');
 
-              await storeShowroomSample({...data, 'item_type': itemType});
+              await storeShowroomSample(
+                  {...data, 'item_type': 'market_product'});
 
               EasyLoading.dismiss();
 
               final prefs = await SharedPreferences.getInstance();
               // 序列化数据并存储，Key 可以根据 itemType 区分，防止不同类型产品混用
-              String storageKey = 'last_sample_data_${itemType ?? "default"}';
+              String storageKey = 'last_sample_data_market_product';
               await prefs.setString(storageKey, jsonEncode(data));
 
               if (!context.mounted) return false;

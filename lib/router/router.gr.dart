@@ -1248,18 +1248,10 @@ class ShowroomQuotationsRouteArgs {
 
 /// generated route for
 /// [_i36.ShowroomSampleCreatePage]
-class ShowroomSampleCreateRoute
-    extends _i54.PageRouteInfo<ShowroomSampleCreateRouteArgs> {
-  ShowroomSampleCreateRoute({
-    _i57.Key? key,
-    String? itemType,
-    List<_i54.PageRouteInfo>? children,
-  }) : super(
+class ShowroomSampleCreateRoute extends _i54.PageRouteInfo<void> {
+  const ShowroomSampleCreateRoute({List<_i54.PageRouteInfo>? children})
+      : super(
           ShowroomSampleCreateRoute.name,
-          args: ShowroomSampleCreateRouteArgs(
-            key: key,
-            itemType: itemType,
-          ),
           initialChildren: children,
         );
 
@@ -1268,30 +1260,9 @@ class ShowroomSampleCreateRoute
   static _i54.PageInfo page = _i54.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ShowroomSampleCreateRouteArgs>(
-          orElse: () => const ShowroomSampleCreateRouteArgs());
-      return _i36.ShowroomSampleCreatePage(
-        key: args.key,
-        itemType: args.itemType,
-      );
+      return const _i36.ShowroomSampleCreatePage();
     },
   );
-}
-
-class ShowroomSampleCreateRouteArgs {
-  const ShowroomSampleCreateRouteArgs({
-    this.key,
-    this.itemType,
-  });
-
-  final _i57.Key? key;
-
-  final String? itemType;
-
-  @override
-  String toString() {
-    return 'ShowroomSampleCreateRouteArgs{key: $key, itemType: $itemType}';
-  }
 }
 
 /// generated route for

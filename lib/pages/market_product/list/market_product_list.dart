@@ -3,6 +3,7 @@ import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/list/widgets/product_view.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,6 +17,7 @@ class MarketProductListPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+    final colorScheme = Theme.of(context).colorScheme;
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
 
@@ -25,6 +27,20 @@ class MarketProductListPage extends HookConsumerWidget {
           elevation: 0,
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
+          actions: [
+            TextButton(
+              onPressed: () async {
+                context.router.push(const ShowroomSampleCreateRoute());
+              },
+              child: Text(
+                "新增",
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
