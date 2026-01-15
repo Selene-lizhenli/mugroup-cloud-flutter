@@ -21,7 +21,7 @@ class AppRouter extends RootStackRouter {
             path: 'dashboard',
           ),
         ],
-      ), 
+      ),
       AutoRoute(
         page: CartRoute.page,
         path: '/samples/cart',
@@ -47,25 +47,21 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: InspectionItemConfirmRoute.page,
           path: "/inspection/item/confirm"),
-      // AutoRoute(
-      //   page: MarketProductRoute.page,
-      //   guards: [AuthGuard()],
-      //   path: '/market_product',
-      //   children: [
-      //     AutoRoute(
-      //       page: MarketProductInfoRoute.page,
-      //       path: "index",
-      //     ),
-      //     AutoRoute(
-      //       page: QuoteRoute.page,
-      //       path: "quotation",
-      //       initial: true,
-      //     ),
-      //   ],
-      // ),
       AutoRoute(
-        page: QuoteRoute.page,
-        path: "/quotation",
+        page: MarketProductRoute.page,
+        guards: [AuthGuard()],
+        path: '/market_product',
+        children: [
+          AutoRoute(
+            page: MarketProductListRoute.page,
+            path: "index",
+          ),
+          AutoRoute(
+            page: QuoteRoute.page,
+            path: "quotation",
+            initial: true,
+          ),
+        ],
       ),
 
       AutoRoute(page: LoginRoute.page, path: "/login"),
