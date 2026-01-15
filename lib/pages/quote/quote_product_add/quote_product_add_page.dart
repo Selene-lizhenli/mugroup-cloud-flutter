@@ -50,6 +50,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
+    final autoValidateMode = useState(AutovalidateMode.disabled);
+
     // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
     useEffect(() {
       if (!isActive && savedFormData != null && formKey.currentState != null) {
@@ -167,6 +169,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: FormBuilder(
                   key: formKey,
+                  autovalidateMode: autoValidateMode.value,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -285,6 +288,12 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         children: [
                           FormBuilderField<Map<String, dynamic>>(
                             name: 'supplyQuote',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '该项不能为空';
+                              }
+                              return null;
+                            },
                             builder: (field) {
                               final supplier = field.value;
                               return GestureDetector(
@@ -306,12 +315,14 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   child: Input(
                                     label: '供应商',
                                     showClearButton: false,
+                                    isRequired: true,
                                     value: supplier == null
                                         ? ''
                                         : (supplier['short_name'] ??
                                             supplier['name'] ??
                                             ''),
                                     hintText: '请选择供应商',
+                                    errorText: field.errorText,
                                   ),
                                 ),
                               );
@@ -385,12 +396,20 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                               if (isVisible('supplier_price'))
                                 Expanded(
                                   child: FormBuilderField<String>(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '该项不能为空';
+                                      }
+                                      return null;
+                                    },
                                     name: "supplier_price",
                                     builder: (field) {
                                       return Input(
-                                        label: '供应商报价',
+                                        label: '供应商报价(￥)',
+                                        isRequired: true,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
+                                        errorText: field.errorText,
                                       );
                                     },
                                   ),
@@ -753,6 +772,9 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                               Navigator.of(context).pop(true);
                             }
                           }
+                        } else {
+                          autoValidateMode.value =
+                              AutovalidateMode.onUserInteraction;
                         }
                       },
                       child: const Text(

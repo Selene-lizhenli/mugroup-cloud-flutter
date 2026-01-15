@@ -13,6 +13,7 @@ class Input extends HookConsumerWidget {
 
   final String? errorText;
   final bool showClearButton;
+  final bool isRequired;
 
   final List<TextInputFormatter>? inputFormatters;
 
@@ -27,6 +28,7 @@ class Input extends HookConsumerWidget {
     this.errorText,
     this.inputFormatters,
     this.showClearButton = true,
+    this.isRequired = false,
   });
 
   @override
@@ -40,10 +42,6 @@ class Input extends HookConsumerWidget {
     useEffect(() {
       if (controller.text != value) {
         controller.text = value;
-        // 保持光标在末尾
-        controller.selection = TextSelection.fromPosition(
-          TextPosition(offset: controller.text.length),
-        );
       }
       return null;
     }, [value]);
@@ -54,14 +52,29 @@ class Input extends HookConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. 标签优化：字号微调，颜色更柔和
         if (label.isNotEmpty) ...[
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          RichText(
+            text: TextSpan(
+              children: [
+                if (isRequired)
+                  const TextSpan(
+                    text: '* ',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      height: 1.0,
+                    ),
+                  ),
+                TextSpan(
+                  text: label,
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
