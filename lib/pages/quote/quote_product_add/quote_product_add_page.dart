@@ -451,7 +451,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         ),
                         children: [
                           FormBuilderField<Map<String, dynamic>>(
-                            name: 'supplyQuote',
+                            name: 'supplier',
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return '该项不能为空';
@@ -715,10 +715,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     },
                                   ),
                                 ),
-                              if (isVisible('product_unit'))
+                              if (isVisible('unit'))
                                 Expanded(
                                   child: FormBuilderField<String>(
-                                    name: "product_unit",
+                                    name: "unit",
                                     builder: (field) {
                                       return Input(
                                         label: '单位',
@@ -730,27 +730,26 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                 ),
                             ],
                           ),
-                          if (isVisible('product_name_cn'))
+                          if (isVisible('name_cn'))
                             FormBuilderField<String>(
-                              name: "product_name_cn",
+                              name: "name_cn",
                               builder: (field) {
                                 return TranslatableInput(
                                   label: '中文名称',
-                                  sourceText: formKey.currentState
-                                      ?.fields['product_name_cn']?.value,
+                                  sourceText: formKey
+                                      .currentState?.fields['name_cn']?.value,
                                   value: field.value ?? '',
                                   onChanged: field.didChange,
                                   onTranslateChanged: (value) {
-                                    formKey
-                                        .currentState?.fields['product_name_en']
+                                    formKey.currentState?.fields['name_en']
                                         ?.didChange(value);
                                   },
                                 );
                               },
                             ),
-                          if (isVisible('product_name_en'))
+                          if (isVisible('name_en'))
                             FormBuilderField<String>(
-                              name: "product_name_en",
+                              name: "name_en",
                               builder: (field) {
                                 return Input(
                                   label: '英文名称',
@@ -778,10 +777,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   },
                                 ),
                               ),
-                            if (isVisible('inner_qty'))
+                            if (isVisible('inner_capacity'))
                               Expanded(
                                 child: FormBuilderField<String>(
-                                  name: "inner_qty",
+                                  name: "inner_capacity",
                                   builder: (field) {
                                     return Input(
                                       label: '内箱数量',
@@ -823,10 +822,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     },
                                   ),
                                 ),
-                              if (isVisible('outer_qty'))
+                              if (isVisible('outer_capacity'))
                                 Expanded(
                                   child: FormBuilderField<String>(
-                                    name: "outer_qty",
+                                    name: "outer_capacity",
                                     builder: (field) {
                                       return Input(
                                         label: '外箱数量',
@@ -837,10 +836,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     },
                                   ),
                                 ),
-                              if (isVisible('volume'))
+                              if (isVisible('outer_volume'))
                                 Expanded(
                                   child: FormBuilderField<String>(
-                                    name: "volume",
+                                    name: "outer_volume",
                                     builder: (field) {
                                       return Input(
                                         label: '体积',
@@ -977,7 +976,30 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                           final Map<String, dynamic> submitValues =
                               Map.from(formState!.value);
 
-                          final supplier = submitValues['supplyQuote'];
+                          final supplier = submitValues['supplier'];
+
+                          submitValues['supply_quotes'] = [
+                            {
+                              "supplier_id": supplier['id'],
+                              'supplier': supplier,
+                              "product_no": submitValues["product_no"],
+                              'product_brand': submitValues["product_brand"],
+                              'supplier_sku': submitValues["supplier_sku"],
+                              "customer_sku": submitValues["customer_sku"],
+                              'supplier_price': submitValues["supplier_price"],
+                              "deliver_day": submitValues["deliver_day"],
+                              "supplier_moq": submitValues["supplier_moq"],
+                              "customer_price": submitValues["customer_price"],
+                              "customer_qty": submitValues["customer_qty"],
+                              "unit": submitValues["unit"],
+                              "material": submitValues["material"],
+                              "inner_capacity": submitValues["inner_capacity"],
+                              "weight": submitValues["weight"],
+                              "packing": submitValues["packing"],
+                              "outer_capacity": submitValues["outer_capacity"],
+                              "outer_volume": submitValues["outer_volume"],
+                            }
+                          ];
 
                           final length =
                               submitValues['length']?.toString() ?? '';
