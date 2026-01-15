@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
@@ -16,6 +17,7 @@ import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/providers/quote_product_form_provider.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
@@ -232,6 +234,23 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
         title: const Text('添加报价产品'),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              context.router.push(QuoteProductAddAdaptiveRoute(
+                quoteId: quoteId,
+                initialMode: 1,
+              ));
+            },
+            child: Text(
+              "平板模式",
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
