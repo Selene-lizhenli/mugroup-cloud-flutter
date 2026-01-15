@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
@@ -24,22 +26,23 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'dart:async';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QuoteProductAddLandscapeView extends HookConsumerWidget {
   final int? quoteId;
   final bool isActive;
-  final Map<String, dynamic>? initialSupplier; 
+  final Map<String, dynamic>? initialSupplier;
   const QuoteProductAddLandscapeView({
     super.key,
     this.quoteId,
     this.initialSupplier,
-    required this.isActive, 
+    required this.isActive,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
     final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
     final savedFormData = ref.watch(quoteProductFormDataProvider);
 
@@ -50,6 +53,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
+
+    final autoValidateMode = useState(AutovalidateMode.disabled);
 
     // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
     useEffect(() {
@@ -95,7 +100,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       return null;
     }, [initialSupplier]);
 
-
     bool isVisible(String name) {
       return fieldConfigs
           .firstWhere(
@@ -136,7 +140,30 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       if (formState?.saveAndValidate() ?? false) {
         final Map<String, dynamic> submitValues = Map.from(formState!.value);
 
-        final supplier = submitValues['supplyQuote'];
+        final supplier = submitValues['supplier'];
+
+        submitValues['supply_quotes'] = [
+          {
+            "supplier_id": supplier['id'],
+            'supplier': supplier,
+            "product_no": submitValues["product_no"],
+            'product_brand': submitValues["product_brand"],
+            'supplier_sku': submitValues["supplier_sku"],
+            "customer_sku": submitValues["customer_sku"],
+            'supplier_price': submitValues["supplier_price"],
+            "deliver_day": submitValues["deliver_day"],
+            "supplier_moq": submitValues["supplier_moq"],
+            "customer_price": submitValues["customer_price"],
+            "customer_qty": submitValues["customer_qty"],
+            "unit": submitValues["unit"],
+            "material": submitValues["material"],
+            "inner_capacity": submitValues["inner_capacity"],
+            "weight": submitValues["weight"],
+            "packing": submitValues["packing"],
+            "outer_capacity": submitValues["outer_capacity"],
+            "outer_volume": submitValues["outer_volume"],
+          }
+        ];
         final length = submitValues['length']?.toString() ?? '';
         final width = submitValues['width']?.toString() ?? '';
         final height = submitValues['heigth']?.toString() ?? '';
@@ -224,6 +251,75 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       }
     }
 
+    Future<void> autoFillSkuFromCache() async {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString('sku_settings_pref_v1');
+
+      if (jsonStr == null) return;
+
+      try {
+        final data = jsonDecode(jsonStr);
+        final bool isAutoFill = data['isAutoFill'] ?? false;
+
+        if (!isAutoFill) return;
+
+        final int type = data['generationType'] ?? 0;
+        String generatedSku = '';
+
+        if (type == 0) {
+          final now = DateTime.now();
+          final dateStr = DateFormat('yyMMdd').format(now);
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          final rnd = Random();
+          final randomStr = String.fromCharCodes(Iterable.generate(
+              4, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+          generatedSku = "$dateStr$randomStr";
+        } else if (type == 1) {
+          return;
+        } else if (type == 2) {
+          final String prefix = data['customPrefix'] ?? '';
+          final mockSerial = Random().nextInt(9999).toString().padLeft(4, '0');
+          generatedSku = "$prefix$mockSerial";
+        }
+
+        if (generatedSku.isEmpty) return;
+
+        final bool syncSupplier = data['syncSupplier'] ?? true;
+        final bool syncCustomer = data['syncCustomer'] ?? true;
+
+        final currentValues = formKey.currentState?.value ?? {};
+
+        Map<String, dynamic> patchData = {};
+
+        if ((currentValues['product_no']?.toString().isEmpty ?? true)) {
+          patchData['product_no'] = generatedSku;
+        }
+
+        if (syncSupplier &&
+            (currentValues['supplier_sku']?.toString().isEmpty ?? true)) {
+          patchData['supplier_sku'] = generatedSku;
+        }
+
+        if (syncCustomer &&
+            (currentValues['customer_sku']?.toString().isEmpty ?? true)) {
+          patchData['customer_sku'] = generatedSku;
+        }
+
+        if (patchData.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            formKey.currentState?.patchValue(patchData);
+          });
+        }
+      } catch (e) {
+        debugPrint("自动填充SKU出错: $e");
+      }
+    }
+
+    useEffect(() {
+      autoFillSkuFromCache();
+      return null;
+    }, []);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F3F5),
       appBar: AppBar(
@@ -268,6 +364,80 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                             children: [
                               FormBuilderField<List<dynamic>>(
                                 name: "image",
+                                onChanged: (images) async {
+                                  if (images == null || images.isEmpty) return;
+
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  final jsonStr =
+                                      prefs.getString('sku_settings_pref_v1');
+                                  if (jsonStr == null) return;
+
+                                  final data = jsonDecode(jsonStr);
+                                  final bool isAutoFill =
+                                      data['isAutoFill'] ?? false;
+                                  final int type = data['generationType'] ?? 0;
+
+                                  if (isAutoFill && type == 1) {
+                                    String filename = "";
+                                    try {
+                                      dynamic firstImg = images.first;
+
+                                      if (firstImg is String) {
+                                        filename = firstImg.split('/').last;
+                                      } else if (firstImg is Map) {
+                                        filename = firstImg['url'] ??
+                                            firstImg['path'] ??
+                                            '';
+                                        filename = filename.split('/').last;
+                                      } else if (firstImg.runtimeType
+                                              .toString() ==
+                                          'Media') {
+                                        filename = (firstImg as dynamic)
+                                                .url
+                                                ?.split('/')
+                                                .last ??
+                                            '';
+                                      } else {
+                                        filename =
+                                            firstImg.toString().split('/').last;
+                                      }
+
+                                      if (filename.contains('.')) {
+                                        filename = filename.substring(
+                                            0, filename.lastIndexOf('.'));
+                                      }
+
+                                      if (filename.length > 15) {
+                                        filename = filename.substring(0, 15);
+                                      }
+                                      filename = filename.toUpperCase();
+                                    } catch (e) {
+                                      debugPrint("解析文件名失败: $e");
+                                      return;
+                                    }
+
+                                    if (filename.isEmpty) return;
+
+                                    final bool syncSupplier =
+                                        data['syncSupplier'] ?? true;
+                                    final bool syncCustomer =
+                                        data['syncCustomer'] ?? true;
+
+                                    Map<String, dynamic> patchData = {};
+
+                                    patchData['product_no'] = filename;
+
+                                    if (syncSupplier) {
+                                      patchData['supplier_sku'] = filename;
+                                    }
+                                    if (syncCustomer) {
+                                      patchData['customer_sku'] = filename;
+                                    }
+
+                                    formKey.currentState?.patchValue(patchData);
+                                  }
+                                },
                                 builder: (field) {
                                   List<TemporaryMedia> displayValue = [];
                                   if (field.value != null) {
@@ -450,37 +620,128 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                 ),
                                 children: [
                                   FormBuilderField<Map<String, dynamic>>(
-                                    name: 'supplyQuote',
+                                    name: 'supplier',
                                     builder: (field) {
                                       final supplier = field.value;
-                                      return GestureDetector(
-                                        onTap: () async {
-                                          final selected =
-                                              await showModalBottomSheet<
-                                                  Map<String, dynamic>>(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                            builder: (_) =>
-                                                const SupplierSelect(),
-                                          );
-                                          logger.d('selected${selected}');
-                                          if (selected != null) {
-                                            field.didChange(selected);
-                                          }
-                                        },
-                                        child: AbsorbPointer(
-                                          child: Input(
-                                            label: '供应商',
-                                            showClearButton: false,
-                                            value: supplier == null
-                                                ? ''
-                                                : (supplier['short_name'] ??
-                                                    supplier['name'] ??
-                                                    ''),
-                                            hintText: '请选择供应商',
-                                          ),
-                                        ),
+                                      return Row(
+                                        children: [
+                                          Expanded(
+                                              child: GestureDetector(
+                                            onTap: () async {
+                                              final selectedSupplier =
+                                                  await showModalBottomSheet<
+                                                      Map<String, dynamic>>(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                builder: (_) =>
+                                                    const SupplierSelect(),
+                                              );
+
+                                              if (selectedSupplier != null) {
+                                                field.didChange(
+                                                    selectedSupplier);
+                                              }
+                                            },
+                                            child: AbsorbPointer(
+                                              child: Input(
+                                                label: '供应商',
+                                                showClearButton: false,
+                                                isRequired: true,
+                                                value: supplier == null
+                                                    ? ''
+                                                    : (supplier['short_name'] ??
+                                                        supplier['name'] ??
+                                                        ''),
+                                                hintText: '请选择供应商',
+                                                errorText: field.errorText,
+                                              ),
+                                            ),
+                                          )),
+                                          const SizedBox(width: 8), // 间距
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 28),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  final currentImages = formKey
+                                                      .currentState
+                                                      ?.fields['image']
+                                                      ?.value;
+
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        SkuSettingsDialog(
+                                                      currentImages:
+                                                          currentImages is List
+                                                              ? currentImages
+                                                              : [],
+                                                      onConfirm: (generatedSku,
+                                                          syncSupplier,
+                                                          syncCustomer) {
+                                                        if (generatedSku
+                                                            .isEmpty) {
+                                                          return;
+                                                        }
+
+                                                        Map<String, dynamic>
+                                                            patchData = {};
+
+                                                        patchData[
+                                                                'product_no'] =
+                                                            generatedSku;
+
+                                                        if (syncSupplier) {
+                                                          patchData[
+                                                                  'supplier_sku'] =
+                                                              generatedSku;
+                                                        }
+                                                        if (syncCustomer) {
+                                                          patchData[
+                                                                  'customer_sku'] =
+                                                              generatedSku;
+                                                        }
+
+                                                        formKey.currentState
+                                                            ?.patchValue(
+                                                                patchData);
+
+                                                        EasyLoading.showSuccess(
+                                                            'SKU已生成并填充');
+                                                      },
+                                                    ),
+                                                  );
+                                                },
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: colorScheme
+                                                            .primary),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    color: colorScheme.primary,
+                                                  ),
+                                                  child: const Text(
+                                                    "SKU设置",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ))
+                                        ],
                                       );
                                     },
                                   ),
@@ -545,10 +806,21 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                         Expanded(
                                           child: FormBuilderField<String>(
                                             name: "supplier_price",
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return '该项不能为空';
+                                              }
+                                              return null;
+                                            },
                                             builder: (field) => Input(
-                                              label: '供应商报价',
+                                              label: '供应商报价(￥)',
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              isRequired: true,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
+                                              errorText: field.errorText,
                                             ),
                                           ),
                                         ),
@@ -558,6 +830,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             name: "deliver_day",
                                             builder: (field) => Input(
                                               label: '发货天数',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
@@ -569,6 +843,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             name: "supplier_moq",
                                             builder: (field) => Input(
                                               label: '供应商MOQ',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
@@ -585,6 +861,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             name: "customer_price",
                                             builder: (field) => Input(
                                               label: '客户报价',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
@@ -596,15 +874,17 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             name: "customer_qty",
                                             builder: (field) => Input(
                                               label: '客户采购数量',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
                                           ),
                                         ),
-                                      if (isVisible('product_unit'))
+                                      if (isVisible('unit'))
                                         Expanded(
                                           child: FormBuilderField<String>(
-                                            name: "product_unit",
+                                            name: "unit",
                                             builder: (field) => Input(
                                               label: '单位',
                                               value: field.value ?? '',
@@ -614,25 +894,25 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                         ),
                                     ],
                                   ),
-                                  if (isVisible('product_name_cn'))
+                                  if (isVisible('name_cn'))
                                     FormBuilderField<String>(
-                                      name: "product_name_cn",
+                                      name: "name_cn",
                                       builder: (field) => TranslatableInput(
                                         label: '中文名称',
                                         sourceText: formKey.currentState
-                                            ?.fields['product_name_cn']?.value,
+                                            ?.fields['name_cn']?.value,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                         onTranslateChanged: (value) {
-                                          formKey.currentState
-                                              ?.fields['product_name_en']
+                                          formKey
+                                              .currentState?.fields['name_en']
                                               ?.didChange(value);
                                         },
                                       ),
                                     ),
-                                  if (isVisible('product_name_en'))
+                                  if (isVisible('name_en'))
                                     FormBuilderField<String>(
-                                      name: "product_name_en",
+                                      name: "name_en",
                                       builder: (field) => Input(
                                         label: '英文名称',
                                         value: field.value ?? '',
@@ -657,12 +937,13 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                           ),
                                         ),
                                       ),
-                                    if (isVisible('inner_qty'))
+                                    if (isVisible('inner_capacity'))
                                       Expanded(
                                         child: FormBuilderField<String>(
-                                          name: "inner_qty",
+                                          name: "inner_capacity",
                                           builder: (field) => Input(
                                             label: '内箱数量',
+                                            keyboardType: TextInputType.number,
                                             value: field.value ?? '',
                                             onChanged: field.didChange,
                                           ),
@@ -674,6 +955,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                           name: "weight",
                                           builder: (field) => Input(
                                             label: '重量',
+                                            keyboardType: TextInputType.number,
                                             value: field.value ?? '',
                                             onChanged: field.didChange,
                                           ),
@@ -694,23 +976,27 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             ),
                                           ),
                                         ),
-                                      if (isVisible('outer_qty'))
+                                      if (isVisible('outer_capacity'))
                                         Expanded(
                                           child: FormBuilderField<String>(
-                                            name: "outer_qty",
+                                            name: "outer_capacity",
                                             builder: (field) => Input(
                                               label: '外箱数量',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
                                           ),
                                         ),
-                                      if (isVisible('volume'))
+                                      if (isVisible('outer_volume'))
                                         Expanded(
                                           child: FormBuilderField<String>(
-                                            name: "volume",
+                                            name: "outer_volume",
                                             builder: (field) => Input(
                                               label: '体积',
+                                              keyboardType:
+                                                  TextInputType.number,
                                               value: field.value ?? '',
                                               onChanged: field.didChange,
                                             ),
