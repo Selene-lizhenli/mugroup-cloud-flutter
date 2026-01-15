@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
@@ -23,6 +25,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'dart:async';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QuoteProductAddPortraitView extends HookConsumerWidget {
@@ -155,6 +158,75 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       }
     }
 
+    Future<void> autoFillSkuFromCache() async {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString('sku_settings_pref_v1');
+
+      if (jsonStr == null) return;
+
+      try {
+        final data = jsonDecode(jsonStr);
+        final bool isAutoFill = data['isAutoFill'] ?? false;
+
+        if (!isAutoFill) return;
+
+        final int type = data['generationType'] ?? 0;
+        String generatedSku = '';
+
+        if (type == 0) {
+          final now = DateTime.now();
+          final dateStr = DateFormat('yyMMdd').format(now);
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          final rnd = Random();
+          final randomStr = String.fromCharCodes(Iterable.generate(
+              4, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+          generatedSku = "$dateStr$randomStr";
+        } else if (type == 1) {
+          return;
+        } else if (type == 2) {
+          final String prefix = data['customPrefix'] ?? '';
+          final mockSerial = Random().nextInt(9999).toString().padLeft(4, '0');
+          generatedSku = "$prefix$mockSerial";
+        }
+
+        if (generatedSku.isEmpty) return;
+
+        final bool syncSupplier = data['syncSupplier'] ?? true;
+        final bool syncCustomer = data['syncCustomer'] ?? true;
+
+        final currentValues = formKey.currentState?.value ?? {};
+
+        Map<String, dynamic> patchData = {};
+
+        if ((currentValues['product_no']?.toString().isEmpty ?? true)) {
+          patchData['product_no'] = generatedSku;
+        }
+
+        if (syncSupplier &&
+            (currentValues['supplier_sku']?.toString().isEmpty ?? true)) {
+          patchData['supplier_sku'] = generatedSku;
+        }
+
+        if (syncCustomer &&
+            (currentValues['customer_sku']?.toString().isEmpty ?? true)) {
+          patchData['customer_sku'] = generatedSku;
+        }
+
+        if (patchData.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            formKey.currentState?.patchValue(patchData);
+          });
+        }
+      } catch (e) {
+        debugPrint("自动填充SKU出错: $e");
+      }
+    }
+
+    useEffect(() {
+      autoFillSkuFromCache();
+      return null;
+    }, []);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加报价产品'),
@@ -197,6 +269,79 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         children: [
                           FormBuilderField<List<dynamic>>(
                             name: "image",
+                            onChanged: (images) async {
+                              if (images == null || images.isEmpty) return;
+
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final jsonStr =
+                                  prefs.getString('sku_settings_pref_v1');
+                              if (jsonStr == null) return;
+
+                              final data = jsonDecode(jsonStr);
+                              final bool isAutoFill =
+                                  data['isAutoFill'] ?? false;
+                              final int type = data['generationType'] ?? 0;
+
+                              if (isAutoFill && type == 1) {
+                                String filename = "";
+                                try {
+                                  dynamic firstImg = images.first;
+
+                                  if (firstImg is String) {
+                                    filename = firstImg.split('/').last;
+                                  } else if (firstImg is Map) {
+                                    filename = firstImg['url'] ??
+                                        firstImg['path'] ??
+                                        '';
+                                    filename = filename.split('/').last;
+                                  } else if (firstImg.runtimeType.toString() ==
+                                      'Media') {
+                                    filename = (firstImg as dynamic)
+                                            .url
+                                            ?.split('/')
+                                            .last ??
+                                        '';
+                                  } else {
+                                    filename =
+                                        firstImg.toString().split('/').last;
+                                  }
+
+                                  if (filename.contains('.')) {
+                                    filename = filename.substring(
+                                        0, filename.lastIndexOf('.'));
+                                  }
+
+                                  if (filename.length > 15) {
+                                    filename = filename.substring(0, 15);
+                                  }
+                                  filename = filename.toUpperCase();
+                                } catch (e) {
+                                  debugPrint("解析文件名失败: $e");
+                                  return;
+                                }
+
+                                if (filename.isEmpty) return;
+
+                                final bool syncSupplier =
+                                    data['syncSupplier'] ?? true;
+                                final bool syncCustomer =
+                                    data['syncCustomer'] ?? true;
+
+                                Map<String, dynamic> patchData = {};
+
+                                patchData['product_no'] = filename;
+
+                                if (syncSupplier) {
+                                  patchData['supplier_sku'] = filename;
+                                }
+                                if (syncCustomer) {
+                                  patchData['customer_sku'] = filename;
+                                }
+
+                                formKey.currentState?.patchValue(patchData);
+                              }
+                            },
                             builder: (field) {
                               List<TemporaryMedia> displayValue = [];
 
@@ -296,35 +441,110 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                             },
                             builder: (field) {
                               final supplier = field.value;
-                              return GestureDetector(
-                                onTap: () async {
-                                  final selectedSupplier =
-                                      await showModalBottomSheet<
-                                          Map<String, dynamic>>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (_) => const SupplierSelect(),
-                                  );
+                              return Row(
+                                children: [
+                                  Expanded(
+                                      child: GestureDetector(
+                                    onTap: () async {
+                                      final selectedSupplier =
+                                          await showModalBottomSheet<
+                                              Map<String, dynamic>>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (_) => const SupplierSelect(),
+                                      );
 
-                                  if (selectedSupplier != null) {
-                                    field.didChange(selectedSupplier);
-                                  }
-                                },
-                                child: AbsorbPointer(
-                                  child: Input(
-                                    label: '供应商',
-                                    showClearButton: false,
-                                    isRequired: true,
-                                    value: supplier == null
-                                        ? ''
-                                        : (supplier['short_name'] ??
-                                            supplier['name'] ??
-                                            ''),
-                                    hintText: '请选择供应商',
-                                    errorText: field.errorText,
-                                  ),
-                                ),
+                                      if (selectedSupplier != null) {
+                                        field.didChange(selectedSupplier);
+                                      }
+                                    },
+                                    child: AbsorbPointer(
+                                      child: Input(
+                                        label: '供应商',
+                                        showClearButton: false,
+                                        isRequired: true,
+                                        value: supplier == null
+                                            ? ''
+                                            : (supplier['short_name'] ??
+                                                supplier['name'] ??
+                                                ''),
+                                        hintText: '请选择供应商',
+                                        errorText: field.errorText,
+                                      ),
+                                    ),
+                                  )),
+                                  const SizedBox(width: 8), // 间距
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 28),
+                                      child: InkWell(
+                                        onTap: () {
+                                          final currentImages = formKey
+                                              .currentState
+                                              ?.fields['image']
+                                              ?.value;
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                SkuSettingsDialog(
+                                              currentImages:
+                                                  currentImages is List
+                                                      ? currentImages
+                                                      : [],
+                                              onConfirm: (generatedSku,
+                                                  syncSupplier, syncCustomer) {
+                                                if (generatedSku.isEmpty) {
+                                                  return;
+                                                }
+
+                                                Map<String, dynamic> patchData =
+                                                    {};
+
+                                                patchData['product_no'] =
+                                                    generatedSku;
+
+                                                // 3. 根据勾选同步更新
+                                                if (syncSupplier) {
+                                                  patchData['supplier_sku'] =
+                                                      generatedSku;
+                                                }
+                                                if (syncCustomer) {
+                                                  patchData['customer_sku'] =
+                                                      generatedSku;
+                                                }
+
+                                                formKey.currentState
+                                                    ?.patchValue(patchData);
+
+                                                EasyLoading.showSuccess(
+                                                    'SKU已生成并填充');
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: colorScheme.primary),
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            color: colorScheme.primary,
+                                          ),
+                                          child: const Text(
+                                            "SKU设置",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ))
+                                ],
                               );
                             },
                           ),
