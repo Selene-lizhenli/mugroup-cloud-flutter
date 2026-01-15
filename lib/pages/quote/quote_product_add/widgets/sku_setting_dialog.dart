@@ -130,6 +130,9 @@ class SkuSettingsDialog extends HookWidget {
       backgroundColor: Colors.white,
       child: Container(
         width: 380,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -148,129 +151,137 @@ class SkuSettingsDialog extends HookWidget {
               ],
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('自动填充SKU',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500)),
-                    Text('启用后将自动生成SKU编码填充到表单',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-                Switch(
-                  value: isAutoFill.value,
-                  onChanged: (v) => isAutoFill.value = v,
-                  activeColor: Colors.white,
-                  activeTrackColor: colorScheme.primary,
-                )
-              ],
-            ),
-            if (isAutoFill.value) ...[
-              const Divider(height: 30),
-              const Text('选择生成方式',
-                  style: TextStyle(color: Colors.grey, fontSize: 13)),
-              const SizedBox(height: 10),
-
-              // 选项组
-              _buildOption(
-                  context, 0, '随机货号', '格式：YYMMDD+4位随机字母', generationType),
-              const SizedBox(height: 8),
-              _buildOption(context, 1, '首张图片名', '使用上传图片的文件名', generationType),
-              const SizedBox(height: 8),
-
-              // 自定义选项
-              GestureDetector(
-                onTap: () => generationType.value = 2,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    border: Border.all(
-                        color: generationType.value == 2
-                            ? colorScheme.primary
-                            : Colors.transparent,
-                        width: 1.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('自动填充SKU',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                            Text('启用后将自动生成SKU编码填充到表单',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                          ],
+                        ),
+                        Switch(
+                          value: isAutoFill.value,
+                          onChanged: (v) => isAutoFill.value = v,
+                          activeColor: Colors.white,
+                          activeTrackColor: colorScheme.primary,
+                        )
+                      ],
+                    ),
+                    if (isAutoFill.value) ...[
+                      const Divider(height: 30),
+                      const Text('选择生成方式',
+                          style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      const SizedBox(height: 10),
+                      _buildOption(context, 0, '随机货号', '格式：YYMMDD+4位随机字母',
+                          generationType),
+                      const SizedBox(height: 8),
+                      _buildOption(
+                          context, 1, '首张图片名', '使用上传图片的文件名', generationType),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => generationType.value = 2,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            border: Border.all(
+                                color: generationType.value == 2
+                                    ? colorScheme.primary
+                                    : Colors.transparent,
+                                width: 1.5),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Radio<int>(
+                                    value: 2,
+                                    groupValue: generationType.value,
+                                    onChanged: (v) => generationType.value = v!,
+                                    activeColor: colorScheme.primary,
+                                  ),
+                                  const Text('自定义前缀',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              if (generationType.value == 2)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 40, right: 10, bottom: 10),
+                                  child: TextField(
+                                    controller: customPrefixController,
+                                    decoration: const InputDecoration(
+                                      hintText: '输入前缀 (如ABC)',
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 8),
+                                      border: OutlineInputBorder(),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                    ),
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F7FA),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                  isLoading.value
+                                      ? '加载配置中...'
+                                      : 'SKU预览: ${previewText.value}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87)),
+                            ),
+                            InkWell(
+                              onTap: () => previewText.value = calculateSku(),
+                              child: Icon(Icons.refresh,
+                                  size: 18, color: colorScheme.primary),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      const Text('同步应用到',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       Row(
                         children: [
-                          Radio<int>(
-                            value: 2,
-                            groupValue: generationType.value,
-                            onChanged: (v) => generationType.value = v!,
-                            activeColor: colorScheme.primary,
-                          ),
-                          const Text('自定义前缀',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          _buildCheckbox('供应商货号', syncSupplier),
+                          const SizedBox(width: 20),
+                          _buildCheckbox('客户货号', syncCustomer),
                         ],
                       ),
-                      if (generationType.value == 2)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 40, right: 10, bottom: 10),
-                          child: TextField(
-                            controller: customPrefixController,
-                            decoration: const InputDecoration(
-                              hintText: '输入前缀 (如ABC)',
-                              isDense: true,
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 8),
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                        )
                     ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F7FA),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                        isLoading.value
-                            ? '加载配置中...'
-                            : 'SKU预览: ${previewText.value}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87)),
-                    InkWell(
-                      onTap: () => previewText.value = calculateSku(),
-                      child: Icon(Icons.refresh,
-                          size: 18, color: colorScheme.primary),
-                    )
                   ],
                 ),
               ),
-
-              const SizedBox(height: 15),
-              const Text('同步应用到',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Row(
-                children: [
-                  _buildCheckbox('供应商货号', syncSupplier),
-                  const SizedBox(width: 20),
-                  _buildCheckbox('客户货号', syncCustomer),
-                ],
-              ),
-            ],
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
