@@ -406,6 +406,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '供应商报价(￥)',
+                                        keyboardType: TextInputType.number,
                                         isRequired: true,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
@@ -421,6 +422,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '发货天数',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
@@ -434,6 +436,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '供应商MOQ',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
@@ -452,6 +455,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '客户报价',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
@@ -465,6 +469,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '客户采购数量',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
@@ -541,6 +546,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   builder: (field) {
                                     return Input(
                                       label: '内箱数量',
+                                      keyboardType: TextInputType.number,
                                       value: field.value ?? '',
                                       onChanged: field.didChange,
                                     );
@@ -554,6 +560,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   builder: (field) {
                                     return Input(
                                       label: '重量',
+                                      keyboardType: TextInputType.number,
                                       value: field.value ?? '',
                                       onChanged: field.didChange,
                                     );
@@ -584,6 +591,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '外箱数量',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
@@ -597,6 +605,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     builder: (field) {
                                       return Input(
                                         label: '体积',
+                                        keyboardType: TextInputType.number,
                                         value: field.value ?? '',
                                         onChanged: field.didChange,
                                       );
