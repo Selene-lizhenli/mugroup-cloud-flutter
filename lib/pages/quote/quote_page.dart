@@ -373,8 +373,7 @@ class _QuotePageState extends State<QuotePage>
                 if (tempId == null) return;
                 context.router.push(
                   QuoteDetailRoute(
-                    id: tempId,
-                    userId: item.user?.id ?? 0,
+                    id: tempId, 
                   ),
                 );
               },

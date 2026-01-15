@@ -902,20 +902,15 @@ class QuoteCreateRouteArgs {
 class QuoteDetailRoute extends _i54.PageRouteInfo<QuoteDetailRouteArgs> {
   QuoteDetailRoute({
     _i57.Key? key,
-    required int userId,
     required int id,
     List<_i54.PageRouteInfo>? children,
   }) : super(
           QuoteDetailRoute.name,
           args: QuoteDetailRouteArgs(
             key: key,
-            userId: userId,
             id: id,
           ),
-          rawPathParams: {
-            'userId': userId,
-            'id': id,
-          },
+          rawPathParams: {'id': id},
           initialChildren: children,
         );
 
@@ -926,13 +921,9 @@ class QuoteDetailRoute extends _i54.PageRouteInfo<QuoteDetailRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<QuoteDetailRouteArgs>(
-          orElse: () => QuoteDetailRouteArgs(
-                userId: pathParams.getInt('userId'),
-                id: pathParams.getInt('id'),
-              ));
+          orElse: () => QuoteDetailRouteArgs(id: pathParams.getInt('id')));
       return _i25.QuoteDetailPage(
         key: args.key,
-        userId: args.userId,
         id: args.id,
       );
     },
@@ -942,19 +933,16 @@ class QuoteDetailRoute extends _i54.PageRouteInfo<QuoteDetailRouteArgs> {
 class QuoteDetailRouteArgs {
   const QuoteDetailRouteArgs({
     this.key,
-    required this.userId,
     required this.id,
   });
 
   final _i57.Key? key;
 
-  final int userId;
-
   final int id;
 
   @override
   String toString() {
-    return 'QuoteDetailRouteArgs{key: $key, userId: $userId, id: $id}';
+    return 'QuoteDetailRouteArgs{key: $key, id: $id}';
   }
 }
 
@@ -985,6 +973,7 @@ class QuoteProductAddAdaptiveRoute
     _i57.Key? key,
     int? quoteId,
     int? initialMode,
+    String? supplierNo,
     List<_i54.PageRouteInfo>? children,
   }) : super(
           QuoteProductAddAdaptiveRoute.name,
@@ -992,6 +981,7 @@ class QuoteProductAddAdaptiveRoute
             key: key,
             quoteId: quoteId,
             initialMode: initialMode,
+            supplierNo: supplierNo,
           ),
           initialChildren: children,
         );
@@ -1007,6 +997,7 @@ class QuoteProductAddAdaptiveRoute
         key: args.key,
         quoteId: args.quoteId,
         initialMode: args.initialMode,
+        supplierNo: args.supplierNo,
       );
     },
   );
@@ -1017,6 +1008,7 @@ class QuoteProductAddAdaptiveRouteArgs {
     this.key,
     this.quoteId,
     this.initialMode,
+    this.supplierNo,
   });
 
   final _i57.Key? key;
@@ -1025,9 +1017,11 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   final int? initialMode;
 
+  final String? supplierNo;
+
   @override
   String toString() {
-    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode}';
+    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode, supplierNo: $supplierNo}';
   }
 }
 

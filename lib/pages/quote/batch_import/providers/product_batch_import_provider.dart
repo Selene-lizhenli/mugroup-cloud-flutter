@@ -5,17 +5,17 @@ class SelectedProduct {
   final int id;
   final String sku;
   final String image;
-  final String supplierPrice;
   final String qty;
   final String name;
+  final String? purchaseCost;
 
   const SelectedProduct({
     required this.id,
     required this.sku,
     required this.image,
-    required this.supplierPrice,
     required this.qty,
     required this.name,
+    required this.purchaseCost,
   });
 
   SelectedProduct copyWith({
@@ -26,8 +26,8 @@ class SelectedProduct {
       id: id,
       sku: sku,
       image: image,
-      supplierPrice: supplierPrice ?? this.supplierPrice,
       qty: qty ?? this.qty,
+      purchaseCost: purchaseCost,
       name: name,
     );
   }
@@ -69,28 +69,6 @@ class ProductBatchImportNotifier
     );
   }
 
-  void toggleSelect(Sample sample) {
-    final sampleId = sample.id ?? -1;
-    final exists = state.selected.any((element) => element.id == sampleId);
-    if (exists) {
-      state = state.copyWith(
-        selected: state.selected
-            .where((e) => e.id != sampleId)
-            .toList(growable: false),
-      );
-    } else {
-      final item = SelectedProduct(
-        id: sampleId,
-        sku: sample.productNo ?? '',
-        image: sample.cover ?? '',
-        supplierPrice: '',
-        qty: '1',
-        name: sample.name,
-      );
-      state = state.copyWith(selected: [...state.selected, item]);
-    }
-  }
-
   void updateSelectedPrice(int id, String price) {
     state = state.copyWith(
       selected: state.selected
@@ -113,6 +91,24 @@ class ProductBatchImportNotifier
     );
   }
 
+  void setSelected(List<Sample> samples) {
+    final items = samples
+        .where((sample) => sample.id != null)
+        .map((sample) => SelectedProduct(
+              id: sample.id!,
+              sku: sample.productNo ?? '',
+              image: sample.cover ?? '',
+              purchaseCost: sample.purchaseCost,
+              qty: '1',
+              name: sample.name,
+            ))
+        .toList(growable: false);
+    state = state.copyWith(selected: items);
+  }
+
+  void clearSelected() {
+    state = state.copyWith(selected: []);
+  }
 
   void clean() {
     state = state.copyWith(
@@ -121,8 +117,6 @@ class ProductBatchImportNotifier
       selected: [],
     );
   }
-
-
 }
 
 final productBatchImportProvider =

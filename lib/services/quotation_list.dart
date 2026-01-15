@@ -40,7 +40,7 @@ Future<ApiResponse<List<QuotationSample>>> getQuotationProductListByProductId(
             return list.map(QuotationSample.fromJson).toList();
           },
         ),
-      );
+      ); 
 }
 
 Future<QuotationList> getQuotationListById(int id) async {
@@ -100,7 +100,7 @@ Future removeQuotationSamples(Map<String, dynamic>? data) async {
 }
 
 // 添加b报价单样品明细中的商品
-Future addQuotationSamples(data) async {
+Future addQuotationSamples(Map<String, Object?>? data) async {
   return api
       .post("api/tenant/showroom/quotations/quotationSamples/add", data: data)
       .then(

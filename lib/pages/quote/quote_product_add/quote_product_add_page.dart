@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -33,20 +34,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 class QuoteProductAddPortraitView extends HookConsumerWidget {
   final int? quoteId;
   final bool isActive;
-
+  final Map<String, dynamic>? initialSupplier; 
+  
   const QuoteProductAddPortraitView({
     super.key,
     this.quoteId,
-    required this.isActive,
+    this.initialSupplier,
+    required this.isActive, 
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+ 
     final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
     final savedFormData = ref.watch(quoteProductFormDataProvider);
-
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_add_form_v1',
           defaultFields: quoteSampleDefaultFields,
@@ -70,7 +73,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     // 使用定时器定期保存表单数据到 provider，仅在当前激活时运行
     useEffect(() {
       if (!isActive) return null;
-      final timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
         if (formKey.currentState != null) {
           formKey.currentState!.save();
           final currentValue = formKey.currentState!.value;
@@ -81,6 +84,26 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       });
       return timer.cancel;
     }, [isActive]);
+
+    // 当父组件异步加载到 initialSupplier 后，同步到当前表单字段
+    useEffect(() {
+      if (initialSupplier == null) return null;
+      if (formKey.currentState == null) return null;
+
+      // 仅在当前表单还没有供应商值时设置，避免覆盖用户已选择的值
+      final currentSupplyQuote =
+          formKey.currentState!.fields['supplyQuote']?.value;
+      if (currentSupplyQuote != null) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        formKey.currentState?.patchValue({
+          'supplyQuote': initialSupplier,
+        });
+      });
+
+      return null;
+    }, [initialSupplier]);
+
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -259,8 +282,13 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
               padding: const EdgeInsets.all(8),
               child: SingleChildScrollView(
                 child: FormBuilder(
-                  key: formKey,
-                  autovalidateMode: autoValidateMode.value,
+                  key: formKey, 
+                   autovalidateMode: autoValidateMode.value,
+                  initialValue: initialSupplier != null
+                      ? <String, dynamic>{
+                          'supplyQuote': initialSupplier,
+                        }
+                      : <String, dynamic>{},
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -1011,6 +1039,12 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                           submitValues['spec'] = spec;
 
                           await storeShowroomSample({
+                            ...submitValues,
+                            "supplier_id": supplier?['id'],
+                            "quotation_id": quoteId,
+                            'item_type': 'market_product'
+                          });
+                          logger.d({
                             ...submitValues,
                             "supplier_id": supplier?['id'],
                             "quotation_id": quoteId,

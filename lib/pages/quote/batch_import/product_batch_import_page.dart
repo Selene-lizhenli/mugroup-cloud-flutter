@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route.dart' show PageInfo;
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -9,7 +10,7 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers/product_batch_import_provider.dart';
-import 'widgets/selected_product_card.dart'; 
+import 'widgets/selected_product_card.dart';
 
 @RoutePage()
 class ProductBatchImportPage extends HookConsumerWidget {
@@ -45,32 +46,36 @@ class ProductBatchImportPage extends HookConsumerWidget {
     Future<void> handleSave() async {
       if (quotationId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('报价单ID不能为空')),
+          const SnackBar(content: Text('报价单ID是空的！')),
         );
         return;
       }
-
+      if (state.supplierId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请选择供应商')),
+        );
+        return;
+      }
       final sampleItems = state.selected.map((e) {
-        final qty = int.tryParse(e.qty) ?? 1;
-        // final supplierPrice = double.tryParse(e.supplierPrice) ?? 0.0;
+        final qty = int.tryParse(e.qty) ?? 1; 
+        final supplierPrice =  e.purchaseCost ?? 0.0;
         return {
           "sample_id": e.id,
-          "qty": qty,
-          // TODO 待调试接口加上
-          // "supplier_price": supplierPrice,
-          // 客户报价
+          "qty":qty,
+          "purchase_cost":supplierPrice, 
         };
-      }).toList();
-
+      }).toList(); 
+      
       final data = {
         'quotation_id': quotationId,
         'sample_items': sampleItems,
+        "supplier_id": state.supplierId, 
       };
-
+      logger.d('批量上传商品数据:${data}');
       final result = await addQuotationSamples(data);
       if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('添加成功')),
+          const SnackBar(content: Text('添加成功'),backgroundColor: Colors.green,),
         );
         // 保存成功后，跳转到报价单详情页面
         if (quotationId != null) {
@@ -80,8 +85,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
             Navigator.of(context).pop();
             context.router.push(
               QuoteDetailRoute(
-                id: quotationId!,
-                userId: userId!,
+                id: quotationId!, 
               ),
             );
           }
@@ -141,14 +145,15 @@ class ProductBatchImportPage extends HookConsumerWidget {
                                 notifier.setSupplier(id, name);
                                 // 选择完供应商后，自动打开产品选择弹窗
                                 if (context.mounted) {
-                                  final result = await context.router.push<List<Sample>>(SelectProductRoute(supplierId: id));
+                                  final result = await context.router
+                                      .push<List<Sample>>(
+                                          SelectProductRoute(supplierId: id));
                                   if (result != null) {
-                                    // 将选中的产品添加到批量导入列表中
-                                    for (final sample in result) {
-                                      if (sample.id != null) {
-                                        notifier.toggleSelect(sample);
-                                      }
-                                    }
+                                    // 用选中的产品替换批量导入列表
+                                    notifier.setSelected(result);
+                                  } else {
+                                    // 如果result为null，清空选中的产品
+                                    notifier.clearSelected();
                                   }
                                 }
                               }
@@ -172,16 +177,15 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               );
                               return;
                             }
-                            final result = await context.router.pushNamed<List<Sample>>(
+                            final result =
+                                await context.router.pushNamed<List<Sample>>(
                               '/selectors/product?supplierId=${state.supplierId}',
                             );
                             if (result != null) {
-                              // 将选中的产品添加到批量导入列表中
-                              for (final sample in result) {
-                                if (sample.id != null) {
-                                  notifier.toggleSelect(sample);
-                                }
-                              }
+                              // 用选中的产品替换批量导入列表
+                              notifier.setSelected(result);
+                            } else { 
+                              notifier.clearSelected();
                             }
                           },
                           child: Container(

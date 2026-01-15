@@ -29,17 +29,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class QuoteProductAddLandscapeView extends HookConsumerWidget {
   final int? quoteId;
   final bool isActive;
-
+  final Map<String, dynamic>? initialSupplier; 
   const QuoteProductAddLandscapeView({
     super.key,
     this.quoteId,
-    required this.isActive,
+    this.initialSupplier,
+    required this.isActive, 
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+    final colorScheme = Theme.of(context).colorScheme; 
     final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
     final savedFormData = ref.watch(quoteProductFormDataProvider);
 
@@ -47,7 +47,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           storageKey: 'quote_product_add_form_v1',
           defaultFields: quoteSampleDefaultFields,
         ));
-
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
@@ -65,7 +65,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     //使用定时器定期保存表单数据到 provider，仅在当前激活时运行
     useEffect(() {
       if (!isActive) return null;
-      final timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
         if (formKey.currentState != null) {
           formKey.currentState!.save();
           final currentValue = formKey.currentState!.value;
@@ -76,6 +76,25 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       });
       return timer.cancel;
     }, [isActive]);
+
+    // 当父组件异步加载到 initialSupplier 后，同步到当前表单字段
+    useEffect(() {
+      if (initialSupplier == null) return null;
+      if (formKey.currentState == null) return null;
+
+      final currentSupplyQuote =
+          formKey.currentState!.fields['supplyQuote']?.value;
+      if (currentSupplyQuote != null) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        formKey.currentState?.patchValue({
+          'supplyQuote': initialSupplier,
+        });
+      });
+
+      return null;
+    }, [initialSupplier]);
+
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -215,6 +234,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       ),
       body: FormBuilder(
         key: formKey,
+        initialValue: initialSupplier != null
+            ? <String, dynamic>{
+                'supplyQuote': initialSupplier,
+              }
+            : <String, dynamic>{},
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
@@ -440,6 +464,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             builder: (_) =>
                                                 const SupplierSelect(),
                                           );
+                                          logger.d('selected${selected}');
                                           if (selected != null) {
                                             field.didChange(selected);
                                           }

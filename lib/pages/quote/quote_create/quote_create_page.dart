@@ -70,7 +70,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
     // 设置联系人
     if (data.company?.contacts?.isNotEmpty == true) {
       final contact = data.company!.contacts!.first;
-      notifier.setSelectedContact(contact);
+      notifier.setSelectedContact(contact!);
     }
 
     // 设置货币
@@ -217,8 +217,19 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                 onPressed: isLoading
                     ? null
                     : () async {
-                        // await notifier.saveDraft();
                         if (context.mounted) {
+                          // 校验：客户为必填项
+                          if (state.selectedCustomers == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('请选择客户'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // 组装提交数据
                           final submitData = {
                             "sample_items": state.productList
                                 .map((item) => {
@@ -250,8 +261,9 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                                   backgroundColor: Colors.green,
                                   content: Text('保存成功')),
                             );
-                            context.router.push(
-                                QuoteDetailRoute(id: quoteId!, userId: 0));
+                            context.router.push(QuoteDetailRoute(
+                              id: quoteId!,
+                            ));
                           } else {
                             // 创建模式：新建
                             final result = await storeShowroomQuotation(
@@ -265,8 +277,9 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                                     content: Text('保存成功')),
                               );
 
-                              context.router.push(
-                                  QuoteDetailRoute(id: result!.id!, userId: 0));
+                              context.router.push(QuoteDetailRoute(
+                                id: result!.id!,
+                              ));
                             }
                           }
 
@@ -310,221 +323,3 @@ class QuoteCreateBottomBar extends ConsumerWidget {
     );
   }
 }
-
-// @RoutePage()
-// class QuoteCreatePage extends HookConsumerWidget {
-//   const QuoteCreatePage({super.key});
-
-//   static const String _draftKey = 'quote_draft';
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final colorScheme = Theme.of(context).colorScheme;
-
-//     /// -------------------------
-//     /// 状态（Hook）
-//     /// -------------------------
-//     final pageController = usePageController();
-//     final currentStep = useState<int>(0);
-
-//     final selectedCustomer = useState<String?>(null);
-//     final selectedProducts = useState<List<String>>([]);
-//     final involvedSuppliers = useState<List<String>>([]);
-
-//     final isSavingDraft = useState<bool>(false);
-
-//     /// -------------------------
-//     /// 初始化：加载草稿
-//     /// -------------------------
-//     useEffect(() {
-//       Future<void> loadDraft() async {
-//         final prefs = await SharedPreferences.getInstance();
-//         final draftJson = prefs.getString(_draftKey);
-//         if (draftJson != null) {
-//           final data = jsonDecode(draftJson);
-//           selectedCustomer.value = data['customer'];
-//           selectedProducts.value = List<String>.from(data['products'] ?? []);
-//           involvedSuppliers.value = List<String>.from(data['suppliers'] ?? []);
-//         }
-//       }
-
-//       loadDraft();
-//       return null;
-//     }, []);
-
-//     /// -------------------------
-//     /// 行为函数
-//     /// -------------------------
-//     Future<void> saveDraft() async {
-//       isSavingDraft.value = true;
-//       final prefs = await SharedPreferences.getInstance();
-//       await prefs.setString(
-//         _draftKey,
-//         jsonEncode({
-//           'customer': selectedCustomer.value,
-//           'products': selectedProducts.value,
-//           'suppliers': involvedSuppliers.value,
-//         }),
-//       );
-//       isSavingDraft.value = false;
-
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('草稿已保存')),
-//       );
-//     }
-
-//     void completeCreation() async {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('创建完成，正在跳转...')),
-//       );
-
-//       final prefs = await SharedPreferences.getInstance();
-//       prefs.remove(_draftKey);
-
-//       Timer(const Duration(seconds: 3), () {
-//         // context.router.replace(
-//         //   QuoteDetailRoute(quoteId: 123),
-//         // );
-//       });
-//     }
-
-//     void nextStep() {
-//       if (currentStep.value < 2) {
-//         currentStep.value++;
-//         pageController.animateToPage(
-//           currentStep.value,
-//           duration: const Duration(milliseconds: 300),
-//           curve: Curves.ease,
-//         );
-//       } else {
-//         completeCreation();
-//       }
-//     }
-
-//     void previousStep() {
-//       if (currentStep.value > 0) {
-//         currentStep.value--;
-//         pageController.animateToPage(
-//           currentStep.value,
-//           duration: const Duration(milliseconds: 300),
-//           curve: Curves.ease,
-//         );
-//       }
-//     }
-
-//     /// -------------------------
-//     /// Step Widgets
-//     /// -------------------------
-
-//     Widget buildProductStep() {
-//       return Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const Text('导入产品', style: TextStyle(fontSize: 18)),
-//           const SizedBox(height: 16),
-//           ElevatedButton(
-//             onPressed: () {
-//               selectedProducts.value = [
-//                 ...selectedProducts.value,
-//                 '产品${selectedProducts.value.length + 1}',
-//               ];
-//             },
-//             child: const Text('从列表导入产品'),
-//           ),
-//           const SizedBox(height: 12),
-//           ...selectedProducts.value.map(Text.new),
-//           const SizedBox(height: 12),
-//           ElevatedButton(
-//             onPressed: () {
-//               involvedSuppliers.value = [
-//                 ...involvedSuppliers.value,
-//                 '供应商${involvedSuppliers.value.length + 1}',
-//               ];
-//             },
-//             child: const Text('添加供应商'),
-//           ),
-//         ],
-//       );
-//     }
-
-//     Widget buildReviewStep() {
-//       return Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const Text('创建完成', style: TextStyle(fontSize: 18)),
-//           const SizedBox(height: 16),
-//           Text('客户：${selectedCustomer.value ?? '-'}'),
-//           Text('产品数量：${selectedProducts.value.length}'),
-//           Text('供应商数量：${involvedSuppliers.value.length}'),
-//           const SizedBox(height: 16),
-//           const Text('3 秒后自动跳转到报价单详情页'),
-//         ],
-//       );
-//     }
-
-//     /// -------------------------
-//     /// UI
-//     /// -------------------------
-//     return Scaffold(
-//       appBar: AppBar(
-//           title: const Text('创建报价单'), backgroundColor: colorScheme.surface),
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             Expanded(
-//               child: PageView(
-//                 controller: pageController,
-//                 physics: const NeverScrollableScrollPhysics(),
-//                 children: [
-//                   QuoteBaseInfoStep(
-//                     selectedCustomer: selectedCustomer.value,
-//                     onSelectCustomer: () {
-//                       showModalBottomSheet(
-//                         context: context,
-//                         isScrollControlled: true,
-//                         backgroundColor: Colors.transparent,
-//                         builder: (_) => const SelectCustomerSheet(),
-//                       );
-//                     },
-//                     onSelectContact: () {},
-//                     onSelectLanguage: () {},
-//                     onSelectCurrency: () {},
-//                   ),
-//                   buildProductStep(),
-//                   buildReviewStep(),
-//                 ],
-//               ),
-//             ),
-//             Row(
-//               children: [
-//                 if (currentStep.value > 0)
-//                   OutlinedButton(
-//                     onPressed: previousStep,
-//                     child: const Text('上一步'),
-//                   ),
-//                 const Spacer(),
-//                 if (currentStep.value < 2)
-//                   OutlinedButton(
-//                     onPressed: saveDraft,
-//                     child: isSavingDraft.value
-//                         ? const SizedBox(
-//                             width: 16,
-//                             height: 16,
-//                             child: CircularProgressIndicator(strokeWidth: 2),
-//                           )
-//                         : const Text('保存草稿'),
-//                   ),
-//                 const SizedBox(width: 8),
-//                 ElevatedButton(
-//                   onPressed: nextStep,
-//                   child: Text(currentStep.value == 2 ? '完成' : '下一步'),
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: 12),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

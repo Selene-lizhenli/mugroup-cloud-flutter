@@ -3,12 +3,9 @@ import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/supplier/supplier_list.dart';
-import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/services/quotation_list.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product/product_edit_dialog.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
+import 'package:cloud/router/router.gr.dart'; 
+import 'package:flutter/material.dart'; 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -50,8 +47,7 @@ class ProductSection extends HookConsumerWidget {
                           onTap: () {
                             context.router.push(
                               ProductBatchImportRoute(
-                                quotationId: quoteId,
-                                userId: state.baseInfo?.user?.id,
+                                quotationId: quoteId, 
                               ),
                             );
                           },
@@ -112,7 +108,7 @@ class ProductSection extends HookConsumerWidget {
 
   Widget _buildProductList(BuildContext context, QuoteDetailState state,
       ColorScheme colorScheme, notifier, int? quoteId) {
-    final theme = Theme.of(context);
+ 
     if (state.isProductLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -169,163 +165,14 @@ class ProductSection extends HookConsumerWidget {
         if (sample == null) {
           return const SizedBox.shrink();
         }
-        // 获取供应商编号
-        final supplierNo = row.supplyQuote?.supplier?.supplierNo ?? '';
-        final supplierName = row.supplyQuote?.supplier?.name ?? '';
-        final supplierDisplay = supplierNo.isNotEmpty
-            ? '供应商:$supplierNo'
-            : (supplierName.isNotEmpty ? '供应商:$supplierName' : '供应商:-');
 
-        return Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: colorScheme.outlineVariant.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ===== 供应商信息和操作按钮 =====
-              Row(
-                children: [
-                  Text(
-                    supplierDisplay,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 12,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () async {
-                      if (quoteId == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('报价单ID不能为空')),
-                        );
-                        return;
-                      }
-                      final Map<String, String>? data = await showDialog(
-                        context: context,
-                        builder: (_) => ProductEditDialog(
-                          row: row,
-                          quotationId: quoteId,
-                        ),
-                      );
-
-                      if (data != null) {
-                        final values = {
-                          "supply_quote": {
-                            "shipping_qty": data['shipping_qty'],
-                            "purchase_cost": data['purchase_cost'],
-                            "customer_price": data['customer_price'],
-                            "internal_sku": data['internal_sku'],
-                            "supplier_sku": data['supplier_sku'],
-                            "customer_sku": data['customer_sku']
-                          }
-                        };
-
-                        await updateShowroomQuotationSample(row.id!, values);
-                      }
-
-                      // 刷新产品列表
-                      if (context.mounted) {
-                        await notifier.fetchProductsPage(
-                            quoteId, state.productPage);
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.edit_outlined,
-                        size: 18,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // 移除产品
-                  InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () async {
-                      await _handleDeleteProductFromList(
-                        context: context,
-                        quoteId: quoteId,
-                        productId: row.id,
-                        notifier: notifier,
-                        page: state.productPage,
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.delete_outline,
-                        size: 18,
-                        color: colorScheme.error,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // ===== 产品信息 =====
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () {
-                    final id = sample.id;
-                    if (id == null) return;
-                    if (!context.mounted) return;
-                    context.router.push(ShowroomSampleDetailRoute(id: id));
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ===== 产品图片 =====
-                      _ProductImage(imageUrl: imageUrl),
-                      const SizedBox(width: 12),
-                      // ===== 产品信息 =====
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _KeyValue(
-                              label: '公司货号',
-                              value: (row.supplyQuote?.internalSku ?? 0)
-                                  .toString(),
-                              highlight: false,
-                            ),
-                            const SizedBox(height: 4),
-                            _KeyValue(
-                              label: '客户报价(CNY)',
-                              value: (row.supplyQuote?.customerPrice ?? 0)
-                                  .toString(),
-                              highlight: false,
-                            ),
-                            const SizedBox(height: 4),
-                            _KeyValue(
-                              label: '供应商报价(CNY)',
-                              value: (row.supplyQuote?.purchaseCost ?? 0)
-                                  .toString(),
-                              highlight: false,
-                            ),
-                            const SizedBox(height: 4),
-                            _KeyValue(
-                              label: '采购数量',
-                              value: (row.supplyQuote?.shippingQty ?? 0)
-                                  .toString(),
-                              highlight: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+        return ProductDetailCard(
+          data: row,
+          imageUrl: imageUrl,
+          quoteId: quoteId,
+          supplierShow: true,
+          refreshCallback: () =>
+              notifier.fetchProductsPage(quoteId, state.productPage),
         );
       },
     );
@@ -380,39 +227,7 @@ class ProductSection extends HookConsumerWidget {
       },
     );
   }
-
-  Future<void> _handleDeleteProductFromList({
-    required BuildContext context,
-    required int? quoteId,
-    required int? productId,
-    required dynamic notifier,
-    required int page,
-  }) async {
-    if (productId == null || quoteId == null) return;
-    final confirmed = await ConfirmDialog.show(
-      context,
-      title: '确认删除',
-      content: '确定要删除该产品吗？',
-      cancelText: '取消',
-      confirmText: '确定',
-    );
-    if (!confirmed || !context.mounted) return;
-
-    EasyLoading.show(status: '删除中...');
-    final params = {
-      'ids': [productId],
-      "quotation_id": quoteId,
-    };
-    try {
-      await removeQuotationSamples(params);
-      await notifier.fetchProductsPage(quoteId, page);
-      EasyLoading.showSuccess('删除成功');
-    } catch (e) {
-      EasyLoading.showError('删除失败：$e');
-    } finally {
-      EasyLoading.dismiss();
-    }
-  }
+ 
 }
 
 class _TabButton extends StatelessWidget {
@@ -468,113 +283,6 @@ class _TabButton extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ProductImage extends StatelessWidget {
-  final String? imageUrl;
-
-  const _ProductImage({this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: imageUrl != null
-          ? Image.network(
-              imageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.image_not_supported, size: 24),
-                      SizedBox(height: 4),
-                      Text(
-                        'IMAGE\nNOT AVAILABLE',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 8),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            )
-          : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.image_not_supported,
-                      size: 24, color: colorScheme.outline),
-                  const SizedBox(height: 4),
-                  Text(
-                    'IMAGE NOT AVAILABLE',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 8, color: colorScheme.outline),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-}
-
-class _KeyValue extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool highlight;
-  final bool priceStyle;
-
-  const _KeyValue({
-    required this.label,
-    required this.value,
-    this.highlight = false,
-    this.priceStyle = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return RichText(
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      softWrap: false,
-      text: TextSpan(
-        style: theme.textTheme.bodySmall,
-        children: [
-          TextSpan(
-            text: '$label: ',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          TextSpan(
-            text: value,
-            style: TextStyle(
-              fontSize: 12,
-              color: priceStyle
-                  ? colorScheme.primary
-                  : (highlight ? colorScheme.primary : colorScheme.onSurface),
-              fontWeight: (priceStyle || highlight)
-                  ? FontWeight.w600
-                  : FontWeight.normal,
-            ),
-          ),
-        ],
       ),
     );
   }

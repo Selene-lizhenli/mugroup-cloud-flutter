@@ -1,7 +1,6 @@
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/quote/quote_supplier_group.dart';
-import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/models/sample/quotation_sample.dart'; 
 
 class QuoteDetailState {
   final bool isBaseLoading;

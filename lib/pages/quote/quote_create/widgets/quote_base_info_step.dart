@@ -34,6 +34,7 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                   _sectionTitle('基本设置'),
                   FormSelectField(
                     label: '选择客户',
+                    required: true,
                     value: state.selectedCustomers?.name ?? '请选择客户',
                     onTap: () => showModalBottomSheet(
                       context: context,

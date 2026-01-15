@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+// 现在该组件默认就是数字输入框（支持小数），
+//如果某个地方仍然需要文本输入，可以在使用时手动传入 keyboardType: TextInputType.text 覆盖。
+
 class HorizontalInput extends HookConsumerWidget {
   final String label;
-  final String value;
+  final value;
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final double? inputWidth;
@@ -75,7 +79,13 @@ class HorizontalInput extends HookConsumerWidget {
           child: TextField(
             controller: controller,
             onChanged: onChanged,
-            keyboardType: keyboardType,
+            // 默认使用数字输入框，外部如需文本可自行传入 keyboardType
+            keyboardType: keyboardType ??
+                const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              // 仅允许输入数字和小数点
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            ],
             textAlign: TextAlign.start,
             style: TextStyle(
               fontSize: inputFontSize,
@@ -85,8 +95,10 @@ class HorizontalInput extends HookConsumerWidget {
             cursorColor: colorScheme.primary,
             decoration: InputDecoration(
               isDense: true,
-              contentPadding:
-                    EdgeInsets.symmetric(horizontal: contentPaddingHorizontalValue, vertical: contentPaddingVerticalValue),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: contentPaddingHorizontalValue,
+                vertical: contentPaddingVerticalValue,
+              ),
               hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
               filled: true,
               fillColor: inputBgColor,

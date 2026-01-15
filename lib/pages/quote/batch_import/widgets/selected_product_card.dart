@@ -20,8 +20,7 @@ class SelectedProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final colorScheme = Theme.of(context).colorScheme; 
     return Slidable(
       key: ValueKey(item.sku),
       endActionPane: ActionPane(
@@ -83,20 +82,21 @@ class SelectedProductCard extends StatelessWidget {
                   HorizontalInput(
                     label: '数量',
                     value: item.qty,
+                    inputWidth:85,
                     keyboardType: TextInputType.number,
                     onChanged: onQtyChanged,
                     contentPaddingHorizontal: 8,
                     contentPaddingVertical: 5,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   HorizontalInput(
                     label: '供应商报价(CNY)',
-                    value: item.supplierPrice,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    value: item.purchaseCost,
+                    keyboardType: TextInputType.number,
                     onChanged: onPriceChanged,
                     contentPaddingHorizontal: 8,
                     contentPaddingVertical: 5,
+                    inputWidth:85
                   ),
                 ],
               ),

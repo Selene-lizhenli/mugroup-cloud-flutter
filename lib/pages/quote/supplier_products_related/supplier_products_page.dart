@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_edit_dialog.dart';
+import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
@@ -166,7 +167,10 @@ class SupplierProductsPage extends HookConsumerWidget {
                               textColor: colorScheme.onSecondary,
                               onTap: () {
                                 context.router.push(
-                                  QuoteProductAddAdaptiveRoute(quoteId: quotationId),
+                                  QuoteProductAddAdaptiveRoute(
+                                    quoteId: quotationId,
+                                    supplierNo: supplierNo,
+                                  ),
                                 );
                               },
                             ),
@@ -300,191 +304,12 @@ class SupplierProductsPage extends HookConsumerWidget {
     ThemeData theme,
     VoidCallback onRefresh,
   ) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
-      decoration: BoxDecoration(
-        color: colorScheme.outlineVariant.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 产品编号和操作按钮
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  sample.productNo ?? '',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              InkWell(
-                borderRadius: BorderRadius.circular(6),
-                onTap: () async {
-                  final result = await showDialog(
-                    context: context,
-                    builder: (_) => ProductEditDialog(
-                      row: row,
-                      quotationId: quotationId,
-                    ),
-                  );
-                  // 如果保存成功，刷新产品列表
-                  if (result != null && context.mounted) {
-                    onRefresh();
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    Icons.edit,
-                    size: 18,
-                    color: colorScheme.secondary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              InkWell(
-                borderRadius: BorderRadius.circular(6),
-                onTap: () async {
-                  await _handleDeleteProduct(context, row.id, onRefresh);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    Icons.delete_outline,
-                    size: 18,
-                    color: colorScheme.error,
-                  ),
-                ),
-              ),
-         
-            ],
-          ),
-          // 产品信息
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 产品图片
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceVariant.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: imageUrl != null
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.image_not_supported,
-                              size: 24);
-                        },
-                      )
-                    : const Icon(Icons.image_not_supported, size: 24),
-              ),
-              const SizedBox(width: 12),
-              // 产品详情
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      Text(
-                        '供应商货号 ',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      Text(
-                        sample.productNo ?? '-',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ]),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          '客户报价(EUR)',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 12,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          row.price ?? '0.000',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          '采购数量',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 12,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${row.qty ?? 0}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return ProductDetailCard(
+      data: row,
+      imageUrl: imageUrl,
+      quoteId: quotationId,
+      refreshCallback: onRefresh,
+      supplierShow: false,
     );
-  }
-
-  Future<void> _handleDeleteProduct(
-      BuildContext context, int? productId, VoidCallback onRefresh) async {
-    if (productId == null) return;
-    final confirmed = await ConfirmDialog.show(
-      context,
-      title: '确认删除',
-      content: '确定要删除该产品吗？',
-      cancelText: '取消',
-      confirmText: '确定',
-    );
-    if (!confirmed || !context.mounted) return;
-
-    EasyLoading.show(status: '删除中...');
-    final params = {
-      'ids': [productId],
-      "quotation_id": quotationId,
-    };
-    try {
-      await removeQuotationSamples(params);
-      EasyLoading.showSuccess('删除成功');
-      onRefresh();
-    } catch (e) {
-      EasyLoading.showError('删除失败：$e');
-    } finally {
-      EasyLoading.dismiss();
-    }
   }
 }
