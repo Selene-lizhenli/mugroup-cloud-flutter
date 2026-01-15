@@ -23,7 +23,9 @@ class ProductListSheet extends HookConsumerWidget {
     final state = ref.watch(productSelectorProvider(supplierId));
     final notifier = ref.read(productSelectorProvider(supplierId).notifier);
     final searchController = useTextEditingController();
+    final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
+    
     // 初始化选中状态
     useEffect(() {
       if (initialSelectedIds != null && initialSelectedIds!.isNotEmpty) {
@@ -34,6 +36,20 @@ class ProductListSheet extends HookConsumerWidget {
       return null;
     }, []);
 
+    // 监听滚动，实现上拉加载更多（节流逻辑在 notifier.loadMore 内部处理）
+    useEffect(() {
+      void onScroll() {
+        if (!scrollController.hasClients) return;
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 200) {
+          notifier.loadMore();
+        }
+      }
+
+      scrollController.addListener(onScroll);
+      return () => scrollController.removeListener(onScroll);
+    }, [scrollController]);
+
     final products = state.products;
     final selectedIds = state.selectedIds;
     final validIds =
@@ -42,7 +58,11 @@ class ProductListSheet extends HookConsumerWidget {
         validIds.isNotEmpty && validIds.every((id) => selectedIds.contains(id));
 
     Future<void> handleSearch() async {
-      await notifier.fetchProducts(search: searchController.text.trim());
+      await notifier.fetchProducts(search: searchController.text.trim(), reset: true);
+    }
+
+    Future<void> handleRefresh() async {
+      await notifier.fetchProducts(search: state.currentSearch, reset: true);
     }
 
     final selectedCount = selectedIds.length;
@@ -133,13 +153,17 @@ class ProductListSheet extends HookConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Expanded(
-                    child: _buildProductList(
-                      state: state,
-                      products: products,
-                      selectedIds: selectedIds,
-                      colorScheme: colorScheme,
-                      notifier: notifier,
-                      context: context,
+                    child: RefreshIndicator(
+                      onRefresh: handleRefresh,
+                      child: _buildProductList(
+                        state: state,
+                        products: products,
+                        selectedIds: selectedIds,
+                        colorScheme: colorScheme,
+                        notifier: notifier,
+                        context: context,
+                        scrollController: scrollController,
+                      ),
                     ),
                   ),
                 ],
@@ -227,6 +251,7 @@ class ProductListSheet extends HookConsumerWidget {
     required ColorScheme colorScheme,
     required ProductSelectorNotifier notifier,
     required BuildContext context,
+    required ScrollController scrollController,
   }) {
     if (state.isLoading) {
       return const Center(
@@ -245,18 +270,56 @@ class ProductListSheet extends HookConsumerWidget {
           ),
         ),
       );
-    } else if (products.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('暂无产品', style: TextStyle(color: colorScheme.outline)),
-        ),
+    } else if (products.isEmpty && !state.isLoading) {
+      return ListView(
+        controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: Center(
+              child:
+                  Text('暂无产品', style: TextStyle(color: colorScheme.outline)),
+            ),
+          ),
+        ],
       );
     } else {
       return ListView.separated(
-        itemCount: products.length,
+        controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: products.length + 1, // +1 用于显示加载更多或没有更多
         separatorBuilder: (_, __) => const SizedBox(height: 0),
         itemBuilder: (_, index) {
+          // 最后一项显示加载更多或没有更多
+          if (index >= products.length) {
+            if (state.isLoadingMore) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.primary,
+                  ),
+                ),
+              );
+            } else if (!state.hasMore && products.isNotEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Text(
+                    '没有更多了',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.outline,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          }
           final item = products[index];
           if (item.id == null) {
             return Padding(

@@ -19,14 +19,14 @@ class ProductEditDialog extends HookWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final shippingQty =
-        useState(row.supplyQuote?.shippingQty?.toString() ?? '');
+        useState(row.qty?.toString() ?? '');//采购数量
     final purchaseCost =
-        useState(row.supplyQuote?.purchaseCost?.toString() ?? '');
+        useState(row.price?.toString() ?? '');//供应商报价
     final customerPrice =
-        useState<String>(row.supplyQuote?.customerPrice?.toString() ?? '');
-    final internalSku = useState(row.supplyQuote?.internalSku ?? '');
-    final supplierSku = useState(row.supplyQuote?.supplierSku ?? '');
-    final customerSku = useState(row.supplyQuote?.customerSku ?? '');
+        useState<String>(row.supplyQuote?.customerPrice?.toString() ?? '');//客户报价
+    final internalSku = useState(row.supplyQuote?.internalSku ?? '');//公司货号
+    final supplierSku = useState(row.supplyQuote?.supplierSku ?? '');//供应商货号
+    final customerSku = useState(row.supplyQuote?.customerSku ?? '');//客户货号
 
     return Dialog(
       child: Padding(

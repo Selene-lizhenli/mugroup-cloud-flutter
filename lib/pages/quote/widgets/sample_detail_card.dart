@@ -157,14 +157,14 @@ class ProductDetailCard extends StatelessWidget {
                         _KeyValue(
                           label: '供应商报价(CNY)',
                           value:
-                              (data?.supplyQuote?.purchaseCost ?? 0).toString(),
+                              (data?.price ?? 0).toString(),
                           highlight: false,
                         ),
                         const SizedBox(height: 4),
                         _KeyValue(
                           label: '采购数量',
                           value:
-                              (data?.supplyQuote?.shippingQty ?? 0).toString(),
+                              (data?.qty ?? 0).toString(),
                           highlight: false,
                         ),
                       ],

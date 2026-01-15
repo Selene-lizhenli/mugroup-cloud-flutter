@@ -1,5 +1,6 @@
-import 'package:cloud/pages/widgets/Input_horizontal.dart';
+import 'package:cloud/pages/widgets/input.dart';
 import 'package:flant/components/image_preview.dart';
+import 'package:flant/components/stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../providers/product_batch_import_provider.dart';
@@ -20,7 +21,7 @@ class SelectedProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
     return Slidable(
       key: ValueKey(item.sku),
       endActionPane: ActionPane(
@@ -59,8 +60,8 @@ class SelectedProductCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: SizedBox(
-                  width: 80,
-                  height: 80,
+                  width: 90,
+                  height: 90,
                   child: _buildCover(item.image),
                 ),
               ),
@@ -79,24 +80,49 @@ class SelectedProductCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  HorizontalInput(
-                    label: '数量',
-                    value: item.qty,
-                    inputWidth:85,
-                    keyboardType: TextInputType.number,
-                    onChanged: onQtyChanged,
-                    contentPaddingHorizontal: 8,
-                    contentPaddingVertical: 5,
-                  ),
-                  const SizedBox(height: 4),
-                  HorizontalInput(
-                    label: '供应商报价(CNY)',
-                    value: item.purchaseCost,
-                    keyboardType: TextInputType.number,
-                    onChanged: onPriceChanged,
-                    contentPaddingHorizontal: 8,
-                    contentPaddingVertical: 5,
-                    inputWidth:85
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Input(
+                          label: '供应商报价(CNY)',
+                          value: item.purchaseCost ?? '',
+                          keyboardType: TextInputType.number,
+                          onChanged: onPriceChanged,
+                          fontSize: 11,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      // 数量部分：label 和 FlanStepper 竖向排列
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '数量',
+                            style: TextStyle(
+                                fontSize: 11, color: Colors.grey.shade700),
+                          ),
+                          const SizedBox(height: 8),
+                          Transform.scale(
+                            scale: 1.1,
+                            child: FlanStepper(
+                              value: int.tryParse(item.qty) ?? 1,
+                              min: 1,
+                              onChange: (v, _) {
+                                final qtyStr =
+                                    v is int ? v.toString() : v.toString();
+                                // 延迟更新，避免在构建期间修改 provider
+                                Future.microtask(() {
+                                  onQtyChanged(qtyStr);
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      // 供应商报价部分：横向排列
+                    ],
                   ),
                 ],
               ),

@@ -62,7 +62,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
         return {
           "sample_id": e.id,
           "qty":qty,
-          "purchase_cost":supplierPrice, 
+          "price":supplierPrice, 
         };
       }).toList(); 
       

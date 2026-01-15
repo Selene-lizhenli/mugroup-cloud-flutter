@@ -16,6 +16,7 @@ class Input extends HookConsumerWidget {
   final bool isRequired;
 
   final List<TextInputFormatter>? inputFormatters;
+  final double fontSize;
 
   const Input({
     super.key,
@@ -29,6 +30,7 @@ class Input extends HookConsumerWidget {
     this.inputFormatters,
     this.showClearButton = true,
     this.isRequired = false,
+    this.fontSize = 14,
   });
 
   @override
@@ -57,11 +59,11 @@ class Input extends HookConsumerWidget {
             text: TextSpan(
               children: [
                 if (isRequired)
-                  const TextSpan(
+                  TextSpan(
                     text: '* ',
                     style: TextStyle(
                       color: Colors.red,
-                      fontSize: 14,
+                      fontSize: fontSize,
                       fontWeight: FontWeight.bold,
                       height: 1.0,
                     ),
@@ -70,7 +72,7 @@ class Input extends HookConsumerWidget {
                   text: label,
                   style: TextStyle(
                     color: Colors.grey.shade700,
-                    fontSize: 14,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
