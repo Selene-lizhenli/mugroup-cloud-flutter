@@ -1,8 +1,7 @@
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
-import 'package:cloud/services/dashboard.dart';
+import 'package:cloud/providers/exchange.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SelectCurrencySheet extends HookConsumerWidget {
@@ -13,29 +12,7 @@ class SelectCurrencySheet extends HookConsumerWidget {
     final notifier = ref.read(quoteCreateProvider.notifier);
     final state = ref.watch(quoteCreateProvider);
     final halfHeight = MediaQuery.of(context).size.height * 0.6;
-
-    final exchangeRates = useState<List<ExchangeRate>>([]);
-    final isLoading = useState<bool>(true);
-    final error = useState<String?>(null);
-
-    useEffect(() {
-      Future<void> loadCurrencies() async {
-        isLoading.value = true;
-        error.value = null;
-
-        final rates = await getExchangesList();
-        if (rates == null || rates.isEmpty) {
-          error.value = '暂无货币数据';
-          exchangeRates.value = [];
-        } else {
-          exchangeRates.value = rates;
-        } 
-        isLoading.value = false;
-      }
-
-      loadCurrencies();
-      return null;
-    }, []);
+    final exchangeAsync = ref.watch(exchangeProvider);
 
     // 构建显示文本：name (shortName)，如 "美元 (USD)"
     String buildDisplayText(ExchangeRate rate) {
@@ -114,30 +91,25 @@ class SelectCurrencySheet extends HookConsumerWidget {
             ),
 
             // ================= Content =================
-            if (isLoading.value)
-              const Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            else if (error.value != null)
-              Expanded(
-                child: Center(
-                  child: Text(
-                    error.value!,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ),
-              )
-            else
-              Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: exchangeRates.value.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, indent: 10),
-                  itemBuilder: (context, index) {
-                    final rate = exchangeRates.value[index];
+            Flexible(
+              child: exchangeAsync.when(
+                data: (exchangeRates) {
+                  if (exchangeRates.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        '暂无货币数据',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
+                  }
+                  
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: exchangeRates.length,
+                    separatorBuilder: (_, __) =>
+                        const Divider(height: 1, indent: 10),
+                    itemBuilder: (context, index) {
+                      final rate = exchangeRates[index];
                     final displayText = buildDisplayText(rate);
                     final selected = isSelected(rate);
                     final rateValue = getRateValue(rate);
@@ -168,8 +140,19 @@ class SelectCurrencySheet extends HookConsumerWidget {
                       },
                     );
                   },
+                );
+                },
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, stack) => Center(
+                  child: Text(
+                    '加载货币数据失败: $error',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
                 ),
               ),
+            ),
           ],
         ),
       ),

@@ -69,58 +69,65 @@ class SupplierListWidget extends StatelessWidget {
 
     final totalProductTypes = _calculateTotalProductTypes();
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(12),
-            itemCount: suppliers.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final supplier = suppliers[index];
-              final supplierId = supplier.supplier?.id;
-              final isSelected = supplierId != null && selectedSupplierIds.contains(supplierId);
-              final totalAmount = _calculateTotalAmount(supplier);
-              final productId = _findFirstProductIdForSupplier(supplier);
-
-              return QuoteListSupplierCard(
-                supplier: supplier,
-                totalAmount: totalAmount,
-                isSelected: isSelected,
-                onToggle: () => onSupplierToggle(supplierId),
-                onTap: onSupplierTap != null
-                    ? () => onSupplierTap!(supplier)
-                    : null,
-                productId: productId,
-              );
-            },
-          ),
-        ),
-        // 底部汇总信息
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            border: Border(
-              top: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.5),
-                width: 1,
-              ),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '共${suppliers.length}个供应商, $totalProductTypes种产品',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      itemCount: suppliers.length + 1, // +1 for summary footer
+      separatorBuilder: (context, index) {
+        // 如果是最后一项（汇总信息），不需要分隔符
+        if (index == suppliers.length - 1) {
+          return const SizedBox(height: 12);
+        }
+        // 如果是汇总信息项之前，添加分隔符
+        if (index == suppliers.length) {
+          return const SizedBox.shrink();
+        }
+        return const SizedBox(height: 12);
+      },
+      itemBuilder: (context, index) {
+        // 如果是最后一项，显示汇总信息
+        if (index == suppliers.length) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border(
+                top: BorderSide(
+                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                  width: 1,
                 ),
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '共${suppliers.length}个供应商, $totalProductTypes种产品',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final supplier = suppliers[index];
+        final supplierId = supplier.supplier?.id;
+        final isSelected = supplierId != null && selectedSupplierIds.contains(supplierId);
+        final totalAmount = _calculateTotalAmount(supplier);
+        final productId = _findFirstProductIdForSupplier(supplier);
+
+        return QuoteListSupplierCard(
+          supplier: supplier,
+          totalAmount: totalAmount,
+          isSelected: isSelected,
+          onToggle: () => onSupplierToggle(supplierId),
+          onTap: onSupplierTap != null
+              ? () => onSupplierTap!(supplier)
+              : null,
+          productId: productId,
+        );
+      },
     );
   }
 }

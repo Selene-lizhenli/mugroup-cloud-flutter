@@ -13,21 +13,18 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 /// 用于显示样品的基本信息，包括产品图片、公司货号、客户报价、供应商报价和采购数量
 class ProductDetailCard extends StatelessWidget {
   /// 样品ID，用于点击后导航到详情页
-  final int? sampleId;
-
-  /// 公司货号
-  final QuotationSample? data;
-
+  final int? sampleId; 
+  // 商品数据
+  final QuotationSample? data; 
   /// 产品图片URL
   final String? imageUrl;
-  final int? quoteId;
-
+  final int? quoteId; 
   /// 自定义点击回调，如果提供则使用此回调，否则使用默认的路由导航
   final VoidCallback? onTap;
   //删除之后的回调
-  final Function? refreshCallback;
-
+  final Function? refreshCallback; 
   final bool? supplierShow;
+  final String? quoteCurrency;
 
   const ProductDetailCard({
     super.key,
@@ -38,6 +35,7 @@ class ProductDetailCard extends StatelessWidget {
     this.quoteId,
     this.supplierShow,
     this.refreshCallback,
+    this.quoteCurrency,
   });
 
   @override
@@ -50,11 +48,11 @@ class ProductDetailCard extends StatelessWidget {
         : null;
     final id = sample?.id;
 
-    final supplierNo = data?.supplyQuote?.supplier?.supplierNo ?? '';
-    final supplierName = data?.supplyQuote?.supplier?.name ?? '';
-    final supplierDisplay = supplierNo.isNotEmpty
-        ? '供应商:$supplierNo'
-        : (supplierName.isNotEmpty ? '供应商:$supplierName' : '供应商:-');
+    final supplierNo = data?.supplyQuote?.supplier?.supplierNo ?? ''; 
+    final shortName = data?.supplyQuote?.supplier?.shortName ?? '';
+    final supplierDisplay = shortName.isNotEmpty
+        ? '供应商: $shortName'
+        : (supplierNo.isNotEmpty ? '供应商:$supplierNo' : '供应商: -');
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -139,6 +137,7 @@ class ProductDetailCard extends StatelessWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _KeyValue(
                           label: '公司货号',
@@ -148,14 +147,14 @@ class ProductDetailCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         _KeyValue(
-                          label: '客户报价(CNY)',
+                          label: '客户报价 ($quoteCurrency)',
                           value: (data?.supplyQuote?.customerPrice ?? 0)
                               .toString(),
                           highlight: false,
                         ),
                         const SizedBox(height: 4),
                         _KeyValue(
-                          label: '供应商报价(CNY)',
+                          label: '供应商报价 (CNY)',
                           value:
                               (data?.price ?? 0).toString(),
                           highlight: false,
@@ -316,7 +315,7 @@ class _KeyValue extends StatelessWidget {
     required this.label,
     required this.value,
     this.highlight = false,
-    this.priceStyle = false,
+    this.priceStyle = false, 
   });
 
   @override
@@ -334,14 +333,14 @@ class _KeyValue extends StatelessWidget {
           TextSpan(
             text: '$label: ',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11.5,
               color: colorScheme.onSurfaceVariant,
             ),
           ),
           TextSpan(
             text: value,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11.5,
               color: priceStyle
                   ? colorScheme.primary
                   : (highlight ? colorScheme.primary : colorScheme.onSurface),

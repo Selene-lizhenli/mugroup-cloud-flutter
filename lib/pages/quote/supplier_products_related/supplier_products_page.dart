@@ -1,14 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product/product_edit_dialog.dart';
-import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/quote/providers/quote_detail_provider.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart'; 
+import 'package:cloud/pages/quote/widgets/sample_detail_card.dart'; 
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/material.dart'; 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -31,6 +29,10 @@ class SupplierProductsPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final quoteDetailAsync = ref.watch(quoteDetailProvider(quotationId));
+    final quoteCurrency = quoteDetailAsync.whenOrNull(
+          data: (quote) => quote.curreny,
+        ) ?? '';
     final isLoading = useState(true);
     final products = useState<List<QuotationSample>>([]);
     final currentPage = useState(1);
@@ -192,6 +194,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                       theme,
                       currentPage.value,
                       totalPages.value,
+                      quoteCurrency,
                       () => fetchProducts(showLoading: true),
                       (page) {
                         currentPage.value = page;
@@ -217,6 +220,7 @@ class SupplierProductsPage extends HookConsumerWidget {
     ThemeData theme,
     int currentPage,
     int totalPages,
+    String quoteCurrency,
     VoidCallback onRefresh,
     ValueChanged<int> onPageChanged,
   ) {
@@ -290,6 +294,7 @@ class SupplierProductsPage extends HookConsumerWidget {
           imageUrl,
           colorScheme,
           theme,
+          quoteCurrency,
           onRefresh,
         );
       },
@@ -303,12 +308,14 @@ class SupplierProductsPage extends HookConsumerWidget {
     String? imageUrl,
     ColorScheme colorScheme,
     ThemeData theme,
+    String quoteCurrency,
     VoidCallback onRefresh,
   ) {
     return ProductDetailCard(
       data: row,
       imageUrl: imageUrl,
       quoteId: quotationId,
+      quoteCurrency: quoteCurrency,
       refreshCallback: onRefresh,
       supplierShow: false,
     );

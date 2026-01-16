@@ -19,7 +19,7 @@ class ProductSection extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quoteDetailProvider);
     final notifier = ref.read(quoteDetailProvider.notifier);
-    final selectedTab = useState(1); // 0: 供应商列表/验货, 1: 产品清单
+    final selectedTab = useState(0); // 0: 供应商列表/验货, 1: 产品清单
     final selectedSupplierIds = useState<Set<int>>({});
 
     final theme = Theme.of(context);
@@ -75,7 +75,7 @@ class ProductSection extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _TabButton(
-                    label: '供应商列表',
+                    label: '供应商列表(${state.suppliers.length})',
                     // icon: Icons.store_mall_directory_outlined,
                     icon: Icons.factory_outlined,
                     isSelected: selectedTab.value == 0,
@@ -84,7 +84,7 @@ class ProductSection extends HookConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   _TabButton(
-                    label: '产品清单',
+                    label: '产品清单(${state.productTotalCount})',
                     icon: Icons.view_list,
                     isSelected: selectedTab.value == 1,
                     onTap: () => selectedTab.value = 1,
@@ -170,6 +170,7 @@ class ProductSection extends HookConsumerWidget {
           data: row,
           imageUrl: imageUrl,
           quoteId: quoteId,
+          quoteCurrency: state.baseInfo?.curreny ?? '',
           supplierShow: true,
           refreshCallback: () =>
               notifier.fetchProductsPage(quoteId, state.productPage),

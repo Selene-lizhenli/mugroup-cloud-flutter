@@ -1,16 +1,17 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
-import 'package:cloud/services/dashboard.dart';
+import 'package:cloud/providers/exchange.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LineChartDemo extends StatefulWidget {
+class LineChartDemo extends ConsumerStatefulWidget {
   const LineChartDemo({super.key});
 
   @override
-  State<LineChartDemo> createState() => _LineChartDemoState();
+  ConsumerState<LineChartDemo> createState() => _LineChartDemoState();
 }
 
-class _LineChartDemoState extends State<LineChartDemo> {
+class _LineChartDemoState extends ConsumerState<LineChartDemo> {
   static const List<Color> _colorPalette = [
     Color(0xFF4A90E2),
     Color(0xFF2E7D32),
@@ -27,205 +28,168 @@ class _LineChartDemoState extends State<LineChartDemo> {
     Color(0xFF3F51B5),
   ];
 
-  List<ExchangeRate>? _exchangeRates;
-  bool _isLoading = true;
-  String? _error;
   int? _touchedIndex;
 
   @override
   void initState() {
     super.initState();
-    _loadExchangeRates();
-  }
-
-  /// 加载汇率数据
-  Future<void> _loadExchangeRates() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
-
-      final response = await getExchangesList();
-      final rates = response ?? [];
-
-      if (rates.isEmpty) {
-        setState(() {
-          _isLoading = false;
-          _error = '暂无汇率数据';
-        });
-        return;
-      }
-
-      int? usdIndex;
-      for (int i = 0; i < rates.length; i++) {
-        if (rates[i].name == '美元') {
-          usdIndex = i;
-          break;
-        }
-      }
-
-      setState(() {
-        _exchangeRates = rates;
-        _touchedIndex = usdIndex ?? 0;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _error = '加载汇率数据失败: $e';
-      });
-    }
-  }
-
-  List<String> get _currencies =>
-      _exchangeRates?.map((e) => e.name ?? '').toList() ?? [];
-
-  List<double> get _exchangeRatesList {
-    if (_exchangeRates == null) return [];
-    return _exchangeRates!.map((e) {
-      final rateStr = e.exchangeRate ?? '0';
-      final rate = double.tryParse(rateStr) ?? 0.0;
-      return double.parse((rate / 100.0).toStringAsFixed(4));
-    }).toList();
-  }
-
-  List<Color> get _currencyColors {
-    if (_exchangeRates == null) return [];
-    return List.generate(
-      _exchangeRates!.length,
-      (index) => _colorPalette[index % _colorPalette.length],
-    );
+    // 触发汇率数据加载
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(exchangeProvider.notifier).refresh();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Container(
+    final exchangeAsync = ref.watch(exchangeProvider);
+
+    return exchangeAsync.when(
+      data: (rates) {
+        if (rates.isEmpty) {
+          return const Center(child: Text('暂无汇率数据'));
+        }
+
+        int? usdIndex;
+        for (int i = 0; i < rates.length; i++) {
+          if (rates[i].name == '美元') {
+            usdIndex = i;
+            break;
+          }
+        }
+        _touchedIndex ??= usdIndex ?? 0;
+
+        final currencies = rates.map((e) => e.name ?? '').toList();
+        final exchangeRates = rates.map((e) {
+          final rateStr = e.exchangeRate ?? '0';
+          final rate = double.tryParse(rateStr) ?? 0.0;
+          return double.parse((rate / 100.0).toStringAsFixed(4));
+        }).toList();
+        final currencyColors = List.generate(
+          rates.length,
+          (index) => _colorPalette[index % _colorPalette.length],
+        );
+
+        final maxY = exchangeRates.isNotEmpty
+            ? exchangeRates.reduce((a, b) => a > b ? a : b) * 1.2
+            : 10.0;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 图例
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: List.generate(
+                  currencies.length,
+                  (index) => _buildLegendItem(
+                      currencies[index], currencyColors[index]),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // 柱状图
+              SizedBox(
+                height: 200,
+                child: BarChart(
+                  BarChartData(
+                    gridData: FlGridData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 20,
+                        getTitles: (value) => (value % 2 == 0 && value >= 0)
+                            ? value.toStringAsFixed(1)
+                            : '',
+                        getTextStyles: (_) => TextStyle(
+                            fontSize: 10, color: Colors.grey.shade600),
+                      ),
+                      bottomTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitles: (value) {
+                          final index = value.toInt();
+                          if (index >= 0 && index < currencies.length) {
+                            final name = currencies[index];
+                            return name.length > 3
+                                ? name.substring(0, 2)
+                                : name;
+                          }
+                          return '';
+                        },
+                        getTextStyles: (_) => TextStyle(
+                            fontSize: 8.2, color: Colors.grey.shade600),
+                      ),
+                      topTitles: SideTitles(showTitles: false),
+                      rightTitles: SideTitles(showTitles: false),
+                    ),
+                    minY: 0,
+                    maxY: maxY,
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(
+                      currencies.length,
+                      (index) => BarChartGroupData(
+                        x: index,
+                        barRods: [
+                          BarChartRodData(
+                            y: exchangeRates[index],
+                            colors: _touchedIndex == index
+                                ? [currencyColors[index].withOpacity(0.8)]
+                                : [currencyColors[index]],
+                            width: 20,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    barTouchData: BarTouchData(
+                      touchCallback: (BarTouchResponse? response) {
+                        setState(() {
+                          if (response != null && response.spot != null) {
+                            _touchedIndex = response.spot!.touchedBarGroupIndex;
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              // 显示选中的货币信息
+              if (_touchedIndex != null &&
+                  _touchedIndex! < currencies.length) ...[
+                const SizedBox(height: 16),
+                _buildSelectedCurrencyInfo(
+                    _touchedIndex!, currencies, exchangeRates),
+              ],
+            ],
+          ),
+        );
+      },
+      loading: () => Container(
         padding: const EdgeInsets.all(16),
         height: 300,
         child: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (_error != null) {
-      return Container(
+      ),
+      error: (error, stack) => Container(
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_error!, style: TextStyle(color: Colors.grey.shade600)),
+              Text('加载汇率数据失败: $error',
+                  style: TextStyle(color: Colors.grey.shade600)),
               const SizedBox(height: 10),
               TextButton(
-                  onPressed: _loadExchangeRates, child: const Text('重试')),
+                onPressed: () => ref.read(exchangeProvider.notifier).refresh(),
+                child: const Text('重试'),
+              ),
             ],
           ),
         ),
-      );
-    }
-
-    if (_exchangeRates == null || _exchangeRates!.isEmpty) {
-      return const Center(child: Text('暂无汇率数据'));
-    }
-
-    final currencies = _currencies;
-    final exchangeRates = _exchangeRatesList;
-    final currencyColors = _currencyColors;
-
-    final maxY = exchangeRates.isNotEmpty
-        ? exchangeRates.reduce((a, b) => a > b ? a : b) * 1.2
-        : 10.0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 图例
-          Wrap(
-            spacing: 12,
-            runSpacing: 8,
-            children: List.generate(
-              currencies.length,
-              (index) =>
-                  _buildLegendItem(currencies[index], currencyColors[index]),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // 柱状图
-          SizedBox(
-            height: 200,
-            child: BarChart(
-              BarChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(
-                  leftTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 20,
-                    getTitles: (value) => (value % 2 == 0 && value >= 0)
-                        ? value.toStringAsFixed(1)
-                        : '',
-                    getTextStyles: (_) =>
-                        TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                  ),
-                  bottomTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 30,
-                    getTitles: (value) {
-                      final index = value.toInt();
-                      if (index >= 0 && index < currencies.length) {
-                        final name = currencies[index];
-                        return name.length > 3 ? name.substring(0, 2) : name;
-                      }
-                      return '';
-                    },
-                    getTextStyles: (_) =>
-                        TextStyle(fontSize: 8.2, color: Colors.grey.shade600),
-                  ),
-                  topTitles: SideTitles(showTitles: false),
-                  rightTitles: SideTitles(showTitles: false),
-                ),
-                minY: 0,
-                maxY: maxY,
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(
-                  currencies.length,
-                  (index) => BarChartGroupData(
-                    x: index,
-                    barRods: [
-                      BarChartRodData(
-                        y: exchangeRates[index],
-                        colors: _touchedIndex == index
-                            ? [currencyColors[index].withOpacity(0.8)]
-                            : [currencyColors[index]],
-                        width: 20,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(4),
-                          topRight: Radius.circular(4),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                barTouchData: BarTouchData(
-                  touchCallback: (BarTouchResponse? response) {
-                    setState(() {
-                      if (response != null && response.spot != null) {
-                        _touchedIndex = response.spot!.touchedBarGroupIndex;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-          // 显示选中的货币信息
-          if (_touchedIndex != null && _touchedIndex! < currencies.length) ...[
-            const SizedBox(height: 16),
-            _buildSelectedCurrencyInfo(_touchedIndex!),
-          ],
-        ],
       ),
     );
   }
@@ -247,9 +211,8 @@ class _LineChartDemoState extends State<LineChartDemo> {
     );
   }
 
-  Widget _buildSelectedCurrencyInfo(int index) {
-    final currencies = _currencies;
-    final exchangeRates = _exchangeRatesList;
+  Widget _buildSelectedCurrencyInfo(
+      int index, List<String> currencies, List<double> exchangeRates) {
     final colorScheme = Theme.of(context).colorScheme;
     if (index >= currencies.length || index >= exchangeRates.length) {
       return const SizedBox.shrink();
@@ -282,19 +245,22 @@ class _LineChartDemoState extends State<LineChartDemo> {
   }
 
   void _showExchangeCalculator(BuildContext context, int defaultCurrencyIndex) {
-    if (_exchangeRates == null || _exchangeRates!.isEmpty) return;
+    final exchangeAsync = ref.read(exchangeProvider);
+    exchangeAsync.whenData((rates) {
+      if (rates.isEmpty) return;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext sheetContext) {
-        return ExchangeCalculatorDialog(
-          exchangeRates: _exchangeRates!,
-          defaultCurrencyIndex: defaultCurrencyIndex,
-        );
-      },
-    );
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext sheetContext) {
+          return ExchangeCalculatorDialog(
+            exchangeRates: rates,
+            defaultCurrencyIndex: defaultCurrencyIndex,
+          );
+        },
+      );
+    });
   }
 }
 

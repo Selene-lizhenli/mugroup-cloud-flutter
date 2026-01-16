@@ -42,11 +42,13 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
       };
       final resp = await getQuotationProductListByProductId(id, params);
       final list = resp.data ?? [];
+      final total = resp.meta!.pagination!.total.toString();
       final totalPages = resp.meta!.pagination!.totalPages;
 
       state = state.copyWith(
         isProductLoading: false,
         products: list,
+        productTotalCount: total,
         productPage: page,
         productTotalPages: totalPages,
         productError: null,

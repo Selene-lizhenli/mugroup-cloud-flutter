@@ -16,6 +16,7 @@ class QuoteDetailState {
   // ===== 新增：产品分页 =====
   final int productPage;
   final int productTotalPages;
+  final String productTotalCount;
   final bool isSupplierLoading;
   final List<QuoteSupplierGroup> suppliers;
 
@@ -28,6 +29,7 @@ class QuoteDetailState {
     this.productError,
     this.productPage = 1,
     this.productTotalPages = 0,
+    this.productTotalCount = '',
     this.isSupplierLoading = false,
     this.suppliers = const [],
     this.supplierError,
@@ -46,6 +48,7 @@ class QuoteDetailState {
     String? productError,
     int? productPage,
     int? productTotalPages,
+    String? productTotalCount,
     bool? isSupplierLoading,
     List<QuoteSupplierGroup>? suppliers,
     String? supplierError,
@@ -59,6 +62,7 @@ class QuoteDetailState {
       productError: productError ?? this.productError,
       productPage: productPage ?? this.productPage,
       productTotalPages: productTotalPages ?? this.productTotalPages,
+      productTotalCount: productTotalCount ?? this.productTotalCount,
       isSupplierLoading: isSupplierLoading ?? this.isSupplierLoading,
       suppliers: suppliers ?? this.suppliers,
       supplierError: supplierError ?? this.supplierError,
