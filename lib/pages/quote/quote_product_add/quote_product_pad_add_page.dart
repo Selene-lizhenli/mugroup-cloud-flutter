@@ -31,11 +31,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class QuoteProductAddLandscapeView extends HookConsumerWidget {
   final int? quoteId;
+  final int? companyId;
   final bool isActive;
   final Map<String, dynamic>? initialSupplier;
   const QuoteProductAddLandscapeView({
     super.key,
     this.quoteId,
+    this.companyId,
     this.initialSupplier,
     required this.isActive,
   });
@@ -892,9 +894,12 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                         backgroundColor: Colors.transparent,
                                         builder: (ctx) => FieldSelector(
                                           fields: fieldConfigs,
-                                          defaultFields: quoteSampleDefaultFields,
+                                          companyId: companyId,
+                                          defaultFields:
+                                              quoteSampleDefaultFields,
                                           onConfigChanged:
                                               notifier.updateConfigs,
+                                          showActionButtons: true,
                                         ),
                                       );
                                     }

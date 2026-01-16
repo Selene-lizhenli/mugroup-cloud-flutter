@@ -12,6 +12,7 @@ import 'dart:async';
 @RoutePage()
 class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   final int? quoteId;
+  final int? companyId;
   final QuotationList? quoteDetail;
   final int? initialMode;
   final String? supplierId; // 页面级参数：供应商 ID
@@ -19,6 +20,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   const QuoteProductAddAdaptivePage({
     super.key,
     this.quoteId,
+    this.companyId,
     this.quoteDetail,
     this.initialMode,
     this.supplierId,
@@ -38,7 +40,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
       Future<void> loadInitialSupplier() async {
         try {
           final resp = await getSupplier(int.parse(supplierId!));
-          if (resp != null ) { 
+          if (resp != null) {
             initialSupplier.value = resp.toJson();
           }
         } catch (e) {
@@ -76,6 +78,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
         QuoteProductAddLandscapeView(
           key: const ValueKey('landscape'),
           quoteId: quoteId,
+          companyId: companyId,
           initialSupplier: initialSupplier.value,
           isActive: currentMode.value == 1,
         ),

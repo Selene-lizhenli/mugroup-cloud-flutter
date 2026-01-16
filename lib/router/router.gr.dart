@@ -1015,6 +1015,7 @@ class QuoteProductAddAdaptiveRoute
   QuoteProductAddAdaptiveRoute({
     _i59.Key? key,
     int? quoteId,
+    int? companyId,
     _i62.QuotationList? quoteDetail,
     int? initialMode,
     String? supplierId,
@@ -1024,6 +1025,7 @@ class QuoteProductAddAdaptiveRoute
           args: QuoteProductAddAdaptiveRouteArgs(
             key: key,
             quoteId: quoteId,
+            companyId: companyId,
             quoteDetail: quoteDetail,
             initialMode: initialMode,
             supplierId: supplierId,
@@ -1041,6 +1043,7 @@ class QuoteProductAddAdaptiveRoute
       return _i29.QuoteProductAddAdaptivePage(
         key: args.key,
         quoteId: args.quoteId,
+        companyId: args.companyId,
         quoteDetail: args.quoteDetail,
         initialMode: args.initialMode,
         supplierId: args.supplierId,
@@ -1053,6 +1056,7 @@ class QuoteProductAddAdaptiveRouteArgs {
   const QuoteProductAddAdaptiveRouteArgs({
     this.key,
     this.quoteId,
+    this.companyId,
     this.quoteDetail,
     this.initialMode,
     this.supplierId,
@@ -1062,6 +1066,8 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   final int? quoteId;
 
+  final int? companyId;
+
   final _i62.QuotationList? quoteDetail;
 
   final int? initialMode;
@@ -1070,7 +1076,7 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   @override
   String toString() {
-    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, quoteDetail: $quoteDetail, initialMode: $initialMode, supplierId: $supplierId}';
+    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, companyId: $companyId, quoteDetail: $quoteDetail, initialMode: $initialMode, supplierId: $supplierId}';
   }
 }
 
