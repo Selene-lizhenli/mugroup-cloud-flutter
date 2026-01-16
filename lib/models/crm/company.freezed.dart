@@ -24,6 +24,9 @@ mixin _$Company {
   String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "user_id")
   int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: "form_schema")
+  List<Map<String, dynamic>>? get formSchema =>
+      throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
   String? get industry => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
@@ -49,6 +52,7 @@ abstract class $CompanyCopyWith<$Res> {
       {int? id,
       String? name,
       @JsonKey(name: "user_id") int? userId,
+      @JsonKey(name: "form_schema") List<Map<String, dynamic>>? formSchema,
       String? address,
       String? industry,
       String? location,
@@ -77,6 +81,7 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
     Object? id = freezed,
     Object? name = freezed,
     Object? userId = freezed,
+    Object? formSchema = freezed,
     Object? address = freezed,
     Object? industry = freezed,
     Object? location = freezed,
@@ -101,6 +106,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
+      formSchema: freezed == formSchema
+          ? _value.formSchema
+          : formSchema // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>?,
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -156,6 +165,7 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
       {int? id,
       String? name,
       @JsonKey(name: "user_id") int? userId,
+      @JsonKey(name: "form_schema") List<Map<String, dynamic>>? formSchema,
       String? address,
       String? industry,
       String? location,
@@ -182,6 +192,7 @@ class __$$CompanyImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? userId = freezed,
+    Object? formSchema = freezed,
     Object? address = freezed,
     Object? industry = freezed,
     Object? location = freezed,
@@ -206,6 +217,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == formSchema
+          ? _value._formSchema
+          : formSchema // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>?,
       freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -257,6 +272,8 @@ class _$CompanyImpl implements _Company {
       this.id,
       this.name,
       @JsonKey(name: "user_id") this.userId,
+      @JsonKey(name: "form_schema")
+      final List<Map<String, dynamic>>? formSchema,
       this.address,
       this.industry,
       this.location,
@@ -267,7 +284,8 @@ class _$CompanyImpl implements _Company {
       final List<String?>? linkedin,
       final List<String?>? whatsapp,
       final List<Contact?>? contacts)
-      : _domain = domain,
+      : _formSchema = formSchema,
+        _domain = domain,
         _email = email,
         _facebook = facebook,
         _linkedin = linkedin,
@@ -284,6 +302,17 @@ class _$CompanyImpl implements _Company {
   @override
   @JsonKey(name: "user_id")
   final int? userId;
+  final List<Map<String, dynamic>>? _formSchema;
+  @override
+  @JsonKey(name: "form_schema")
+  List<Map<String, dynamic>>? get formSchema {
+    final value = _formSchema;
+    if (value == null) return null;
+    if (_formSchema is EqualUnmodifiableListView) return _formSchema;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final String? address;
   @override
@@ -354,7 +383,7 @@ class _$CompanyImpl implements _Company {
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, userId: $userId, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp, contacts: $contacts)';
+    return 'Company(id: $id, name: $name, userId: $userId, formSchema: $formSchema, address: $address, industry: $industry, location: $location, source: $source, domain: $domain, email: $email, facebook: $facebook, linkedin: $linkedin, whatsapp: $whatsapp, contacts: $contacts)';
   }
 
   @override
@@ -365,6 +394,8 @@ class _$CompanyImpl implements _Company {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            const DeepCollectionEquality()
+                .equals(other._formSchema, _formSchema) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.industry, industry) ||
                 other.industry == industry) &&
@@ -386,6 +417,7 @@ class _$CompanyImpl implements _Company {
       id,
       name,
       userId,
+      const DeepCollectionEquality().hash(_formSchema),
       address,
       industry,
       location,
@@ -416,6 +448,8 @@ abstract class _Company implements Company {
       final int? id,
       final String? name,
       @JsonKey(name: "user_id") final int? userId,
+      @JsonKey(name: "form_schema")
+      final List<Map<String, dynamic>>? formSchema,
       final String? address,
       final String? industry,
       final String? location,
@@ -436,6 +470,9 @@ abstract class _Company implements Company {
   @override
   @JsonKey(name: "user_id")
   int? get userId;
+  @override
+  @JsonKey(name: "form_schema")
+  List<Map<String, dynamic>>? get formSchema;
   @override
   String? get address;
   @override

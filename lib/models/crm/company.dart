@@ -10,6 +10,7 @@ class Company with _$Company {
     int? id,
     String? name,
     @JsonKey(name: "user_id") int? userId,
+    @JsonKey(name: "form_schema") List<Map<String, dynamic>>? formSchema,
     String? address,
     String? industry,
     String? location,

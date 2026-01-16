@@ -70,9 +70,9 @@ class ProductSection extends HookConsumerWidget {
                               return;
                             }
                             context.router.push(QuoteProductAddAdaptiveRoute(
-                              quoteId: quoteId,
-                              initialMode: 0,
-                            ));
+                                quoteId: quoteId,
+                                initialMode: 0,
+                                quoteDetail: state.baseInfo));
                           },
                         ),
                       ],

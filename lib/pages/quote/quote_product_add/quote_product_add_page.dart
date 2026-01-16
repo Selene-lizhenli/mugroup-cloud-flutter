@@ -34,11 +34,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class QuoteProductAddPortraitView extends HookConsumerWidget {
   final int? quoteId;
   final bool isActive;
+  final int? companyId;
   final Map<String, dynamic>? initialSupplier;
 
   const QuoteProductAddPortraitView({
     super.key,
     this.quoteId,
+    this.companyId,
     this.initialSupplier,
     required this.isActive,
   });
@@ -805,18 +807,13 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                   builder: (ctx) {
                                     return FieldSelector(
                                       fields: fieldConfigs,
+                                      companyId: companyId,
                                       defaultFields: quoteSampleDefaultFields,
                                       onConfigChanged:
                                           (List<FieldConfig> newConfigs) {
                                         notifier.updateConfigs(newConfigs);
                                       },
                                       showActionButtons: true,
-                                      onUpload: () {
-                                        print("点击了上传");
-                                      },
-                                      onDownload: () {
-                                        print("点击了下载");
-                                      },
                                     );
                                   },
                                 );

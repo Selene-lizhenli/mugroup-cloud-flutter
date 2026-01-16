@@ -10,6 +10,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i56;
 import 'package:cloud/models/dashboard/public_news_article.dart' as _i61;
+import 'package:cloud/models/quote/quotation_list.dart' as _i62;
 import 'package:cloud/models/wms/warehouse.dart' as _i58;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
@@ -1014,6 +1015,7 @@ class QuoteProductAddAdaptiveRoute
   QuoteProductAddAdaptiveRoute({
     _i59.Key? key,
     int? quoteId,
+    _i62.QuotationList? quoteDetail,
     int? initialMode,
     String? supplierId,
     List<_i56.PageRouteInfo>? children,
@@ -1022,6 +1024,7 @@ class QuoteProductAddAdaptiveRoute
           args: QuoteProductAddAdaptiveRouteArgs(
             key: key,
             quoteId: quoteId,
+            quoteDetail: quoteDetail,
             initialMode: initialMode,
             supplierId: supplierId,
           ),
@@ -1038,6 +1041,7 @@ class QuoteProductAddAdaptiveRoute
       return _i29.QuoteProductAddAdaptivePage(
         key: args.key,
         quoteId: args.quoteId,
+        quoteDetail: args.quoteDetail,
         initialMode: args.initialMode,
         supplierId: args.supplierId,
       );
@@ -1049,6 +1053,7 @@ class QuoteProductAddAdaptiveRouteArgs {
   const QuoteProductAddAdaptiveRouteArgs({
     this.key,
     this.quoteId,
+    this.quoteDetail,
     this.initialMode,
     this.supplierId,
   });
@@ -1057,13 +1062,15 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   final int? quoteId;
 
+  final _i62.QuotationList? quoteDetail;
+
   final int? initialMode;
 
   final String? supplierId;
 
   @override
   String toString() {
-    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode, supplierId: $supplierId}';
+    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, quoteDetail: $quoteDetail, initialMode: $initialMode, supplierId: $supplierId}';
   }
 }
 

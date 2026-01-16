@@ -1,8 +1,12 @@
 import 'package:cloud/models/field_config.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class FieldSelector extends StatefulWidget {
   final List<FieldConfig> fields; // 当前的配置
+  final int? companyId;
   final List<FieldConfig> defaultFields; // 默认配置源
   final ValueChanged<List<FieldConfig>>? onConfigChanged;
 
@@ -15,6 +19,7 @@ class FieldSelector extends StatefulWidget {
   const FieldSelector({
     super.key,
     required this.fields,
+    this.companyId,
     required this.defaultFields,
     this.onConfigChanged,
     this.onUpload,
@@ -146,7 +151,23 @@ class _FieldSelectorState extends State<FieldSelector> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: widget.onUpload,
+                        onPressed: () async {
+                          final bool isConfirmed = await ConfirmDialog.show(
+                            context,
+                            content: '确定要将当前字段配置上传到该客户吗？这将盖该客户现有的字段设置。',
+                          );
+                          if (isConfirmed) {
+                            if (widget.companyId == null) return;
+
+                            await updateCrmCompany(
+                              widget.companyId!,
+                              {
+                                'form_schema': widget.fields,
+                              },
+                            );
+                            EasyLoading.showSuccess('上传成功');
+                          }
+                        },
                         icon: const Icon(Icons.upload, size: 16),
                         label: const Text(
                           '上传客户字段',
@@ -170,7 +191,25 @@ class _FieldSelectorState extends State<FieldSelector> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: widget.onDownload,
+                        onPressed: () async {
+                          final bool isConfirmed = await ConfirmDialog.show(
+                            context,
+                            content: '确定要将当前字段配置上传到该客户吗？这将盖该客户现有的字段设置。',
+                          );
+                          if (isConfirmed) {
+                            if (widget.companyId == null) return;
+
+                            final resp =
+                                await showCrmCompany(widget.companyId!);
+
+                            setState(() {
+                              _localFields = (resp?.formSchema ?? [])
+                                  .map((e) => FieldConfig.fromJson(e))
+                                  .toList();
+                            });
+                            EasyLoading.showSuccess('同步成功');
+                          }
+                        },
                         icon: const Icon(Icons.download, size: 16),
                         label: const Text(
                           '下载客户字段',
@@ -330,6 +369,7 @@ class _FieldSelectorState extends State<FieldSelector> {
                         if (widget.onConfigChanged != null) {
                           widget.onConfigChanged!(_localFields);
                         }
+                        EasyLoading.showSuccess('字段设置保存成功');
                       },
                       child: const Text(
                         '保存配置',
