@@ -35,6 +35,22 @@ class SupplySupplierForm extends HookConsumerWidget {
 
     final provinceId = useState<String?>(null);
 
+    // 解析 stall_address 为区域和店铺号
+    Map<String, dynamic> getInitialValues() {
+      final initialData = initial?.toJson() ?? {};
+      if (initialData['stall_address'] != null &&
+          initialData['stall_address'] is String) {
+        final stallAddress = initialData['stall_address'] as String;
+        final parts = stallAddress.split(';');
+        initialData['stall_area'] = parts.isNotEmpty ? parts[0] : '';
+        initialData['stall_shop_number'] = parts.length > 1 ? parts[1] : '';
+      } else {
+        initialData['stall_area'] = '';
+        initialData['stall_shop_number'] = '';
+      }
+      return initialData;
+    }
+
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
       final images = formKey.currentState?.value['images'];
@@ -71,7 +87,7 @@ class SupplySupplierForm extends HookConsumerWidget {
               child: FormBuilder(
                 key: formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                initialValue: initial?.toJson() ?? {},
+                initialValue: getInitialValues(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -241,6 +257,42 @@ class SupplySupplierForm extends HookConsumerWidget {
                               onChanged: field.didChange,
                             );
                           },
+                        ),
+                      ],
+                    ),
+                    BuildFormCard(
+                      title: '档口信息',
+                      collapsible: true,
+                      defaultExpanded: true,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FormBuilderField<String>(
+                                name: "stall_area",
+                                builder: (field) {
+                                  return Input(
+                                    label: '区域',
+                                    value: field.value ?? '',
+                                    onChanged: field.didChange,
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: FormBuilderField<String>(
+                                name: "stall_shop_number",
+                                builder: (field) {
+                                  return Input(
+                                    label: '店铺号',
+                                    value: field.value ?? '',
+                                    onChanged: field.didChange,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -590,6 +642,8 @@ class SupplySupplierForm extends HookConsumerWidget {
                   final values = formState!.value;
                   // 创建可修改的 map 副本
                   final data = Map<String, dynamic>.from(values);
+                  
+                  // 处理 images
                   if (data['images'] != null && data['images'] is List) {
                     data['images'] = (data['images'] as List)
                         .map((e) => {
@@ -598,6 +652,19 @@ class SupplySupplierForm extends HookConsumerWidget {
                             })
                         .toList();
                   }
+                  
+                  // 合并档口信息：区域和店铺号合并为 stall_address
+                  final stallArea = data['stall_area']?.toString().trim() ?? '';
+                  final stallShopNumber = data['stall_shop_number']?.toString().trim() ?? '';
+                  if (stallArea.isNotEmpty || stallShopNumber.isNotEmpty) {
+                    data['stall_address'] = [stallArea, stallShopNumber].join(';');
+                  } else {
+                    data['stall_address'] = null;
+                  }
+                  // 移除临时字段
+                  data.remove('stall_area');
+                  data.remove('stall_shop_number');
+                  
                   onSubmit(data);
                 }
               },

@@ -194,14 +194,12 @@ class SupplierAddSheet extends HookConsumerWidget {
         // 处理名片图片 - 转换为包含 collection_name 的格式
         if (businessCard.value.isNotEmpty) {
           data['images'] = businessCard.value.map((e) => {
-            ...e.toJson(),
-            'id': e.id,
+            ...e.toJson(), 
             'collection_name': 'bussiness_card',
           }).toList();
         } 
 
-        final supplier = await storeSupplySupplier(data);
-        logger.d('supplierNo: $supplier');
+        final supplier = await storeSupplySupplier(data); 
         if (supplier != null && context.mounted) {
           Navigator.pop(context);
           if (quotationId != null && supplier.id != null) {

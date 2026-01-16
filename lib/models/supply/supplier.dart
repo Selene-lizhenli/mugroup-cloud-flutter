@@ -26,6 +26,7 @@ class Supplier with _$Supplier {
     @JsonKey(name: 'bank_name') String? bankName,
     @JsonKey(name: 'bank_account') String? bankAccount,
     @JsonKey(name: 'business_title') String? businessTitle,
+    @JsonKey(name: 'stall_address') String? stallAddress,
     @JsonKey(name: 'bill_type') String? billType,
     @JsonKey(name: 'type_id') int? typeId,
     @JsonKey(name: 'is_corporate') String? isCorporate,

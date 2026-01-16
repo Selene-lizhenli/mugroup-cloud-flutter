@@ -49,6 +49,8 @@ mixin _$Supplier {
   String? get bankAccount => throw _privateConstructorUsedError;
   @JsonKey(name: 'business_title')
   String? get businessTitle => throw _privateConstructorUsedError;
+  @JsonKey(name: 'stall_address')
+  String? get stallAddress => throw _privateConstructorUsedError;
   @JsonKey(name: 'bill_type')
   String? get billType => throw _privateConstructorUsedError;
   @JsonKey(name: 'type_id')
@@ -113,6 +115,7 @@ abstract class $SupplierCopyWith<$Res> {
       @JsonKey(name: 'bank_name') String? bankName,
       @JsonKey(name: 'bank_account') String? bankAccount,
       @JsonKey(name: 'business_title') String? businessTitle,
+      @JsonKey(name: 'stall_address') String? stallAddress,
       @JsonKey(name: 'bill_type') String? billType,
       @JsonKey(name: 'type_id') int? typeId,
       @JsonKey(name: 'is_corporate') String? isCorporate,
@@ -163,6 +166,7 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
     Object? bankName = freezed,
     Object? bankAccount = freezed,
     Object? businessTitle = freezed,
+    Object? stallAddress = freezed,
     Object? billType = freezed,
     Object? typeId = freezed,
     Object? isCorporate = freezed,
@@ -253,6 +257,10 @@ class _$SupplierCopyWithImpl<$Res, $Val extends Supplier>
       businessTitle: freezed == businessTitle
           ? _value.businessTitle
           : businessTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stallAddress: freezed == stallAddress
+          ? _value.stallAddress
+          : stallAddress // ignore: cast_nullable_to_non_nullable
               as String?,
       billType: freezed == billType
           ? _value.billType
@@ -353,6 +361,7 @@ abstract class _$$SupplierImplCopyWith<$Res>
       @JsonKey(name: 'bank_name') String? bankName,
       @JsonKey(name: 'bank_account') String? bankAccount,
       @JsonKey(name: 'business_title') String? businessTitle,
+      @JsonKey(name: 'stall_address') String? stallAddress,
       @JsonKey(name: 'bill_type') String? billType,
       @JsonKey(name: 'type_id') int? typeId,
       @JsonKey(name: 'is_corporate') String? isCorporate,
@@ -401,6 +410,7 @@ class __$$SupplierImplCopyWithImpl<$Res>
     Object? bankName = freezed,
     Object? bankAccount = freezed,
     Object? businessTitle = freezed,
+    Object? stallAddress = freezed,
     Object? billType = freezed,
     Object? typeId = freezed,
     Object? isCorporate = freezed,
@@ -491,6 +501,10 @@ class __$$SupplierImplCopyWithImpl<$Res>
       freezed == businessTitle
           ? _value.businessTitle
           : businessTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == stallAddress
+          ? _value.stallAddress
+          : stallAddress // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == billType
           ? _value.billType
@@ -586,6 +600,7 @@ class _$SupplierImpl implements _Supplier {
       @JsonKey(name: 'bank_name') this.bankName,
       @JsonKey(name: 'bank_account') this.bankAccount,
       @JsonKey(name: 'business_title') this.businessTitle,
+      @JsonKey(name: 'stall_address') this.stallAddress,
       @JsonKey(name: 'bill_type') this.billType,
       @JsonKey(name: 'type_id') this.typeId,
       @JsonKey(name: 'is_corporate') this.isCorporate,
@@ -667,6 +682,9 @@ class _$SupplierImpl implements _Supplier {
   @override
   @JsonKey(name: 'business_title')
   final String? businessTitle;
+  @override
+  @JsonKey(name: 'stall_address')
+  final String? stallAddress;
   @override
   @JsonKey(name: 'bill_type')
   final String? billType;
@@ -751,7 +769,7 @@ class _$SupplierImpl implements _Supplier {
 
   @override
   String toString() {
-    return 'Supplier(id: $id, name: $name, city: $city, province: $province, address: $address, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, sitePhotos: $sitePhotos, showroomPhotos: $showroomPhotos, devicePhotos: $devicePhotos, contacts: $contacts)';
+    return 'Supplier(id: $id, name: $name, city: $city, province: $province, address: $address, annual: $annual, advantages: $advantages, supplierNo: $supplierNo, usciCode: $usciCode, isCore: $isCore, canBill: $canBill, businessScope: $businessScope, exportMarket: $exportMarket, shippingAmount: $shippingAmount, shortName: $shortName, bankName: $bankName, bankAccount: $bankAccount, businessTitle: $businessTitle, stallAddress: $stallAddress, billType: $billType, typeId: $typeId, isCorporate: $isCorporate, supplierType: $supplierType, corpCustomer: $corpCustomer, corpCompany: $corpCompany, showroomArea: $showroomArea, corpSkuid: $corpSkuid, marketRate: $marketRate, landType: $landType, factoryArea: $factoryArea, employeeCount: $employeeCount, developedAt: $developedAt, sitePhotos: $sitePhotos, showroomPhotos: $showroomPhotos, devicePhotos: $devicePhotos, contacts: $contacts)';
   }
 
   @override
@@ -788,6 +806,8 @@ class _$SupplierImpl implements _Supplier {
                 other.bankAccount == bankAccount) &&
             (identical(other.businessTitle, businessTitle) ||
                 other.businessTitle == businessTitle) &&
+            (identical(other.stallAddress, stallAddress) ||
+                other.stallAddress == stallAddress) &&
             (identical(other.billType, billType) ||
                 other.billType == billType) &&
             (identical(other.typeId, typeId) || other.typeId == typeId) &&
@@ -844,6 +864,7 @@ class _$SupplierImpl implements _Supplier {
         bankName,
         bankAccount,
         businessTitle,
+        stallAddress,
         billType,
         typeId,
         isCorporate,
@@ -897,6 +918,7 @@ abstract class _Supplier implements Supplier {
       @JsonKey(name: 'bank_name') final String? bankName,
       @JsonKey(name: 'bank_account') final String? bankAccount,
       @JsonKey(name: 'business_title') final String? businessTitle,
+      @JsonKey(name: 'stall_address') final String? stallAddress,
       @JsonKey(name: 'bill_type') final String? billType,
       @JsonKey(name: 'type_id') final int? typeId,
       @JsonKey(name: 'is_corporate') final String? isCorporate,
@@ -965,6 +987,9 @@ abstract class _Supplier implements Supplier {
   @override
   @JsonKey(name: 'business_title')
   String? get businessTitle;
+  @override
+  @JsonKey(name: 'stall_address')
+  String? get stallAddress;
   @override
   @JsonKey(name: 'bill_type')
   String? get billType;
