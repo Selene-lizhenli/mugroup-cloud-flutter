@@ -542,8 +542,15 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             confirmColor: Colors.blue,
           );
           if (isContinue == true) {
+            final currentSupplier = formState.value['supplier'];
             formState.reset();
             formDataNotifier.clearFormData();
+
+            if (currentSupplier != null) {
+              formKey.currentState?.patchValue({
+                'supplier': currentSupplier,
+              });
+            }
           } else {
             if (context.mounted) Navigator.of(context).pop(true);
           }
