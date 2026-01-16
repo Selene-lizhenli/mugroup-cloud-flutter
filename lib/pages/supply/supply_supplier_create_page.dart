@@ -19,7 +19,7 @@ class SupplySupplierCreatePage extends HookConsumerWidget {
       ),
       body: SupplySupplierForm(
         initial: null,
-        onSubmit: (data) async {
+        onSubmit: (data) async { 
           await storeSupplySupplier(data);
           EasyLoading.showSuccess("创建成功");
           if (context.mounted) {

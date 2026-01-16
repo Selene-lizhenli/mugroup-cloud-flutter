@@ -148,8 +148,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
                 SupplySupplierForm(
                   key: ValueKey('info_${refreshKey.value}'),
                   initial: supplier.value,
-                  onSubmit: (data) async {
-                    logger.d(data);
+                  onSubmit: (data) async {  
                     await updateSupplySupplier(id, data);
                     EasyLoading.showSuccess("编辑成功");
                   },

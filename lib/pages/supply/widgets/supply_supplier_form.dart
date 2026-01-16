@@ -588,8 +588,17 @@ class SupplySupplierForm extends HookConsumerWidget {
                 final formState = formKey.currentState;
                 if (formState?.saveAndValidate() ?? false) {
                   final values = formState!.value;
-
-                  onSubmit(values);
+                  // 创建可修改的 map 副本
+                  final data = Map<String, dynamic>.from(values);
+                  if (data['images'] != null && data['images'] is List) {
+                    data['images'] = (data['images'] as List)
+                        .map((e) => {
+                              ...e.toJson(), 
+                              'collection_name': 'bussiness_card',
+                            })
+                        .toList();
+                  }
+                  onSubmit(data);
                 }
               },
               child: const Text(
