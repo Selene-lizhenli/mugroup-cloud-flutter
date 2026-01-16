@@ -10,7 +10,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i56;
 import 'package:cloud/models/dashboard/public_news_article.dart' as _i61;
-import 'package:cloud/models/quote/quotation_list.dart' as _i62;
 import 'package:cloud/models/wms/warehouse.dart' as _i58;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
@@ -1021,9 +1020,12 @@ class QuoteProductAddAdaptiveRoute
           QuoteProductAddAdaptiveRoute.name,
           args: QuoteProductAddAdaptiveRouteArgs(
             key: key,
-            quoteId: quoteId,
-            companyId: companyId,
-            quoteDetail: quoteDetail,
+            initialMode: initialMode,
+            supplierId: supplierId,
+          ),
+          initialChildren: children,
+        );
+
   static const String name = 'QuoteProductAddAdaptiveRoute';
 
   static _i56.PageInfo page = _i56.PageInfo(
@@ -1033,9 +1035,6 @@ class QuoteProductAddAdaptiveRoute
           orElse: () => const QuoteProductAddAdaptiveRouteArgs());
       return _i29.QuoteProductAddAdaptivePage(
         key: args.key,
-        quoteId: args.quoteId,
-        companyId: args.companyId,
-        quoteDetail: args.quoteDetail,
         initialMode: args.initialMode,
         supplierId: args.supplierId,
       );
@@ -1046,20 +1045,11 @@ class QuoteProductAddAdaptiveRoute
 class QuoteProductAddAdaptiveRouteArgs {
   const QuoteProductAddAdaptiveRouteArgs({
     this.key,
-    this.quoteId,
-    this.companyId,
-    this.quoteDetail,
     this.initialMode,
     this.supplierId,
   });
 
   final _i59.Key? key;
-
-  final int? quoteId;
-
-  final int? companyId;
-
-  final _i62.QuotationList? quoteDetail;
 
   final int? initialMode;
 
@@ -1067,7 +1057,7 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   @override
   String toString() {
-    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, companyId: $companyId, quoteDetail: $quoteDetail, initialMode: $initialMode, supplierId: $supplierId}';
+    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, initialMode: $initialMode, supplierId: $supplierId}';
   }
 }
 
