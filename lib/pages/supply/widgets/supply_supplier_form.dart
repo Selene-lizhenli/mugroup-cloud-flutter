@@ -86,7 +86,6 @@ class SupplySupplierForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
                 initialValue: getInitialValues(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -642,29 +641,31 @@ class SupplySupplierForm extends HookConsumerWidget {
                   final values = formState!.value;
                   // 创建可修改的 map 副本
                   final data = Map<String, dynamic>.from(values);
-                  
+
                   // 处理 images
                   if (data['images'] != null && data['images'] is List) {
                     data['images'] = (data['images'] as List)
                         .map((e) => {
-                              ...e.toJson(), 
+                              ...e.toJson(),
                               'collection_name': 'bussiness_card',
                             })
                         .toList();
                   }
-                  
+
                   // 合并档口信息：区域和店铺号合并为 stall_address
                   final stallArea = data['stall_area']?.toString().trim() ?? '';
-                  final stallShopNumber = data['stall_shop_number']?.toString().trim() ?? '';
+                  final stallShopNumber =
+                      data['stall_shop_number']?.toString().trim() ?? '';
                   if (stallArea.isNotEmpty || stallShopNumber.isNotEmpty) {
-                    data['stall_address'] = [stallArea, stallShopNumber].join(';');
+                    data['stall_address'] =
+                        [stallArea, stallShopNumber].join(';');
                   } else {
                     data['stall_address'] = null;
                   }
                   // 移除临时字段
                   data.remove('stall_area');
                   data.remove('stall_shop_number');
-                  
+
                   onSubmit(data);
                 }
               },

@@ -640,7 +640,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: FormBuilder(
                   key: formKey,
-                  autovalidateMode: autoValidateMode.value,
                   // initialValue: initialSupplier != null
                   //     ? <String, dynamic>{
                   //         'supplyQuote': initialSupplier,

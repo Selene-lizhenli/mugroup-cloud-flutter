@@ -687,7 +687,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       ),
       body: FormBuilder(
         key: formKey,
-        autovalidateMode: autoValidateMode.value,
         initialValue: initialSupplier != null
             ? <String, dynamic>{
                 'supplyQuote': initialSupplier,

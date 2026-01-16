@@ -46,7 +46,6 @@ class SupplySupplierContactCreatePage extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: FormBuilder(
             key: formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
