@@ -23,8 +23,7 @@ class CrmCompanyPage extends HookConsumerWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('客户列表'),
-          elevation: 0,
-          backgroundColor: Colors.white,
+          elevation: 0, 
           foregroundColor: Colors.black,
           actions: [
             TextButton(
@@ -35,7 +34,7 @@ class CrmCompanyPage extends HookConsumerWidget {
                 "新增",
                 style: TextStyle(
                   color: colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ),

@@ -25,7 +25,7 @@ class SupplySupplierPage extends HookConsumerWidget {
         appBar: AppBar(
           title: const Text('供应商列表'),
           elevation: 0,
-          backgroundColor: Colors.white,
+          // backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           actions: [
             TextButton(
@@ -36,7 +36,7 @@ class SupplySupplierPage extends HookConsumerWidget {
                 "新增",
                 style: TextStyle(
                   color: colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -55,25 +55,8 @@ class SupplySupplierPage extends HookConsumerWidget {
                 home.bus.dispatch(
                     SearchEvent(search: search, media: home.currentMedia));
               },
-              onSearchMedia: (temporaryMedia) {
-                homeNotifier.addMedia(temporaryMedia);
-                if (temporaryMedia.id == home.currentMediaId) {
-                  return;
-                }
-                home.bus.dispatch(
-                    SearchEvent(search: home.search, media: temporaryMedia));
-              },
-              onDeleteMedia: (temporaryMedia) {
-                final nextState = homeNotifier.deleteMedia(temporaryMedia);
-                if (nextState.currentMediaId == home.currentMediaId) {
-                  return;
-                }
-
-                home.bus.dispatch(SearchEvent(
-                  media: nextState.currentMedia,
-                  search: nextState.search,
-                ));
-              },
+              enableImageSearch: false,
+       
             ),
             Expanded(
               child: PageView(

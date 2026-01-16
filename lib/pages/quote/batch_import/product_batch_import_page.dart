@@ -160,7 +160,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               context: context,
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
-                              builder: (_) => const SupplierSelect(),
+                              builder: (_) => const SupplierSelect(showCreateSupplier: false),
                             );
                             if (result is Map<String, dynamic>) {
                               final name = (result['short_name'] ??

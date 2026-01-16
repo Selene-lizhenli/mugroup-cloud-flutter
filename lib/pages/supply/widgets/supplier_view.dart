@@ -1,4 +1,5 @@
 import 'package:cloud/hooks/hooks.dart';
+import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
@@ -45,6 +46,16 @@ class SupplierView extends HookConsumerWidget {
       search.value = searchText;
       media.value = searchMedia;
 
+      // 如果搜索内容为空，清空列表并返回空响应
+      if (searchText == null || searchText.trim().isEmpty) {
+        if (init == true) {
+          suppliers.value = [];
+          hasSearched.value = false;
+          page.value = 1;
+        }
+        return ApiResponse<List<Supplier>>.data([], null);
+      }
+
       if (init == true) {
         hasSearched.value = true;
         page.value = 1;
@@ -64,7 +75,7 @@ class SupplierView extends HookConsumerWidget {
         suppliers.value = [...suppliers.value, ...resp.data];
       }
 
-      if (resp.data.length >= 20) {
+      if (resp.data.length >= pageSize) {
         page.value++;
       }
 
@@ -131,7 +142,7 @@ class SupplierView extends HookConsumerWidget {
             final resp =
                 await fetchData(search.value, searchMedia: media.value);
 
-            refreshController.finishLoad(resp.data.length >= pageSize
+            refreshController.finishLoad((resp.data.length) >= pageSize
                 ? IndicatorResult.success
                 : IndicatorResult.noMore);
           },
@@ -139,12 +150,13 @@ class SupplierView extends HookConsumerWidget {
             slivers: [
               MultiSliver(
                 children: [
-                  if (suppliers.value.isEmpty)
+                  // 如果搜索内容为空，不展示列表
+                  if (search.value == null || search.value!.trim().isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
                         child: Text(
-                          hasSearched.value ? '暂无数据' : '请输入关键词搜索',
+                          '请输入关键词搜索',
                           style: TextStyle(
                             color: colorScheme.surfaceContainerHighest,
                             fontSize: 16,
@@ -152,6 +164,21 @@ class SupplierView extends HookConsumerWidget {
                         ),
                       ),
                     )
+                  // 如果搜索内容不为空，但列表为空，显示"暂无数据"
+                  else if (suppliers.value.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Text(
+                          '暂无数据',
+                          style: TextStyle(
+                            color: colorScheme.surfaceContainerHighest,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    )
+                  // 如果搜索内容不为空且有数据，展示列表
                   else
                     SliverPadding(
                       padding: const EdgeInsets.all(0),

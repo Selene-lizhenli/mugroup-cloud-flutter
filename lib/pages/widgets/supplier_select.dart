@@ -9,7 +9,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SupplierSelect extends HookConsumerWidget {
-  const SupplierSelect({super.key});
+  final bool showCreateSupplier;
+
+  const SupplierSelect({
+    super.key,
+    this.showCreateSupplier = true,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -139,71 +144,59 @@ class SupplierSelect extends HookConsumerWidget {
                                 color: Colors.grey[400], fontSize: 13)))
                     : Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
-                            child: Container(
-                              padding: const EdgeInsets.fromLTRB(24,17, 30, 17),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: colorScheme.secondary,
-                                ),
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
+                          if (showCreateSupplier)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(24,17, 30, 17),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
-                                  onTap: () {
-                                    if (context.mounted) {
-                                      context.router.push(
-                                          const SupplySupplierCreateRoute());
-                                      return;
-                                    }
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.add,
-                                        color: colorScheme.secondary,
-                                        size: 24,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '创建新供应商',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                color: colorScheme.secondary,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                         
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                  border: Border.all(
+                                    color: colorScheme.secondary,
                                   ),
-
-                                  //  Padding(
-                                  //   padding: const EdgeInsets.symmetric(vertical: 18),
-                                  //   child: Center(
-                                  //     child: Icon(
-                                  //       Icons.add,
-                                  //       size: 24,
-                                  //       color: colorScheme.secondary,
-                                  //     ),
-                                  //   ),
-                                  // ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(8),
+                                    onTap: () {
+                                      if (context.mounted) {
+                                        context.router.push(
+                                            const SupplySupplierCreateRoute());
+                                        return;
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          color: colorScheme.secondary,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '创建新供应商',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: colorScheme.secondary,
+                                                ),
+                                              ), 
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ), 
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
                           Expanded(
                               child: ListView.separated(
                             padding: const EdgeInsets.all(4),

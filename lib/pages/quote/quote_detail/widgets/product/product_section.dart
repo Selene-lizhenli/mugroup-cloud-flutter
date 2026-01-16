@@ -2,10 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/supplier_add_sheet.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/supplier/supplier_list.dart';
 import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
-import 'package:cloud/router/router.gr.dart'; 
-import 'package:flutter/material.dart'; 
+import 'package:cloud/router/router.gr.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -47,7 +48,7 @@ class ProductSection extends HookConsumerWidget {
                           onTap: () {
                             context.router.push(
                               ProductBatchImportRoute(
-                                quotationId: quoteId, 
+                                quotationId: quoteId,
                               ),
                             );
                           },
@@ -59,6 +60,15 @@ class ProductSection extends HookConsumerWidget {
                           backgroundColor: colorScheme.secondary, // 蓝色
                           textColor: colorScheme.onSecondary,
                           onTap: () {
+                            if (selectedTab.value == 0) {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) =>
+                                    SupplierAddSheet(quotationId: quoteId),
+                              );
+                              return;
+                            }
                             context.router.push(QuoteProductAddAdaptiveRoute(
                               quoteId: quoteId,
                               initialMode: 0,
@@ -108,7 +118,6 @@ class ProductSection extends HookConsumerWidget {
 
   Widget _buildProductList(BuildContext context, QuoteDetailState state,
       ColorScheme colorScheme, notifier, int? quoteId) {
- 
     if (state.isProductLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -228,7 +237,6 @@ class ProductSection extends HookConsumerWidget {
       },
     );
   }
- 
 }
 
 class _TabButton extends StatelessWidget {
