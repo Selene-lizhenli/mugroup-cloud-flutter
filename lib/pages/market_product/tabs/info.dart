@@ -113,7 +113,7 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     enTitle: 'Suppliers',
                     cnTitle: '新增供应商',
                     onTap: () {
-                      context.router.push(const SupplySupplierCreateRoute());
+                      context.router.push(const MarketProductSupplierCreateRoute());
                     },
                   ),
                 ),

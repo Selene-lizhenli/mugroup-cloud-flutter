@@ -67,6 +67,9 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: MarketProductCompanyCreateRoute.page,
           path: "/market_product/company/create"),
+      AutoRoute(
+          page: MarketProductSupplierCreateRoute.page,
+          path: "/market_product/supplier/create"),
 
       AutoRoute(page: LoginRoute.page, path: "/login"),
       AutoRoute(page: ScanRoute.page, path: "/scan"),

@@ -163,7 +163,7 @@ class SupplierSelect extends HookConsumerWidget {
                                     onTap: () {
                                       if (context.mounted) {
                                         context.router.push(
-                                            const SupplySupplierCreateRoute());
+                                            const MarketProductSupplierCreateRoute());
                                         return;
                                       }
                                     },
