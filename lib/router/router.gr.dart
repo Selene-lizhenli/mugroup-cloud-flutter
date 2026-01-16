@@ -1016,7 +1016,7 @@ class QuoteProductAddAdaptiveRoute
     int? quoteId,
     int? initialMode,
     String? supplierId,
-    List<_i55.PageRouteInfo>? children,
+    List<_i56.PageRouteInfo>? children,
   }) : super(
           QuoteProductAddAdaptiveRoute.name,
           args: QuoteProductAddAdaptiveRouteArgs(
