@@ -13,16 +13,18 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 /// 用于显示样品的基本信息，包括产品图片、公司货号、客户报价、供应商报价和采购数量
 class ProductDetailCard extends StatelessWidget {
   /// 样品ID，用于点击后导航到详情页
-  final int? sampleId; 
+  final int? sampleId;
   // 商品数据
-  final QuotationSample? data; 
+  final QuotationSample? data;
+
   /// 产品图片URL
   final String? imageUrl;
-  final int? quoteId; 
+  final int? quoteId;
+
   /// 自定义点击回调，如果提供则使用此回调，否则使用默认的路由导航
   final VoidCallback? onTap;
   //删除之后的回调
-  final Function? refreshCallback; 
+  final Function? refreshCallback;
   final bool? supplierShow;
   final String? quoteCurrency;
 
@@ -48,11 +50,14 @@ class ProductDetailCard extends StatelessWidget {
         : null;
     final id = sample?.id;
 
-    final supplierNo = data?.supplyQuote?.supplier?.supplierNo ?? ''; 
+    final supplierNo = data?.supplyQuote?.supplier?.supplierNo ?? '';
     final shortName = data?.supplyQuote?.supplier?.shortName ?? '';
+    final name = data?.supplyQuote?.supplier?.shortName ?? '';
     final supplierDisplay = shortName.isNotEmpty
         ? '供应商: $shortName'
-        : (supplierNo.isNotEmpty ? '供应商:$supplierNo' : '供应商: -');
+        : name.isNotEmpty
+            ? '供应商: $name'
+            : (supplierNo.isNotEmpty ? '供应商: $supplierNo' : '供应商: -');
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -100,7 +105,8 @@ class ProductDetailCard extends StatelessWidget {
               InkWell(
                 borderRadius: BorderRadius.circular(6),
                 onTap: () async {
-                  await _handleDeleteProduct(context, id, refreshCallback);
+                  await _handleDeleteProduct(
+                      context, data?.id, refreshCallback);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(4),
@@ -123,7 +129,7 @@ class ProductDetailCard extends StatelessWidget {
                   () {
                     if (sampleId == null && id == null) return;
                     if (!context.mounted) return;
-                    logger.d('ididdi${sampleId }${id}');
+                    logger.d('ididdi${sampleId}${id}');
                     context.router
                         .push(ShowroomSampleDetailRoute(id: sampleId ?? id!));
                   },
@@ -155,15 +161,13 @@ class ProductDetailCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         _KeyValue(
                           label: '供应商报价 (CNY)',
-                          value:
-                              (data?.price ?? 0).toString(),
+                          value: (data?.price ?? 0).toString(),
                           highlight: false,
                         ),
                         const SizedBox(height: 4),
                         _KeyValue(
                           label: '采购数量',
-                          value:
-                              (data?.qty ?? 0).toString(),
+                          value: (data?.qty ?? 0).toString(),
                           highlight: false,
                         ),
                       ],
@@ -179,8 +183,8 @@ class ProductDetailCard extends StatelessWidget {
   }
 
   Future<void> _handleDeleteProduct(
-      BuildContext context, int? productId, Function? onRefresh) async {
-    if (productId == null) return;
+      BuildContext context, int? itemId, Function? onRefresh) async {
+    if (itemId == null) return;
     final confirmed = await ConfirmDialog.show(
       context,
       title: '确认删除',
@@ -192,7 +196,7 @@ class ProductDetailCard extends StatelessWidget {
 
     EasyLoading.show(status: '删除中...');
     final params = {
-      'ids': [productId],
+      'ids': [itemId],
       "quotation_id": quoteId,
     };
     logger.d('${params}params');
@@ -315,7 +319,7 @@ class _KeyValue extends StatelessWidget {
     required this.label,
     required this.value,
     this.highlight = false,
-    this.priceStyle = false, 
+    this.priceStyle = false,
   });
 
   @override
