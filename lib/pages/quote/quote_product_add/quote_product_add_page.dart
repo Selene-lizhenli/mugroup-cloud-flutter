@@ -436,8 +436,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       if (formKey.currentState == null) return null;
 
       // 仅在当前表单还没有供应商值时设置，避免覆盖用户已选择的值
-      final currentSupplier =
-          formKey.currentState!.fields['supplier']?.value;
+      final currentSupplier = formKey.currentState!.fields['supplier']?.value;
       if (currentSupplier != null && currentSupplier.isNotEmpty) return null;
 
       // 使用 addPostFrameCallback 确保表单完全构建后再设置值
@@ -447,7 +446,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
         if (supplierField != null) {
           // 如果字段还没有值，才设置
           final currentValue = supplierField.value;
-          if (currentValue == null || 
+          if (currentValue == null ||
               (currentValue is Map && currentValue.isEmpty)) {
             formKey.currentState?.patchValue({
               'supplier': initialSupplier,
@@ -458,7 +457,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
       return null;
     }, [initialSupplier, isActive]);
-
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -637,8 +635,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
               padding: const EdgeInsets.all(8),
               child: SingleChildScrollView(
                 child: FormBuilder(
-                  key: formKey, 
-                   autovalidateMode: autoValidateMode.value,
+                  key: formKey,
+                  autovalidateMode: autoValidateMode.value,
                   // initialValue: initialSupplier != null
                   //     ? <String, dynamic>{
                   //         'supplyQuote': initialSupplier,
@@ -811,6 +809,13 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                       onConfigChanged:
                                           (List<FieldConfig> newConfigs) {
                                         notifier.updateConfigs(newConfigs);
+                                      },
+                                      showActionButtons: true,
+                                      onUpload: () {
+                                        print("点击了上传");
+                                      },
+                                      onDownload: () {
+                                        print("点击了下载");
                                       },
                                     );
                                   },

@@ -3,14 +3,23 @@ import 'package:flutter/material.dart';
 
 class FieldSelector extends StatefulWidget {
   final List<FieldConfig> fields; // 当前的配置
-  final List<FieldConfig> defaultFields; // 新增：默认配置源
+  final List<FieldConfig> defaultFields; // 默认配置源
   final ValueChanged<List<FieldConfig>>? onConfigChanged;
+
+  // 点击上传和下载的回调
+  final VoidCallback? onUpload;
+  final VoidCallback? onDownload;
+
+  final bool showActionButtons;
 
   const FieldSelector({
     super.key,
     required this.fields,
-    required this.defaultFields, // 必传，否则不知道恢复成什么样
+    required this.defaultFields,
     this.onConfigChanged,
+    this.onUpload,
+    this.onDownload,
+    this.showActionButtons = false,
   });
 
   @override
@@ -26,16 +35,12 @@ class _FieldSelectorState extends State<FieldSelector> {
     _initData();
   }
 
-  // 初始化数据提取出来，方便重置时复用
   void _initData() {
-    // 这里的深拷贝很重要，防止 List 引用污染
     _localFields = widget.fields.map((e) => e.copyWith()).toList();
   }
 
-  // 恢复默认设置逻辑
   void _resetToDefault() {
     setState(() {
-      // 从 widget.defaultFields 重新拷贝一份数据
       _localFields = widget.defaultFields.map((e) => e.copyWith()).toList();
     });
   }
@@ -71,6 +76,7 @@ class _FieldSelectorState extends State<FieldSelector> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
@@ -80,13 +86,11 @@ class _FieldSelectorState extends State<FieldSelector> {
       ),
       child: Column(
         children: [
-          // --- 1. 顶部标题栏 ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              border: Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,8 +125,64 @@ class _FieldSelectorState extends State<FieldSelector> {
               ],
             ),
           ),
-
-          // --- 2. 列表区域 ---
+          if (widget.showActionButtons)
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        onPressed: widget.onUpload,
+                        icon: const Icon(Icons.upload, size: 16),
+                        label: const Text(
+                          '上传客户字段',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: primaryColor,
+                          side: BorderSide(color: primaryColor),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        onPressed: widget.onDownload,
+                        icon: const Icon(Icons.download, size: 16),
+                        label: const Text(
+                          '下载客户字段',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: Theme(
               data: theme.copyWith(
@@ -205,7 +265,7 @@ class _FieldSelectorState extends State<FieldSelector> {
                                   inactiveThumbColor: Colors.white,
                                   inactiveTrackColor: Colors.grey[200],
                                   trackOutlineColor:
-                                      MaterialStateProperty.resolveWith(
+                                      WidgetStateProperty.resolveWith(
                                     (states) => Colors.transparent,
                                   ),
                                   onChanged: (val) => _toggleItem(index, val),
@@ -221,8 +281,6 @@ class _FieldSelectorState extends State<FieldSelector> {
               ),
             ),
           ),
-
-          // --- 3. 底部按钮区域 (修改了这里) ---
           Container(
             padding: EdgeInsets.fromLTRB(
                 20, 10, 20, MediaQuery.of(context).padding.bottom + 10),
@@ -232,15 +290,14 @@ class _FieldSelectorState extends State<FieldSelector> {
             ),
             child: Row(
               children: [
-                // 左侧：恢复默认按钮
                 Expanded(
                   flex: 1,
                   child: SizedBox(
                     height: 48,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey[700], // 文字颜色
-                        side: BorderSide(color: Colors.grey[300]!), // 边框颜色
+                        foregroundColor: Colors.grey[700],
+                        side: BorderSide(color: Colors.grey[300]!),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
@@ -254,10 +311,9 @@ class _FieldSelectorState extends State<FieldSelector> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12), // 两个按钮之间的间距
-                // 右侧：保存配置按钮
+                const SizedBox(width: 12),
                 Expanded(
-                  flex: 2, // 权重设为 2，让保存按钮稍微宽一点（可选，也可以设为1）
+                  flex: 2,
                   child: SizedBox(
                     height: 48,
                     child: ElevatedButton(
