@@ -100,7 +100,7 @@ class MarketProductInfoPage extends HookConsumerWidget {
                     enTitle: 'Customers',
                     cnTitle: '新增客户',
                     onTap: () {
-                      context.router.push(const CrmCompanyCreateRoute());
+                      context.router.push(const MarketProductCompanyCreateRoute());
                     },
                   ),
                 ),

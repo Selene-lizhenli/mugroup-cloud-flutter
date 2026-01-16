@@ -64,6 +64,10 @@ class AppRouter extends RootStackRouter {
         ],
       ),
 
+      AutoRoute(
+          page: MarketProductCompanyCreateRoute.page,
+          path: "/market_product/company/create"),
+
       AutoRoute(page: LoginRoute.page, path: "/login"),
       AutoRoute(page: ScanRoute.page, path: "/scan"),
       AutoRoute(page: WmsTransferRoute.page, path: "/wms/transfer/:id"),

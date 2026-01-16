@@ -29,7 +29,7 @@ class CrmCompanyPage extends HookConsumerWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                context.router.push(const CrmCompanyCreateRoute());
+                context.router.push(const MarketProductCompanyCreateRoute());
               },
               child: Text(
                 "新增",

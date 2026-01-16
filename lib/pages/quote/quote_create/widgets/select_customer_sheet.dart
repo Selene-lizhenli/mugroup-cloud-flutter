@@ -90,7 +90,7 @@ class SelectCustomerSheet extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () async {
-        await context.router.push(const CrmCompanyCreateRoute());
+        await context.router.push(const MarketProductCompanyCreateRoute());
         if (context.mounted) {
           notifier.loadCustomers();
         }
