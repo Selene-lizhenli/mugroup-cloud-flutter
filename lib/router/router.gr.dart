@@ -1014,9 +1014,6 @@ class QuoteProductAddAdaptiveRoute
     extends _i56.PageRouteInfo<QuoteProductAddAdaptiveRouteArgs> {
   QuoteProductAddAdaptiveRoute({
     _i59.Key? key,
-    int? quoteId,
-    int? companyId,
-    _i62.QuotationList? quoteDetail,
     int? initialMode,
     String? supplierId,
     List<_i56.PageRouteInfo>? children,
@@ -1027,12 +1024,6 @@ class QuoteProductAddAdaptiveRoute
             quoteId: quoteId,
             companyId: companyId,
             quoteDetail: quoteDetail,
-            initialMode: initialMode,
-            supplierId: supplierId,
-          ),
-          initialChildren: children,
-        );
-
   static const String name = 'QuoteProductAddAdaptiveRoute';
 
   static _i56.PageInfo page = _i56.PageInfo(

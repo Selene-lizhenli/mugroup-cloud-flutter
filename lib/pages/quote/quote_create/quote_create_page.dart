@@ -3,6 +3,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
+import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
@@ -196,6 +197,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
     final state = ref.watch(quoteCreateProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = state.savingDraft || state.submitting;
+    final quoteDetailNotifier = ref.read(quoteDetailProvider.notifier);
 
     return SafeArea(
       top: false,
@@ -256,34 +258,27 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                               submitData,
                             );
                             isSuccess = result == true;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  backgroundColor: Colors.green,
-                                  content: Text('保存成功')),
-                            );
-                            context.router.push(QuoteDetailRoute(
-                              id: quoteId!,
-                            ));
+                            if (context.mounted) {
+                              context.router.maybePop(QuoteDetailRoute(
+                                id: quoteId!,
+                              ));
+                              //刷新报价单详情page 
+                              quoteDetailNotifier.fetchQuoteDetail(quoteId!);
+                            }
                           } else {
                             // 创建模式：新建
                             final result = await storeShowroomQuotation(
                               submitData,
                             );
                             isSuccess = result != null;
-                            if (result != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    backgroundColor: Colors.green,
-                                    content: Text('保存成功')),
-                              );
-
-                              context.router.push(QuoteDetailRoute(
-                                id: result!.id!,
+                            if (result != null && context.mounted) {
+                              context.router.replace(QuoteDetailRoute(
+                                id: result.id!,
                               ));
                             }
                           }
 
-                          if (!isSuccess) {
+                          if (!isSuccess && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 backgroundColor:

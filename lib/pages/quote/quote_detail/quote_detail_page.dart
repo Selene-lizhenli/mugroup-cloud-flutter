@@ -1,4 +1,5 @@
-import 'package:auto_route/auto_route.dart'; 
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart'; 
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/export/export_pick_drawer.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/quote_detail_body.dart'; 
@@ -22,8 +23,8 @@ class QuoteDetailPage extends HookConsumerWidget {
     final quoteDetailState = ref.watch(quoteDetailProvider);
     final quoteDetailNotifier = ref.read(quoteDetailProvider.notifier);
 
+ logger.d('quoteDetailState: ${quoteDetailState.baseInfo?.toJson()}');
  
-
     useEffect(() {
       if (id > 0) {
         Future.microtask(() {

@@ -36,6 +36,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
   final bool isActive;
   final int? companyId;
   final Map<String, dynamic>? initialSupplier;
+  final String translationLanguage; // 翻译目标语言（小写，如 'en', 'ja', 'es' 等）
 
   const QuoteProductAddPortraitView({
     super.key,
@@ -43,6 +44,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     this.companyId,
     this.initialSupplier,
     required this.isActive,
+    this.translationLanguage = 'en', // 默认英语
   });
 
   @override
@@ -213,6 +215,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
             name: "name_cn",
             builder: (field) => TranslatableInput(
               label: '中文名称',
+              toLanguage: translationLanguage,
               sourceText: formKey.currentState?.fields['name_cn']?.value,
               value: field.value ?? '',
               onChanged: field.didChange,
@@ -615,8 +618,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              context.router.push(QuoteProductAddAdaptiveRoute(
-                quoteId: quoteId,
+              context.router.push(QuoteProductAddAdaptiveRoute( 
                 initialMode: 1,
                 companyId: companyId,
               ));
@@ -973,6 +975,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                 return TextArea(
                                   label: '中文描述',
                                   showTranslate: true,
+                                  toLanguage: translationLanguage,
                                   sourceText: formKey.currentState
                                       ?.fields['description_cn']?.value,
                                   value: field.value,

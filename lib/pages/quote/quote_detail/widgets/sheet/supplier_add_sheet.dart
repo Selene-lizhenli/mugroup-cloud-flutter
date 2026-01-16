@@ -4,6 +4,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
+import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/services/supply.dart';
@@ -34,6 +36,8 @@ class SupplierAddSheet extends HookConsumerWidget {
     final businessCard = useState<List<TemporaryMedia>>([]);
 
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final quoteDetailState = ref.watch(quoteDetailProvider);
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -114,8 +118,10 @@ class SupplierAddSheet extends HookConsumerWidget {
                         businessCard,
                         colorScheme,
                         theme,
+                        quoteDetailState,
                       )
-                    : _buildSelectForm(context, colorScheme, theme),
+                    : _buildSelectForm(
+                        context, colorScheme, theme, quoteDetailState),
               ),
             ],
           ),
@@ -163,6 +169,7 @@ class SupplierAddSheet extends HookConsumerWidget {
     ValueNotifier<List<TemporaryMedia>> businessCard,
     ColorScheme colorScheme,
     ThemeData theme,
+    QuoteDetailState quoteDetailState,
   ) {
     void onSubmit() async {
       // 验证供应商名称
@@ -193,20 +200,21 @@ class SupplierAddSheet extends HookConsumerWidget {
 
         // 处理名片图片 - 转换为包含 collection_name 的格式
         if (businessCard.value.isNotEmpty) {
-          data['images'] = businessCard.value.map((e) => {
-            ...e.toJson(), 
-            'collection_name': 'bussiness_card',
-          }).toList();
-        } 
+          data['images'] = businessCard.value
+              .map((e) => {
+                    ...e.toJson(),
+                    'collection_name': 'bussiness_card',
+                  })
+              .toList();
+        }
 
-        final supplier = await storeSupplySupplier(data); 
+        final supplier = await storeSupplySupplier(data);
         if (supplier != null && context.mounted) {
           Navigator.pop(context);
           if (quotationId != null && supplier.id != null) {
-            context.router.push(QuoteProductAddAdaptiveRoute(
-              quoteId: quotationId,
+            context.router.push(QuoteProductAddAdaptiveRoute( 
               supplierId: supplier.id.toString(),
-              initialMode: 0,
+              initialMode: 0, 
             ));
           }
         }
@@ -286,7 +294,7 @@ class SupplierAddSheet extends HookConsumerWidget {
             const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
-              child: ImageUploader( 
+              child: ImageUploader(
                 directCamera: false,
                 maxCount: 1,
                 showRecognizeButton: false,
@@ -359,6 +367,7 @@ class SupplierAddSheet extends HookConsumerWidget {
     BuildContext context,
     ColorScheme colorScheme,
     ThemeData theme,
+    QuoteDetailState quoteDetailState,
   ) {
     final searchController = useTextEditingController();
     useListenable(searchController);
@@ -470,7 +479,7 @@ class SupplierAddSheet extends HookConsumerWidget {
                             final supplier = suppliers.value![index];
                             final supplierName =
                                 supplier.shortName ?? supplier.name ?? '未知供应商';
-                            final supplierId = supplier.id; 
+                            final supplierId = supplier.id;
                             final supplierNo = supplier.supplierNo;
 
                             return InkWell(
@@ -482,10 +491,9 @@ class SupplierAddSheet extends HookConsumerWidget {
                                   Navigator.pop(context);
                                   // 跳转到创建产品页面，传递供应商编号
                                   context.router
-                                      .push(QuoteProductAddAdaptiveRoute(
-                                    quoteId: quotationId,
+                                      .push(QuoteProductAddAdaptiveRoute( 
                                     supplierId: supplierId.toString(),
-                                    initialMode: 0,
+                                    initialMode: 0, 
                                   ));
                                 }
                               },

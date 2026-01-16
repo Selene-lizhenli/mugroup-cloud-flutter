@@ -34,12 +34,15 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
   final int? companyId;
   final bool isActive;
   final Map<String, dynamic>? initialSupplier;
+  final String translationLanguage; // 翻译目标语言（小写，如 'en', 'ja', 'es' 等）
+
   const QuoteProductAddLandscapeView({
     super.key,
     this.quoteId,
     this.companyId,
     this.initialSupplier,
     required this.isActive,
+    this.translationLanguage = 'en', // 默认英语
   });
 
   @override
@@ -207,6 +210,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             name: "name_cn",
             builder: (field) => TranslatableInput(
               label: '中文名称',
+              toLanguage: translationLanguage,
               sourceText: formKey.currentState?.fields['name_cn']?.value,
               value: field.value ?? '',
               onChanged: field.didChange,
@@ -1123,6 +1127,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                       builder: (field) => TextArea(
                                         label: '中文描述',
                                         showTranslate: true,
+                                        toLanguage: translationLanguage,
                                         sourceText: formKey.currentState
                                             ?.fields['description_cn']?.value,
                                         value: field.value,
