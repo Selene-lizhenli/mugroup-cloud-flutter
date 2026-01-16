@@ -43,6 +43,7 @@ Future<ApiResponse<List<Supplier>>> getSupplySuppliers(
       );
 }
 
+// 供应商详情
 Future<Supplier?> getSupplier(int id) async {
   return api.get("api/tenant/supply/suppliers/$id").then(
     (res) {

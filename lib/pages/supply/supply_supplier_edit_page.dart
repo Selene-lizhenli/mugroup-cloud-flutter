@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_page.dart';
 import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_page.dart';
@@ -148,6 +149,7 @@ class SupplySupplierEditPage extends HookConsumerWidget {
                   key: ValueKey('info_${refreshKey.value}'),
                   initial: supplier.value,
                   onSubmit: (data) async {
+                    logger.d(data);
                     await updateSupplySupplier(id, data);
                     EasyLoading.showSuccess("编辑成功");
                   },

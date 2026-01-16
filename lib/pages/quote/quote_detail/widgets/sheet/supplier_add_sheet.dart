@@ -7,6 +7,7 @@ import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/services/supply.dart';
+import 'package:cloud/services/openai.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -50,7 +51,7 @@ class SupplierAddSheet extends HookConsumerWidget {
               // 标题栏
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.grey.shade200),
@@ -163,6 +164,65 @@ class SupplierAddSheet extends HookConsumerWidget {
     ColorScheme colorScheme,
     ThemeData theme,
   ) {
+    void onSubmit() async {
+      // 验证供应商名称
+      if (supplierName.value.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('请输入供应商名称'),
+          ),
+        );
+        return;
+      }
+
+      try {
+        // 构建提交数据
+        final data = <String, dynamic>{
+          'name': supplierName.value.trim(),
+          'collection_name': "bussiness_card",
+        };
+
+        // 处理档口位置
+        if (area.value.isNotEmpty || shopNumber.value.isNotEmpty) {
+          final stallAddress = [
+            if (area.value.isNotEmpty) area.value,
+            if (shopNumber.value.isNotEmpty) shopNumber.value,
+          ].join(';');
+          data['stall_address'] = stallAddress;
+        }
+
+        // 处理名片图片 - 转换为包含 collection_name 的格式
+        if (businessCard.value.isNotEmpty) {
+          data['images'] = businessCard.value.map((e) => {
+            ...e.toJson(),
+            'id': e.id,
+            'collection_name': 'bussiness_card',
+          }).toList();
+        } 
+
+        final supplier = await storeSupplySupplier(data);
+        logger.d('supplierNo: $supplier');
+        if (supplier != null && context.mounted) {
+          Navigator.pop(context);
+          if (quotationId != null && supplier.id != null) {
+            context.router.push(QuoteProductAddAdaptiveRoute(
+              quoteId: quotationId,
+              supplierId: supplier.id.toString(),
+              initialMode: 0,
+            ));
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('创建供应商失败: ${e.toString()}'),
+            ),
+          );
+        }
+      }
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -228,9 +288,20 @@ class SupplierAddSheet extends HookConsumerWidget {
             const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
-              child: ImageUploader(
-                label: null,
+              child: ImageUploader( 
+                directCamera: false,
                 maxCount: 1,
+                showRecognizeButton: false,
+                recognizeApi: identifySupplySuppliersCard,
+                onRecognizeResult: (data) {
+                  if (data != null && data is Map<String, dynamic>) {
+                    // 更新供应商名称
+                    if (data['name'] != null) {
+                      supplierName.value = data['name'].toString();
+                    }
+                    // 可以在这里添加其他字段的更新逻辑
+                  }
+                },
                 value: businessCard.value,
                 onChanged: (value) => businessCard.value = value,
               ),
@@ -261,25 +332,7 @@ class SupplierAddSheet extends HookConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // 验证表单
-                      if (supplierName.value.trim().isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('请输入供应商名称'),
-                          ),
-                        );
-                        return;
-                      }
-                      // TODO: 处理创建供应商逻辑
-                      Navigator.pop(context, {
-                        'type': 'create',
-                        'name': supplierName.value,
-                        'area': area.value,
-                        'shopNumber': shopNumber.value,
-                        'businessCard': businessCard.value,
-                      });
-                    },
+                    onPressed: onSubmit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -344,7 +397,7 @@ class SupplierAddSheet extends HookConsumerWidget {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column( 
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // 搜索框
@@ -384,103 +437,108 @@ class SupplierAddSheet extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             // 供应商列表
-            isLoading.value
-                ? const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : (suppliers.value == null || suppliers.value!.isEmpty)
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 40),
-                          child: Text(
-                            "暂无数据",
-                            style: TextStyle(color: Colors.grey[400], fontSize: 13),
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 400,
+              ),
+              child: isLoading.value
+                  ? const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : (suppliers.value == null || suppliers.value!.isEmpty)
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Text(
+                              "暂无数据",
+                              style: TextStyle(
+                                  color: Colors.grey[400], fontSize: 13),
+                            ),
                           ),
-                        ),
-                      )
-                    : Column(
-                        children: List.generate(
-                          suppliers.value!.length,
-                          (index) {
+                        )
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: suppliers.value!.length,
+                          separatorBuilder: (context, index) => Divider(
+                            height: 1,
+                            color: Colors.grey.shade200,
+                          ),
+                          itemBuilder: (context, index) {
                             final supplier = suppliers.value![index];
                             final supplierName =
                                 supplier.shortName ?? supplier.name ?? '未知供应商';
+                            final supplierId = supplier.id; 
                             final supplierNo = supplier.supplierNo;
 
-                            return Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    logger.d(
-                                        'supplierNo: $supplierNo, quotationId: $quotationId');
-                                    if (supplierNo != null && quotationId != null) {
-                                      // 关闭当前 sheet
-                                      Navigator.pop(context);
-                                      // 跳转到创建产品页面，传递供应商编号
-                                      context.router.push(QuoteProductAddAdaptiveRoute(
-                                        quoteId: quotationId,
-                                        supplierNo: supplierNo.toString(),
-                                        initialMode: 0,
-                                      ));
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                supplierName,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              if (supplierNo != null) ...[
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  "$supplierNo",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: colorScheme
-                                                        .surfaceContainerHighest,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
+                            return InkWell(
+                              onTap: () {
+                                logger.d(
+                                    'supplier_id: $supplierId, quotationId: $quotationId');
+                                if (supplierId != null && quotationId != null) {
+                                  // 关闭当前 sheet
+                                  Navigator.pop(context);
+                                  // 跳转到创建产品页面，传递供应商编号
+                                  context.router
+                                      .push(QuoteProductAddAdaptiveRoute(
+                                    quoteId: quotationId,
+                                    supplierId: supplierId.toString(),
+                                    initialMode: 0,
+                                  ));
+                                }
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            supplierName,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ),
-                                        // 大于号图标，点击后跳转到创建产品页面
-                                        Icon(
-                                          Icons.chevron_right,
-                                          color: Colors.grey.shade400,
-                                          size: 20,
-                                        ),
-                                      ],
+                                          if (supplierNo != null) ...[
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              supplierNo,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: colorScheme
+                                                    .surfaceContainerHighest,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                    // 大于号图标，点击后跳转到创建产品页面
+                                    Icon(
+                                      Icons.chevron_right,
+                                      color: Colors.grey.shade400,
+                                      size: 20,
+                                    ),
+                                  ],
                                 ),
-                                if (index < suppliers.value!.length - 1)
-                                  Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade200,
-                                  ),
-                              ],
+                              ),
                             );
                           },
                         ),
-                      ),
+            ),
           ],
         ),
       ),

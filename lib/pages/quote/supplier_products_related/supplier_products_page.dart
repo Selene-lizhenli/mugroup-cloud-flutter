@@ -172,7 +172,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                                 context.router.push(
                                   QuoteProductAddAdaptiveRoute(
                                     quoteId: quotationId,
-                                    supplierNo: supplierNo,
+                                    supplierId: supplierId.toString(),
                                   ),
                                 );
                               },

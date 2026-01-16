@@ -1015,15 +1015,15 @@ class QuoteProductAddAdaptiveRoute
     _i59.Key? key,
     int? quoteId,
     int? initialMode,
-    String? supplierNo,
-    List<_i56.PageRouteInfo>? children,
+    String? supplierId,
+    List<_i55.PageRouteInfo>? children,
   }) : super(
           QuoteProductAddAdaptiveRoute.name,
           args: QuoteProductAddAdaptiveRouteArgs(
             key: key,
             quoteId: quoteId,
             initialMode: initialMode,
-            supplierNo: supplierNo,
+            supplierId: supplierId,
           ),
           initialChildren: children,
         );
@@ -1039,7 +1039,7 @@ class QuoteProductAddAdaptiveRoute
         key: args.key,
         quoteId: args.quoteId,
         initialMode: args.initialMode,
-        supplierNo: args.supplierNo,
+        supplierId: args.supplierId,
       );
     },
   );
@@ -1050,7 +1050,7 @@ class QuoteProductAddAdaptiveRouteArgs {
     this.key,
     this.quoteId,
     this.initialMode,
-    this.supplierNo,
+    this.supplierId,
   });
 
   final _i59.Key? key;
@@ -1059,11 +1059,11 @@ class QuoteProductAddAdaptiveRouteArgs {
 
   final int? initialMode;
 
-  final String? supplierNo;
+  final String? supplierId;
 
   @override
   String toString() {
-    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode, supplierNo: $supplierNo}';
+    return 'QuoteProductAddAdaptiveRouteArgs{key: $key, quoteId: $quoteId, initialMode: $initialMode, supplierId: $supplierId}';
   }
 }
 

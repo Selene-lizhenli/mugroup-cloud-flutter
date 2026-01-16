@@ -12,13 +12,13 @@ import 'dart:async';
 class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   final int? quoteId;
   final int? initialMode;
-  final String? supplierNo; // 页面级参数：供应商 ID
+  final String? supplierId; // 页面级参数：供应商 ID
 
   const QuoteProductAddAdaptivePage({
     super.key,
     this.quoteId,
     this.initialMode,
-    this.supplierNo,
+    this.supplierId,
   });
 
   @override
@@ -30,21 +30,13 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
     final initialSupplier = useState<Map<String, dynamic>?>(null); 
     // 页面加载后，如果有 supplierId，则请求供应商数据
     useEffect(() {
-      if (supplierNo == null) return null;
+      if (supplierId == null) return null;
 
       Future<void> loadInitialSupplier() async {
         try {
-          final resp = await getSupplySuppliers(queryParameters: {
-            "search": supplierNo.toString(),
-          });
-
-          if (resp.data.isNotEmpty) {
-            final supplier = resp.data.firstWhere(
-              (s) => s.supplierNo == supplierNo,
-              orElse: () => resp.data.first,
-            );
-            initialSupplier.value = supplier.toJson();
-       
+          final resp = await getSupplier(int.parse(supplierId!));
+          if (resp != null ) { 
+            initialSupplier.value = resp.toJson();
           }
         } catch (e) {
           logger.e('加载供应商失败: $e');
@@ -53,7 +45,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
 
       loadInitialSupplier();
       return null;
-    }, [supplierNo]);
+    }, [supplierId]);
 
     useEffect(() {
       if (initialMode != null && !hasAppliedInitial.value) {
