@@ -618,9 +618,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              context.router.push(QuoteProductAddAdaptiveRoute( 
+              context.router.push(QuoteProductAddAdaptiveRoute(
                 initialMode: 1,
-                companyId: companyId,
               ));
             },
             child: Text(
