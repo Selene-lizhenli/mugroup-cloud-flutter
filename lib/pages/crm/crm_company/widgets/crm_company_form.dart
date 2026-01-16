@@ -105,11 +105,19 @@ class CrmCompanyForm extends HookConsumerWidget {
                       children: [
                         FormBuilderField<String>(
                           name: "name",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return '该项不能为空';
+                            }
+                            return null;
+                          },
                           builder: (field) {
                             return Input(
                               label: '客户名称',
+                              isRequired: true,
                               value: field.value ?? '',
                               onChanged: field.didChange,
+                              errorText: field.errorText,
                             );
                           },
                         ),
