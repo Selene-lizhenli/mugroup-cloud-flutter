@@ -23,7 +23,7 @@ final List<FieldConfig> quoteSampleDefaultFields = [
   const FieldConfig(label: '供应商MOQ', name: 'supplier_moq', isVisible: true),
   const FieldConfig(label: '客户报价', name: 'customer_price', isVisible: true),
   const FieldConfig(label: '客户采购数量', name: 'customer_qty', isVisible: true),
-  const FieldConfig(label: '单位', name: 'product_unit', isVisible: true),
+  const FieldConfig(label: '单位', name: 'unit', isVisible: true),
   const FieldConfig(label: '中文名称', name: 'name_cn', isVisible: true),
   const FieldConfig(label: '英文名称', name: 'name_en', isVisible: true),
   const FieldConfig(label: '材质', name: 'material', isVisible: true),
