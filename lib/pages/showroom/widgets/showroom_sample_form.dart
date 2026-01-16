@@ -56,6 +56,244 @@ class ShowroomSampleForm extends HookConsumerWidget {
 
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
+    const basicInfoFieldNames = {
+      'product_no',
+      'purchase_cost',
+      'name_cn',
+      'name_en'
+    };
+
+    const specFieldNames = {'unit', 'packing', 'series', 'spec'};
+
+    double getFieldWeight(String name) {
+      const largeFields = {'spec', 'name_cn', 'name_en'};
+
+      if (largeFields.contains(name)) return 3;
+
+      const mediumFields = {
+        'product_no',
+        'purchase_cost',
+      };
+      if (mediumFields.contains(name)) return 1.5;
+
+      return 1.0;
+    }
+
+    Widget buildFieldItem(String fieldName) {
+      switch (fieldName) {
+        case 'product_no':
+          return FormBuilderField<String>(
+            name: "product_no",
+            builder: (field) => Input(
+              label: '产品货号',
+              value: field.value ?? '',
+              onChanged: field.didChange,
+            ),
+          );
+
+        case 'purchase_cost':
+          return FormBuilderField<String>(
+            name: "purchase_cost",
+            builder: (field) => Input(
+              label: '价格',
+              keyboardType: TextInputType.number,
+              value: field.value ?? '',
+              onChanged: field.didChange,
+            ),
+          );
+
+        case 'unit':
+          return FormBuilderField<String>(
+            name: "unit",
+            builder: (field) => FormBuilderField<String>(
+              name: "unit",
+              builder: (field) {
+                return Select(
+                  label: '单位',
+                  value: field.value,
+                  options: [
+                    SelectOption(label: 'PC', value: 'PC'),
+                    SelectOption(label: 'SET', value: 'SET'),
+                    SelectOption(label: 'CTN', value: 'CTN'),
+                    SelectOption(label: 'KG', value: 'KG'),
+                    SelectOption(label: 'T', value: 'T'),
+                    SelectOption(label: 'CBM', value: 'CBM'),
+                    SelectOption(label: 'M', value: 'M'),
+                    SelectOption(label: 'L', value: 'L'),
+                    SelectOption(label: 'BAG', value: 'BAG'),
+                    SelectOption(label: 'PACK', value: 'PACK'),
+                    SelectOption(label: 'CASE', value: 'CASE'),
+                    SelectOption(label: 'PAIR', value: 'PAIR'),
+                    SelectOption(label: 'BOX', value: 'BOX'),
+                    SelectOption(label: 'SQM', value: 'SQM'),
+                    SelectOption(label: 'G', value: 'G'),
+                    SelectOption(label: 'Pieces', value: 'Pieces'),
+                    SelectOption(label: 'Pair', value: 'Pair'),
+                  ],
+                  onChanged: field.didChange,
+                );
+              },
+            ),
+          );
+
+        case 'name_cn':
+          return FormBuilderField<String>(
+            name: "name_cn",
+            builder: (field) => TranslatableInput(
+              label: '中文名称',
+              sourceText: formKey.currentState?.fields['name_cn']?.value,
+              value: field.value ?? '',
+              onChanged: field.didChange,
+              onTranslateChanged: (value) {
+                formKey.currentState?.fields['name_en']?.didChange(value);
+              },
+            ),
+          );
+        case 'name_en':
+          return FormBuilderField<String>(
+            name: "name_en",
+            builder: (field) => Input(
+              label: '英文名称',
+              value: field.value ?? '',
+              onChanged: field.didChange,
+            ),
+          );
+
+        case 'series':
+          return FormBuilderField<String>(
+            name: "series",
+            builder: (field) => Input(
+              label: '系列',
+              value: field.value ?? '',
+              onChanged: field.didChange,
+            ),
+          );
+        case 'packing':
+          return FormBuilderField<String>(
+            name: "packing",
+            builder: (field) => Input(
+              label: '包装方式',
+              value: field.value ?? '',
+              onChanged: field.didChange,
+            ),
+          );
+
+        case 'spec':
+          return Row(
+            children: [
+              Expanded(
+                child: FormBuilderField<String>(
+                  name: "length",
+                  builder: (field) => Input(
+                    label: '长',
+                    value: field.value ?? '',
+                    onChanged: field.didChange,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FormBuilderField<String>(
+                  name: "width",
+                  builder: (field) => Input(
+                    label: '宽',
+                    value: field.value ?? '',
+                    onChanged: field.didChange,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FormBuilderField<String>(
+                  name: "heigth",
+                  builder: (field) => Input(
+                    label: '高',
+                    value: field.value ?? '',
+                    onChanged: field.didChange,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+
+        default:
+          return const SizedBox.shrink();
+      }
+    }
+
+    List<Widget> buildFlowSection(Set<String> scopeNames) {
+      final sortedConfigs = fieldConfigs.where((config) {
+        if (config.name == 'spec' && scopeNames.contains('size')) {
+          return config.isVisible;
+        }
+        return scopeNames.contains(config.name) && config.isVisible;
+      }).toList();
+
+      List<Widget> rows = [];
+      List<Widget> buffer = [];
+      double currentLineWeight = 0.0;
+
+      void flushBuffer() {
+        if (buffer.isEmpty) return;
+
+        List<Widget> rowChildren = [];
+        for (int i = 0; i < buffer.length; i++) {
+          rowChildren.add(Expanded(child: buffer[i]));
+        }
+
+        if (currentLineWeight < 2.0 && buffer.length < 2) {
+          rowChildren.add(const Spacer());
+          if (currentLineWeight < 1.1) rowChildren.add(const Spacer());
+        }
+
+        rows.add(SpacingRow(spacing: 12, children: rowChildren));
+        buffer.clear();
+        currentLineWeight = 0.0;
+      }
+
+      for (var config in sortedConfigs) {
+        String logicName =
+            (config.name == 'size' && scopeNames.contains('spec'))
+                ? 'spec'
+                : config.name;
+
+        double weight = getFieldWeight(logicName);
+
+        if (currentLineWeight + weight > 3.1) {
+          flushBuffer();
+        }
+
+        if (weight >= 3.0 && buffer.isNotEmpty) {
+          flushBuffer();
+        }
+
+        if (weight >= 3.0) {
+          rows.add(buildFieldItem(logicName));
+          rows.add(const SizedBox(height: 12));
+        } else {
+          buffer.add(buildFieldItem(logicName));
+          currentLineWeight += weight;
+        }
+      }
+      flushBuffer();
+      return rows;
+    }
+
     bool isVisible(String name) {
       return fieldConfigs
           .firstWhere((e) => e.name == name,
@@ -276,68 +514,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           ),
                         ],
                       ),
-                      children: [
-                        SpacingRow(
-                          spacing: 12,
-                          children: [
-                            if (isVisible('product_no'))
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "product_no",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '产品货号',
-                                      hintText: '自动生成',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                ),
-                              ),
-                            if (isVisible('purchase_cost'))
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "purchase_cost",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '价格',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                        if (isVisible('name_cn'))
-                          FormBuilderField<String>(
-                            name: "name_cn",
-                            builder: (field) {
-                              return TranslatableInput(
-                                label: '中文名称',
-                                sourceText: formKey
-                                    .currentState?.fields['name_cn']?.value,
-                                value: field.value ?? '',
-                                onChanged: field.didChange,
-                                onTranslateChanged: (value) {
-                                  formKey.currentState?.fields['name_en']
-                                      ?.didChange(value);
-                                },
-                              );
-                            },
-                          ),
-                        if (isVisible('name_en'))
-                          FormBuilderField<String>(
-                            name: "name_en",
-                            builder: (field) {
-                              return Input(
-                                label: '英文名称',
-                                value: field.value ?? '',
-                                onChanged: field.didChange,
-                              );
-                            },
-                          ),
-                      ],
+                      children: [...buildFlowSection(basicInfoFieldNames)],
                     ),
                     FormBuilderField<List<Map<String, dynamic>>>(
                       name: "supply_quotes",
@@ -610,146 +787,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                     ),
                     BuildFormCard(
                       title: '产品规格',
-                      children: [
-                        SpacingRow(
-                          spacing: 12,
-                          children: [
-                            if (isVisible('unit'))
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "unit",
-                                  builder: (field) {
-                                    return Select(
-                                      label: '单位',
-                                      value: field.value,
-                                      options: [
-                                        SelectOption(label: 'PC', value: 'PC'),
-                                        SelectOption(
-                                            label: 'SET', value: 'SET'),
-                                        SelectOption(
-                                            label: 'CTN', value: 'CTN'),
-                                        SelectOption(label: 'KG', value: 'KG'),
-                                        SelectOption(label: 'T', value: 'T'),
-                                        SelectOption(
-                                            label: 'CBM', value: 'CBM'),
-                                        SelectOption(label: 'M', value: 'M'),
-                                        SelectOption(label: 'L', value: 'L'),
-                                        SelectOption(
-                                            label: 'BAG', value: 'BAG'),
-                                        SelectOption(
-                                            label: 'PACK', value: 'PACK'),
-                                        SelectOption(
-                                            label: 'CASE', value: 'CASE'),
-                                        SelectOption(
-                                            label: 'PAIR', value: 'PAIR'),
-                                        SelectOption(
-                                            label: 'BOX', value: 'BOX'),
-                                        SelectOption(
-                                            label: 'SQM', value: 'SQM'),
-                                        SelectOption(label: 'G', value: 'G'),
-                                        SelectOption(
-                                            label: 'Pieces', value: 'Pieces'),
-                                        SelectOption(
-                                            label: 'Pair', value: 'Pair'),
-                                      ],
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                ),
-                              ),
-                            if (isVisible('packing'))
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "packing",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '包装方式',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                ),
-                              ),
-                            if (isVisible('series'))
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "series",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '系列',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                        if (isVisible('spec'))
-                          Row(
-                            children: [
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "length",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '长',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'^\d+\.?\d*')),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "width",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '宽',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'^\d+\.?\d*')),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: FormBuilderField<String>(
-                                  name: "heigth",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '高',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'^\d+\.?\d*')),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
+                      children: [...buildFlowSection(specFieldNames)],
                     ),
                     BuildFormCard(
                       title: '描述',
