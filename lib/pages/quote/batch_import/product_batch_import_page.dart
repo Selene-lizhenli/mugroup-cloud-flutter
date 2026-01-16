@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route.dart' show PageInfo;
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,19 +14,13 @@ import 'widgets/selected_product_card.dart';
 
 @RoutePage()
 class ProductBatchImportPage extends HookConsumerWidget {
-  static const String routeName = 'ProductBatchImportRoute';
-  static PageInfo page = PageInfo(
-    routeName,
-    builder: (data) => const ProductBatchImportPage(),
-  );
-
   final int? quotationId;
-  final int? userId;
+  final String? supplierNo; // 页面级参数：供应商编号
 
   const ProductBatchImportPage({
     super.key,
     this.quotationId,
-    this.userId,
+    this.supplierNo,
   });
 
   @override
@@ -35,6 +29,38 @@ class ProductBatchImportPage extends HookConsumerWidget {
     final notifier = ref.read(productBatchImportProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
     final batchQtyController = useTextEditingController(text: '1');
+
+    // 页面加载后，如果有 supplierNo，则请求供应商数据并设置为默认值
+    useEffect(() {
+      if (supplierNo == null || supplierNo!.isEmpty) return null;
+
+      Future<void> loadInitialSupplier() async {
+        try {
+          final resp = await getSupplySuppliers(queryParameters: {
+            "search": supplierNo,
+          });
+
+          if (resp.data.isNotEmpty) {
+            final supplier = resp.data.firstWhere(
+              (s) => s.supplierNo == supplierNo,
+              orElse: () => resp.data.first,
+            );
+            
+            if (supplier.id != null) {
+              final supplierName = supplier.shortName ?? supplier.name ?? '';
+              if (supplierName.isNotEmpty) {
+                notifier.setSupplier(supplier.id!, supplierName);
+              }
+            }
+          }
+        } catch (e) {
+          logger.e('加载供应商失败: $e');
+        }
+      }
+
+      loadInitialSupplier();
+      return null;
+    }, [supplierNo]);
 
     void applyBatchQty() {
       final newQty = batchQtyController.text;

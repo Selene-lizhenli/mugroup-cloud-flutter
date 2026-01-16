@@ -88,21 +88,32 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     // 当父组件异步加载到 initialSupplier 后，同步到当前表单字段
     useEffect(() {
       if (initialSupplier == null) return null;
+      if (!isActive) return null; // 仅在激活状态下设置
       if (formKey.currentState == null) return null;
 
       // 仅在当前表单还没有供应商值时设置，避免覆盖用户已选择的值
-      final currentSupplyQuote =
-          formKey.currentState!.fields['supplyQuote']?.value;
-      if (currentSupplyQuote != null) return null;
+      final currentSupplier =
+          formKey.currentState!.fields['supplier']?.value;
+      if (currentSupplier != null && currentSupplier.isNotEmpty) return null;
 
+      // 使用 addPostFrameCallback 确保表单完全构建后再设置值
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        formKey.currentState?.patchValue({
-          'supplyQuote': initialSupplier,
-        });
+        // 再次检查表单状态和字段是否存在
+        final supplierField = formKey.currentState?.fields['supplier'];
+        if (supplierField != null) {
+          // 如果字段还没有值，才设置
+          final currentValue = supplierField.value;
+          if (currentValue == null || 
+              (currentValue is Map && currentValue.isEmpty)) {
+            formKey.currentState?.patchValue({
+              'supplier': initialSupplier,
+            });
+          }
+        }
       });
 
       return null;
-    }, [initialSupplier]);
+    }, [initialSupplier, isActive]);
 
 
     bool isVisible(String name) {
@@ -284,11 +295,11 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                 child: FormBuilder(
                   key: formKey, 
                    autovalidateMode: autoValidateMode.value,
-                  initialValue: initialSupplier != null
-                      ? <String, dynamic>{
-                          'supplyQuote': initialSupplier,
-                        }
-                      : <String, dynamic>{},
+                  // initialValue: initialSupplier != null
+                  //     ? <String, dynamic>{
+                  //         'supplyQuote': initialSupplier,
+                  //       }
+                  //     : <String, dynamic>{},
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [

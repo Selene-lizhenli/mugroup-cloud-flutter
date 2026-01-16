@@ -803,14 +803,14 @@ class ProductBatchImportRoute
   ProductBatchImportRoute({
     _i57.Key? key,
     int? quotationId,
-    int? userId,
+    String? supplierNo,
     List<_i54.PageRouteInfo>? children,
   }) : super(
           ProductBatchImportRoute.name,
           args: ProductBatchImportRouteArgs(
             key: key,
             quotationId: quotationId,
-            userId: userId,
+            supplierNo: supplierNo,
           ),
           initialChildren: children,
         );
@@ -825,7 +825,7 @@ class ProductBatchImportRoute
       return _i23.ProductBatchImportPage(
         key: args.key,
         quotationId: args.quotationId,
-        userId: args.userId,
+        supplierNo: args.supplierNo,
       );
     },
   );
@@ -835,18 +835,18 @@ class ProductBatchImportRouteArgs {
   const ProductBatchImportRouteArgs({
     this.key,
     this.quotationId,
-    this.userId,
+    this.supplierNo,
   });
 
   final _i57.Key? key;
 
   final int? quotationId;
 
-  final int? userId;
+  final String? supplierNo;
 
   @override
   String toString() {
-    return 'ProductBatchImportRouteArgs{key: $key, quotationId: $quotationId, userId: $userId}';
+    return 'ProductBatchImportRouteArgs{key: $key, quotationId: $quotationId, supplierNo: $supplierNo}';
   }
 }
 

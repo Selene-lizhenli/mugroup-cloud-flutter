@@ -155,6 +155,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                                 context.router.push(
                                   ProductBatchImportRoute(
                                     quotationId: quotationId,
+                                    supplierNo: supplierNo.toString(),
                                   ),
                                 );
                               },
