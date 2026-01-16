@@ -15,13 +15,14 @@ _$CompanyImpl _$$CompanyImplFromJson(Map<String, dynamic> json) =>
       json['industry'] as String?,
       json['location'] as String?,
       json['source'] as String?,
-      (json['domain'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['email'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['facebook'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['linkedin'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['whatsapp'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      (json['domain'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      (json['email'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      (json['facebook'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      (json['linkedin'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      (json['whatsapp'] as List<dynamic>?)?.map((e) => e as String?).toList(),
       (json['contacts'] as List<dynamic>?)
-          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
+          ?.map((e) =>
+              e == null ? null : Contact.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

@@ -14,12 +14,12 @@ class Company with _$Company {
     String? industry,
     String? location,
     String? source,
-    List<String>? domain,
-    List<String>? email,
-    List<String>? facebook,
-    List<String>? linkedin,
-    List<String>? whatsapp,
-    List<Contact>? contacts,
+    List<String?>? domain,
+    List<String?>? email,
+    List<String?>? facebook,
+    List<String?>? linkedin,
+    List<String?>? whatsapp,
+    List<Contact?>? contacts,
   ) = _Company;
 
   factory Company.fromJson(Map<String, dynamic> json) =>

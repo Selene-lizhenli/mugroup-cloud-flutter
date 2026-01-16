@@ -28,12 +28,12 @@ mixin _$Company {
   String? get industry => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
   String? get source => throw _privateConstructorUsedError;
-  List<String>? get domain => throw _privateConstructorUsedError;
-  List<String>? get email => throw _privateConstructorUsedError;
-  List<String>? get facebook => throw _privateConstructorUsedError;
-  List<String>? get linkedin => throw _privateConstructorUsedError;
-  List<String>? get whatsapp => throw _privateConstructorUsedError;
-  List<Contact>? get contacts => throw _privateConstructorUsedError;
+  List<String?>? get domain => throw _privateConstructorUsedError;
+  List<String?>? get email => throw _privateConstructorUsedError;
+  List<String?>? get facebook => throw _privateConstructorUsedError;
+  List<String?>? get linkedin => throw _privateConstructorUsedError;
+  List<String?>? get whatsapp => throw _privateConstructorUsedError;
+  List<Contact?>? get contacts => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -53,12 +53,12 @@ abstract class $CompanyCopyWith<$Res> {
       String? industry,
       String? location,
       String? source,
-      List<String>? domain,
-      List<String>? email,
-      List<String>? facebook,
-      List<String>? linkedin,
-      List<String>? whatsapp,
-      List<Contact>? contacts});
+      List<String?>? domain,
+      List<String?>? email,
+      List<String?>? facebook,
+      List<String?>? linkedin,
+      List<String?>? whatsapp,
+      List<Contact?>? contacts});
 }
 
 /// @nodoc
@@ -120,27 +120,27 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
       domain: freezed == domain
           ? _value.domain
           : domain // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       facebook: freezed == facebook
           ? _value.facebook
           : facebook // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       linkedin: freezed == linkedin
           ? _value.linkedin
           : linkedin // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       whatsapp: freezed == whatsapp
           ? _value.whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       contacts: freezed == contacts
           ? _value.contacts
           : contacts // ignore: cast_nullable_to_non_nullable
-              as List<Contact>?,
+              as List<Contact?>?,
     ) as $Val);
   }
 }
@@ -160,12 +160,12 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
       String? industry,
       String? location,
       String? source,
-      List<String>? domain,
-      List<String>? email,
-      List<String>? facebook,
-      List<String>? linkedin,
-      List<String>? whatsapp,
-      List<Contact>? contacts});
+      List<String?>? domain,
+      List<String?>? email,
+      List<String?>? facebook,
+      List<String?>? linkedin,
+      List<String?>? whatsapp,
+      List<Contact?>? contacts});
 }
 
 /// @nodoc
@@ -225,27 +225,27 @@ class __$$CompanyImplCopyWithImpl<$Res>
       freezed == domain
           ? _value._domain
           : domain // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       freezed == email
           ? _value._email
           : email // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       freezed == facebook
           ? _value._facebook
           : facebook // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       freezed == linkedin
           ? _value._linkedin
           : linkedin // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       freezed == whatsapp
           ? _value._whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String?>?,
       freezed == contacts
           ? _value._contacts
           : contacts // ignore: cast_nullable_to_non_nullable
-              as List<Contact>?,
+              as List<Contact?>?,
     ));
   }
 }
@@ -261,12 +261,12 @@ class _$CompanyImpl implements _Company {
       this.industry,
       this.location,
       this.source,
-      final List<String>? domain,
-      final List<String>? email,
-      final List<String>? facebook,
-      final List<String>? linkedin,
-      final List<String>? whatsapp,
-      final List<Contact>? contacts)
+      final List<String?>? domain,
+      final List<String?>? email,
+      final List<String?>? facebook,
+      final List<String?>? linkedin,
+      final List<String?>? whatsapp,
+      final List<Contact?>? contacts)
       : _domain = domain,
         _email = email,
         _facebook = facebook,
@@ -292,9 +292,9 @@ class _$CompanyImpl implements _Company {
   final String? location;
   @override
   final String? source;
-  final List<String>? _domain;
+  final List<String?>? _domain;
   @override
-  List<String>? get domain {
+  List<String?>? get domain {
     final value = _domain;
     if (value == null) return null;
     if (_domain is EqualUnmodifiableListView) return _domain;
@@ -302,9 +302,9 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _email;
+  final List<String?>? _email;
   @override
-  List<String>? get email {
+  List<String?>? get email {
     final value = _email;
     if (value == null) return null;
     if (_email is EqualUnmodifiableListView) return _email;
@@ -312,9 +312,9 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _facebook;
+  final List<String?>? _facebook;
   @override
-  List<String>? get facebook {
+  List<String?>? get facebook {
     final value = _facebook;
     if (value == null) return null;
     if (_facebook is EqualUnmodifiableListView) return _facebook;
@@ -322,9 +322,9 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _linkedin;
+  final List<String?>? _linkedin;
   @override
-  List<String>? get linkedin {
+  List<String?>? get linkedin {
     final value = _linkedin;
     if (value == null) return null;
     if (_linkedin is EqualUnmodifiableListView) return _linkedin;
@@ -332,9 +332,9 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _whatsapp;
+  final List<String?>? _whatsapp;
   @override
-  List<String>? get whatsapp {
+  List<String?>? get whatsapp {
     final value = _whatsapp;
     if (value == null) return null;
     if (_whatsapp is EqualUnmodifiableListView) return _whatsapp;
@@ -342,9 +342,9 @@ class _$CompanyImpl implements _Company {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<Contact>? _contacts;
+  final List<Contact?>? _contacts;
   @override
-  List<Contact>? get contacts {
+  List<Contact?>? get contacts {
     final value = _contacts;
     if (value == null) return null;
     if (_contacts is EqualUnmodifiableListView) return _contacts;
@@ -420,12 +420,12 @@ abstract class _Company implements Company {
       final String? industry,
       final String? location,
       final String? source,
-      final List<String>? domain,
-      final List<String>? email,
-      final List<String>? facebook,
-      final List<String>? linkedin,
-      final List<String>? whatsapp,
-      final List<Contact>? contacts) = _$CompanyImpl;
+      final List<String?>? domain,
+      final List<String?>? email,
+      final List<String?>? facebook,
+      final List<String?>? linkedin,
+      final List<String?>? whatsapp,
+      final List<Contact?>? contacts) = _$CompanyImpl;
 
   factory _Company.fromJson(Map<String, dynamic> json) = _$CompanyImpl.fromJson;
 
@@ -445,17 +445,17 @@ abstract class _Company implements Company {
   @override
   String? get source;
   @override
-  List<String>? get domain;
+  List<String?>? get domain;
   @override
-  List<String>? get email;
+  List<String?>? get email;
   @override
-  List<String>? get facebook;
+  List<String?>? get facebook;
   @override
-  List<String>? get linkedin;
+  List<String?>? get linkedin;
   @override
-  List<String>? get whatsapp;
+  List<String?>? get whatsapp;
   @override
-  List<Contact>? get contacts;
+  List<Contact?>? get contacts;
   @override
   @JsonKey(ignore: true)
   _$$CompanyImplCopyWith<_$CompanyImpl> get copyWith =>
