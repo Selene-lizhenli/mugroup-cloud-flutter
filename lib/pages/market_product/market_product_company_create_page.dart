@@ -1,4 +1,5 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:auto_route/auto_route.dart'; 
+import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
@@ -349,9 +350,9 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                         final hasContactName = values['contact_name'] != null &&
                             values['contact_name'].toString().isNotEmpty;
 
+                        Contact? newContact;
                         if (hasContactName) {
                           final companyId = newCompany?.id;
-
                           // 4. 整理联系人数据 (映射回后端需要的标准字段名)
                           final contactData = {
                             'company_id': companyId,
@@ -364,13 +365,11 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                             'linkedin': values['contact_linkedin'],
                             'facebook': values['contact_facebook'],
                           };
-
-                          await storeCrmContact(contactData);
+                          newContact = await storeCrmContact(contactData); 
                         }
-
                         EasyLoading.showSuccess("创建成功");
                         if (context.mounted) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop((newCompany, newContact));
                         }
                       } catch (e) {
                         EasyLoading.showError("创建失败: $e");

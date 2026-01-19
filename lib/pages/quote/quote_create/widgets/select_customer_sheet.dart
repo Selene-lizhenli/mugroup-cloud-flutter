@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -90,8 +91,21 @@ class SelectCustomerSheet extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () async {
-        await context.router.push(const MarketProductCompanyCreateRoute());
-        if (context.mounted) {
+        final result = await context.router.push<(Company?, Contact?)>(
+          const MarketProductCompanyCreateRoute(),
+        );  
+        if (context.mounted && result != null) {
+          final (newCompany, newContact) = result; 
+          if (newCompany != null) { 
+            notifier.setSelectedCustomer(newCompany); 
+            if (newContact != null) {
+              notifier.setSelectedContact(newContact);
+            } 
+            Navigator.pop(context);
+          } else { 
+            notifier.loadCustomers();
+          }
+        } else if (context.mounted) { 
           notifier.loadCustomers();
         }
       },
