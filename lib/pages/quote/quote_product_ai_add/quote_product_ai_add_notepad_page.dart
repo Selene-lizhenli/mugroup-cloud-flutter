@@ -14,9 +14,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const Color primaryBlue = Color(0xFF4080FF);
-    const Color bgGrey = Color(0xFFF5F5F5);
-    const Color textGrey = Color(0xFF666666);
+    final colorScheme = Theme.of(context).colorScheme;
 
     final supplierController = useTextEditingController();
 
@@ -25,7 +23,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     final imageList = useState<List<TemporaryMedia>?>(null);
 
     return Scaffold(
-      backgroundColor: bgGrey,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text(
           'AI自动录入产品',
@@ -46,14 +44,16 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               color: const Color(0xFFEef6FF),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.volume_up_outlined, color: primaryBlue, size: 18),
-                  SizedBox(width: 8),
+                  Icon(Icons.volume_up_outlined,
+                      color: colorScheme.primary, size: 18),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       '您正在使用AI录入功能，信息将会由自动识别录入!!!',
-                      style: TextStyle(color: primaryBlue, fontSize: 12),
+                      style:
+                          TextStyle(color: colorScheme.primary, fontSize: 12),
                     ),
                   ),
                 ],
@@ -64,7 +64,6 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 2. 橙色状态 Banner
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -82,9 +81,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                           color: Colors.orange, fontWeight: FontWeight.bold),
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -99,16 +96,14 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                             color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4A72E0),
+                        backgroundColor: colorScheme.primary,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4)),
                         elevation: 0,
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   const Row(
                     children: [
                       Text('*', style: TextStyle(color: Colors.red)),
@@ -163,7 +158,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3F51B5), // 深蓝色
+                          backgroundColor: colorScheme.primary,
                           minimumSize: const Size(80, 40),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4)),
@@ -175,9 +170,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -209,7 +202,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                           ),
                           child: const Text(
                             '上传整页报价单图片，系统将自动识别并录入产品信息',
-                            style: TextStyle(color: textGrey, fontSize: 13),
+                            style: TextStyle(
+                                color: Color(0xFF666666), fontSize: 13),
                           ),
                         ),
                         const SizedBox(height: 16),
