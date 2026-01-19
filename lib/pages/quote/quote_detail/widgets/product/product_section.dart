@@ -394,10 +394,14 @@ class AddProductModeDialog extends HookWidget {
                     context.router.push(QuoteProductAddAdaptiveRoute(
                       initialMode: 0,
                     ));
-
-                    if (isAiMode.value) {
-                      print(
-                          "AI子模式: ${aiSubOptionIndex.value == 0 ? '地板' : '记事本'}");
+                  }
+                  if (isAiMode.value) {
+                    if (aiSubOptionIndex.value == 0) {}
+                    if (aiSubOptionIndex.value == 1) {
+                      Navigator.of(context).pop();
+                      context.router.push(QuoteProductAiAddNotepadRoute(
+                        quoteId: quoteId,
+                      ));
                     }
                   }
                 },
