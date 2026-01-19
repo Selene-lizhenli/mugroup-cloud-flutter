@@ -432,7 +432,6 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     try {
       final file = await _controller.takePicture();
       setState(() => _capturedImages.add(file));
-      // 拍照后滚动到底部
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
@@ -445,6 +444,77 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     } catch (e) {
       debugPrint("Take photo error: $e");
     }
+  }
+
+  void _showImagePreview(XFile file) {
+    showDialog(
+      context: context,
+      useSafeArea: false,
+      barrierColor: Colors.black,
+      builder: (ctx) {
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Center(
+                  child: Image.file(File(file.path), fit: BoxFit.contain),
+                ),
+              ),
+            ),
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 10,
+              right: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Navigator.pop(ctx),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: Colors.black26,
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        const Icon(Icons.close, color: Colors.white, size: 28),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 40,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _capturedImages.remove(file);
+                      });
+                      Navigator.pop(ctx);
+                    },
+                    borderRadius: BorderRadius.circular(30),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: const Icon(Icons.delete_outline,
+                          color: Colors.white, size: 28),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -464,7 +534,6 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
           if (_isFlashing)
             Positioned.fill(
                 child: Container(color: Colors.white.withOpacity(0.5))),
-          // --- 图片列表 ---
           if (_capturedImages.isNotEmpty)
             Positioned(
               bottom: 160,
@@ -481,14 +550,12 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
                   itemCount: _capturedImages.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (_, index) {
-                    // 显示缩略图
                     return _buildThumbnailItem(
                         _capturedImages[index], index + 1);
                   },
                 ),
               ),
             ),
-          // --- 底部控制栏 ---
           Positioned(
             bottom: 0,
             left: 0,
@@ -555,33 +622,37 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
   }
 
   Widget _buildThumbnailItem(XFile file, int number) {
-    return Stack(
-      children: [
-        Container(
-          width: 60,
-          height: 80,
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 1.5),
-              borderRadius: BorderRadius.circular(4)),
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(3),
-              child: Image.file(File(file.path), fit: BoxFit.cover)),
-        ),
-        Positioned(
-          right: 4,
-          bottom: 4,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+    return GestureDetector(
+      onTap: () => _showImagePreview(file),
+      child: Stack(
+        children: [
+          Container(
+            width: 60,
+            height: 80,
             decoration: BoxDecoration(
-                color: Colors.black54, borderRadius: BorderRadius.circular(2)),
-            child: Text("$number",
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold)),
+                border: Border.all(color: Colors.white, width: 1.5),
+                borderRadius: BorderRadius.circular(4)),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: Image.file(File(file.path), fit: BoxFit.cover)),
           ),
-        )
-      ],
+          Positioned(
+            right: 4,
+            bottom: 4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(2)),
+              child: Text("$number",
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold)),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
