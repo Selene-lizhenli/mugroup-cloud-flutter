@@ -362,7 +362,7 @@ class _InlineFieldSelectorState extends State<InlineFieldSelector> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  '字段配置',
+                  '选择识别字段',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
