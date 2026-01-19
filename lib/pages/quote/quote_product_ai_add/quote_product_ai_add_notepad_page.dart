@@ -27,13 +27,6 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: bgGrey,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => {},
-        ),
-        centerTitle: true,
         title: const Text(
           'AI自动录入产品',
           style: TextStyle(
@@ -42,6 +35,9 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
