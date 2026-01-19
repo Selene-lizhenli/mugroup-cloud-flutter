@@ -56,10 +56,10 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  const FormDateTimeField(
-                    requiredField: false,
-                    label: '报价日期',
-                  ),
+                  // const FormDateTimeField(
+                  //   requiredField: false,
+                  //   label: '报价日期',
+                  // ),
                   Row(
                     children: [
                       Expanded(

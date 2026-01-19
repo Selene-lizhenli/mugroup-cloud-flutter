@@ -60,6 +60,9 @@ _$QuotationListImpl _$$QuotationListImplFromJson(Map<String, dynamic> json) =>
       company: json['company'] == null
           ? null
           : Company.fromJson(json['company'] as Map<String, dynamic>),
+      contact: json['contact'] == null
+          ? null
+          : Contact.fromJson(json['contact'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
@@ -102,4 +105,5 @@ Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
       'user': instance.user,
       'creator': instance.creator,
       'company': instance.company,
+      'contact': instance.contact,
     };

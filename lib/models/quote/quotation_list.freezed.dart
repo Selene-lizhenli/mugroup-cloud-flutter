@@ -86,6 +86,7 @@ mixin _$QuotationList {
   User? get user => throw _privateConstructorUsedError;
   User? get creator => throw _privateConstructorUsedError;
   Company? get company => throw _privateConstructorUsedError;
+  Contact? get contact => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -137,11 +138,13 @@ abstract class $QuotationListCopyWith<$Res> {
       List<User>? collaborators,
       User? user,
       User? creator,
-      Company? company});
+      Company? company,
+      Contact? contact});
 
   $UserCopyWith<$Res>? get user;
   $UserCopyWith<$Res>? get creator;
   $CompanyCopyWith<$Res>? get company;
+  $ContactCopyWith<$Res>? get contact;
 }
 
 /// @nodoc
@@ -195,6 +198,7 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
     Object? user = freezed,
     Object? creator = freezed,
     Object? company = freezed,
+    Object? contact = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -349,6 +353,10 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
           ? _value.company
           : company // ignore: cast_nullable_to_non_nullable
               as Company?,
+      contact: freezed == contact
+          ? _value.contact
+          : contact // ignore: cast_nullable_to_non_nullable
+              as Contact?,
     ) as $Val);
   }
 
@@ -385,6 +393,18 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
 
     return $CompanyCopyWith<$Res>(_value.company!, (value) {
       return _then(_value.copyWith(company: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ContactCopyWith<$Res>? get contact {
+    if (_value.contact == null) {
+      return null;
+    }
+
+    return $ContactCopyWith<$Res>(_value.contact!, (value) {
+      return _then(_value.copyWith(contact: value) as $Val);
     });
   }
 }
@@ -435,7 +455,8 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       List<User>? collaborators,
       User? user,
       User? creator,
-      Company? company});
+      Company? company,
+      Contact? contact});
 
   @override
   $UserCopyWith<$Res>? get user;
@@ -443,6 +464,8 @@ abstract class _$$QuotationListImplCopyWith<$Res>
   $UserCopyWith<$Res>? get creator;
   @override
   $CompanyCopyWith<$Res>? get company;
+  @override
+  $ContactCopyWith<$Res>? get contact;
 }
 
 /// @nodoc
@@ -494,6 +517,7 @@ class __$$QuotationListImplCopyWithImpl<$Res>
     Object? user = freezed,
     Object? creator = freezed,
     Object? company = freezed,
+    Object? contact = freezed,
   }) {
     return _then(_$QuotationListImpl(
       id: freezed == id
@@ -648,6 +672,10 @@ class __$$QuotationListImplCopyWithImpl<$Res>
           ? _value.company
           : company // ignore: cast_nullable_to_non_nullable
               as Company?,
+      contact: freezed == contact
+          ? _value.contact
+          : contact // ignore: cast_nullable_to_non_nullable
+              as Contact?,
     ));
   }
 }
@@ -693,7 +721,8 @@ class _$QuotationListImpl implements _QuotationList {
       final List<User>? collaborators,
       this.user,
       this.creator,
-      this.company})
+      this.company,
+      this.contact})
       : _collaborators = collaborators;
 
   factory _$QuotationListImpl.fromJson(Map<String, dynamic> json) =>
@@ -811,10 +840,12 @@ class _$QuotationListImpl implements _QuotationList {
   final User? creator;
   @override
   final Company? company;
+  @override
+  final Contact? contact;
 
   @override
   String toString() {
-    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, collaborators: $collaborators, user: $user, creator: $creator, company: $company)';
+    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, collaborators: $collaborators, user: $user, creator: $creator, company: $company, contact: $contact)';
   }
 
   @override
@@ -885,7 +916,8 @@ class _$QuotationListImpl implements _QuotationList {
                 .equals(other._collaborators, _collaborators) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.creator, creator) || other.creator == creator) &&
-            (identical(other.company, company) || other.company == company));
+            (identical(other.company, company) || other.company == company) &&
+            (identical(other.contact, contact) || other.contact == contact));
   }
 
   @JsonKey(ignore: true)
@@ -929,7 +961,8 @@ class _$QuotationListImpl implements _QuotationList {
         const DeepCollectionEquality().hash(_collaborators),
         user,
         creator,
-        company
+        company,
+        contact
       ]);
 
   @JsonKey(ignore: true)
@@ -985,7 +1018,8 @@ abstract class _QuotationList implements QuotationList {
       final List<User>? collaborators,
       final User? user,
       final User? creator,
-      final Company? company}) = _$QuotationListImpl;
+      final Company? company,
+      final Contact? contact}) = _$QuotationListImpl;
 
   factory _QuotationList.fromJson(Map<String, dynamic> json) =
       _$QuotationListImpl.fromJson;
@@ -1094,6 +1128,8 @@ abstract class _QuotationList implements QuotationList {
   User? get creator;
   @override
   Company? get company;
+  @override
+  Contact? get contact;
   @override
   @JsonKey(ignore: true)
   _$$QuotationListImplCopyWith<_$QuotationListImpl> get copyWith =>

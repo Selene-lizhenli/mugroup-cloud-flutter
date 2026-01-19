@@ -59,32 +59,14 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
 
   void _initializeEditData() {
     if (_editData == null) return;
-
     final notifier = ref.read(quoteCreateProvider.notifier);
     final data = _editData!;
 
-    // 设置客户
-    if (data.company != null) {
-      notifier.setSelectedCustomer(data.company!);
-    }
+    notifier.setSelectedCustomer(data.company!);
+    notifier.setSelectedContact(data.contact!);
+    notifier.setCurrency(data.curreny!);
+    notifier.setRate(data.exchange!);
 
-    // 设置联系人
-    if (data.company?.contacts?.isNotEmpty == true) {
-      final contact = data.company!.contacts!.first;
-      notifier.setSelectedContact(contact!);
-    }
-
-    // 设置货币
-    if (data.curreny != null) {
-      notifier.setCurrency(data.curreny!);
-    }
-
-    // 设置汇率
-    if (data.exchange != null) {
-      notifier.setRate(data.exchange!);
-    }
-
-    // 设置报价日期
     if (data.quoteAt != null) {
       try {
         final date = DateTime.parse(data.quoteAt!);
@@ -125,64 +107,6 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
   }
 }
 
-// class _ReviewStep extends ConsumerWidget {
-//   const _ReviewStep({super.key});
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final state = ref.watch(quoteCreateProvider);
-//     return Center(
-//       child: Text('确认创建：${state.customer ?? '-'}'),
-//     );
-//   }
-// }
-
-// class QuoteCreateBottomBar extends ConsumerWidget {
-//   const QuoteCreateBottomBar({super.key});
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final state = ref.watch(quoteCreateProvider);
-//     final notifier = ref.read(quoteCreateProvider.notifier);
-//     return SafeArea(
-//       child: Padding(
-//         padding: const EdgeInsets.all(12),
-//         child: Row(
-//           children: [
-//             if (state.stepIndex > 0)
-//               OutlinedButton(
-//                 onPressed: notifier.previousStep,
-//                 child: const Text('上一步'),
-//               ),
-//             const Spacer(),
-//             if (state.step != QuoteCreateStep.review)
-//               OutlinedButton(
-//                 onPressed: () async {
-//                   await notifier.saveDraft();
-//                   ScaffoldMessenger.of(context).showSnackBar(
-//                     const SnackBar(content: Text('草稿已保存')),
-//                   );
-//                 },
-//                 child: state.savingDraft
-//                     ? const SizedBox(
-//                         width: 16,
-//                         height: 16,
-//                         child: CircularProgressIndicator(strokeWidth: 2),
-//                       )
-//                     : const Text('保存草稿'),
-//               ),
-//             const SizedBox(width: 8),
-//             ElevatedButton(
-//               onPressed: notifier.nextStep,
-//               child: Text(
-//                 state.step == QuoteCreateStep.review ? '完成' : '下一步',
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class QuoteCreateBottomBar extends ConsumerWidget {
   final int? quoteId; // 编辑模式时的报价单ID
 
@@ -193,10 +117,10 @@ class QuoteCreateBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider).user; // TODO: 保存时使用
+    final user = ref.watch(userProvider).user; //  保存时使用
     final state = ref.watch(quoteCreateProvider);
     final colorScheme = Theme.of(context).colorScheme;
-    final isLoading = state.savingDraft || state.submitting;
+    final isLoading = state.submitting;
     final quoteDetailNotifier = ref.read(quoteDetailProvider.notifier);
 
     return SafeArea(
@@ -233,21 +157,16 @@ class QuoteCreateBottomBar extends ConsumerWidget {
 
                           // 组装提交数据
                           final submitData = {
-                            "sample_items": state.productList
-                                .map((item) => {
-                                      "sample_id": item.sample.id,
-                                      "price": item.price,
-                                      "qty": item.count
-                                    })
-                                .toList(),
-                            "user_id": user?.id, //外銷員
+                            "sample_items": const [],
+                            "user_id": user?.id, //外销员
                             "curreny": state.currency, //货币
                             "exchange": state.rate, //汇率
                             "commission_rate": state.addPercentage, //加点
                             "quote_at": state.quoteDate.toIso8601String(),
-                            "contact_id": state.selectedContact?.id, //联系人
+                            "contact_id": state.contact, //联系人
                             "company_id": state.selectedCustomers?.id, //客户
                             "language": state.language?.name,
+                            "company": state.selectedCustomers,
                           };
                           logger.d('state${submitData}');
                           bool isSuccess = false;
@@ -262,7 +181,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                               context.router.maybePop(QuoteDetailRoute(
                                 id: quoteId!,
                               ));
-                              //刷新报价单详情page 
+                              //刷新报价单详情page
                               quoteDetailNotifier.fetchQuoteDetail(quoteId!);
                             }
                           } else {

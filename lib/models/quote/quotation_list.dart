@@ -1,4 +1,5 @@
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/models/crm/contact.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud/models/user.dart';
 
@@ -31,7 +32,7 @@ class QuotationList with _$QuotationList {
     String? remark,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(name: 'user_id') int? userId,
+    @JsonKey(name: 'user_id') int? userId, 
     @JsonKey(name: 'creator_id') int? creatorId,
     @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'item_type') String? itemType,
@@ -46,6 +47,7 @@ class QuotationList with _$QuotationList {
     User? user,
     User? creator,
     Company? company,
+    Contact? contact,
   }) = _QuotationList;
 
   factory QuotationList.fromJson(Map<String, dynamic> json) =>
