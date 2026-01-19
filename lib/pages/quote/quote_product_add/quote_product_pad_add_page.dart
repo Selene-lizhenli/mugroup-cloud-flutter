@@ -540,10 +540,10 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           final isContinue = await ConfirmDialog.show(
             context,
             title: '创建成功',
-            content: '样品已成功创建，您希望接下来做什么？',
-            cancelText: '完成并返回',
-            confirmText: '继续创建',
-            confirmColor: Colors.blue,
+            content: '创建成功，是否继续添加？',
+            cancelText: '不，直接返回',
+            confirmText: '继续添加',
+            confirmColor: colorScheme.primary,
           );
           if (isContinue == true) {
             final currentSupplier = formState.value['supplier'];

@@ -12,6 +12,7 @@ class Input extends HookConsumerWidget {
   final String? hintText;
 
   final String? errorText;
+  final FocusNode? focusNode;
   final bool showClearButton;
   final bool isRequired;
 
@@ -27,6 +28,7 @@ class Input extends HookConsumerWidget {
     this.keyboardType,
     this.hintText,
     this.errorText,
+    this.focusNode,
     this.inputFormatters,
     this.showClearButton = true,
     this.isRequired = false,
@@ -85,6 +87,7 @@ class Input extends HookConsumerWidget {
         // 2. 输入框实体
         TextField(
           controller: controller,
+          focusNode: focusNode,
           onChanged: onChanged,
           textInputAction: textInputAction,
           keyboardType: keyboardType,

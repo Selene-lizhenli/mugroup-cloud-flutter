@@ -25,13 +25,7 @@ class BaseInfoSection extends HookConsumerWidget {
     final colorScheme = theme.colorScheme;
     final Company? company = item?.company;
     final isExpanded = useState(false);
-    
-    // 获取第一个联系人
-    final contact = company?.contacts?.isNotEmpty == true
-        ? company!.contacts!.first
-        : null;
-  
-
+ 
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
@@ -59,157 +53,203 @@ class BaseInfoSection extends HookConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Spacer(), 
-                if (onEdit != null)
+
+                const Spacer(),
+
+                if (onEdit != null && isExpanded.value == true) ...[
+                  const SizedBox(width: 10),
                   ActionPillButton(
                     label: '编辑',
-                    icon: Icons.edit_outlined,
+                    // icon: Icons.edit ,
                     textColor: colorScheme.primary,
-                    borderColor: colorScheme.primary,
+                    // borderColor: colorScheme.primary,
                     onTap: onEdit!,
+                    fontSize: 12,
+                    vertical: 2,
+                    horizontal: 9,
                   ),
-                if (onEdit != null && onDelete != null)
-                  const SizedBox(width: 8), 
-                if (onDelete != null)
-                  ActionPillButton(
-                    label: '删除',
-                    icon: Icons.delete_outline,
-                    textColor: colorScheme.error,
-                    borderColor: colorScheme.error,
-                    onTap: onDelete!,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // ===== 内容区域（2列网格）=====
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // 所有信息项
-                final allItems = [
-                  // 客户名称
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child: _InfoItem(
-                      label: '客户名称',
-                      value: company?.name ?? ' ',
-                      showArrow: company != null && company.id != null,
-                      onTap: company != null && company.id != null
-                          ? () {
-                              context.router.push(
-                                CrmCompanyDetailRoute(id: company.id!),
-                              );
-                            }
-                          : null,
-                    ),
-                  ),
-                  // 联系人
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child: _InfoItem(
-                      label: '联系人',
-                      value: item?.contactId??"",
-                    ),
-                  ),
-                  // 外销员
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child: _InfoItem(
-                      label: '外销员',
-                      value: item?.user?.name ?? '-',
-                    ),
-                  ),
-                  // 报价日期
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child: _InfoItem(
-                      label: '报价日期',
-                      value: _formatDate(item?.quoteAt),
-                    ),
-                  ),
-                  // 报价语言
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child:   _InfoItem(
-                      label: '报价语言',
-                      value: item?.language??'',  
-                    ),
-
-                  ),
-                  // 报价货币
-                  SizedBox(
-                    width: (constraints.maxWidth - 16) / 2,
-                    child: _InfoItem(
-                      label: '报价货币',
-                      value: item?.curreny ?? 'CNY',
-                    ),
-                  ),
-                  // 更新日期
-                  // SizedBox(
-                  //   width: (constraints.maxWidth - 16) / 2,
-                  //   child: _InfoItem(
-                  //     label: '更新日期',
-                  //     value: item?.updatedAt != null
-                  //         ? _formatDateTime(item!.updatedAt!)
-                  //         : '无日期',
+                  // InkWell(
+                  //   borderRadius: BorderRadius.circular(6),
+                  //   onTap: onEdit,
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(4),
+                  //     child: Icon(
+                  //       Icons.edit,
+                  //       size: 15,
+                  //       color: colorScheme.primary,
+                  //     ),
                   //   ),
                   // ),
-                ];
+                  const SizedBox(
+                    width: 8,
+                  )
+                ],
 
-                // 默认显示3行（6个信息项）
-                const maxVisibleItems = 6;
-                final shouldShowExpand = allItems.length > maxVisibleItems;
-                final visibleItems = isExpanded.value
-                    ? allItems
-                    : allItems.take(maxVisibleItems).toList();
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 12,
-                      children: visibleItems,
+                InkWell(
+                  onTap: () {
+                    isExpanded.value = !isExpanded.value;
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 8,
                     ),
-                    if (shouldShowExpand)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: InkWell(
-                          onTap: () {
-                            isExpanded.value = !isExpanded.value;
-                          },
-                          borderRadius: BorderRadius.circular(4),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 4,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  isExpanded.value ? '收起' : '展开',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.secondary,
-                                    fontSize: 12,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isExpanded.value ? '收起' : '查看',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          isExpanded.value
+                              ? Icons.expand_less
+                              : Icons.expand_more,
+                          size: 16,
+                          color: colorScheme.secondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ), 
+              ],
+            ),
+
+            // ===== 内容区域（2列网格）=====
+            if (isExpanded.value)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // 所有信息项
+                  final allItems = [
+                    // 客户名称
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '客户名称',
+                        value: company?.name ?? ' ',
+                        showArrow: company != null && company.id != null,
+                        onTap: company != null && company.id != null
+                            ? () {
+                                context.router.push(
+                                  CrmCompanyDetailRoute(id: company.id!),
+                                );
+                              }
+                            : null,
+                      ),
+                    ),
+                    // 联系人
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '联系人',
+                        value: item?.contactId ?? "",
+                      ),
+                    ),
+                    // 外销员
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '外销员',
+                        value: item?.user?.name ?? '-',
+                      ),
+                    ),
+                    // 报价日期
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '报价日期',
+                        value: _formatDate(item?.quoteAt),
+                      ),
+                    ),
+                    // 报价语言
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '报价语言',
+                        value: item?.language ?? '',
+                      ),
+                    ),
+                    // 报价货币
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: _InfoItem(
+                        label: '报价货币',
+                        value: item?.curreny ?? 'CNY',
+                      ),
+                    ),
+                    // 更新日期
+                    // SizedBox(
+                    //   width: (constraints.maxWidth - 16) / 2,
+                    //   child: _InfoItem(
+                    //     label: '更新日期',
+                    //     value: item?.updatedAt != null
+                    //         ? _formatDateTime(item!.updatedAt!)
+                    //         : '无日期',
+                    //   ),
+                    // ),
+                  ];
+
+                  // 默认显示3行（6个信息项）
+                  const maxVisibleItems = 6;
+                  final shouldShowExpand = allItems.length > maxVisibleItems;
+                  final visibleItems = isExpanded.value
+                      ? allItems
+                      : allItems.take(maxVisibleItems).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 12,
+                        children: visibleItems,
+                      ),
+                      if (shouldShowExpand)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: InkWell(
+                            onTap: () {
+                              isExpanded.value = !isExpanded.value;
+                            },
+                            borderRadius: BorderRadius.circular(4),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 4,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    isExpanded.value ? '收起' : '展开',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.secondary,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  isExpanded.value
-                                      ? Icons.expand_less
-                                      : Icons.expand_more,
-                                  size: 16,
-                                  color: colorScheme.secondary,
-                                ),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    isExpanded.value
+                                        ? Icons.expand_less
+                                        : Icons.expand_more,
+                                    size: 16,
+                                    color: colorScheme.secondary,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
+                    ],
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -263,22 +303,28 @@ class _InfoItem extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            value,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.87),
-              fontSize: 12,
+            child: Row(
+          children: [
+            Text(
+              value,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.87),
+                fontSize: 12,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (showArrow)
-          Icon(
-            Icons.chevron_right,
-            size: 16,
-            color: colorScheme.onSurface.withOpacity(0.4),
-          ),
+            const SizedBox(
+              width: 2,
+            ),
+            if (showArrow)
+              Icon(
+                Icons.chevron_right,
+                size: 16,
+                color: colorScheme.onSurface.withOpacity(0.4),
+              ),
+          ],
+        )),
       ],
     );
 

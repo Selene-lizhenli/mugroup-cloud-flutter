@@ -1,4 +1,4 @@
-import 'package:cloud/helper/helper.dart';
+ 
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/services/quotation_list.dart';
@@ -22,7 +22,7 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
     await Future.wait([
       _fetchBaseInfo(id),
       _fetchProducts(id, 1),
-      _fetchSuppliers(id),
+      // _fetchSuppliers(id),
     ]);
   }
 
@@ -38,7 +38,7 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
     try {
       final params = {
         "page": page,
-        "pageSize": 10,
+        "pageSize": 100000000,
       };
       final resp = await getQuotationProductListByProductId(id, params);
       final list = resp.data ?? [];
@@ -61,16 +61,16 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
     }
   }
 
-  Future<void> _fetchSuppliers(
-    int id,
-  ) async {
-    final list = await getQuotationSupplierListById(id);
-    logger.d('供应商列表：$list');
-    state = state.copyWith(
-      isSupplierLoading: false,
-      suppliers: list,
-    );
-  }
+  // Future<void> _fetchSuppliers(
+  //   int id,
+  // ) async {
+  //   final list = await getQuotationSupplierListById(id);
+  //   logger.d('供应商列表：$list');
+  //   state = state.copyWith(
+  //     isSupplierLoading: false,
+  //     suppliers: list,
+  //   );
+  // }
 
   /// 对外暴露：切换产品页
   Future<void> fetchProductsPage(int id, int page) async {

@@ -19,34 +19,7 @@ class QuoteDetailBody extends StatelessWidget {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
-    // if (item == null || item!.id == null) return;
-
-    // final quoteNo = item!.quoteNo ?? '${item!.id}';
-    // final confirmed = await ConfirmDialog.show(
-    //   context,
-    //   title: '确认删除',
-    //   content: '确认删除报价单 $quoteNo 吗？',
-    //   cancelText: '取消',
-    //   confirmText: '确定',
-    // );
-    // if (confirmed && context.mounted) {
-    //   try {
-    //     EasyLoading.show(status: '删除中...');
-    //     await deleteQuotation(item!.id!);
-    //     EasyLoading.dismiss();
-
-    //     if (context.mounted) {
-    //       EasyLoading.showSuccess('删除成功');
-    //       // 返回上一页
-    //       Navigator.of(context).pop();
-    //     }
-    //   } catch (e) {
-    //     EasyLoading.dismiss();
-    //     if (context.mounted) {
-    //       EasyLoading.showError('删除失败：${e.toString()}');
-    //     }
-    //   }
-    // }
+ 
     final confirmed = await ConfirmDialog.show(
       context,
       title: '提示',

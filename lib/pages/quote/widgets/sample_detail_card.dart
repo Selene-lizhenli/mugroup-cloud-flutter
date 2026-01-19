@@ -128,8 +128,7 @@ class ProductDetailCard extends StatelessWidget {
               onTap: onTap ??
                   () {
                     if (sampleId == null && id == null) return;
-                    if (!context.mounted) return;
-                    logger.d('ididdi${sampleId}${id}');
+                    if (!context.mounted) return; 
                     context.router
                         .push(ShowroomSampleDetailRoute(id: sampleId ?? id!));
                   },

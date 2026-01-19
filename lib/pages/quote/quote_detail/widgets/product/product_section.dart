@@ -1,9 +1,12 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/sample/quotation_sample.dart';
+import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/supplier_add_sheet.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/supplier/supplier_list.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/supplier_with_products_card.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +23,6 @@ class ProductSection extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quoteDetailProvider);
     final notifier = ref.read(quoteDetailProvider.notifier);
-    final selectedTab = useState(0); // 0: 供应商列表/验货, 1: 产品清单
     final selectedSupplierIds = useState<Set<int>>({});
 
     final theme = Theme.of(context);
@@ -37,7 +39,7 @@ class ProductSection extends HookConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('报价产品', style: theme.textTheme.titleMedium),
+                    Text('报价产品(${state.products.length})', style: theme.textTheme.titleMedium),
                     Row(
                       children: [
                         ActionPillButton(
@@ -55,28 +57,32 @@ class ProductSection extends HookConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         ActionPillButton(
-                          label: '新增产品',
+                          label: '新增供应商',
                           icon: Icons.add,
                           backgroundColor: colorScheme.secondary, // 蓝色
                           textColor: colorScheme.onSecondary,
                           onTap: () {
-                            if (selectedTab.value == 0) {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (context) =>
-                                    SupplierAddSheet(quotationId: quoteId),
-                              );
-                              return;
-                            }
-
-                            if (selectedTab.value == 1) {
-                              showDialog(
-                                context: context,
-                                builder: (context) =>
-                                    AddProductModeDialog(quoteId: quoteId),
-                              );
-                            }
+                            // if (selectedTab.value == 0) {
+                            //   showModalBottomSheet(
+                            //     context: context,
+                            //     isScrollControlled: true,
+                            //     builder: (context) =>
+                            //         SupplierAddSheet(quotationId: quoteId),
+                            //   );
+                            //   return;
+                            // }
+                            // if (selectedTab.value == 1) {
+                            //   showDialog(
+                            //     context: context,
+                            //     builder: (context) =>
+                            //         AddProductModeDialog(quoteId: quoteId),
+                            //   );
+                            // }
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) =>
+                                  AddSupplierSheet(quotationId: quoteId),
+                            );
                           },
                         ),
                       ],
@@ -85,35 +91,39 @@ class ProductSection extends HookConsumerWidget {
                 ),
               ),
               // ===== 标签页导航 =====
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _TabButton(
-                    label: '供应商列表(${state.suppliers.length})',
-                    // icon: Icons.store_mall_directory_outlined,
-                    icon: Icons.factory_outlined,
-                    isSelected: selectedTab.value == 0,
-                    onTap: () => selectedTab.value = 0,
-                    colorScheme: colorScheme,
-                  ),
-                  const SizedBox(width: 8),
-                  _TabButton(
-                    label: '产品清单(${state.productTotalCount})',
-                    icon: Icons.view_list,
-                    isSelected: selectedTab.value == 1,
-                    onTap: () => selectedTab.value = 1,
-                    colorScheme: colorScheme,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              const Divider(height: 1),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     _TabButton(
+              //       label: '供应商列表(${state.suppliers.length})',
+              //       // icon: Icons.store_mall_directory_outlined,
+              //       icon: Icons.factory_outlined,
+              //       isSelected: selectedTab.value == 0,
+              //       onTap: () => selectedTab.value = 0,
+              //       colorScheme: colorScheme,
+              //     ),
+              //     const SizedBox(width: 8),
+              //     _TabButton(
+              //       label: '产品清单(${state.productTotalCount})',
+              //       icon: Icons.view_list,
+              //       isSelected: selectedTab.value == 1,
+              //       onTap: () => selectedTab.value = 1,
+              //       colorScheme: colorScheme,
+              //     ),
+              //   ],
+              //  ),
+              // const SizedBox(height: 8),
+              // const Divider(height: 1),
+              // Expanded(
+              //   child: selectedTab.value == 1
+              //       ? _buildProductList(
+              //           context, state, colorScheme, notifier, quoteId)
+              //       : _buildSupplierList(context, state, colorScheme, notifier,
+              //           selectedSupplierIds, quoteId),
+              // ),
               Expanded(
-                child: selectedTab.value == 1
-                    ? _buildProductList(
-                        context, state, colorScheme, notifier, quoteId)
-                    : _buildSupplierList(context, state, colorScheme, notifier,
-                        selectedSupplierIds, quoteId),
+                child: _buildSupplierList(context, state, colorScheme, notifier,
+                    selectedSupplierIds, quoteId),
               ),
             ],
           ),
@@ -200,44 +210,75 @@ class ProductSection extends HookConsumerWidget {
     ValueNotifier<Set<int>> selectedSupplierIds,
     int? quoteId,
   ) {
-    if (state.isSupplierLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state.supplierError != null) {
+    // 供应商分组改为：完全基于产品列表中的 supplyQuote.supplierId
+    if (state.products.isEmpty) {
       return Center(
         child: Text(
-          '供应商加载失败',
-          style: TextStyle(color: colorScheme.error),
+          '暂无产品',
+          style: TextStyle(color: colorScheme.surfaceContainerHighest),
         ),
       );
     }
 
-    return SupplierListWidget(
-      suppliers: state.suppliers,
-      products: state.products,
-      selectedSupplierIds: selectedSupplierIds.value,
-      onSupplierToggle: (supplierId) {
-        if (supplierId == null) return;
-        final newSet = Set<int>.from(selectedSupplierIds.value);
-        if (newSet.contains(supplierId)) {
-          newSet.remove(supplierId);
-        } else {
-          newSet.add(supplierId);
-        }
-        selectedSupplierIds.value = newSet;
-      },
-      onSupplierTap: (supplier) {
-        if (quoteId != null && supplier.supplier?.id != null) {
-          context.router.push(
-            SupplierProductsRoute(
-              quotationId: quoteId,
-              supplierId: supplier.supplier!.id!,
-              supplierNo: supplier.supplier?.supplierNo ?? '',
-              supplierName: supplier.supplier?.name ?? '',
-            ),
-          );
-        }
+    final Map<int, List<QuotationSample>> grouped = {};
+    final List<int> supplierOrder = [];
+    final Map<int, Supplier?> supplierInfo = {};
+    int unknownKeySeed = -1;
+
+    for (final p in state.products) {
+      final id = p.supplyQuote?.supplierId;
+      final key = id ?? (unknownKeySeed--);
+
+      if (!grouped.containsKey(key)) {
+        grouped[key] = [];
+        supplierOrder.add(key);
+      }
+      grouped[key]!.add(p);
+
+      // 尽量保存供应商快照信息（如果有）
+      final s = p.supplyQuote?.supplier;
+      if (id != null && s != null) {
+        supplierInfo[id] = s;
+      }
+    }
+    logger.d(supplierOrder);
+    logger.d('state.products: ${state.products}');
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      itemCount: supplierOrder.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        color: colorScheme.outlineVariant.withOpacity(0.6),
+      ),
+      itemBuilder: (context, index) {
+        final supplierKey = supplierOrder[index];
+        final supplierProducts =
+            grouped[supplierKey] ?? const <QuotationSample>[];
+        final supplierId = supplierKey > 0 ? supplierKey : null;
+        final supplier = supplierId != null ? supplierInfo[supplierId] : null;
+
+        return SupplierWithProductsCard(
+          supplier: supplier,
+          supplierId: supplierId,
+          products: supplierProducts,
+          supplierIndex: index + 1,
+          colorScheme: colorScheme,
+          theme: Theme.of(context),
+          quoteId: quoteId,
+          onSupplierTap: () {
+            if (quoteId != null && supplierId != null) {
+              context.router.push(
+                SupplierProductsRoute(
+                  quotationId: quoteId,
+                  supplierId: supplierId,
+                  supplierNo: supplier?.supplierNo ?? '',
+                  supplierName: supplier?.name ?? '',
+                ),
+              );
+            }
+          },
+        );
       },
     );
   }

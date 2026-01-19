@@ -96,8 +96,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
         'quotation_id': quotationId,
         'sample_items': sampleItems,
         "supplier_id": state.supplierId, 
-      };
-      logger.d('批量上传商品数据:${data}');
+      }; 
       final result = await addQuotationSamples(data);
       if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
