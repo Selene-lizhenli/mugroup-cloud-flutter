@@ -104,6 +104,12 @@ class AppRouter extends RootStackRouter {
       AutoRoute(
           page: QuoteProductAddAdaptiveRoute.page, path: "/quote/product/add"),
       AutoRoute(
+          page: QuoteProductAiAddFloorRoute.page,
+          path: "/quote/product/ai/add/floor"),
+      AutoRoute(
+          page: QuoteProductAiAddNotepadRoute.page,
+          path: "/quote/product/ai/add/notepad"),
+      AutoRoute(
         page: ProductBatchImportRoute.page,
         path: "/quote/product/batch_import",
       ),
