@@ -396,7 +396,12 @@ class AddProductModeDialog extends HookWidget {
                     ));
                   }
                   if (isAiMode.value) {
-                    if (aiSubOptionIndex.value == 0) {}
+                    if (aiSubOptionIndex.value == 0) {
+                      Navigator.of(context).pop();
+                      context.router.push(QuoteProductAiAddFloorRoute(
+                        quoteId: quoteId,
+                      ));
+                    }
                     if (aiSubOptionIndex.value == 1) {
                       Navigator.of(context).pop();
                       context.router.push(QuoteProductAiAddNotepadRoute(
