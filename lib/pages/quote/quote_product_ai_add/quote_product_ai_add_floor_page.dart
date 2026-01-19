@@ -16,8 +16,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   const QuoteProductAiAddFloorPage({super.key, this.quoteId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const Color primaryBlue = Color(0xFF4080FF);
-    const Color bgGrey = Color(0xFFF5F5F5);
+    final colorScheme = Theme.of(context).colorScheme;
 
     final supplierController = useTextEditingController();
 
@@ -34,7 +33,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
 
     return Scaffold(
-      backgroundColor: bgGrey,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text(
           'AI自动录入产品',
@@ -48,159 +47,209 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      )
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ImageUploader(
-                        value: imageList.value,
-                        onChanged: (value) {
-                          imageList.value = value;
-                        },
-                      ),
-                    ],
-                  ),
-                )),
-              ],
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              color: const Color(0xFFEef6FF),
-              child: const Row(
-                children: [
-                  Icon(Icons.volume_up_outlined, color: primaryBlue, size: 18),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '您正在使用AI录入功能，信息将会由自动识别录入!!!',
-                      style: TextStyle(color: primaryBlue, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(6.0),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ImageUploader(
+                              value: imageList.value,
+                              onChanged: (value) {
+                                imageList.value = value;
+                              },
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                  ),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF8E1),
-                      border: const Border(
-                        left: BorderSide(color: Colors.orange, width: 4),
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      '当前录入模式：地板/白板',
-                      style: TextStyle(
-                          color: Colors.orange, fontWeight: FontWeight.bold),
+                    color: const Color(0xFFEef6FF),
+                    child: Row(
+                      children: [
+                        Icon(Icons.volume_up_outlined,
+                            color: colorScheme.primary, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '您正在使用AI录入功能，信息将会由自动识别录入!!!',
+                            style: TextStyle(
+                                color: colorScheme.primary, fontSize: 12),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Row(
-                    children: [
-                      Text('*', style: TextStyle(color: Colors.red)),
-                      Text('供应商',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 40,
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: TextField(
-                            controller: supplierController,
-                            readOnly: true,
-                            onTap: () async {
-                              final Map<String, dynamic>? result =
-                                  await showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) => const SupplierSelect(),
-                              );
-
-                              if (result != null) {
-                                supplierController.text = result['name'] ?? '';
-
-                                selectedSupplierState.value = result;
-                              }
-                            },
-                            decoration: const InputDecoration(
-                              hintText: '输入供应商名称搜索或添加',
-                              hintStyle:
-                                  TextStyle(fontSize: 13, color: Colors.grey),
-                              prefixIcon: Icon(Icons.search,
-                                  size: 20, color: Colors.grey),
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 10),
+                            color: const Color(0xFFFFF8E1),
+                            border: const Border(
+                              left: BorderSide(color: Colors.orange, width: 4),
                             ),
-                            style: const TextStyle(fontSize: 14),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            '当前录入模式：地板/白板',
+                            style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3F51B5), // 深蓝色
-                          minimumSize: const Size(80, 40),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                        const SizedBox(height: 4),
+                        const Row(
+                          children: [
+                            Text('*', style: TextStyle(color: Colors.red)),
+                            Text('供应商',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
                         ),
-                        child: const Text('SKU设置',
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.white)),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: TextField(
+                                  controller: supplierController,
+                                  readOnly: true,
+                                  onTap: () async {
+                                    final Map<String, dynamic>? result =
+                                        await showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (_) => const SupplierSelect(),
+                                    );
+
+                                    if (result != null) {
+                                      supplierController.text =
+                                          result['name'] ?? '';
+
+                                      selectedSupplierState.value = result;
+                                    }
+                                  },
+                                  decoration: const InputDecoration(
+                                    hintText: '输入供应商名称搜索或添加',
+                                    hintStyle: TextStyle(
+                                        fontSize: 13, color: Colors.grey),
+                                    prefixIcon: Icon(Icons.search,
+                                        size: 20, color: Colors.grey),
+                                    border: InputBorder.none,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 10),
+                                  ),
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                minimumSize: const Size(80, 40),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4)),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                              ),
+                              child: const Text('SKU设置',
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
+                  if (fieldConfigs.isNotEmpty)
+                    InlineFieldSelector(
+                      fields: fieldConfigs,
+                      defaultFields: quoteAIFloorDefaultFields,
+                      onConfigChanged: (newConfig) {
+                        notifier.updateConfigs(newConfig);
+                      },
+                    )
                 ],
               ),
             ),
-            if (fieldConfigs.isNotEmpty)
-              InlineFieldSelector(
-                fields: fieldConfigs,
-                defaultFields: quoteAIFloorDefaultFields,
-                onConfigChanged: (newConfig) {
-                  notifier.updateConfigs(newConfig);
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+                .copyWith(bottom: MediaQuery.of(context).padding.bottom + 8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, -2),
+                )
+              ],
+            ),
+            child: SizedBox(
+              height: 44, // 按钮高度
+              child: ElevatedButton(
+                onPressed: () {
+                  // TODO: 这里写保存逻辑
+                  print('点击保存产品');
                 },
-              )
-          ],
-        ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                child: const Text('保存产品'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -288,7 +337,6 @@ class _InlineFieldSelectorState extends State<InlineFieldSelector> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
 
     return Container(
       decoration: BoxDecoration(
