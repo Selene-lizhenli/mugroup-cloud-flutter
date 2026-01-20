@@ -101,8 +101,8 @@ class _SupplierWithProductsCardState
                   fontSize: 12,
                   onTap: () async {
                     await context.router.push(
-                      QuoteProductAddAdaptiveRoute(
-                        initialMode: 0,
+                      QuoteProductNewAddRoute(
+                        quoteId: 0,
                         supplierId: supplierId?.toString(),
                       ),
                     );
