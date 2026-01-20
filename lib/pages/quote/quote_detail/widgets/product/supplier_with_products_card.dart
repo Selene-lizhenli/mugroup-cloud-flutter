@@ -82,7 +82,7 @@ class _SupplierWithProductsCardState
               children: [
                 Text(
                   '$label(${products.length})',
-                  style: theme.textTheme.titleMedium?.copyWith(),
+                  style: theme.textTheme.titleSmall?.copyWith(),
                 ),
                 if (onSupplierTap != null) ...[
                   const SizedBox(width: 4),
@@ -98,7 +98,7 @@ class _SupplierWithProductsCardState
                   icon: Icons.add,
                   // backgroundColor: colorScheme.secondary,
                   textColor: colorScheme.primary,
-                  fontSize: 12,
+                  fontSize: 13,
                   onTap: () async {
                     await context.router.push(
                       QuoteProductNewAddRoute(

@@ -23,6 +23,10 @@ class ImageUploader extends HookConsumerWidget {
   final ValueChanged<dynamic>? onRecognizeResult;
   final String? errorText;
 
+  /// 智能识别按钮位置：
+  /// false => 顶部（默认）、true => 底部左对齐
+  final bool recognizeAtBottom;
+
   // --- 核心控制参数 ---
   /// 模式控制：
   /// true  => 单击直接进入普通相机
@@ -33,6 +37,8 @@ class ImageUploader extends HookConsumerWidget {
   /// true  => 允许长按进入连拍模式
   /// false => 长按无效果
   final bool enableContinuous;
+
+  final IconData? customIcon;
 
   final void Function(List<File> files)? onContinuousCapture;
 
@@ -46,10 +52,12 @@ class ImageUploader extends HookConsumerWidget {
     this.recognizeApi,
     this.onRecognizeResult,
     this.errorText,
+    this.recognizeAtBottom = false,
     // 默认设置：保留弹窗，关闭连拍
     this.directCamera = false,
     this.enableContinuous = false,
     this.onContinuousCapture,
+    this.customIcon,
   });
 
   @override
@@ -224,10 +232,14 @@ class ImageUploader extends HookConsumerWidget {
       }
     }
 
+    final bool showTopBar =
+        label != null || (showRecognizeButton && !recognizeAtBottom);
+    final bool showBottomRecognize = showRecognizeButton && recognizeAtBottom;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (label != null || showRecognizeButton) ...[
+        if (showTopBar) ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -237,7 +249,7 @@ class ImageUploader extends HookConsumerWidget {
                         fontSize: 14, fontWeight: FontWeight.bold))
               else
                 const SizedBox(),
-              if (showRecognizeButton)
+              if (showRecognizeButton && !recognizeAtBottom)
                 GestureDetector(
                   onTap: handleSmartRecognize,
                   child: Container(
@@ -261,21 +273,47 @@ class ImageUploader extends HookConsumerWidget {
           ),
           const SizedBox(height: 8),
         ],
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            ...List.generate(currentImages.length, (index) {
-              return _buildImageItem(context, index,
-                  currentImages[index].thumbUrl ?? currentImages[index].url,
-                  onRemove: () => handleDelete(index));
-            }),
-            if (remainingCount > 0)
-              _buildAddButton(
-                onTap: handleTap,
-                // 只有开启了连拍，才绑定长按事件
-                onLongPress: enableContinuous ? handleLongPress : null,
-                hasError: hasError,
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                ...List.generate(currentImages.length, (index) {
+                  return _buildImageItem(context, index,
+                      currentImages[index].thumbUrl ?? currentImages[index].url,
+                      onRemove: () => handleDelete(index));
+                }),
+                if (remainingCount > 0)
+                  _buildAddButton(
+                    onTap: handleTap,
+                    // 只有开启了连拍，才绑定长按事件
+                    onLongPress: enableContinuous ? handleLongPress : null,
+                    hasError: hasError,
+                  ),
+              ],
+            ),
+            if (showBottomRecognize)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0,left: 12),
+                child: GestureDetector(
+                  onTap: handleSmartRecognize,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.center_focus_weak,
+                          size: 16, color: Theme.of(context).primaryColor),
+                      const SizedBox(width: 4),
+                      Text("智能识别",
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
               ),
           ],
         ),
@@ -356,7 +394,7 @@ class ImageUploader extends HookConsumerWidget {
             width: hasError ? 1.2 : 1.0,
           ),
         ),
-        child: const Icon(Icons.add, color: Color(0xFF999999), size: 28),
+        child:   Icon(customIcon ?? Icons.add, color: Color(0xFF999999), size: 28),
       ),
     );
   }
