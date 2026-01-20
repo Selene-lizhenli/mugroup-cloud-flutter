@@ -1,8 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/base_info_section.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/export/export_section.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product/product_section.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/base_info_section.dart'; 
+import 'package:cloud/pages/quote/quote_detail/widgets/product/product.dart'; 
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -37,32 +36,28 @@ class QuoteDetailBody extends StatelessWidget {
     if (item == null) {
       return const Center(child: Text('无详情数据'));
     }
-    return Scaffold(
-      body: Column(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(12,0, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ExportActionBar(item: item),
-                const SizedBox(height: 12),
-                BaseInfoSection(                                                                                                                                                                                                                     
-                  item: item,
-                  onEdit: () => _handleEdit(context),
-                  onDelete: () => _handleDelete(context),
-                ),
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 12),
+              BaseInfoSection(
+                item: item,
+                onEdit: () => _handleEdit(context),
+                onDelete: () => _handleDelete(context),
+              ),
+            ],
           ),
-          Expanded(
-            child: Padding(                                                                                                                                                                                                                                                                                                                                                                                                              
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: ProductSection(quoteId: item!.id),
-            ),
-          ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: ProductSection(quoteId: item!.id),
+        ),
+      ],
     );
   }
 }

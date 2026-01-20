@@ -69,7 +69,8 @@ class SupplierProductsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('供应商产品列表'),
+        title: const Text('产品列表'),
+        // title: const Text('供应商产品列表'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -82,7 +83,7 @@ class SupplierProductsPage extends HookConsumerWidget {
         children: [
           // 供应商信息卡片
           Container(
-            margin: const EdgeInsets.all(12),
+            margin: const EdgeInsets.fromLTRB(12,12,12,12),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: colorScheme.surface,
@@ -95,13 +96,13 @@ class SupplierProductsPage extends HookConsumerWidget {
                   color: colorScheme.secondary,
                   size: 24,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '供应商: ',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                // const SizedBox(width: 8),
+                // Text(
+                //   '供应商: ',
+                //   style: theme.textTheme.bodyMedium?.copyWith(
+                //     color: colorScheme.onSurfaceVariant,
+                //   ),
+                // ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -149,7 +150,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                         Row(
                           children: [
                             ActionPillButton(
-                              label: '批量导入',
+                              label: '导入',
                               icon: Icons.download,
                               backgroundColor: colorScheme.primary,
                               textColor: colorScheme.onPrimary,
@@ -164,7 +165,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                             ),
                             const SizedBox(width: 8),
                             ActionPillButton(
-                              label: '新增产品',
+                              label: '新增',
                               icon: Icons.add,
                               backgroundColor: colorScheme.secondary,
                               textColor: colorScheme.onSecondary,

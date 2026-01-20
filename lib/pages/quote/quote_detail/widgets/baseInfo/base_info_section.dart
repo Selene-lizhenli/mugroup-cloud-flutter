@@ -1,5 +1,7 @@
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/item_info.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
@@ -25,7 +27,7 @@ class BaseInfoSection extends HookConsumerWidget {
     final colorScheme = theme.colorScheme;
     final Company? company = item?.company;
     final isExpanded = useState(false);
- 
+
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
@@ -39,89 +41,89 @@ class BaseInfoSection extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ===== 标题栏 =====
-            Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 18,
-                  color: colorScheme.secondary.withOpacity(1),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '基本信息${item?.id != null ? '#${item!.id}' : ''}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
+            // 折叠时
+            if (isExpanded.value == false) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    company?.name ?? ' ',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w500, height: 1.2),
                   ),
-                ),
-
-                const Spacer(),
-
-                if (onEdit != null && isExpanded.value == true) ...[
                   const SizedBox(width: 10),
-                  ActionPillButton(
-                    label: '编辑',
-                    // icon: Icons.edit ,
-                    textColor: colorScheme.primary,
-                    // borderColor: colorScheme.primary,
-                    onTap: onEdit!,
-                    fontSize: 12,
-                    vertical: 2,
-                    horizontal: 9,
+                  Text(
+                    '${item?.curreny ?? ''}',
+                    style: const TextStyle(
+                        // color: colorScheme.surfaceContainerHighest,
+                        fontSize: 12,
+                        height: 1.2),
                   ),
-                  // InkWell(
-                  //   borderRadius: BorderRadius.circular(6),
-                  //   onTap: onEdit,
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.all(4),
-                  //     child: Icon(
-                  //       Icons.edit,
-                  //       size: 15,
-                  //       color: colorScheme.primary,
-                  //     ),
-                  //   ),
-                  // ),
-                  const SizedBox(
-                    width: 8,
-                  )
-                ],
-
-                InkWell(
-                  onTap: () {
-                    isExpanded.value = !isExpanded.value;
-                  },
-                  borderRadius: BorderRadius.circular(4),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 8,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isExpanded.value ? '收起' : '查看',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.secondary,
-                            fontSize: 12,
+                  const SizedBox(width: 10),
+                  Text(
+                    '${item?.language ?? ''}',
+                    style: const TextStyle(
+                        // color: colorScheme.surfaceContainerHighest,
+                        fontSize: 12,
+                        height: 1.2),
+                  ),
+                  const Spacer(),
+                  InkWell(
+                    onTap: () {
+                      isExpanded.value = !isExpanded.value;
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Text('展开',
+                          //     style: TextStyle(
+                          //         color: colorScheme.secondary, fontSize: 12)),
+                          Icon(
+                            Icons.keyboard_double_arrow_down,
+                            size: 15,
+                            color: colorScheme.primary,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          isExpanded.value
-                              ? Icons.expand_less
-                              : Icons.expand_more,
-                          size: 16,
-                          color: colorScheme.secondary,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ), 
-              ],
-            ),
+                ],
+              ),
+            ] else ...[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      company?.name ?? ' ',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w500, height: 1.2),
+                    ),
+                    if (onEdit != null) ...[
+                      const SizedBox(width: 10,),
+                      ActionPillButton(
+                        label: '编辑',
+                        textColor: colorScheme.primary,
+                        // borderColor: colorScheme.primary, 
+                        onTap: onEdit!,
+                        icon: Icons.edit_outlined,
+                        fontSize: 12,
+                        vertical: 4,
+                        horizontal: 9,
+                      ),
+                    ],
+                  ]),
+              // ===== 内容区域（2列网格）=====
+              // 展开时
 
-            // ===== 内容区域（2列网格）=====
-            if (isExpanded.value)
               LayoutBuilder(
                 builder: (context, constraints) {
                   // 所有信息项
@@ -129,7 +131,7 @@ class BaseInfoSection extends HookConsumerWidget {
                     // 客户名称
                     SizedBox(
                       width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
+                      child: InfoItem(
                         label: '客户名称',
                         value: company?.name ?? ' ',
                         showArrow: company != null && company.id != null,
@@ -142,10 +144,18 @@ class BaseInfoSection extends HookConsumerWidget {
                             : null,
                       ),
                     ),
+                    // 报价货币
+                    SizedBox(
+                      width: (constraints.maxWidth - 16) / 2,
+                      child: InfoItem(
+                        label: '报价货币',
+                        value: item?.curreny ?? 'CNY',
+                      ),
+                    ),
                     // 联系人
                     SizedBox(
                       width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
+                      child: InfoItem(
                         label: '联系人',
                         value: item?.contactId ?? "",
                       ),
@@ -153,7 +163,7 @@ class BaseInfoSection extends HookConsumerWidget {
                     // 外销员
                     SizedBox(
                       width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
+                      child: InfoItem(
                         label: '外销员',
                         value: item?.user?.name ?? '-',
                       ),
@@ -161,7 +171,7 @@ class BaseInfoSection extends HookConsumerWidget {
                     // 报价日期
                     SizedBox(
                       width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
+                      child: InfoItem(
                         label: '报价日期',
                         value: _formatDate(item?.quoteAt),
                       ),
@@ -169,19 +179,12 @@ class BaseInfoSection extends HookConsumerWidget {
                     // 报价语言
                     SizedBox(
                       width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
+                      child: InfoItem(
                         label: '报价语言',
                         value: item?.language ?? '',
                       ),
                     ),
-                    // 报价货币
-                    SizedBox(
-                      width: (constraints.maxWidth - 16) / 2,
-                      child: _InfoItem(
-                        label: '报价货币',
-                        value: item?.curreny ?? 'CNY',
-                      ),
-                    ),
+
                     // 更新日期
                     // SizedBox(
                     //   width: (constraints.maxWidth - 16) / 2,
@@ -193,14 +196,6 @@ class BaseInfoSection extends HookConsumerWidget {
                     //   ),
                     // ),
                   ];
-
-                  // 默认显示3行（6个信息项）
-                  const maxVisibleItems = 6;
-                  final shouldShowExpand = allItems.length > maxVisibleItems;
-                  final visibleItems = isExpanded.value
-                      ? allItems
-                      : allItems.take(maxVisibleItems).toList();
-
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -208,48 +203,47 @@ class BaseInfoSection extends HookConsumerWidget {
                       Wrap(
                         spacing: 16,
                         runSpacing: 12,
-                        children: visibleItems,
+                        children: allItems,
                       ),
-                      if (shouldShowExpand)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: InkWell(
-                            onTap: () {
-                              isExpanded.value = !isExpanded.value;
-                            },
-                            borderRadius: BorderRadius.circular(4),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 4,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    isExpanded.value ? '收起' : '展开',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.secondary,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    isExpanded.value
-                                        ? Icons.expand_less
-                                        : Icons.expand_more,
-                                    size: 16,
-                                    color: colorScheme.secondary,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                     ],
                   );
                 },
               ),
+
+              // ===== 尾部操作（2列网格）===== //展开时
+              const SizedBox(height: 4),
+              Row(children: [
+                const Spacer(),
+                InkWell(
+                  onTap: () {
+                    isExpanded.value = !isExpanded.value;
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('收起',
+                            style: TextStyle(
+                                color: colorScheme.primary, fontSize: 12)),
+                        const SizedBox(width: 2),
+                        Icon(
+                          Icons.keyboard_double_arrow_up_outlined,
+                          size: 15,
+                          color: colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            ],
           ],
         ),
       ),
@@ -266,79 +260,5 @@ class BaseInfoSection extends HookConsumerWidget {
     }
   }
 
-  String _formatDateTime(DateTime date) {
-    return '${date.year}-${_two(date.month)}-${_two(date.day)}';
-  }
-
   String _two(int n) => n.toString().padLeft(2, '0');
-}
-
-class _InfoItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool showArrow;
-  final VoidCallback? onTap;
-
-  const _InfoItem({
-    required this.label,
-    required this.value,
-    this.showArrow = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    Widget content = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.surfaceContainerHighest,
-            fontSize: 12,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-            child: Row(
-          children: [
-            Text(
-              value,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.87),
-                fontSize: 12,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(
-              width: 2,
-            ),
-            if (showArrow)
-              Icon(
-                Icons.chevron_right,
-                size: 16,
-                color: colorScheme.onSurface.withOpacity(0.4),
-              ),
-          ],
-        )),
-      ],
-    );
-
-    if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(4),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: content,
-        ),
-      );
-    }
-
-    return content;
-  }
 }

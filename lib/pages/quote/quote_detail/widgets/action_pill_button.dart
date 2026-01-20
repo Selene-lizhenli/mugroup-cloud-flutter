@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ActionPillButton extends StatelessWidget {
-  final String label;
+  final String? label;
   final IconData? icon;
   final Color? backgroundColor;
   final Color textColor;
@@ -13,7 +13,7 @@ class ActionPillButton extends StatelessWidget {
 
   const ActionPillButton({
     super.key,
-    required this.label,
+    this.label,
     this.icon,
     this.backgroundColor,
     required this.textColor,
@@ -48,14 +48,16 @@ class ActionPillButton extends StatelessWidget {
                 Icon(icon, size: 17, color: textColor),
                 const SizedBox(width: 4),
               ],
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: fontSize ?? 15,
-                  color: textColor,
-                  fontWeight: FontWeight.w500,
+              if (label != null) ...[
+                Text(
+                  label!.toString(),
+                  style: TextStyle(
+                    fontSize: fontSize ?? 15,
+                    color: textColor,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

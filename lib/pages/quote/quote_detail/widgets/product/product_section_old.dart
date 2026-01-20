@@ -39,25 +39,10 @@ class ProductSection extends HookConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('报价产品(${state.products.length})', style: theme.textTheme.titleMedium),
                     Row(
                       children: [
                         ActionPillButton(
-                          label: '批量导入',
-                          icon: Icons.download,
-                          backgroundColor: colorScheme.primary,
-                          textColor: Colors.white,
-                          onTap: () {
-                            context.router.push(
-                              ProductBatchImportRoute(
-                                quotationId: quoteId,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ActionPillButton(
-                          label: '新增供应商',
+                          label: '供应商',
                           icon: Icons.add,
                           backgroundColor: colorScheme.secondary, // 蓝色
                           textColor: colorScheme.onSecondary,
@@ -82,6 +67,20 @@ class ProductSection extends HookConsumerWidget {
                               context: context,
                               builder: (context) =>
                                   AddSupplierSheet(quotationId: quoteId),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ActionPillButton(
+                          label: '导入',
+                          icon: Icons.download,
+                          backgroundColor: colorScheme.primary,
+                          textColor: Colors.white,
+                          onTap: () {
+                            context.router.push(
+                              ProductBatchImportRoute(
+                                quotationId: quoteId,
+                              ),
                             );
                           },
                         ),

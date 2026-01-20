@@ -67,17 +67,22 @@ class QuoteDetailPage extends HookConsumerWidget {
           ),
         ],
       ),
-      body: NotificationListener<ScrollNotification>( 
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-         
-            Expanded(
-              child: QuoteDetailBody(
-                item: quoteDetailState.baseInfo,
-              ),
+      body: NotificationListener<ScrollNotification>(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: QuoteDetailBody(
+                    item: quoteDetailState.baseInfo,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
