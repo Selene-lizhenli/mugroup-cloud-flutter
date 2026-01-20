@@ -611,27 +611,27 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('添加报价产品'),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          TextButton(
-            onPressed: () async {
-              context.router.push(QuoteProductAddAdaptiveRoute(
-                initialMode: 1,
-              ));
-            },
-            child: Text(
-              "平板模式",
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: const Text('添加报价产品'),
+      //   backgroundColor: Colors.white,
+      //   surfaceTintColor: Colors.transparent,
+      //   actions: [
+      //     TextButton(
+      //       onPressed: () async {
+      //         context.router.push(QuoteProductAddAdaptiveRoute(
+      //           initialMode: 1,
+      //         ));
+      //       },
+      //       child: Text(
+      //         "平板模式",
+      //         style: TextStyle(
+      //           color: colorScheme.primary,
+      //           fontSize: 16,
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
       body: Column(
         children: [
           Expanded(

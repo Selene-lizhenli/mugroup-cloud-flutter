@@ -1170,12 +1170,14 @@ class QuoteProductNewAddRoute
   QuoteProductNewAddRoute({
     _i62.Key? key,
     int? quoteId,
+    String? supplierId,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductNewAddRoute.name,
           args: QuoteProductNewAddRouteArgs(
             key: key,
             quoteId: quoteId,
+            supplierId: supplierId,
           ),
           initialChildren: children,
         );
@@ -1190,6 +1192,7 @@ class QuoteProductNewAddRoute
       return _i32.QuoteProductNewAddPage(
         key: args.key,
         quoteId: args.quoteId,
+        supplierId: args.supplierId,
       );
     },
   );
@@ -1199,15 +1202,18 @@ class QuoteProductNewAddRouteArgs {
   const QuoteProductNewAddRouteArgs({
     this.key,
     this.quoteId,
+    this.supplierId,
   });
 
   final _i62.Key? key;
 
   final int? quoteId;
 
+  final String? supplierId;
+
   @override
   String toString() {
-    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId}';
+    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId}';
   }
 }
 

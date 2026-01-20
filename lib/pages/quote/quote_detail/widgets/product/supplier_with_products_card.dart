@@ -112,15 +112,21 @@ class SupplierWithProductsCard extends ConsumerWidget {
                         child: InkWell(
                           onTap: () async {
                             await context.router.push(
-                              QuoteProductAddAdaptiveRoute(
-                                initialMode: 0,
-                                supplierId: supplierId?.toString(),
+                              QuoteProductNewAddRoute(
+                                quoteId: 0,
+                                supplierId: supplierId?.toString(), 
                               ),
                             );
+                            // await context.router.push(
+                            //   QuoteProductAddAdaptiveRoute(
+                            //     initialMode: 0,
+                            //     supplierId: supplierId?.toString(),
+                            //   ),
+                            // );
                           
-                              await quoteDetailNotifier.fetchQuoteDetail(
-                                quoteId!,
-                              );
+                            //   await quoteDetailNotifier.fetchQuoteDetail(
+                            //     quoteId!,
+                            //   );
                           
                           },
                           child: Container(
