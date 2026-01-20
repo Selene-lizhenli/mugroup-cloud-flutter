@@ -8,12 +8,12 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i58;
-import 'package:cloud/models/dashboard/public_news_article.dart' as _i63;
-import 'package:cloud/models/wms/warehouse.dart' as _i60;
+import 'package:auto_route/auto_route.dart' as _i59;
+import 'package:cloud/models/dashboard/public_news_article.dart' as _i64;
+import 'package:cloud/models/wms/warehouse.dart' as _i61;
 import 'package:cloud/pages/cart/cart_page.dart' as _i1;
 import 'package:cloud/pages/cart/confirm/confirm_page.dart' as _i2;
-import 'package:cloud/pages/cart/models/state.dart' as _i59;
+import 'package:cloud/pages/cart/models/state.dart' as _i60;
 import 'package:cloud/pages/crm/crm_company/crm_company_create_page.dart'
     as _i3;
 import 'package:cloud/pages/crm/crm_company/crm_company_detail_page.dart'
@@ -26,7 +26,7 @@ import 'package:cloud/pages/crm/crm_contact/crm_contact_edit_page.dart' as _i8;
 import 'package:cloud/pages/dashboard/dashboard.dart' as _i9;
 import 'package:cloud/pages/dashboard/pages/news_pages.dart' as _i24;
 import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart'
-    as _i62;
+    as _i63;
 import 'package:cloud/pages/inspection/inspection_add_page.dart' as _i10;
 import 'package:cloud/pages/inspection/inspection_detail_page.dart' as _i11;
 import 'package:cloud/pages/inspection/inspection_item_confirm_page.dart'
@@ -56,53 +56,55 @@ import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_floo
     as _i30;
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_notepad_page.dart'
     as _i31;
+import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart'
+    as _i32;
 import 'package:cloud/pages/quote/supplier_products_related/supplier_products_page.dart'
-    as _i43;
-import 'package:cloud/pages/samples/samples_list_page.dart' as _i32;
-import 'package:cloud/pages/scan/scan_page.dart' as _i33;
-import 'package:cloud/pages/selectors/select_product/select_product_page.dart'
-    as _i34;
-import 'package:cloud/pages/selectors/select_user/select_user_page.dart'
-    as _i35;
-import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.dart'
-    as _i36;
-import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
-    as _i37;
-import 'package:cloud/pages/setting/setting_page.dart' as _i38;
-import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i39;
-import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i40;
-import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
-    as _i41;
-import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i42;
-import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_create_page.dart'
     as _i44;
-import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'
+import 'package:cloud/pages/samples/samples_list_page.dart' as _i33;
+import 'package:cloud/pages/scan/scan_page.dart' as _i34;
+import 'package:cloud/pages/selectors/select_product/select_product_page.dart'
+    as _i35;
+import 'package:cloud/pages/selectors/select_user/select_user_page.dart'
+    as _i36;
+import 'package:cloud/pages/selectors/select_wms_borrow/select_wms_borrow_page.dart'
+    as _i37;
+import 'package:cloud/pages/selectors/select_wms_warehouse/select_wms_warehouse_page.dart'
+    as _i38;
+import 'package:cloud/pages/setting/setting_page.dart' as _i39;
+import 'package:cloud/pages/showroom/showroom_quotations_page.dart' as _i40;
+import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i41;
+import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
+    as _i42;
+import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i43;
+import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_create_page.dart'
     as _i45;
-import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_create_page.dart'
+import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'
     as _i46;
-import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_edit_page.dart'
+import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_create_page.dart'
     as _i47;
-import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i48;
+import 'package:cloud/pages/supply/supply_supplier_contact/supply_supplier_contact_edit_page.dart'
+    as _i48;
+import 'package:cloud/pages/supply/supply_supplier_create_page.dart' as _i49;
 import 'package:cloud/pages/supply/supply_supplier_detail/supply_supplier_detail_page.dart'
-    as _i51;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
-    as _i49;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
-    as _i50;
-import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
     as _i52;
-import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i53;
-import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i54;
-import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i55;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/contact.dart'
+    as _i50;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/info.dart'
+    as _i51;
+import 'package:cloud/pages/supply/supply_supplier_detail/tabs/sample.dart'
+    as _i53;
+import 'package:cloud/pages/supply/supply_supplier_edit_page.dart' as _i54;
+import 'package:cloud/pages/supply/supply_supplier_page.dart' as _i55;
+import 'package:cloud/pages/wms/wms_delivery_page.dart' as _i56;
 import 'package:cloud/pages/wms/wms_transfer_confirm/wms_transfer_confirm_page.dart'
-    as _i56;
-import 'package:cloud/pages/wms/wms_transfer_page.dart' as _i57;
-import 'package:flutter/material.dart' as _i61;
+    as _i57;
+import 'package:cloud/pages/wms/wms_transfer_page.dart' as _i58;
+import 'package:flutter/material.dart' as _i62;
 
 /// generated route for
 /// [_i1.CartPage]
-class CartRoute extends _i58.PageRouteInfo<void> {
-  const CartRoute({List<_i58.PageRouteInfo>? children})
+class CartRoute extends _i59.PageRouteInfo<void> {
+  const CartRoute({List<_i59.PageRouteInfo>? children})
       : super(
           CartRoute.name,
           initialChildren: children,
@@ -110,7 +112,7 @@ class CartRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'CartRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i1.CartPage();
@@ -120,12 +122,12 @@ class CartRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.ConfirmPage]
-class ConfirmRoute extends _i58.PageRouteInfo<ConfirmRouteArgs> {
+class ConfirmRoute extends _i59.PageRouteInfo<ConfirmRouteArgs> {
   ConfirmRoute({
-    required List<_i59.CartItem>? items,
-    required _i60.Warehouse? warehouse,
-    _i61.Key? key,
-    List<_i58.PageRouteInfo>? children,
+    required List<_i60.CartItem>? items,
+    required _i61.Warehouse? warehouse,
+    _i62.Key? key,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           ConfirmRoute.name,
           args: ConfirmRouteArgs(
@@ -138,7 +140,7 @@ class ConfirmRoute extends _i58.PageRouteInfo<ConfirmRouteArgs> {
 
   static const String name = 'ConfirmRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ConfirmRouteArgs>();
@@ -158,11 +160,11 @@ class ConfirmRouteArgs {
     this.key,
   });
 
-  final List<_i59.CartItem>? items;
+  final List<_i60.CartItem>? items;
 
-  final _i60.Warehouse? warehouse;
+  final _i61.Warehouse? warehouse;
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   @override
   String toString() {
@@ -172,8 +174,8 @@ class ConfirmRouteArgs {
 
 /// generated route for
 /// [_i3.CrmCompanyCreatePage]
-class CrmCompanyCreateRoute extends _i58.PageRouteInfo<void> {
-  const CrmCompanyCreateRoute({List<_i58.PageRouteInfo>? children})
+class CrmCompanyCreateRoute extends _i59.PageRouteInfo<void> {
+  const CrmCompanyCreateRoute({List<_i59.PageRouteInfo>? children})
       : super(
           CrmCompanyCreateRoute.name,
           initialChildren: children,
@@ -181,7 +183,7 @@ class CrmCompanyCreateRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'CrmCompanyCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i3.CrmCompanyCreatePage();
@@ -192,11 +194,11 @@ class CrmCompanyCreateRoute extends _i58.PageRouteInfo<void> {
 /// generated route for
 /// [_i4.CrmCompanyDetailPage]
 class CrmCompanyDetailRoute
-    extends _i58.PageRouteInfo<CrmCompanyDetailRouteArgs> {
+    extends _i59.PageRouteInfo<CrmCompanyDetailRouteArgs> {
   CrmCompanyDetailRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           CrmCompanyDetailRoute.name,
           args: CrmCompanyDetailRouteArgs(
@@ -208,7 +210,7 @@ class CrmCompanyDetailRoute
 
   static const String name = 'CrmCompanyDetailRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CrmCompanyDetailRouteArgs>();
@@ -226,7 +228,7 @@ class CrmCompanyDetailRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -238,11 +240,11 @@ class CrmCompanyDetailRouteArgs {
 
 /// generated route for
 /// [_i5.CrmCompanyEditPage]
-class CrmCompanyEditRoute extends _i58.PageRouteInfo<CrmCompanyEditRouteArgs> {
+class CrmCompanyEditRoute extends _i59.PageRouteInfo<CrmCompanyEditRouteArgs> {
   CrmCompanyEditRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           CrmCompanyEditRoute.name,
           args: CrmCompanyEditRouteArgs(
@@ -255,7 +257,7 @@ class CrmCompanyEditRoute extends _i58.PageRouteInfo<CrmCompanyEditRouteArgs> {
 
   static const String name = 'CrmCompanyEditRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -275,7 +277,7 @@ class CrmCompanyEditRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -287,8 +289,8 @@ class CrmCompanyEditRouteArgs {
 
 /// generated route for
 /// [_i6.CrmCompanyPage]
-class CrmCompanyRoute extends _i58.PageRouteInfo<void> {
-  const CrmCompanyRoute({List<_i58.PageRouteInfo>? children})
+class CrmCompanyRoute extends _i59.PageRouteInfo<void> {
+  const CrmCompanyRoute({List<_i59.PageRouteInfo>? children})
       : super(
           CrmCompanyRoute.name,
           initialChildren: children,
@@ -296,7 +298,7 @@ class CrmCompanyRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'CrmCompanyRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i6.CrmCompanyPage();
@@ -307,11 +309,11 @@ class CrmCompanyRoute extends _i58.PageRouteInfo<void> {
 /// generated route for
 /// [_i7.CrmContactCreatePage]
 class CrmContactCreateRoute
-    extends _i58.PageRouteInfo<CrmContactCreateRouteArgs> {
+    extends _i59.PageRouteInfo<CrmContactCreateRouteArgs> {
   CrmContactCreateRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? companyId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           CrmContactCreateRoute.name,
           args: CrmContactCreateRouteArgs(
@@ -323,7 +325,7 @@ class CrmContactCreateRoute
 
   static const String name = 'CrmContactCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CrmContactCreateRouteArgs>(
@@ -342,7 +344,7 @@ class CrmContactCreateRouteArgs {
     this.companyId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? companyId;
 
@@ -354,11 +356,11 @@ class CrmContactCreateRouteArgs {
 
 /// generated route for
 /// [_i8.CrmContactEditPage]
-class CrmContactEditRoute extends _i58.PageRouteInfo<CrmContactEditRouteArgs> {
+class CrmContactEditRoute extends _i59.PageRouteInfo<CrmContactEditRouteArgs> {
   CrmContactEditRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           CrmContactEditRoute.name,
           args: CrmContactEditRouteArgs(
@@ -370,7 +372,7 @@ class CrmContactEditRoute extends _i58.PageRouteInfo<CrmContactEditRouteArgs> {
 
   static const String name = 'CrmContactEditRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CrmContactEditRouteArgs>();
@@ -388,7 +390,7 @@ class CrmContactEditRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -400,11 +402,11 @@ class CrmContactEditRouteArgs {
 
 /// generated route for
 /// [_i9.DashboardPage]
-class DashboardRoute extends _i58.PageRouteInfo<DashboardRouteArgs> {
+class DashboardRoute extends _i59.PageRouteInfo<DashboardRouteArgs> {
   DashboardRoute({
-    _i61.Key? key,
-    _i61.GlobalKey<_i61.State<_i62.SelectedModulesWidget>>? selectedModulesKey,
-    List<_i58.PageRouteInfo>? children,
+    _i62.Key? key,
+    _i62.GlobalKey<_i62.State<_i63.SelectedModulesWidget>>? selectedModulesKey,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           DashboardRoute.name,
           args: DashboardRouteArgs(
@@ -416,7 +418,7 @@ class DashboardRoute extends _i58.PageRouteInfo<DashboardRouteArgs> {
 
   static const String name = 'DashboardRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<DashboardRouteArgs>(
@@ -435,9 +437,9 @@ class DashboardRouteArgs {
     this.selectedModulesKey,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
-  final _i61.GlobalKey<_i61.State<_i62.SelectedModulesWidget>>?
+  final _i62.GlobalKey<_i62.State<_i63.SelectedModulesWidget>>?
       selectedModulesKey;
 
   @override
@@ -448,8 +450,8 @@ class DashboardRouteArgs {
 
 /// generated route for
 /// [_i10.InspectionAddPage]
-class InspectionAddRoute extends _i58.PageRouteInfo<void> {
-  const InspectionAddRoute({List<_i58.PageRouteInfo>? children})
+class InspectionAddRoute extends _i59.PageRouteInfo<void> {
+  const InspectionAddRoute({List<_i59.PageRouteInfo>? children})
       : super(
           InspectionAddRoute.name,
           initialChildren: children,
@@ -457,7 +459,7 @@ class InspectionAddRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'InspectionAddRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i10.InspectionAddPage();
@@ -468,11 +470,11 @@ class InspectionAddRoute extends _i58.PageRouteInfo<void> {
 /// generated route for
 /// [_i11.InspectionDetailPage]
 class InspectionDetailRoute
-    extends _i58.PageRouteInfo<InspectionDetailRouteArgs> {
+    extends _i59.PageRouteInfo<InspectionDetailRouteArgs> {
   InspectionDetailRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           InspectionDetailRoute.name,
           args: InspectionDetailRouteArgs(
@@ -484,7 +486,7 @@ class InspectionDetailRoute
 
   static const String name = 'InspectionDetailRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<InspectionDetailRouteArgs>();
@@ -502,7 +504,7 @@ class InspectionDetailRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -515,11 +517,11 @@ class InspectionDetailRouteArgs {
 /// generated route for
 /// [_i12.InspectionItemConfirmPage]
 class InspectionItemConfirmRoute
-    extends _i58.PageRouteInfo<InspectionItemConfirmRouteArgs> {
+    extends _i59.PageRouteInfo<InspectionItemConfirmRouteArgs> {
   InspectionItemConfirmRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           InspectionItemConfirmRoute.name,
           args: InspectionItemConfirmRouteArgs(
@@ -531,7 +533,7 @@ class InspectionItemConfirmRoute
 
   static const String name = 'InspectionItemConfirmRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<InspectionItemConfirmRouteArgs>();
@@ -549,7 +551,7 @@ class InspectionItemConfirmRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -561,8 +563,8 @@ class InspectionItemConfirmRouteArgs {
 
 /// generated route for
 /// [_i13.InspectionPage]
-class InspectionRoute extends _i58.PageRouteInfo<void> {
-  const InspectionRoute({List<_i58.PageRouteInfo>? children})
+class InspectionRoute extends _i59.PageRouteInfo<void> {
+  const InspectionRoute({List<_i59.PageRouteInfo>? children})
       : super(
           InspectionRoute.name,
           initialChildren: children,
@@ -570,7 +572,7 @@ class InspectionRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'InspectionRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i13.InspectionPage();
@@ -580,8 +582,8 @@ class InspectionRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i14.Layout]
-class Layout extends _i58.PageRouteInfo<void> {
-  const Layout({List<_i58.PageRouteInfo>? children})
+class Layout extends _i59.PageRouteInfo<void> {
+  const Layout({List<_i59.PageRouteInfo>? children})
       : super(
           Layout.name,
           initialChildren: children,
@@ -589,7 +591,7 @@ class Layout extends _i58.PageRouteInfo<void> {
 
   static const String name = 'Layout';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i14.Layout();
@@ -599,11 +601,11 @@ class Layout extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i15.LoginPage]
-class LoginRoute extends _i58.PageRouteInfo<LoginRouteArgs> {
+class LoginRoute extends _i59.PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     void Function()? onLogin,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           LoginRoute.name,
           args: LoginRouteArgs(
@@ -615,7 +617,7 @@ class LoginRoute extends _i58.PageRouteInfo<LoginRouteArgs> {
 
   static const String name = 'LoginRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args =
@@ -634,7 +636,7 @@ class LoginRouteArgs {
     this.onLogin,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final void Function()? onLogin;
 
@@ -646,8 +648,8 @@ class LoginRouteArgs {
 
 /// generated route for
 /// [_i16.MarketProductCompanyCreatePage]
-class MarketProductCompanyCreateRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductCompanyCreateRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductCompanyCreateRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductCompanyCreateRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductCompanyCreateRoute.name,
           initialChildren: children,
@@ -655,7 +657,7 @@ class MarketProductCompanyCreateRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductCompanyCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i16.MarketProductCompanyCreatePage();
@@ -665,8 +667,8 @@ class MarketProductCompanyCreateRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i17.MarketProductInfoPage]
-class MarketProductInfoRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductInfoRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductInfoRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductInfoRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductInfoRoute.name,
           initialChildren: children,
@@ -674,7 +676,7 @@ class MarketProductInfoRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductInfoRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i17.MarketProductInfoPage();
@@ -684,8 +686,8 @@ class MarketProductInfoRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i18.MarketProductInspectionPage]
-class MarketProductInspectionRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductInspectionRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductInspectionRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductInspectionRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductInspectionRoute.name,
           initialChildren: children,
@@ -693,7 +695,7 @@ class MarketProductInspectionRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductInspectionRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i18.MarketProductInspectionPage();
@@ -703,8 +705,8 @@ class MarketProductInspectionRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i19.MarketProductListPage]
-class MarketProductListRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductListRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductListRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductListRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductListRoute.name,
           initialChildren: children,
@@ -712,7 +714,7 @@ class MarketProductListRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductListRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i19.MarketProductListPage();
@@ -722,8 +724,8 @@ class MarketProductListRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i20.MarketProductPage]
-class MarketProductRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductRoute.name,
           initialChildren: children,
@@ -731,7 +733,7 @@ class MarketProductRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i20.MarketProductPage();
@@ -741,8 +743,8 @@ class MarketProductRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i21.MarketProductQuotationPage]
-class MarketProductQuotationRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductQuotationRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductQuotationRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductQuotationRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductQuotationRoute.name,
           initialChildren: children,
@@ -750,7 +752,7 @@ class MarketProductQuotationRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductQuotationRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i21.MarketProductQuotationPage();
@@ -760,8 +762,8 @@ class MarketProductQuotationRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i22.MarketProductSupplierCreatePage]
-class MarketProductSupplierCreateRoute extends _i58.PageRouteInfo<void> {
-  const MarketProductSupplierCreateRoute({List<_i58.PageRouteInfo>? children})
+class MarketProductSupplierCreateRoute extends _i59.PageRouteInfo<void> {
+  const MarketProductSupplierCreateRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MarketProductSupplierCreateRoute.name,
           initialChildren: children,
@@ -769,7 +771,7 @@ class MarketProductSupplierCreateRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MarketProductSupplierCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i22.MarketProductSupplierCreatePage();
@@ -779,8 +781,8 @@ class MarketProductSupplierCreateRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i23.MyPage]
-class MyRoute extends _i58.PageRouteInfo<void> {
-  const MyRoute({List<_i58.PageRouteInfo>? children})
+class MyRoute extends _i59.PageRouteInfo<void> {
+  const MyRoute({List<_i59.PageRouteInfo>? children})
       : super(
           MyRoute.name,
           initialChildren: children,
@@ -788,7 +790,7 @@ class MyRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'MyRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i23.MyPage();
@@ -798,11 +800,11 @@ class MyRoute extends _i58.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i24.NewsPage]
-class NewsRoute extends _i58.PageRouteInfo<NewsRouteArgs> {
+class NewsRoute extends _i59.PageRouteInfo<NewsRouteArgs> {
   NewsRoute({
-    _i61.Key? key,
-    required _i63.PublicNewsArticle article,
-    List<_i58.PageRouteInfo>? children,
+    _i62.Key? key,
+    required _i64.PublicNewsArticle article,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           NewsRoute.name,
           args: NewsRouteArgs(
@@ -814,7 +816,7 @@ class NewsRoute extends _i58.PageRouteInfo<NewsRouteArgs> {
 
   static const String name = 'NewsRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<NewsRouteArgs>();
@@ -832,9 +834,9 @@ class NewsRouteArgs {
     required this.article,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
-  final _i63.PublicNewsArticle article;
+  final _i64.PublicNewsArticle article;
 
   @override
   String toString() {
@@ -845,12 +847,12 @@ class NewsRouteArgs {
 /// generated route for
 /// [_i25.ProductBatchImportPage]
 class ProductBatchImportRoute
-    extends _i58.PageRouteInfo<ProductBatchImportRouteArgs> {
+    extends _i59.PageRouteInfo<ProductBatchImportRouteArgs> {
   ProductBatchImportRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? quotationId,
     String? supplierNo,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           ProductBatchImportRoute.name,
           args: ProductBatchImportRouteArgs(
@@ -863,7 +865,7 @@ class ProductBatchImportRoute
 
   static const String name = 'ProductBatchImportRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ProductBatchImportRouteArgs>(
@@ -884,7 +886,7 @@ class ProductBatchImportRouteArgs {
     this.supplierNo,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? quotationId;
 
@@ -898,11 +900,11 @@ class ProductBatchImportRouteArgs {
 
 /// generated route for
 /// [_i26.QuoteCreatePage]
-class QuoteCreateRoute extends _i58.PageRouteInfo<QuoteCreateRouteArgs> {
+class QuoteCreateRoute extends _i59.PageRouteInfo<QuoteCreateRouteArgs> {
   QuoteCreateRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? quoteId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteCreateRoute.name,
           args: QuoteCreateRouteArgs(
@@ -914,7 +916,7 @@ class QuoteCreateRoute extends _i58.PageRouteInfo<QuoteCreateRouteArgs> {
 
   static const String name = 'QuoteCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<QuoteCreateRouteArgs>(
@@ -933,7 +935,7 @@ class QuoteCreateRouteArgs {
     this.quoteId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? quoteId;
 
@@ -945,11 +947,11 @@ class QuoteCreateRouteArgs {
 
 /// generated route for
 /// [_i27.QuoteDetailPage]
-class QuoteDetailRoute extends _i58.PageRouteInfo<QuoteDetailRouteArgs> {
+class QuoteDetailRoute extends _i59.PageRouteInfo<QuoteDetailRouteArgs> {
   QuoteDetailRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteDetailRoute.name,
           args: QuoteDetailRouteArgs(
@@ -962,7 +964,7 @@ class QuoteDetailRoute extends _i58.PageRouteInfo<QuoteDetailRouteArgs> {
 
   static const String name = 'QuoteDetailRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -982,7 +984,7 @@ class QuoteDetailRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -994,8 +996,8 @@ class QuoteDetailRouteArgs {
 
 /// generated route for
 /// [_i28.QuotePage]
-class QuoteRoute extends _i58.PageRouteInfo<void> {
-  const QuoteRoute({List<_i58.PageRouteInfo>? children})
+class QuoteRoute extends _i59.PageRouteInfo<void> {
+  const QuoteRoute({List<_i59.PageRouteInfo>? children})
       : super(
           QuoteRoute.name,
           initialChildren: children,
@@ -1003,7 +1005,7 @@ class QuoteRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'QuoteRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       return const _i28.QuotePage();
@@ -1014,12 +1016,12 @@ class QuoteRoute extends _i58.PageRouteInfo<void> {
 /// generated route for
 /// [_i29.QuoteProductAddAdaptivePage]
 class QuoteProductAddAdaptiveRoute
-    extends _i58.PageRouteInfo<QuoteProductAddAdaptiveRouteArgs> {
+    extends _i59.PageRouteInfo<QuoteProductAddAdaptiveRouteArgs> {
   QuoteProductAddAdaptiveRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? initialMode,
     String? supplierId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductAddAdaptiveRoute.name,
           args: QuoteProductAddAdaptiveRouteArgs(
@@ -1032,7 +1034,7 @@ class QuoteProductAddAdaptiveRoute
 
   static const String name = 'QuoteProductAddAdaptiveRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<QuoteProductAddAdaptiveRouteArgs>(
@@ -1053,7 +1055,7 @@ class QuoteProductAddAdaptiveRouteArgs {
     this.supplierId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? initialMode;
 
@@ -1068,11 +1070,11 @@ class QuoteProductAddAdaptiveRouteArgs {
 /// generated route for
 /// [_i30.QuoteProductAiAddFloorPage]
 class QuoteProductAiAddFloorRoute
-    extends _i58.PageRouteInfo<QuoteProductAiAddFloorRouteArgs> {
+    extends _i59.PageRouteInfo<QuoteProductAiAddFloorRouteArgs> {
   QuoteProductAiAddFloorRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? quoteId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductAiAddFloorRoute.name,
           args: QuoteProductAiAddFloorRouteArgs(
@@ -1084,7 +1086,7 @@ class QuoteProductAiAddFloorRoute
 
   static const String name = 'QuoteProductAiAddFloorRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<QuoteProductAiAddFloorRouteArgs>(
@@ -1103,7 +1105,7 @@ class QuoteProductAiAddFloorRouteArgs {
     this.quoteId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? quoteId;
 
@@ -1116,11 +1118,11 @@ class QuoteProductAiAddFloorRouteArgs {
 /// generated route for
 /// [_i31.QuoteProductAiAddNotepadPage]
 class QuoteProductAiAddNotepadRoute
-    extends _i58.PageRouteInfo<QuoteProductAiAddNotepadRouteArgs> {
+    extends _i59.PageRouteInfo<QuoteProductAiAddNotepadRouteArgs> {
   QuoteProductAiAddNotepadRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? quoteId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductAiAddNotepadRoute.name,
           args: QuoteProductAiAddNotepadRouteArgs(
@@ -1132,7 +1134,7 @@ class QuoteProductAiAddNotepadRoute
 
   static const String name = 'QuoteProductAiAddNotepadRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<QuoteProductAiAddNotepadRouteArgs>(
@@ -1151,7 +1153,7 @@ class QuoteProductAiAddNotepadRouteArgs {
     this.quoteId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? quoteId;
 
@@ -1162,9 +1164,57 @@ class QuoteProductAiAddNotepadRouteArgs {
 }
 
 /// generated route for
-/// [_i32.SamplesListPage]
-class SamplesListRoute extends _i58.PageRouteInfo<void> {
-  const SamplesListRoute({List<_i58.PageRouteInfo>? children})
+/// [_i32.QuoteProductNewAddPage]
+class QuoteProductNewAddRoute
+    extends _i59.PageRouteInfo<QuoteProductNewAddRouteArgs> {
+  QuoteProductNewAddRoute({
+    _i62.Key? key,
+    int? quoteId,
+    List<_i59.PageRouteInfo>? children,
+  }) : super(
+          QuoteProductNewAddRoute.name,
+          args: QuoteProductNewAddRouteArgs(
+            key: key,
+            quoteId: quoteId,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'QuoteProductNewAddRoute';
+
+  static _i59.PageInfo page = _i59.PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<QuoteProductNewAddRouteArgs>(
+          orElse: () => const QuoteProductNewAddRouteArgs());
+      return _i32.QuoteProductNewAddPage(
+        key: args.key,
+        quoteId: args.quoteId,
+      );
+    },
+  );
+}
+
+class QuoteProductNewAddRouteArgs {
+  const QuoteProductNewAddRouteArgs({
+    this.key,
+    this.quoteId,
+  });
+
+  final _i62.Key? key;
+
+  final int? quoteId;
+
+  @override
+  String toString() {
+    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId}';
+  }
+}
+
+/// generated route for
+/// [_i33.SamplesListPage]
+class SamplesListRoute extends _i59.PageRouteInfo<void> {
+  const SamplesListRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SamplesListRoute.name,
           initialChildren: children,
@@ -1172,18 +1222,18 @@ class SamplesListRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SamplesListRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i32.SamplesListPage();
+      return const _i33.SamplesListPage();
     },
   );
 }
 
 /// generated route for
-/// [_i33.ScanPage]
-class ScanRoute extends _i58.PageRouteInfo<void> {
-  const ScanRoute({List<_i58.PageRouteInfo>? children})
+/// [_i34.ScanPage]
+class ScanRoute extends _i59.PageRouteInfo<void> {
+  const ScanRoute({List<_i59.PageRouteInfo>? children})
       : super(
           ScanRoute.name,
           initialChildren: children,
@@ -1191,21 +1241,21 @@ class ScanRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'ScanRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i33.ScanPage();
+      return const _i34.ScanPage();
     },
   );
 }
 
 /// generated route for
-/// [_i34.SelectProductPage]
-class SelectProductRoute extends _i58.PageRouteInfo<SelectProductRouteArgs> {
+/// [_i35.SelectProductPage]
+class SelectProductRoute extends _i59.PageRouteInfo<SelectProductRouteArgs> {
   SelectProductRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     int? supplierId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SelectProductRoute.name,
           args: SelectProductRouteArgs(
@@ -1218,14 +1268,14 @@ class SelectProductRoute extends _i58.PageRouteInfo<SelectProductRouteArgs> {
 
   static const String name = 'SelectProductRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final queryParams = data.queryParams;
       final args = data.argsAs<SelectProductRouteArgs>(
           orElse: () => SelectProductRouteArgs(
               supplierId: queryParams.optInt('supplierId')));
-      return _i34.SelectProductPage(
+      return _i35.SelectProductPage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -1239,7 +1289,7 @@ class SelectProductRouteArgs {
     this.supplierId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int? supplierId;
 
@@ -1250,9 +1300,9 @@ class SelectProductRouteArgs {
 }
 
 /// generated route for
-/// [_i35.SelectUserPage]
-class SelectUserRoute extends _i58.PageRouteInfo<void> {
-  const SelectUserRoute({List<_i58.PageRouteInfo>? children})
+/// [_i36.SelectUserPage]
+class SelectUserRoute extends _i59.PageRouteInfo<void> {
+  const SelectUserRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SelectUserRoute.name,
           initialChildren: children,
@@ -1260,18 +1310,18 @@ class SelectUserRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SelectUserRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i35.SelectUserPage();
+      return const _i36.SelectUserPage();
     },
   );
 }
 
 /// generated route for
-/// [_i36.SelectWmsBorrowPage]
-class SelectWmsBorrowRoute extends _i58.PageRouteInfo<void> {
-  const SelectWmsBorrowRoute({List<_i58.PageRouteInfo>? children})
+/// [_i37.SelectWmsBorrowPage]
+class SelectWmsBorrowRoute extends _i59.PageRouteInfo<void> {
+  const SelectWmsBorrowRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SelectWmsBorrowRoute.name,
           initialChildren: children,
@@ -1279,18 +1329,18 @@ class SelectWmsBorrowRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SelectWmsBorrowRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i36.SelectWmsBorrowPage();
+      return const _i37.SelectWmsBorrowPage();
     },
   );
 }
 
 /// generated route for
-/// [_i37.SelectWmsWarehousePage]
-class SelectWmsWarehouseRoute extends _i58.PageRouteInfo<void> {
-  const SelectWmsWarehouseRoute({List<_i58.PageRouteInfo>? children})
+/// [_i38.SelectWmsWarehousePage]
+class SelectWmsWarehouseRoute extends _i59.PageRouteInfo<void> {
+  const SelectWmsWarehouseRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SelectWmsWarehouseRoute.name,
           initialChildren: children,
@@ -1298,18 +1348,18 @@ class SelectWmsWarehouseRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SelectWmsWarehouseRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i37.SelectWmsWarehousePage();
+      return const _i38.SelectWmsWarehousePage();
     },
   );
 }
 
 /// generated route for
-/// [_i38.SettingPage]
-class SettingRoute extends _i58.PageRouteInfo<void> {
-  const SettingRoute({List<_i58.PageRouteInfo>? children})
+/// [_i39.SettingPage]
+class SettingRoute extends _i59.PageRouteInfo<void> {
+  const SettingRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SettingRoute.name,
           initialChildren: children,
@@ -1317,22 +1367,22 @@ class SettingRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SettingRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i38.SettingPage();
+      return const _i39.SettingPage();
     },
   );
 }
 
 /// generated route for
-/// [_i39.ShowroomQuotationsPage]
+/// [_i40.ShowroomQuotationsPage]
 class ShowroomQuotationsRoute
-    extends _i58.PageRouteInfo<ShowroomQuotationsRouteArgs> {
+    extends _i59.PageRouteInfo<ShowroomQuotationsRouteArgs> {
   ShowroomQuotationsRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required String quoteNo,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           ShowroomQuotationsRoute.name,
           args: ShowroomQuotationsRouteArgs(
@@ -1345,14 +1395,14 @@ class ShowroomQuotationsRoute
 
   static const String name = 'ShowroomQuotationsRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ShowroomQuotationsRouteArgs>(
           orElse: () => ShowroomQuotationsRouteArgs(
               quoteNo: pathParams.getString('quoteNo')));
-      return _i39.ShowroomQuotationsPage(
+      return _i40.ShowroomQuotationsPage(
         key: args.key,
         quoteNo: args.quoteNo,
       );
@@ -1366,7 +1416,7 @@ class ShowroomQuotationsRouteArgs {
     required this.quoteNo,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final String quoteNo;
 
@@ -1377,9 +1427,9 @@ class ShowroomQuotationsRouteArgs {
 }
 
 /// generated route for
-/// [_i40.ShowroomSampleCreatePage]
-class ShowroomSampleCreateRoute extends _i58.PageRouteInfo<void> {
-  const ShowroomSampleCreateRoute({List<_i58.PageRouteInfo>? children})
+/// [_i41.ShowroomSampleCreatePage]
+class ShowroomSampleCreateRoute extends _i59.PageRouteInfo<void> {
+  const ShowroomSampleCreateRoute({List<_i59.PageRouteInfo>? children})
       : super(
           ShowroomSampleCreateRoute.name,
           initialChildren: children,
@@ -1387,22 +1437,22 @@ class ShowroomSampleCreateRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'ShowroomSampleCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i40.ShowroomSampleCreatePage();
+      return const _i41.ShowroomSampleCreatePage();
     },
   );
 }
 
 /// generated route for
-/// [_i41.ShowroomSampleDetailPage]
+/// [_i42.ShowroomSampleDetailPage]
 class ShowroomSampleDetailRoute
-    extends _i58.PageRouteInfo<ShowroomSampleDetailRouteArgs> {
+    extends _i59.PageRouteInfo<ShowroomSampleDetailRouteArgs> {
   ShowroomSampleDetailRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           ShowroomSampleDetailRoute.name,
           args: ShowroomSampleDetailRouteArgs(
@@ -1415,14 +1465,14 @@ class ShowroomSampleDetailRoute
 
   static const String name = 'ShowroomSampleDetailRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ShowroomSampleDetailRouteArgs>(
           orElse: () =>
               ShowroomSampleDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i41.ShowroomSampleDetailPage(
+      return _i42.ShowroomSampleDetailPage(
         key: args.key,
         id: args.id,
       );
@@ -1436,7 +1486,7 @@ class ShowroomSampleDetailRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -1447,13 +1497,13 @@ class ShowroomSampleDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i42.ShowroomSampleEditPage]
+/// [_i43.ShowroomSampleEditPage]
 class ShowroomSampleEditRoute
-    extends _i58.PageRouteInfo<ShowroomSampleEditRouteArgs> {
+    extends _i59.PageRouteInfo<ShowroomSampleEditRouteArgs> {
   ShowroomSampleEditRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           ShowroomSampleEditRoute.name,
           args: ShowroomSampleEditRouteArgs(
@@ -1466,14 +1516,14 @@ class ShowroomSampleEditRoute
 
   static const String name = 'ShowroomSampleEditRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ShowroomSampleEditRouteArgs>(
           orElse: () =>
               ShowroomSampleEditRouteArgs(id: pathParams.getInt('id')));
-      return _i42.ShowroomSampleEditPage(
+      return _i43.ShowroomSampleEditPage(
         key: args.key,
         id: args.id,
       );
@@ -1487,7 +1537,7 @@ class ShowroomSampleEditRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -1498,16 +1548,16 @@ class ShowroomSampleEditRouteArgs {
 }
 
 /// generated route for
-/// [_i43.SupplierProductsPage]
+/// [_i44.SupplierProductsPage]
 class SupplierProductsRoute
-    extends _i58.PageRouteInfo<SupplierProductsRouteArgs> {
+    extends _i59.PageRouteInfo<SupplierProductsRouteArgs> {
   SupplierProductsRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int quotationId,
     required int supplierId,
     required String supplierNo,
     required String supplierName,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplierProductsRoute.name,
           args: SupplierProductsRouteArgs(
@@ -1528,7 +1578,7 @@ class SupplierProductsRoute
 
   static const String name = 'SupplierProductsRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -1539,7 +1589,7 @@ class SupplierProductsRoute
                 supplierNo: pathParams.getString('supplierNo'),
                 supplierName: pathParams.getString('supplierName'),
               ));
-      return _i43.SupplierProductsPage(
+      return _i44.SupplierProductsPage(
         key: args.key,
         quotationId: args.quotationId,
         supplierId: args.supplierId,
@@ -1559,7 +1609,7 @@ class SupplierProductsRouteArgs {
     required this.supplierName,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int quotationId;
 
@@ -1576,13 +1626,13 @@ class SupplierProductsRouteArgs {
 }
 
 /// generated route for
-/// [_i44.SupplySupplierActivityCreatePage]
+/// [_i45.SupplySupplierActivityCreatePage]
 class SupplySupplierActivityCreateRoute
-    extends _i58.PageRouteInfo<SupplySupplierActivityCreateRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierActivityCreateRouteArgs> {
   SupplySupplierActivityCreateRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int supplierId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierActivityCreateRoute.name,
           args: SupplySupplierActivityCreateRouteArgs(
@@ -1594,11 +1644,11 @@ class SupplySupplierActivityCreateRoute
 
   static const String name = 'SupplySupplierActivityCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierActivityCreateRouteArgs>();
-      return _i44.SupplySupplierActivityCreatePage(
+      return _i45.SupplySupplierActivityCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -1612,7 +1662,7 @@ class SupplySupplierActivityCreateRouteArgs {
     required this.supplierId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int supplierId;
 
@@ -1623,13 +1673,13 @@ class SupplySupplierActivityCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i45.SupplySupplierCertCreatePage]
+/// [_i46.SupplySupplierCertCreatePage]
 class SupplySupplierCertCreateRoute
-    extends _i58.PageRouteInfo<SupplySupplierCertCreateRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierCertCreateRouteArgs> {
   SupplySupplierCertCreateRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int supplierId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierCertCreateRoute.name,
           args: SupplySupplierCertCreateRouteArgs(
@@ -1641,11 +1691,11 @@ class SupplySupplierCertCreateRoute
 
   static const String name = 'SupplySupplierCertCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierCertCreateRouteArgs>();
-      return _i45.SupplySupplierCertCreatePage(
+      return _i46.SupplySupplierCertCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -1659,7 +1709,7 @@ class SupplySupplierCertCreateRouteArgs {
     required this.supplierId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int supplierId;
 
@@ -1670,13 +1720,13 @@ class SupplySupplierCertCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i46.SupplySupplierContactCreatePage]
+/// [_i47.SupplySupplierContactCreatePage]
 class SupplySupplierContactCreateRoute
-    extends _i58.PageRouteInfo<SupplySupplierContactCreateRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierContactCreateRouteArgs> {
   SupplySupplierContactCreateRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int supplierId,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierContactCreateRoute.name,
           args: SupplySupplierContactCreateRouteArgs(
@@ -1688,11 +1738,11 @@ class SupplySupplierContactCreateRoute
 
   static const String name = 'SupplySupplierContactCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<SupplySupplierContactCreateRouteArgs>();
-      return _i46.SupplySupplierContactCreatePage(
+      return _i47.SupplySupplierContactCreatePage(
         key: args.key,
         supplierId: args.supplierId,
       );
@@ -1706,7 +1756,7 @@ class SupplySupplierContactCreateRouteArgs {
     required this.supplierId,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int supplierId;
 
@@ -1717,13 +1767,13 @@ class SupplySupplierContactCreateRouteArgs {
 }
 
 /// generated route for
-/// [_i47.SupplySupplierContactEditPage]
+/// [_i48.SupplySupplierContactEditPage]
 class SupplySupplierContactEditRoute
-    extends _i58.PageRouteInfo<SupplySupplierContactEditRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierContactEditRouteArgs> {
   SupplySupplierContactEditRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierContactEditRoute.name,
           args: SupplySupplierContactEditRouteArgs(
@@ -1736,14 +1786,14 @@ class SupplySupplierContactEditRoute
 
   static const String name = 'SupplySupplierContactEditRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierContactEditRouteArgs>(
           orElse: () =>
               SupplySupplierContactEditRouteArgs(id: pathParams.getInt('id')));
-      return _i47.SupplySupplierContactEditPage(
+      return _i48.SupplySupplierContactEditPage(
         key: args.key,
         id: args.id,
       );
@@ -1757,7 +1807,7 @@ class SupplySupplierContactEditRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -1768,9 +1818,9 @@ class SupplySupplierContactEditRouteArgs {
 }
 
 /// generated route for
-/// [_i48.SupplySupplierCreatePage]
-class SupplySupplierCreateRoute extends _i58.PageRouteInfo<void> {
-  const SupplySupplierCreateRoute({List<_i58.PageRouteInfo>? children})
+/// [_i49.SupplySupplierCreatePage]
+class SupplySupplierCreateRoute extends _i59.PageRouteInfo<void> {
+  const SupplySupplierCreateRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SupplySupplierCreateRoute.name,
           initialChildren: children,
@@ -1778,21 +1828,21 @@ class SupplySupplierCreateRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SupplySupplierCreateRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i48.SupplySupplierCreatePage();
+      return const _i49.SupplySupplierCreatePage();
     },
   );
 }
 
 /// generated route for
-/// [_i49.SupplySupplierDetailContactPage]
+/// [_i50.SupplySupplierDetailContactPage]
 class SupplySupplierDetailContactRoute
-    extends _i58.PageRouteInfo<SupplySupplierDetailContactRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierDetailContactRouteArgs> {
   SupplySupplierDetailContactRoute({
-    _i61.Key? key,
-    List<_i58.PageRouteInfo>? children,
+    _i62.Key? key,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierDetailContactRoute.name,
           args: SupplySupplierDetailContactRouteArgs(key: key),
@@ -1801,13 +1851,13 @@ class SupplySupplierDetailContactRoute
 
   static const String name = 'SupplySupplierDetailContactRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailContactRouteArgs>(
           orElse: () => SupplySupplierDetailContactRouteArgs());
-      return _i49.SupplySupplierDetailContactPage(
+      return _i50.SupplySupplierDetailContactPage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -1818,7 +1868,7 @@ class SupplySupplierDetailContactRoute
 class SupplySupplierDetailContactRouteArgs {
   const SupplySupplierDetailContactRouteArgs({this.key});
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   @override
   String toString() {
@@ -1827,12 +1877,12 @@ class SupplySupplierDetailContactRouteArgs {
 }
 
 /// generated route for
-/// [_i50.SupplySupplierDetailInfoPage]
+/// [_i51.SupplySupplierDetailInfoPage]
 class SupplySupplierDetailInfoRoute
-    extends _i58.PageRouteInfo<SupplySupplierDetailInfoRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierDetailInfoRouteArgs> {
   SupplySupplierDetailInfoRoute({
-    _i61.Key? key,
-    List<_i58.PageRouteInfo>? children,
+    _i62.Key? key,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierDetailInfoRoute.name,
           args: SupplySupplierDetailInfoRouteArgs(key: key),
@@ -1841,13 +1891,13 @@ class SupplySupplierDetailInfoRoute
 
   static const String name = 'SupplySupplierDetailInfoRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailInfoRouteArgs>(
           orElse: () => SupplySupplierDetailInfoRouteArgs());
-      return _i50.SupplySupplierDetailInfoPage(
+      return _i51.SupplySupplierDetailInfoPage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -1858,7 +1908,7 @@ class SupplySupplierDetailInfoRoute
 class SupplySupplierDetailInfoRouteArgs {
   const SupplySupplierDetailInfoRouteArgs({this.key});
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   @override
   String toString() {
@@ -1867,13 +1917,13 @@ class SupplySupplierDetailInfoRouteArgs {
 }
 
 /// generated route for
-/// [_i51.SupplySupplierDetailPage]
+/// [_i52.SupplySupplierDetailPage]
 class SupplySupplierDetailRoute
-    extends _i58.PageRouteInfo<SupplySupplierDetailRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierDetailRouteArgs> {
   SupplySupplierDetailRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierDetailRoute.name,
           args: SupplySupplierDetailRouteArgs(
@@ -1886,14 +1936,14 @@ class SupplySupplierDetailRoute
 
   static const String name = 'SupplySupplierDetailRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailRouteArgs>(
           orElse: () =>
               SupplySupplierDetailRouteArgs(id: pathParams.getInt('id')));
-      return _i51.SupplySupplierDetailPage(
+      return _i52.SupplySupplierDetailPage(
         key: args.key,
         id: args.id,
       );
@@ -1907,7 +1957,7 @@ class SupplySupplierDetailRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -1918,12 +1968,12 @@ class SupplySupplierDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i52.SupplySupplierDetailSamplePage]
+/// [_i53.SupplySupplierDetailSamplePage]
 class SupplySupplierDetailSampleRoute
-    extends _i58.PageRouteInfo<SupplySupplierDetailSampleRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierDetailSampleRouteArgs> {
   SupplySupplierDetailSampleRoute({
-    _i61.Key? key,
-    List<_i58.PageRouteInfo>? children,
+    _i62.Key? key,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierDetailSampleRoute.name,
           args: SupplySupplierDetailSampleRouteArgs(key: key),
@@ -1932,13 +1982,13 @@ class SupplySupplierDetailSampleRoute
 
   static const String name = 'SupplySupplierDetailSampleRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierDetailSampleRouteArgs>(
           orElse: () => SupplySupplierDetailSampleRouteArgs());
-      return _i52.SupplySupplierDetailSamplePage(
+      return _i53.SupplySupplierDetailSamplePage(
         key: args.key,
         id: pathParams.getInt('id'),
       );
@@ -1949,7 +1999,7 @@ class SupplySupplierDetailSampleRoute
 class SupplySupplierDetailSampleRouteArgs {
   const SupplySupplierDetailSampleRouteArgs({this.key});
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   @override
   String toString() {
@@ -1958,13 +2008,13 @@ class SupplySupplierDetailSampleRouteArgs {
 }
 
 /// generated route for
-/// [_i53.SupplySupplierEditPage]
+/// [_i54.SupplySupplierEditPage]
 class SupplySupplierEditRoute
-    extends _i58.PageRouteInfo<SupplySupplierEditRouteArgs> {
+    extends _i59.PageRouteInfo<SupplySupplierEditRouteArgs> {
   SupplySupplierEditRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplySupplierEditRoute.name,
           args: SupplySupplierEditRouteArgs(
@@ -1977,14 +2027,14 @@ class SupplySupplierEditRoute
 
   static const String name = 'SupplySupplierEditRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<SupplySupplierEditRouteArgs>(
           orElse: () =>
               SupplySupplierEditRouteArgs(id: pathParams.getInt('id')));
-      return _i53.SupplySupplierEditPage(
+      return _i54.SupplySupplierEditPage(
         key: args.key,
         id: args.id,
       );
@@ -1998,7 +2048,7 @@ class SupplySupplierEditRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -2009,9 +2059,9 @@ class SupplySupplierEditRouteArgs {
 }
 
 /// generated route for
-/// [_i54.SupplySupplierPage]
-class SupplySupplierRoute extends _i58.PageRouteInfo<void> {
-  const SupplySupplierRoute({List<_i58.PageRouteInfo>? children})
+/// [_i55.SupplySupplierPage]
+class SupplySupplierRoute extends _i59.PageRouteInfo<void> {
+  const SupplySupplierRoute({List<_i59.PageRouteInfo>? children})
       : super(
           SupplySupplierRoute.name,
           initialChildren: children,
@@ -2019,21 +2069,21 @@ class SupplySupplierRoute extends _i58.PageRouteInfo<void> {
 
   static const String name = 'SupplySupplierRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
-      return const _i54.SupplySupplierPage();
+      return const _i55.SupplySupplierPage();
     },
   );
 }
 
 /// generated route for
-/// [_i55.WmsDeliveryPage]
-class WmsDeliveryRoute extends _i58.PageRouteInfo<WmsDeliveryRouteArgs> {
+/// [_i56.WmsDeliveryPage]
+class WmsDeliveryRoute extends _i59.PageRouteInfo<WmsDeliveryRouteArgs> {
   WmsDeliveryRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required String code,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           WmsDeliveryRoute.name,
           args: WmsDeliveryRouteArgs(
@@ -2046,14 +2096,14 @@ class WmsDeliveryRoute extends _i58.PageRouteInfo<WmsDeliveryRouteArgs> {
 
   static const String name = 'WmsDeliveryRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WmsDeliveryRouteArgs>(
           orElse: () =>
               WmsDeliveryRouteArgs(code: pathParams.getString('code')));
-      return _i55.WmsDeliveryPage(
+      return _i56.WmsDeliveryPage(
         key: args.key,
         code: args.code,
       );
@@ -2067,7 +2117,7 @@ class WmsDeliveryRouteArgs {
     required this.code,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final String code;
 
@@ -2078,13 +2128,13 @@ class WmsDeliveryRouteArgs {
 }
 
 /// generated route for
-/// [_i56.WmsTransferConfirmPage]
+/// [_i57.WmsTransferConfirmPage]
 class WmsTransferConfirmRoute
-    extends _i58.PageRouteInfo<WmsTransferConfirmRouteArgs> {
+    extends _i59.PageRouteInfo<WmsTransferConfirmRouteArgs> {
   WmsTransferConfirmRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required int id,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           WmsTransferConfirmRoute.name,
           args: WmsTransferConfirmRouteArgs(
@@ -2097,14 +2147,14 @@ class WmsTransferConfirmRoute
 
   static const String name = 'WmsTransferConfirmRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WmsTransferConfirmRouteArgs>(
           orElse: () =>
               WmsTransferConfirmRouteArgs(id: pathParams.getInt('id')));
-      return _i56.WmsTransferConfirmPage(
+      return _i57.WmsTransferConfirmPage(
         key: args.key,
         id: args.id,
       );
@@ -2118,7 +2168,7 @@ class WmsTransferConfirmRouteArgs {
     required this.id,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final int id;
 
@@ -2129,12 +2179,12 @@ class WmsTransferConfirmRouteArgs {
 }
 
 /// generated route for
-/// [_i57.WmsTransferPage]
-class WmsTransferRoute extends _i58.PageRouteInfo<WmsTransferRouteArgs> {
+/// [_i58.WmsTransferPage]
+class WmsTransferRoute extends _i59.PageRouteInfo<WmsTransferRouteArgs> {
   WmsTransferRoute({
-    _i61.Key? key,
+    _i62.Key? key,
     required String code,
-    List<_i58.PageRouteInfo>? children,
+    List<_i59.PageRouteInfo>? children,
   }) : super(
           WmsTransferRoute.name,
           args: WmsTransferRouteArgs(
@@ -2147,14 +2197,14 @@ class WmsTransferRoute extends _i58.PageRouteInfo<WmsTransferRouteArgs> {
 
   static const String name = 'WmsTransferRoute';
 
-  static _i58.PageInfo page = _i58.PageInfo(
+  static _i59.PageInfo page = _i59.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<WmsTransferRouteArgs>(
           orElse: () =>
               WmsTransferRouteArgs(code: pathParams.getString('code')));
-      return _i57.WmsTransferPage(
+      return _i58.WmsTransferPage(
         key: args.key,
         code: args.code,
       );
@@ -2168,7 +2218,7 @@ class WmsTransferRouteArgs {
     required this.code,
   });
 
-  final _i61.Key? key;
+  final _i62.Key? key;
 
   final String code;
 
