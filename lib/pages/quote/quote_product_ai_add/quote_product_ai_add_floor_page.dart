@@ -26,7 +26,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
 
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_ai_add_v1',
-          defaultFields: quoteAIFloorDefaultFields,
+          defaultFields: quoteSampleDefaultFields,
         ));
 
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
@@ -204,7 +204,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   if (fieldConfigs.isNotEmpty)
                     InlineFieldSelector(
                       fields: fieldConfigs,
-                      defaultFields: quoteAIFloorDefaultFields,
+                      defaultFields: quoteSampleDefaultFields,
                       onConfigChanged: (newConfig) {
                         notifier.updateConfigs(newConfig);
                       },
