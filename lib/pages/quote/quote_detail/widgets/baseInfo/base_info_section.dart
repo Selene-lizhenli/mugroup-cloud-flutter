@@ -44,31 +44,46 @@ class BaseInfoSection extends HookConsumerWidget {
             // 折叠时
             if (isExpanded.value == false) ...[
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    company?.name ?? ' ',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w500, height: 1.2),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '${item?.curreny ?? ''}',
-                    style: const TextStyle(
-                        // color: colorScheme.surfaceContainerHighest,
-                        fontSize: 12,
-                        height: 1.2),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '${item?.language ?? ''}',
-                    style: const TextStyle(
-                        // color: colorScheme.surfaceContainerHighest,
-                        fontSize: 12,
-                        height: 1.2),
-                  ),
-                  const Spacer(),
+                  Expanded(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                         Text(
+                              company?.name ?? ' ',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  height: 1.2),
+                              overflow: TextOverflow.ellipsis,
+                            ), 
+                          const SizedBox(width: 8),
+                          Flexible(
+                            flex: 1,
+                            child: Text(
+                              '币种：${item?.curreny ?? ''}',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  height: 1.2),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            flex: 1,
+                            child: Text(
+                              '语言：${item?.language ?? ''}',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  height: 1.2),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ]),
+                  ), 
+                  // const Spacer(),
                   InkWell(
                     onTap: () {
                       isExpanded.value = !isExpanded.value;
@@ -83,9 +98,6 @@ class BaseInfoSection extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Text('展开',
-                          //     style: TextStyle(
-                          //         color: colorScheme.secondary, fontSize: 12)),
                           Icon(
                             Icons.keyboard_double_arrow_down,
                             size: 15,
@@ -108,11 +120,12 @@ class BaseInfoSection extends HookConsumerWidget {
                           ?.copyWith(fontWeight: FontWeight.w500, height: 1.2),
                     ),
                     if (onEdit != null) ...[
-                      const SizedBox(width: 10,),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       ActionPillButton(
                         label: '编辑',
                         textColor: colorScheme.primary,
-                        // borderColor: colorScheme.primary, 
                         onTap: onEdit!,
                         icon: Icons.edit_outlined,
                         fontSize: 12,
@@ -123,7 +136,6 @@ class BaseInfoSection extends HookConsumerWidget {
                   ]),
               // ===== 内容区域（2列网格）=====
               // 展开时
-
               LayoutBuilder(
                 builder: (context, constraints) {
                   // 所有信息项

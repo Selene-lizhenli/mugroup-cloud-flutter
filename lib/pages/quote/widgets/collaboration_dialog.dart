@@ -1,5 +1,6 @@
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/quote/providers/quote_detail_provider.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -49,6 +50,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
 
     final currentCollaborators = quoteAsync.value?.collaborators ?? [];
     final bool hasSearchText = searchController.text.trim().isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -69,7 +71,9 @@ class CollaborationBottomSheet extends HookConsumerWidget {
                     height: 40,
                     decoration: const BoxDecoration(
                       color: Color(0xFFF2F3F5),
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          bottomLeft: Radius.circular(8)),
                     ),
                     child: TextField(
                       controller: searchController,
@@ -100,28 +104,28 @@ class CollaborationBottomSheet extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                ), 
+                ),
                 SizedBox(
                   height: 40,
                   child: ElevatedButton(
                     onPressed: hasSearchText ? handleSearch : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3D66D6),
-                      disabledBackgroundColor: const Color(0xFFE5E6EB),
+                      backgroundColor: colorScheme.primary,
+                      disabledBackgroundColor: colorScheme.primary,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      shape: const RoundedRectangleBorder( 
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(8), bottomRight: Radius.circular(8)), 
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(8),
+                            bottomRight: Radius.circular(8)),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       '搜索',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: hasSearchText
-                            ? Colors.white
-                            : const Color(0xFF86909C),
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -183,6 +187,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         const SizedBox(height: 12),
@@ -194,7 +199,8 @@ class CollaborationBottomSheet extends HookConsumerWidget {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        Stack(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Align(
               alignment: Alignment.centerLeft,
@@ -208,9 +214,18 @@ class CollaborationBottomSheet extends HookConsumerWidget {
             ),
             Align(
               alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.grey),
-                onPressed: () => Navigator.pop(context),
+              child: ActionPillButton(
+                label: '确定',
+                onTap: () => Navigator.pop(context),
+
+                textColor: colorScheme.primary,
+                // backgroundColor: colorScheme.primary,
+
+                // onPressed: () => Navigator.pop(context),
+                // child: Text(
+                //   '确定',
+                //   style: TextStyle(color: colorScheme.primary, fontSize: 16),
+                // ),
               ),
             )
           ],

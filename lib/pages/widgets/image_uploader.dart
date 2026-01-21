@@ -387,10 +387,10 @@ class ImageUploader extends HookConsumerWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: const Color(0xFFF7F7F7),
+          color: const Color.fromARGB(255, 243, 243, 243),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: hasError ? Colors.red : const Color(0xFFD9D9D9),
+            color: hasError ? Colors.red : const Color(0x00FFFFFF),
             width: hasError ? 1.2 : 1.0,
           ),
         ),

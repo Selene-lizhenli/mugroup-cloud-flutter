@@ -27,7 +27,7 @@ class AddSupplierSheet extends HookConsumerWidget {
     final businessCard = useState<List<TemporaryMedia>>([]);
     final supplierNameFocus = useFocusNode();
 
-    final maxHeight = MediaQuery.of(context).size.height * 0.8;
+    final maxHeight = MediaQuery.of(context).size.height * 0.65;
 
     void onSubmit() async {
       if (supplierName.value.trim().isEmpty) {
@@ -75,160 +75,157 @@ class AddSupplierSheet extends HookConsumerWidget {
 
     final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return SafeArea(
-      top: false,
-      child: AnimatedPadding(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: EdgeInsets.only(bottom: keyboardPadding),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade200),
-                    ),
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: keyboardPadding),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight,),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                        color:   Color.fromARGB(255, 245, 245, 245)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '添加供应商',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+              ),
+
+              // 内容区域，使用 Expanded 让下方可滚动，自适应校验提示高度
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        '添加供应商',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                      SizedBox(
+                        width: double.infinity,
+                        child: ImageUploader(
+                          directCamera: true,
+                          maxCount: 1,
+                          customIcon: Icons.camera_alt,
+                          recognizeAtBottom: true,
+                          enableContinuous: true,
+                          showRecognizeButton: true,
+                          recognizeApi: identifySupplySuppliersCard,
+                          onRecognizeResult: (data) {
+                            if (data != null && data is Map<String, dynamic>) {
+                              // 更新供应商名称
+                              if (data['name'] != null) {
+                                supplierName.value = data['name'].toString();
+                              }
+                              // 可以在这里添加其他字段的更新逻辑
+                            }
+                          },
+                          value: businessCard.value,
+                          onChanged: (value) => businessCard.value = value,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
+                      const SizedBox(height: 8),
+                      // 供应商名称
+                      Input(
+                        label: '供应商名称',
+                        value: supplierName.value,
+                        onChanged: (value) {
+                          supplierName.value = value;
+                        },
+                        focusNode: supplierNameFocus,
+                        hintText: '请输入供应商名称',
+                        isRequired: true,
+                      ),
+
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Input(
+                              label: '店铺号',
+                              value: shopNumber.value,
+                              onChanged: (value) => shopNumber.value = value,
+                              hintText: '请输入店铺号',
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+                      // 底部按钮
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                '取消',
+                                style: TextStyle(
+                                  color: Colors.grey.shade700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: onSubmit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                '创建供应商',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-
-                // 内容区域，使用 Expanded 让下方可滚动，自适应校验提示高度
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ImageUploader(
-                            directCamera: true,
-                            maxCount: 1,
-                            customIcon: Icons.camera_alt,
-                            recognizeAtBottom: true,
-                            enableContinuous: true, 
-                            showRecognizeButton: true,
-                            recognizeApi: identifySupplySuppliersCard,
-                            onRecognizeResult: (data) {
-                              if (data != null &&
-                                  data is Map<String, dynamic>) {
-                                // 更新供应商名称
-                                if (data['name'] != null) {
-                                  supplierName.value = data['name'].toString();
-                                }
-                                // 可以在这里添加其他字段的更新逻辑
-                              }
-                            },
-                            value: businessCard.value,
-                            onChanged: (value) => businessCard.value = value,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // 供应商名称
-                        Input(
-                          label: '供应商名称',
-                          value: supplierName.value,
-                          onChanged: (value) {
-                            supplierName.value = value;
-                          },
-                          focusNode: supplierNameFocus,
-                          hintText: '请输入供应商名称',
-                          isRequired: true,
-                        ),
-
-                        const SizedBox(height:8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Input(
-                                label: '店铺号',
-                                value: shopNumber.value,
-                                onChanged: (value) => shopNumber.value = value,
-                                hintText: '请输入店铺号',
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-                        // 底部按钮
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.pop(context),
-                                style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  side: BorderSide(color: Colors.grey.shade300),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  '取消',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: onSubmit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text(
-                                  '创建供应商',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

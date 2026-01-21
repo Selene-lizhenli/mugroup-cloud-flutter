@@ -43,8 +43,7 @@ class ProductSection extends HookConsumerWidget {
       if (id != null && s != null) {
         supplierInfo[id] = s;
       }
-    } 
-
+    }
 
     return Container(
         color: colorScheme.surface,
@@ -67,6 +66,8 @@ class ProductSection extends HookConsumerWidget {
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
+                            isScrollControlled: true,
+                            useSafeArea: true,
                             builder: (context) =>
                                 AddSupplierSheet(quotationId: quoteId),
                           );
@@ -91,43 +92,52 @@ class ProductSection extends HookConsumerWidget {
                 ],
               ),
             ),
-              if (state.products.isEmpty) ...[
-                Empty(
-                  // icon: Icons.search,
-                  padding: 100,
-                  textSpans: [
-                    WidgetSpan(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '暂无产品，',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.outline,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) =>
-                                    AddSupplierSheet(quotationId: quoteId),
-                              );
-                            },
-                            child: Text(
-                              '去添加供应商？',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+            if (state.isProductLoading) ...[
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: CircularProgressIndicator(),
                 ),
-              ] else ...[
+              ),
+            ] else if (state.products.isEmpty) ...[
+              Empty(
+                // icon: Icons.search,
+                padding: 100,
+                textSpans: [
+                  WidgetSpan(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '暂无产品，',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.outline,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              builder: (context) =>
+                                  AddSupplierSheet(quotationId: quoteId),
+                            );
+                          },
+                          child: Text(
+                            '去添加供应商？',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
               Column(
                 children: [
                   for (var i = 0; i < supplierOrder.length; i++) ...[
