@@ -165,13 +165,13 @@ flutter:
           weight: 400
 
   assets:
-    - assets/coming.png
-    - assets/carouse/yiwudong4.jpg
+    - assets/coming.png 
     - assets/noImage.png
     - assets/icon.png
     - assets/logo.webp
-    - assets/splash.png
-    - assets/icons/
+    - assets/splash.png 
+    - assets/element/empty.png
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
