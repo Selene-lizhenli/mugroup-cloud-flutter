@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -156,28 +157,38 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                             padding: const EdgeInsets.all(8),
                             child: Row(
                               children: [
-                                AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(6),
+                                GestureDetector(
+                                  onTap: () {
+                                    showFlanImagePreview(
+                                      context,
+                                      images: [imageList.value![index].url],
+                                      startPosition: index,
+                                      loop: false,
+                                    );
+                                  },
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: imageList.value != null &&
+                                              imageList.value!.length > index
+                                          ? Image.network(
+                                              imageList.value![index].url,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return const Icon(
+                                                    Icons.broken_image,
+                                                    color: Colors.grey);
+                                              },
+                                            )
+                                          : const Icon(Icons.image,
+                                              color: Colors.grey),
                                     ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: imageList.value != null &&
-                                            imageList.value!.length > index
-                                        ? Image.network(
-                                            imageList.value![index].url,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return const Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.grey);
-                                            },
-                                          )
-                                        : const Icon(Icons.image,
-                                            color: Colors.grey),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
