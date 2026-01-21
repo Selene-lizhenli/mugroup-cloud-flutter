@@ -46,3 +46,16 @@ Future identifySupplySuppliersCard(Map<String, dynamic>? data) async {
     },
   );
 }
+
+Future identifySupplierShopCard(Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/openai/identifyStall", data: data)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Map<String, dynamic>.from(res.data);
+    },
+  );
+}

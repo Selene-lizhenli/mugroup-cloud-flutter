@@ -25,7 +25,7 @@ class DashboardStatsState with _$DashboardStatsState {
     @Default([]) List<int> inspectionData, // 验货任务数量
     @Default(false) bool isLoading, // 是否正在加载
     @Default(TimeDimension.last6Months) TimeDimension timeDimension, // 时间维度 
-    @Default('选样排行') String sampleRoomDimension, // 样品间模块的维度选择
+    @Default('报价次数排行') String sampleRoomDimension, // 样品间模块的维度选择
   }) = _DashboardStatsState;
 }
 

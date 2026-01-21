@@ -253,24 +253,24 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
             .select((state) => state.sampleRoomDimension));
         return [
           PopupMenuItem<String>(
-            value: '选样排行',
+            value: '报价次数排行',
             child: Row(
               children: [
                 Icon(
                   Icons.leaderboard,
                   size: 18,
-                  color: currentDimension == '选样排行'
+                  color: currentDimension == '报价次数排行'
                       ? Theme.of(context).colorScheme.primary
                       : Colors.grey,
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '选样排行',
+                  '报价次数排行',
                   style: TextStyle(
-                    color: currentDimension == '选样排行'
+                    color: currentDimension == '报价次数排行'
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    fontWeight: currentDimension == '选样排行'
+                    fontWeight: currentDimension == '报价次数排行'
                         ? FontWeight.w600
                         : FontWeight.normal,
                   ),

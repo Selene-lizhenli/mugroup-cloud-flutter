@@ -153,7 +153,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                               ),
                             );
                             return;
-                          } 
+                          }
                           // 组装提交数据
                           final submitData = {
                             "sample_items": const [],
@@ -166,7 +166,8 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                             "company_id": state.selectedCustomers?.id, //客户
                             "language": state.language?.name,
                             "company": state.selectedCustomers,
-                          }; 
+                            "type": "market",//区分市场采购的报价单
+                          };
                           bool isSuccess = false;
                           if (quoteId != null) {
                             // 接口需要调整参数：编辑模式更新

@@ -299,6 +299,7 @@ class _QuotePageState extends State<QuotePage>
       "page": page.toString(),
       "pageSize": pageSize.toString(),
       if (quoteAt != null) 'quote_at': quoteAt!,
+      "type":"market",//区分市场采购的报价单
     };
     logger.d(paramsData);
     final newData = await getShowroomQuotation(paramsData);

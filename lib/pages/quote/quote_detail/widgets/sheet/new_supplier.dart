@@ -27,7 +27,7 @@ class AddSupplierSheet extends HookConsumerWidget {
     final businessCard = useState<List<TemporaryMedia>>([]);
     final supplierNameFocus = useFocusNode();
 
-    final maxHeight = MediaQuery.of(context).size.height * 0.65;
+    final minHeight = MediaQuery.of(context).size.height * 0.65;
 
     void onSubmit() async {
       if (supplierName.value.trim().isEmpty) {
@@ -80,7 +80,9 @@ class AddSupplierSheet extends HookConsumerWidget {
       curve: Curves.easeOut,
       padding: EdgeInsets.only(bottom: keyboardPadding),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: maxHeight,),
+        constraints: BoxConstraints(
+          maxHeight: minHeight,
+        ),
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -94,8 +96,8 @@ class AddSupplierSheet extends HookConsumerWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                 decoration: const BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(
-                        color:   Color.fromARGB(255, 245, 245, 245)),
+                    bottom:
+                        BorderSide(color: Color.fromARGB(255, 245, 245, 245)),
                   ),
                 ),
                 child: Row(
@@ -133,14 +135,18 @@ class AddSupplierSheet extends HookConsumerWidget {
                           recognizeAtBottom: true,
                           enableContinuous: true,
                           showRecognizeButton: true,
-                          recognizeApi: identifySupplySuppliersCard,
+                          recognizeApi: identifySupplierShopCard,
                           onRecognizeResult: (data) {
                             if (data != null && data is Map<String, dynamic>) {
                               // 更新供应商名称
-                              if (data['name'] != null) {
-                                supplierName.value = data['name'].toString();
+                              if (data['supplier_name'] != null) {
+                                supplierName.value =
+                                    data['supplier_name'].toString();
                               }
-                              // 可以在这里添加其他字段的更新逻辑
+                              if (data['stall_address'] != null) {
+                                shopNumber.value =
+                                    data['stall_address'].toString();
+                              }
                             }
                           },
                           value: businessCard.value,

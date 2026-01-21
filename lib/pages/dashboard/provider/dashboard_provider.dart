@@ -62,7 +62,7 @@ class DashboardStats extends _$DashboardStats {
       inspectionData: [],
       isLoading: false,
       timeDimension: TimeDimension.last6Months, 
-      sampleRoomDimension: '选样排行',
+      sampleRoomDimension: '报价次数排行',
     );
 
     return dashboardStatsState;
