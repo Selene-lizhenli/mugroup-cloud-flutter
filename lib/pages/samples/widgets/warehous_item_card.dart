@@ -2,7 +2,7 @@ import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 
@@ -134,6 +134,7 @@ class WarehouseShowCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeNotifier = ref.read(homeProvider.notifier);
     final orderedImages = _orderedImages(warehouse);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: const BoxDecoration(
@@ -183,7 +184,95 @@ class WarehouseShowCard extends ConsumerWidget {
               child: _ImageGallery(
                 images: orderedImages,
                 warehouseName: warehouse.name ?? '-',
-                onImageTap: _showImagePreview,
+                onImageTap: (context, images, index, warehouseName) {
+                  if (warehouse.id == null || warehouse.id == 0) {
+                    // 如果warehouse.id没有，显示弹窗提示
+                    showDialog(
+                      context: context,
+                      builder: (context) => Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 0,
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          constraints: const BoxConstraints(maxWidth: 320),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // 图标容器
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFFFF3E0),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.lightbulb_outline,
+                                  color: Color(0xFFFF9800),
+                                  size: 32,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              // 标题
+                              const Text(
+                                '独立样品间暂未开放',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF1A1A1A),
+                                  height: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              // 内容描述
+                              const Text(
+                                '敬请期待！',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFF666666),
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                          
+                              const SizedBox(height: 28),
+                              // 按钮
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:  colorScheme.primary,
+                                    foregroundColor: colorScheme.onPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                  ),
+                                  child: const Text(
+                                    '我知道了',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    // 正常显示图片预览
+                    _showImagePreview(context, images, index, warehouseName);
+                  }
+                },
               ),
             ),
           ),

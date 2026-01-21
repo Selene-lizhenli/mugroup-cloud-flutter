@@ -165,6 +165,7 @@ flutter:
 
   assets:
     - assets/coming.png 
+    - assets/building2d.png
     - assets/noImage.png
     - assets/icon.png
     - assets/logo.webp

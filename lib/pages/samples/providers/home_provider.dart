@@ -4,6 +4,7 @@ import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/models/wms.dart';
+import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/models/home_state.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/widgets.dart';
@@ -44,7 +45,6 @@ class Home extends _$Home {
   void setsupplierTotalPages(int page) {
     state = state.copyWith(supplierPages: page);
   }
-
 
   /// 切换到指定的 PageView 页面（全局控制 PageView）
   void switchToPage(int page) {
@@ -124,10 +124,21 @@ class Home extends _$Home {
     state = state.copyWith(isLoadingWarehouses: true);
 
     final resp = await getWarehouses();
-    final warehouses = resp.data;
-    
+    final warehouses = resp.data ?? [];
+
+    // 添加独立样品间
+    const independentWarehouse = Warehouse(
+      name: '独立样品间',
+      image: [
+        WarehouseImage(
+          url: 'assets/building2d.png',
+          thumbUrl: 'assets/building2d.png',
+        ),
+      ],
+    );
+
     state = state.copyWith(
-      warehouses: warehouses,
+      warehouses: [...warehouses, independentWarehouse],
       isLoadingWarehouses: false,
     );
   }
