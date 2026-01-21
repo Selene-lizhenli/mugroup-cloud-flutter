@@ -35,9 +35,9 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
           indicatorColor: colorScheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
           tabs: const [
-            Tab(text: "商品图"),
-            Tab(text: "白板"),
-            Tab(text: "记事本"),
+            Tab(text: "手动录入"),
+            Tab(text: "白板识别"),
+            Tab(text: "记录本识别"),
           ],
         ),
       ),
