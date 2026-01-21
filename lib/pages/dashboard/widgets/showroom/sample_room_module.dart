@@ -265,7 +265,14 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
               ),
             )
           else if (currentDimension == '选样排行')
-            TopChartContent(data: _topDimensionData)
+            _isLoading
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : TopChartContent(data: _topDimensionData)
           else
             ChartContent(sampleRoomData: sampleRoomData),
         ],
