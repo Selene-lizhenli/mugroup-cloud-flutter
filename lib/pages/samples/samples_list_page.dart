@@ -90,7 +90,7 @@ class SamplesListPage extends HookConsumerWidget {
         ),
         body: Container(
           // color: colorScheme.secondary,
-          padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
+          padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
