@@ -128,7 +128,7 @@ class Home extends _$Home {
 
     // 添加独立样品间
     const independentWarehouse = Warehouse(
-      name: '独立样品间',
+      name: '独立(部门)样品间',
       image: [
         WarehouseImage(
           url: 'assets/building2d.png',

@@ -36,7 +36,7 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 
   const SampleRoomChart({
     super.key,
-    this.moduleTitle = '选样排行', // 默认值
+    this.moduleTitle = '报价次数排行', // 默认值
   });
 
   @override
@@ -65,9 +65,9 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   @override
   void initState() {
     super.initState();
-    // 初始化时强制将维度设置为「选样排行」，并根据该维度加载数据
+    // 初始化时强制将维度设置为「报价次数排行」，并根据该维度加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      const defaultDimension = '选样排行';
+      const defaultDimension = '报价次数排行';
       ref
           .read(dashboardStatsProvider.notifier)
           .setSampleRoomDimension(defaultDimension);
@@ -200,8 +200,8 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
             }
           });
         }
-      } else if (dimension == '选样排行') { 
-        // 加载选样排行数据
+      } else if (dimension == '报价次数排行') { 
+        // 加载报价次数排行数据
         final resp = await getQuoteStatsSummary(
             params: {"start": null, "end": null}); //获取排行数据
         if (mounted) {
@@ -264,7 +264,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                 child: CircularProgressIndicator(),
               ),
             )
-          else if (currentDimension == '选样排行')
+          else if (currentDimension == '报价次数排行')
             _isLoading
                 ? const Center(
                     child: Padding(
