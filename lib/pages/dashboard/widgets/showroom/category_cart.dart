@@ -1,23 +1,23 @@
-import 'package:cloud/models/dashboard/quote_top_stats.dart';
+ 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'sample_room_module.dart';
 
 /// 图表内容组件
-class ChartContent extends StatefulWidget {
+class CategoryChartContent extends StatefulWidget {
   final List<Level1CategoryStat> sampleRoomData; 
 
-  const ChartContent({
+  const CategoryChartContent({
     super.key,
     required this.sampleRoomData, 
   });
 
   @override
-  State<ChartContent> createState() => _ChartContentState();
+  State<CategoryChartContent> createState() => _ChartContentState();
 }
 
-class _ChartContentState extends State<ChartContent> {
+class _ChartContentState extends State<CategoryChartContent> {
   int? _selectedIndex; // 当前选中的扇区索引
   bool _isLegendExpanded = false; // 图例是否展开
 

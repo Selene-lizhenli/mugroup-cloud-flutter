@@ -3,11 +3,12 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/category_cart.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/chart_contet.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/showroom_cart.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +48,10 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 }
 
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
-  List<Level1CategoryStat> _dimensionData = []; // 数据（从API获取）
-  List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 排行
-  List<ShipTopStats> _shipTopDimensionData = []; //  数据 排行
+  List<Level1CategoryStat> _showroomDimensionData = []; // 数据样品间分类
+  List<Level1CategoryStat> _categoryDimensionData = []; // 数据 产品分类
+  List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 报价排行
+  List<ShipTopStats> _shipTopDimensionData = []; //  数据 出货排行
 
   bool _isLoading = false; // 数据加载状态
 
@@ -149,11 +151,12 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
 
     // 按数量降序（你也可以按名称/ID 排序）
     result.sort((a, b) => b.totalProductsCount.compareTo(a.totalProductsCount));
+    logger.d(result);
     return result;
   }
 
   handleCategoryData() async {
-    if (_dimensionData.isNotEmpty) {
+    if (_categoryDimensionData.isNotEmpty) {
       setState(() {
         _isLoading = false;
       });
@@ -161,20 +164,21 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     }
     final categoriesData = await getAllShowroomCategories();
     logger.d('categoriesData: $categoriesData');
+
     if (mounted) {
       setState(() {
         _isLoading = false;
         if (categoriesData != null && categoriesData.isNotEmpty) {
-          _dimensionData = buildLevel1Stats(categoriesData, rootId: 1);
+          _categoryDimensionData = buildLevel1Stats(categoriesData, rootId: 1);
         } else {
-          _dimensionData = [];
+          _categoryDimensionData = [];
         }
       });
     }
   }
 
   handleShowroomData() async {
-    if (_dimensionData.isNotEmpty) {
+    if (_showroomDimensionData.isNotEmpty) {
       setState(() {
         _isLoading = false;
       });
@@ -203,7 +207,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     if (mounted) {
       setState(() {
         _isLoading = false;
-        _dimensionData = data;
+        _showroomDimensionData = data;
       });
     }
   }
@@ -261,7 +265,6 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
         if (mounted) {
           setState(() {
             _isLoading = false;
-            _dimensionData = [];
           });
         }
       }
@@ -269,7 +272,6 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _dimensionData = [];
         });
       }
     }
@@ -318,8 +320,17 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ),
                   )
                 : TopChartContent(data: _quoteTopDimensionData)
+          else if (currentDimension == sampleDimensionConfigs[3]['value'])
+            CategoryChartContent(sampleRoomData: _categoryDimensionData)
+          else if (currentDimension == sampleDimensionConfigs[2]['value'])
+            ChartContent(sampleRoomData: _showroomDimensionData)
           else
-            ChartContent(sampleRoomData: _dimensionData),
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Text("暂无数据"),
+              ),
+            )
         ],
       ),
     );
