@@ -47,6 +47,8 @@ class HomeAppBar extends HookConsumerWidget {
 
   final bool enableImageSearch;
 
+  final Color? fillColor ;
+
   const HomeAppBar({
     super.key,
     required this.controller,
@@ -54,7 +56,10 @@ class HomeAppBar extends HookConsumerWidget {
     this.onSearchMedia,
     this.onDeleteMedia,
     this.enableImageSearch = true,
+    this.fillColor,
   });
+  
+  get transparent => null;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
@@ -119,15 +124,14 @@ class HomeAppBar extends HookConsumerWidget {
         Container(
           width: double.infinity,
           margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-          padding: const EdgeInsets.only(left: 8, right: 2, bottom: 0),
+          padding: const EdgeInsets.only(left: 8, right: 0, bottom: 0),
           height: 40,
-          decoration: BoxDecoration(
-            color: colorScheme.onPrimary,
+          decoration: BoxDecoration( 
             border: Border.all(
               color: colorScheme.primary,
               width: 1,
             ),
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -141,8 +145,14 @@ class HomeAppBar extends HookConsumerWidget {
                     FocusManager.instance.primaryFocus?.unfocus();
                   },
                   focusNode: focusNode,
-                  decoration: const InputDecoration.collapsed(
+                  decoration: InputDecoration(
                     hintText: '',
+                    filled: true,
+                    fillColor: fillColor ?? Colors.transparent,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (value) {
@@ -173,14 +183,14 @@ class HomeAppBar extends HookConsumerWidget {
               ),
               Container(
                 margin:
-                    const EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 0),
+                    const EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                   ),
                   onPressed: () {

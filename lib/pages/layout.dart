@@ -20,10 +20,7 @@ class Layout extends HookConsumerWidget {
   const Layout({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider).user;
-    final permissions = user?.permissions ?? [];
-    final marketUser = permissions.contains('showroom.market_product.show'); 
+  Widget build(BuildContext context, WidgetRef ref) { 
     final checkVersion = useCallback(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final checkResp = await silentApi
@@ -74,22 +71,14 @@ class Layout extends HookConsumerWidget {
           },
         );
       }
-    }, []);
-    final hasRedirected = useRef(false);
+    }, []); 
+    
     useEffect(() {
       checkVersion();
 
       return null;
     }, [checkVersion]);
-
-    useEffect(() {
-      // 只在首次检测到 marketUser 为 true 时跳转 
-      if (marketUser && !hasRedirected.value) {
-        hasRedirected.value = true;
-        context.router.push(const QuoteRoute());
-      }
-      return null;
-    }, [marketUser]);
+ 
 
     // 创建用于刷新 DashboardPage 的 key
     final dashboardModulesKey = useMemoized(

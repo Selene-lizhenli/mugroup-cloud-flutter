@@ -120,6 +120,13 @@ class Home extends _$Home {
     return state;
   }
 
+  void clearMedia() {
+    state = state.copyWith(
+      media: [],
+      currentMediaId: null,
+    );
+  }
+
   Future<void> fetchWarehouses() async {
     state = state.copyWith(isLoadingWarehouses: true);
 

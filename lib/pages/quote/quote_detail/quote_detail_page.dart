@@ -22,8 +22,7 @@ class QuoteDetailPage extends HookConsumerWidget {
 
     final quoteDetailState = ref.watch(quoteDetailProvider);
     final quoteDetailNotifier = ref.read(quoteDetailProvider.notifier);
-
- logger.d('quoteDetailState: ${quoteDetailState.baseInfo?.toJson()}');
+ 
  
     useEffect(() {
       if (id > 0) {
@@ -63,7 +62,7 @@ class QuoteDetailPage extends HookConsumerWidget {
                 quoteDetailNotifier.fetchQuoteDetail(quoteId);
               }
             },
-            icon: const Icon(Icons.refresh, size: 22),
+            icon: const Icon(Icons.refresh, size: 20),
           ),
         ],
       ),

@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/providers/quote_detail_provider.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart'; 
-import 'package:cloud/pages/quote/widgets/sample_detail_card.dart'; 
+import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
+import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -32,7 +32,8 @@ class SupplierProductsPage extends HookConsumerWidget {
     final quoteDetailAsync = ref.watch(quoteDetailProvider(quotationId));
     final quoteCurrency = quoteDetailAsync.whenOrNull(
           data: (quote) => quote.curreny,
-        ) ?? '';
+        ) ??
+        '';
     final isLoading = useState(true);
     final products = useState<List<QuotationSample>>([]);
     final currentPage = useState(1);
@@ -74,7 +75,7 @@ class SupplierProductsPage extends HookConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, size: 20),
             onPressed: () => fetchProducts(showLoading: true),
           ),
         ],
@@ -83,7 +84,7 @@ class SupplierProductsPage extends HookConsumerWidget {
         children: [
           // 供应商信息卡片
           Container(
-            margin: const EdgeInsets.fromLTRB(12,12,12,12),
+            margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: colorScheme.surface,
@@ -171,8 +172,8 @@ class SupplierProductsPage extends HookConsumerWidget {
                               textColor: colorScheme.onSecondary,
                               onTap: () {
                                 context.router.push(
-                                  QuoteProductAddAdaptiveRoute( 
-                                    supplierId: supplierId.toString(), 
+                                  QuoteProductAddAdaptiveRoute(
+                                    supplierId: supplierId.toString(),
                                   ),
                                 );
                               },

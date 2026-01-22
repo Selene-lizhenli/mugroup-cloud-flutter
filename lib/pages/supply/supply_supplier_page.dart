@@ -25,7 +25,7 @@ class SupplySupplierPage extends HookConsumerWidget {
         appBar: AppBar(
           title: const Text('供应商列表'),
           elevation: 0,
-          // backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           foregroundColor: Colors.black,
           actions: [
             TextButton(
@@ -56,7 +56,6 @@ class SupplySupplierPage extends HookConsumerWidget {
                     SearchEvent(search: search, media: home.currentMedia));
               },
               enableImageSearch: false,
-       
             ),
             Expanded(
               child: PageView(

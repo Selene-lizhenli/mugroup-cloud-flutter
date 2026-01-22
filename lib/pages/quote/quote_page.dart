@@ -335,7 +335,7 @@ class _QuotePageState extends State<QuotePage>
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: '刷新', 
-            iconSize: 22,
+            iconSize: 20,
             onPressed: () => _fetchData(reset: true),
           ),
           // 新增按钮：跳转到市场产品列表页

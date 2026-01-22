@@ -25,7 +25,9 @@ class SamplesListPage extends HookConsumerWidget {
     return Scaffold(
         backgroundColor: colorScheme.surfaceTint,
         appBar: AppBar(
-          title: Text(currentWarehouse?.name ?? '样品间'),
+          title: Text(currentPageIndex.value == 1
+              ? currentWarehouse?.name ?? '样品间'
+              : '样品间'),
           backgroundColor: colorScheme.surfaceTint,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
@@ -78,6 +80,7 @@ class SamplesListPage extends HookConsumerWidget {
                 //清空搜索内容
                 home.searchTextController.clear();
                 homeNotifier.setSearch('');
+                homeNotifier.clearMedia(); //清空图片媒体内容
                 home.bus.dispatch(
                   SearchEvent(search: '', media: null),
                 );
@@ -123,10 +126,12 @@ class SamplesListPage extends HookConsumerWidget {
                 },
                 onDeleteMedia: (temporaryMedia) {
                   final nextState = homeNotifier.deleteMedia(temporaryMedia);
+                  if (nextState.currentMediaId == null) {
+                    homeNotifier.switchToPage(0);
+                  }
                   if (nextState.currentMediaId == home.currentMediaId) {
                     return;
-                  }
-
+                  } 
                   home.bus.dispatch(
                     SearchEvent(
                       media: nextState.currentMedia,

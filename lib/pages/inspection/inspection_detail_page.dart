@@ -97,15 +97,11 @@ class InspectionDetailPage extends HookConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          // 1. 刷新按钮
-          TextButton(
+          // 1. 刷新按钮 
+            IconButton(
             onPressed: () => refreshData(),
-            child: const Text(
-              '刷新',
-              style: TextStyle(color: textGrey, fontSize: 16),
-            ),
-          ),
-
+            icon: const Icon(Icons.refresh, size: 20),
+          ), 
           TextButton(
             onPressed: () async {
               await showModalBottomSheet(

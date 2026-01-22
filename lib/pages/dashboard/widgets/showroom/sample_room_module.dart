@@ -294,45 +294,116 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     final currentDimension = ref.watch(
       dashboardStatsProvider.select((state) => state.sampleRoomDimension),
     );
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 根据数据状态显示内容
-          if (currentDimension == sampleDimensionConfigs[0]['value'])
-            _isLoading
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(40.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : ShipTopChartContent(data: _shipTopDimensionData)
-          else if (currentDimension == sampleDimensionConfigs[1]['value'])
-            _isLoading
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(40.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : TopChartContent(data: _quoteTopDimensionData)
-          else if (currentDimension == sampleDimensionConfigs[3]['value'])
-            CategoryChartContent(sampleRoomData: _categoryDimensionData)
-          else if (currentDimension == sampleDimensionConfigs[2]['value'])
-            ChartContent(sampleRoomData: _showroomDimensionData)
-          else
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(40.0),
-                child: Text("暂无数据"),
+    return Column(
+      children: [
+        // 模块标题和维度选择器
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4, left: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 模块标题
+              Text(
+                '样品间',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontSize: 16),
               ),
-            )
-        ],
-      ),
+              // 维度选择器
+              PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.tune,
+                  size: 20,
+                  color: Colors.grey.shade600,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                offset: const Offset(-10, 45),
+                itemBuilder: (BuildContext context) =>
+                    sampleDimensionConfigs.map((config) {
+                  return PopupMenuItem<String>(
+                    value: config['value'],
+                    child: Row(
+                      children: [
+                        Icon(
+                          config['icon'],
+                          size: 18,
+                          color: currentDimension == config['value']
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.grey,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          config['label'],
+                          style: TextStyle(
+                            color: currentDimension == config['value']
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                            fontWeight: currentDimension == config['value']
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onSelected: (String value) {
+                  ref
+                      .read(dashboardStatsProvider.notifier)
+                      .setSampleRoomDimension(value);
+                },
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: colorScheme.surface),
+          clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 根据数据状态显示内容
+              if (currentDimension == sampleDimensionConfigs[0]['value'])
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : ShipTopChartContent(data: _shipTopDimensionData)
+              else if (currentDimension == sampleDimensionConfigs[1]['value'])
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : TopChartContent(data: _quoteTopDimensionData)
+              else if (currentDimension == sampleDimensionConfigs[3]['value'])
+                CategoryChartContent(sampleRoomData: _categoryDimensionData)
+              else if (currentDimension == sampleDimensionConfigs[2]['value'])
+                ChartContent(sampleRoomData: _showroomDimensionData)
+              else
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Text("暂无数据"),
+                  ),
+                )
+            ],
+          ),
+        )
+      ],
     );
   }
 }

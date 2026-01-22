@@ -95,188 +95,218 @@ class _NewsBoardState extends State<NewsBoard> {
       );
     }
 
-    // 遍历显示所有文章
+    // 模块标题
     return Column(
-      children: _articles!.asMap().entries.map((entry) {
-        final index = entry.key;
-        final article = entry.value;
-        final isLast = index == _articles!.length - 1;
-        final isFirst = index == 0;
-        // 获取第一张图片URL（优先使用thumb_url，其次url）
-        final imageUrl = _getImageUrl(article);
-        return GestureDetector(
-          onTap: () {
-            context.router.push(NewsRoute(
-              currentIndex: index,
-              totalLength: _articles!.length,
-              articleList: _articles,
-            ));
-          },
-          child: Container(
-              margin:
-                  EdgeInsets.fromLTRB(8, isFirst ? 10 : 0, 8, isLast ? 10 : 0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // 图片
-                      if (imageUrl != null && imageUrl.isNotEmpty)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: ImageShow(
-                            imageUrl: imageUrl,
-                            height: 80,
-                            width: 80,
-                            fit: BoxFit.cover,
-                            errorIconSize: 32,
-                          ),
-                        ),
-                      const SizedBox(width: 10),
-                      // 标题和内容
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              article.title ?? '',
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .fontSize,
-                                color: colorScheme.onSurface,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            // 使用富文本加载器，限制2行显示
-
-                            if (article.summary != null)
-                              Text(
-                                article.summary ?? '',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colorScheme.outline,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            else
-                              SizedBox(
-                                height: (Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .fontSize! *
-                                    4), // 3行高度 + 行间距
-                                child: ClipRect(
-                                  child: Html(
-                                    data: article.content ?? '',
-                                    style: {
-                                      'body': Style(
-                                        margin: Margins.zero,
-                                        padding: HtmlPaddings.zero,
-                                        fontSize: FontSize(
-                                          Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .fontSize!,
-                                        ),
-                                        color:
-                                            colorScheme.surfaceContainerHighest,
-                                        display: Display.block,
-                                      ),
-                                      'p': Style(
-                                        margin: Margins.zero,
-                                        padding: HtmlPaddings.zero,
-                                        fontSize: FontSize(
-                                          Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .fontSize!,
-                                        ),
-                                        color:
-                                            colorScheme.surfaceContainerHighest,
-                                        display: Display.block,
-                                      ),
-                                    },
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: 12,),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8, left: 4),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '集团资讯',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 16),
+                ),
+              ]),
+        ),
+        Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: colorScheme.surface),
+            clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // 遍历显示所有文章
+              ..._articles!.asMap().entries.map((entry) {
+                final index = entry.key;
+                final article = entry.value;
+                final isLast = index == _articles!.length - 1;
+                final isFirst = index == 0;
+                // 获取第一张图片URL（优先使用thumb_url，其次url）
+                final imageUrl = _getImageUrl(article);
+                return GestureDetector(
+                  onTap: () {
+                    context.router.push(NewsRoute(
+                      currentIndex: index,
+                      totalLength: _articles!.length,
+                      articleList: _articles,
+                    ));
+                  },
+                  child: Container(
+                      margin: EdgeInsets.fromLTRB(
+                          8, isFirst ? 10 : 0, 8, isLast ? 10 : 0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // 图片
+                              if (imageUrl != null && imageUrl.isNotEmpty)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: ImageShow(
+                                    imageUrl: imageUrl,
+                                    height: 80,
+                                    width: 80,
+                                    fit: BoxFit.cover,
+                                    errorIconSize: 32,
                                   ),
                                 ),
+                              const SizedBox(width: 10),
+                              // 标题和内容
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      article.title ?? '',
+                                      style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .fontSize,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // 使用富文本加载器，限制2行显示
+
+                                    if (article.summary != null)
+                                      Text(
+                                        article.summary ?? '',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: colorScheme.outline,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    else
+                                      SizedBox(
+                                        height: (Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .fontSize! *
+                                            4), // 3行高度 + 行间距
+                                        child: ClipRect(
+                                          child: Html(
+                                            data: article.content ?? '',
+                                            style: {
+                                              'body': Style(
+                                                margin: Margins.zero,
+                                                padding: HtmlPaddings.zero,
+                                                fontSize: FontSize(
+                                                  Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .fontSize!,
+                                                ),
+                                                color: colorScheme
+                                                    .surfaceContainerHighest,
+                                                display: Display.block,
+                                              ),
+                                              'p': Style(
+                                                margin: Margins.zero,
+                                                padding: HtmlPaddings.zero,
+                                                fontSize: FontSize(
+                                                  Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .fontSize!,
+                                                ),
+                                                color: colorScheme
+                                                    .surfaceContainerHighest,
+                                                display: Display.block,
+                                              ),
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                          ],
-                        ),
+                            ],
+                          ),
+                          if (!isLast)
+                            const SizedBox(
+                              height: 12,
+                            ),
+                          if (!isLast)
+                            Divider(
+                                height: 0.5,
+                                color: colorScheme.outline.withOpacity(0.15))
+                        ],
+                      )
+
+                      // Row(
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     // 图片
+                      //     if (imageUrl != null && imageUrl.isNotEmpty)
+                      //         ImageShow(
+                      //         imageUrl: imageUrl,
+                      //         width: 80,
+                      //         fit: BoxFit.cover,
+                      //         errorIconSize: 32,
+                      //       ),
+                      //     const SizedBox(width: 10),
+                      //     // 标题和内容
+                      //     Expanded(
+                      //       child: Column(
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         mainAxisSize: MainAxisSize.min,
+                      //         children: [
+                      //           Text(
+                      //             article.title ?? '',
+                      //             style: TextStyle(
+                      //               fontSize:
+                      //                   Theme.of(context).textTheme.bodyMedium!.fontSize,
+                      //               color: colorScheme.onSurface,
+                      //             ),
+                      //             maxLines: 1,
+                      //             overflow: TextOverflow.ellipsis,
+                      //           ),
+                      //           const SizedBox(height: 4),
+                      //           Text(
+                      //             article.content ?? '',
+                      //             style: TextStyle(
+                      //               fontSize:
+                      //                   Theme.of(context).textTheme.bodySmall!.fontSize,
+                      //               color: colorScheme.surfaceContainerHighest,
+                      //             ),
+                      //             maxLines: 2,
+                      //             overflow: TextOverflow.ellipsis,
+                      //             softWrap: true,
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+
+                      //   ],
+                      // ),
+
                       ),
-                    ],
-                  ),
-                  if (!isLast)
-                    const SizedBox(
-                      height: 12,
-                    ),
-                  if (!isLast)
-                    Divider(
-                        height: 0.5,
-                        color: colorScheme.outline.withOpacity(0.15))
-                ],
-              )
-
-              // Row(
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     // 图片
-              //     if (imageUrl != null && imageUrl.isNotEmpty)
-              //         ImageShow(
-              //         imageUrl: imageUrl,
-              //         width: 80,
-              //         fit: BoxFit.cover,
-              //         errorIconSize: 32,
-              //       ),
-              //     const SizedBox(width: 10),
-              //     // 标题和内容
-              //     Expanded(
-              //       child: Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         mainAxisSize: MainAxisSize.min,
-              //         children: [
-              //           Text(
-              //             article.title ?? '',
-              //             style: TextStyle(
-              //               fontSize:
-              //                   Theme.of(context).textTheme.bodyMedium!.fontSize,
-              //               color: colorScheme.onSurface,
-              //             ),
-              //             maxLines: 1,
-              //             overflow: TextOverflow.ellipsis,
-              //           ),
-              //           const SizedBox(height: 4),
-              //           Text(
-              //             article.content ?? '',
-              //             style: TextStyle(
-              //               fontSize:
-              //                   Theme.of(context).textTheme.bodySmall!.fontSize,
-              //               color: colorScheme.surfaceContainerHighest,
-              //             ),
-              //             maxLines: 2,
-              //             overflow: TextOverflow.ellipsis,
-              //             softWrap: true,
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-
-              //   ],
-              // ),
-
-              ),
-        );
-      }).toList(),
+                );
+              }).toList(),
+            ])),
+      ],
     );
   }
 

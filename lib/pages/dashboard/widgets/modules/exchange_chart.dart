@@ -13,6 +13,7 @@ class LineChartDemo extends ConsumerStatefulWidget {
 
 class _LineChartDemoState extends ConsumerState<LineChartDemo> {
   int? _touchedIndex;
+  bool _isExpanded = false; // 控制折叠展开状态，默认为折叠
 
   @override
   void initState() {
@@ -54,198 +55,300 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
             ? exchangeRates.reduce((a, b) => a > b ? a : b) * 1.2
             : 10.0;
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 柱状图
-              SizedBox(
-                height: 200,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Stack(
-                      children: [
-                        BarChart(
-                          BarChartData(
-                            gridData: FlGridData(show: false),
-                            titlesData: FlTitlesData(
-                              leftTitles: SideTitles(
-                                showTitles: false, // 隐藏左侧标题
-                                reservedSize: 0,
-                                getTitles: (value) =>
-                                    (value % 2 == 0 && value >= 0)
-                                        ? value.toStringAsFixed(1)
-                                        : '',
-                                getTextStyles: (_) => TextStyle(
-                                    fontSize: 10, color: Colors.grey.shade600),
+        return Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4, left: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 模块标题
+                Text(
+                  '今日汇率',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 16),
+                ),
+                // 汇率计算器按钮
+                TextButton(
+                  onPressed: () =>
+                      _showExchangeCalculator(context, _touchedIndex ?? 0),
+                  style: TextButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    textStyle: const TextStyle(fontSize: 14),
+                  ),
+                  child: const Text(
+                    '汇率计算器',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 模块标题和维度选择器
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: colorScheme.surface),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 模块标题和汇率计算器按钮
+                // 柱状图
+                SizedBox(
+                  height: 200,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Stack(
+                        children: [
+                          BarChart(
+                            BarChartData(
+                              gridData: FlGridData(show: false),
+                              titlesData: FlTitlesData(
+                                leftTitles: SideTitles(
+                                  showTitles: false, // 隐藏左侧标题
+                                  reservedSize: 0,
+                                  getTitles: (value) =>
+                                      (value % 2 == 0 && value >= 0)
+                                          ? value.toStringAsFixed(1)
+                                          : '',
+                                  getTextStyles: (_) => TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey.shade600),
+                                ),
+                                bottomTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 20,
+                                  getTitles: (value) {
+                                    final index = value.toInt();
+                                    if (index >= 0 &&
+                                        index < currencies.length) {
+                                      final name = currencies[index];
+                                      return name.length > 3
+                                          ? name.substring(0, 2)
+                                          : name;
+                                    }
+                                    return '';
+                                  },
+                                  getTextStyles: (_) => TextStyle(
+                                      fontSize: 8.2,
+                                      color: Colors.grey.shade600),
+                                ),
+                                topTitles: SideTitles(showTitles: false),
+                                rightTitles: SideTitles(showTitles: false),
                               ),
-                              bottomTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 20,
-                                getTitles: (value) {
-                                  final index = value.toInt();
-                                  if (index >= 0 && index < currencies.length) {
-                                    final name = currencies[index];
-                                    return name.length > 3
-                                        ? name.substring(0, 2)
-                                        : name;
-                                  }
-                                  return '';
-                                },
-                                getTextStyles: (_) => TextStyle(
-                                    fontSize: 8.2, color: Colors.grey.shade600),
-                              ),
-                              topTitles: SideTitles(showTitles: false),
-                              rightTitles: SideTitles(showTitles: false),
-                            ),
-                            minY: 0,
-                            maxY: maxY,
-                            borderData: FlBorderData(show: false),
-                            barGroups: List.generate(
-                              currencies.length,
-                              (index) => BarChartGroupData(
-                                x: index,
-                                barRods: [
-                                  BarChartRodData(
-                                    y: exchangeRates[index],
-                                    colors: [
-                                      _touchedIndex == index
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .secondary
-                                              .withRed(100)
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .secondary
-                                    ],
-                                    width: 20,
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(4),
-                                      topRight: Radius.circular(4),
+                              minY: 0,
+                              maxY: maxY,
+                              borderData: FlBorderData(show: false),
+                              barGroups: List.generate(
+                                currencies.length,
+                                (index) => BarChartGroupData(
+                                  x: index,
+                                  barRods: [
+                                    BarChartRodData(
+                                      y: exchangeRates[index],
+                                      colors: [
+                                        Theme.of(context).colorScheme.primary
+                                      ],
+                                      width: 20,
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(4),
+                                        topRight: Radius.circular(4),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            barTouchData: BarTouchData(
-                              touchCallback: (BarTouchResponse? response) {
-                                setState(() {
-                                  if (response != null &&
-                                      response.spot != null) {
-                                    _touchedIndex =
-                                        response.spot!.touchedBarGroupIndex;
-                                  }
-                                });
-                              },
+                              barTouchData: BarTouchData(
+                                touchCallback: (BarTouchResponse? response) {
+                                  setState(() {
+                                    if (response != null &&
+                                        response.spot != null) {
+                                      _touchedIndex =
+                                          response.spot!.touchedBarGroupIndex;
+                                    }
+                                  });
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned.fill(
-                          child: IgnorePointer(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children:
-                                  List.generate(currencies.length, (index) {
-                                final rate = exchangeRates[index];
-                                // 定义柱状图的实际绘制高度（排除底部标题保留空间）
-                                final chartDrawingHeight =
-                                    constraints.maxHeight -
-                                        30; // 30 是 bottomTitles 的 reservedSize
-                                final barHeight =
-                                    (rate / maxY) * chartDrawingHeight;
-                                final barTop =
-                                    chartDrawingHeight - barHeight; // 柱子顶部的Y坐标
-                                const textHeight =
-                                    8.0; // 文字字体大小 (根据TextStyle的fontSize)
-                                const textPaddingAboveBar =
-                                    4.0; // 文字距离柱子顶部的额外间距
-                                final dyCandidate = barTop -
-                                    textHeight -
-                                    textPaddingAboveBar; // 计算文字的理想顶部Y坐标
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children:
+                                    List.generate(currencies.length, (index) {
+                                  final rate = exchangeRates[index];
+                                  // 定义柱状图的实际绘制高度（排除底部标题保留空间）
+                                  final chartDrawingHeight = constraints
+                                          .maxHeight -
+                                      30; // 30 是 bottomTitles 的 reservedSize
+                                  final barHeight =
+                                      (rate / maxY) * chartDrawingHeight;
+                                  final barTop = chartDrawingHeight -
+                                      barHeight; // 柱子顶部的Y坐标
+                                  const textHeight =
+                                      8.0; // 文字字体大小 (根据TextStyle的fontSize)
+                                  const textPaddingAboveBar =
+                                      4.0; // 文字距离柱子顶部的额外间距
+                                  final dyCandidate = barTop -
+                                      textHeight -
+                                      textPaddingAboveBar; // 计算文字的理想顶部Y坐标
 
-                                // 限制dy在图表绘制区域内，防止文字超出边界
-                                // 最小dy: 0 (图表顶部)
-                                // 最大dy: chartDrawingHeight - textHeight (图表底部，确保文字完全可见)
-                                final dy = dyCandidate.clamp(
-                                    0.0, chartDrawingHeight - textHeight);
+                                  // 限制dy在图表绘制区域内，防止文字超出边界
+                                  // 最小dy: 0 (图表顶部)
+                                  // 最大dy: chartDrawingHeight - textHeight (图表底部，确保文字完全可见)
+                                  final dy = dyCandidate.clamp(
+                                      0.0, chartDrawingHeight - textHeight);
 
-                                return Expanded(
-                                  child: Align(
-                                    alignment: Alignment.topCenter,
-                                    child: Transform.translate(
-                                      offset: Offset(0, dy),
-                                      child: Text(
-                                        rate.toStringAsFixed(4),
-                                        style: TextStyle(
-                                          color: colorScheme.onSurface,
-                                          fontSize: 8,
-                                          height: 1,
+                                  return Expanded(
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Transform.translate(
+                                        offset: Offset(0, dy),
+                                        child: Text(
+                                          rate.toStringAsFixed(4),
+                                          style: TextStyle(
+                                            color: colorScheme.onSurface,
+                                            fontSize: 8,
+                                            height: 1,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
+                                  );
+                                }),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-              // 显示选中的货币信息
-              if (_touchedIndex != null &&
-                  _touchedIndex! < currencies.length) ...[
-                const SizedBox(height: 16),
-                _buildSelectedCurrencyInfo(
-                    _touchedIndex!, currencies, exchangeRates),
+                // 汇率标题和折叠按钮
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '今日汇率',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(
+                                  fontSize: 13, color: colorScheme.onSurface),
+                        ),
+                      ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => setState(() => _isExpanded = !_isExpanded),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _isExpanded ? '收起' : '展开',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.secondary,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              Icon(
+                                _isExpanded
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
+                                size: 18,
+                                color: colorScheme.secondary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Visibility(
+                    visible: _isExpanded,
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: rates.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // 每行两个
+                        crossAxisSpacing: 0,
+                        mainAxisSpacing: 0,
+                        childAspectRatio: 5.5, // 调整宽高比以适应内容
+                      ),
+                      itemBuilder: (context, index) {
+                        final rateItem = rates[index];
+                        final rate =
+                            double.tryParse(rateItem.exchangeRate ?? '0') ??
+                                0.0;
+                        final displayRate =
+                            (rate / 100.0).toStringAsFixed(4); // 假设汇率是除以100的
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '${rateItem.name}  ' ?? '',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        height: 1,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    ' $displayRate' ?? '',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ), // End of Visibility
+                ), // End of AnimatedSize
               ],
-
-              // const SizedBox(height: 12),
-              // GridView.builder(
-              //   shrinkWrap: true,
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   itemCount: rates.length,
-              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              //     crossAxisCount: 2, // 每行两个
-              //     crossAxisSpacing: 0,
-              //     mainAxisSpacing: 0,
-              //     childAspectRatio:5, // 调整宽高比以适应内容
-              //   ),
-              //   itemBuilder: (context, index) {
-              //     final rateItem = rates[index];
-              //     final rate = double.tryParse(rateItem.exchangeRate ?? '0') ?? 0.0;
-              //     final displayRate = (rate / 100.0).toStringAsFixed(4); // 假设汇率是除以100的
-              //     return Container(
-              //       padding:
-              //           const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              //       decoration: BoxDecoration(
-              //         color: Theme.of(context).colorScheme.surface,
-              //         borderRadius: BorderRadius.circular(8),
-              //       ),
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Text(
-              //             '${rateItem.name} $displayRate' ?? '',
-              //             style: TextStyle(
-              //                 fontSize: 11,
-              //                 height: 1,
-              //                 color: Theme.of(context).colorScheme.onSurface),
-              //             maxLines: 1,
-              //             overflow: TextOverflow.ellipsis,
-              //           ),
-              //         ],
-              //       ),
-              //     );
-              //   },
-              // ),
-            ],
-          ),
-        );
+            ),
+          )
+        ]);
       },
       loading: () => Container(
         padding: const EdgeInsets.all(16),
@@ -268,39 +371,6 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSelectedCurrencyInfo(
-      int index, List<String> currencies, List<double> exchangeRates) {
-    final colorScheme = Theme.of(context).colorScheme;
-    if (index >= currencies.length || index >= exchangeRates.length) {
-      return const SizedBox.shrink();
-    }
-
-    final currencyName = currencies[index];
-    final rate = exchangeRates[index];
-    final cnyAmount = (100 * rate).toStringAsFixed(2);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '100 $currencyName = $cnyAmount 元',
-            style: TextStyle(fontSize: 13, color: colorScheme.onSurface),
-          ),
-          TextButton(
-            onPressed: () => _showExchangeCalculator(context, index),
-            child: const Text('汇率计算器', style: TextStyle(fontSize: 14)),
-          ),
-        ],
       ),
     );
   }

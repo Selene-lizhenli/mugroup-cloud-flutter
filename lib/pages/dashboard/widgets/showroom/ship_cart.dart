@@ -96,96 +96,109 @@ class _TopChartContentState extends State<ShipTopChartContent> {
         ),
         const SizedBox(height: 6),
         // 列表（可展开/收起）
-        if (_isExpanded)
-          ...displayData.asMap().entries.expand<Widget>((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            return [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                ),
-                child: InkWell(
-                  onTap: item.id != null
-                      ? () {
-                          if (context.mounted) {
-                            context.router.push(
-                              ShowroomSampleDetailRoute(id: item.id!),
-                            );
-                          }
-                        }
-                      : null,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Row(
-                    children: [
-                      // 缩略图
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: SizedBox(
-                          width: 55,
-                          height: 55,
-                          child: ImageShow(
-                            imageUrl: item.thumbUrl ?? '',
-                            fit: BoxFit.contain,
-                            enablePreview: false,
-                            showErrorText: true,
-                            errorIconSize: 18,
-                            errorTextSize: 7,
+
+        AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: Visibility(
+                visible: _isExpanded,
+                child: Column(
+                  children: [
+                    ...displayData.asMap().entries.expand<Widget>((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      return [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                          ),
+                          child: InkWell(
+                            onTap: item.id != null
+                                ? () {
+                                    if (context.mounted) {
+                                      context.router.push(
+                                        ShowroomSampleDetailRoute(id: item.id!),
+                                      );
+                                    }
+                                  }
+                                : null,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Row(
+                              children: [
+                                // 缩略图
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(2),
+                                  child: SizedBox(
+                                    width: 55,
+                                    height: 55,
+                                    child: ImageShow(
+                                      imageUrl: item.thumbUrl ?? '',
+                                      fit: BoxFit.contain,
+                                      enablePreview: false,
+                                      showErrorText: true,
+                                      errorIconSize: 18,
+                                      errorTextSize: 7,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                // 内容
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.sampleName ?? ' ',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '样品编号: ${item.sampleNo ?? ' '}',
+                                            style: TextStyle(
+                                                color: colorScheme.outline,
+                                                fontSize: 10),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            '${sampleDimensionConfigs[0]['label']}：${item.shippingAmount ?? ' '}',
+                                            style: TextStyle(
+                                                color: colorScheme.outline,
+                                                fontSize: 10),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                // 箭头图标（可点击）
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Icon(Icons.arrow_forward_ios,
+                                    color: colorScheme.outline, size: 14),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      // 内容
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.sampleName ?? ' ',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '样品编号: ${item.sampleNo ?? ' '}',
-                                  style: TextStyle(
-                                      color: colorScheme.outline, fontSize: 10),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '${sampleDimensionConfigs[0]['label']}：${item.shippingAmount ?? ' '}',
-                                  style: TextStyle(
-                                      color: colorScheme.outline, fontSize: 10),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                      // 箭头图标（可点击）
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Icon(Icons.arrow_forward_ios,
-                          color: colorScheme.outline, size: 14),
-                    ],
-                  ),
-                ),
-              ),
-              // 添加水平分割线（最后一条数据后不添加）
-              if (index < displayData.length - 1)
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withOpacity(0.15),
-                ),
-            ];
-          }),
+                        // 添加水平分割线（最后一条数据后不添加）
+                        if (index < displayData.length - 1)
+                          Divider(
+                            height: 1,
+                            color: colorScheme.outline.withOpacity(0.15),
+                          ),
+                      ];
+                    })
+                  ],
+                ))),
       ],
     );
   }

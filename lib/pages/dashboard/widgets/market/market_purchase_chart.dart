@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -79,6 +80,132 @@ class MarketPurchaseChart extends HookConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 模块标题和维度选择器
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 模块标题
+                Text(
+                  '市场带客',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(),
+                ),
+                // 维度选择器
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.tune,
+                    size: 20,
+                    color: Colors.grey.shade600,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  offset: const Offset(-10, 45),
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      value: '最近半年',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 18,
+                            color: stats.timeDimension == TimeDimension.last6Months
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '最近半年',
+                            style: TextStyle(
+                              color: stats.timeDimension == TimeDimension.last6Months
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              fontWeight: stats.timeDimension == TimeDimension.last6Months
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: '最近一年',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 18,
+                            color: stats.timeDimension == TimeDimension.last12Months
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '最近一年',
+                            style: TextStyle(
+                              color: stats.timeDimension == TimeDimension.last12Months
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              fontWeight: stats.timeDimension == TimeDimension.last12Months
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: '所有时间',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.all_inclusive,
+                            size: 18,
+                            color: stats.timeDimension == TimeDimension.allTime
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '所有时间',
+                            style: TextStyle(
+                              color: stats.timeDimension == TimeDimension.allTime
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              fontWeight: stats.timeDimension == TimeDimension.allTime
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (String value) {
+                    TimeDimension? dimension;
+                    switch (value) {
+                      case '最近半年':
+                        dimension = TimeDimension.last6Months;
+                        break;
+                      case '最近一年':
+                        dimension = TimeDimension.last12Months;
+                        break;
+                      case '所有时间':
+                        dimension = TimeDimension.allTime;
+                        break;
+                    }
+                    if (dimension != null) {
+                      // 市场带客模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
+                      ref.read(moduleStatsProvider('market_purchase').notifier).setTimeDimension(dimension);
+                      ref.read(moduleStatsProvider('customer').notifier).setTimeDimension(dimension);
+                      ref.read(moduleStatsProvider('supplier').notifier).setTimeDimension(dimension);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
           // 图例
           Wrap(
             spacing: 20,
