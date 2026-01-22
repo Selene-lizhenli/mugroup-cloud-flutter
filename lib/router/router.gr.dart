@@ -803,13 +803,17 @@ class MyRoute extends _i59.PageRouteInfo<void> {
 class NewsRoute extends _i59.PageRouteInfo<NewsRouteArgs> {
   NewsRoute({
     _i62.Key? key,
-    required _i64.PublicNewsArticle article,
+    required int currentIndex,
+    required int totalLength,
+    List<_i64.PublicNewsArticle>? articleList,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           NewsRoute.name,
           args: NewsRouteArgs(
             key: key,
-            article: article,
+            currentIndex: currentIndex,
+            totalLength: totalLength,
+            articleList: articleList,
           ),
           initialChildren: children,
         );
@@ -822,7 +826,9 @@ class NewsRoute extends _i59.PageRouteInfo<NewsRouteArgs> {
       final args = data.argsAs<NewsRouteArgs>();
       return _i24.NewsPage(
         key: args.key,
-        article: args.article,
+        currentIndex: args.currentIndex,
+        totalLength: args.totalLength,
+        articleList: args.articleList,
       );
     },
   );
@@ -831,16 +837,22 @@ class NewsRoute extends _i59.PageRouteInfo<NewsRouteArgs> {
 class NewsRouteArgs {
   const NewsRouteArgs({
     this.key,
-    required this.article,
+    required this.currentIndex,
+    required this.totalLength,
+    this.articleList,
   });
 
   final _i62.Key? key;
 
-  final _i64.PublicNewsArticle article;
+  final int currentIndex;
+
+  final int totalLength;
+
+  final List<_i64.PublicNewsArticle>? articleList;
 
   @override
   String toString() {
-    return 'NewsRouteArgs{key: $key, article: $article}';
+    return 'NewsRouteArgs{key: $key, currentIndex: $currentIndex, totalLength: $totalLength, articleList: $articleList}';
   }
 }
 

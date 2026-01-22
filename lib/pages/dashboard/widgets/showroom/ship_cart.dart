@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/constants/dashboard_configs.dart'; 
+import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // 只取前5条数据
-    final displayData = widget.data.take(9).toList();
+    final displayData = widget.data.take(8).toList();
 
     // 如果没有数据，显示空状态
     if (displayData.isEmpty) {
@@ -94,7 +94,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
             ],
           ),
         ),
-        const SizedBox(height: 6), 
+        const SizedBox(height: 6),
         // 列表（可展开/收起）
         if (_isExpanded)
           ...displayData.asMap().entries.expand<Widget>((entry) {
@@ -123,7 +123,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(2),
                         child: SizedBox(
-                          width: 55, 
+                          width: 55,
                           height: 55,
                           child: ImageShow(
                             imageUrl: item.thumbUrl ?? '',
@@ -195,12 +195,13 @@ class _TopChartContentState extends State<ShipTopChartContent> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // 计算最大数量，用于设置纵轴最大值
-    final maxCount =
-        displayData.map((e) => e.shippingAmount ?? 0).reduce((a, b) => a > b ? a : b);
+    final maxCount = displayData
+        .map((e) => e.shippingAmount ?? 0)
+        .reduce((a, b) => a > b ? a : b);
     final maxY = maxCount > 0 ? (maxCount * 1.2).ceil().toDouble() : 10.0;
 
     return Container(
-      height: 200, 
+      height: 200,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -309,8 +310,9 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                       final shippingAmount = item.shippingAmount ?? 0;
                       // 图表绘制区域高度（给 bottomTitles 预留空间）
                       final chartAreaHeight = constraints.maxHeight - 10;
-                      final barHeight =
-                          maxY <= 0 ? 0.0 : (shippingAmount / maxY) * chartAreaHeight;
+                      final barHeight = maxY <= 0
+                          ? 0.0
+                          : (shippingAmount / maxY) * chartAreaHeight;
                       final barTop = chartAreaHeight - barHeight;
                       // 往上抬一点点，让数字“贴”在柱顶上方
                       final dy = (barTop - 14).clamp(0.0, chartAreaHeight);
@@ -324,7 +326,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                               '$shippingAmount',
                               style: TextStyle(
                                 color: colorScheme.onSurface,
-                                fontSize: 8, 
+                                fontSize: 8,
                               ),
                             ),
                           ),

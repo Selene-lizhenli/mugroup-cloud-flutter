@@ -144,11 +144,12 @@ Future<Quotation?> getShowroomQuotationByQuoteNo(String quoteNo) async {
     },
   );
 }
+
 /// 获取产品分类统计数据（包含 count）
 Future<List<Category>?> getAllShowroomCategories() async {
   final res = await api.get(
     "api/tenant/showroom/categories",
-    queryParameters: {'all': '0'},
+    queryParameters: {'all': '0', "with_products_count": true},
   );
 
   if (res.data is List) {
@@ -158,7 +159,6 @@ Future<List<Category>?> getAllShowroomCategories() async {
   }
   return null;
 }
-
 
 /// 统计数据项
 class SampleStatisticItem {

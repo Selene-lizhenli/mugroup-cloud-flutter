@@ -360,6 +360,7 @@ mixin _$PublicNewsArticle {
   int? get id => throw _privateConstructorUsedError;
   String? get title => throw _privateConstructorUsedError;
   String? get content => throw _privateConstructorUsedError;
+  String? get summary => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -382,6 +383,7 @@ abstract class $PublicNewsArticleCopyWith<$Res> {
       {int? id,
       String? title,
       String? content,
+      String? summary,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       List<NewsMedia>? media});
@@ -403,6 +405,7 @@ class _$PublicNewsArticleCopyWithImpl<$Res, $Val extends PublicNewsArticle>
     Object? id = freezed,
     Object? title = freezed,
     Object? content = freezed,
+    Object? summary = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? media = freezed,
@@ -419,6 +422,10 @@ class _$PublicNewsArticleCopyWithImpl<$Res, $Val extends PublicNewsArticle>
       content: freezed == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
+              as String?,
+      summary: freezed == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -448,6 +455,7 @@ abstract class _$$PublicNewsArticleImplCopyWith<$Res>
       {int? id,
       String? title,
       String? content,
+      String? summary,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       List<NewsMedia>? media});
@@ -467,6 +475,7 @@ class __$$PublicNewsArticleImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? title = freezed,
     Object? content = freezed,
+    Object? summary = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? media = freezed,
@@ -483,6 +492,10 @@ class __$$PublicNewsArticleImplCopyWithImpl<$Res>
       content: freezed == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
+              as String?,
+      summary: freezed == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -507,6 +520,7 @@ class _$PublicNewsArticleImpl implements _PublicNewsArticle {
       {this.id,
       this.title,
       this.content,
+      this.summary,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       final List<NewsMedia>? media})
@@ -521,6 +535,8 @@ class _$PublicNewsArticleImpl implements _PublicNewsArticle {
   final String? title;
   @override
   final String? content;
+  @override
+  final String? summary;
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -539,7 +555,7 @@ class _$PublicNewsArticleImpl implements _PublicNewsArticle {
 
   @override
   String toString() {
-    return 'PublicNewsArticle(id: $id, title: $title, content: $content, createdAt: $createdAt, updatedAt: $updatedAt, media: $media)';
+    return 'PublicNewsArticle(id: $id, title: $title, content: $content, summary: $summary, createdAt: $createdAt, updatedAt: $updatedAt, media: $media)';
   }
 
   @override
@@ -550,6 +566,7 @@ class _$PublicNewsArticleImpl implements _PublicNewsArticle {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.content, content) || other.content == content) &&
+            (identical(other.summary, summary) || other.summary == summary) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -559,8 +576,8 @@ class _$PublicNewsArticleImpl implements _PublicNewsArticle {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, content, createdAt,
-      updatedAt, const DeepCollectionEquality().hash(_media));
+  int get hashCode => Object.hash(runtimeType, id, title, content, summary,
+      createdAt, updatedAt, const DeepCollectionEquality().hash(_media));
 
   @JsonKey(ignore: true)
   @override
@@ -582,6 +599,7 @@ abstract class _PublicNewsArticle implements PublicNewsArticle {
       {final int? id,
       final String? title,
       final String? content,
+      final String? summary,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       final List<NewsMedia>? media}) = _$PublicNewsArticleImpl;
@@ -595,6 +613,8 @@ abstract class _PublicNewsArticle implements PublicNewsArticle {
   String? get title;
   @override
   String? get content;
+  @override
+  String? get summary;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;

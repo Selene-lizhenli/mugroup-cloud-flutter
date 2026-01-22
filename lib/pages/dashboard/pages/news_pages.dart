@@ -3,25 +3,30 @@ import 'package:cloud/models/dashboard/public_news_article.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:cloud/router/router.gr.dart';
 
 @RoutePage()
 class NewsPage extends StatelessWidget {
-  final PublicNewsArticle article;
+  final int currentIndex;
+  final int totalLength;
+  final List<PublicNewsArticle>? articleList;
 
   const NewsPage({
     super.key,
-    required this.article,
+    required this.currentIndex,
+    required this.totalLength,
+    this.articleList,
   });
- 
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme; 
-    final media = article.media; 
-    final contextWidth = MediaQuery.of(context).size.width; 
+    final colorScheme = Theme.of(context).colorScheme;
+    final contextWidth = MediaQuery.of(context).size.width;
+    final article = articleList?[currentIndex];
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            article.title ?? '',
+            article?.title ?? '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -36,59 +41,36 @@ class NewsPage extends StatelessWidget {
                   AppBar().preferredSize.height -
                   MediaQuery.of(context).padding.top -
                   40; // padding 20 * 2
-              
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: availableHeight,
-                  ),
+
+               return Scrollbar(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: availableHeight,
+                    ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // 文章图片（显示所有媒体中的图片）
-                      if (media != null && media.isNotEmpty) ...[
-                        ...media.where((m) => m.type == 'image').map((media) {
-                          final imageUrl =
-                              media.url ?? media.whiteUrl ?? media.thumbUrl;
-                          if (imageUrl == null || imageUrl.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: ImageShow(
-                                imageUrl: imageUrl, 
-                                enablePreview:true, 
-                                width: contextWidth,
-                                fit: BoxFit.contain,
-                                errorIconSize: 38,
-                              ),
-                            ),
-                          );
-                        }),
-                      
-                      ],
-                      const SizedBox(height: 10,),
+                    children: [  
                       // 文章内容（富文本）
                       Html(
-                        data: article.content ?? '',
+                        data:
+                            article?.content?.replaceAll('< img', '<img') ?? '',
                         style: {
                           'body': Style(
                             margin: Margins.zero,
                             padding: HtmlPaddings.zero,
-                            fontSize:   FontSize(16),
+                            fontSize: FontSize(16),
                             lineHeight: const LineHeight(1.8),
                             color: colorScheme.onSurface,
-                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif',
+                            fontFamily:
+                                '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif',
                           ),
                           'p': Style(
                             margin: Margins.only(bottom: 12),
                             fontSize: FontSize(16),
-                            lineHeight: LineHeight(1.8),
+                            lineHeight: const LineHeight(1.8),
                             color: colorScheme.onSurface,
                           ),
                           'strong': Style(
@@ -112,13 +94,106 @@ class NewsPage extends StatelessWidget {
                           ),
                         },
                         extensions: [
-                            ImageExtension(),
+                          ImageExtension(
+                            builder: (extensionContext) {
+                              final src = extensionContext.attributes['src'];
+                              if (src == null || src.trim().isEmpty) {
+                                // 如果 src 为空，显示调试信息
+                                return Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(8),
+                                  color: Colors.grey[200],
+                                  child: const Text('图片URL为空或无效',
+                                      style: TextStyle(color: Colors.red)),
+                                );
+                              }
+
+                              String imageUrl = src.trim();
+
+                              if (!imageUrl.startsWith('http://') &&
+                                  !imageUrl.startsWith('https://')) {
+                                // 如果是相对路径，可以在这里添加基础 URL
+                                imageUrl =
+                                    'https://www.mugroup.com.cn$imageUrl';
+                              }
+
+                              if (imageUrl.startsWith('//')) {
+                                imageUrl = 'https:$imageUrl';
+                              }
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: ImageShow(
+                                    imageUrl: imageUrl,
+                                    enablePreview: true,
+                                    width: contextWidth,
+                                    fit: BoxFit.contain,
+                                    errorIconSize: 38,
+                                    showErrorText: true, // 确保显示错误文本
+                                    errorTextSize: 10, // 可以调整大小
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ],
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            TextButton(
+                              onPressed: currentIndex > 0
+                                  ? () {
+                                      context.router.replace(
+                                        NewsRoute(
+                                          currentIndex: currentIndex - 1,
+                                          totalLength: totalLength,
+                                          articleList: articleList,
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              child: Text(
+                                '上一篇',
+                                style: TextStyle(
+                                    color: currentIndex > 0
+                                        ? colorScheme.primary
+                                        : Colors.grey),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: currentIndex < totalLength - 1
+                                  ? () {
+                                      context.router.replace(
+                                        NewsRoute(
+                                          currentIndex: currentIndex + 1,
+                                          totalLength: totalLength,
+                                          articleList: articleList,
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              child: Text(
+                                '下一篇',
+                                style: TextStyle(
+                                    color: currentIndex < totalLength - 1
+                                        ? colorScheme.primary
+                                        : Colors.grey),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              );
+              ));
             },
           ),
         ));

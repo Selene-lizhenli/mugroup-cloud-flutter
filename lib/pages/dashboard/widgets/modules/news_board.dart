@@ -102,13 +102,15 @@ class _NewsBoardState extends State<NewsBoard> {
         final article = entry.value;
         final isLast = index == _articles!.length - 1;
         final isFirst = index == 0;
-        logger.d('article.media: ${article}');
         // 获取第一张图片URL（优先使用thumb_url，其次url）
         final imageUrl = _getImageUrl(article);
-        logger.d('imageUrl: ${article},${imageUrl}');
         return GestureDetector(
           onTap: () {
-            context.router.push(NewsRoute(article: article));
+            context.router.push(NewsRoute(
+              currentIndex: index,
+              totalLength: _articles!.length,
+              articleList: _articles,
+            ));
           },
           child: Container(
               margin:
@@ -122,7 +124,7 @@ class _NewsBoardState extends State<NewsBoard> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // 图片 
+                      // 图片
                       if (imageUrl != null && imageUrl.isNotEmpty)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
@@ -133,7 +135,7 @@ class _NewsBoardState extends State<NewsBoard> {
                             fit: BoxFit.cover,
                             errorIconSize: 32,
                           ),
-                        ), 
+                        ),
                       const SizedBox(width: 10),
                       // 标题和内容
                       Expanded(
@@ -156,46 +158,58 @@ class _NewsBoardState extends State<NewsBoard> {
                             ),
                             const SizedBox(height: 4),
                             // 使用富文本加载器，限制2行显示
-                            SizedBox(
-                              height: (Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .fontSize! *
-                                  4), // 3行高度 + 行间距
-                              child: ClipRect(
-                                child: Html(
-                                  data: article.content ?? '',
-                                  style: {
-                                    'body': Style(
-                                      margin: Margins.zero,
-                                      padding: HtmlPaddings.zero,
-                                      fontSize: FontSize(
-                                        Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .fontSize!,
+
+                            if (article.summary != null)
+                              Text(
+                                article.summary ?? '',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.outline,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            else
+                              SizedBox(
+                                height: (Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .fontSize! *
+                                    4), // 3行高度 + 行间距
+                                child: ClipRect(
+                                  child: Html(
+                                    data: article.content ?? '',
+                                    style: {
+                                      'body': Style(
+                                        margin: Margins.zero,
+                                        padding: HtmlPaddings.zero,
+                                        fontSize: FontSize(
+                                          Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .fontSize!,
+                                        ),
+                                        color:
+                                            colorScheme.surfaceContainerHighest,
+                                        display: Display.block,
                                       ),
-                                      color:
-                                          colorScheme.surfaceContainerHighest,
-                                      display: Display.block,
-                                    ),
-                                    'p': Style(
-                                      margin: Margins.zero,
-                                      padding: HtmlPaddings.zero,
-                                      fontSize: FontSize(
-                                        Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .fontSize!,
+                                      'p': Style(
+                                        margin: Margins.zero,
+                                        padding: HtmlPaddings.zero,
+                                        fontSize: FontSize(
+                                          Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .fontSize!,
+                                        ),
+                                        color:
+                                            colorScheme.surfaceContainerHighest,
+                                        display: Display.block,
                                       ),
-                                      color:
-                                          colorScheme.surfaceContainerHighest,
-                                      display: Display.block,
-                                    ),
-                                  },
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),

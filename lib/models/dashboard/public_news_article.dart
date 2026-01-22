@@ -30,6 +30,7 @@ class PublicNewsArticle with _$PublicNewsArticle {
     int? id,
     String? title,
     String? content,
+     String? summary,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     List<NewsMedia>? media,

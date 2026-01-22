@@ -40,6 +40,7 @@ _$PublicNewsArticleImpl _$$PublicNewsArticleImplFromJson(
       id: (json['id'] as num?)?.toInt(),
       title: json['title'] as String?,
       content: json['content'] as String?,
+      summary: json['summary'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       media: (json['media'] as List<dynamic>?)
@@ -53,6 +54,7 @@ Map<String, dynamic> _$$PublicNewsArticleImplToJson(
       'id': instance.id,
       'title': instance.title,
       'content': instance.content,
+      'summary': instance.summary,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
       'media': instance.media,
