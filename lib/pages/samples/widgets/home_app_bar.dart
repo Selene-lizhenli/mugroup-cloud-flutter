@@ -7,6 +7,7 @@ import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -124,9 +125,9 @@ class HomeAppBar extends HookConsumerWidget {
               // 搜索输入框
               Expanded(
                 child: Container(
-                  height: 40,
+                  height: 36,
                   padding: const EdgeInsets.only(left: 12, right: 0),
-                  decoration: BoxDecoration( 
+                  decoration: BoxDecoration(
                     border: Border.all(
                       color: colorScheme.primary,
                       width: 1,
@@ -147,8 +148,10 @@ class HomeAppBar extends HookConsumerWidget {
                           onTapOutside: (event) {
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
+                          style:const TextStyle(fontSize: 14 ),
                           focusNode: focusNode,
                           decoration: const InputDecoration.collapsed(
+                            hintStyle: TextStyle(fontSize:12),
                             hintText: '',
                           ),
                           textInputAction: TextInputAction.search,
@@ -158,12 +161,12 @@ class HomeAppBar extends HookConsumerWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 30,
-                        height: 30,
+                        width: 28,
+                        height: 28,
                         child: IconButton(
-                          icon:   Icon(
+                          icon: Icon(
                             CupertinoIcons.camera,
-                            size: 28,
+                            size: 26,
                             color: colorScheme.outline,
                           ),
                           padding: EdgeInsets.zero,
@@ -173,7 +176,7 @@ class HomeAppBar extends HookConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       SizedBox(
-                        height: 40,
+                        height: 36,
                         child: TextButton(
                           style: TextButton.styleFrom(
                             backgroundColor: colorScheme.primary,

@@ -11,6 +11,8 @@ import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
+const String warehousesIdField = "warehouse_id";
+
 class ProductDropdownMenu extends HookConsumerWidget {
   final List<FacetCount> facetCounts;
   final Map<String, dynamic> value;
@@ -26,7 +28,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final query = useState<Map<String, dynamic>>({});
-    const String warehousesIdField = "warehouse_id";
     final supportFacet = {
       "supplier_ids": "供应商",
       "category_id": "产品分类",
@@ -42,6 +43,65 @@ class ProductDropdownMenu extends HookConsumerWidget {
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);
     final isMounted = useRef(true);
+
+    List<TDDropdownItem> handleWarehouseDropdown(menus) {
+      final home = ref.watch(homeProvider);
+      final homeNotifier = ref.read(homeProvider.notifier);
+      final warehouses = home.warehouses;
+      final currentSelectedWarehouse = home.currentSelectedWarehouse;
+      final lable = supportFacet[warehousesIdField] ?? "";
+      final option = menuOptions[warehousesIdField];
+
+      if (warehouses.isNotEmpty) {
+        // 构建样品间选项
+        final warehouseOptions = <TDDropdownItemOption>[];
+        for (var warehouse in warehouses) {
+          if (warehouse.abandoned == true || warehouse.id == null) {
+            continue;
+          }
+          warehouseOptions.add(TDDropdownItemOption(
+            label: warehouse.name ?? '-',
+            value: warehouse.id.toString(),
+            selected: currentSelectedWarehouse?.id == warehouse.id,
+          ));
+        }
+
+        // 创建样品间菜单项
+        final warehouseItem = TDDropdownItem(
+          label: lable,
+          multiple: option?.multiple,
+          optionsColumns: option?.optionsColumns,
+          options: warehouseOptions,
+          onChange: (value) {
+            // 单选时，value  是数组，需要取第一个元素
+            final selectedValue =
+                value is List ? (value.isNotEmpty ? value.first : null) : value;
+            if (selectedValue == null ||
+                selectedValue == '0' ||
+                selectedValue == 0) {
+              query.value = {...query.value}..remove(warehousesIdField);
+              homeNotifier.setCurrentSelectedWarehouse(null);
+              return;
+            }
+
+            final selectedWarehouse = warehouses.firstWhereOrNull(
+              (w) => w.id.toString() == selectedValue.toString(),
+            );
+            homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
+
+            query.value = {...query.value, warehousesIdField: selectedValue};
+          },
+          onConfirm: (value) {},
+          onReset: () {
+            homeNotifier.setCurrentSelectedWarehouse(null);
+            query.value = {...query.value}..remove(warehousesIdField);
+          },
+        );
+
+        menus.add(warehouseItem);
+      }
+      return menus;
+    }
 
     useEffect(() {
       isMounted.value = true;
@@ -117,64 +177,11 @@ class ProductDropdownMenu extends HookConsumerWidget {
 
       return null;
     }, [fetchCategories, facetCounts]);
-    
+
     final menus = <TDDropdownItem>[];
-    //添加样品间筛选
-    final home = ref.watch(homeProvider);
-    final homeNotifier = ref.read(homeProvider.notifier);
-    final warehouses = home.warehouses;
-    final currentSelectedWarehouse = home.currentSelectedWarehouse;
-    final lable = supportFacet[warehousesIdField] ?? "";
-    final option = menuOptions[warehousesIdField];
-
-    if (warehouses.isNotEmpty) {
-      // 构建样品间选项
-      final warehouseOptions = <TDDropdownItemOption>[];
-      for (var warehouse in warehouses) {
-        warehouseOptions.add(TDDropdownItemOption(
-          label: warehouse.name ?? '-',
-          value: warehouse.id.toString(),
-          selected: currentSelectedWarehouse?.id == warehouse.id,
-        ));
-      }
-
-      // 创建样品间菜单项
-      final warehouseItem = TDDropdownItem(
-        label: lable,
-        multiple: option?.multiple,
-        optionsColumns: option?.optionsColumns,
-        options: warehouseOptions,
-        onChange: (value) {
-          // 单选时，value  是数组，需要取第一个元素
-          final selectedValue =
-              value is List ? (value.isNotEmpty ? value.first : null) : value;
-          if (selectedValue == null ||
-              selectedValue == '0' ||
-              selectedValue == 0) {
-            query.value = {...query.value}..remove(warehousesIdField);
-            homeNotifier.setCurrentSelectedWarehouse(null);
-            return;
-          }
-
-          final selectedWarehouse = warehouses.firstWhereOrNull(
-            (w) => w.id.toString() == selectedValue.toString(),
-          );
-          homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
-
-          query.value = {...query.value, warehousesIdField: selectedValue};
-        },
-        onConfirm: (value) {},
-        onReset: () {
-          homeNotifier.setCurrentSelectedWarehouse(null);
-          query.value = {...query.value}..remove(warehousesIdField);
-        },
-      );
-
-      menus.add(warehouseItem);
-    }
-
-
-    logger.d(facetCounts);
+    //添加样品间筛选项
+    handleWarehouseDropdown(menus);
+   //添加供应商等筛选项
     for (var facetCount in facetCounts) {
       final field = facetCount.fieldName;
       if (!supportFacet.containsKey(field)) {
@@ -246,7 +253,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
     }
 
     if (menus.isEmpty) return const SizedBox.shrink();
-
     return Container(
       color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 5),

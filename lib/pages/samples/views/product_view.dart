@@ -1,5 +1,4 @@
 import 'package:cloud/hooks/hooks.dart';
-import 'package:cloud/hooks/useUpdateEffect/hook.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -32,15 +31,16 @@ class ProductView extends HookConsumerWidget {
       controlFinishLoad: true,
       controlFinishRefresh: true,
     );
-    final home = ref.watch(homeProvider); 
-         final currentHome = ref.read(homeProvider);
+    final home = ref.watch(homeProvider);
+    final currentHome = ref.read(homeProvider);
     final isDetailedMode = home.isDetailedMode;
     final search = useState(home.search);
     // 初始化 query，如果有选中的样品间，将其添加到 query 中
     final initialQuery = <String, dynamic>{};
-    if (home.currentSelectedWarehouse != null && 
+    if (home.currentSelectedWarehouse != null &&
         home.currentSelectedWarehouse!.id != 0) {
-      initialQuery['warehouse_id'] = home.currentSelectedWarehouse!.id.toString();
+      initialQuery['warehouse_id'] =
+          home.currentSelectedWarehouse!.id.toString();
     }
     final query = useState<Map<String, dynamic>>(initialQuery);
     final previousMode = useRef(isDetailedMode);
@@ -50,7 +50,7 @@ class ProductView extends HookConsumerWidget {
     final facetCounts = useState(<FacetCount>[]);
     final showDropDown = useState(isDetailedMode);
     final colorScheme = Theme.of(context).colorScheme;
- 
+
     final mediaQuery = MediaQuery.of(context);
 
     var crossAxisCount = 2;
@@ -83,7 +83,7 @@ class ProductView extends HookConsumerWidget {
         "pageSize": pageSize,
         "includes": 'supplyQuotes.supplier',
         ...(overrideQuery ?? query.value),
-      }; 
+      };
       final resp = await getSamples(queryParameters: queryParameters);
 
       // 如果提供了 overrideQuery，在更新 samples 之前先更新 query.value
@@ -93,54 +93,55 @@ class ProductView extends HookConsumerWidget {
       }
 
       // 根据是否是精简模式来更新 showDropDown
-      showDropDown.value = home.isDetailedMode; 
+      showDropDown.value = home.isDetailedMode;
       if (init == true || page.value == 1) {
         samples.value = resp.data;
       } else {
         samples.value = [...samples.value, ...resp.data];
       }
-      
+
       // 只在首次加载（page == 1 且 facetCounts 为空）时设置 facetCounts
       // 这样筛选条件选择后，筛选项按钮不会消失
       if (page.value == 1 && facetCounts.value.isEmpty) {
         facetCounts.value = resp.meta?.facetCounts ?? [];
       }
-   
+
       if (resp.data.length >= 20) {
         page.value++;
       }
 
       return resp;
     }
- 
+
     // 监听视图模式变化，切换到精简模式时重置筛选项并刷新
     useUpdateEffect(() {
       final wasDetailed = previousMode.value;
       previousMode.value = isDetailedMode;
-         final resetQuery = <String, dynamic>{};  
+      final resetQuery = <String, dynamic>{};
       // 如果从详细模式切换到精简模式，重置筛选项（保留 warehouse_id）
       if (wasDetailed == true && !isDetailedMode) {
-        if (currentHome.currentSelectedWarehouse != null && 
+        if (currentHome.currentSelectedWarehouse != null &&
             currentHome.currentSelectedWarehouse!.id != 0) {
-          resetQuery['warehouse_id'] = currentHome.currentSelectedWarehouse!.id.toString();
+          resetQuery['warehouse_id'] =
+              currentHome.currentSelectedWarehouse!.id.toString();
         }
-      }     // 使用 Future.microtask 来延迟执行
-        Future.microtask(() async {
-          try {
-            // 使用 overrideQuery 参数，fetchData 内部会更新 query.value
-            await fetchData(
-              search.value,
-              searchMedia: media.value,
-              init: true,
-              overrideQuery: resetQuery,
-            );
-            refreshController.finishRefresh();
-          } catch (e) {
-            refreshController.finishRefresh(IndicatorResult.fail, false);
-          } finally {
-            refreshController.resetFooter();
-          }
-        });
+      } // 使用 Future.microtask 来延迟执行
+      Future.microtask(() async {
+        try {
+          // 使用 overrideQuery 参数，fetchData 内部会更新 query.value
+          await fetchData(
+            search.value,
+            searchMedia: media.value,
+            init: true,
+            overrideQuery: resetQuery,
+          );
+          refreshController.finishRefresh();
+        } catch (e) {
+          refreshController.finishRefresh(IndicatorResult.fail, false);
+        } finally {
+          refreshController.resetFooter();
+        }
+      });
       return null;
     }, [isDetailedMode]);
 

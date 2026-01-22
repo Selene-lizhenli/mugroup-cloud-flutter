@@ -5,19 +5,19 @@ import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-
 // 每个样品间 名称及图片
 class WarehouseShowCard extends ConsumerWidget {
   final Warehouse warehouse;
   final double imageHeight;
 
   const WarehouseShowCard({
-    super.key, 
+    super.key,
     required this.warehouse,
     required this.imageHeight,
   });
 
-  void _showImagePreview(BuildContext context, List<WarehouseImage> images, int initialIndex, String warehouseName) {
+  void showImagePreview(BuildContext context, List<WarehouseImage> images,
+      int initialIndex, String warehouseName) {
     int currentIndex = initialIndex;
     final pageController = PageController(initialPage: initialIndex);
 
@@ -43,7 +43,8 @@ class WarehouseShowCard extends ConsumerWidget {
                     },
                     itemBuilder: (context, index) {
                       final image = images[index];
-                      final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
+                      final imageUrl =
+                          image.thumbUrl ?? image.url ?? image.whiteUrl;
 
                       return Center(
                         child: InteractiveViewer(
@@ -54,15 +55,19 @@ class WarehouseShowCard extends ConsumerWidget {
                               ? Image.network(
                                   imageUrl,
                                   fit: BoxFit.contain,
-                                  loadingBuilder: (context, child, loadingProgress) {
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
-                                    return const Center(child: CircularProgressIndicator());
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   },
                                   errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.image_not_supported, color: Colors.grey, size: 48);
+                                    return const Icon(Icons.image_not_supported,
+                                        color: Colors.grey, size: 48);
                                   },
                                 )
-                              : const Icon(Icons.image_not_supported, color: Colors.grey, size: 48),
+                              : const Icon(Icons.image_not_supported,
+                                  color: Colors.grey, size: 48),
                         ),
                       );
                     },
@@ -73,7 +78,8 @@ class WarehouseShowCard extends ConsumerWidget {
                     left: 0,
                     right: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -115,7 +121,9 @@ class WarehouseShowCard extends ConsumerWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: index == currentIndex ? Colors.white : Colors.white.withOpacity(0.5),
+                            color: index == currentIndex
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
                           ),
                         ),
                       ),
@@ -130,11 +138,130 @@ class WarehouseShowCard extends ConsumerWidget {
     );
   }
 
+  void showNotOpenDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 图标容器
+              Container(
+                width: 64,
+                height: 64,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF3E0),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.lightbulb_outline,
+                  color: Color(0xFFFF9800),
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // 标题
+              const Text(
+                '独立样品间暂未开放',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1A1A1A),
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // 内容描述
+              const Text(
+                '敬请期待！',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF666666),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 28),
+              // 按钮
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                  ),
+                  child: const Text(
+                    '我知道了',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void onTrumbImageTap(context, images, index, warehouseName) {
+    if (warehouse.id == null) {
+      // 如果warehouse.id没有，显示弹窗提示
+      showNotOpenDialog(context);
+    } else {
+      // 正常显示图片预览
+      showImagePreview(context, images, index, warehouseName);
+    }
+  }
+
+  void onWarehouseTitleTap(context, homeNotifier) {
+    // 设置当前选中的样品间
+    // 点击样品间标题后切换到商品列表页（ProductView）
+    if (warehouse.id == null) {
+      showNotOpenDialog(context);
+      return;
+    }
+    homeNotifier.setCurrentSelectedWarehouse(warehouse);
+    homeNotifier.switchToProductView();
+  }
+ 
+  List<WarehouseImage> orderImages(Warehouse warehouse) {
+    final images = warehouse.image ?? [];
+    final buildingImages =
+        images.where((img) => isBuildingImage(img)).toList();
+    final otherImages = images.where((img) => !isBuildingImage(img)).toList();
+    return [...buildingImages, ...otherImages];
+  }
+
+  bool isBuildingImage(WarehouseImage image) {
+    final name = (image.filename ?? image.name ?? '').toLowerCase();
+    return name.startsWith('building');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeNotifier = ref.read(homeProvider.notifier);
-    final orderedImages = _orderedImages(warehouse);
-    final colorScheme = Theme.of(context).colorScheme;
+    final orderedImages = orderImages(warehouse);
 
     return Container(
       decoration: const BoxDecoration(
@@ -146,12 +273,7 @@ class WarehouseShowCard extends ConsumerWidget {
         children: [
           // 标题，点击跳转
           InkWell(
-            onTap: () {
-              // 设置当前选中的样品间
-              homeNotifier.setCurrentSelectedWarehouse(warehouse);
-              // 点击样品间标题后切换到商品列表页（ProductView）
-              homeNotifier.switchToProductView();
-            },
+            onTap: () => onWarehouseTitleTap(context, homeNotifier),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
               child: Row(
@@ -184,95 +306,7 @@ class WarehouseShowCard extends ConsumerWidget {
               child: _ImageGallery(
                 images: orderedImages,
                 warehouseName: warehouse.name ?? '-',
-                onImageTap: (context, images, index, warehouseName) {
-                  if (warehouse.id == null || warehouse.id == 0) {
-                    // 如果warehouse.id没有，显示弹窗提示
-                    showDialog(
-                      context: context,
-                      builder: (context) => Dialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 0,
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          constraints: const BoxConstraints(maxWidth: 320),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // 图标容器
-                              Container(
-                                width: 64,
-                                height: 64,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFFF3E0),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.lightbulb_outline,
-                                  color: Color(0xFFFF9800),
-                                  size: 32,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // 标题
-                              const Text(
-                                '独立样品间暂未开放',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF1A1A1A),
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              // 内容描述
-                              const Text(
-                                '敬请期待！',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF666666),
-                                  height: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                          
-                              const SizedBox(height: 28),
-                              // 按钮
-                              SizedBox(
-                                width: double.infinity,
-                                height: 48,
-                                child: ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:  colorScheme.primary,
-                                    foregroundColor: colorScheme.onPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                  ),
-                                  child: const Text(
-                                    '我知道了',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    // 正常显示图片预览
-                    _showImagePreview(context, images, index, warehouseName);
-                  }
-                },
+                onImageTap: onTrumbImageTap,
               ),
             ),
           ),
@@ -280,22 +314,7 @@ class WarehouseShowCard extends ConsumerWidget {
       ),
     );
   }
-
-  List<WarehouseImage> _orderedImages(Warehouse warehouse) {
-    final images = warehouse.image ?? [];
-    final buildingImages =
-        images.where((img) => _isBuildingImage(img)).toList();
-    final otherImages = images.where((img) => !_isBuildingImage(img)).toList();
-    return [...buildingImages, ...otherImages];
-  }
-
-  bool _isBuildingImage(WarehouseImage image) {
-    final name = (image.filename ?? image.name ?? '').toLowerCase();
-    return name.startsWith('building');
-  }
 }
-
-
 
 // 独立的图片画廊 Widget，使用 RepaintBoundary 优化性能
 class _ImageGallery extends StatelessWidget {
@@ -345,7 +364,8 @@ class _ImageGallery extends StatelessWidget {
                     color: Colors.grey.shade300,
                     child: imageUrl != null && imageUrl.isNotEmpty
                         ? GestureDetector(
-                            onTap: () => onImageTap(context, images, index, warehouseName),
+                            onTap: () => onImageTap(
+                                context, images, index, warehouseName),
                             child: ImageShow(
                               imageUrl: imageUrl,
                               fit: BoxFit.contain,
@@ -366,4 +386,3 @@ class _ImageGallery extends StatelessWidget {
     );
   }
 }
- 

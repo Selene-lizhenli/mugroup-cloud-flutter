@@ -136,9 +136,12 @@ class Home extends _$Home {
         ),
       ],
     );
+    // 过滤掉废弃的样品间
+    final filteredWarehouses =
+        warehouses.where((warehouse) => warehouse.abandoned != true).toList();
 
     state = state.copyWith(
-      warehouses: [...warehouses, independentWarehouse],
+      warehouses: [...filteredWarehouses, independentWarehouse],
       isLoadingWarehouses: false,
     );
   }
