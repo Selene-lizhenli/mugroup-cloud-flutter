@@ -205,22 +205,22 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                                   final dy = dyCandidate.clamp(
                                       0.0, chartDrawingHeight - textHeight);
 
-                                  return Expanded(
+                                return Expanded(
+                                  child: Transform.translate(
+                                    offset: Offset(0, dy),
                                     child: Align(
                                       alignment: Alignment.topCenter,
-                                      child: Transform.translate(
-                                        offset: Offset(0, dy),
-                                        child: Text(
-                                          rate.toStringAsFixed(4),
-                                          style: TextStyle(
-                                            color: colorScheme.onSurface,
-                                            fontSize: 8,
-                                            height: 1,
-                                          ),
+                                      child: Text(
+                                        rate.toStringAsFixed(4),
+                                        style: TextStyle(
+                                          color: colorScheme.onSurface,
+                                          fontSize: 6.5,
+                                          height: 1,
                                         ),
                                       ),
                                     ),
-                                  );
+                                  ),
+                                );
                                 }),
                               ),
                             ),
@@ -277,6 +277,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                     ],
                   ),
                 ),
+
                 AnimatedSize(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
@@ -288,7 +289,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                       itemCount: rates.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, // 每行两个
+                        crossAxisCount: 2, // 每行两个
                         crossAxisSpacing: 0,
                         mainAxisSpacing: 0,
                         childAspectRatio: 5.5, // 调整宽高比以适应内容
@@ -311,6 +312,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              const SizedBox(height: 4,),
                               Row(
                                 children: [
                                   Text(

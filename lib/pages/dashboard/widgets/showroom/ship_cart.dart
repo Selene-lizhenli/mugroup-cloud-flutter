@@ -166,8 +166,14 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                             style: TextStyle(
                                                 color: colorScheme.outline,
                                                 fontSize: 10),
-                                          ),
-                                          const SizedBox(width: 10),
+                                          ), 
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4), 
+                                       Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [ 
                                           Text(
                                             '${sampleDimensionConfigs[0]['label']}：${item.shippingAmount ?? ' '}',
                                             style: TextStyle(
