@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/services/media.dart';
@@ -297,7 +298,7 @@ class ImageUploader extends HookConsumerWidget {
             ),
             if (showBottomRecognize)
               Padding(
-                padding: const EdgeInsets.only(top: 8.0,left: 12),
+                padding: const EdgeInsets.only(top: 8.0, left: 12),
                 child: GestureDetector(
                   onTap: handleSmartRecognize,
                   child: Row(
@@ -394,7 +395,8 @@ class ImageUploader extends HookConsumerWidget {
             width: hasError ? 1.2 : 1.0,
           ),
         ),
-        child:   Icon(customIcon ?? Icons.add, color: Color(0xFF999999), size: 28),
+        child: Icon(customIcon ?? Icons.add,
+            color: const Color(0xFF999999), size: 28),
       ),
     );
   }
@@ -402,6 +404,7 @@ class ImageUploader extends HookConsumerWidget {
 
 class ContinuousCameraPage extends StatefulWidget {
   final List<CameraDescription> cameras;
+
   const ContinuousCameraPage({super.key, required this.cameras});
 
   @override
@@ -409,21 +412,36 @@ class ContinuousCameraPage extends StatefulWidget {
 }
 
 class _ContinuousCameraPageState extends State<ContinuousCameraPage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late CameraController _controller;
-  final List<XFile> _capturedImages = [];
+
+  final List<XFile?> _capturedImages = [];
+
+  int? _replaceIndex;
+
   final ScrollController _scrollController = ScrollController();
   bool _isReady = false;
-  bool _isFlashing = false;
+
+  late AnimationController _shutterAnimController;
+  late Animation<double> _shutterScaleAnim;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    _shutterAnimController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 100));
+    _shutterScaleAnim = Tween<double>(begin: 1.0, end: 0.85).animate(
+        CurvedAnimation(
+            parent: _shutterAnimController, curve: Curves.easeInOut));
+
     _initCamera();
   }
 
   Future<void> _initCamera() async {
+    if (widget.cameras.isEmpty) return;
+
     _controller = CameraController(
       widget.cameras[0],
       ResolutionPreset.high,
@@ -432,8 +450,11 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
           ? ImageFormatGroup.jpeg
           : ImageFormatGroup.bgra8888,
     );
+
     try {
       await _controller.initialize();
+
+      await _controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
       if (!mounted) return;
       setState(() => _isReady = true);
     } catch (e) {
@@ -446,6 +467,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     _scrollController.dispose();
+    _shutterAnimController.dispose();
     super.dispose();
   }
 
@@ -461,22 +483,33 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
   Future<void> _takePhoto() async {
     if (!_controller.value.isInitialized) return;
-    setState(() => _isFlashing = true);
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) setState(() => _isFlashing = false);
-    });
-    HapticFeedback.mediumImpact();
+
+    _shutterAnimController
+        .forward()
+        .then((_) => _shutterAnimController.reverse());
+    HapticFeedback.lightImpact();
 
     try {
       final file = await _controller.takePicture();
-      setState(() => _capturedImages.add(file));
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
+
+      setState(() {
+        if (_replaceIndex != null) {
+          if (_replaceIndex! < _capturedImages.length) {
+            _capturedImages[_replaceIndex!] = file;
+          }
+          _replaceIndex = null;
+        } else {
+          _capturedImages.add(file);
+
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutQuart,
+              );
+            }
+          });
         }
       });
     } catch (e) {
@@ -484,72 +517,101 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     }
   }
 
-  void _showImagePreview(XFile file) {
-    showDialog(
+  void _deleteAndRetake(int index) {
+    setState(() {
+      _capturedImages[index] = null;
+      _replaceIndex = index;
+    });
+  }
+
+  void _showImagePreview(int index) {
+    XFile? file = _capturedImages[index];
+    if (file == null) return;
+
+    showGeneralDialog(
       context: context,
-      useSafeArea: false,
+      barrierDismissible: true,
+      barrierLabel: "Preview",
       barrierColor: Colors.black,
-      builder: (ctx) {
-        return Stack(
-          children: [
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: Center(
-                  child: Image.file(File(file.path), fit: BoxFit.contain),
-                ),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 10,
-              right: 20,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (ctx, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
                   onTap: () => Navigator.pop(ctx),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Colors.black26,
-                      shape: BoxShape.circle,
-                    ),
-                    child:
-                        const Icon(Icons.close, color: Colors.white, size: 28),
+                  child: InteractiveViewer(
+                    child: Image.file(File(file.path), fit: BoxFit.contain),
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 40,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _capturedImages.remove(file);
-                      });
-                      Navigator.pop(ctx);
-                    },
-                    borderRadius: BorderRadius.circular(30),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(30),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded,
+                              color: Colors.white, size: 28),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                        Text("${index + 1}/${_capturedImages.length}",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600)),
+                        const SizedBox(width: 48),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _deleteAndRetake(index);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2C2C2C),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.refresh_rounded,
+                                color: Colors.amber, size: 20),
+                            SizedBox(width: 8),
+                            Text("重拍此页",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500)),
+                          ],
+                        ),
                       ),
-                      child: const Icon(Icons.delete_outline,
-                          color: Colors.white, size: 28),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -560,98 +622,188 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     if (!_isReady) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+        body: Center(
+            child:
+                CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
       );
     }
+
+    final int validCount = _capturedImages.where((e) => e != null).length;
+    final bool isRetakeMode = _replaceIndex != null;
+
+    const Color primaryColor = Color(0xFF007AFF);
+    const Color warningColor = Color(0xFFFF9500);
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Center(child: CameraPreview(_controller)),
-          if (_isFlashing)
-            Positioned.fill(
-                child: Container(color: Colors.white.withOpacity(0.5))),
-          if (_capturedImages.isNotEmpty)
-            Positioned(
-              bottom: 160,
-              left: 0,
-              right: 0,
-              height: 80,
-              child: Container(
-                color: Colors.black26,
-                child: ListView.separated(
-                  controller: _scrollController,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _capturedImages.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, index) {
-                    return _buildThumbnailItem(
-                        _capturedImages[index], index + 1);
-                  },
+          SizedBox.expand(child: CameraPreview(_controller)),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black54, Colors.transparent],
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Colors.black26,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, size: 20),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (isRetakeMode)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: warningColor.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.warning_amber_rounded,
+                                  size: 14, color: Colors.white),
+                              const SizedBox(width: 4),
+                              Text("正在重拍第 ${_replaceIndex! + 1} 张",
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      const Spacer(),
+                      const SizedBox(width: 40),
+                    ],
+                  ),
                 ),
               ),
             ),
+          ),
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              height: 160,
-              padding: const EdgeInsets.only(bottom: 20),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black87, Colors.transparent]),
-              ),
-              child: SafeArea(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                        icon: const Icon(Icons.close,
-                            color: Colors.white, size: 32),
-                        onPressed: () => Navigator.pop(context)),
-                    GestureDetector(
-                      onTap: _takePhoto,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_capturedImages.isNotEmpty)
+                  ClipRRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: Colors.grey.shade400, width: 4)),
-                        child: const Icon(Icons.camera_alt,
-                            size: 32, color: Colors.black54),
+                        height: 90,
+                        width: double.infinity,
+                        color: Colors.black.withOpacity(0.3),
+                        alignment: Alignment.centerLeft,
+                        child: ListView.separated(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _capturedImages.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 10),
+                          itemBuilder: (_, index) =>
+                              _buildThumbnailItem(index, isRetakeMode),
+                        ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context, _capturedImages),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                            color: _capturedImages.isEmpty
-                                ? Colors.white24
-                                : Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Text(
-                            _capturedImages.isEmpty
-                                ? '完成'
-                                : '完成(${_capturedImages.length})',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14)),
-                      ),
+                  ),
+                Container(
+                  color: Colors.black.withOpacity(0.6),
+                  padding: const EdgeInsets.only(top: 24, bottom: 48),
+                  child: SafeArea(
+                    top: false,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            width: 80,
+                            child: Center(
+                              child: Text("已拍 $validCount",
+                                  style: const TextStyle(
+                                      color: Colors.white54, fontSize: 12)),
+                            )),
+                        GestureDetector(
+                          onTap: _takePhoto,
+                          child: ScaleTransition(
+                            scale: _shutterScaleAnim,
+                            child: Container(
+                              width: 76,
+                              height: 76,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 4),
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isRetakeMode
+                                      ? warningColor
+                                      : Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                final result =
+                                    _capturedImages.whereType<XFile>().toList();
+                                Navigator.pop(context, result);
+                              },
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 200),
+                                opacity: validCount > 0 ? 1.0 : 0.5,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text("完成",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -659,37 +811,72 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     );
   }
 
-  Widget _buildThumbnailItem(XFile file, int number) {
+  Widget _buildThumbnailItem(int index, bool isGlobalRetakeMode) {
+    final XFile? file = _capturedImages[index];
+    final bool isTarget = _replaceIndex == index;
+
     return GestureDetector(
-      onTap: () => _showImagePreview(file),
-      child: Stack(
-        children: [
-          Container(
-            width: 60,
-            height: 80,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 1.5),
-                borderRadius: BorderRadius.circular(4)),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: Image.file(File(file.path), fit: BoxFit.cover)),
+      onTap: () {
+        if (file == null) {
+          setState(() => _replaceIndex = index);
+        } else {
+          _showImagePreview(index);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 56,
+        height: 76,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: isTarget
+              ? Border.all(color: const Color(0xFFFF9500), width: 2)
+              : Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          color: Colors.white.withOpacity(0.1),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (file != null)
+                Image.file(File(file.path), fit: BoxFit.cover)
+              else
+                Container(
+                  color: Colors.black12,
+                  child: const Center(
+                    child: Icon(Icons.add, color: Colors.white38, size: 20),
+                  ),
+                ),
+              if (isGlobalRetakeMode && !isTarget)
+                Container(color: Colors.black54),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  color: isTarget ? const Color(0xFFFF9500) : Colors.black54,
+                  child: Text(
+                    "${index + 1}",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              if (file == null && isTarget)
+                const Center(
+                    child: Text("补拍",
+                        style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold)))
+            ],
           ),
-          Positioned(
-            right: 4,
-            bottom: 4,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(2)),
-              child: Text("$number",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold)),
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
