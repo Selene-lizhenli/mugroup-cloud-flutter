@@ -1,3 +1,4 @@
+import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/exchange_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
 import 'package:cloud/pages/dashboard/widgets/market/market_purchase_chart.dart';
@@ -79,7 +80,7 @@ class DashboardModules {
       ),
     ];
   }
-
+ 
   /// 获取已选中的模块（按照设置页面中保存的排序顺序）
   static Future<List<ModuleInfo>> getSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
@@ -252,82 +253,33 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
         final currentDimension = ref.watch(dashboardStatsProvider
             .select((state) => state.sampleRoomDimension));
         return [
-          PopupMenuItem<String>(
-            value: '报价次数排行',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.leaderboard,
-                  size: 18,
-                  color: currentDimension == '报价次数排行'
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.grey,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '报价次数排行',
-                  style: TextStyle(
-                    color: currentDimension == '报价次数排行'
+          // 定义维度配置
+          ...sampleDimensionConfigs.map((config) =>
+            PopupMenuItem<String>(
+              value: config['value'],
+              child: Row(
+                children: [
+                  Icon(
+                    config['icon'],
+                    size: 18,
+                    color: currentDimension == config['value']
                         ? Theme.of(context).colorScheme.primary
-                        : null,
-                    fontWeight: currentDimension == '报价次数排行'
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                        : Colors.grey,
                   ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem<String>(
-            value: '产品目录',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.category,
-                  size: 18,
-                  color: currentDimension == '产品目录'
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.grey,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '产品目录',
-                  style: TextStyle(
-                    color: currentDimension == '产品目录'
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                    fontWeight: currentDimension == '产品目录'
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                  const SizedBox(width: 12),
+                  Text(
+                    config['label'],
+                    style: TextStyle(
+                      color: currentDimension == config['value']
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                      fontWeight: currentDimension == config['value']
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem<String>(
-            value: '样品间',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.warehouse,
-                  size: 18,
-                  color: currentDimension == '样品间'
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.grey,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '样品间',
-                  style: TextStyle(
-                    color: currentDimension == '样品间'
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                    fontWeight: currentDimension == '样品间'
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ];

@@ -1,6 +1,9 @@
+import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
@@ -45,7 +48,9 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   List<Level1CategoryStat> _dimensionData = []; // 数据（从API获取）
-  List<QuoteTopStats> _topDimensionData = []; //  数据 排行
+  List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 排行
+  List<ShipTopStats> _shipTopDimensionData = []; //  数据 排行
+
   bool _isLoading = false; // 数据加载状态
 
   // 颜色列表，用于分配颜色
@@ -67,12 +72,9 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     super.initState();
     // 初始化时强制将维度设置为「报价次数排行」，并根据该维度加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      const defaultDimension = '报价次数排行';
-      ref
-          .read(dashboardStatsProvider.notifier)
-          .setSampleRoomDimension(defaultDimension);
-      _lastLoadedDimension = defaultDimension;
-      _loadDimensionData(defaultDimension);
+      final sampleRoomDimension =
+          ref.read(dashboardStatsProvider).sampleRoomDimension;
+      _loadDimensionData(sampleRoomDimension);
     });
   }
 
@@ -150,6 +152,96 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     return result;
   }
 
+  handleCategoryData() async {
+    if (_dimensionData.isNotEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    final categoriesData = await getAllShowroomCategories();
+    logger.d('categoriesData: $categoriesData');
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        if (categoriesData != null && categoriesData.isNotEmpty) {
+          _dimensionData = buildLevel1Stats(categoriesData, rootId: 1);
+        } else {
+          _dimensionData = [];
+        }
+      });
+    }
+  }
+
+  handleShowroomData() async {
+    if (_dimensionData.isNotEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    final resp = await getWarehouses();
+    final warehouses = resp.data;
+    List<Level1CategoryStat> data;
+    if (warehouses.isNotEmpty) {
+      // 过滤掉 abandoned == true 的仓库
+      final activeWarehouses =
+          warehouses.where((warehouse) => warehouse.abandoned != true).toList();
+      data = activeWarehouses.asMap().entries.map((entry) {
+        final index = entry.key;
+        final warehouse = entry.value;
+        return Level1CategoryStat(
+          id: warehouse.id ?? index,
+          name: warehouse.name ?? '未命名样品间',
+          totalProductsCount: warehouse.sampleCount ?? 0,
+          color: _colorPalette[index % _colorPalette.length],
+        );
+      }).toList();
+    } else {
+      data = [];
+    }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _dimensionData = data;
+      });
+    }
+  }
+
+  handleQuoteRankData() async {
+    if (_quoteTopDimensionData.isNotEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    final resp = await getQuoteStatsSummary(
+        params: {"start": null, "end": null}); //获取排行数据
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _quoteTopDimensionData = resp ?? [];
+      });
+    }
+  }
+
+  handleShipRankData() async {
+    if (_shipTopDimensionData.isNotEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    final resp = await getShipStatsSummary(
+        params: {"start": null, "end": null}); //获取排行数据
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _shipTopDimensionData = resp ?? [];
+      });
+    }
+  }
+
   /// 根据维度加载数据
   Future<void> _loadDimensionData(String dimension) async {
     setState(() {
@@ -157,61 +249,15 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     });
     logger.d('dimension: $dimension');
     try {
-      if (dimension == '产品目录') {
-        // 加载产品目录数据（使用包含 count 的方法）
-        final categoriesData = await getAllShowroomCategories();
-
-        logger.d('categoriesData: $categoriesData');
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            if (categoriesData != null && categoriesData.isNotEmpty) {
-              _dimensionData = buildLevel1Stats(categoriesData, rootId: 1);
-            } else {
-              _dimensionData = [];
-            }
-          });
-        }
-      } else if (dimension == '样品间') {
-        // 加载样品间数据
-        final resp = await getWarehouses();
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            final warehouses = resp.data;
-            if (warehouses.isNotEmpty) {
-              // 过滤掉 abandoned == true 的仓库
-              final activeWarehouses = warehouses
-                  .where((warehouse) => warehouse.abandoned != true)
-                  .toList();
-
-              _dimensionData = activeWarehouses.asMap().entries.map((entry) {
-                final index = entry.key;
-                final warehouse = entry.value;
-                return Level1CategoryStat(
-                  id: warehouse.id ?? index,
-                  name: warehouse.name ?? '未命名样品间',
-                  totalProductsCount: warehouse.sampleCount ?? 0,
-                  color: _colorPalette[index % _colorPalette.length],
-                );
-              }).toList();
-            } else {
-              _dimensionData = [];
-            }
-          });
-        }
-      } else if (dimension == '报价次数排行') { 
-        // 加载报价次数排行数据
-        final resp = await getQuoteStatsSummary(
-            params: {"start": null, "end": null}); //获取排行数据
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _topDimensionData = resp ?? [];
-          });
-        }
+      if (dimension == sampleDimensionConfigs[3]['value']) {
+        handleCategoryData();
+      } else if (dimension == sampleDimensionConfigs[2]['value']) {
+        handleShowroomData();
+      } else if (dimension == sampleDimensionConfigs[1]['value']) {
+        handleQuoteRankData();
+      } else if (dimension == sampleDimensionConfigs[0]['value']) {
+        handleShipRankData();
       } else {
-        // 未知维度，设置为空数据
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -247,9 +293,6 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       dashboardStatsProvider.select((state) => state.sampleRoomDimension),
     );
 
-    // 使用从API获取的维度数据
-    final sampleRoomData = _dimensionData;
-
     return Container(
       padding: const EdgeInsets.all(16),
       clipBehavior: Clip.none, // 使用 ClipRect 在内部裁剪
@@ -257,14 +300,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 根据数据状态显示内容
-          if (_isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(40.0),
-                child: CircularProgressIndicator(),
-              ),
-            )
-          else if (currentDimension == '报价次数排行')
+          if (currentDimension == sampleDimensionConfigs[0]['value'])
             _isLoading
                 ? const Center(
                     child: Padding(
@@ -272,9 +308,18 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                       child: CircularProgressIndicator(),
                     ),
                   )
-                : TopChartContent(data: _topDimensionData)
+                : ShipTopChartContent(data: _shipTopDimensionData)
+          else if (currentDimension == sampleDimensionConfigs[1]['value'])
+            _isLoading
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : TopChartContent(data: _quoteTopDimensionData)
           else
-            ChartContent(sampleRoomData: sampleRoomData),
+            ChartContent(sampleRoomData: _dimensionData),
         ],
       ),
     );

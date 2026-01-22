@@ -1,9 +1,13 @@
+import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_provider.g.dart';
+
+/// 样品间模块维度的默认值（取配置数组的第一项的 value 值）
+final String sampleRoomDimensionDefault = sampleDimensionConfigs.first['value'] as String;
 
 /// 构建日期范围参数
 /// 返回包含 start_date 和 end_date 的参数字典
@@ -54,7 +58,8 @@ String _formatMonthLabel(String monthKey) {
 class DashboardStats extends _$DashboardStats {
   @override
   DashboardStatsState build() {
-    const dashboardStatsState = DashboardStatsState(
+     
+    final dashboardStatsState = DashboardStatsState(
       timeLabels: [],
       productData: [],
       customerData: [],
@@ -62,7 +67,7 @@ class DashboardStats extends _$DashboardStats {
       inspectionData: [],
       isLoading: false,
       timeDimension: TimeDimension.last6Months, 
-      sampleRoomDimension: '报价次数排行',
+      sampleRoomDimension: sampleRoomDimensionDefault,
     );
 
     return dashboardStatsState;

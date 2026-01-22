@@ -4,6 +4,7 @@ import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/models/dashboard/market_stats.dart';
 import 'package:cloud/models/dashboard/public_news_article.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/models/dashboard/stats.dart';
 
 /// 类型别名，用于向后兼容路由系统
@@ -55,6 +56,19 @@ Future<List<QuoteTopStats>?> getQuoteStatsSummary({
     }
     returnedData = (res.data as List).map((e) => QuoteTopStats.fromJson(e as Map<String, dynamic>)).toList();
     logger.d(' returnedData ${returnedData}'); 
+    return returnedData;  
+}
+
+Future<List<ShipTopStats>?> getShipStatsSummary({
+  Map<String, dynamic>? params,
+}) async { 
+    List<ShipTopStats>? returnedData;
+    final res = await api.get('api/tenant/showroom/samples/charts/shipmentamount',  ); 
+    if (res.data == null) { 
+      returnedData = null;
+    }
+    returnedData = (res.data as List).map((e) => ShipTopStats.fromJson(e as Map<String, dynamic>)).toList();
+    logger.d(' getShipStatsSummary returnedData ${returnedData}'); 
     return returnedData;  
 }
 

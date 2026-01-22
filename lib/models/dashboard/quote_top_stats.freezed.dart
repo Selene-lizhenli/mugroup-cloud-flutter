@@ -20,9 +20,10 @@ QuoteTopStats _$QuoteTopStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$QuoteTopStats {
-  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_no')
   String? get sampleNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'sample_id')
+  int? get sampleId => throw _privateConstructorUsedError;
   @JsonKey(name: 'count')
   int? get count => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_name')
@@ -45,8 +46,8 @@ abstract class $QuoteTopStatsCopyWith<$Res> {
       _$QuoteTopStatsCopyWithImpl<$Res, QuoteTopStats>;
   @useResult
   $Res call(
-      {String? name,
-      @JsonKey(name: 'sample_no') String? sampleNo,
+      {@JsonKey(name: 'sample_no') String? sampleNo,
+      @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
       @JsonKey(name: 'id') int? id,
@@ -66,22 +67,22 @@ class _$QuoteTopStatsCopyWithImpl<$Res, $Val extends QuoteTopStats>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
     Object? sampleNo = freezed,
+    Object? sampleId = freezed,
     Object? count = freezed,
     Object? sampleName = freezed,
     Object? id = freezed,
     Object? thumbUrl = freezed,
   }) {
     return _then(_value.copyWith(
-      name: freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
       sampleNo: freezed == sampleNo
           ? _value.sampleNo
           : sampleNo // ignore: cast_nullable_to_non_nullable
               as String?,
+      sampleId: freezed == sampleId
+          ? _value.sampleId
+          : sampleId // ignore: cast_nullable_to_non_nullable
+              as int?,
       count: freezed == count
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
@@ -111,8 +112,8 @@ abstract class _$$QuoteTopStatsImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? name,
-      @JsonKey(name: 'sample_no') String? sampleNo,
+      {@JsonKey(name: 'sample_no') String? sampleNo,
+      @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
       @JsonKey(name: 'id') int? id,
@@ -130,22 +131,22 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
     Object? sampleNo = freezed,
+    Object? sampleId = freezed,
     Object? count = freezed,
     Object? sampleName = freezed,
     Object? id = freezed,
     Object? thumbUrl = freezed,
   }) {
     return _then(_$QuoteTopStatsImpl(
-      name: freezed == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String?,
       sampleNo: freezed == sampleNo
           ? _value.sampleNo
           : sampleNo // ignore: cast_nullable_to_non_nullable
               as String?,
+      sampleId: freezed == sampleId
+          ? _value.sampleId
+          : sampleId // ignore: cast_nullable_to_non_nullable
+              as int?,
       count: freezed == count
           ? _value.count
           : count // ignore: cast_nullable_to_non_nullable
@@ -170,8 +171,8 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$QuoteTopStatsImpl implements _QuoteTopStats {
   const _$QuoteTopStatsImpl(
-      {this.name,
-      @JsonKey(name: 'sample_no') this.sampleNo,
+      {@JsonKey(name: 'sample_no') this.sampleNo,
+      @JsonKey(name: 'sample_id') this.sampleId,
       @JsonKey(name: 'count') this.count,
       @JsonKey(name: 'sample_name') this.sampleName,
       @JsonKey(name: 'id') this.id,
@@ -181,10 +182,11 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
       _$$QuoteTopStatsImplFromJson(json);
 
   @override
-  final String? name;
-  @override
   @JsonKey(name: 'sample_no')
   final String? sampleNo;
+  @override
+  @JsonKey(name: 'sample_id')
+  final int? sampleId;
   @override
   @JsonKey(name: 'count')
   final int? count;
@@ -201,7 +203,7 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
   @override
   String toString() {
-    return 'QuoteTopStats(name: $name, sampleNo: $sampleNo, count: $count, sampleName: $sampleName, id: $id, thumbUrl: $thumbUrl)';
+    return 'QuoteTopStats(sampleNo: $sampleNo, sampleId: $sampleId, count: $count, sampleName: $sampleName, id: $id, thumbUrl: $thumbUrl)';
   }
 
   @override
@@ -209,9 +211,10 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QuoteTopStatsImpl &&
-            (identical(other.name, name) || other.name == name) &&
             (identical(other.sampleNo, sampleNo) ||
                 other.sampleNo == sampleNo) &&
+            (identical(other.sampleId, sampleId) ||
+                other.sampleId == sampleId) &&
             (identical(other.count, count) || other.count == count) &&
             (identical(other.sampleName, sampleName) ||
                 other.sampleName == sampleName) &&
@@ -222,8 +225,8 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, sampleNo, count, sampleName, id, thumbUrl);
+  int get hashCode => Object.hash(
+      runtimeType, sampleNo, sampleId, count, sampleName, id, thumbUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -241,8 +244,8 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
 abstract class _QuoteTopStats implements QuoteTopStats {
   const factory _QuoteTopStats(
-          {final String? name,
-          @JsonKey(name: 'sample_no') final String? sampleNo,
+          {@JsonKey(name: 'sample_no') final String? sampleNo,
+          @JsonKey(name: 'sample_id') final int? sampleId,
           @JsonKey(name: 'count') final int? count,
           @JsonKey(name: 'sample_name') final String? sampleName,
           @JsonKey(name: 'id') final int? id,
@@ -253,10 +256,11 @@ abstract class _QuoteTopStats implements QuoteTopStats {
       _$QuoteTopStatsImpl.fromJson;
 
   @override
-  String? get name;
-  @override
   @JsonKey(name: 'sample_no')
   String? get sampleNo;
+  @override
+  @JsonKey(name: 'sample_id')
+  int? get sampleId;
   @override
   @JsonKey(name: 'count')
   int? get count;
