@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/crm/contact.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/helper/form_data_converter.dart';
+import 'package:cloud/models/crm/contact.dart' as crmContact;
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
@@ -16,6 +18,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 @RoutePage()
 class MarketProductCompanyCreatePage extends HookConsumerWidget {
   const MarketProductCompanyCreatePage({super.key});
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,14 +40,15 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
       try {
         final result = await identifyCompanyCard({'image': images});
 
-        if (result != null && result is Map<String, dynamic>) {
-          EasyLoading.showSuccess("识别成功");
-
-          formKey.currentState?.patchValue(result);
+        if (result != null) {
+          EasyLoading.showSuccess("识别成功"); 
+          final formValues = convertCompanyCardDataToFormValues(result);
+          formKey.currentState?.patchValue(formValues);
         } else {
           EasyLoading.dismiss();
         }
       } catch (e) {
+        logger.d('error$e');
         EasyLoading.showError('识别失败');
       }
     }
@@ -373,7 +377,7 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                         final hasContactName = values['contact_name'] != null &&
                             values['contact_name'].toString().isNotEmpty;
 
-                        Contact? newContact;
+                        crmContact.Contact? newContact;
                         if (hasContactName) {
                           final companyId = newCompany?.id;
                           // 4. 整理联系人数据 (映射回后端需要的标准字段名)

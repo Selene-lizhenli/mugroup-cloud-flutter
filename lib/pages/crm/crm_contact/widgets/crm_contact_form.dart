@@ -1,3 +1,5 @@
+import 'package:cloud/helper/form_data_converter.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -45,13 +47,14 @@ class CrmCotactForm extends HookConsumerWidget {
 
         if (result != null && result is Map<String, dynamic>) {
           EasyLoading.showSuccess("识别成功");
-
-          formKey.currentState?.patchValue(result);
+          final formValues = convertCompanyCardDataToFormValues(result);
+          formKey.currentState?.patchValue(formValues);
         } else {
           EasyLoading.dismiss();
         }
       } catch (e) {
-        EasyLoading.showError('识别失败');
+        logger.d('error$e');
+        EasyLoading.showError('识别失败$e');
       }
     }
 

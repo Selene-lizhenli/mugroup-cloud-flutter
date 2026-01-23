@@ -43,19 +43,20 @@ class CrmCompanyPage extends HookConsumerWidget {
           ],
         ),
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 8,
-            ),
-            HomeAppBar(
-              enableImageSearch: false,
-              controller: home.searchTextController,
-              onSearchText: (search) {
-                homeNotifier.setSearch(search);
-                home.bus.dispatch(
-                    SearchEvent(search: search, media: home.currentMedia));
-              },
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: HomeAppBar(
+                enableImageSearch: false,
+                controller: home.searchTextController,
+                onSearchText: (search) {
+                  homeNotifier.setSearch(search);
+                  home.bus.dispatch(
+                      SearchEvent(search: search, media: home.currentMedia));
+                },
+              ),
             ),
             Expanded(
               child: PageView(

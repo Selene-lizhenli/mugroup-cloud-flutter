@@ -1,4 +1,6 @@
 import 'package:cloud/http/api.dart';
+import 'package:cloud/models/company_card_data.dart';
+import 'package:cloud/models/sample/media.dart';
 
 Future translate(Map<String, dynamic>? data) async {
   return api.post("api/tenant/openai/translate", data: data).then(
@@ -23,13 +25,13 @@ Future identifySample(Map<String, dynamic>? data) async {
   );
 }
 
-Future identifyCompanyCard(Map<String, dynamic>? data) async {
+Future<CompanyCardData?> identifyCompanyCard(Map<String, dynamic>? data) async {
   return api.post("api/tenant/openai/identifyCompanyCard", data: data).then(
     (res) {
       if (res.data == null) {
         return null;
       }
-      return Map<String, dynamic>.from(res.data);
+      return CompanyCardData.fromJson(Map<String, dynamic>.from(res.data));
     },
   );
 }

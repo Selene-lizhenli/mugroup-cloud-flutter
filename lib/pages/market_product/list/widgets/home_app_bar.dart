@@ -122,11 +122,9 @@ class HomeAppBar extends HookConsumerWidget {
     return Column(
       children: [
         Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-          padding: const EdgeInsets.only(left: 8, right: 0, bottom: 0),
-          height: 40,
-          decoration: BoxDecoration(
+          width: double.infinity, 
+          height: 38,
+          decoration: BoxDecoration( 
             border: Border.all(
               color: colorScheme.primary,
               width: 1,
@@ -152,11 +150,7 @@ class HomeAppBar extends HookConsumerWidget {
                     fillColor: fillColor ?? Colors.transparent,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 10,
-                    ),
+                    focusedBorder: InputBorder.none, 
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (value) {

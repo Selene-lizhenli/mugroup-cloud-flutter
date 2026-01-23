@@ -84,8 +84,8 @@ class CompanyView extends HookConsumerWidget {
       };
     }, []);
 
-    return Container(
-        padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
+    return Container( 
+        margin: const EdgeInsets.fromLTRB(12, 2, 12, 0),
         decoration: BoxDecoration(
           color: colorScheme.surfaceTint,
           borderRadius: home.currentMediaId != null

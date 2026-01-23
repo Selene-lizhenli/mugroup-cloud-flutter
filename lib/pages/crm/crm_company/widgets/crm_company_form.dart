@@ -1,3 +1,5 @@
+import 'package:cloud/helper/form_data_converter.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -44,14 +46,15 @@ class CrmCompanyForm extends HookConsumerWidget {
         final result = await identifyCompanyCard({'image': images});
 
         if (result != null && result is Map<String, dynamic>) {
-          EasyLoading.showSuccess("识别成功");
-
-          formKey.currentState?.patchValue(result);
+          EasyLoading.showSuccess("识别成功"); 
+          final formValues = convertCompanyCardDataToFormValues(result);
+          formKey.currentState?.patchValue(formValues);
         } else {
           EasyLoading.dismiss();
         }
       } catch (e) {
-        EasyLoading.showError('识别失败');
+        logger.d('error$e');
+        EasyLoading.showError('识别失败$e');
       }
     }
 
@@ -63,7 +66,14 @@ class CrmCompanyForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
-                initialValue: initial?.toJson() ?? {},
+                initialValue: initial == null ? {} : {
+                  ...initial!.toJson(),
+                  'domain': initial!.domain?.whereType<String>().toList() ?? [],
+                  'email': initial!.email?.whereType<String>().toList() ?? [],
+                  'facebook': initial!.facebook?.whereType<String>().toList() ?? [],
+                  'linkedin': initial!.linkedin?.whereType<String>().toList() ?? [],
+                  'whatsapp': initial!.whatsapp?.whereType<String>().toList() ?? [],
+                },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -190,7 +200,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: '公司网址',
                               btnText: '添加公司网址',
-                              values: field.value ?? [''],
+                              values: field.value?.whereType<String>().toList() ?? [''],
                               onChanged: field.didChange,
                             );
                           },
@@ -201,7 +211,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: '邮箱',
                               btnText: '添加邮箱',
-                              values: field.value ?? [''],
+                              values: field.value?.whereType<String>().toList() ?? [''],
                               onChanged: field.didChange,
                             );
                           },
@@ -212,7 +222,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: 'LinkedIn',
                               btnText: '添加 LinkedIn',
-                              values: field.value ?? [''],
+                              values: field.value?.whereType<String>().toList() ?? [''],
                               onChanged: field.didChange,
                             );
                           },
@@ -223,7 +233,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: 'WhatsApp',
                               btnText: '添加 WhatsApp',
-                              values: field.value ?? [''],
+                              values: field.value?.whereType<String>().toList() ?? [''],
                               onChanged: field.didChange,
                             );
                           },
@@ -234,7 +244,7 @@ class CrmCompanyForm extends HookConsumerWidget {
                             return MultiInput(
                               label: 'Facebook',
                               btnText: '添加 Facebook',
-                              values: field.value ?? [''],
+                              values: field.value?.whereType<String>().toList() ?? [''],
                               onChanged: field.didChange,
                             );
                           },

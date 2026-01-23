@@ -48,14 +48,17 @@ class SupplySupplierPage extends HookConsumerWidget {
             const SizedBox(
               height: 8,
             ),
-            HomeAppBar(
-              controller: home.searchTextController,
-              onSearchText: (search) {
-                homeNotifier.setSearch(search);
-                home.bus.dispatch(
-                    SearchEvent(search: search, media: home.currentMedia));
-              },
-              enableImageSearch: false,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: HomeAppBar(
+                controller: home.searchTextController,
+                onSearchText: (search) {
+                  homeNotifier.setSearch(search);
+                  home.bus.dispatch(
+                      SearchEvent(search: search, media: home.currentMedia));
+                },
+                enableImageSearch: false,
+              ),
             ),
             Expanded(
               child: PageView(
