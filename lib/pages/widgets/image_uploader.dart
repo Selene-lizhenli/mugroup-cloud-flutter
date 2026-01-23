@@ -35,6 +35,9 @@ class ImageUploader extends HookConsumerWidget {
   /// false => 单击弹出菜单（包含“拍摄”和“相册”）
   final bool directCamera;
 
+  /// 新增参数：直接打开相册
+  final bool directGallery;
+
   /// 连拍开关：
   /// true  => 允许长按进入连拍模式
   /// false => 长按无效果
@@ -57,6 +60,7 @@ class ImageUploader extends HookConsumerWidget {
     this.recognizeAtBottom = false,
     // 默认设置：保留弹窗，关闭连拍
     this.directCamera = false,
+    this.directGallery = false,
     this.enableContinuous = false,
     this.onContinuousCapture,
     this.customIcon,
@@ -161,6 +165,10 @@ class ImageUploader extends HookConsumerWidget {
       if (directCamera) {
         // 模式一：直接进相机
         await openStandardCamera();
+      } else if (directGallery) {
+        // 优先级 2：直接进相册 (新增逻辑)
+        print(directGallery);
+        await openGallery();
       } else {
         // 模式二：弹窗选择 (相册 + 相机)
         await showFlanActionSheet(
