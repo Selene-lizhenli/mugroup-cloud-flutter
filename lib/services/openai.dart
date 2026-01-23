@@ -1,6 +1,7 @@
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/company_card_data.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:dio/dio.dart';
 
 Future translate(Map<String, dynamic>? data) async {
   return api.post("api/tenant/openai/translate", data: data).then(
@@ -50,9 +51,7 @@ Future identifySupplySuppliersCard(Map<String, dynamic>? data) async {
 }
 
 Future identifySupplierShopCard(Map<String, dynamic>? data) async {
-  return api
-      .post("api/tenant/openai/identifyStall", data: data)
-      .then(
+  return api.post("api/tenant/openai/identifyStall", data: data).then(
     (res) {
       if (res.data == null) {
         return null;
@@ -60,4 +59,27 @@ Future identifySupplierShopCard(Map<String, dynamic>? data) async {
       return Map<String, dynamic>.from(res.data);
     },
   );
+}
+
+Future identifyOcr(Map<String, dynamic>? data) async {
+  const url = "https://yw-host.964062.xyz:63019/mucloud/ai/ocr";
+
+  return api
+      .post(
+    url,
+    data: data,
+    options: Options(
+      headers: {
+        "x-access-token": "VEpPnatr9Ewv4RhmjKpcgqhChxwnzAmNmdanULPmoxm",
+        "x-action": "ExtractQtnBasic",
+        "Content-Type": "application/json",
+      },
+    ),
+  )
+      .then((res) {
+    if (res.data == null) {
+      return null;
+    }
+    return Map<String, dynamic>.from(res.data);
+  });
 }
