@@ -27,7 +27,6 @@ class InspectionDetailPage extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final colorScheme = Theme.of(context).colorScheme;
     final Color primaryColor = colorScheme.primary;
-    final Color secondaryColor = colorScheme.secondary;
 
     const Color bgGrey = Color(0xFFF5F7FA);
     const Color textDark = Color(0xFF333333);
@@ -98,11 +97,11 @@ class InspectionDetailPage extends HookConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          // 1. 刷新按钮 
-            IconButton(
+          // 1. 刷新按钮
+          IconButton(
             onPressed: () => refreshData(),
             icon: const Icon(Icons.refresh, size: 20),
-          ), 
+          ),
           TextButton(
             onPressed: () async {
               await showModalBottomSheet(
@@ -387,7 +386,7 @@ class InspectionDetailPage extends HookConsumerWidget {
           onPressed: () {
             showDialog(
               context: context,
-              barrierDismissible: false,
+              barrierDismissible: true,
               builder: (context) => ExportInspectionDialog(id: id),
             );
           },
@@ -447,17 +446,35 @@ class ExportInspectionDialog extends HookWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              '导出验货清单',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: textDark,
-              ),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                const Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '导出验货清单',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: textDark,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.close,
+                        color: Color(0xFF999999), size: 24),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             Row(
@@ -498,30 +515,72 @@ class ExportInspectionDialog extends HookWidget {
               ],
             ),
             const SizedBox(height: 16),
-            Text(
-              '如果不需要发送到邮箱，请点击下载',
-              style: TextStyle(color: Colors.grey[500], fontSize: 13),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                '如果不需要发送到邮箱，请点击下载',
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
             ),
             const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: textDark,
-                      side: BorderSide(color: Colors.grey[200]!),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        EasyLoading.show(status: '正在下载图片包...');
+
+                        var response = await exportInspectionImage(id);
+
+                        List<int> bytes;
+                        if (response.data is List<int>) {
+                          bytes = response.data;
+                        } else if (response.data is List) {
+                          bytes = List<int>.from(response.data);
+                        } else {
+                          throw Exception("数据格式错误: 预期为二进制流");
+                        }
+
+                        final directory = await getTemporaryDirectory();
+
+                        final fileName =
+                            '验货图片_${id}_${DateTime.now().millisecondsSinceEpoch}.zip';
+                        final filePath = '${directory.path}/$fileName';
+
+                        final file = File(filePath);
+                        await file.writeAsBytes(bytes);
+
+                        EasyLoading.dismiss();
+
+                        if (!context.mounted) return;
+                        final box = context.findRenderObject() as RenderBox?;
+
+                        await Share.shareXFiles(
+                          [XFile(filePath)],
+                          text: '这是验货任务 $id 的图片压缩包',
+                          subject: fileName,
+                          sharePositionOrigin:
+                              box!.localToGlobal(Offset.zero) & box.size,
+                        );
+                      } catch (e) {
+                        EasyLoading.dismiss();
+                        EasyLoading.showError('下载失败: $e');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      backgroundColor: const Color(0xFFFAFAFA),
+                      backgroundColor: primaryColor,
                     ),
-                    child: const Text('取消'),
+                    child: const Text('下载图片文件'),
                   ),
                 ),
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
@@ -557,7 +616,6 @@ class ExportInspectionDialog extends HookWidget {
                               box!.localToGlobal(Offset.zero) & box.size,
                         );
 
-                        // 4. 分享窗口关闭后，关闭当前的导出弹窗
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }
@@ -575,19 +633,18 @@ class ExportInspectionDialog extends HookWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    child: const Text('下载'),
+                    child: const Text('下载xlsx文件'), // 稍微改了下文案区分
                   ),
                 ),
                 const SizedBox(width: 12),
 
-                // 邮件发送按钮
+                // 邮件发送按钮 (保持不变)
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
                       final email = emailController.text;
                       Navigator.of(context).pop();
                       // TODO: 处理发送逻辑
-                      // print('Send to: $email');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,

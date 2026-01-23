@@ -117,6 +117,18 @@ Future exportInspection(int id) async {
   );
 }
 
+
+Future exportInspectionImage(int id) async {
+  return api.get(
+    "api/tenant/inspection/tasks/$id/exportImages",
+    options: Options(
+      responseType: ResponseType.bytes,
+      followRedirects: false,
+      receiveTimeout: const Duration(seconds: 60),
+    ),
+  );
+}
+
 Future<InspectionItem?> showInspectionItem(int id) async {
   return api.get("api/tenant/inspection/items/$id").then(
     (res) {
