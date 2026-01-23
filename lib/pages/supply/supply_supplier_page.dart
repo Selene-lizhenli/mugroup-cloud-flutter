@@ -43,7 +43,7 @@ class SupplySupplierPage extends HookConsumerWidget {
           ],
         ),
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
               height: 8,
@@ -59,6 +59,9 @@ class SupplySupplierPage extends HookConsumerWidget {
                 },
                 enableImageSearch: false,
               ),
+            ),
+             const SizedBox(
+              height: 8,
             ),
             Expanded(
               child: PageView(

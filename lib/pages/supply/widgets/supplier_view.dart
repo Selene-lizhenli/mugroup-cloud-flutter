@@ -110,7 +110,8 @@ class SupplierView extends HookConsumerWidget {
     }, []);
 
     return Container(
-        padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
+        margin: const EdgeInsets.fromLTRB(14, 2, 14, 0),
+        padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
         decoration: BoxDecoration(
           color: colorScheme.surfaceTint,
           borderRadius: home.currentMediaId != null

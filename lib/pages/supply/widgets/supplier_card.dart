@@ -90,7 +90,7 @@ class SupplierCard extends StatelessWidget {
                         color: Colors.grey.shade800,
                         height: 1.2,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
