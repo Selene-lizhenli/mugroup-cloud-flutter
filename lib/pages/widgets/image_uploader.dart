@@ -287,8 +287,7 @@ class ImageUploader extends HookConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(
-                child: Wrap(
+            Wrap(
               spacing: 10,
               runSpacing: 10,
               children: [
@@ -305,7 +304,7 @@ class ImageUploader extends HookConsumerWidget {
                     hasError: hasError,
                   ),
               ],
-            )),
+            ),
             if (showBottomRecognize)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 12),
