@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart'; 
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
@@ -218,7 +219,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                         width: 18,
                         height: 18,
                         child: MuProgressIndicator(
-                          muBarWidth: 4, 
+                          barWidth: 2, 
                         ),
                       )
                     : Text(

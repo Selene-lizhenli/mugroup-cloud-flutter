@@ -113,14 +113,14 @@ class ImageShow extends StatelessWidget {
         return SizedBox(
           width: width,
           child: const Center(
-            child: MuProgressIndicator(muBarWidth: 4),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else if (width == null && height != null) {
         return SizedBox(
           height: height,
           child: const Center(
-            child: MuProgressIndicator(muBarWidth: 4),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else if (width != null && height != null) {
@@ -128,14 +128,14 @@ class ImageShow extends StatelessWidget {
           width: width,
           height: height,
           child: const Center(
-            child: MuProgressIndicator(muBarWidth: 4),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else {
         return const AspectRatio(
           aspectRatio: 1,
           child: Center(
-            child: MuProgressIndicator(muBarWidth: 4),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       }

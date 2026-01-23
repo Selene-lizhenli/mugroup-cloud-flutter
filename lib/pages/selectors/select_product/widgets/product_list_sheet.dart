@@ -258,7 +258,7 @@ class ProductListSheet extends HookConsumerWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: MuProgressIndicator(muBarWidth: 2),
+          child: MuProgressIndicator(barWidth: 2),
         ),
       );
     } else if (state.error != null) {
@@ -297,9 +297,11 @@ class ProductListSheet extends HookConsumerWidget {
             if (state.isLoadingMore) {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: MuProgressIndicator(
-                    muBarWidth: 4, 
+                    barWidth: 2, 
                   ),
                 ),
               );

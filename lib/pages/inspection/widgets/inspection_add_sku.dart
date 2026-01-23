@@ -188,7 +188,7 @@ class InspectionAddSku extends HookConsumerWidget {
                     width: 24,
                     height: 24,
                     child: MuProgressIndicator(
-                      muBarWidth: 3.5,
+                      barWidth: 2.5,
                     ))
                 : Text(
                     isUploadMode ? '上传并解析' : '确认添加',

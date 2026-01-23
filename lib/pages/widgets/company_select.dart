@@ -251,7 +251,7 @@ class _CompanySelectSheet extends HookConsumerWidget {
           Expanded(
             child: isLoading.value
                 ? const Center(
-                    child: MuProgressIndicator(muBarWidth: 4),
+                    child: MuProgressIndicator(barWidth: 2),
                   )
                 : (companies.value == null || companies.value!.isEmpty)
                     ? Center(

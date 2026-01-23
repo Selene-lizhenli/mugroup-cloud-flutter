@@ -24,7 +24,7 @@ class MuProgressIndicator extends StatefulWidget {
   final Duration duration;
 
   /// 柱子宽度
-  final double muBarWidth;
+  final double barWidth;
 
   /// 柱子间距
   final double barSpacing;
@@ -50,7 +50,7 @@ class MuProgressIndicator extends StatefulWidget {
   const MuProgressIndicator({
     super.key,
     this.duration = const Duration(milliseconds: 800),
-    this. muBarWidth = 6.0,
+    this.barWidth = 6.0,
     this.barSpacing = 2.0,
     this.maxHeight = 30.0,
     this.minHeightRatio = 0.3,
@@ -102,7 +102,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
   Widget build(BuildContext context) {
 
     final colorScheme = Theme.of(context).colorScheme; 
-    final barWidth = widget. muBarWidth;
+    final barWidth = widget.barWidth;
     final barSpacing = widget.barSpacing;
     final maxHeight = widget.maxHeight;
     final minHeightRatio = widget.minHeightRatio;
@@ -160,7 +160,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
                text ?? '加载中...',
               style: TextStyle(
                   fontSize:  fontSize ?? 12.0,
-                  color:  textColor ?? colorScheme.outline),
+                  color:  textColor ?? colorScheme.onSurface),
             ),
           ),
       ],

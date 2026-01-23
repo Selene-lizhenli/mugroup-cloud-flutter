@@ -112,7 +112,7 @@ class SelectUserPage extends HookConsumerWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: MuProgressIndicator(muBarWidth: 2),
+          child: MuProgressIndicator(barWidth: 2),
         ),
       );
     }

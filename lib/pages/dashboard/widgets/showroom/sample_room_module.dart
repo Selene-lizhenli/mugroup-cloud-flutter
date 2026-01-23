@@ -377,9 +377,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(
-                            showText: true,
-                          ),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : ShipTopChartContent(data: _shipTopDimensionData)
@@ -388,9 +386,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(
-                            showText: true,
-                          ),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : TopChartContent(data: _quoteTopDimensionData)
@@ -399,9 +395,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(
-                            showText: true,
-                          ),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : CategoryChartContent(
@@ -411,9 +405,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(
-                            showText: true,
-                          ),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : ChartContent(sampleRoomData: _showroomDimensionData)
