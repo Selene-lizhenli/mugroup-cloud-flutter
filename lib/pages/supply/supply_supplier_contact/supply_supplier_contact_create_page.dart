@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/schema.dart';
+import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/dynamic_build_field.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
@@ -39,43 +40,116 @@ class SupplySupplierContactCreatePage extends HookConsumerWidget {
       );
     }
 
+    Future<void> handleSmartRecognize() async {
+      formKey.currentState?.save();
+      final images = formKey.currentState?.value['images'];
+
+      if (images == null || (images is List && images.isEmpty)) {
+        EasyLoading.showInfo("请先上传图片");
+        return;
+      }
+
+      await EasyLoading.show(
+          status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
+
+      try {
+        final result = await identifySupplySuppliersCard({'image': images});
+
+        if (result != null && result is Map<String, dynamic>) {
+          EasyLoading.showSuccess("识别成功");
+
+          formKey.currentState?.patchValue(result);
+        } else {
+          EasyLoading.dismiss();
+        }
+      } catch (e) {
+        EasyLoading.showError('识别失败');
+      }
+    }
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('供应商联系人创建')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: FormBuilder(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FormBuilderField<List<TemporaryMedia>>(
-                  name: "images",
-                  builder: (field) {
-                    return ImageUploader(
-                      label: "名片",
-                      customIcon: Icons.camera_alt,
-                      showRecognizeButton: true,
-                      recognizeApi: identifySupplySuppliersCard,
-                      onRecognizeResult: (data) {
-                        if (data != null && data is Map<String, dynamic>) {
-                          formKey.currentState?.patchValue(data);
-                          formKey.currentState?.save();
-                        }
-                      },
-                      value: field.value,
-                      onChanged: field.didChange,
-                    );
-                  },
-                ),
-                for (final item in schemas.value ?? [])
-                  DynamicBuildField(schema: item),
-              ],
+      appBar: AppBar(
+        title: const Text('供应商联系人创建'),
+        backgroundColor: colorScheme.surface,
+      ),
+      body: Column(children: [
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: FormBuilder(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  BuildFormCard(
+                    title: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        const Text(
+                          '名片',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '名片自动识别',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    action: GestureDetector(
+                      onTap: handleSmartRecognize,
+                      child: Row(
+                        children: [
+                          Icon(Icons.center_focus_weak,
+                              size: 16, color: Theme.of(context).primaryColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            "智能识别",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    children: [
+                      FormBuilderField<List<TemporaryMedia>>(
+                        name: "images",
+                        builder: (field) {
+                          return ImageUploader(
+                            customIcon: Icons.camera_alt,
+                            value: field.value,
+                            onChanged: field.didChange,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  BuildFormCard(
+                    title: '基本信息',
+                    children: [
+                      for (final item in schemas.value ?? [])
+                        DynamicBuildField(schema: item),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        ))
+      ]),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: ElevatedButton(
