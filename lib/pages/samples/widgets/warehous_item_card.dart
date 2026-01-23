@@ -341,7 +341,9 @@ class _ImageGallery extends StatelessWidget {
       );
     }
 
-    // 计算图片尺寸，限制内存使用
+    // 计算图片尺寸，限制内存使用 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageSize = (screenWidth * 0.5).round(); // 大约屏幕宽度的20%
 
     return Container(
       color: Colors.transparent,
@@ -353,7 +355,7 @@ class _ImageGallery extends StatelessWidget {
         itemBuilder: (context, index) {
           final image = images[index];
 
-          final imageUrl = image.url ?? image.thumbUrl ?? image.whiteUrl;
+          final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
           return RepaintBoundary(
             child: Padding(
               padding: EdgeInsets.only(
@@ -372,6 +374,8 @@ class _ImageGallery extends StatelessWidget {
                             child: ImageShow(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
+                              memCacheWidth: image.thumbUrl == null ? imageSize : null,
+                              memCacheHeight: image.thumbUrl == null ? imageSize : null,
                               enablePreview: false, // 禁用默认预览，使用自定义预览
                             ),
                           )
