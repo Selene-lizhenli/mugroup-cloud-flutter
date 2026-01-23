@@ -432,7 +432,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                                 width: 16,
                                 height: 16,
                                 child: MuProgressIndicator(
-                                  barWidth: 2, 
+                                  muBarWidth: 2, 
                                 ),
                               )
                             : Text(

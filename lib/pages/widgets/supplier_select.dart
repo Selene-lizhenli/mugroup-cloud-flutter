@@ -135,7 +135,7 @@ class SupplierSelect extends HookConsumerWidget {
                     child: SizedBox(
                       width: 24,
                       height: 24,
-                      child: MuProgressIndicator(barWidth: 2),
+                      child: MuProgressIndicator(),
                     ),
                   )
                 : (suppliers.value == null || suppliers.value!.isEmpty)

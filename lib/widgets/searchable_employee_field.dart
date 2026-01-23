@@ -196,7 +196,7 @@ class _SearchableEmployeeFieldState extends State<SearchableEmployeeField> {
                         child: SizedBox(
                           width: 16,
                           height: 16,
-                          child: MuProgressIndicator(barWidth: 2),
+                          child: MuProgressIndicator(muBarWidth: 4),
                         ),
                       )
                     : _controller.text.isNotEmpty
@@ -274,7 +274,10 @@ class _SearchableEmployeeFieldState extends State<SearchableEmployeeField> {
           ],
         ),
         // 空状态提示
-        if (_showList && !_loading && _list.isEmpty && _controller.text.trim().isNotEmpty)
+        if (_showList &&
+            !_loading &&
+            _list.isEmpty &&
+            _controller.text.trim().isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
@@ -289,4 +292,3 @@ class _SearchableEmployeeFieldState extends State<SearchableEmployeeField> {
     );
   }
 }
-

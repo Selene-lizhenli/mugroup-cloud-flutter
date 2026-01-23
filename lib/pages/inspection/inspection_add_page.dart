@@ -87,7 +87,7 @@ class InspectionAddPage extends HookConsumerWidget {
                         text: '*',
                         style: TextStyle(color: redColor, fontSize: 14),
                         children: const [
-                            TextSpan(
+                          TextSpan(
                             text: ' 任务标题',
                             style: TextStyle(color: labelColor, fontSize: 14),
                           ),
@@ -192,7 +192,7 @@ class InspectionAddPage extends HookConsumerWidget {
                         width: 20,
                         height: 20,
                         child: MuProgressIndicator(
-                          barWidth: 2, 
+                          muBarWidth: 4,
                         ),
                       )
                     : const Text(

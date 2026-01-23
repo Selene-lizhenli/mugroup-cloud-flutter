@@ -246,7 +246,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
       return const Center(
           child: Padding(
         padding: EdgeInsets.all(20.0),
-        child: MuProgressIndicator(barWidth: 2),
+        child: MuProgressIndicator(muBarWidth: 2),
       ));
     }
 

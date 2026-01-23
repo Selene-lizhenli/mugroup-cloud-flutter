@@ -218,7 +218,7 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                         width: 18,
                         height: 18,
                         child: MuProgressIndicator(
-                          barWidth: 2, 
+                          muBarWidth: 4, 
                         ),
                       )
                     : Text(

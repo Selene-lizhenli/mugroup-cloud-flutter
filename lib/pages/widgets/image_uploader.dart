@@ -624,7 +624,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     if (!_isReady) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(child: MuProgressIndicator(barWidth: 2)),
+        body: Center(child: MuProgressIndicator(muBarWidth: 4)),
       );
     }
 

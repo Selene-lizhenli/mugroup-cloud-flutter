@@ -454,7 +454,7 @@ class SupplierAddSheet extends HookConsumerWidget {
                       child: SizedBox(
                         width: 24,
                         height: 24,
-                        child: MuProgressIndicator(barWidth: 2),
+                        child: MuProgressIndicator(muBarWidth: 4),
                       ),
                     )
                   : (suppliers.value == null || suppliers.value!.isEmpty)
