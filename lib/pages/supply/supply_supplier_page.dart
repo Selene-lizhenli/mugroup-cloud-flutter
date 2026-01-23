@@ -60,9 +60,6 @@ class SupplySupplierPage extends HookConsumerWidget {
                 enableImageSearch: false,
               ),
             ),
-             const SizedBox(
-              height: 8,
-            ),
             Expanded(
               child: PageView(
                 controller: home.pageController,
