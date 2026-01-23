@@ -377,7 +377,9 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
+                          child: MuProgressIndicator(
+                            showText: true,
+                          ),
                         ),
                       )
                     : ShipTopChartContent(data: _shipTopDimensionData)
@@ -386,21 +388,49 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
+                          child: MuProgressIndicator(
+                            showText: true,
+                          ),
                         ),
                       )
                     : TopChartContent(data: _quoteTopDimensionData)
               else if (currentDimension == sampleDimensionConfigs[3]['value'])
-                CategoryChartContent(sampleRoomData: _categoryDimensionData)
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: MuProgressIndicator(
+                            showText: true,
+                          ),
+                        ),
+                      )
+                    : CategoryChartContent(
+                        sampleRoomData: _categoryDimensionData)
               else if (currentDimension == sampleDimensionConfigs[2]['value'])
-                ChartContent(sampleRoomData: _showroomDimensionData)
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: MuProgressIndicator(
+                            showText: true,
+                          ),
+                        ),
+                      )
+                    : ChartContent(sampleRoomData: _showroomDimensionData)
               else
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(40.0),
-                    child: Text("暂无数据"),
-                  ),
-                )
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: MuProgressIndicator(),
+                        ),
+                      )
+                    : const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: Text("暂无数据"),
+                        ),
+                      )
             ],
           ),
         )

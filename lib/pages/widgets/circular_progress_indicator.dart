@@ -160,7 +160,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
                text ?? '加载中...',
               style: TextStyle(
                   fontSize:  fontSize ?? 12.0,
-                  color:  textColor ?? colorScheme.onSurface),
+                  color:  textColor ?? colorScheme.outline),
             ),
           ),
       ],

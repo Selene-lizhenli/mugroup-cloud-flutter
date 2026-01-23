@@ -16,8 +16,10 @@ class SamplesPageView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
-    final warehouses = home.warehouses; 
-    final screenHeight = MediaQuery.of(context).size.height;  // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
+    final warehouses = home.warehouses;
+    final screenHeight = MediaQuery.of(context)
+        .size
+        .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
     final imageHeight = screenHeight * 0.2;
 
     useEffect(() {
@@ -29,7 +31,7 @@ class SamplesPageView extends HookConsumerWidget {
 
     if (home.isLoadingWarehouses) {
       return const Center(
-        child: MuProgressIndicator(),
+        child: MuProgressIndicator(showText: true),
       );
     }
     if (warehouses.isEmpty) {
