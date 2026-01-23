@@ -1,5 +1,6 @@
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -159,7 +160,7 @@ class SelectContactSheet extends HookConsumerWidget {
     }
 
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: MuProgressIndicator());
     }
 
     if (list.isEmpty) {

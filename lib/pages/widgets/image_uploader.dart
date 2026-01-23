@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -623,9 +624,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     if (!_isReady) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-            child:
-                CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+        body: Center(child: MuProgressIndicator(barWidth: 2)),
       );
     }
 

@@ -1,3 +1,4 @@
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
@@ -355,7 +356,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
       loading: () => Container(
         padding: const EdgeInsets.all(16),
         height: 300,
-        child: const Center(child: CircularProgressIndicator()),
+        child: const Center(child: MuProgressIndicator()),
       ),
       error: (error, stack) => Container(
         padding: const EdgeInsets.all(16),

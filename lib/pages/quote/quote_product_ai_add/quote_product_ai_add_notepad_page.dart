@@ -3,6 +3,7 @@ import 'dart:math'; // 用于随机生成行数
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:flant/components/image_preview.dart';
@@ -150,7 +151,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       alignment: Alignment.center,
                       child: Column(
                         children: [
-                          const CircularProgressIndicator(),
+                          const MuProgressIndicator(),
                           const SizedBox(height: 10),
                           Text("AI正在分析多张单据...",
                               style: TextStyle(

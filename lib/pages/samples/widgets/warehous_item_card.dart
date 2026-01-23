@@ -1,6 +1,7 @@
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -59,7 +60,11 @@ class WarehouseShowCard extends ConsumerWidget {
                                       (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
                                     return const Center(
-                                        child: CircularProgressIndicator());
+                                        child: MuProgressIndicator(
+                                      showText: true,
+                                      fontSize: 11,
+                                      textColor: Colors.white,
+                                    ));
                                   },
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Icon(Icons.image_not_supported,
@@ -244,11 +249,10 @@ class WarehouseShowCard extends ConsumerWidget {
     homeNotifier.setCurrentSelectedWarehouse(warehouse);
     homeNotifier.switchToProductView();
   }
- 
+
   List<WarehouseImage> orderImages(Warehouse warehouse) {
     final images = warehouse.image ?? [];
-    final buildingImages =
-        images.where((img) => isBuildingImage(img)).toList();
+    final buildingImages = images.where((img) => isBuildingImage(img)).toList();
     final otherImages = images.where((img) => !isBuildingImage(img)).toList();
     return [...buildingImages, ...otherImages];
   }

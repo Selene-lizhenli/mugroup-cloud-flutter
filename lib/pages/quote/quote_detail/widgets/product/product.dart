@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/supplier_with_products_card.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
@@ -96,7 +97,7 @@ class ProductSection extends HookConsumerWidget {
               const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 40),
-                  child: CircularProgressIndicator(),
+                  child: MuProgressIndicator(),
                 ),
               ),
             ] else if (state.products.isEmpty) ...[

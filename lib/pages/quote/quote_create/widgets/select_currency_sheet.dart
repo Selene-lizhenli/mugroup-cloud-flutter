@@ -1,5 +1,6 @@
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/providers/exchange.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -143,7 +144,7 @@ class SelectCurrencySheet extends HookConsumerWidget {
                 );
                 },
                 loading: () => const Center(
-                  child: CircularProgressIndicator(),
+                  child: MuProgressIndicator(),
                 ),
                 error: (error, stack) => Center(
                   child: Text(

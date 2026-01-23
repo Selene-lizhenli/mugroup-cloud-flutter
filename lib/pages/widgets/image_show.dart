@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 
 /// 可复用的图片展示组件
@@ -112,14 +113,14 @@ class ImageShow extends StatelessWidget {
         return SizedBox(
           width: width,
           child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else if (width == null && height != null) {
         return SizedBox(
           height: height,
           child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else if (width != null && height != null) {
@@ -127,14 +128,14 @@ class ImageShow extends StatelessWidget {
           width: width,
           height: height,
           child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       } else {
         return const AspectRatio(
           aspectRatio: 1,
           child: Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: MuProgressIndicator(barWidth: 2),
           ),
         );
       }

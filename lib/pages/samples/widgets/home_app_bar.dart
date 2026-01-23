@@ -1,13 +1,11 @@
-import 'package:auto_route/auto_route.dart';
+
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
-import 'package:cloud/pages/samples/widgets/home_media.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/pages/samples/widgets/home_media.dart'; 
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart'; 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';

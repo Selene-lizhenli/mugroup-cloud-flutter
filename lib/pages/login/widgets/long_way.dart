@@ -4,6 +4,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/pages/login/shared.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -212,8 +213,8 @@ class LoginWay extends HookConsumerWidget {
                         child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
+                          child: MuProgressIndicator(
+                            barWidth: 3,
                           ),
                         ),
                       ),

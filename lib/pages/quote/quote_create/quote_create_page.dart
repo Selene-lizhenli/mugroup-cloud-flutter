@@ -1,6 +1,6 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
+import 'package:auto_route/auto_route.dart'; 
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/quote_base_info_step.dart';
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
@@ -88,7 +88,7 @@ class _QuoteCreatePageState extends ConsumerState<QuoteCreatePage> {
           title: Text(isEditMode ? '编辑报价单' : '新增报价单'),
           backgroundColor: colorScheme.surface,
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(child: MuProgressIndicator()),
       );
     }
 
@@ -217,9 +217,8 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                     ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                        child: MuProgressIndicator(
+                          barWidth: 2, 
                         ),
                       )
                     : Text(

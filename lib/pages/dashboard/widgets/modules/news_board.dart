@@ -1,4 +1,5 @@
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/services/dashboard.dart';
@@ -64,7 +65,7 @@ class _NewsBoardState extends State<NewsBoard> {
         height: 70,
         margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: const Center(
-          child: CircularProgressIndicator(),
+          child: MuProgressIndicator(),
         ),
       );
     }

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/schema.dart';
 import 'package:cloud/models/supply/contact.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/dynamic_build_field.dart';
 import 'package:cloud/services/schema.dart';
 import 'package:cloud/services/supply.dart';
@@ -41,7 +42,7 @@ class SupplySupplierContactEditPage extends HookConsumerWidget {
 
     if (schemas.value == null || supplierContact.value == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: MuProgressIndicator()),
       );
     }
     return Scaffold(

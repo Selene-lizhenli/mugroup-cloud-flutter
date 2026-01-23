@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:cloud/pages/selectors/select_product/providers/product_selector_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/models/sample/sample.dart';
 
@@ -257,7 +258,7 @@ class ProductListSheet extends HookConsumerWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: MuProgressIndicator(barWidth: 2),
         ),
       );
     } else if (state.error != null) {
@@ -294,12 +295,11 @@ class ProductListSheet extends HookConsumerWidget {
           // 最后一项显示加载更多或没有更多
           if (index >= products.length) {
             if (state.isLoadingMore) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: colorScheme.primary,
+                  child: MuProgressIndicator(
+                    barWidth: 2, 
                   ),
                 ),
               );

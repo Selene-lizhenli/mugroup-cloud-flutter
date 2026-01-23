@@ -1,3 +1,4 @@
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -186,8 +187,9 @@ class InspectionAddSku extends HookConsumerWidget {
                 ? const SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2.5, color: Colors.white))
+                    child: MuProgressIndicator(
+                      barWidth: 2.5,
+                    ))
                 : Text(
                     isUploadMode ? '上传并解析' : '确认添加',
                     style: const TextStyle(

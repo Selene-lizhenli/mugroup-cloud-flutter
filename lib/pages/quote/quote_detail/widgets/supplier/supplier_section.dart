@@ -1,6 +1,7 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quote_supplier_group.dart';
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -37,7 +38,7 @@ class SupplierSection extends ConsumerWidget {
               if (state.isSupplierLoading) {
                 return const Padding(
                   padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: MuProgressIndicator()),
                 );
               }
 

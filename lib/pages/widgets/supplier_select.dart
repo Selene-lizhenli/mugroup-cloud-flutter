@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +135,7 @@ class SupplierSelect extends HookConsumerWidget {
                     child: SizedBox(
                       width: 24,
                       height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: MuProgressIndicator(barWidth: 2),
                     ),
                   )
                 : (suppliers.value == null || suppliers.value!.isEmpty)
@@ -148,7 +149,8 @@ class SupplierSelect extends HookConsumerWidget {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(24,17, 30, 17),
+                                padding:
+                                    const EdgeInsets.fromLTRB(24, 17, 30, 17),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
@@ -187,12 +189,12 @@ class SupplierSelect extends HookConsumerWidget {
                                                   fontWeight: FontWeight.w600,
                                                   color: colorScheme.secondary,
                                                 ),
-                                              ), 
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ],
-                                    ), 
+                                    ),
                                   ),
                                 ),
                               ),

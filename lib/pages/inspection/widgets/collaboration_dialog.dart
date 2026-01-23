@@ -1,5 +1,6 @@
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/inspection/providers/inspection_detail_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -230,7 +231,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
       return const Center(
           child: Padding(
         padding: EdgeInsets.all(20.0),
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: MuProgressIndicator(barWidth: 2),
       ));
     }
 

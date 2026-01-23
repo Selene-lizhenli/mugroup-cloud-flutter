@@ -3,6 +3,7 @@ import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/widgets/quote_item.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/stepper.dart';
@@ -208,7 +209,7 @@ class SampleItem extends HookWidget {
         ],
       ),
       child: loading.value == true
-          ? const CircularProgressIndicator()
+          ? const MuProgressIndicator()
           : ListView.builder(
               shrinkWrap: true,
               itemCount: quotes.value?.length,

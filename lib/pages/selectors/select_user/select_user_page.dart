@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/selectors/select_user/widgets/user_card.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/selectors/select_user/widgets/user_item.dart';
 import 'package:cloud/services/tenant.dart';
 import 'package:cloud/pages/widgets/search_tabbar.dart';
@@ -111,7 +112,7 @@ class SelectUserPage extends HookConsumerWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: MuProgressIndicator(barWidth: 2),
         ),
       );
     }

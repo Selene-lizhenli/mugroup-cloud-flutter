@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -50,7 +51,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
         padding: const EdgeInsets.all(16),
         height: 200,
         child: const Center(
-          child: CircularProgressIndicator(),
+          child: MuProgressIndicator(),
         ),
       );
     }

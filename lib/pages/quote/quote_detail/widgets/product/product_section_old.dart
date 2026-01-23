@@ -129,77 +129,7 @@ class ProductSection extends HookConsumerWidget {
         ));
   }
 
-  Widget _buildProductList(BuildContext context, QuoteDetailState state,
-      ColorScheme colorScheme, notifier, int? quoteId) {
-    if (state.isProductLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state.productError != null) {
-      return Center(
-        child: Text(
-          '产品加载失败',
-          style: TextStyle(color: colorScheme.error),
-        ),
-      );
-    }
-
-    if (state.products.isEmpty) {
-      return Center(
-          child: Text(
-        '暂无产品',
-        style: TextStyle(color: colorScheme.surfaceContainerHighest),
-      ));
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-      itemCount: state.products.length + 1, // +1 for pagination
-      separatorBuilder: (_, index) {
-        // 最后一个分隔符用于分页组件
-        if (index == state.products.length - 1) {
-          return const SizedBox(height: 8);
-        }
-        return const SizedBox(height: 10);
-      },
-      itemBuilder: (context, index) {
-        // 如果是最后一项，显示分页组件
-        if (index == state.products.length) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: PaginationBar(
-              currentPage: state.productPage,
-              totalPages: state.productTotalPages,
-              onPageChanged: (page) {
-                if (quoteId != null) {
-                  notifier.fetchProductsPage(quoteId, page);
-                }
-              },
-            ),
-          );
-        }
-        final row = state.products[index];
-        final sample = row.showroomSample;
-
-        final imageUrl = sample?.image?.isNotEmpty == true
-            ? sample!.image!.first.thumbUrl
-            : null;
-        if (sample == null) {
-          return const SizedBox.shrink();
-        }
-
-        return ProductDetailCard(
-          data: row,
-          imageUrl: imageUrl,
-          quoteId: quoteId,
-          quoteCurrency: state.baseInfo?.curreny ?? '',
-          supplierShow: true,
-          refreshCallback: () =>
-              notifier.fetchProductsPage(quoteId, state.productPage),
-        );
-      },
-    );
-  }
+ 
 
   Widget _buildSupplierList(
     BuildContext context,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -250,7 +251,7 @@ class _CompanySelectSheet extends HookConsumerWidget {
           Expanded(
             child: isLoading.value
                 ? const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: MuProgressIndicator(barWidth: 2),
                   )
                 : (companies.value == null || companies.value!.isEmpty)
                     ? Center(

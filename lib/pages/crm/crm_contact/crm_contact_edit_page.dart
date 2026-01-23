@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/pages/crm/crm_contact/widgets/crm_contact_form.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -33,7 +34,7 @@ class CrmContactEditPage extends HookConsumerWidget {
 
     if (isLoading.value) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: MuProgressIndicator()),
       );
     }
 

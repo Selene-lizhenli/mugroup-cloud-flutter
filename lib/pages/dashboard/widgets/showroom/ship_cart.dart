@@ -345,7 +345,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                               '$shippingAmount',
                               style: TextStyle(
                                 color: colorScheme.onSurface,
-                                fontSize: 8,
+                                fontSize: 7,
                               ),
                             ),
                           ),

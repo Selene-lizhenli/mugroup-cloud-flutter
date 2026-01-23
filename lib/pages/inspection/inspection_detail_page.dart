@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
@@ -121,7 +122,7 @@ class InspectionDetailPage extends HookConsumerWidget {
         ],
       ),
       body: isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MuProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(12),
               child: Column(

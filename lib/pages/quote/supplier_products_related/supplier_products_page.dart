@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/providers/quote_detail_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -226,7 +227,7 @@ class SupplierProductsPage extends HookConsumerWidget {
     ValueChanged<int> onPageChanged,
   ) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: MuProgressIndicator());
     }
 
     if (error != null) {

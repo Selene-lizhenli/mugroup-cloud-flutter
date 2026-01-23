@@ -1,5 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -82,7 +83,7 @@ class _ModuleLineChartState extends ConsumerState<ModuleLineChart> {
         padding: widget.padding,
         height: widget.height,
         child: const Center(
-          child: CircularProgressIndicator(),
+          child: MuProgressIndicator(),
         ),
       );
     }

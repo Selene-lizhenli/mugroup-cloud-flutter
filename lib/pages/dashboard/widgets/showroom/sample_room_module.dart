@@ -5,6 +5,7 @@ import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/category_cart.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
@@ -376,7 +377,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: CircularProgressIndicator(),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : ShipTopChartContent(data: _shipTopDimensionData)
@@ -385,7 +386,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: CircularProgressIndicator(),
+                          child: MuProgressIndicator(),
                         ),
                       )
                     : TopChartContent(data: _quoteTopDimensionData)

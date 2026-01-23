@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_sample_form.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -25,7 +26,7 @@ class ShowroomSampleEditPage extends HookConsumerWidget {
 
     if (sample.value == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: MuProgressIndicator()),
       );
     }
 

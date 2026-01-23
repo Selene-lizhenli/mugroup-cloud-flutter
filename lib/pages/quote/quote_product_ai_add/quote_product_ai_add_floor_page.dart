@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:flant/components/image_preview.dart';
@@ -122,7 +123,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                       alignment: Alignment.center,
                       child: Column(
                         children: [
-                          const CircularProgressIndicator(),
+                          const MuProgressIndicator(),
                           const SizedBox(height: 10),
                           Text("正在识别中...",
                               style: TextStyle(

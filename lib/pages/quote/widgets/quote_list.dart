@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 
 class BuildQuoteList extends StatelessWidget {
   final bool isLoading;
@@ -30,7 +31,7 @@ class BuildQuoteList extends StatelessWidget {
 
     return Expanded(
       child: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MuProgressIndicator())
           : RefreshIndicator(
               onRefresh: onRefresh,
               child: ListView.builder(
@@ -49,7 +50,7 @@ class BuildQuoteList extends StatelessWidget {
                     if (isLoadingMore) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(child: MuProgressIndicator()),
                       );
                     } else if (!hasMore) {
                       return Padding(

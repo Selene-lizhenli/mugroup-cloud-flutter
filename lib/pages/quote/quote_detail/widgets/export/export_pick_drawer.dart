@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -430,11 +431,8 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
+                                child: MuProgressIndicator(
+                                  barWidth: 2, 
                                 ),
                               )
                             : Text(

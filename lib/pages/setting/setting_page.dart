@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/exchange_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/dashboard/widgets/market/market_purchase_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_module.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
@@ -248,7 +249,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
     final notifier = ref.read(coreProvider.notifier);
     if (_loading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: MuProgressIndicator()),
       );
     }
 

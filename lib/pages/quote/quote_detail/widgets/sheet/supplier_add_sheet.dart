@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
@@ -453,7 +454,7 @@ class SupplierAddSheet extends HookConsumerWidget {
                       child: SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: MuProgressIndicator(barWidth: 2),
                       ),
                     )
                   : (suppliers.value == null || suppliers.value!.isEmpty)
