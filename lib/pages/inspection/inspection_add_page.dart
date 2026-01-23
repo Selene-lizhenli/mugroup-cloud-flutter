@@ -63,25 +63,6 @@ class InspectionAddPage extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.check_circle_outline,
-                            color: primaryColor, size: 22),
-                        const SizedBox(width: 8),
-                        const Text(
-                          '新增验货任务',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: labelColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(
-                        height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-                    const SizedBox(height: 20),
                     RichText(
                       text: TextSpan(
                         text: '*',
