@@ -20,14 +20,13 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
   final int id;
   const InspectionItemConfirmPage({super.key, required this.id});
 
- 
   static const _cBg = Color(0xFFF5F6FA);
   static const _cText = Color(0xFF333333);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final Color primaryColor = colorScheme.primary; 
+    final Color primaryColor = colorScheme.primary;
 
     final inspectionItem = useState<InspectionItem?>(null);
     final isLoading = useState(true);
@@ -479,6 +478,7 @@ class _PhotoCard extends HookConsumerWidget {
                     maxCount: 50,
                     value: detailsList,
                     directCamera: isDirectCamera.value,
+                    directGallery: !isDirectCamera.value,
                     enableContinuous: false,
                     onChanged: (list) => onMediaChanged('details', list),
                   ),
@@ -565,6 +565,7 @@ class _PhotoCard extends HookConsumerWidget {
                 maxCount: 1,
                 value: mediaMap[apiKey] ?? [],
                 directCamera: isDirectCamera,
+                directGallery: !isDirectCamera,
                 enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
                 onContinuousCapture: onContinuousCapture,
