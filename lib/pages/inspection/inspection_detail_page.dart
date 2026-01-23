@@ -441,226 +441,255 @@ class ExportInspectionDialog extends HookWidget {
 
     final emailController = useTextEditingController();
 
-    return Dialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                const Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    '导出验货清单',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: textDark,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(Icons.close,
-                        color: Color(0xFF999999), size: 24),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                const Text(
-                  '邮箱',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Color(0xFF666666),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: SizedBox(
-                    height: 40,
-                    child: TextField(
-                      controller: emailController,
-                      style: const TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        hintText: '请输入接收验货清单的邮箱',
-                        hintStyle:
-                            TextStyle(color: Colors.grey[400], fontSize: 13),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: borderColor),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: primaryColor),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+    final isDownloading = useState(false);
+
+    return PopScope(
+      canPop: !isDownloading.value,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '导出验货清单',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textDark,
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                '如果不需要发送到邮箱，请点击下载',
-                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(Icons.close,
+                          color: Color(0xFF999999), size: 24),
+                      onPressed: isDownloading.value
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        EasyLoading.show(status: '正在下载图片包...');
-
-                        var response = await exportInspectionImage(id);
-
-                        List<int> bytes;
-                        if (response.data is List<int>) {
-                          bytes = response.data;
-                        } else if (response.data is List) {
-                          bytes = List<int>.from(response.data);
-                        } else {
-                          throw Exception("数据格式错误: 预期为二进制流");
-                        }
-
-                        final directory = await getTemporaryDirectory();
-
-                        final fileName =
-                            '验货图片_${id}_${DateTime.now().millisecondsSinceEpoch}.zip';
-                        final filePath = '${directory.path}/$fileName';
-
-                        final file = File(filePath);
-                        await file.writeAsBytes(bytes);
-
-                        EasyLoading.dismiss();
-
-                        if (!context.mounted) return;
-                        final box = context.findRenderObject() as RenderBox?;
-
-                        await Share.shareXFiles(
-                          [XFile(filePath)],
-                          text: '这是验货任务 $id 的图片压缩包',
-                          subject: fileName,
-                          sharePositionOrigin:
-                              box!.localToGlobal(Offset.zero) & box.size,
-                        );
-                      } catch (e) {
-                        EasyLoading.dismiss();
-                        EasyLoading.showError('下载失败: $e');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      backgroundColor: primaryColor,
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  const Text(
+                    '邮箱',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Color(0xFF666666),
+                      fontWeight: FontWeight.w500,
                     ),
-                    child: const Text('下载图片文件'),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        EasyLoading.show(status: '正在导出...');
-
-                        var response = await exportInspection(id);
-                        List<int> bytes;
-                        if (response.data is List<int>) {
-                          bytes = response.data;
-                        } else if (response.data is List) {
-                          bytes = List<int>.from(response.data);
-                        } else {
-                          throw Exception("数据格式错误");
-                        }
-
-                        final directory = await getTemporaryDirectory();
-                        final fileName =
-                            '验货清单_${id}_${DateTime.now().millisecondsSinceEpoch}.xlsx';
-                        final filePath = '${directory.path}/$fileName';
-                        final file = File(filePath);
-                        await file.writeAsBytes(bytes);
-
-                        EasyLoading.dismiss();
-
-                        final box = context.findRenderObject() as RenderBox?;
-
-                        await Share.shareXFiles(
-                          [XFile(filePath)],
-                          text: '这是验货任务 $id 的清单文件',
-                          subject: fileName,
-                          sharePositionOrigin:
-                              box!.localToGlobal(Offset.zero) & box.size,
-                        );
-
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                        }
-                      } catch (e) {
-                        EasyLoading.dismiss();
-                        EasyLoading.showError('导出失败: $e');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: TextField(
+                        controller: emailController,
+                        enabled: !isDownloading.value,
+                        style: const TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: '请输入接收验货清单的邮箱',
+                          hintStyle:
+                              TextStyle(color: Colors.grey[400], fontSize: 13),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: borderColor),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: primaryColor),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey[200]!),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
                       ),
                     ),
-                    child: const Text('下载xlsx文件'), // 稍微改了下文案区分
                   ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '如果不需要发送到邮箱，请点击下载',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
                 ),
-                const SizedBox(width: 12),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isDownloading.value
+                          ? null
+                          : () async {
+                              isDownloading.value = true;
+                              try {
+                                EasyLoading.show(status: '正在下载图片包...');
 
-                // 邮件发送按钮 (保持不变)
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final email = emailController.text;
-                      Navigator.of(context).pop();
-                      // TODO: 处理发送逻辑
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                                var response = await exportInspectionImage(id);
+
+                                List<int> bytes;
+                                if (response.data is List<int>) {
+                                  bytes = response.data;
+                                } else if (response.data is List) {
+                                  bytes = List<int>.from(response.data);
+                                } else {
+                                  throw Exception("数据格式错误: 预期为二进制流");
+                                }
+
+                                final directory = await getTemporaryDirectory();
+                                final fileName =
+                                    '验货图片_${id}_${DateTime.now().millisecondsSinceEpoch}.zip';
+                                final filePath = '${directory.path}/$fileName';
+
+                                final file = File(filePath);
+                                await file.writeAsBytes(bytes);
+
+                                EasyLoading.dismiss();
+
+                                if (!context.mounted) return;
+                                final box =
+                                    context.findRenderObject() as RenderBox?;
+
+                                await Share.shareXFiles(
+                                  [XFile(filePath)],
+                                  text: '这是验货任务 $id 的图片压缩包',
+                                  subject: fileName,
+                                  sharePositionOrigin:
+                                      box!.localToGlobal(Offset.zero) &
+                                          box.size,
+                                );
+                              } catch (e) {
+                                EasyLoading.dismiss();
+                                EasyLoading.showError('下载失败: $e');
+                              } finally {
+                                isDownloading.value = false;
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        backgroundColor: primaryColor,
                       ),
+                      child: const Text('下载图片文件'),
                     ),
-                    child: const Text('邮件发送'),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isDownloading.value
+                          ? null
+                          : () async {
+                              isDownloading.value = true;
+                              try {
+                                EasyLoading.show(status: '正在导出...');
+
+                                var response = await exportInspection(id);
+                                List<int> bytes;
+                                if (response.data is List<int>) {
+                                  bytes = response.data;
+                                } else if (response.data is List) {
+                                  bytes = List<int>.from(response.data);
+                                } else {
+                                  throw Exception("数据格式错误");
+                                }
+
+                                final directory = await getTemporaryDirectory();
+                                final fileName =
+                                    '验货清单_${id}_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+                                final filePath = '${directory.path}/$fileName';
+                                final file = File(filePath);
+                                await file.writeAsBytes(bytes);
+
+                                EasyLoading.dismiss();
+
+                                if (!context.mounted) return;
+                                final box =
+                                    context.findRenderObject() as RenderBox?;
+
+                                await Share.shareXFiles(
+                                  [XFile(filePath)],
+                                  text: '这是验货任务 $id 的清单文件',
+                                  subject: fileName,
+                                  sharePositionOrigin:
+                                      box!.localToGlobal(Offset.zero) &
+                                          box.size,
+                                );
+
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              } catch (e) {
+                                EasyLoading.dismiss();
+                                EasyLoading.showError('导出失败: $e');
+                              } finally {
+                                isDownloading.value = false;
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      child: const Text('下载xlsx文件'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isDownloading.value
+                          ? null
+                          : () {
+                              final email = emailController.text;
+                              Navigator.of(context).pop();
+                              // TODO: 处理发送逻辑
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      child: const Text('邮件发送'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
