@@ -1,4 +1,5 @@
 import 'package:cloud/core/rx_bus.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -7,6 +8,7 @@ import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/models/home_state.dart';
 import 'package:cloud/services/wms.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -33,6 +35,10 @@ class Home extends _$Home {
       supplierNoMore: false,
       warehouses: [],
       isLoadingWarehouses: false,
+      query: {},
+      productCurrentPage: 1,
+      productNoMore: false,
+      productListLoading: false,
     );
 
     return homeState;
@@ -163,5 +169,57 @@ class Home extends _$Home {
 
   void setViewMode(bool isDetailed) {
     state = state.copyWith(isDetailedMode: isDetailed);
+  }
+
+  void setQuery(Map<String, dynamic> newQuery) {
+    state = state.copyWith(query: newQuery);
+  }
+
+  Future<ApiResponse<List<Sample>>> fetchSamples({
+    String? searchText,
+    bool? init = false,
+    TemporaryMedia? searchMedia,
+  }) async {
+    // 准备查询参数（使用当前状态）
+    final currentPage = init == true ? 1 : state.productCurrentPage;
+    final queryParameters = {
+      "search": searchText ?? state.search,
+      if (searchMedia != null) "image": searchMedia.id,
+      "item_type": "sample", // 样品间数据
+      "page": currentPage,
+      "pageSize": 20,
+      "includes": 'supplyQuotes.supplier',
+      if (state.isDetailedMode == true) ...state.query,
+      if (state.currentSelectedWarehouse != null)
+        'warehouse_id': state.currentSelectedWarehouse!.id.toString()
+    };
+    logger.d('样品列表查询参数$queryParameters');
+    final resp = await getSamples(queryParameters: queryParameters);
+
+    // 使用 addPostFrameCallback 延迟状态更新，避免在构建过程中修改状态
+
+    var updatedState = state.copyWith(
+      search: searchText,
+      // media: searchMedia != null ? [searchMedia] : state.media,
+      currentMediaId: searchMedia?.id,
+      productListLoading: false,
+      samples: (init == true || currentPage == 1)
+          ? resp.data
+          : [...state.samples, ...resp.data],
+      productNoMore: resp.data.length < 20,
+    );
+    if (state.productCurrentPage == 1 && state.facetCounts.isEmpty) {
+      updatedState = updatedState.copyWith(
+        facetCounts: resp.meta?.facetCounts ?? [],
+      );
+    }
+    if (resp.data.length >= 20) {
+      updatedState = updatedState.copyWith(
+        productCurrentPage: state.productCurrentPage + 1,
+      );
+    }
+    state = updatedState;
+
+    return resp;
   }
 }

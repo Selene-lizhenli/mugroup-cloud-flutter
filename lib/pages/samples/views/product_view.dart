@@ -1,14 +1,11 @@
 import 'package:cloud/hooks/hooks.dart';
-import 'package:cloud/models/response.dart';
-import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/pages/samples/widgets/product_card_detailed.dart';
 import 'package:cloud/pages/samples/widgets/product_dropdown_menu.dart';
-import 'package:cloud/services/sample.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -32,25 +29,9 @@ class ProductView extends HookConsumerWidget {
       controlFinishRefresh: true,
     );
     final home = ref.watch(homeProvider);
-    final currentHome = ref.read(homeProvider);
-    final isDetailedMode = home.isDetailedMode;
-    final search = useState(home.search);
-    // 初始化 query，如果有选中的样品间，将其添加到 query 中
-    final initialQuery = <String, dynamic>{};
-    if (home.currentSelectedWarehouse != null &&
-        home.currentSelectedWarehouse!.id != 0) {
-      initialQuery['warehouse_id'] =
-          home.currentSelectedWarehouse!.id.toString();
-    }
-    final query = useState<Map<String, dynamic>>(initialQuery);
-    final previousMode = useRef(isDetailedMode);
-    final media = useState<TemporaryMedia?>(home.currentMedia);
-    final page = useRef(1);
-    final samples = useState<List<Sample>>(<Sample>[]);
-    final facetCounts = useState(<FacetCount>[]);
-    final showDropDown = useState(isDetailedMode);
+    final productListLoading = home.productListLoading;
+    final homeNotifier = ref.read(homeProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
-
     final mediaQuery = MediaQuery.of(context);
 
     var crossAxisCount = 2;
@@ -63,77 +44,14 @@ class ProductView extends HookConsumerWidget {
       crossAxisCount = 4;
     }
 
-    fetchData(
-      String? searchText, {
-      bool? init = false,
-      TemporaryMedia? searchMedia,
-      Map<String, dynamic>? overrideQuery,
-    }) async {
-      search.value = searchText;
-      media.value = searchMedia;
-      if (init == true) {
-        page.value = 1;
-      }
-
-      final queryParameters = {
-        "search": searchText,
-        if (searchMedia != null) "image": searchMedia.id,
-        "item_type": "all",
-        "page": page.value,
-        "pageSize": pageSize,
-        "includes": 'supplyQuotes.supplier',
-        ...(overrideQuery ?? query.value),
-      };
-      final resp = await getSamples(queryParameters: queryParameters);
-
-      // 如果提供了 overrideQuery，在更新 samples 之前先更新 query.value
-      // 这样 query 和 samples 的更新会在同一个同步代码块中，可能被批处理合并
-      if (overrideQuery != null) {
-        query.value = overrideQuery;
-      }
-
-      // 根据是否是精简模式来更新 showDropDown
-      showDropDown.value = home.isDetailedMode;
-      if (init == true || page.value == 1) {
-        samples.value = resp.data;
-      } else {
-        samples.value = [...samples.value, ...resp.data];
-      }
-
-      // 只在首次加载（page == 1 且 facetCounts 为空）时设置 facetCounts
-      // 这样筛选条件选择后，筛选项按钮不会消失
-      if (page.value == 1 && facetCounts.value.isEmpty) {
-        facetCounts.value = resp.meta?.facetCounts ?? [];
-      }
-
-      if (resp.data.length >= 20) {
-        page.value++;
-      }
-
-      return resp;
-    }
-
-    // 监听视图模式变化，切换到精简模式时重置筛选项并刷新
+    // 监听当前选中仓库变化、视图变化、搜索内容变化，如果改变了，就调用 fetchData
     useUpdateEffect(() {
-      final wasDetailed = previousMode.value;
-      previousMode.value = isDetailedMode;
-      final resetQuery = <String, dynamic>{};
-      // 如果从详细模式切换到精简模式，重置筛选项（保留 warehouse_id）
-      if (wasDetailed == true && !isDetailedMode) {
-        if (currentHome.currentSelectedWarehouse != null &&
-            currentHome.currentSelectedWarehouse!.id != 0) {
-          resetQuery['warehouse_id'] =
-              currentHome.currentSelectedWarehouse!.id.toString();
-        }
-      } // 使用 Future.microtask 来延迟执行
-      Future.microtask(() async {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
-          // 使用 overrideQuery 参数，fetchData 内部会更新 query.value
-          await fetchData(
-            search.value,
-            searchMedia: media.value,
+          await homeNotifier.fetchSamples(
+            searchText: home.search,
+            searchMedia: home.currentMedia,
             init: true,
-            overrideQuery: resetQuery,
           );
           refreshController.finishRefresh();
         } catch (e) {
@@ -143,7 +61,7 @@ class ProductView extends HookConsumerWidget {
         }
       });
       return null;
-    }, [isDetailedMode]);
+    }, [home.currentSelectedWarehouse, home.isDetailedMode, home.query]);
 
     useEffect(() {
       final searchEventSubscription = home.bus.on<SearchEvent>().listen(
@@ -155,14 +73,16 @@ class ProductView extends HookConsumerWidget {
           }
 
           if (event.from == SearchEventFrom.tab) {
-            if (search.value == event.search &&
-                media.value?.id == event.media?.id) {
+            if (home.search == event.search &&
+                home.currentMedia?.id == event.media?.id) {
               return;
             }
           }
 
-          search.value = event.search;
-          media.value = event.media;
+          homeNotifier.setSearch(event.search ?? '');
+          if (event.media != null) {
+            homeNotifier.addMedia(event.media!);
+          }
 
           refreshController.callRefresh(force: true);
         },
@@ -177,7 +97,7 @@ class ProductView extends HookConsumerWidget {
         padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
         decoration: BoxDecoration(
           color: colorScheme.surfaceTint,
-          borderRadius: home.currentMediaId != null
+          borderRadius: home.currentMedia != null
               ? null
               : const BorderRadius.only(
                   topLeft: Radius.circular(8),
@@ -190,10 +110,10 @@ class ProductView extends HookConsumerWidget {
           refreshOnStart: true,
           onRefresh: () async {
             try {
-              await fetchData(
-                search.value,
-                searchMedia: media.value,
-                init: true,
+              await homeNotifier.fetchSamples(
+                searchText: home.search,
+                searchMedia: home.currentMedia,
+                init: false,
               );
               refreshController.finishRefresh();
             } catch (e) {
@@ -203,8 +123,11 @@ class ProductView extends HookConsumerWidget {
             }
           },
           onLoad: () async {
-            final resp =
-                await fetchData(search.value, searchMedia: media.value);
+            final resp = await homeNotifier.fetchSamples(
+              searchText: home.search,
+              searchMedia: home.currentMedia,
+              init: true,
+            );
 
             refreshController.finishLoad(resp.data.length >= pageSize
                 ? IndicatorResult.success
@@ -218,18 +141,20 @@ class ProductView extends HookConsumerWidget {
                   Container(
                     height: 0,
                   ),
-                  if (facetCounts.value.isNotEmpty && showDropDown.value)
+                  if (home.facetCounts.isNotEmpty && home.isDetailedMode)
                     SliverPinnedHeader(
                       child: ProductDropdownMenu(
-                        facetCounts: facetCounts.value,
-                        value: query.value,
-                        onChange: (menuQuery) {
-                          query.value = menuQuery;
-                          refreshController.callRefresh(force: true);
-                        },
+                        facetCounts: home.facetCounts,
                       ),
                     ),
-                  if (samples.value.isEmpty)
+                  if (productListLoading == true)
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: MuProgressIndicator(showText: true),
+                      ),
+                    )
+                  else if (home.samples.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
@@ -247,17 +172,17 @@ class ProductView extends HookConsumerWidget {
                       crossAxisCount: crossAxisCount,
                       mainAxisSpacing: 5,
                       crossAxisSpacing: 5,
-                      itemCount: samples.value.length,
+                      itemCount: home.samples.length,
                       padding: const EdgeInsets.all(5),
                       clipBehavior: Clip.none,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        final sample = samples.value[index];
+                        final sample = home.samples[index];
                         final cartItem = cartState.items.firstWhereOrNull(
                             (element) => element.sample.id == sample.id);
 
-                        if (isDetailedMode) {
+                        if (home.isDetailedMode) {
                           return ProductCardDetailed(
                             key: ValueKey(sample.id),
                             sample: sample,

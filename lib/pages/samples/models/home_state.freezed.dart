@@ -24,7 +24,8 @@ mixin _$HomeState {
   String? get search => throw _privateConstructorUsedError;
   List<TemporaryMedia> get media => throw _privateConstructorUsedError;
   int? get currentMediaId => throw _privateConstructorUsedError; // 当前选中的媒体id
-// ----------  样品 ----------
+  bool? get productListLoading =>
+      throw _privateConstructorUsedError; // ----------  样品 ----------
   List<Sample> get samples => throw _privateConstructorUsedError;
   List<FacetCount> get facetCounts => throw _privateConstructorUsedError;
   int get samplePages => throw _privateConstructorUsedError;
@@ -38,7 +39,11 @@ mixin _$HomeState {
   bool get isLoadingWarehouses => throw _privateConstructorUsedError;
   Warehouse? get currentSelectedWarehouse =>
       throw _privateConstructorUsedError; // ----------  视图模式 ----------
-  bool get isDetailedMode => throw _privateConstructorUsedError;
+  bool get isDetailedMode =>
+      throw _privateConstructorUsedError; // false: 精简模式, true: 详细模式
+  Map<String, dynamic> get query => throw _privateConstructorUsedError;
+  int get productCurrentPage => throw _privateConstructorUsedError;
+  bool get productNoMore => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomeStateCopyWith<HomeState> get copyWith =>
@@ -58,6 +63,7 @@ abstract class $HomeStateCopyWith<$Res> {
       String? search,
       List<TemporaryMedia> media,
       int? currentMediaId,
+      bool? productListLoading,
       List<Sample> samples,
       List<FacetCount> facetCounts,
       int samplePages,
@@ -68,7 +74,10 @@ abstract class $HomeStateCopyWith<$Res> {
       List<Warehouse> warehouses,
       bool isLoadingWarehouses,
       Warehouse? currentSelectedWarehouse,
-      bool isDetailedMode});
+      bool isDetailedMode,
+      Map<String, dynamic> query,
+      int productCurrentPage,
+      bool productNoMore});
 
   $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
 }
@@ -93,6 +102,7 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? search = freezed,
     Object? media = null,
     Object? currentMediaId = freezed,
+    Object? productListLoading = freezed,
     Object? samples = null,
     Object? facetCounts = null,
     Object? samplePages = null,
@@ -104,6 +114,9 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
     Object? isDetailedMode = null,
+    Object? query = null,
+    Object? productCurrentPage = null,
+    Object? productNoMore = null,
   }) {
     return _then(_value.copyWith(
       bus: null == bus
@@ -134,6 +147,10 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.currentMediaId
           : currentMediaId // ignore: cast_nullable_to_non_nullable
               as int?,
+      productListLoading: freezed == productListLoading
+          ? _value.productListLoading
+          : productListLoading // ignore: cast_nullable_to_non_nullable
+              as bool?,
       samples: null == samples
           ? _value.samples
           : samples // ignore: cast_nullable_to_non_nullable
@@ -178,6 +195,18 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.isDetailedMode
           : isDetailedMode // ignore: cast_nullable_to_non_nullable
               as bool,
+      query: null == query
+          ? _value.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      productCurrentPage: null == productCurrentPage
+          ? _value.productCurrentPage
+          : productCurrentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      productNoMore: null == productNoMore
+          ? _value.productNoMore
+          : productNoMore // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -210,6 +239,7 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       String? search,
       List<TemporaryMedia> media,
       int? currentMediaId,
+      bool? productListLoading,
       List<Sample> samples,
       List<FacetCount> facetCounts,
       int samplePages,
@@ -220,7 +250,10 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       List<Warehouse> warehouses,
       bool isLoadingWarehouses,
       Warehouse? currentSelectedWarehouse,
-      bool isDetailedMode});
+      bool isDetailedMode,
+      Map<String, dynamic> query,
+      int productCurrentPage,
+      bool productNoMore});
 
   @override
   $WarehouseCopyWith<$Res>? get currentSelectedWarehouse;
@@ -244,6 +277,7 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? search = freezed,
     Object? media = null,
     Object? currentMediaId = freezed,
+    Object? productListLoading = freezed,
     Object? samples = null,
     Object? facetCounts = null,
     Object? samplePages = null,
@@ -255,6 +289,9 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
     Object? isDetailedMode = null,
+    Object? query = null,
+    Object? productCurrentPage = null,
+    Object? productNoMore = null,
   }) {
     return _then(_$HomeStateImpl(
       bus: null == bus
@@ -285,6 +322,10 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.currentMediaId
           : currentMediaId // ignore: cast_nullable_to_non_nullable
               as int?,
+      productListLoading: freezed == productListLoading
+          ? _value.productListLoading
+          : productListLoading // ignore: cast_nullable_to_non_nullable
+              as bool?,
       samples: null == samples
           ? _value._samples
           : samples // ignore: cast_nullable_to_non_nullable
@@ -329,6 +370,18 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value.isDetailedMode
           : isDetailedMode // ignore: cast_nullable_to_non_nullable
               as bool,
+      query: null == query
+          ? _value._query
+          : query // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      productCurrentPage: null == productCurrentPage
+          ? _value.productCurrentPage
+          : productCurrentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      productNoMore: null == productNoMore
+          ? _value.productNoMore
+          : productNoMore // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -344,6 +397,7 @@ class _$HomeStateImpl extends _HomeState {
       this.search,
       required final List<TemporaryMedia> media,
       this.currentMediaId,
+      this.productListLoading,
       final List<Sample> samples = const [],
       final List<FacetCount> facetCounts = const [],
       this.samplePages = 1,
@@ -354,12 +408,16 @@ class _$HomeStateImpl extends _HomeState {
       final List<Warehouse> warehouses = const [],
       this.isLoadingWarehouses = false,
       this.currentSelectedWarehouse,
-      this.isDetailedMode = false})
+      this.isDetailedMode = false,
+      final Map<String, dynamic> query = const {},
+      this.productCurrentPage = 1,
+      this.productNoMore = false})
       : _media = media,
         _samples = samples,
         _facetCounts = facetCounts,
         _suppliers = suppliers,
         _warehouses = warehouses,
+        _query = query,
         super._();
 
   @override
@@ -383,9 +441,10 @@ class _$HomeStateImpl extends _HomeState {
   @override
   final int? currentMediaId;
 // 当前选中的媒体id
+  @override
+  final bool? productListLoading;
 // ----------  样品 ----------
   final List<Sample> _samples;
-// 当前选中的媒体id
 // ----------  样品 ----------
   @override
   @JsonKey()
@@ -447,10 +506,27 @@ class _$HomeStateImpl extends _HomeState {
   @override
   @JsonKey()
   final bool isDetailedMode;
+// false: 精简模式, true: 详细模式
+  final Map<String, dynamic> _query;
+// false: 精简模式, true: 详细模式
+  @override
+  @JsonKey()
+  Map<String, dynamic> get query {
+    if (_query is EqualUnmodifiableMapView) return _query;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_query);
+  }
+
+  @override
+  @JsonKey()
+  final int productCurrentPage;
+  @override
+  @JsonKey()
+  final bool productNoMore;
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse, isDetailedMode: $isDetailedMode)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, productListLoading: $productListLoading, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse, isDetailedMode: $isDetailedMode, query: $query, productCurrentPage: $productCurrentPage, productNoMore: $productNoMore)';
   }
 
   @override
@@ -469,6 +545,8 @@ class _$HomeStateImpl extends _HomeState {
             const DeepCollectionEquality().equals(other._media, _media) &&
             (identical(other.currentMediaId, currentMediaId) ||
                 other.currentMediaId == currentMediaId) &&
+            (identical(other.productListLoading, productListLoading) ||
+                other.productListLoading == productListLoading) &&
             const DeepCollectionEquality().equals(other._samples, _samples) &&
             const DeepCollectionEquality()
                 .equals(other._facetCounts, _facetCounts) &&
@@ -490,30 +568,40 @@ class _$HomeStateImpl extends _HomeState {
                     other.currentSelectedWarehouse, currentSelectedWarehouse) ||
                 other.currentSelectedWarehouse == currentSelectedWarehouse) &&
             (identical(other.isDetailedMode, isDetailedMode) ||
-                other.isDetailedMode == isDetailedMode));
+                other.isDetailedMode == isDetailedMode) &&
+            const DeepCollectionEquality().equals(other._query, _query) &&
+            (identical(other.productCurrentPage, productCurrentPage) ||
+                other.productCurrentPage == productCurrentPage) &&
+            (identical(other.productNoMore, productNoMore) ||
+                other.productNoMore == productNoMore));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      bus,
-      currentPage,
-      pageController,
-      searchTextController,
-      search,
-      const DeepCollectionEquality().hash(_media),
-      currentMediaId,
-      const DeepCollectionEquality().hash(_samples),
-      const DeepCollectionEquality().hash(_facetCounts),
-      samplePages,
-      sampleNoMore,
-      const DeepCollectionEquality().hash(_suppliers),
-      supplierPages,
-      supplierNoMore,
-      const DeepCollectionEquality().hash(_warehouses),
-      isLoadingWarehouses,
-      currentSelectedWarehouse,
-      isDetailedMode);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        bus,
+        currentPage,
+        pageController,
+        searchTextController,
+        search,
+        const DeepCollectionEquality().hash(_media),
+        currentMediaId,
+        productListLoading,
+        const DeepCollectionEquality().hash(_samples),
+        const DeepCollectionEquality().hash(_facetCounts),
+        samplePages,
+        sampleNoMore,
+        const DeepCollectionEquality().hash(_suppliers),
+        supplierPages,
+        supplierNoMore,
+        const DeepCollectionEquality().hash(_warehouses),
+        isLoadingWarehouses,
+        currentSelectedWarehouse,
+        isDetailedMode,
+        const DeepCollectionEquality().hash(_query),
+        productCurrentPage,
+        productNoMore
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -531,6 +619,7 @@ abstract class _HomeState extends HomeState {
       final String? search,
       required final List<TemporaryMedia> media,
       final int? currentMediaId,
+      final bool? productListLoading,
       final List<Sample> samples,
       final List<FacetCount> facetCounts,
       final int samplePages,
@@ -541,7 +630,10 @@ abstract class _HomeState extends HomeState {
       final List<Warehouse> warehouses,
       final bool isLoadingWarehouses,
       final Warehouse? currentSelectedWarehouse,
-      final bool isDetailedMode}) = _$HomeStateImpl;
+      final bool isDetailedMode,
+      final Map<String, dynamic> query,
+      final int productCurrentPage,
+      final bool productNoMore}) = _$HomeStateImpl;
   const _HomeState._() : super._();
 
   @override
@@ -559,7 +651,8 @@ abstract class _HomeState extends HomeState {
   @override
   int? get currentMediaId;
   @override // 当前选中的媒体id
-// ----------  样品 ----------
+  bool? get productListLoading;
+  @override // ----------  样品 ----------
   List<Sample> get samples;
   @override
   List<FacetCount> get facetCounts;
@@ -581,6 +674,12 @@ abstract class _HomeState extends HomeState {
   Warehouse? get currentSelectedWarehouse;
   @override // ----------  视图模式 ----------
   bool get isDetailedMode;
+  @override // false: 精简模式, true: 详细模式
+  Map<String, dynamic> get query;
+  @override
+  int get productCurrentPage;
+  @override
+  bool get productNoMore;
   @override
   @JsonKey(ignore: true)
   _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>

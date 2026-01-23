@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/views/product_view.dart';
@@ -85,6 +86,7 @@ class SamplesListPage extends HookConsumerWidget {
                   SearchEvent(search: '', media: null),
                 );
                 homeNotifier.switchToPage(0);
+                homeNotifier.setCurrentSelectedWarehouse(null);
               } else {
                 context.router.maybePop();
               }
@@ -102,41 +104,40 @@ class SamplesListPage extends HookConsumerWidget {
                 onSearchText: (search) {
                   final text = search.trim();
                   // 文本为空时，使用样品间列表页（SamplesPageView）
-                  if (text.isEmpty) {
-                    homeNotifier.switchToPage(0);
-                  } else {
-                    // 有搜索内容时，切换到商品列表页（ProductView）
+                  if (text.isNotEmpty && home.currentPage == 0) {
                     homeNotifier.switchToProductView();
                   }
                   homeNotifier.setSearch(search);
-                  home.bus.dispatch(
-                    SearchEvent(search: search, media: home.currentMedia),
+                  homeNotifier.fetchSamples(
+                    searchText: search,
+                    searchMedia: home.currentMedia,
+                    init: true,
                   );
                 },
                 onSearchMedia: (temporaryMedia) {
+                  homeNotifier.switchToProductView();
                   homeNotifier.addMedia(temporaryMedia);
                   if (temporaryMedia.id == home.currentMediaId) {
                     return;
                   }
                   // 图片搜索后切换到商品列表页（ProductView）
-                  homeNotifier.switchToProductView();
-                  home.bus.dispatch(
-                    SearchEvent(search: home.search, media: temporaryMedia),
+                  homeNotifier.fetchSamples(
+                    searchText: home.search,
+                    searchMedia: temporaryMedia,
+                    init: true,
                   );
                 },
                 onDeleteMedia: (temporaryMedia) {
                   final nextState = homeNotifier.deleteMedia(temporaryMedia);
-                  if (nextState.currentMediaId == null) {
-                    homeNotifier.switchToPage(0);
-                  }
                   if (nextState.currentMediaId == home.currentMediaId) {
                     return;
-                  } 
-                  home.bus.dispatch(
-                    SearchEvent(
-                      media: nextState.currentMedia,
-                      search: nextState.search,
-                    ),
+                  }
+                  homeNotifier.fetchSamples(
+                    searchText: nextState.search,
+                    searchMedia: nextState.currentMediaId == null
+                        ? null
+                        : nextState.currentMedia,
+                    init: true,
                   );
                 },
               ),
@@ -146,13 +147,9 @@ class SamplesListPage extends HookConsumerWidget {
                   onPageChanged: (page) {
                     homeNotifier.switchToPage(page);
                     currentPageIndex.value = page;
-                    home.bus.dispatch(
-                      SearchEvent(
-                        media: home.currentMedia,
-                        search: home.search,
-                        from: SearchEventFrom.tab,
-                      ),
-                    );
+                    if (page == 0) {
+                      homeNotifier.setCurrentSelectedWarehouse(null);
+                    }
                   },
                   allowImplicitScrolling: false,
                   children: const [SamplesPageView(), ProductView()],

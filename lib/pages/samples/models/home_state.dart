@@ -22,6 +22,7 @@ abstract class HomeState with _$HomeState {
     String? search,
     required List<TemporaryMedia> media,
     int? currentMediaId, // 当前选中的媒体id
+    bool? productListLoading,
 
     // ----------  样品 ----------
     @Default([]) List<Sample> samples,
@@ -41,6 +42,9 @@ abstract class HomeState with _$HomeState {
     
     // ----------  视图模式 ----------
     @Default(false) bool isDetailedMode, // false: 精简模式, true: 详细模式
+    @Default({}) Map<String, dynamic> query,
+    @Default(1) int productCurrentPage,
+    @Default(false) bool productNoMore,
   }) = _HomeState;
   TemporaryMedia? get currentMedia {
     return media.firstWhereOrNull((item) => item.id == currentMediaId);

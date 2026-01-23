@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
@@ -14,20 +13,18 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 const String warehousesIdField = "warehouse_id";
 
 class ProductDropdownMenu extends HookConsumerWidget {
-  final List<FacetCount> facetCounts;
-  final Map<String, dynamic> value;
-  final void Function(Map<String, dynamic> query) onChange;
+  final List<FacetCount> facetCounts;  
 
   const ProductDropdownMenu({
-    super.key,
-    required this.value,
-    required this.facetCounts,
-    required this.onChange,
+    super.key, 
+    required this.facetCounts, 
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final query = useState<Map<String, dynamic>>({});
+    final home = ref.watch(homeProvider);
+    final query = home.query;
+    final homeNotifier = ref.read(homeProvider.notifier);
     final supportFacet = {
       "supplier_ids": "供应商",
       "category_id": "产品分类",
@@ -73,13 +70,11 @@ class ProductDropdownMenu extends HookConsumerWidget {
           optionsColumns: option?.optionsColumns,
           options: warehouseOptions,
           onChange: (value) {
+            // 选中的样品间的数据放在provider中，不放在query中
             // 单选时，value  是数组，需要取第一个元素
             final selectedValue =
                 value is List ? (value.isNotEmpty ? value.first : null) : value;
-            if (selectedValue == null ||
-                selectedValue == '0' ||
-                selectedValue == 0) {
-              query.value = {...query.value}..remove(warehousesIdField);
+            if (selectedValue == null) { 
               homeNotifier.setCurrentSelectedWarehouse(null);
               return;
             }
@@ -87,14 +82,11 @@ class ProductDropdownMenu extends HookConsumerWidget {
             final selectedWarehouse = warehouses.firstWhereOrNull(
               (w) => w.id.toString() == selectedValue.toString(),
             );
-            homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
-
-            query.value = {...query.value, warehousesIdField: selectedValue};
+            homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse); 
           },
           onConfirm: (value) {},
           onReset: () {
-            homeNotifier.setCurrentSelectedWarehouse(null);
-            query.value = {...query.value}..remove(warehousesIdField);
+            homeNotifier.setCurrentSelectedWarehouse(null); 
           },
         );
 
@@ -110,10 +102,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
       };
     }, []);
 
-    useEffect(() {
-      query.value = value;
-      return null;
-    }, [value]);
 
     final fetchSuppliers = useCallback((List<String> ids) async {
       final resp = await getSupplySuppliers(queryParameters: {
@@ -181,7 +169,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
     final menus = <TDDropdownItem>[];
     //添加样品间筛选项
     handleWarehouseDropdown(menus);
-   //添加供应商等筛选项
+    //添加供应商等筛选项
     for (var facetCount in facetCounts) {
       final field = facetCount.fieldName;
       if (!supportFacet.containsKey(field)) {
@@ -193,7 +181,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
       TDDropdownItem? item;
       final option = menuOptions[field];
       final options = <TDDropdownItemOption>[];
-      final selectValues = query.value[field];
+      final selectValues = query[field];
 
       for (var count in facetCount.counts) {
         var label = count.value;
@@ -229,23 +217,23 @@ class ProductDropdownMenu extends HookConsumerWidget {
         optionsColumns: option?.optionsColumns,
         options: options,
         onChange: (value) {
-          query.value = {
-            ...query.value,
+          homeNotifier.setQuery({
+            ...query,
             field: value,
-          };
+          });
         },
         onConfirm: (value) {
           if (value is List && value.isEmpty) {
-            query.value = {...query.value}..remove(field);
+            homeNotifier.setQuery({...query}..remove(field));
             return;
           }
-          query.value = {
-            ...query.value,
+          homeNotifier.setQuery({
+            ...query,
             field: value,
-          };
+          });
         },
         onReset: () {
-          query.value = {...query.value}..remove(field);
+          homeNotifier.setQuery({...query}..remove(field));
         },
       );
 
@@ -262,10 +250,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
           direction: TDDropdownMenuDirection.down,
           isScrollable: true,
           onMenuClosed: (index) {
-            if (const DeepCollectionEquality().equals(query.value, value)) {
-              return;
-            }
-            onChange(query.value);
+            // Query is now updated directly through callbacks, no need for additional onChange
           },
           items: menus,
         ),

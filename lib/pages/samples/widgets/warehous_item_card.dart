@@ -45,7 +45,7 @@ class WarehouseShowCard extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final image = images[index];
                       final imageUrl =
-                          image.thumbUrl ?? image.url ?? image.whiteUrl;
+                          image.url ?? image.thumbUrl ?? image.whiteUrl;
 
                       return Center(
                         child: InteractiveViewer(
