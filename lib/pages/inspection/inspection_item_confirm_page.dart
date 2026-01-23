@@ -83,6 +83,13 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
     }, []);
 
     Future<void> handleSubmit() async {
+      final bool hasImages =
+          mediaMap.value.values.any((medias) => medias.isNotEmpty);
+
+      if (!hasImages) {
+        EasyLoading.showInfo('请至少上传一张验货图片');
+        return;
+      }
       final Map<String, dynamic> submitData = {};
 
       mediaMap.value.forEach((key, medias) {
