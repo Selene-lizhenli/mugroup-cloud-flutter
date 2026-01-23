@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class BuildFormCard extends StatefulWidget {
-  final String title;
+  final dynamic title;
   final List<Widget> children;
   final bool isLast;
   final Widget? action;
   final bool defaultExpanded;
-  final bool collapsible; // 新增：是否启用折叠功能
+  final bool collapsible;
 
   const BuildFormCard({
     super.key,
@@ -15,7 +15,7 @@ class BuildFormCard extends StatefulWidget {
     this.isLast = false,
     this.action,
     this.defaultExpanded = false,
-    this.collapsible = false, // 默认不启用折叠
+    this.collapsible = false,
   });
 
   @override
@@ -70,36 +70,38 @@ class _BuildFormCardState extends State<BuildFormCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 16,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(2),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 16,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                      Text(
-                        widget.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
+                        widget.title is Widget
+                            ? widget.title
+                            : Text(
+                                widget.title.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (widget.action != null) ...[
                         widget.action!,
-                        // 只有当有 action 且 启用了折叠 显示箭头时，才需要间距
                         if (widget.collapsible) const SizedBox(width: 8),
                       ],
-                      // 只有启用折叠时，才显示箭头
                       if (widget.collapsible)
                         AnimatedRotation(
                           turns: _isExpanded ? 0.5 : 0,
@@ -115,7 +117,6 @@ class _BuildFormCardState extends State<BuildFormCard> {
               ),
             ),
           ),
-          // 控制内容显示
           if (shouldShowContent)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

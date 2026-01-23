@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route.dart'; 
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -66,7 +66,29 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         BuildFormCard(
-                          title: '名片',
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              const Text(
+                                '名片',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '名片自动识别',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey[500],
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
                           action: GestureDetector(
                             onTap: handleSmartRecognize,
                             child: Row(
@@ -91,6 +113,7 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                               name: "images",
                               builder: (field) {
                                 return ImageUploader(
+                                  customIcon: Icons.camera_alt,
                                   value: field.value,
                                   onChanged: field.didChange,
                                 );
@@ -365,7 +388,7 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                             'linkedin': values['contact_linkedin'],
                             'facebook': values['contact_facebook'],
                           };
-                          newContact = await storeCrmContact(contactData); 
+                          newContact = await storeCrmContact(contactData);
                         }
                         EasyLoading.showSuccess("创建成功");
                         if (context.mounted) {

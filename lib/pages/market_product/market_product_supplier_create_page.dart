@@ -64,7 +64,29 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         BuildFormCard(
-                          title: '名片',
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              const Text(
+                                '名片',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '名片自动识别',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey[500],
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
                           action: GestureDetector(
                             onTap: handleSmartRecognize,
                             child: Row(
@@ -89,6 +111,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               name: "images",
                               builder: (field) {
                                 return ImageUploader(
+                                  customIcon: Icons.camera_alt,
                                   value: field.value,
                                   onChanged: field.didChange,
                                 );

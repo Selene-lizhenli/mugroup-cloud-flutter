@@ -55,6 +55,7 @@ class SupplySupplierContactCreatePage extends HookConsumerWidget {
                   builder: (field) {
                     return ImageUploader(
                       label: "名片",
+                      customIcon: Icons.camera_alt,
                       showRecognizeButton: true,
                       recognizeApi: identifySupplySuppliersCard,
                       onRecognizeResult: (data) {
