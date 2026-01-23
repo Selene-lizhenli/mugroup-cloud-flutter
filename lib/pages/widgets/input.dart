@@ -60,16 +60,15 @@ class Input extends HookConsumerWidget {
           RichText(
             text: TextSpan(
               children: [
-                if (isRequired)
-                  TextSpan(
-                    text: '* ',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.bold,
-                      height: 1.0,
-                    ),
+                TextSpan(
+                  text: '* ',
+                  style: TextStyle(
+                    color: isRequired ? Colors.red : Colors.transparent,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                    height: 1.0,
                   ),
+                ),
                 TextSpan(
                   text: label,
                   style: TextStyle(
@@ -139,6 +138,7 @@ class Input extends HookConsumerWidget {
                 : null,
           ),
         ),
+        const SizedBox(height: 4),
       ],
     );
   }
