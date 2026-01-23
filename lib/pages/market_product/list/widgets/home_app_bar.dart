@@ -47,7 +47,7 @@ class HomeAppBar extends HookConsumerWidget {
 
   final bool enableImageSearch;
 
-  final Color? fillColor ;
+  final Color? fillColor;
 
   const HomeAppBar({
     super.key,
@@ -58,7 +58,7 @@ class HomeAppBar extends HookConsumerWidget {
     this.enableImageSearch = true,
     this.fillColor,
   });
-  
+
   get transparent => null;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -126,7 +126,7 @@ class HomeAppBar extends HookConsumerWidget {
           margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
           padding: const EdgeInsets.only(left: 8, right: 0, bottom: 0),
           height: 40,
-          decoration: BoxDecoration( 
+          decoration: BoxDecoration(
             border: Border.all(
               color: colorScheme.primary,
               width: 1,
@@ -141,6 +141,7 @@ class HomeAppBar extends HookConsumerWidget {
                 child: TextField(
                   autofocus: false,
                   controller: controller,
+                  textAlignVertical: TextAlignVertical.center,
                   onTapOutside: (event) {
                     FocusManager.instance.primaryFocus?.unfocus();
                   },
@@ -152,7 +153,10 @@ class HomeAppBar extends HookConsumerWidget {
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 10,
+                    ),
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (value) {
