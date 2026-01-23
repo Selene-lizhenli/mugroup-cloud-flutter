@@ -27,6 +27,10 @@ Future<Sample?> storeShowroomSample(Map<String, dynamic>? data) async {
   );
 }
 
+Future batchStoreShowroomSample(Map<String, dynamic>? data) async {
+  return api.post("api/tenant/showroom/samples/batchStore", data: data);
+}
+
 Future<ApiResponse<List<Sample>>> getSamples(
     {Map<String, dynamic>? queryParameters}) async {
   return api

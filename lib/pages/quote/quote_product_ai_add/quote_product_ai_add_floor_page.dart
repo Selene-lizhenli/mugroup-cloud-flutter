@@ -1,23 +1,21 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart'; // 假设包含 logger
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/services/openai.dart';
+import 'package:cloud/services/sample.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ColumnConfig {
   final String key;
   final String label;
   final double width;
-
   const ColumnConfig(this.key, this.label, {this.width = 80.0});
 }
 
@@ -35,16 +33,172 @@ const List<ColumnConfig> _kTableColumns = [
   ColumnConfig('description', '描述', width: 80),
 ];
 
-class _MockRowData {
+/// 更好的数据模型，包含 helper 方法
+class ProductDraftItem {
   final Map<String, String> data;
+  final TemporaryMedia media;
+  final bool isRecognizing; // 增加单个条目的识别状态
 
-  _MockRowData(this.data);
+  ProductDraftItem({
+    required this.data,
+    required this.media,
+    this.isRecognizing = false,
+  });
+
+  // 用于更新特定字段
+  ProductDraftItem copyWith({
+    Map<String, String>? data,
+    TemporaryMedia? media,
+    bool? isRecognizing,
+  }) {
+    return ProductDraftItem(
+      data: data ?? this.data,
+      media: media ?? this.media,
+      isRecognizing: isRecognizing ?? this.isRecognizing,
+    );
+  }
+
+  // 获取显示用的值
+  String getValue(String key) => data[key] ?? '-';
 
   @override
-  String toString() {
-    return data.toString();
+  String toString() => 'ProductDraftItem(data: $data)';
+}
+
+// --- 2. Riverpod Controller (业务逻辑层) ---
+
+class ProductAiAddState {
+  final List<ProductDraftItem> items;
+  final bool isGlobalLoading;
+
+  ProductAiAddState({this.items = const [], this.isGlobalLoading = false});
+
+  ProductAiAddState copyWith({
+    List<ProductDraftItem>? items,
+    bool? isGlobalLoading,
+  }) {
+    return ProductAiAddState(
+      items: items ?? this.items,
+      isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
+    );
   }
 }
+
+class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
+  @override
+  ProductAiAddState build() {
+    return ProductAiAddState();
+  }
+
+  // 图片列表变化时的入口方法
+  Future<void> onImagesChanged(
+      List<TemporaryMedia>? newImages, WidgetRef ref) async {
+    final images = newImages ?? [];
+    final currentItems = state.items;
+
+    // 1. 如果图片减少了，直接截取对应的数据
+    if (images.length < currentItems.length) {
+      state = state.copyWith(items: currentItems.sublist(0, images.length));
+      return;
+    }
+
+    // 2. 如果图片增加了，保留旧数据，追加新数据占位符
+    if (images.length > currentItems.length) {
+      final List<ProductDraftItem> newItems = List.from(currentItems);
+
+      // 找出新增的图片索引
+      final int startIndex = currentItems.length;
+
+      // 先添加占位数据
+      for (int i = startIndex; i < images.length; i++) {
+        newItems.add(ProductDraftItem(
+          data: {}, // 空数据
+          media: images[i],
+          isRecognizing: true, // 标记正在识别
+        ));
+      }
+
+      // 更新UI显示Loading占位
+      state = state.copyWith(items: newItems, isGlobalLoading: true);
+
+      // 开始处理新增图片的 OCR
+      await _processOcrQueue(startIndex, images, ref);
+    }
+  }
+
+  Future<void> _processOcrQueue(
+      int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
+    final user = ref.read(userProvider).user;
+
+    // 这里的策略是并发还是串行？这里演示串行处理，也可以改为 Future.wait 并发
+    List<ProductDraftItem> tempItems = List.from(state.items);
+
+    for (int i = startIndex; i < images.length; i++) {
+      final imageUrl = images[i].url;
+      Map<String, String> rowMap = {};
+
+      try {
+        final result = await identifyOcr({
+          "department": user?.department?.name,
+          "employee_name": user?.name,
+          "employee_number": user?.jobNumber,
+          "image": imageUrl,
+        });
+
+        if (result != null &&
+            result['success'] == true &&
+            (result['data'] as List).isNotEmpty) {
+          final item = result['data'].first;
+          for (var col in _kTableColumns) {
+            String rawVal = (item[col.key] ?? '').toString().trim();
+            rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
+          }
+        } else {
+          for (var col in _kTableColumns) rowMap[col.key] = '-';
+          rowMap['price'] = '未识别';
+        }
+      } catch (e) {
+        logger.e('OCR Error: $e');
+        for (var col in _kTableColumns) rowMap[col.key] = '-';
+        rowMap['price'] = '识别错误';
+      }
+
+      // 更新单条数据状态
+      if (i < tempItems.length) {
+        tempItems[i] = tempItems[i].copyWith(
+          data: rowMap,
+          isRecognizing: false,
+        );
+        // 实时更新状态，让用户看到进度
+        state = state.copyWith(items: List.from(tempItems));
+      }
+    }
+
+    state = state.copyWith(isGlobalLoading: false);
+  }
+
+  // 更新单个单元格数据
+  void updateCell(int index, String key, String value) {
+    if (index >= state.items.length) return;
+
+    final item = state.items[index];
+    final newData = Map<String, String>.from(item.data);
+    newData[key] = value.isEmpty ? '-' : value;
+
+    final newItems = List<ProductDraftItem>.from(state.items);
+    newItems[index] = item.copyWith(data: newData);
+
+    state = state.copyWith(items: newItems);
+  }
+}
+
+// 定义 Provider
+final productAiAddProvider =
+    NotifierProvider.autoDispose<ProductAiAddController, ProductAiAddState>(
+  ProductAiAddController.new,
+);
+
+// --- 3. UI 页面 ---
 
 @RoutePage()
 class QuoteProductAiAddFloorPage extends HookConsumerWidget {
@@ -55,91 +209,11 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final user = ref.watch(userProvider).user;
+    final providerState = ref.watch(productAiAddProvider);
+    final controller = ref.read(productAiAddProvider.notifier);
 
-    final imageList = useState<List<TemporaryMedia>?>(null);
-    final isAnalyzing = useState(false);
-    final resultList = useState<List<_MockRowData>>([]);
-
-    Future<_MockRowData?> recognizeOcr(String imageUrl) async {
-      try {
-        final result = await identifyOcr({
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": imageUrl,
-        });
-
-        logger.d('OCR Result: $result');
-
-        Map<String, String> rowMap = {};
-
-        if (result != null && result['success'] == true) {
-          final dataList = result['data'];
-          if (dataList is List && dataList.isNotEmpty) {
-            final item = dataList.first;
-
-            for (var col in _kTableColumns) {
-              String rawVal = (item[col.key] ?? '').toString().trim();
-
-              rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
-            }
-            return _MockRowData(rowMap);
-          }
-        }
-
-        for (var col in _kTableColumns) {
-          rowMap[col.key] = '-';
-        }
-
-        rowMap['price'] = '未识别';
-        return _MockRowData(rowMap);
-      } catch (e) {
-        logger.e('OCR Error: $e');
-
-        Map<String, String> errorMap = {};
-        for (var col in _kTableColumns) errorMap[col.key] = '-';
-        errorMap['price'] = '识别错误';
-        return _MockRowData(errorMap);
-      }
-    }
-
-    useEffect(() {
-      final images = imageList.value;
-
-      if (images == null || images.isEmpty) {
-        resultList.value = [];
-        isAnalyzing.value = false;
-        return null;
-      }
-
-      if (resultList.value.length != images.length) {
-        Future<void> processImages() async {
-          if (images.length < resultList.value.length) {
-            resultList.value = resultList.value.sublist(0, images.length);
-            return;
-          }
-
-          isAnalyzing.value = true;
-          List<_MockRowData> tempResults = List.from(resultList.value);
-
-          for (int i = resultList.value.length; i < images.length; i++) {
-            final data = await recognizeOcr(images[i].url);
-            if (data != null) {
-              tempResults.add(data);
-            }
-          }
-
-          if (context.mounted) {
-            resultList.value = tempResults;
-            isAnalyzing.value = false;
-          }
-        }
-
-        processImages();
-      }
-      return null;
-    }, [imageList.value]);
+    // 提取当前的 media 列表供 ImageUploader 回显
+    final currentMediaList = providerState.items.map((e) => e.media).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -151,67 +225,45 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               child: Column(
                 children: [
                   // 图片上传区域
-                  _buildUploadArea(imageList),
+                  _buildUploadArea(currentMediaList, (newImages) {
+                    controller.onImagesChanged(newImages, ref);
+                  }),
 
                   // 提示栏
                   _buildInfoBar(colorScheme),
 
-                  // Loading 状态
-                  if (isAnalyzing.value)
-                    Container(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: const Center(child: CircularProgressIndicator()),
+                  // 列表区域
+                  if (providerState.items.isNotEmpty) ...[
+                    _buildTableHeader(),
+                    const SizedBox(height: 8),
+                    ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: providerState.items.length,
+                      separatorBuilder: (c, i) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final item = providerState.items[index];
+                        return _buildDataRow(
+                          context,
+                          index,
+                          item,
+                          (key, val) => controller.updateCell(index, key, val),
+                        );
+                      },
                     ),
-
-                  // --- 3. 列表区域 ---
-                  if (!isAnalyzing.value && resultList.value.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      child: Column(
-                        children: [
-                          _buildTableHeader(),
-                          const SizedBox(height: 8),
-                          ListView.separated(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: resultList.value.length,
-                            separatorBuilder: (c, i) =>
-                                const SizedBox(height: 8),
-                            itemBuilder: (context, index) {
-                              return _buildDataRow(
-                                context,
-                                index,
-                                resultList.value[index],
-                                imageList.value![index].url,
-                                (newData) {
-                                  // 更新状态
-                                  final newList =
-                                      List<_MockRowData>.from(resultList.value);
-                                  newList[index] = newData;
-                                  resultList.value = newList;
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                  ]
                 ],
               ),
             ),
           ),
-          _buildBottomAction(
-            context,
-            colorScheme,
-            resultList.value,
-          ),
+          _buildBottomAction(context, colorScheme, providerState.items),
         ],
       ),
     );
   }
 
-  Widget _buildUploadArea(ValueNotifier<List<TemporaryMedia>?> imageList) {
+  Widget _buildUploadArea(List<TemporaryMedia>? value,
+      ValueChanged<List<TemporaryMedia>?> onChanged) {
     return Row(
       children: [
         Expanded(
@@ -235,8 +287,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ImageUploader(
-                    value: imageList.value,
-                    onChanged: (value) => imageList.value = value,
+                    value: value,
+                    onChanged: onChanged,
                   ),
                 ],
               ),
@@ -269,18 +321,16 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
 
   Widget _buildTableHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8).copyWith(top: 10),
       child: Row(
         children: [
           const SizedBox(
             width: 70 + 16,
-            child: Text(
-              ' 图片预览',
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.bold),
-            ),
+            child: Text(' 图片预览',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold)),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -295,10 +345,9 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     child: Text(
                       col.label,
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
                     ),
                   );
                 }).toList(),
@@ -310,19 +359,30 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDataRow(BuildContext context, int index, _MockRowData item,
-      String imageUrl, Function(_MockRowData) onUpdate) {
+  Widget _buildDataRow(BuildContext context, int index, ProductDraftItem item,
+      Function(String key, String val) onUpdate) {
+    // 如果该行正在识别中，显示 Loading
+    if (item.isRecognizing) {
+      return Container(
+        height: 80,
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(8)),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Container(
       height: 80,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          )
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 4,
+              offset: const Offset(0, 1))
         ],
       ),
       padding: const EdgeInsets.all(8),
@@ -330,11 +390,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         children: [
           GestureDetector(
             onTap: () {
-              showFlanImagePreview(
-                context,
-                images: [imageUrl],
-                loop: false,
-              );
+              showFlanImagePreview(context,
+                  images: [item.media.url], loop: false);
             },
             child: AspectRatio(
               aspectRatio: 1,
@@ -345,7 +402,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Image.network(
-                  imageUrl,
+                  item.media.url,
                   fit: BoxFit.cover,
                   errorBuilder: (ctx, err, stack) =>
                       const Icon(Icons.broken_image, color: Colors.grey),
@@ -360,8 +417,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               physics: const ClampingScrollPhysics(),
               child: Row(
                 children: _kTableColumns.map((col) {
-                  final text = item.data[col.key] ?? '-';
-
+                  final text = item.getValue(col.key);
                   return Container(
                     width: col.width,
                     alignment: Alignment.centerLeft,
@@ -373,13 +429,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                           EditDialog.show(
                             context,
                             initialText: text == '-' ? '' : text,
-                            onConfirm: (newText) {
-                              final newData =
-                                  Map<String, String>.from(item.data);
-                              newData[col.key] =
-                                  newText.isEmpty ? '-' : newText;
-                              onUpdate(_MockRowData(newData));
-                            },
+                            onConfirm: (newText) => onUpdate(col.key, newText),
                           );
                         },
                         child: Padding(
@@ -416,8 +466,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomAction(
-      BuildContext context, ColorScheme colorScheme, List<_MockRowData> data) {
+  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
+      List<ProductDraftItem> items) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
@@ -432,9 +482,44 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       child: SizedBox(
         height: 44,
         child: ElevatedButton(
-          onPressed: () {
-            logger.d("准备保存的数据条数: $data");
-          },
+          onPressed: items.isEmpty
+              ? null
+              : () async {
+                  final List<Map<String, dynamic>> submitList = [];
+
+                  for (var item in items) {
+                    if (item.isRecognizing) continue;
+
+                    final row = item.data;
+
+                    String? val(String key) =>
+                        (row[key] == null || row[key] == '-') ? null : row[key];
+
+                    submitList.add({
+                      'supply_quotes': [
+                        {
+                          "supplier_id": '67545',
+                          'supplier_price': val('price'),
+                          'outer_capacity': val('out_carton'),
+                          'inner_capacity': val('inner_pack'),
+                          'weight': val('weight'),
+                          'packaging': val('packaging_type'),
+                          'unit': val('unit'),
+                          'outer_volume': val('volume'),
+                          'supplier_moq': val('moq'),
+                        }
+                      ],
+                      'spec': val('size'),
+                      'description_cn': val('description'),
+                      'image': [item.media],
+                      'item_type': 'market_product'
+                    });
+                  }
+
+                  if (submitList.isEmpty) return;
+
+                  await batchStoreShowroomSample({'products': submitList});
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: Colors.white,
