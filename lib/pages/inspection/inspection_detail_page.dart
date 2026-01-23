@@ -435,13 +435,97 @@ class ExportInspectionDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF3B66F5);
     const Color textDark = Color(0xFF333333);
     final borderColor = Colors.grey[300]!;
-
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color primaryColor = colorScheme.primary;
     final emailController = useTextEditingController();
 
     final isDownloading = useState(false);
+
+    void showEmailNotSupportedTip() {
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            constraints: const BoxConstraints(maxWidth: 320),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 图标容器
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFF3E0),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.lightbulb_outline,
+                    color: Color(0xFFFF9800),
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // 标题
+                const Text(
+                  '暂不支持邮箱格式哦~',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1A1A1A),
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // 内容描述
+                const Text(
+                  'Comming Soon，敬请期待！',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF666666),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 28),
+                // 按钮
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: const Text(
+                      '我知道了',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return PopScope(
       canPop: !isDownloading.value,
@@ -515,7 +599,7 @@ class ExportInspectionDialog extends HookWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: primaryColor),
+                            borderSide: BorderSide(color: primaryColor),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           disabledBorder: OutlineInputBorder(
@@ -595,9 +679,12 @@ class ExportInspectionDialog extends HookWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        backgroundColor: primaryColor,
+                        backgroundColor: colorScheme.secondary,
                       ),
-                      child: const Text('下载图片文件'),
+                      child: Text(
+                        '下载图片文件',
+                        style: TextStyle(color: colorScheme.onSecondary),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -653,7 +740,7 @@ class ExportInspectionDialog extends HookWidget {
                               }
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
+                        backgroundColor: colorScheme.secondary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -670,9 +757,8 @@ class ExportInspectionDialog extends HookWidget {
                       onPressed: isDownloading.value
                           ? null
                           : () {
-                              final email = emailController.text;
-                              Navigator.of(context).pop();
-                              // TODO: 处理发送逻辑
+                              // final email = emailController.text;
+                              showEmailNotSupportedTip();
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
@@ -683,7 +769,10 @@ class ExportInspectionDialog extends HookWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      child: const Text('邮件发送'),
+                      child: Text(
+                        '邮件发送',
+                        style: TextStyle(color: colorScheme.onSecondary),
+                      ),
                     ),
                   ),
                 ],
