@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -10,6 +9,7 @@ import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ColumnConfig {
@@ -44,7 +44,6 @@ class ProductDraftItem {
     this.isRecognizing = false,
   });
 
-  // 用于更新特定字段
   ProductDraftItem copyWith({
     Map<String, String>? data,
     TemporaryMedia? media,
@@ -57,7 +56,6 @@ class ProductDraftItem {
     );
   }
 
-  // 获取显示用的值
   String getValue(String key) => data[key] ?? '-';
 
   @override
@@ -67,16 +65,23 @@ class ProductDraftItem {
 class ProductAiAddState {
   final List<ProductDraftItem> items;
   final bool isGlobalLoading;
+  final bool isSubmitting;
 
-  ProductAiAddState({this.items = const [], this.isGlobalLoading = false});
+  ProductAiAddState({
+    this.items = const [],
+    this.isGlobalLoading = false,
+    this.isSubmitting = false,
+  });
 
   ProductAiAddState copyWith({
     List<ProductDraftItem>? items,
     bool? isGlobalLoading,
+    bool? isSubmitting,
   }) {
     return ProductAiAddState(
       items: items ?? this.items,
       isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
     );
   }
 }
@@ -87,7 +92,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     return ProductAiAddState();
   }
 
-  // 图片列表变化时的入口方法
   Future<void> onImagesChanged(
       List<TemporaryMedia>? newImages, WidgetRef ref) async {
     final images = newImages ?? [];
@@ -102,20 +106,17 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     // 2. 如果图片增加了，保留旧数据，追加新数据占位符
     if (images.length > currentItems.length) {
       final List<ProductDraftItem> newItems = List.from(currentItems);
-
-      // 找出新增的图片索引
       final int startIndex = currentItems.length;
 
-      // 先添加占位数据
+      // 先添加占位数据，标记为识别中
       for (int i = startIndex; i < images.length; i++) {
         newItems.add(ProductDraftItem(
-          data: {}, // 空数据
+          data: {},
           media: images[i],
-          isRecognizing: true, // 标记正在识别
+          isRecognizing: true,
         ));
       }
 
-      // 更新UI显示Loading占位
       state = state.copyWith(items: newItems, isGlobalLoading: true);
 
       // 开始处理新增图片的 OCR
@@ -126,50 +127,56 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   Future<void> _processOcrQueue(
       int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
     final user = ref.read(userProvider).user;
-
     List<ProductDraftItem> tempItems = List.from(state.items);
 
     for (int i = startIndex; i < images.length; i++) {
       final imageUrl = images[i].url;
       Map<String, String> rowMap = {};
 
-      final result = await identifyOcr('ExtractQtnBasic', {
-        "department": user?.department?.name,
-        "employee_name": user?.name,
-        "employee_number": user?.jobNumber,
-        "image": imageUrl,
-      });
+      try {
+        final result = await identifyOcr('ExtractQtnBasic', {
+          "department": user?.department?.name,
+          "employee_name": user?.name,
+          "employee_number": user?.jobNumber,
+          "image": imageUrl,
+        });
 
-      if (result != null &&
-          result['success'] == true &&
-          (result['data'] as List).isNotEmpty) {
-        final item = result['data'].first;
-        for (var col in _kTableColumns) {
-          String rawVal = (item[col.key] ?? '').toString().trim();
-          rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
+        if (result != null &&
+            result['success'] == true &&
+            (result['data'] as List).isNotEmpty) {
+          final item = result['data'].first;
+          for (var col in _kTableColumns) {
+            String rawVal = (item[col.key] ?? '').toString().trim();
+            rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
+          }
+        } else {
+          for (var col in _kTableColumns) {
+            rowMap[col.key] = '-';
+          }
+          rowMap['price'] = '未识别';
         }
-      } else {
+      } catch (e) {
+        // 异常处理，防止一直 loading
         for (var col in _kTableColumns) {
           rowMap[col.key] = '-';
         }
-        rowMap['price'] = '未识别';
+        rowMap['price'] = '识别错误';
       }
 
-      // 更新单条数据状态
-      if (i < tempItems.length) {
+      // 注意：检查索引防止用户在识别中途删除了图片导致数组越界
+      if (i < state.items.length) {
+        tempItems = List.from(state.items); // 获取最新的 state 防止覆盖删除操作
         tempItems[i] = tempItems[i].copyWith(
           data: rowMap,
           isRecognizing: false,
         );
-        // 实时更新状态，让用户看到进度
-        state = state.copyWith(items: List.from(tempItems));
+        state = state.copyWith(items: tempItems);
       }
     }
 
     state = state.copyWith(isGlobalLoading: false);
   }
 
-  // 更新单个单元格数据
   void updateCell(int index, String key, String value) {
     if (index >= state.items.length) return;
 
@@ -181,6 +188,83 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     newItems[index] = item.copyWith(data: newData);
 
     state = state.copyWith(items: newItems);
+  }
+
+  Future<bool> submitProducts(String? supplierId) async {
+    // 1. 基础校验
+    if (state.isSubmitting) return false;
+
+    // 2. 检查是否有未完成的识别
+    if (state.items.any((element) => element.isRecognizing)) {
+      EasyLoading.showToast('请等待所有图片识别完成');
+      return false;
+    }
+
+    if (state.items.isEmpty) {
+      EasyLoading.showToast('请先上传图片');
+      return false;
+    }
+
+    // 3. 开始提交
+    state = state.copyWith(isSubmitting: true);
+    EasyLoading.show(status: '保存中...');
+
+    try {
+      final List<Map<String, dynamic>> submitList = [];
+
+      for (var item in state.items) {
+        // 双重保险，跳过识别中的
+        if (item.isRecognizing) continue;
+
+        final row = item.data;
+        String? val(String key) =>
+            (row[key] == null || row[key] == '-') ? null : row[key];
+
+        submitList.add({
+          'supply_quotes': [
+            {
+              "supplier_id": supplierId,
+              'supplier_price': val('price'),
+              'outer_capacity': val('out_carton'),
+              'inner_capacity': val('inner_pack'),
+              'weight': val('weight'),
+              'packaging': val('packaging_type'),
+              'unit': val('unit'),
+              'outer_volume': val('volume'),
+              'supplier_moq': val('moq'),
+            }
+          ],
+          'spec': val('size'),
+          'description_cn': val('description'),
+          'image': [item.media],
+          'item_type': 'market_product'
+        });
+      }
+
+      if (submitList.isEmpty) {
+        EasyLoading.showInfo('没有有效数据可提交');
+        return false;
+      }
+
+      // API 调用
+      await batchStoreShowroomSample({'products': submitList});
+
+      // 4. 成功后处理
+      EasyLoading.showSuccess('保存成功');
+      clear(); // 清空数据
+      return true;
+    } catch (e) {
+      EasyLoading.showError('保存失败: $e');
+      return false;
+    } finally {
+      // 无论成功失败，取消提交状态
+      state = state.copyWith(isSubmitting: false);
+    }
+  }
+
+  /// 清空所有数据（成功后调用）
+  void clear() {
+    state = ProductAiAddState();
   }
 }
 
@@ -223,7 +307,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
 
                   // 列表区域
                   if (providerState.items.isNotEmpty) ...[
-                    // 这里去掉了原本的表头 Header
                     const SizedBox(height: 8),
                     ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
@@ -246,7 +329,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               ),
             ),
           ),
-          _buildBottomAction(context, colorScheme, providerState.items),
+          _buildBottomAction(context, colorScheme, providerState, controller),
         ],
       ),
     );
@@ -444,8 +527,32 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
-      List<ProductDraftItem> items) {
+  /// 优化后的底部按钮
+  Widget _buildBottomAction(
+    BuildContext context,
+    ColorScheme colorScheme,
+    ProductAiAddState state,
+    ProductAiAddController controller,
+  ) {
+    // 1. 判断是否还有正在识别的项目
+    final bool hasRecognizingItems =
+        state.items.any((item) => item.isRecognizing);
+
+    // 2. 列表是否为空
+    final bool isEmpty = state.items.isEmpty;
+
+    // 3. 计算按钮是否可用 (非空 且 无识别中 且 非提交中)
+    final bool canSubmit =
+        !isEmpty && !hasRecognizingItems && !state.isSubmitting;
+
+    // 4. 计算按钮文案
+    String buttonText = '保存产品 (${state.items.length})';
+    if (hasRecognizingItems) {
+      buttonText = 'AI识别中...';
+    } else if (state.isSubmitting) {
+      buttonText = '提交中...';
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
@@ -460,54 +567,39 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       child: SizedBox(
         height: 44,
         child: ElevatedButton(
-          onPressed: items.isEmpty
-              ? null
-              : () async {
-                  final List<Map<String, dynamic>> submitList = [];
-
-                  for (var item in items) {
-                    if (item.isRecognizing) continue;
-
-                    final row = item.data;
-
-                    String? val(String key) =>
-                        (row[key] == null || row[key] == '-') ? null : row[key];
-
-                    submitList.add({
-                      'supply_quotes': [
-                        {
-                          "supplier_id": supplierId,
-                          'supplier_price': val('price'),
-                          'outer_capacity': val('out_carton'),
-                          'inner_capacity': val('inner_pack'),
-                          'weight': val('weight'),
-                          'packaging': val('packaging_type'),
-                          'unit': val('unit'),
-                          'outer_volume': val('volume'),
-                          'supplier_moq': val('moq'),
-                        }
-                      ],
-                      'spec': val('size'),
-                      'description_cn': val('description'),
-                      'image': [item.media],
-                      'item_type': 'market_product'
-                    });
-                  }
-
-                  if (submitList.isEmpty) return;
-
-                  await batchStoreShowroomSample({'products': submitList});
-                },
+          onPressed: canSubmit
+              ? () async {
+                  await controller.submitProducts(supplierId);
+                }
+              : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: Colors.white,
-            elevation: 1,
+            disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
+            disabledForegroundColor: Colors.white.withOpacity(0.8),
+            elevation: canSubmit ? 1 : 0,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
             textStyle:
                 const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
-          child: Text('保存产品 (${items.length})'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (hasRecognizingItems || state.isSubmitting) ...[
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Text(buttonText),
+            ],
+          ),
         ),
       ),
     );
