@@ -455,10 +455,8 @@ class _PhotoCard extends HookConsumerWidget {
                     isDirectCamera: isDirectCamera.value,
                     mediaMap: mediaMap,
                     onMediaChanged: onMediaChanged,
-                    // 3. 判断逻辑：只有索引为 0 (第一个) 时开启连拍 并且没有图片
-                    enableContinuous: index == 0,
-                    onContinuousCapture:
-                        index == 0 ? handleAutoDistribute : null,
+                    enableContinuous: true,
+                    onContinuousCapture: handleAutoDistribute,
                   );
                 }).toList(),
               ),
@@ -490,7 +488,8 @@ class _PhotoCard extends HookConsumerWidget {
                       customIcon: Icons.camera_alt,
                       directCamera: isDirectCamera.value,
                       directGallery: !isDirectCamera.value,
-                      enableContinuous: false,
+                      enableContinuous: true,
+                      onContinuousCapture: handleAutoDistribute,
                       onChanged: (list) => onMediaChanged('details', list),
                     ),
                   ),
