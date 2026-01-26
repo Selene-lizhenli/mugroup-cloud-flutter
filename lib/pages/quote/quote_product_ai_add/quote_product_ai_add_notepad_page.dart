@@ -412,7 +412,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'AI自动识别中，双击表格文字可进行修改，支持一图多品。',
+              'AI自动识别中，点击表格文字可进行修改，支持一图多品。',
               style: TextStyle(
                   color: colorScheme.primary,
                   fontSize: 12,
@@ -579,7 +579,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                         const SizedBox(height: 4),
                         GestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onDoubleTap: () {
+                          onTap: () {
                             EditDialog.show(
                               context,
                               initialText: text == '-' ? '' : text,

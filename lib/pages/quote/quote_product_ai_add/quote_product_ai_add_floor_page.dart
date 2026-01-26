@@ -389,7 +389,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'AI自动识别中，双击数据可直接修改',
+              'AI自动识别中，点击数据可直接修改',
               style: TextStyle(
                   color: colorScheme.primary,
                   fontSize: 12,
@@ -477,7 +477,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                       color: Colors.transparent,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(4),
-                        onDoubleTap: () {
+                        onTap: () {
                           EditDialog.show(
                             context,
                             initialText: isEmpty ? '' : text,
