@@ -400,10 +400,16 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                   .whereType<TemporaryMedia>()
                                   .toList();
                             }
-                            return ImageUploader(
-                              customIcon: Icons.camera_alt,
-                              value: displayValue,
-                              onChanged: field.didChange,
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              clipBehavior: Clip.none,
+                              child: ImageUploader(
+                                customIcon: Icons.camera_alt,
+                                value: displayValue,
+                                onChanged: (value) {
+                                  field.didChange(value);
+                                },
+                              ),
                             );
                           },
                         ),

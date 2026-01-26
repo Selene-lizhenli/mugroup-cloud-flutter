@@ -19,7 +19,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class MarketProductCompanyCreatePage extends HookConsumerWidget {
   const MarketProductCompanyCreatePage({super.key});
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -41,7 +40,7 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
         final result = await identifyCompanyCard({'image': images});
 
         if (result != null) {
-          EasyLoading.showSuccess("识别成功"); 
+          EasyLoading.showSuccess("识别成功");
           final formValues = convertCompanyCardDataToFormValues(result);
           formKey.currentState?.patchValue(formValues);
         } else {
@@ -116,10 +115,16 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                             FormBuilderField<List<TemporaryMedia>>(
                               name: "images",
                               builder: (field) {
-                                return ImageUploader(
-                                  customIcon: Icons.camera_alt,
-                                  value: field.value,
-                                  onChanged: field.didChange,
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  clipBehavior: Clip.none,
+                                  child: ImageUploader(
+                                    customIcon: Icons.camera_alt,
+                                    value: field.value,
+                                    onChanged: (value) {
+                                      field.didChange(value);
+                                    },
+                                  ),
                                 );
                               },
                             ),

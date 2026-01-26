@@ -480,15 +480,19 @@ class _PhotoCard extends HookConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  ImageUploader(
-                    label: null,
-                    maxCount: 50,
-                    value: detailsList,
-                    customIcon: Icons.camera_alt,
-                    directCamera: isDirectCamera.value,
-                    directGallery: !isDirectCamera.value,
-                    enableContinuous: false,
-                    onChanged: (list) => onMediaChanged('details', list),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
+                    child: ImageUploader(
+                      label: null,
+                      maxCount: 50,
+                      value: detailsList,
+                      customIcon: Icons.camera_alt,
+                      directCamera: isDirectCamera.value,
+                      directGallery: !isDirectCamera.value,
+                      enableContinuous: false,
+                      onChanged: (list) => onMediaChanged('details', list),
+                    ),
                   ),
                 ],
               )
@@ -571,6 +575,7 @@ class _PhotoCard extends HookConsumerWidget {
               child: ImageUploader(
                 label: null,
                 maxCount: 1,
+                customIcon: Icons.camera_alt,
                 value: mediaMap[apiKey] ?? [],
                 directCamera: isDirectCamera,
                 directGallery: !isDirectCamera,

@@ -825,10 +825,16 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                             fontWeight: FontWeight.w600),
                                       ),
                                       const SizedBox(height: 12),
-                                      ImageUploader(
-                                        customIcon: Icons.camera_alt,
-                                        value: displayValue,
-                                        onChanged: field.didChange,
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        clipBehavior: Clip.none,
+                                        child: ImageUploader(
+                                          customIcon: Icons.camera_alt,
+                                          value: displayValue,
+                                          onChanged: (value) {
+                                            field.didChange(value);
+                                          },
+                                        ),
                                       ),
                                     ],
                                   );

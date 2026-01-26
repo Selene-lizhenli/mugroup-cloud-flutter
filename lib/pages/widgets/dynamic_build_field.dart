@@ -171,23 +171,27 @@ class DynamicBuildField extends HookConsumerWidget {
                 .toList();
           }
 
-          return ImageUploader(
-            label: s.title,
-            showRecognizeButton: true,
-            recognizeApi: recognizeApi,
-            customIcon: Icons.camera_alt,
-            onRecognizeResult: (data) {
-              if (data != null && data is Map<String, dynamic>) {
-                final form = FormBuilder.of(context);
-                form?.patchValue(data);
-                form?.save();
-              }
-            },
-            value: displayValue,
-            onChanged: (newValue) {
-              field.didChange(newValue);
-            },
-            errorText: field.errorText,
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: ImageUploader(
+              label: s.title,
+              showRecognizeButton: true,
+              recognizeApi: recognizeApi,
+              customIcon: Icons.camera_alt,
+              onRecognizeResult: (data) {
+                if (data != null && data is Map<String, dynamic>) {
+                  final form = FormBuilder.of(context);
+                  form?.patchValue(data);
+                  form?.save();
+                }
+              },
+              value: displayValue,
+              onChanged: (newValue) {
+                field.didChange(newValue);
+              },
+              errorText: field.errorText,
+            ),
           );
         },
       );

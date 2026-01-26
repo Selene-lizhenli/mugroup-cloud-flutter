@@ -38,12 +38,16 @@ class SupplySupplierActivityCreatePage extends HookConsumerWidget {
                     return null;
                   },
                   builder: (field) {
-                    return ImageUploader(
-                      label: "附件",
-                      value: field.value,
-                      customIcon: Icons.camera_alt,
-                      onChanged: field.didChange,
-                      errorText: field.errorText,
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      child: ImageUploader(
+                        label: "附件",
+                        value: field.value,
+                        customIcon: Icons.camera_alt,
+                        onChanged: field.didChange,
+                        errorText: field.errorText,
+                      ),
                     );
                   },
                 ),
