@@ -52,11 +52,13 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
           // --- Tab 2: 白板 ---
           QuoteProductAiAddFloorPage(
             quoteId: quoteId,
+            supplierId: supplierId,
           ),
 
           // --- Tab 3: 记事本 ---
           QuoteProductAiAddNotepadPage(
             quoteId: quoteId,
+            supplierId: supplierId,
           ),
         ],
       ),

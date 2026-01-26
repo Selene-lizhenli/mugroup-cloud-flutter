@@ -223,8 +223,10 @@ final productAiAddProvider =
 @RoutePage()
 class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
   final int? quoteId;
+  final String? supplierId;
 
-  const QuoteProductAiAddNotepadPage({super.key, this.quoteId});
+  const QuoteProductAiAddNotepadPage(
+      {super.key, this.quoteId, this.supplierId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -582,7 +584,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       submitList.add({
                         'supply_quotes': [
                           {
-                            "supplier_id": '67545',
+                            "supplier_id": supplierId,
                             'supplier_price': val('price'),
                             'outer_capacity': val('out_carton'),
                             'supplier_sku': val('item_no'),
