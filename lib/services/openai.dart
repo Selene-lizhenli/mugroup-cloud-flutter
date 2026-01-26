@@ -61,7 +61,7 @@ Future identifySupplierShopCard(Map<String, dynamic>? data) async {
   );
 }
 
-Future identifyOcr(Map<String, dynamic>? data) async {
+Future identifyOcr(String type, Map<String, dynamic>? data) async {
   const url = "https://yw-host.964062.xyz:63019/mucloud/ai/ocr";
 
   return api
@@ -71,7 +71,7 @@ Future identifyOcr(Map<String, dynamic>? data) async {
     options: Options(
       headers: {
         "x-access-token": "VEpPnatr9Ewv4RhmjKpcgqhChxwnzAmNmdanULPmoxm",
-        "x-action": "ExtractQtnBasic",
+        "x-action": type,
         "Content-Type": "application/json",
       },
     ),

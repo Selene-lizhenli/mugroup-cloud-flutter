@@ -138,7 +138,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       Map<String, String> rowMap = {};
 
       try {
-        final result = await identifyOcr({
+        final result = await identifyOcr('ExtractQtnBasic', {
           "department": user?.department?.name,
           "employee_name": user?.name,
           "employee_number": user?.jobNumber,
