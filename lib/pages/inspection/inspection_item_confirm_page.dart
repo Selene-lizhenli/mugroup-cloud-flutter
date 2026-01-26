@@ -357,11 +357,29 @@ class _PhotoCard extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 左侧：标题
-                  _TitleRow(
-                    icon: Icons.camera_alt_outlined,
-                    title: '验货图片',
-                    color: blue,
-                    textColor: text,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end, // 让提示文字对齐标题底部
+                    children: [
+                      _TitleRow(
+                        icon: Icons.camera_alt_outlined,
+                        title: '验货图片',
+                        color: blue,
+                        textColor: text,
+                      ),
+                      const SizedBox(width: 6), // 间距
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            bottom: 2), // 微调底部距离，使其视觉上与文字基线对齐
+                        child: Text(
+                          '长按连拍',
+                          style: TextStyle(
+                            fontSize: 11, // 小字号
+                            color: Colors.grey[500], // 灰色提示
+                            height: 1.0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   Flexible(
