@@ -24,7 +24,7 @@ mixin _$ExchangeRate {
   @JsonKey(name: 'exchange_rate')
   String? get exchangeRate => throw _privateConstructorUsedError;
   @JsonKey(name: 'reverse_exchange_rate')
-  double? get reverseExchangeRate => throw _privateConstructorUsedError;
+  String? get reverseExchangeRate => throw _privateConstructorUsedError;
   @JsonKey(name: 'date')
   String? get date => throw _privateConstructorUsedError;
   @JsonKey(name: 'short_name')
@@ -45,7 +45,7 @@ abstract class $ExchangeRateCopyWith<$Res> {
   $Res call(
       {String? name,
       @JsonKey(name: 'exchange_rate') String? exchangeRate,
-      @JsonKey(name: 'reverse_exchange_rate') double? reverseExchangeRate,
+      @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
       @JsonKey(name: 'date') String? date,
       @JsonKey(name: 'short_name') String? shortName});
 }
@@ -81,7 +81,7 @@ class _$ExchangeRateCopyWithImpl<$Res, $Val extends ExchangeRate>
       reverseExchangeRate: freezed == reverseExchangeRate
           ? _value.reverseExchangeRate
           : reverseExchangeRate // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -105,7 +105,7 @@ abstract class _$$ExchangeRateImplCopyWith<$Res>
   $Res call(
       {String? name,
       @JsonKey(name: 'exchange_rate') String? exchangeRate,
-      @JsonKey(name: 'reverse_exchange_rate') double? reverseExchangeRate,
+      @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
       @JsonKey(name: 'date') String? date,
       @JsonKey(name: 'short_name') String? shortName});
 }
@@ -139,7 +139,7 @@ class __$$ExchangeRateImplCopyWithImpl<$Res>
       reverseExchangeRate: freezed == reverseExchangeRate
           ? _value.reverseExchangeRate
           : reverseExchangeRate // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -172,7 +172,7 @@ class _$ExchangeRateImpl implements _ExchangeRate {
   final String? exchangeRate;
   @override
   @JsonKey(name: 'reverse_exchange_rate')
-  final double? reverseExchangeRate;
+  final String? reverseExchangeRate;
   @override
   @JsonKey(name: 'date')
   final String? date;
@@ -223,7 +223,7 @@ abstract class _ExchangeRate implements ExchangeRate {
   const factory _ExchangeRate(
       {final String? name,
       @JsonKey(name: 'exchange_rate') final String? exchangeRate,
-      @JsonKey(name: 'reverse_exchange_rate') final double? reverseExchangeRate,
+      @JsonKey(name: 'reverse_exchange_rate') final String? reverseExchangeRate,
       @JsonKey(name: 'date') final String? date,
       @JsonKey(name: 'short_name')
       final String? shortName}) = _$ExchangeRateImpl;
@@ -238,7 +238,7 @@ abstract class _ExchangeRate implements ExchangeRate {
   String? get exchangeRate;
   @override
   @JsonKey(name: 'reverse_exchange_rate')
-  double? get reverseExchangeRate;
+  String? get reverseExchangeRate;
   @override
   @JsonKey(name: 'date')
   String? get date;

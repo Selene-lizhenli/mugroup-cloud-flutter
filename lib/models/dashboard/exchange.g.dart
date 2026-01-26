@@ -10,7 +10,7 @@ _$ExchangeRateImpl _$$ExchangeRateImplFromJson(Map<String, dynamic> json) =>
     _$ExchangeRateImpl(
       name: json['name'] as String?,
       exchangeRate: json['exchange_rate'] as String?,
-      reverseExchangeRate: (json['reverse_exchange_rate'] as num?)?.toDouble(),
+      reverseExchangeRate: json['reverse_exchange_rate'] as String?,
       date: json['date'] as String?,
       shortName: json['short_name'] as String?,
     );

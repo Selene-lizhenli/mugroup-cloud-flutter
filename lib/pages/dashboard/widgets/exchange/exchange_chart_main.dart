@@ -1,92 +1,45 @@
-import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator_dialog.dart';
+import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
+import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/min_max_labels.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/pages/widgets/show_error.dart';
+import 'package:cloud/providers/exchange.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LineChartDemo extends StatefulWidget {
+class LineChartDemo extends ConsumerStatefulWidget {
   const LineChartDemo({super.key});
 
   @override
-  State<LineChartDemo> createState() => _LineChartDemoState();
+  ConsumerState<LineChartDemo> createState() => _LineChartDemoState();
 }
 
-class _LineChartDemoState extends State<LineChartDemo> {
-  int? _touchedIndex;
-  bool _isExpanded = false; // 控制折叠展开状态，默认为折叠
-  String? _selectedDimension = '美元'; // 选中的维度，默认选中美元
+class _LineChartDemoState extends ConsumerState<LineChartDemo> {
+  int? _touchedIndex; 
+  ExchangeRate? _selectedDimension; // 选中的维度，默认选中美元
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isListLoading = false;
 
   // 存储当前货币的历史数据
-  ExchangeRateHistory? _exchangeData;
+  ExchangeRateHistory? _exchangeData; //波动图的数据
+  List<ExchangeRate>? _currencyList; //列表的数据
 
-  // 维度选项配置和对应的货币代码映射
-  static const Map<String, String> _dimensionCurrencyMap = {
-    '美元': 'USD',
-    '澳大': 'AUD',
-    '巴西': 'BRL',
-    '加拿': 'CAD',
-    '欧元': 'EUR',
-    '英镑': 'GBP',
-    '印度': 'INR',
-    '日元': 'JPY',
-    '韩国元': 'KRW',
-    '卢布': 'RUB',
-    '沙特': 'SAR',
-    '新加': 'SGD',
-    '土耳': 'TRY',
-  };
 
-  // 货币代码到中文名称的反向映射
-  static const Map<String, String> _currencyToChineseMap = {
-    'USD': '美元',
-    'AUD': '澳大',
-    'BRL': '巴西',
-    'CAD': '加拿',
-    'EUR': '欧元',
-    'GBP': '英镑',
-    'INR': '印度',
-    'JPY': '日元',
-    'KRW': '韩国元',
-    'RUB': '卢布',
-    'SAR': '沙特',
-    'SGD': '新加',
-    'TRY': '土耳',
-  };
-
-  /// 将货币代码转换为中文名称
-  String _getCurrencyChineseName(String? currencyCode) {
-    if (currencyCode == null || currencyCode.isEmpty) {
-      return '汇率波动';
-    }
-    return '${_currencyToChineseMap[currencyCode.toUpperCase()]} ${currencyCode.isNotEmpty ? '($currencyCode)' : ''}';
-  }
-
-  static const List<String> _dimensionOptions = [
-    '美元',
-    '澳大',
-    '巴西',
-    '加拿',
-    '欧元',
-    '英镑',
-    '印度',
-    '日元',
-    '韩国元',
-    '卢布',
-    '沙特',
-    '新加',
-    '土耳',
-  ];
-
-  // 维度选项配置（供外部使用）
-  static List<String> get dimensionOptions => _dimensionOptions;
+ 
+  // /// 将货币代码转换为中文名称
+  // String _getCurrencyChineseName(String? currencyCode) {
+  //   if (currencyCode == null || currencyCode.isEmpty) {
+  //     return '汇率波动';
+  //   }
+  //   return '${_currencyToChineseMap[currencyCode.toUpperCase()]} ${currencyCode.isNotEmpty ? '($currencyCode)' : ''}';
+  // }
 
   /// 获取日期范围（最近30天）
   Map<String, String> _getDateRange() {
@@ -112,7 +65,7 @@ class _LineChartDemoState extends State<LineChartDemo> {
 
     try {
       final dateRange = _getDateRange();
-      final currency = _dimensionCurrencyMap[_selectedDimension!];
+      final currency = _selectedDimension!.shortName;
 
       if (currency == null) {
         if (mounted) {
@@ -146,12 +99,40 @@ class _LineChartDemoState extends State<LineChartDemo> {
     }
   }
 
+  Future<void> _loadCurrencyList() async {
+    try {
+      if (mounted) {
+        setState(() {
+          _isListLoading = true;
+        });
+      }
+      final data = await getExchangesList();
+      if (mounted) {
+        setState(() {
+          _currencyList = data;
+          _isListLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = '数据加载失败! $e';
+          _isListLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    // 页面加载后调用接口
+    // 页面加载后：若已选择维度，则调用趋势接口；否则展示汇率列表（exchangeProvider）
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadExchangeData();
+      if (_selectedDimension != null) {
+        _loadExchangeData();
+      } else {
+        _loadCurrencyList();
+      }
     });
   }
 
@@ -199,26 +180,42 @@ class _LineChartDemoState extends State<LineChartDemo> {
     }
 
     _touchedIndex ??= 0;
-    void onDimensionSelected(String value) async {
-      if (_selectedDimension != value) {
+    void onDimensionSelected(ExchangeRate? value) async {
+      if (_selectedDimension?.shortName != value?.shortName) {
         setState(() {
           _selectedDimension = value;
           _exchangeData = null; // 清除旧数据
         });
-        // 切换维度时重新加载数据
-        await _loadExchangeData();
+        if (_selectedDimension != null) {
+          await _loadExchangeData();
+        }
+      } else {
+        setState(() {
+          _selectedDimension = null;
+        });
       }
     }
 
     return Column(children: [
-      ExchangeChartHeader(
-        onCalculatorPressed: () =>
-            _showExchangeCalculator(context, _touchedIndex ?? 0),
+      ExchangeChartHeader(  
         selectedDimension: _selectedDimension,
-        dimensionOptions: _dimensionOptions,
         onDimensionSelected: onDimensionSelected,
+        currencyList: _currencyList,
       ),
-      if (_isLoading)
+      // 未选择维度：展示 exchangeProvider 的汇率列表（表格）
+      if (_selectedDimension == null)
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: colorScheme.surface,
+          ),
+          child: ExchangeRatesValueList(
+            list: _currencyList,
+            loading: _isListLoading,
+          ),
+        )
+      else if (_isLoading)
         Container(
           padding: const EdgeInsets.all(16),
           height: 150,
@@ -255,9 +252,9 @@ class _LineChartDemoState extends State<LineChartDemo> {
             child: Empty(),
           ),
         )
-      else  
+      else
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: colorScheme.surface),
@@ -469,195 +466,176 @@ class _LineChartDemoState extends State<LineChartDemo> {
                             ),
                           ),
                         ),
+                        // 显示当前选择的维度注释（右上角）
+
+                        if (_selectedDimension != null)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: IgnorePointer(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '${_selectedDimension!.name} ${_selectedDimension!.shortName}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     );
                   },
                 ),
               ),
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
               // 汇率标题和折叠按钮
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _getCurrencyChineseName(_exchangeData!.currency),
-                        style: TextStyle(
-                            fontSize: 12, color: colorScheme.onSurface),
-                      ),
-                    ),
-                    // InkWell(
-                    //   borderRadius: BorderRadius.circular(8),
-                    //   onTap: () => setState(() => _isExpanded = !_isExpanded),
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.symmetric(
-                    //         horizontal: 6, vertical: 4),
-                    //     child: Row(
-                    //       mainAxisSize: MainAxisSize.min,
-                    //       children: [
-                    //         Text(
-                    //           _isExpanded ? '收起' : '展开',
-                    //           style: TextStyle(
-                    //             fontSize: 12,
-                    //             color: colorScheme.secondary,
-                    //           ),
-                    //         ),
-                    //         const SizedBox(width: 2),
-                    //         Icon(
-                    //           _isExpanded
-                    //               ? Icons.keyboard_arrow_up
-                    //               : Icons.keyboard_arrow_down,
-                    //           size: 18,
-                    //           color: colorScheme.secondary,
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    TextButton(
-                      onPressed: () =>
-                          _showExchangeCalculator(context, _touchedIndex ?? 0),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        textStyle: const TextStyle(fontSize: 14),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.calculator,
-                            size: 14,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            '汇率计算器',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 5),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Expanded(
+              //         child: Text(
+              //           _getCurrencyChineseName(_exchangeData!.currency),
+              //           style: TextStyle(
+              //               fontSize: 12, color: colorScheme.onSurface),
+              //         ),
+              //       ),
+              //       // InkWell(
+              //       //   borderRadius: BorderRadius.circular(8),
+              //       //   onTap: () => setState(() => _isExpanded = !_isExpanded),
+              //       //   child: Padding(
+              //       //     padding: const EdgeInsets.symmetric(
+              //       //         horizontal: 6, vertical: 4),
+              //       //     child: Row(
+              //       //       mainAxisSize: MainAxisSize.min,
+              //       //       children: [
+              //       //         Text(
+              //       //           _isExpanded ? '收起' : '展开',
+              //       //           style: TextStyle(
+              //       //             fontSize: 12,
+              //       //             color: colorScheme.secondary,
+              //       //           ),
+              //       //         ),
+              //       //         const SizedBox(width: 2),
+              //       //         Icon(
+              //       //           _isExpanded
+              //       //               ? Icons.keyboard_arrow_up
+              //       //               : Icons.keyboard_arrow_down,
+              //       //           size: 18,
+              //       //           color: colorScheme.secondary,
+              //       //         ),
+              //       //       ],
+              //       //     ),
+              //       //   ),
+              //       // ),
+              //       // TextButton(
+              //       //   onPressed: () =>
+              //       //       _showExchangeCalculator(context, _touchedIndex ?? 0),
+              //       //   style: TextButton.styleFrom(
+              //       //     padding: const EdgeInsets.symmetric(
+              //       //         horizontal: 12, vertical: 6),
+              //       //     textStyle: const TextStyle(fontSize: 14),
+              //       //   ),
+              //       //   child: Row(
+              //       //     mainAxisSize: MainAxisSize.min,
+              //       //     children: [
+              //       //       Icon(
+              //       //         FontAwesomeIcons.calculator,
+              //       //         size: 14,
+              //       //         color: colorScheme.primary,
+              //       //       ),
+              //       //       const SizedBox(width: 6),
+              //       //       const Text(
+              //       //         '汇率计算器',
+              //       //         style: TextStyle(fontSize: 12),
+              //       //       ),
+              //       //     ],
+              //       //   ),
+              //       // ),
+              //     ],
+              //   ),
+              // ),
 
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: Visibility(
-                  visible: _isExpanded,
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: data.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 每行两个
-                      crossAxisSpacing: 0,
-                      mainAxisSpacing: 0,
-                      childAspectRatio: 5.5, // 调整宽高比以适应内容
-                    ),
-                    itemBuilder: (context, index) {
-                      final rate = rates[index];
-                      final displayRate = rate.toStringAsFixed(4);
-                      final dateStr = dates[index];
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 4,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  dateStr.isNotEmpty ? '$dateStr  ' : '',
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      height: 1,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  displayRate,
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ), // End of Visibility
-              ), // End of AnimatedSize
+              // AnimatedSize(
+              //   duration: const Duration(milliseconds: 300),
+              //   curve: Curves.easeInOut,
+              //   child: Visibility(
+              //     visible: _isExpanded,
+              //     child: GridView.builder(
+              //       shrinkWrap: true,
+              //       physics: const NeverScrollableScrollPhysics(),
+              //       itemCount: data.length,
+              //       gridDelegate:
+              //           const SliverGridDelegateWithFixedCrossAxisCount(
+              //         crossAxisCount: 2, // 每行两个
+              //         crossAxisSpacing: 0,
+              //         mainAxisSpacing: 0,
+              //         childAspectRatio: 5.5, // 调整宽高比以适应内容
+              //       ),
+              //       itemBuilder: (context, index) {
+              //         final rate = rates[index];
+              //         final displayRate = rate.toStringAsFixed(4);
+              //         final dateStr = dates[index];
+              //         return Container(
+              //           padding: const EdgeInsets.symmetric(
+              //               horizontal: 6, vertical: 0),
+              //           decoration: BoxDecoration(
+              //             color: Theme.of(context).colorScheme.surface,
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           child: Column(
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               const SizedBox(
+              //                 height: 4,
+              //               ),
+              //               Row(
+              //                 children: [
+              //                   Text(
+              //                     dateStr.isNotEmpty ? '$dateStr  ' : '',
+              //                     style: TextStyle(
+              //                         fontSize: 11,
+              //                         height: 1,
+              //                         color: Theme.of(context)
+              //                             .colorScheme
+              //                             .outline),
+              //                     maxLines: 1,
+              //                     overflow: TextOverflow.ellipsis,
+              //                   ),
+              //                   Text(
+              //                     displayRate,
+              //                     style: TextStyle(
+              //                         fontSize: 11,
+              //                         fontWeight: FontWeight.w500,
+              //                         height: 1,
+              //                         color: Theme.of(context)
+              //                             .colorScheme
+              //                             .onSurface),
+              //                     maxLines: 1,
+              //                     overflow: TextOverflow.ellipsis,
+              //                   ),
+              //                 ],
+              //               )
+              //             ],
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //   ), // End of Visibility
+              // ), // End of AnimatedSize
             ],
           ),
         )
     ]);
   }
 
-  void _showExchangeCalculator(
-    BuildContext context,
-    int filteredIndex,
-  ) {
-    // 将新的数据结构转换为 ExchangeRate 格式，供计算器使用
-    if (_exchangeData == null ||
-        _selectedDimension == null ||
-        (_exchangeData!.data?.isEmpty ?? true)) {
-      return;
-    }
-
-    // 获取最新的汇率（最后一条数据）
-    final data = _exchangeData!.data;
-    if (data == null || data.isEmpty) return;
-
-    final rateString = data.last.rate;
-    final latestRate = double.tryParse(rateString ?? '0') ?? 0.0;
-    final currency = _dimensionCurrencyMap[_selectedDimension!] ?? '';
-
-    // 创建 ExchangeRate 对象
-    // 注意：新接口返回的 rate 是直接汇率值，不是百分比
-    // 为了兼容计算器，我们需要计算 reverseExchangeRate
-    final exchangeRate = ExchangeRate(
-      name: _selectedDimension!,
-      shortName: currency,
-      exchangeRate: (latestRate * 100).toString(), // 转换为百分比格式
-      reverseExchangeRate: latestRate > 0 ? 1.0 / latestRate : null,
-      date: data.last.date,
-    );
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext sheetContext) {
-        return ExchangeCalculatorDialog(
-          exchangeRates: [exchangeRate],
-          defaultCurrencyIndex: 0,
-        );
-      },
-    );
-  }
+  
 }

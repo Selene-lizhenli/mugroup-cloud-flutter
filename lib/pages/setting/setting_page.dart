@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/dashboard/widgets/market/market_purchase_chart.dart';

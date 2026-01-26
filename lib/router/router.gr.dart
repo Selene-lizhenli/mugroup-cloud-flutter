@@ -1086,12 +1086,14 @@ class QuoteProductAiAddFloorRoute
   QuoteProductAiAddFloorRoute({
     _i62.Key? key,
     int? quoteId,
+    String? supplierId,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductAiAddFloorRoute.name,
           args: QuoteProductAiAddFloorRouteArgs(
             key: key,
             quoteId: quoteId,
+            supplierId: supplierId,
           ),
           initialChildren: children,
         );
@@ -1106,6 +1108,7 @@ class QuoteProductAiAddFloorRoute
       return _i30.QuoteProductAiAddFloorPage(
         key: args.key,
         quoteId: args.quoteId,
+        supplierId: args.supplierId,
       );
     },
   );
@@ -1115,15 +1118,18 @@ class QuoteProductAiAddFloorRouteArgs {
   const QuoteProductAiAddFloorRouteArgs({
     this.key,
     this.quoteId,
+    this.supplierId,
   });
 
   final _i62.Key? key;
 
   final int? quoteId;
 
+  final String? supplierId;
+
   @override
   String toString() {
-    return 'QuoteProductAiAddFloorRouteArgs{key: $key, quoteId: $quoteId}';
+    return 'QuoteProductAiAddFloorRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId}';
   }
 }
 
@@ -1134,12 +1140,14 @@ class QuoteProductAiAddNotepadRoute
   QuoteProductAiAddNotepadRoute({
     _i62.Key? key,
     int? quoteId,
+    String? supplierId,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductAiAddNotepadRoute.name,
           args: QuoteProductAiAddNotepadRouteArgs(
             key: key,
             quoteId: quoteId,
+            supplierId: supplierId,
           ),
           initialChildren: children,
         );
@@ -1154,6 +1162,7 @@ class QuoteProductAiAddNotepadRoute
       return _i31.QuoteProductAiAddNotepadPage(
         key: args.key,
         quoteId: args.quoteId,
+        supplierId: args.supplierId,
       );
     },
   );
@@ -1163,15 +1172,18 @@ class QuoteProductAiAddNotepadRouteArgs {
   const QuoteProductAiAddNotepadRouteArgs({
     this.key,
     this.quoteId,
+    this.supplierId,
   });
 
   final _i62.Key? key;
 
   final int? quoteId;
 
+  final String? supplierId;
+
   @override
   String toString() {
-    return 'QuoteProductAiAddNotepadRouteArgs{key: $key, quoteId: $quoteId}';
+    return 'QuoteProductAiAddNotepadRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId}';
   }
 }
 

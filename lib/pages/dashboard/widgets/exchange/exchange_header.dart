@@ -1,26 +1,39 @@
- 
+import 'package:cloud/models/dashboard/exchange.dart';
+import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// 汇率图表头部组件（包含标题、汇率计算器和维度选择器）
 class ExchangeChartHeader extends StatelessWidget {
-  final VoidCallback onCalculatorPressed;
-  final String? selectedDimension;
-  final List<String> dimensionOptions;
-  final ValueChanged<String> onDimensionSelected;
+  final ExchangeRate? selectedDimension;
+  final ValueChanged<ExchangeRate> onDimensionSelected;
+  final List<ExchangeRate>? currencyList;
 
   const ExchangeChartHeader({
     super.key,
-    required this.onCalculatorPressed,
     required this.selectedDimension,
-    required this.dimensionOptions,
     required this.onDimensionSelected,
+    this.currencyList,
   });
 
-  void _openDimensionBottomSheet(BuildContext context) {
+  void _showExchangeCalculator(
+    BuildContext context,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext sheetContext) {
+        return ExchangeCalculatorDialog(
+            selectedDimension: selectedDimension, list: currencyList);
+      },
+    );
+  }
+
+  void _openDimensionBottomSheet(BuildContext context) async {
     final colorScheme = Theme.of(context).colorScheme;
 
-    showModalBottomSheet<String>(
+    await showModalBottomSheet<ExchangeRate>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -31,7 +44,8 @@ class ExchangeChartHeader extends StatelessWidget {
             constraints: BoxConstraints(maxHeight: maxHeight),
             decoration: BoxDecoration(
               color: colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: Column(
@@ -62,46 +76,53 @@ class ExchangeChartHeader extends StatelessWidget {
                   ),
                 ),
                 Divider(height: 1, color: colorScheme.outlineVariant),
-                Flexible(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: dimensionOptions.length,
-                    separatorBuilder: (_, __) =>
-                        Divider(height: 1, color: colorScheme.outlineVariant),
-                    itemBuilder: (ctx, index) {
-                      final dimension = dimensionOptions[index];
-                      final isSelected = selectedDimension == dimension;
+                if (currencyList != null && currencyList!.isNotEmpty)
+                  Flexible(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      itemCount: currencyList!.length,
+                      separatorBuilder: (_, __) =>
+                          Divider(height: 1, color: colorScheme.outlineVariant),
+                      itemBuilder: (ctx, index) {
+                        final dimension = currencyList![index];
+                        final isSelected =
+                            selectedDimension?.shortName == dimension.shortName;
 
-                      return ListTile(
-                        dense: true,
-                        leading: Icon(
-                          isSelected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_unchecked,
-                          size: 18,
-                          color: isSelected ? colorScheme.primary : colorScheme.outline,
-                        ),
-                        title: Text(
-                          dimension,
-                          style: TextStyle(
-                            color:
-                                isSelected ? colorScheme.primary : colorScheme.onSurface,
-                            fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.normal,
+                        return ListTile(
+                          dense: true,
+                          leading: Icon(
+                            isSelected
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_unchecked,
+                            size: 18,
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.outline,
                           ),
-                        ),
-                        onTap: () => Navigator.of(sheetContext).pop(dimension),
-                      );
-                    },
+                          title: Text(
+                            '${dimension.name} ${dimension.shortName}',
+                            style: TextStyle(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          onTap: () =>
+                              Navigator.of(sheetContext).pop(dimension),
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             ),
           ),
         );
       },
     ).then((value) {
-      if (value != null && value != selectedDimension) {
+      if (value != null) {
         onDimensionSelected(value);
       }
     });
@@ -119,39 +140,26 @@ class ExchangeChartHeader extends StatelessWidget {
           // 模块标题
           Text(
             '汇率波动',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontSize: 16),
+            style:
+                Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // TextButton(
-              //   onPressed: onCalculatorPressed,
-              //   style: TextButton.styleFrom(
-              //     padding:
-              //         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              //     textStyle: const TextStyle(fontSize: 14),
-              //   ),
-              //   child: Row(
-              //     mainAxisSize: MainAxisSize.min,
-              //     children: [
-              //       Icon(
-              //         FontAwesomeIcons.calculator,
-              //         size: 14,
-              //         color: colorScheme.primary,
-              //       ),
-              //       const SizedBox(width: 6),
-              //       const Text(
-              //         '汇率计算器',
-              //         style: TextStyle(fontSize: 12),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              const SizedBox(width: 10),
+              InkWell(
+                onTap: () => _showExchangeCalculator(context),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.calculator,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ],
+                ),
+              ), 
               TextButton(
                 onPressed: () => _openDimensionBottomSheet(context),
                 style: TextButton.styleFrom(
@@ -166,15 +174,6 @@ class ExchangeChartHeader extends StatelessWidget {
                       size: 20,
                       color: Colors.grey.shade600,
                     ),
-                    // const SizedBox(width: 6),
-                    // Text(
-                    //   selectedDimension ?? '选择',
-                    //   style: TextStyle(
-                    //     fontSize: 12,
-                    //     color: Colors.grey.shade800,
-                    //     fontWeight: FontWeight.w500,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

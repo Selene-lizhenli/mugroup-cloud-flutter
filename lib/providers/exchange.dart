@@ -46,6 +46,25 @@ class Exchange extends _$Exchange {
     );
   }
 
+  /// 获取维度选项列表（返回包含 name、shortName、reverseExchangeRate 的对象列表）
+  List<ExchangeRate> getDimensionOptions() {
+    final rates = state.value;
+    if (rates == null || rates.isEmpty) return [];
+    
+    // 过滤掉 name 为空的项，并按 name 去重
+    final Map<String, ExchangeRate> uniqueRates = {};
+    for (final rate in rates) {
+      if (rate.name != null && rate.name!.isNotEmpty) {
+        // 使用 name 作为 key 去重
+        if (!uniqueRates.containsKey(rate.name)) {
+          uniqueRates[rate.name!] = rate;
+        }
+      }
+    }
+    
+    return uniqueRates.values.toList();
+  }
+
   /// 计算货币换算
   /// [amount] 金额
   /// [fromCurrency] 源货币（供应商报价货币，通常是CNY）

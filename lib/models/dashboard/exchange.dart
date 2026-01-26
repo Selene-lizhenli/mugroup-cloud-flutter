@@ -9,7 +9,7 @@ class ExchangeRate with _$ExchangeRate {
   const factory ExchangeRate({
     String? name,
     @JsonKey(name: 'exchange_rate') String? exchangeRate,
-    @JsonKey(name: 'reverse_exchange_rate') double? reverseExchangeRate,
+    @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
     @JsonKey(name: 'date') String? date,
     @JsonKey(name: 'short_name') String? shortName,
   }) = _ExchangeRate;
