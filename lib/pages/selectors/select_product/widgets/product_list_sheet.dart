@@ -26,7 +26,7 @@ class ProductListSheet extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     // 初始化选中状态
     useEffect(() {
       if (initialSelectedIds != null && initialSelectedIds!.isNotEmpty) {
@@ -59,7 +59,8 @@ class ProductListSheet extends HookConsumerWidget {
         validIds.isNotEmpty && validIds.every((id) => selectedIds.contains(id));
 
     Future<void> handleSearch() async {
-      await notifier.fetchProducts(search: searchController.text.trim(), reset: true);
+      await notifier.fetchProducts(
+          search: searchController.text.trim(), reset: true);
     }
 
     Future<void> handleRefresh() async {
@@ -279,8 +280,7 @@ class ProductListSheet extends HookConsumerWidget {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
             child: Center(
-              child:
-                  Text('暂无产品', style: TextStyle(color: colorScheme.outline)),
+              child: Text('暂无产品', style: TextStyle(color: colorScheme.outline)),
             ),
           ),
         ],
@@ -297,11 +297,9 @@ class ProductListSheet extends HookConsumerWidget {
             if (state.isLoadingMore) {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: MuProgressIndicator(
-                    barWidth: 2, 
+                    barWidth: 2,
                   ),
                 ),
               );

@@ -173,7 +173,7 @@ class InspectionAddPage extends HookConsumerWidget {
                         width: 20,
                         height: 20,
                         child: MuProgressIndicator(
-                          muBarWidth: 4,
+                          barWidth: 4,
                         ),
                       )
                     : const Text(
