@@ -102,22 +102,6 @@ class InspectionDetailPage extends HookConsumerWidget {
             onPressed: () => refreshData(),
             icon: const Icon(Icons.refresh, size: 20),
           ),
-          TextButton(
-            onPressed: () async {
-              await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => InspectionAddSku(id: id),
-              );
-
-              refreshData(isSilent: true);
-            },
-            child: Text(
-              '新增',
-              style: TextStyle(color: primaryColor, fontSize: 16),
-            ),
-          ),
         ],
       ),
       body: isLoading.value
@@ -144,7 +128,16 @@ class InspectionDetailPage extends HookConsumerWidget {
                             textGrey,
                             primaryColor,
                             searchController,
-                            currentTab),
+                            currentTab, () async {
+                          await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => InspectionAddSku(id: id),
+                          );
+
+                          refreshData(isSilent: true);
+                        }),
                         Divider(
                             height: 1, thickness: 1, color: Colors.grey[100]),
                         if (filteredItems.isEmpty)
@@ -195,23 +188,9 @@ class InspectionDetailPage extends HookConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle_outline, color: primaryColor, size: 20),
-              const SizedBox(width: 8),
-              Text('任务信息',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: textDark)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Divider(height: 1, thickness: 1, color: Colors.grey[100]),
-          const SizedBox(height: 16),
-          Row(
-            children: [
               Text('${inspection?.name}',
-                  style: const TextStyle(
-                      fontSize: 15, color: Color(0xFF333333))), // 修复颜色引用
+                  style:
+                      const TextStyle(fontSize: 15, color: Color(0xFF333333))),
               const Spacer(),
               Text(
                 (inspection?.createdAt != null &&
@@ -274,11 +253,12 @@ class InspectionDetailPage extends HookConsumerWidget {
       Color textGrey,
       Color primaryColor,
       TextEditingController controller,
-      ValueNotifier<int> currentTab) {
+      ValueNotifier<int> currentTab,
+      VoidCallback onTap) {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
           child: Row(
             children: [
               Icon(Icons.format_list_bulleted, color: primaryColor, size: 20),
@@ -301,6 +281,13 @@ class InspectionDetailPage extends HookConsumerWidget {
                             fontWeight: FontWeight.bold)),
                     TextSpan(text: '/$totalCount 个SKU'),
                   ],
+                ),
+              ),
+              TextButton(
+                onPressed: onTap,
+                child: Text(
+                  '新增',
+                  style: TextStyle(color: primaryColor, fontSize: 16),
                 ),
               ),
             ],
