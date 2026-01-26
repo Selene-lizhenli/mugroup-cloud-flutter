@@ -21,23 +21,22 @@ class ColumnConfig {
 
 const List<ColumnConfig> _kTableColumns = [
   ColumnConfig('price', '供应商报价', width: 80),
-  ColumnConfig('out_carton', '外装箱量', width: 80),
-  ColumnConfig('inner_pack', '内装箱量', width: 60),
-  ColumnConfig('size', '尺寸', width: 80),
-  ColumnConfig('weight', '重量(克)', width: 60),
+  ColumnConfig('out_carton', '外装箱量', width: 70),
+  ColumnConfig('inner_pack', '内装箱量', width: 70),
+  ColumnConfig('size', '尺寸', width: 90),
+  ColumnConfig('weight', '重量(g)', width: 60),
   ColumnConfig('packaging_type', '包装方式', width: 70),
   ColumnConfig('unit', '单位', width: 50),
   ColumnConfig('volume', '体积', width: 60),
-  ColumnConfig('moq', '起订量', width: 70),
+  ColumnConfig('moq', '起订量', width: 60),
   ColumnConfig('capacity', '容量', width: 60),
-  ColumnConfig('description', '描述', width: 80),
+  ColumnConfig('description', '描述', width: 120),
 ];
 
-/// 更好的数据模型，包含 helper 方法
 class ProductDraftItem {
   final Map<String, String> data;
   final TemporaryMedia media;
-  final bool isRecognizing; // 增加单个条目的识别状态
+  final bool isRecognizing;
 
   ProductDraftItem({
     required this.data,
@@ -64,8 +63,6 @@ class ProductDraftItem {
   @override
   String toString() => 'ProductDraftItem(data: $data)';
 }
-
-// --- 2. Riverpod Controller (业务逻辑层) ---
 
 class ProductAiAddState {
   final List<ProductDraftItem> items;
@@ -130,37 +127,32 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
     final user = ref.read(userProvider).user;
 
-    // 这里的策略是并发还是串行？这里演示串行处理，也可以改为 Future.wait 并发
     List<ProductDraftItem> tempItems = List.from(state.items);
 
     for (int i = startIndex; i < images.length; i++) {
       final imageUrl = images[i].url;
       Map<String, String> rowMap = {};
 
-      try {
-        final result = await identifyOcr('ExtractQtnBasic', {
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": imageUrl,
-        });
+      final result = await identifyOcr('ExtractQtnBasic', {
+        "department": user?.department?.name,
+        "employee_name": user?.name,
+        "employee_number": user?.jobNumber,
+        "image": imageUrl,
+      });
 
-        if (result != null &&
-            result['success'] == true &&
-            (result['data'] as List).isNotEmpty) {
-          final item = result['data'].first;
-          for (var col in _kTableColumns) {
-            String rawVal = (item[col.key] ?? '').toString().trim();
-            rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
-          }
-        } else {
-          for (var col in _kTableColumns) rowMap[col.key] = '-';
-          rowMap['price'] = '未识别';
+      if (result != null &&
+          result['success'] == true &&
+          (result['data'] as List).isNotEmpty) {
+        final item = result['data'].first;
+        for (var col in _kTableColumns) {
+          String rawVal = (item[col.key] ?? '').toString().trim();
+          rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
         }
-      } catch (e) {
-        logger.e('OCR Error: $e');
-        for (var col in _kTableColumns) rowMap[col.key] = '-';
-        rowMap['price'] = '识别错误';
+      } else {
+        for (var col in _kTableColumns) {
+          rowMap[col.key] = '-';
+        }
+        rowMap['price'] = '未识别';
       }
 
       // 更新单条数据状态
@@ -192,13 +184,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   }
 }
 
-// 定义 Provider
 final productAiAddProvider =
     NotifierProvider.autoDispose<ProductAiAddController, ProductAiAddState>(
   ProductAiAddController.new,
 );
-
-// --- 3. UI 页面 ---
 
 @RoutePage()
 class QuoteProductAiAddFloorPage extends HookConsumerWidget {
@@ -212,11 +201,10 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
 
-    // 提取当前的 media 列表供 ImageUploader 回显
     final currentMediaList = providerState.items.map((e) => e.media).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF7F8FA),
       body: Column(
         children: [
           Expanded(
@@ -234,11 +222,12 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
 
                   // 列表区域
                   if (providerState.items.isNotEmpty) ...[
-                    _buildTableHeader(),
+                    // 这里去掉了原本的表头 Header
                     const SizedBox(height: 8),
                     ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       itemCount: providerState.items.length,
                       separatorBuilder: (c, i) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
@@ -302,56 +291,24 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   Widget _buildInfoBar(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      color: const Color(0xFFEef6FF),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
+      ),
       child: Row(
         children: [
-          Icon(Icons.volume_up_outlined, color: colorScheme.primary, size: 18),
+          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 14),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'AI自动识别中，双击表格文字可进行修改!!!',
-              style: TextStyle(color: colorScheme.primary, fontSize: 12),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8).copyWith(top: 10),
-      child: Row(
-        children: [
-          const SizedBox(
-            width: 70 + 16,
-            child: Text(' 图片预览',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold)),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              child: Row(
-                children: _kTableColumns.map((col) {
-                  return Container(
-                    width: col.width,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      col.label,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
-                    ),
-                  );
-                }).toList(),
-              ),
+              'AI自动识别中，双击数据可直接修改',
+              style: TextStyle(
+                  color: colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -361,26 +318,31 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
 
   Widget _buildDataRow(BuildContext context, int index, ProductDraftItem item,
       Function(String key, String val) onUpdate) {
-    // 如果该行正在识别中，显示 Loading
+    const double rowHeight = 72.0;
+
     if (item.isRecognizing) {
       return Container(
-        height: 80,
-        margin: const EdgeInsets.symmetric(horizontal: 10),
+        height: rowHeight,
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(8)),
-        child: const Center(child: CircularProgressIndicator()),
+        child: const Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
       );
     }
 
     return Container(
-      height: 80,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      height: rowHeight,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 4,
               offset: const Offset(0, 1))
         ],
@@ -397,20 +359,22 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.grey[300]!),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Image.network(
                   item.media.url,
                   fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) =>
-                      const Icon(Icons.broken_image, color: Colors.grey),
+                  errorBuilder: (ctx, err, stack) => const Center(
+                      child: Icon(Icons.broken_image_outlined,
+                          color: Colors.grey, size: 20)),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -418,9 +382,12 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               child: Row(
                 children: _kTableColumns.map((col) {
                   final text = item.getValue(col.key);
+                  final bool isEmpty = text == '-' || text.isEmpty;
+
                   return Container(
                     width: col.width,
                     alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(right: 8),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -428,31 +395,40 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         onDoubleTap: () {
                           EditDialog.show(
                             context,
-                            initialText: text == '-' ? '' : text,
+                            initialText: isEmpty ? '' : text,
                             onConfirm: (newText) => onUpdate(col.key, newText),
                           );
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 4),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                text,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: text == '-'
-                                      ? Colors.grey[400]
-                                      : Colors.black87,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              col.label,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey[500],
+                                fontWeight: FontWeight.normal,
                               ),
-                            ],
-                          ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              text,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: isEmpty
+                                    ? FontWeight.normal
+                                    : FontWeight.w600,
+                                color: isEmpty
+                                    ? Colors.grey[300]
+                                    : const Color(0xFF333333),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -470,8 +446,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       List<ProductDraftItem> items) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-          .copyWith(bottom: MediaQuery.of(context).padding.bottom + 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
+          .copyWith(bottom: MediaQuery.of(context).padding.bottom + 10),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
@@ -523,13 +499,13 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: Colors.white,
-            elevation: 0,
+            elevation: 1,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
             textStyle:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
-          child: const Text('保存产品'),
+          child: Text('保存产品 (${items.length})'),
         ),
       ),
     );
