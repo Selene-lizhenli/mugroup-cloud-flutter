@@ -276,6 +276,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ImageUploader(
+                    customIcon: Icons.camera_alt,
                     value: value,
                     onChanged: onChanged,
                   ),

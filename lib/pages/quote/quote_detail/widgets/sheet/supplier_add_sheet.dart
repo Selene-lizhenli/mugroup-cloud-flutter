@@ -299,6 +299,7 @@ class SupplierAddSheet extends HookConsumerWidget {
                 directCamera: false,
                 maxCount: 1,
                 showRecognizeButton: false,
+                customIcon: Icons.camera_alt,
                 recognizeApi: identifySupplySuppliersCard,
                 onRecognizeResult: (data) {
                   if (data != null && data is Map<String, dynamic>) {

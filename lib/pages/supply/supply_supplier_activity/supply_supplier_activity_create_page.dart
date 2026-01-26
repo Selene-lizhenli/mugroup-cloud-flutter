@@ -41,6 +41,7 @@ class SupplySupplierActivityCreatePage extends HookConsumerWidget {
                     return ImageUploader(
                       label: "附件",
                       value: field.value,
+                      customIcon: Icons.camera_alt,
                       onChanged: field.didChange,
                       errorText: field.errorText,
                     );

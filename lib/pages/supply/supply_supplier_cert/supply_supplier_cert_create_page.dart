@@ -42,6 +42,7 @@ class SupplySupplierCertCreatePage extends HookConsumerWidget {
                     return ImageUploader(
                       label: "证书文件",
                       value: field.value,
+                      customIcon: Icons.camera_alt,
                       onChanged: field.didChange,
                       errorText: field.errorText,
                     );

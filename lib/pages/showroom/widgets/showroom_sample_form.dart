@@ -401,6 +401,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                   .toList();
                             }
                             return ImageUploader(
+                              customIcon: Icons.camera_alt,
                               value: displayValue,
                               onChanged: field.didChange,
                             );

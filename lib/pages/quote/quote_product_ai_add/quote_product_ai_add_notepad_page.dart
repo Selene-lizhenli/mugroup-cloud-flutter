@@ -304,6 +304,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               padding: const EdgeInsets.all(16),
               scrollDirection: Axis.horizontal,
               child: ImageUploader(
+                customIcon: Icons.camera_alt,
                 value: value,
                 onChanged: onChanged,
               ),

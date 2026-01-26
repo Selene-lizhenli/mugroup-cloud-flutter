@@ -175,6 +175,7 @@ class DynamicBuildField extends HookConsumerWidget {
             label: s.title,
             showRecognizeButton: true,
             recognizeApi: recognizeApi,
+            customIcon: Icons.camera_alt,
             onRecognizeResult: (data) {
               if (data != null && data is Map<String, dynamic>) {
                 final form = FormBuilder.of(context);

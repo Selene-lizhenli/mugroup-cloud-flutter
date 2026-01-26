@@ -118,6 +118,7 @@ class CrmCotactForm extends HookConsumerWidget {
                           name: "images",
                           builder: (field) {
                             return ImageUploader(
+                              customIcon: Icons.camera_alt,
                               value: field.value,
                               onChanged: field.didChange,
                             );

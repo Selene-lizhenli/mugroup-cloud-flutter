@@ -826,6 +826,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                       ),
                                       const SizedBox(height: 12),
                                       ImageUploader(
+                                        customIcon: Icons.camera_alt,
                                         value: displayValue,
                                         onChanged: field.didChange,
                                       ),

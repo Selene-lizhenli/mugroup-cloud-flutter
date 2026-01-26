@@ -484,6 +484,7 @@ class _PhotoCard extends HookConsumerWidget {
                     label: null,
                     maxCount: 50,
                     value: detailsList,
+                    customIcon: Icons.camera_alt,
                     directCamera: isDirectCamera.value,
                     directGallery: !isDirectCamera.value,
                     enableContinuous: false,
