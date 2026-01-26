@@ -17,3 +17,27 @@ class ExchangeRate with _$ExchangeRate {
   factory ExchangeRate.fromJson(Map<String, dynamic> json) =>
       _$ExchangeRateFromJson(json);
 }
+
+/// 汇率波动数据项
+@freezed
+class ExchangeRateDataItem with _$ExchangeRateDataItem {
+  const factory ExchangeRateDataItem({
+    required String? date,
+    required String? rate,
+  }) = _ExchangeRateDataItem;
+
+  factory ExchangeRateDataItem.fromJson(Map<String, dynamic> json) =>
+      _$ExchangeRateDataItemFromJson(json);
+}
+
+/// 汇率历史数据响应
+@freezed
+class ExchangeRateHistory with _$ExchangeRateHistory {
+  const factory ExchangeRateHistory({
+    required String? currency,
+    @JsonKey(name: 'data') List<ExchangeRateDataItem>? data,
+  }) = _ExchangeRateHistory;
+
+  factory ExchangeRateHistory.fromJson(Map<String, dynamic> json) =>
+      _$ExchangeRateHistoryFromJson(json);
+}

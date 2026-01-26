@@ -23,3 +23,33 @@ Map<String, dynamic> _$$ExchangeRateImplToJson(_$ExchangeRateImpl instance) =>
       'date': instance.date,
       'short_name': instance.shortName,
     };
+
+_$ExchangeRateDataItemImpl _$$ExchangeRateDataItemImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ExchangeRateDataItemImpl(
+      date: json['date'] as String?,
+      rate: json['rate'] as String?,
+    );
+
+Map<String, dynamic> _$$ExchangeRateDataItemImplToJson(
+        _$ExchangeRateDataItemImpl instance) =>
+    <String, dynamic>{
+      'date': instance.date,
+      'rate': instance.rate,
+    };
+
+_$ExchangeRateHistoryImpl _$$ExchangeRateHistoryImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ExchangeRateHistoryImpl(
+      currency: json['currency'] as String?,
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => ExchangeRateDataItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$ExchangeRateHistoryImplToJson(
+        _$ExchangeRateHistoryImpl instance) =>
+    <String, dynamic>{
+      'currency': instance.currency,
+      'data': instance.data,
+    };

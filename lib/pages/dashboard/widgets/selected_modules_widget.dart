@@ -1,6 +1,6 @@
 import 'package:cloud/pages/dashboard/widgets/market/market_purchase_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
-import 'package:cloud/pages/dashboard/widgets/modules/exchange_chart.dart';
+import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';

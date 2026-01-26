@@ -250,3 +250,335 @@ abstract class _ExchangeRate implements ExchangeRate {
   _$$ExchangeRateImplCopyWith<_$ExchangeRateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+ExchangeRateDataItem _$ExchangeRateDataItemFromJson(Map<String, dynamic> json) {
+  return _ExchangeRateDataItem.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ExchangeRateDataItem {
+  String? get date => throw _privateConstructorUsedError;
+  String? get rate => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ExchangeRateDataItemCopyWith<ExchangeRateDataItem> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ExchangeRateDataItemCopyWith<$Res> {
+  factory $ExchangeRateDataItemCopyWith(ExchangeRateDataItem value,
+          $Res Function(ExchangeRateDataItem) then) =
+      _$ExchangeRateDataItemCopyWithImpl<$Res, ExchangeRateDataItem>;
+  @useResult
+  $Res call({String? date, String? rate});
+}
+
+/// @nodoc
+class _$ExchangeRateDataItemCopyWithImpl<$Res,
+        $Val extends ExchangeRateDataItem>
+    implements $ExchangeRateDataItemCopyWith<$Res> {
+  _$ExchangeRateDataItemCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? date = freezed,
+    Object? rate = freezed,
+  }) {
+    return _then(_value.copyWith(
+      date: freezed == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String?,
+      rate: freezed == rate
+          ? _value.rate
+          : rate // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ExchangeRateDataItemImplCopyWith<$Res>
+    implements $ExchangeRateDataItemCopyWith<$Res> {
+  factory _$$ExchangeRateDataItemImplCopyWith(_$ExchangeRateDataItemImpl value,
+          $Res Function(_$ExchangeRateDataItemImpl) then) =
+      __$$ExchangeRateDataItemImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? date, String? rate});
+}
+
+/// @nodoc
+class __$$ExchangeRateDataItemImplCopyWithImpl<$Res>
+    extends _$ExchangeRateDataItemCopyWithImpl<$Res, _$ExchangeRateDataItemImpl>
+    implements _$$ExchangeRateDataItemImplCopyWith<$Res> {
+  __$$ExchangeRateDataItemImplCopyWithImpl(_$ExchangeRateDataItemImpl _value,
+      $Res Function(_$ExchangeRateDataItemImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? date = freezed,
+    Object? rate = freezed,
+  }) {
+    return _then(_$ExchangeRateDataItemImpl(
+      date: freezed == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String?,
+      rate: freezed == rate
+          ? _value.rate
+          : rate // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ExchangeRateDataItemImpl implements _ExchangeRateDataItem {
+  const _$ExchangeRateDataItemImpl({required this.date, required this.rate});
+
+  factory _$ExchangeRateDataItemImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ExchangeRateDataItemImplFromJson(json);
+
+  @override
+  final String? date;
+  @override
+  final String? rate;
+
+  @override
+  String toString() {
+    return 'ExchangeRateDataItem(date: $date, rate: $rate)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ExchangeRateDataItemImpl &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.rate, rate) || other.rate == rate));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, date, rate);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ExchangeRateDataItemImplCopyWith<_$ExchangeRateDataItemImpl>
+      get copyWith =>
+          __$$ExchangeRateDataItemImplCopyWithImpl<_$ExchangeRateDataItemImpl>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ExchangeRateDataItemImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ExchangeRateDataItem implements ExchangeRateDataItem {
+  const factory _ExchangeRateDataItem(
+      {required final String? date,
+      required final String? rate}) = _$ExchangeRateDataItemImpl;
+
+  factory _ExchangeRateDataItem.fromJson(Map<String, dynamic> json) =
+      _$ExchangeRateDataItemImpl.fromJson;
+
+  @override
+  String? get date;
+  @override
+  String? get rate;
+  @override
+  @JsonKey(ignore: true)
+  _$$ExchangeRateDataItemImplCopyWith<_$ExchangeRateDataItemImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+ExchangeRateHistory _$ExchangeRateHistoryFromJson(Map<String, dynamic> json) {
+  return _ExchangeRateHistory.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ExchangeRateHistory {
+  String? get currency => throw _privateConstructorUsedError;
+  @JsonKey(name: 'data')
+  List<ExchangeRateDataItem>? get data => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ExchangeRateHistoryCopyWith<ExchangeRateHistory> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ExchangeRateHistoryCopyWith<$Res> {
+  factory $ExchangeRateHistoryCopyWith(
+          ExchangeRateHistory value, $Res Function(ExchangeRateHistory) then) =
+      _$ExchangeRateHistoryCopyWithImpl<$Res, ExchangeRateHistory>;
+  @useResult
+  $Res call(
+      {String? currency,
+      @JsonKey(name: 'data') List<ExchangeRateDataItem>? data});
+}
+
+/// @nodoc
+class _$ExchangeRateHistoryCopyWithImpl<$Res, $Val extends ExchangeRateHistory>
+    implements $ExchangeRateHistoryCopyWith<$Res> {
+  _$ExchangeRateHistoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currency = freezed,
+    Object? data = freezed,
+  }) {
+    return _then(_value.copyWith(
+      currency: freezed == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String?,
+      data: freezed == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<ExchangeRateDataItem>?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ExchangeRateHistoryImplCopyWith<$Res>
+    implements $ExchangeRateHistoryCopyWith<$Res> {
+  factory _$$ExchangeRateHistoryImplCopyWith(_$ExchangeRateHistoryImpl value,
+          $Res Function(_$ExchangeRateHistoryImpl) then) =
+      __$$ExchangeRateHistoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String? currency,
+      @JsonKey(name: 'data') List<ExchangeRateDataItem>? data});
+}
+
+/// @nodoc
+class __$$ExchangeRateHistoryImplCopyWithImpl<$Res>
+    extends _$ExchangeRateHistoryCopyWithImpl<$Res, _$ExchangeRateHistoryImpl>
+    implements _$$ExchangeRateHistoryImplCopyWith<$Res> {
+  __$$ExchangeRateHistoryImplCopyWithImpl(_$ExchangeRateHistoryImpl _value,
+      $Res Function(_$ExchangeRateHistoryImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currency = freezed,
+    Object? data = freezed,
+  }) {
+    return _then(_$ExchangeRateHistoryImpl(
+      currency: freezed == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String?,
+      data: freezed == data
+          ? _value._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as List<ExchangeRateDataItem>?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ExchangeRateHistoryImpl implements _ExchangeRateHistory {
+  const _$ExchangeRateHistoryImpl(
+      {required this.currency,
+      @JsonKey(name: 'data') final List<ExchangeRateDataItem>? data})
+      : _data = data;
+
+  factory _$ExchangeRateHistoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ExchangeRateHistoryImplFromJson(json);
+
+  @override
+  final String? currency;
+  final List<ExchangeRateDataItem>? _data;
+  @override
+  @JsonKey(name: 'data')
+  List<ExchangeRateDataItem>? get data {
+    final value = _data;
+    if (value == null) return null;
+    if (_data is EqualUnmodifiableListView) return _data;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  String toString() {
+    return 'ExchangeRateHistory(currency: $currency, data: $data)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ExchangeRateHistoryImpl &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
+            const DeepCollectionEquality().equals(other._data, _data));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, currency, const DeepCollectionEquality().hash(_data));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ExchangeRateHistoryImplCopyWith<_$ExchangeRateHistoryImpl> get copyWith =>
+      __$$ExchangeRateHistoryImplCopyWithImpl<_$ExchangeRateHistoryImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ExchangeRateHistoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ExchangeRateHistory implements ExchangeRateHistory {
+  const factory _ExchangeRateHistory(
+          {required final String? currency,
+          @JsonKey(name: 'data') final List<ExchangeRateDataItem>? data}) =
+      _$ExchangeRateHistoryImpl;
+
+  factory _ExchangeRateHistory.fromJson(Map<String, dynamic> json) =
+      _$ExchangeRateHistoryImpl.fromJson;
+
+  @override
+  String? get currency;
+  @override
+  @JsonKey(name: 'data')
+  List<ExchangeRateDataItem>? get data;
+  @override
+  @JsonKey(ignore: true)
+  _$$ExchangeRateHistoryImplCopyWith<_$ExchangeRateHistoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

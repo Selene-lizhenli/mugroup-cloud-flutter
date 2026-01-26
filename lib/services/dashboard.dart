@@ -1,7 +1,6 @@
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
-import 'package:cloud/models/dashboard/market_stats.dart';
 import 'package:cloud/models/dashboard/public_news_article.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
@@ -25,6 +24,35 @@ Future<List<ExchangeRate>?> getExchangesList() async {
   }
 
   return null;
+}
+
+/// 获取汇率历史数据
+/// [currency] 货币代码，如 USD, AUD 等
+/// [start] 开始日期，格式：YYYY-MM-DD
+/// [end] 结束日期，格式：YYYY-MM-DD
+Future<ExchangeRateHistory?> getExchangeRateHistory({
+  required String currency,
+  required String start,
+  required String end,
+}) async {
+  try {
+    final res = await api.get(
+      'api/tenant/exchanges/trend',
+      data: {
+        'currency': currency,
+        'start': start,
+        'end': end,
+      },
+    );
+
+    if (res.data == null) {
+      return null;
+    } 
+    return ExchangeRateHistory.fromJson(res.data as Map<String, dynamic>);
+  } catch (e) {
+    logger.e('获取汇率历史数据失败: $e');
+    return null;
+  }
 }
 
 /// 获取统计数据汇总

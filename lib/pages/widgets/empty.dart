@@ -17,6 +17,8 @@ class Empty extends StatelessWidget {
   final Color? iconColor;
   final double? padding;
   final double? height;
+  final bool? showImage;
+  final double? fontSize;
 
   const Empty({
     super.key,
@@ -30,6 +32,8 @@ class Empty extends StatelessWidget {
     this.iconColor,
     this.padding = 0,
     this.height,
+    this.showImage = false,
+    this.fontSize = 12,
   });
 
   @override
@@ -37,10 +41,8 @@ class Empty extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final effectiveIconColor = iconColor ?? colorScheme.outline;
-    final effectiveTextStyle = textStyle ??
-        theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.outline,
-        );
+    final effectiveTextStyle =
+        textStyle ?? TextStyle(color: colorScheme.outline, fontSize: fontSize);
     final effectivePadding = padding != null ? padding! * 2 : 120;
 
     return SizedBox(
@@ -56,7 +58,7 @@ class Empty extends StatelessWidget {
               size: iconSize,
               color: effectiveIconColor,
             ),
-          ] else ...[
+          ] else if (showImage == true) ...[
             Image.asset(
               'assets/element/empty.png',
               height: picHeight,
