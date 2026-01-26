@@ -317,16 +317,24 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
   Widget _buildInfoBar(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      color: const Color(0xFFEef6FF),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
+      ),
       child: Row(
         children: [
-          Icon(Icons.volume_up_outlined, color: colorScheme.primary, size: 18),
+          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 14),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'AI自动识别中，双击表格文字可进行修改，支持一图多品。',
-              style: TextStyle(color: colorScheme.primary, fontSize: 12),
+              style: TextStyle(
+                  color: colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500),
             ),
           ),
         ],
