@@ -38,10 +38,11 @@ class _TopChartContentState extends State<ShipTopChartContent> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    // 只取前8条数据
-    final displayData = widget.data.take(8).toList();
     final isLoading = widget.isLoading;
+    final selectedRange = widget.selectedRange;
+    final onRangeChanged = widget.onRangeChanged;
+    // 只取前8条数据；shipCount 为 true 时按 shippingCount 从大到小排序后取前 8
+    final displayData = widget.data.take(8).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,15 +71,21 @@ class _TopChartContentState extends State<ShipTopChartContent> {
           buildBarChart(context, displayData),
 
         const SizedBox(height: 16),
+
         /// 时间范围选择
         TimeRangeSelect(
-          selectedRange: widget.selectedRange,
-          onRangeChanged: widget.onRangeChanged,
+          selectedRange: selectedRange,
+          onRangeChanged: onRangeChanged,
         ),
         const SizedBox(height: 16),
+
         /// 排行标题
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            color: colorScheme.surfaceTint.withOpacity(0.8),
+          ),
           child: Row(
             children: [
               Expanded(
@@ -121,8 +128,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
             ],
           ),
         ),
-        const SizedBox(height: 6),
-        // 列表（可展开/收起） 
+
+        // 列表（可展开/收起）
         AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -130,6 +137,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                 visible: _isExpanded,
                 child: Column(
                   children: [
+                    const SizedBox(height: 6),
                     ...displayData.asMap().entries.expand<Widget>((entry) {
                       final index = entry.key;
                       final item = entry.value;
@@ -197,6 +205,14 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                           children: [
                                             Text(
                                               '样品编号: ${item.sampleNo ?? ' '}',
+                                              style: TextStyle(
+                                                  color: colorScheme.onSurface
+                                                      .withOpacity(0.72),
+                                                  fontSize: 10),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '出货次数：${formatCurrencyAmount(item.shippingCount)}',
                                               style: TextStyle(
                                                   color: colorScheme.onSurface
                                                       .withOpacity(0.72),
@@ -283,7 +299,10 @@ class _TopChartContentState extends State<ShipTopChartContent> {
   }
 
   /// 构建柱状图
-  Widget buildBarChart(BuildContext context, List<ShipTopStats> displayData) {
+  Widget buildBarChart(
+    BuildContext context,
+    List<ShipTopStats> displayData,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     // 计算最大数量，用于设置纵轴最大值
@@ -319,7 +338,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                         return BarTooltipItem(
                           '${item.sampleName ?? ''}\n'
                           '编号: ${item.sampleNo ?? '未知'}\n'
-                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)}',
+                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)}\n'
+                          '出货次数: ${formatCurrencyAmount(item.shippingCount ?? 0)}',
                           TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 10,
@@ -374,7 +394,6 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                     final index = entry.key;
                     final item = entry.value;
                     final shippingAmount = item.shippingAmount ?? 0;
-
                     return BarChartGroupData(
                       x: index + 1,
                       barRods: [
@@ -399,12 +418,11 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: displayData.asMap().entries.map((entry) {
                       final item = entry.value;
-                      final shippingAmount = item.shippingAmount ?? 0;
+                      final data = item.shippingAmount ?? 0;
                       // 图表绘制区域高度（给 bottomTitles 预留空间）
                       final chartAreaHeight = constraints.maxHeight - 10;
-                      final barHeight = maxY <= 0
-                          ? 0.0
-                          : (shippingAmount / maxY) * chartAreaHeight;
+                      final barHeight =
+                          maxY <= 0 ? 0.0 : (data / maxY) * chartAreaHeight;
                       final barTop = chartAreaHeight - barHeight;
                       // 往上抬一点点，让数字“贴”在柱顶上方
                       final dy = (barTop - 14).clamp(0.0, chartAreaHeight);
@@ -415,7 +433,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                           child: Transform.translate(
                             offset: Offset(0, dy),
                             child: Text(
-                              formatCurrencyAmount(shippingAmount),
+                              formatCurrencyAmount(data),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 7,

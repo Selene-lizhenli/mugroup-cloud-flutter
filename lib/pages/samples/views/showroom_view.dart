@@ -21,7 +21,7 @@ class SamplesPageView extends HookConsumerWidget {
         .size
         .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
     final isPad =  MediaQuery.of(context).size.width > 600;
-    final imageHeight = screenHeight * (isPad ? 0.25 : 0.2);
+    final imageHeight = screenHeight * (isPad ? 0.26 : 0.19);
 
     useEffect(() {
       Future.microtask(() async {

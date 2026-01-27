@@ -11,7 +11,7 @@ final List<Map<String, dynamic>> sampleDimensionConfigs = [
     'label': '报价次数',
     'value': 'quote_rank',
     'icon': Icons.leaderboard,
-  },
+  }, 
   // {
   //   'label': '样品间',
   //   'value': 'sample_room',

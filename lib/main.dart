@@ -156,7 +156,7 @@ class MyApp extends ConsumerWidget {
           onPrimary: Colors.white, //玫粉色上的颜色
           secondary: secondaryColor,
           onSecondary: Colors.white, //蓝色上的颜色
-          surfaceTint: const Color.fromARGB(255, 240, 239, 240), //纸张背景色
+          surfaceTint: const Color.fromARGB(255, 240, 239, 240), //纸张背景色  更淡
           surface: Colors.white, //卡片背景颜色
           onSurface: Colors.black, //字体颜色 黑色
           surfaceContainerHighest: Colors.grey, //灰色 不重要的文字

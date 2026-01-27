@@ -100,7 +100,31 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       final params = shipDateRangeToParams(_shipDateRange);
       final resp = await getShipStatsSummary(params: params);
       if (mounted) {
-        setState(() { 
+        setState(() {
+          _shipTopDimensionData = resp ?? [];
+        });
+      }
+    } catch (e) {
+      logger.d('Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  handleShipCountRankData() async {
+    setState(() {
+      _isLoading = true;
+      _shipTopDimensionData = [];
+    });
+    try {
+      final params = shipDateRangeToParams(_shipDateRange);
+      final resp = await getShipStatsSummary(params: params);
+      if (mounted) {
+        setState(() {
           _shipTopDimensionData = resp ?? [];
         });
       }
@@ -124,7 +148,8 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     try {
       if (dimension == sampleDimensionConfigs[1]['value']) {
         handleQuoteRankData();
-      } else if (dimension == sampleDimensionConfigs[0]['value']) {
+      } else if (dimension == sampleDimensionConfigs[0]['value'] ||
+          dimension == sampleDimensionConfigs[2]['value']) {
         handleShipRankData();
       } else {
         if (mounted) {
@@ -259,7 +284,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     });
                     handleQuoteRankData();
                   },
-                )
+                ) 
               else
                 _isLoading
                     ? const Center(

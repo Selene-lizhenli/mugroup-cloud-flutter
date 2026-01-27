@@ -30,7 +30,9 @@ mixin _$ShipTopStats {
   @JsonKey(name: 'sample_name')
   String? get sampleName => throw _privateConstructorUsedError;
   @JsonKey(name: 'shipping_amount')
-  int? get shippingAmount => throw _privateConstructorUsedError;
+  int? get shippingAmount => throw _privateConstructorUsedError; // 出货金额
+  @JsonKey(name: 'shipping_count')
+  int? get shippingCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -50,7 +52,8 @@ abstract class $ShipTopStatsCopyWith<$Res> {
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       @JsonKey(name: 'sample_no') String? sampleNo,
       @JsonKey(name: 'sample_name') String? sampleName,
-      @JsonKey(name: 'shipping_amount') int? shippingAmount});
+      @JsonKey(name: 'shipping_amount') int? shippingAmount,
+      @JsonKey(name: 'shipping_count') int? shippingCount});
 }
 
 /// @nodoc
@@ -72,6 +75,7 @@ class _$ShipTopStatsCopyWithImpl<$Res, $Val extends ShipTopStats>
     Object? sampleNo = freezed,
     Object? sampleName = freezed,
     Object? shippingAmount = freezed,
+    Object? shippingCount = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -98,6 +102,10 @@ class _$ShipTopStatsCopyWithImpl<$Res, $Val extends ShipTopStats>
           ? _value.shippingAmount
           : shippingAmount // ignore: cast_nullable_to_non_nullable
               as int?,
+      shippingCount: freezed == shippingCount
+          ? _value.shippingCount
+          : shippingCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -116,7 +124,8 @@ abstract class _$$ShipTopStatsImplCopyWith<$Res>
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       @JsonKey(name: 'sample_no') String? sampleNo,
       @JsonKey(name: 'sample_name') String? sampleName,
-      @JsonKey(name: 'shipping_amount') int? shippingAmount});
+      @JsonKey(name: 'shipping_amount') int? shippingAmount,
+      @JsonKey(name: 'shipping_count') int? shippingCount});
 }
 
 /// @nodoc
@@ -136,6 +145,7 @@ class __$$ShipTopStatsImplCopyWithImpl<$Res>
     Object? sampleNo = freezed,
     Object? sampleName = freezed,
     Object? shippingAmount = freezed,
+    Object? shippingCount = freezed,
   }) {
     return _then(_$ShipTopStatsImpl(
       id: freezed == id
@@ -162,6 +172,10 @@ class __$$ShipTopStatsImplCopyWithImpl<$Res>
           ? _value.shippingAmount
           : shippingAmount // ignore: cast_nullable_to_non_nullable
               as int?,
+      shippingCount: freezed == shippingCount
+          ? _value.shippingCount
+          : shippingCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -175,7 +189,8 @@ class _$ShipTopStatsImpl implements _ShipTopStats {
       @JsonKey(name: 'thumb_url') this.thumbUrl,
       @JsonKey(name: 'sample_no') this.sampleNo,
       @JsonKey(name: 'sample_name') this.sampleName,
-      @JsonKey(name: 'shipping_amount') this.shippingAmount});
+      @JsonKey(name: 'shipping_amount') this.shippingAmount,
+      @JsonKey(name: 'shipping_count') this.shippingCount});
 
   factory _$ShipTopStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$ShipTopStatsImplFromJson(json);
@@ -199,10 +214,14 @@ class _$ShipTopStatsImpl implements _ShipTopStats {
   @override
   @JsonKey(name: 'shipping_amount')
   final int? shippingAmount;
+// 出货金额
+  @override
+  @JsonKey(name: 'shipping_count')
+  final int? shippingCount;
 
   @override
   String toString() {
-    return 'ShipTopStats(id: $id, categoryName: $categoryName, thumbUrl: $thumbUrl, sampleNo: $sampleNo, sampleName: $sampleName, shippingAmount: $shippingAmount)';
+    return 'ShipTopStats(id: $id, categoryName: $categoryName, thumbUrl: $thumbUrl, sampleNo: $sampleNo, sampleName: $sampleName, shippingAmount: $shippingAmount, shippingCount: $shippingCount)';
   }
 
   @override
@@ -220,13 +239,15 @@ class _$ShipTopStatsImpl implements _ShipTopStats {
             (identical(other.sampleName, sampleName) ||
                 other.sampleName == sampleName) &&
             (identical(other.shippingAmount, shippingAmount) ||
-                other.shippingAmount == shippingAmount));
+                other.shippingAmount == shippingAmount) &&
+            (identical(other.shippingCount, shippingCount) ||
+                other.shippingCount == shippingCount));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, categoryName, thumbUrl,
-      sampleNo, sampleName, shippingAmount);
+      sampleNo, sampleName, shippingAmount, shippingCount);
 
   @JsonKey(ignore: true)
   @override
@@ -249,7 +270,8 @@ abstract class _ShipTopStats implements ShipTopStats {
           @JsonKey(name: 'thumb_url') final String? thumbUrl,
           @JsonKey(name: 'sample_no') final String? sampleNo,
           @JsonKey(name: 'sample_name') final String? sampleName,
-          @JsonKey(name: 'shipping_amount') final int? shippingAmount}) =
+          @JsonKey(name: 'shipping_amount') final int? shippingAmount,
+          @JsonKey(name: 'shipping_count') final int? shippingCount}) =
       _$ShipTopStatsImpl;
 
   factory _ShipTopStats.fromJson(Map<String, dynamic> json) =
@@ -272,6 +294,9 @@ abstract class _ShipTopStats implements ShipTopStats {
   @override
   @JsonKey(name: 'shipping_amount')
   int? get shippingAmount;
+  @override // 出货金额
+  @JsonKey(name: 'shipping_count')
+  int? get shippingCount;
   @override
   @JsonKey(ignore: true)
   _$$ShipTopStatsImplCopyWith<_$ShipTopStatsImpl> get copyWith =>

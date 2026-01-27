@@ -71,8 +71,12 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
           onRangeChanged: widget.onRangeChanged,
         ),
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            color: colorScheme.surfaceTint.withOpacity(0.8),
+          ),
           child: Row(
             children: [
               Expanded(
@@ -290,7 +294,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
-                      tooltipBgColor: colorScheme.onSurface.withOpacity(0.06),
+                      tooltipBgColor: colorScheme.onPrimary.withOpacity(0.89),
                       fitInsideHorizontally: true,
                       tooltipRoundedRadius: 8,
                       tooltipMargin: 8,

@@ -14,6 +14,7 @@ _$ShipTopStatsImpl _$$ShipTopStatsImplFromJson(Map<String, dynamic> json) =>
       sampleNo: json['sample_no'] as String?,
       sampleName: json['sample_name'] as String?,
       shippingAmount: (json['shipping_amount'] as num?)?.toInt(),
+      shippingCount: (json['shipping_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$ShipTopStatsImplToJson(_$ShipTopStatsImpl instance) =>
@@ -24,4 +25,5 @@ Map<String, dynamic> _$$ShipTopStatsImplToJson(_$ShipTopStatsImpl instance) =>
       'sample_no': instance.sampleNo,
       'sample_name': instance.sampleName,
       'shipping_amount': instance.shippingAmount,
+      'shipping_count': instance.shippingCount,
     };

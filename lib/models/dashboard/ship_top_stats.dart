@@ -12,7 +12,8 @@ class ShipTopStats with _$ShipTopStats {
     @JsonKey(name: 'thumb_url') String? thumbUrl, // 样品缩略图
     @JsonKey(name: 'sample_no') String? sampleNo, 
     @JsonKey(name: 'sample_name') String? sampleName,
-    @JsonKey(name: 'shipping_amount') int? shippingAmount, 
+    @JsonKey(name: 'shipping_amount') int? shippingAmount, // 出货金额
+    @JsonKey(name: 'shipping_count') int? shippingCount, // 出货次数
   }) = _ShipTopStats;
 
   factory ShipTopStats.fromJson(Map<String, dynamic> json) =>
