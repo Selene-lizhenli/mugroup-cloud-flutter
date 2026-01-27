@@ -57,19 +57,17 @@ class TimeRangeSelect extends StatelessWidget {
             label: '最近一年',
             isSelected: selectedRange == ShipDateRange.lastYear,
             onTap: () => onRangeChanged?.call(ShipDateRange.lastYear),
-          ),
-          const SizedBox(width: 8),
+          ), 
           _RangeChip(
             label: '最近半年',
             isSelected: selectedRange == ShipDateRange.lastHalfYear,
             onTap: () => onRangeChanged?.call(ShipDateRange.lastHalfYear),
-          ),
-          const SizedBox(width: 8),
+          ), 
             _RangeChip(
             label: '最近三个月',
             isSelected: selectedRange == ShipDateRange.lastThreeMonths,
             onTap: () => onRangeChanged?.call(ShipDateRange.lastThreeMonths),
-          ),
+          ),  
           _RangeChip(
             label: '最近一个月',
             isSelected: selectedRange == ShipDateRange.lastMonth,
@@ -104,11 +102,12 @@ class _RangeChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Text(
             label,
             style: TextStyle(
               fontSize: 12,
+              height: 1,
               color: isSelected
                   ? colorScheme.onSurface
                   : colorScheme.onSurface.withOpacity(0.72),

@@ -167,6 +167,57 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     }
   }
 
+  /// 点击展开时 自动上滚动，使得界面能出现在viewport
+  void handleExpandScroll(expandedContentKey ) { 
+      // 等待动画完成后再滚动，确保内容已渲染
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 等待 AnimatedSize 动画完成（300ms）
+        Future.delayed(const Duration(milliseconds: 350), () {
+          if (mounted) {
+            final context = expandedContentKey.currentContext;
+            if (context != null) {
+              final scrollable = Scrollable.maybeOf(context);
+              if (scrollable != null) {
+                final scrollController = scrollable.widget.controller;
+                if (scrollController != null && scrollController.hasClients) {
+                  // 获取展开内容的 RenderBox
+                  final renderBox = context.findRenderObject() as RenderBox?;
+                  if (renderBox != null && renderBox.attached) {
+                    // 计算展开内容在全局坐标系中的位置
+                    final position = renderBox.localToGlobal(Offset.zero);
+                    // 获取 Scrollable 的 RenderBox（视口）
+                    final scrollableRenderBox =
+                        scrollable.context.findRenderObject() as RenderBox?;
+                    if (scrollableRenderBox != null) {
+                      final viewportPosition =
+                          scrollableRenderBox.localToGlobal(Offset.zero);
+                      // 计算展开内容相对于视口的位置
+                      final relativeY = position.dy - viewportPosition.dy;
+                      // 目标：让展开内容距离视口顶部200像素
+                      // 需要滚动的距离 = 当前相对位置 - 200
+                      final scrollDelta = relativeY - 300;
+                      final newOffset =
+                          (scrollController.offset + scrollDelta).clamp(
+                        0.0,
+                        scrollController.position.maxScrollExtent,
+                      );
+                      scrollController.animateTo(
+                        newOffset,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      });
+      return;
+    }
+ 
+
   @override
   Widget build(BuildContext context) {
     // 监听维度变化并重新加载数据
@@ -264,6 +315,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
               if (currentDimension == sampleDimensionConfigs[0]['value'])
                 ShipTopChartContent(
                   isLoading: _isLoading,
+                     handleExpandScroll: handleExpandScroll,
                   data: _shipTopDimensionData,
                   selectedRange: _shipDateRange,
                   onRangeChanged: (ShipDateRange range) {
@@ -275,6 +327,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                 )
               else if (currentDimension == sampleDimensionConfigs[1]['value'])
                 QuoteTopChartContent(
+                  handleExpandScroll: handleExpandScroll,
                   isLoading: _isLoading,
                   data: _quoteTopDimensionData,
                   selectedRange: _quoteDateRange,
