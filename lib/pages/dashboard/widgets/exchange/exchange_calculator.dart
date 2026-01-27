@@ -16,12 +16,15 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedCurrencyIndex = useState<int?>(null);
+    final selectedCurrencyIndex = useState<int?>(null); //选中的货币索引
     final currencyAmountController = useTextEditingController();
     final cnyAmountController = useTextEditingController();
     final isUpdating = useState<bool>(false);
 
-    const primaryColor = Color(0xFF1677FF);
+    final colorScheme = Theme.of(context).colorScheme;
+    final primaryColor = colorScheme.primary;
+    final secondaryColor = colorScheme.secondary;
+
     const backgroundColor = Color(0xFFF7F8FA);
     const textColor = Color(0xFF1F1F1F);
     final containerRadius = BorderRadius.circular(16);
@@ -220,7 +223,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
     Widget buildInputRow({
       required String currencyName,
       required TextEditingController controller,
-      required bool isSource,
+      required bool isPrimary,
       VoidCallback? onTapSelector,
     }) {
       return Container(
@@ -242,9 +245,9 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: isSource
+                      color: isPrimary
                           ? primaryColor.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.05),
+                          : secondaryColor.withOpacity(0.05),
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -253,7 +256,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
                           ? currencyName.substring(0, 1)
                           : '?',
                       style: TextStyle(
-                        color: isSource ? primaryColor : Colors.red,
+                        color: isPrimary ? primaryColor : secondaryColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -384,13 +387,14 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
                   buildInputRow(
                     currencyName: '人民币',
                     controller: cnyAmountController,
-                    isSource: false,
+                    isPrimary: true,
+                    onTapSelector: showCurrencySelector,
                   ),
                   const SizedBox(height: 4),
                   buildInputRow(
                     currencyName: currentCurrency.name ?? '',
                     controller: currencyAmountController,
-                    isSource: true,
+                    isPrimary: true,
                     onTapSelector: showCurrencySelector,
                   ),
                 ],
@@ -415,8 +419,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.swap_vert,
-                      size: 20, color: primaryColor),
+                  child: Icon(Icons.swap_vert, size: 20, color: primaryColor),
                 ),
               ),
             ],
@@ -451,6 +454,9 @@ class _CurrencySearchList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final keyword = useState<String>('');
+    final colorScheme = Theme.of(context).colorScheme;
+    final primaryColor = colorScheme.primary;
+    final secondaryColor = colorScheme.secondary;
 
     final filteredIndices = useMemoized(() {
       if (keyword.value.isEmpty) {
@@ -510,7 +516,6 @@ class _CurrencySearchList extends HookWidget {
                     final realIndex = filteredIndices[index];
                     final item = exchangeRates[realIndex];
                     final isSelected = realIndex == selectedIndex;
-                    const primaryColor = Color(0xFF1677FF);
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -524,7 +529,7 @@ class _CurrencySearchList extends HookWidget {
                         alignment: Alignment.center,
                         child: Text(
                           (item.name ?? '?').substring(0, 1),
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: primaryColor, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -537,7 +542,7 @@ class _CurrencySearchList extends HookWidget {
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: primaryColor)
+                          ? Icon(Icons.check_circle, color: primaryColor)
                           : null,
                       onTap: () => onSelect(realIndex),
                     );

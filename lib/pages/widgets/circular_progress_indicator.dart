@@ -100,8 +100,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
 
   @override
   Widget build(BuildContext context) {
-
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
     final barWidth = widget.barWidth;
     final barSpacing = widget.barSpacing;
     final maxHeight = widget.maxHeight;
@@ -115,7 +114,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height:  maxHeight + 10, // 给一些额外的空间
+          height: maxHeight + 10, // 给一些额外的空间
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -123,13 +122,13 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
               // 计算柱子高度比例：中间最高，两边对称递减
               // 高度比例：minHeightRatio, 0.6, 1.0, 0.6, minHeightRatio
               final heightRatios = [
-                 minHeightRatio,
+                minHeightRatio,
                 0.6,
                 1.0,
                 0.6,
                 minHeightRatio
               ];
-              final maxHeightCalc =  maxHeight * heightRatios[index];
+              final maxHeightCalc = maxHeight * heightRatios[index];
 
               // 颜色：primary和secondary交替
               final color =
@@ -139,13 +138,13 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
                 animation: _animations[index],
                 builder: (context, child) {
                   return Container(
-                    width:  barWidth,
+                    width: barWidth,
                     height: maxHeightCalc * _animations[index].value,
-                    margin: EdgeInsets.symmetric(horizontal:  barSpacing),
+                    margin: EdgeInsets.symmetric(horizontal: barSpacing),
                     decoration: BoxDecoration(
                       color: color,
-                      borderRadius: BorderRadius.circular(
-                           barWidth / 2), // 圆角半径等于宽度的一半
+                      borderRadius:
+                          BorderRadius.circular(barWidth / 2), // 圆角半径等于宽度的一半
                     ),
                   );
                 },
@@ -153,14 +152,14 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
             }),
           ),
         ),
-        if ( showText == true)
+        if (showText == true)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-               text ?? '加载中...',
+              text ?? '加载中...',
               style: TextStyle(
-                  fontSize:  fontSize ?? 12.0,
-                  color:  textColor ?? colorScheme.onSurface),
+                  fontSize: fontSize ?? 12.0,
+                  color: textColor ?? colorScheme.onSurface),
             ),
           ),
       ],

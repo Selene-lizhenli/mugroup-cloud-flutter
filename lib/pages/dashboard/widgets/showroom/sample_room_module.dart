@@ -1,9 +1,10 @@
 import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
-import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart'
+    show shipDateRangeToParams;
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
@@ -45,24 +46,12 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 }
 
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
-  // List<Level1CategoryStat> _showroomDimensionData = []; // 数据样品间分类
-  // List<Level1CategoryStat> _categoryDimensionData = []; // 数据 产品分类
   List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 报价排行
   List<ShipTopStats> _shipTopDimensionData = []; //  数据 出货排行
+  ShipDateRange _shipDateRange = ShipDateRange.lastYear; // 出货排行时间范围
+  ShipDateRange _quoteDateRange = ShipDateRange.lastYear; // 报价次数排行时间范围
 
   bool _isLoading = false; // 数据加载状态
-
-  // 颜色列表，用于分配颜色
-  static const List<Color> _colorPalette = [
-    Color(0xFF4A90E2), // 蓝色
-    Color(0xFF2E7D32), // 深绿色
-    Color.fromARGB(255, 15, 76, 125), // 浅蓝色
-    Color(0xFFFF9800), // 橙色
-    Color(0xFFFFC107), // 黄色
-    Color.fromARGB(255, 195, 89, 213), // 紫色
-    Color.fromARGB(255, 160, 70, 109), //玫粉色
-    Color(0xFF00BCD4), // 青色
-  ];
 
   String? _lastLoadedDimension;
 
@@ -77,168 +66,52 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     });
   }
 
-  /// 将扁平 categories 归并到一级目录并统计每个一级目录下包含的总 productsCount
-  List<Level1CategoryStat> buildLevel1Stats(
-    List<Category> categories, {
-    int rootId = 1,
-    bool includeRoot = false, // 是否把 Root 也当成一级目录输出
-  }) {
-    // 先建立 id -> Category 的索引，方便必要时补全名称（如果 ancestors 里只带了 id/name 也行）
-    final byId = <int, Category>{};
-    for (final c in categories) {
-      byId[c.id] = c;
-    }
-
-    // 一级目录 id -> 累加的 productsCount
-    final totals = <int, int>{};
-    // 一级目录 id -> name（用于输出）
-    final names = <int, String>{};
-
-    int safeCount(Category c) => c.productsCount ?? 0;
-
-    for (final c in categories) {
-      // 可选：跳过 Root 自己
-      if (!includeRoot && c.id == rootId) continue;
-
-      final ancestors = c.ancestors ?? const [];
-
-      // 情况 A：它就是一级目录（Root 的直接子类）
-      // 1) parentId == rootId
-      // 2) 或者 ancestors 只有 Root
-      final isDirectChildOfRoot = (c.parentId == rootId) ||
-          (ancestors.length == 1 && ancestors.first.id == rootId);
-
-      final int level1Id;
-      final String? level1Name;
-
-      if (isDirectChildOfRoot) {
-        level1Id = c.id;
-        level1Name = c.name;
-      } else {
-        // 情况 B：更深层：找 ancestors 中 Root 后面的第一个节点
-        // 例如 ancestors: [Root, Kitchen & Dining, Pots & Pans 的父...]
-        // 那一级目录就是 Kitchen & Dining（index 1）
-        final rootIndex = ancestors.indexWhere((a) => a.id == rootId);
-        if (rootIndex != -1 && ancestors.length > rootIndex + 1) {
-          final level1 = ancestors[rootIndex + 1];
-          level1Id = level1.id;
-          level1Name = level1.name;
-        } else {
-          // 实在找不到归属（数据不完整），就跳过或你也可以归到 Root
-          continue;
-        }
-      }
-
-      // 记录 name（如果 ancestors 里 name 为空，尝试从 byId 取）
-      names[level1Id] =
-          level1Name ?? byId[level1Id]?.name ?? 'Unknown($level1Id)';
-      totals[level1Id] = (totals[level1Id] ?? 0) + safeCount(c);
-    }
-
-    // 输出 list
-    final result = <Level1CategoryStat>[];
-    totals.forEach((id, total) {
-      result.add(Level1CategoryStat(
-        id: id,
-        name: names[id] ?? 'Unknown($id)',
-        totalProductsCount: total,
-        color: _colorPalette[id % _colorPalette.length],
-      ));
-    });
-
-    // 按数量降序（你也可以按名称/ID 排序）
-    result.sort((a, b) => b.totalProductsCount.compareTo(a.totalProductsCount));
-    logger.d(result);
-    return result;
-  }
-
-  // handleCategoryData() async {
-  //   if (_categoryDimensionData.isNotEmpty) {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     return;
-  //   }
-  //   final categoriesData = await getAllShowroomCategories();
-  //   logger.d('categoriesData: $categoriesData');
-  //   if (mounted) {
-  //     setState(() {
-  //       _isLoading = false;
-  //       if (categoriesData != null && categoriesData.isNotEmpty) {
-  //         _categoryDimensionData = buildLevel1Stats(categoriesData, rootId: 1);
-  //       } else {
-  //         _categoryDimensionData = [];
-  //       }
-  //     });
-  //   }
-  // }
-
-  // handleShowroomData() async {
-  //   if (_showroomDimensionData.isNotEmpty) {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     return;
-  //   }
-  //   final resp = await getWarehouses();
-  //   final warehouses = resp.data;
-  //   List<Level1CategoryStat> data;
-  //   if (warehouses.isNotEmpty) {
-  //     // 过滤掉 abandoned == true 的仓库
-  //     final activeWarehouses =
-  //         warehouses.where((warehouse) => warehouse.abandoned != true).toList();
-  //     data = activeWarehouses.asMap().entries.map((entry) {
-  //       final index = entry.key;
-  //       final warehouse = entry.value;
-  //       return Level1CategoryStat(
-  //         id: warehouse.id ?? index,
-  //         name: warehouse.name ?? '未命名样品间',
-  //         totalProductsCount: warehouse.sampleCount ?? 0,
-  //         color: _colorPalette[index % _colorPalette.length],
-  //       );
-  //     }).toList();
-  //   } else {
-  //     data = [];
-  //   }
-  //   if (mounted) {
-  //     setState(() {
-  //       _isLoading = false;
-  //       _showroomDimensionData = data;
-  //     });
-  //   }
-  // }
-
   handleQuoteRankData() async {
-    if (_quoteTopDimensionData.isNotEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-    final resp = await getQuoteStatsSummary(
-        params: {"start": null, "end": null}); //获取排行数据
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _quoteTopDimensionData = resp ?? [];
-      });
+    setState(() {
+      _isLoading = true;
+      _quoteTopDimensionData = [];
+    });
+    try {
+      final params = shipDateRangeToParams(_quoteDateRange);
+      logger.d('handleQuoteRankData params: $params');
+      final resp = await getQuoteStatsSummary(params: params);
+      if (mounted) {
+        setState(() {
+          _quoteTopDimensionData = resp ?? [];
+        });
+      }
+    } catch (e) {
+      logger.d('Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   handleShipRankData() async {
-    if (_shipTopDimensionData.isNotEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-    final resp = await getShipStatsSummary(
-        params: {"start": null, "end": null}); //获取排行数据
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _shipTopDimensionData = resp ?? [];
-      });
+    setState(() {
+      _isLoading = true;
+      _shipTopDimensionData = [];
+    });
+    try {
+      final params = shipDateRangeToParams(_shipDateRange);
+      final resp = await getShipStatsSummary(params: params);
+      if (mounted) {
+        setState(() { 
+          _shipTopDimensionData = resp ?? [];
+        });
+      }
+    } catch (e) {
+      logger.d('Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -364,23 +237,29 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
             children: [
               // 根据数据状态显示内容
               if (currentDimension == sampleDimensionConfigs[0]['value'])
-                _isLoading
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(text: '加载中...'),
-                        ),
-                      )
-                    : ShipTopChartContent(data: _shipTopDimensionData)
+                ShipTopChartContent(
+                  isLoading: _isLoading,
+                  data: _shipTopDimensionData,
+                  selectedRange: _shipDateRange,
+                  onRangeChanged: (ShipDateRange range) {
+                    setState(() {
+                      _shipDateRange = range;
+                    });
+                    handleShipRankData();
+                  },
+                )
               else if (currentDimension == sampleDimensionConfigs[1]['value'])
-                _isLoading
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(text: '加载中...'),
-                        ),
-                      )
-                    : TopChartContent(data: _quoteTopDimensionData)
+                QuoteTopChartContent(
+                  isLoading: _isLoading,
+                  data: _quoteTopDimensionData,
+                  selectedRange: _quoteDateRange,
+                  onRangeChanged: (ShipDateRange range) {
+                    setState(() {
+                      _quoteDateRange = range;
+                    });
+                    handleQuoteRankData();
+                  },
+                )
               else
                 _isLoading
                     ? const Center(

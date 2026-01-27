@@ -1,54 +1,76 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 
 /// 样品间---统计排行图表&列表组件
-class TopChartContent extends StatefulWidget {
+class QuoteTopChartContent extends StatefulWidget {
   final List<QuoteTopStats> data;
+  final ShipDateRange selectedRange;
+  final ValueChanged<ShipDateRange>? onRangeChanged;
+  final bool? isLoading;
 
-  const TopChartContent({
+  const QuoteTopChartContent({
     super.key,
     required this.data,
+    this.selectedRange = ShipDateRange.lastYear,
+    this.onRangeChanged,
+    this.isLoading,
   });
-
   @override
-  State<TopChartContent> createState() => _TopChartContentState();
+  State<QuoteTopChartContent> createState() => _TopChartContentState();
 }
 
-class _TopChartContentState extends State<TopChartContent> {
+class _TopChartContentState extends State<QuoteTopChartContent> {
   bool _isExpanded = false;
+  static const double chartContainerHeight = 200;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // 只取前5条数据
+    // 只取前9条数据
     final displayData = widget.data.take(9).toList();
-
-    // 如果没有数据，显示空状态
-    if (displayData.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Text(
-            '暂无数据',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.outline,
-                ),
-          ),
-        ),
-      );
-    }
+    final isLoading = widget.isLoading;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 柱状图
-        buildBarChart(context, displayData),
-        const SizedBox(height: 20),
+        if (isLoading == true)
+          const SizedBox(
+            height: chartContainerHeight,
+            child: Center(
+              child: MuProgressIndicator(showText: true, text: '加载中...'),
+            ),
+          )
+        else if (displayData.isEmpty)
+          SizedBox(
+            height: chartContainerHeight,
+            child: Center(
+              child: Text(
+                '暂无数据',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.outline,
+                    ),
+              ),
+            ),
+          )
+        else
+          buildBarChart(context, displayData),
+
+        const SizedBox(height: 16),
+
+        /// 时间范围选择
+        TimeRangeSelect(
+          selectedRange: widget.selectedRange,
+          onRangeChanged: widget.onRangeChanged,
+        ),
+        const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
@@ -93,89 +115,138 @@ class _TopChartContentState extends State<TopChartContent> {
             ],
           ),
         ),
-        const SizedBox(height: 6), 
+        const SizedBox(height: 6),
         // 列表（可展开/收起）
         if (_isExpanded)
           ...displayData.asMap().entries.expand<Widget>((entry) {
             final index = entry.key;
             final item = entry.value;
+            final isTopThree = index < 3;
+            final medalColor = index == 0
+                ? const Color(0xFFFFD700) // 金
+                : index == 1
+                    ? const Color(0xFFC0C0C0) // 银
+                    : const Color(0xFFCD7F32); // 铜
+
             return [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                ),
-                child: InkWell(
-                  onTap: item.id != null
-                      ? () {
-                          if (context.mounted) {
-                            context.router.push(
-                              ShowroomSampleDetailRoute(id: item.id!),
-                            );
-                          }
-                        }
-                      : null,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Row(
-                    children: [
-                      // 缩略图
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: SizedBox(
-                          width: 55, 
-                          height: 55,
-                          child: ImageShow(
-                            imageUrl: item.thumbUrl ?? '',
-                            fit: BoxFit.contain,
-                            enablePreview: false,
-                            showErrorText: true,
-                            errorIconSize: 18,
-                            errorTextSize: 7,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // 内容
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.sampleName ?? ' ',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(),
+              Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                    ),
+                    child: InkWell(
+                      onTap: item.id != null
+                          ? () {
+                              if (context.mounted) {
+                                context.router.push(
+                                  ShowroomSampleDetailRoute(id: item.id!),
+                                );
+                              }
+                            }
+                          : null,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        children: [
+                          // 缩略图
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: SizedBox(
+                              width: 55,
+                              height: 55,
+                              child: ImageShow(
+                                imageUrl: item.thumbUrl ?? '',
+                                fit: BoxFit.contain,
+                                enablePreview: false,
+                                showErrorText: true,
+                                errorIconSize: 18,
+                                errorTextSize: 7,
+                              ),
                             ),
-                            const SizedBox(height: 4),
-                            Row(
+                          ),
+                          const SizedBox(width: 12),
+                          // 内容
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '样品编号: ${item.sampleNo ?? ' '}',
-                                  style: TextStyle(
-                                      color: colorScheme.outline, fontSize: 10),
+                                  item.sampleName ?? ' ',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(),
                                 ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '挑样次数：${item.count ?? ' '}',
-                                  style: TextStyle(
-                                      color: colorScheme.outline, fontSize: 10),
-                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '样品编号: ${item.sampleNo ?? ' '}',
+                                      style: TextStyle(
+                                          color: colorScheme.onSurface
+                                              .withOpacity(0.72),
+                                          fontSize: 10),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      '报价次数：${item.count ?? ' '}',
+                                      style: TextStyle(
+                                          color: colorScheme.onSurface
+                                              .withOpacity(0.72),
+                                          fontSize: 10),
+                                    ),
+                                  ],
+                                )
                               ],
-                            )
+                            ),
+                          ),
+                          // 箭头图标（可点击）
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Icon(Icons.arrow_forward_ios,
+                              color: colorScheme.outline, size: 14),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (isTopThree)
+                    Positioned(
+                      left: 2,
+                      top: 2,
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: medalColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              size: 14,
+                              color: index == 1
+                                  ? Colors.grey.shade800
+                                  : Colors.white,
+                            ),
+                            // Text(index.toString()),
                           ],
                         ),
                       ),
-                      // 箭头图标（可点击）
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Icon(Icons.arrow_forward_ios,
-                          color: colorScheme.outline, size: 14),
-                    ],
-                  ),
-                ),
+                    ),
+                ],
               ),
               // 添加水平分割线（最后一条数据后不添加）
               if (index < displayData.length - 1)
@@ -196,10 +267,13 @@ class _TopChartContentState extends State<TopChartContent> {
     // 计算最大数量，用于设置纵轴最大值
     final maxCount =
         displayData.map((e) => e.count ?? 0).reduce((a, b) => a > b ? a : b);
-    final maxY = maxCount > 0 ? (maxCount * 1.2).ceil().toDouble() : 10.0;
+    final minCount =
+        displayData.map((e) => e.count ?? 0).reduce((a, b) => a > b ? b : a);
+    final maxY = maxCount > 0 ? (maxCount * 1.1).ceil().toDouble() : 10.0;
+    final minY = minCount > 0 ? (minCount * 0.85).ceil().toDouble() : 10.0;
 
     return Container(
-      height: 200, 
+      height: 200,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -212,7 +286,7 @@ class _TopChartContentState extends State<TopChartContent> {
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   maxY: maxY,
-                  minY: 0,
+                  minY: minY,
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
@@ -308,12 +382,13 @@ class _TopChartContentState extends State<TopChartContent> {
                       final count = item.count ?? 0;
                       // 图表绘制区域高度（给 bottomTitles 预留空间）
                       final chartAreaHeight = constraints.maxHeight - 10;
-                      final barHeight =
-                          maxY <= 0 ? 0.0 : (count / maxY) * chartAreaHeight;
-                      final barTop = chartAreaHeight - barHeight;
-                      // 往上抬一点点，让数字“贴”在柱顶上方
+                      // 有 minY 时：柱顶在像素中的位置 = (maxY - count) / (maxY - minY) * chartAreaHeight
+                      final rangeY = maxY - minY;
+                      final barTop = rangeY <= 0
+                          ? chartAreaHeight * 0.5
+                          : chartAreaHeight * (maxY - count) / rangeY;
+                      // 往上抬一点，让数字贴在柱顶上方
                       final dy = (barTop - 14).clamp(0.0, chartAreaHeight);
-
                       return Expanded(
                         child: Align(
                           alignment: Alignment.topCenter,
@@ -323,7 +398,7 @@ class _TopChartContentState extends State<TopChartContent> {
                               '$count',
                               style: TextStyle(
                                 color: colorScheme.onSurface,
-                                fontSize: 10, 
+                                fontSize: 10,
                               ),
                             ),
                           ),

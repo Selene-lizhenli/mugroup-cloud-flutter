@@ -2,18 +2,30 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart'
+    show ShipDateRange, TimeRangeSelect;
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 
+export 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart'
+    show ShipDateRange;
+
 /// 样品间---统计排行图表&列表组件
 class ShipTopChartContent extends StatefulWidget {
   final List<ShipTopStats> data;
+  final ShipDateRange selectedRange;
+  final ValueChanged<ShipDateRange>? onRangeChanged;
+  final bool? isLoading;
 
   const ShipTopChartContent({
     super.key,
     required this.data,
+    this.selectedRange = ShipDateRange.lastYear,
+    this.onRangeChanged,
+    this.isLoading,
   });
 
   @override
@@ -22,35 +34,49 @@ class ShipTopChartContent extends StatefulWidget {
 
 class _TopChartContentState extends State<ShipTopChartContent> {
   bool _isExpanded = false;
-
+  static const double chartContainerHeight = 200;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // 只取前5条数据
+    // 只取前8条数据
     final displayData = widget.data.take(8).toList();
-
-    // 如果没有数据，显示空状态
-    if (displayData.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Text(
-            '暂无数据',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.outline,
-                ),
-          ),
-        ),
-      );
-    }
+    final isLoading = widget.isLoading;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 柱状图
-        buildBarChart(context, displayData),
-        const SizedBox(height: 20),
+        if (isLoading == true)
+          const SizedBox(
+            height: chartContainerHeight,
+            child: Center(
+              child: MuProgressIndicator(showText: true, text: '加载中...'),
+            ),
+          )
+        else if (displayData.isEmpty)
+          SizedBox(
+            height: chartContainerHeight,
+            child: Center(
+              child: Text(
+                '暂无数据',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.outline,
+                    ),
+              ),
+            ),
+          )
+        else
+          buildBarChart(context, displayData),
+
+        const SizedBox(height: 16),
+        /// 时间范围选择
+        TimeRangeSelect(
+          selectedRange: widget.selectedRange,
+          onRangeChanged: widget.onRangeChanged,
+        ),
+        const SizedBox(height: 16),
+        /// 排行标题
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
@@ -74,7 +100,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isExpanded ? '收起' : '展开',
+                        _isExpanded ? '收起' : '更多',
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.primary,
@@ -96,8 +122,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
           ),
         ),
         const SizedBox(height: 6),
-        // 列表（可展开/收起）
-
+        // 列表（可展开/收起） 
         AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -173,7 +198,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                             Text(
                                               '样品编号: ${item.sampleNo ?? ' '}',
                                               style: TextStyle(
-                                                  color: colorScheme.outline,
+                                                  color: colorScheme.onSurface
+                                                      .withOpacity(0.72),
                                                   fontSize: 10),
                                             ),
                                           ],
@@ -186,7 +212,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                             Text(
                                               '出货金额(CNY)：${formatCurrencyAmount(item.shippingAmount)}',
                                               style: TextStyle(
-                                                  color: colorScheme.outline,
+                                                  color: colorScheme.onSurface
+                                                      .withOpacity(0.72),
                                                   fontSize: 10),
                                             ),
                                           ],
@@ -266,7 +293,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
     final maxY = maxCount > 0 ? (maxCount * 1.2).ceil().toDouble() : 10.0;
 
     return Container(
-      height: 200,
+      height: chartContainerHeight,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),

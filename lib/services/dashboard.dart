@@ -47,7 +47,7 @@ Future<ExchangeRateHistory?> getExchangeRateHistory({
 
     if (res.data == null) {
       return null;
-    } 
+    }
     return ExchangeRateHistory.fromJson(res.data as Map<String, dynamic>);
   } catch (e) {
     logger.e('获取汇率历史数据失败: $e');
@@ -73,31 +73,38 @@ Future<StatsSummary?> getStatsSummary({
   return null;
 }
 
- 
 Future<List<QuoteTopStats>?> getQuoteStatsSummary({
   Map<String, dynamic>? params,
-}) async { 
-    List<QuoteTopStats>? returnedData;
-    final res = await api.get('api/tenant/showroom/quotations/charts/sample', data: params); 
-    if (res.data == null) {
-      returnedData = null;
-    }
-    returnedData = (res.data as List).map((e) => QuoteTopStats.fromJson(e as Map<String, dynamic>)).toList();
-    logger.d(' returnedData ${returnedData}'); 
-    return returnedData;  
+}) async {
+  List<QuoteTopStats>? returnedData;
+  final res = await api.get('api/tenant/showroom/quotations/charts/sample',
+      data: params);
+  if (res.data == null) {
+    returnedData = null;
+  } else {
+    returnedData = (res.data as List)
+        .map((e) => QuoteTopStats.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } 
+  return returnedData;
 }
 
 Future<List<ShipTopStats>?> getShipStatsSummary({
   Map<String, dynamic>? params,
-}) async { 
-    List<ShipTopStats>? returnedData;
-    final res = await api.get('api/tenant/showroom/samples/charts/shipmentamount',  ); 
-    if (res.data == null) { 
-      returnedData = null;
-    }
-    returnedData = (res.data as List).map((e) => ShipTopStats.fromJson(e as Map<String, dynamic>)).toList();
-    logger.d(' getShipStatsSummary returnedData ${returnedData}'); 
-    return returnedData;  
+}) async {
+  List<ShipTopStats>? returnedData;
+  final res = await api.get(
+    'api/tenant/showroom/samples/charts/shipmentamount',
+    data: params,
+  );
+  if (res.data == null) {
+    returnedData = null;
+  }
+  returnedData = (res.data as List)
+      .map((e) => ShipTopStats.fromJson(e as Map<String, dynamic>))
+      .toList();
+  logger.d(' getShipStatsSummary returnedData ${returnedData}');
+  return returnedData;
 }
 
 /// 格式化月份标签，将 "2026-01" 转换为 "1月"
