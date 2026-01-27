@@ -2,10 +2,10 @@ import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/models/sample/category.dart';
-import 'package:cloud/models/dashboard/quote_top_stats.dart'; 
+import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/services/dashboard.dart'; 
+import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -368,7 +368,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
+                          child: MuProgressIndicator(text: '加载中...'),
                         ),
                       )
                     : ShipTopChartContent(data: _shipTopDimensionData)
@@ -377,7 +377,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
+                          child: MuProgressIndicator(text: '加载中...'),
                         ),
                       )
                     : TopChartContent(data: _quoteTopDimensionData)

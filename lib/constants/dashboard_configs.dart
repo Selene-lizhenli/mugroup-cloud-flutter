@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// 样品间模块的维度配置
 final List<Map<String, dynamic>> sampleDimensionConfigs = [
   {
-    'label': '出货次数',
+    'label': '出货金额',
     'value': 'ship_rank',
     'icon': Icons.leaderboard,
   },

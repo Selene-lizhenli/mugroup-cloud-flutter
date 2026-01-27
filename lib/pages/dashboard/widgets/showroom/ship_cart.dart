@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/dashboard_configs.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -107,94 +108,139 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                     ...displayData.asMap().entries.expand<Widget>((entry) {
                       final index = entry.key;
                       final item = entry.value;
+                      final isTopThree = index < 3;
+                      final medalColor = index == 0
+                          ? const Color(0xFFFFD700) // 金
+                          : index == 1
+                              ? const Color(0xFFC0C0C0) // 银
+                              : const Color(0xFFCD7F32); // 铜
                       return [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surface,
-                          ),
-                          child: InkWell(
-                            onTap: item.id != null
-                                ? () {
-                                    if (context.mounted) {
-                                      context.router.push(
-                                        ShowroomSampleDetailRoute(id: item.id!),
-                                      );
+                        Stack(children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                            ),
+                            child: InkWell(
+                              onTap: item.id != null
+                                  ? () {
+                                      if (context.mounted) {
+                                        context.router.push(
+                                          ShowroomSampleDetailRoute(
+                                              id: item.id!),
+                                        );
+                                      }
                                     }
-                                  }
-                                : null,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Row(
-                              children: [
-                                // 缩略图
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(2),
-                                  child: SizedBox(
-                                    width: 55,
-                                    height: 55,
-                                    child: ImageShow(
-                                      imageUrl: item.thumbUrl ?? '',
-                                      fit: BoxFit.contain,
-                                      enablePreview: false,
-                                      showErrorText: true,
-                                      errorIconSize: 18,
-                                      errorTextSize: 7,
+                                  : null,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(2),
+                                    child: SizedBox(
+                                      width: 55,
+                                      height: 55,
+                                      child: ImageShow(
+                                        imageUrl: item.thumbUrl ?? '',
+                                        fit: BoxFit.contain,
+                                        enablePreview: false,
+                                        showErrorText: true,
+                                        errorIconSize: 18,
+                                        errorTextSize: 7,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                // 内容
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.sampleName ?? ' ',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '样品编号: ${item.sampleNo ?? ' '}',
-                                            style: TextStyle(
-                                                color: colorScheme.outline,
-                                                fontSize: 10),
-                                          ), 
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4), 
-                                       Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [ 
-                                          Text(
-                                            '出货金额(CNY)：${item.shippingAmount ?? ' '}',
-                                            style: TextStyle(
-                                                color: colorScheme.outline,
-                                                fontSize: 10),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+
+                                  const SizedBox(width: 12),
+                                  // 内容
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.sampleName ?? ' ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '样品编号: ${item.sampleNo ?? ' '}',
+                                              style: TextStyle(
+                                                  color: colorScheme.outline,
+                                                  fontSize: 10),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '出货金额(CNY)：${formatCurrencyAmount(item.shippingAmount)}',
+                                              style: TextStyle(
+                                                  color: colorScheme.outline,
+                                                  fontSize: 10),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                // 箭头图标（可点击）
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(Icons.arrow_forward_ios,
-                                    color: colorScheme.outline, size: 14),
-                              ],
+                                  // 箭头图标（可点击）
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Icon(Icons.arrow_forward_ios,
+                                      color: colorScheme.outline, size: 14),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                          // 奖杯
+                          if (isTopThree)
+                            Positioned(
+                              left: 2,
+                              top: 2,
+                              child: Container(
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: medalColor,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.emoji_events,
+                                      size: 14,
+                                      color: index == 1
+                                          ? Colors.grey.shade800
+                                          : Colors.white,
+                                    ),
+                                    // Text(index.toString()),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ]),
+
                         // 添加水平分割线（最后一条数据后不添加）
                         if (index < displayData.length - 1)
                           Divider(
@@ -202,7 +248,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                             color: colorScheme.outline.withOpacity(0.15),
                           ),
                       ];
-                    })
+                    }),
                   ],
                 ))),
       ],
@@ -246,7 +292,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                         return BarTooltipItem(
                           '${item.sampleName ?? ''}\n'
                           '编号: ${item.sampleNo ?? '未知'}\n'
-                          '出货金额(CNY): ${item.shippingAmount ?? 0}', 
+                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)}',
                           TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 10,
@@ -342,7 +388,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                           child: Transform.translate(
                             offset: Offset(0, dy),
                             child: Text(
-                              '$shippingAmount',
+                              formatCurrencyAmount(shippingAmount),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 7,
