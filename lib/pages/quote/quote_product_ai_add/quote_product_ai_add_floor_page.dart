@@ -11,6 +11,7 @@ import 'package:cloud/services/sample.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductDraftItem {
@@ -273,6 +274,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
 
+    final isTemplateExpanded = useState(false);
+
     final currentTemplate = getTemplateById(providerState.currentTemplateId);
 
     final currentMediaList = providerState.items.map((e) => e.media).toList();
@@ -286,11 +289,16 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
-                  _buildTemplateSelector(
-                      context, providerState.currentTemplateId, colorScheme,
-                      (newId) {
-                    controller.changeTemplate(newId);
-                  }),
+                  _buildCollapsibleTemplateSelector(
+                    context,
+                    currentTemplate,
+                    isTemplateExpanded,
+                    colorScheme,
+                    (newId) {
+                      controller.changeTemplate(newId);
+                      isTemplateExpanded.value = false;
+                    },
+                  ),
                   // 图片上传区域
                   _buildUploadArea(currentMediaList, (newImages) {
                     controller.onImagesChanged(newImages, ref);
@@ -600,116 +608,233 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   }
 }
 
-Widget _buildTemplateSelector(
+Widget _buildCollapsibleTemplateSelector(
+  BuildContext context,
+  TemplateOption currentTemplate,
+  ValueNotifier<bool> isExpanded,
+  ColorScheme colorScheme,
+  Function(String id) onSelect,
+) {
+  return Container(
+    color: Colors.white,
+    margin: const EdgeInsets.only(bottom: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 1. 标题栏 (点击可展开/收起)
+        InkWell(
+          onTap: () {
+            isExpanded.value = !isExpanded.value;
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.dashboard_customize_outlined,
+                    size: 18, color: colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  '当前模板: ',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                Text(
+                  currentTemplate.name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const Spacer(),
+                AnimatedRotation(
+                  turns: isExpanded.value ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  child:
+                      Icon(Icons.keyboard_arrow_down, color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            height: isExpanded.value ? null : 0,
+            child: Column(
+              children: [
+                _buildTemplateListContent(
+                    context, currentTemplate.id, colorScheme, onSelect),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildTemplateListContent(
   BuildContext context,
   String currentId,
   ColorScheme colorScheme,
   Function(String id) onSelect,
 ) {
+  const double kItemHeight = 64.0;
+
   return SizedBox(
-    height: 80,
+    height: kItemHeight,
     child: ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       scrollDirection: Axis.horizontal,
-      itemCount: kQuoteAiTemplates.length, // 使用新的配置常量
-      separatorBuilder: (c, i) => const SizedBox(width: 10),
+      itemCount: kQuoteAiTemplates.length,
+      separatorBuilder: (c, i) => const SizedBox(width: 12),
       itemBuilder: (context, index) {
         final t = kQuoteAiTemplates[index];
         final bool isSelected = t.id == currentId;
 
-        final borderColor = isSelected ? colorScheme.primary : Colors.grey[300];
+        final primaryColor = colorScheme.primary;
+        final borderColor =
+            isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
         final bgColor =
-            isSelected ? colorScheme.primary.withOpacity(0.05) : Colors.white;
-        final textColor = isSelected ? colorScheme.primary : Colors.black87;
+            isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
+        final iconBgColor = isSelected ? Colors.white : Colors.grey[100];
+        final iconColor = isSelected ? primaryColor : Colors.grey[500];
 
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onSelect(t.id),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              width: 160,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: borderColor!, width: isSelected ? 1.5 : 1),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(Icons.table_chart_outlined,
-                        size: 20, color: Colors.grey),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          t.name,
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: textColor),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+        return Container(
+          width: 150,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: borderColor,
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSelect(t.id),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: iconBgColor,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        Text(
-                          isSelected ? '当前使用' : '点击切换',
-                          style: TextStyle(
-                              fontSize: 10,
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : Colors.grey[500]),
+                        child: Icon(
+                          Icons.table_chart_outlined,
+                          size: 18,
+                          color: iconColor,
                         ),
-                      ],
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (ctx) {
-                            return Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: GestureDetector(
-                                onTap: () => Navigator.pop(ctx),
-                                child: InteractiveViewer(
-                                  child: Image.network(
-                                    t.previewImageUrl,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.white,
-                                        height: 300,
-                                        child:
-                                            const Center(child: Text('预览规则图'))),
-                                  ),
-                                ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              t.name,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
                               ),
-                            );
-                          });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Icon(Icons.visibility_outlined,
-                          size: 18, color: Colors.grey[400]),
-                    ),
-                  )
-                ],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isSelected ? '当前使用' : '点击切换',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: isSelected
+                                    ? primaryColor
+                                    : Colors.grey[400],
+                                fontWeight: isSelected
+                                    ? FontWeight.w500
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            _showPreviewDialog(context, t.previewImageUrl);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Icon(
+                              Icons.visibility_outlined,
+                              size: 16,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         );
       },
     ),
+  );
+}
+
+void _showPreviewDialog(BuildContext context, String imageUrl) {
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(ctx),
+          child: InteractiveViewer(
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 500),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Center(
+                      child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.broken_image, color: Colors.grey),
+                      SizedBox(height: 8),
+                      Text('暂无预览图',
+                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  )),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
   );
 }
