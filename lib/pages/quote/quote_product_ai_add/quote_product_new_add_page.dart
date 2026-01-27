@@ -44,24 +44,51 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
       body: TabBarView(
         controller: tabController,
         children: [
-          QuoteProductAddAdaptivePage(
-            initialMode: 0,
-            supplierId: supplierId,
+          KeepAliveWrapper(
+            child: QuoteProductAddAdaptivePage(
+              initialMode: 0,
+              supplierId: supplierId,
+            ),
           ),
 
           // --- Tab 2: 白板 ---
-          QuoteProductAiAddFloorPage(
-            quoteId: quoteId,
-            supplierId: supplierId,
+          KeepAliveWrapper(
+            child: QuoteProductAiAddFloorPage(
+              quoteId: quoteId,
+              supplierId: supplierId,
+            ),
           ),
 
           // --- Tab 3: 记事本 ---
-          QuoteProductAiAddNotepadPage(
-            quoteId: quoteId,
-            supplierId: supplierId,
+          KeepAliveWrapper(
+            child: QuoteProductAiAddNotepadPage(
+              quoteId: quoteId,
+              supplierId: supplierId,
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const KeepAliveWrapper({super.key, required this.child});
+
+  @override
+  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }
