@@ -62,12 +62,12 @@ class DashboardModules {
         contentBuilder: () => const SupplierChart(),
         group: '数据统计',
       ),
-      ModuleInfo(
-        id: 'news',
-        title: '集团资讯',
-        contentBuilder: () => const NewsBoard(),
-        group: '应用',
-      ),
+      // ModuleInfo(
+      //   id: 'news',
+      //   title: '集团资讯',
+      //   contentBuilder: () => const NewsBoard(),
+      //   group: '应用',
+      // ),
       ModuleInfo(
         id: 'rate',
         title: '今日汇率',
@@ -76,14 +76,13 @@ class DashboardModules {
       ),
     ];
   }
- 
+
   /// 获取已选中的模块（按照设置页面中保存的排序顺序）
   static Future<List<ModuleInfo>> getSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds =
-        prefs.getStringList(_storageKey) ?? ['rate', 'news', 'sample_room'];
-    final orderIds =
-        prefs.getStringList(_orderKey) ?? ['rate', 'news', 'sample_room'];
+        prefs.getStringList(_storageKey) ?? ['rate', 'sample_room'];
+    final orderIds = prefs.getStringList(_orderKey) ?? ['rate', 'sample_room'];
 
     if (selectedIds.isEmpty) {
       return [];
@@ -187,10 +186,9 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
   Widget _buildModuleCard(ModuleInfo module) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [ 
-         module.contentBuilder(), 
+      children: [
+        module.contentBuilder(),
       ],
     );
   }
-
 }
