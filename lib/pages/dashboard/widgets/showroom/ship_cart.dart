@@ -175,7 +175,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                             CrossAxisAlignment.start,
                                         children: [ 
                                           Text(
-                                            '${sampleDimensionConfigs[0]['label']}：${item.shippingAmount ?? ' '}',
+                                            '出货金额(CNY)：${item.shippingAmount ?? ' '}',
                                             style: TextStyle(
                                                 color: colorScheme.outline,
                                                 fontSize: 10),
@@ -246,7 +246,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                         return BarTooltipItem(
                           '${item.sampleName ?? ''}\n'
                           '编号: ${item.sampleNo ?? '未知'}\n'
-                          '数量: ${item.shippingAmount ?? 0}',
+                          '出货金额(CNY): ${item.shippingAmount ?? 0}', 
                           TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 10,

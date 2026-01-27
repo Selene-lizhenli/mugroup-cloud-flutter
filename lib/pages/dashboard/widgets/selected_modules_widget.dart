@@ -34,7 +34,7 @@ class DashboardModules {
     return [
       ModuleInfo(
         id: 'sample_room',
-        title: '样品间',
+        title: 'Top榜单',
         contentBuilder: () => const SampleRoomChart(),
         group: '数据统计',
       ),
@@ -44,12 +44,12 @@ class DashboardModules {
         contentBuilder: () => const InspectionChart(),
         group: '数据统计',
       ),
-      ModuleInfo(
-        id: 'market_purchase',
-        title: '市场带客',
-        contentBuilder: () => const MarketPurchaseChart(),
-        group: '数据统计',
-      ),
+      // ModuleInfo(
+      //   id: 'market_purchase',
+      //   title: '市场带客',
+      //   contentBuilder: () => const MarketPurchaseChart(),
+      //   group: '数据统计',
+      // ),
       ModuleInfo(
         id: 'customer',
         title: '客户',

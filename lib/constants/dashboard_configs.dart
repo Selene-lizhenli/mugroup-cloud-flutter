@@ -12,14 +12,14 @@ final List<Map<String, dynamic>> sampleDimensionConfigs = [
     'value': 'quote_rank',
     'icon': Icons.leaderboard,
   },
-  {
-    'label': '样品间',
-    'value': 'sample_room',
-    'icon': Icons.warehouse,
-  },
-  {
-    'label': '产品目录',
-    'value': 'product_category',
-    'icon': Icons.category,
-  },
+  // {
+  //   'label': '样品间',
+  //   'value': 'sample_room',
+  //   'icon': Icons.warehouse,
+  // },
+  // {
+  //   'label': '产品目录',
+  //   'value': 'product_category',
+  //   'icon': Icons.category,
+  // },
 ];

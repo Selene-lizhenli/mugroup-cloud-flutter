@@ -2,14 +2,10 @@ import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
 import 'package:cloud/models/sample/category.dart';
-import 'package:cloud/models/dashboard/quote_top_stats.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/category_cart.dart';
+import 'package:cloud/models/dashboard/quote_top_stats.dart'; 
 import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/services/dashboard.dart';
-import 'package:cloud/services/sample.dart';
-import 'package:cloud/services/wms.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/showroom_cart.dart';
+import 'package:cloud/services/dashboard.dart'; 
 import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +45,8 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 }
 
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
-  List<Level1CategoryStat> _showroomDimensionData = []; // 数据样品间分类
-  List<Level1CategoryStat> _categoryDimensionData = []; // 数据 产品分类
+  // List<Level1CategoryStat> _showroomDimensionData = []; // 数据样品间分类
+  // List<Level1CategoryStat> _categoryDimensionData = []; // 数据 产品分类
   List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 报价排行
   List<ShipTopStats> _shipTopDimensionData = []; //  数据 出货排行
 
@@ -156,62 +152,61 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     return result;
   }
 
-  handleCategoryData() async {
-    if (_categoryDimensionData.isNotEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-    final categoriesData = await getAllShowroomCategories();
-    logger.d('categoriesData: $categoriesData');
+  // handleCategoryData() async {
+  //   if (_categoryDimensionData.isNotEmpty) {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     return;
+  //   }
+  //   final categoriesData = await getAllShowroomCategories();
+  //   logger.d('categoriesData: $categoriesData');
+  //   if (mounted) {
+  //     setState(() {
+  //       _isLoading = false;
+  //       if (categoriesData != null && categoriesData.isNotEmpty) {
+  //         _categoryDimensionData = buildLevel1Stats(categoriesData, rootId: 1);
+  //       } else {
+  //         _categoryDimensionData = [];
+  //       }
+  //     });
+  //   }
+  // }
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        if (categoriesData != null && categoriesData.isNotEmpty) {
-          _categoryDimensionData = buildLevel1Stats(categoriesData, rootId: 1);
-        } else {
-          _categoryDimensionData = [];
-        }
-      });
-    }
-  }
-
-  handleShowroomData() async {
-    if (_showroomDimensionData.isNotEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-    final resp = await getWarehouses();
-    final warehouses = resp.data;
-    List<Level1CategoryStat> data;
-    if (warehouses.isNotEmpty) {
-      // 过滤掉 abandoned == true 的仓库
-      final activeWarehouses =
-          warehouses.where((warehouse) => warehouse.abandoned != true).toList();
-      data = activeWarehouses.asMap().entries.map((entry) {
-        final index = entry.key;
-        final warehouse = entry.value;
-        return Level1CategoryStat(
-          id: warehouse.id ?? index,
-          name: warehouse.name ?? '未命名样品间',
-          totalProductsCount: warehouse.sampleCount ?? 0,
-          color: _colorPalette[index % _colorPalette.length],
-        );
-      }).toList();
-    } else {
-      data = [];
-    }
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _showroomDimensionData = data;
-      });
-    }
-  }
+  // handleShowroomData() async {
+  //   if (_showroomDimensionData.isNotEmpty) {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     return;
+  //   }
+  //   final resp = await getWarehouses();
+  //   final warehouses = resp.data;
+  //   List<Level1CategoryStat> data;
+  //   if (warehouses.isNotEmpty) {
+  //     // 过滤掉 abandoned == true 的仓库
+  //     final activeWarehouses =
+  //         warehouses.where((warehouse) => warehouse.abandoned != true).toList();
+  //     data = activeWarehouses.asMap().entries.map((entry) {
+  //       final index = entry.key;
+  //       final warehouse = entry.value;
+  //       return Level1CategoryStat(
+  //         id: warehouse.id ?? index,
+  //         name: warehouse.name ?? '未命名样品间',
+  //         totalProductsCount: warehouse.sampleCount ?? 0,
+  //         color: _colorPalette[index % _colorPalette.length],
+  //       );
+  //     }).toList();
+  //   } else {
+  //     data = [];
+  //   }
+  //   if (mounted) {
+  //     setState(() {
+  //       _isLoading = false;
+  //       _showroomDimensionData = data;
+  //     });
+  //   }
+  // }
 
   handleQuoteRankData() async {
     if (_quoteTopDimensionData.isNotEmpty) {
@@ -254,11 +249,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     });
     logger.d('dimension: $dimension');
     try {
-      if (dimension == sampleDimensionConfigs[3]['value']) {
-        handleCategoryData();
-      } else if (dimension == sampleDimensionConfigs[2]['value']) {
-        handleShowroomData();
-      } else if (dimension == sampleDimensionConfigs[1]['value']) {
+      if (dimension == sampleDimensionConfigs[1]['value']) {
         handleQuoteRankData();
       } else if (dimension == sampleDimensionConfigs[0]['value']) {
         handleShipRankData();
@@ -308,7 +299,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
             children: [
               // 模块标题
               Text(
-                '样品间',
+                'Top榜单',
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
@@ -390,25 +381,6 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                         ),
                       )
                     : TopChartContent(data: _quoteTopDimensionData)
-              else if (currentDimension == sampleDimensionConfigs[3]['value'])
-                _isLoading
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
-                        ),
-                      )
-                    : CategoryChartContent(
-                        sampleRoomData: _categoryDimensionData)
-              else if (currentDimension == sampleDimensionConfigs[2]['value'])
-                _isLoading
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: MuProgressIndicator(),
-                        ),
-                      )
-                    : ChartContent(sampleRoomData: _showroomDimensionData)
               else
                 _isLoading
                     ? const Center(
