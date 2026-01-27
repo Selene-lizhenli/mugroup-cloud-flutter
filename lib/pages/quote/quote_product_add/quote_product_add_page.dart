@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/form_definitions.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
@@ -17,8 +17,6 @@ import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
-import 'package:cloud/providers/quote_product_form_provider.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
@@ -51,8 +49,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
-    final savedFormData = ref.watch(quoteProductFormDataProvider);
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_add_form_v1',
@@ -61,8 +57,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
-
-    logger.d(fieldConfigs);
 
     final autoValidateMode = useState(AutovalidateMode.disabled);
 
@@ -409,59 +403,31 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       return rows;
     }
 
-    // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
+    // 1. 获取 Provider 最新数据
+    final formData = ref.watch(quoteProductAddFormProvider);
+    final formDataNotifier = ref.read(quoteProductAddFormProvider.notifier);
+
+    ref.listen(quoteProductAddFormProvider, (previous, next) {
+      if (!isActive && next.isNotEmpty) {
+        if (formKey.currentState != null) {
+          logger.d('屏幕切走11$isActive');
+          formKey.currentState?.patchValue(next);
+        }
+      }
+    });
     useEffect(() {
-      if (!isActive && savedFormData != null && formKey.currentState != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          formKey.currentState?.patchValue(savedFormData);
-        });
+      if (isActive) {
+        if (formData.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (formKey.currentState != null) {
+              logger.d('竖屏激活：加载数据 $formData');
+              formKey.currentState?.patchValue(formData);
+            }
+          });
+        }
       }
       return null;
-    }, [savedFormData, isActive]);
-
-    // 使用定时器定期保存表单数据到 provider，仅在当前激活时运行
-    useEffect(() {
-      if (!isActive) return null;
-      final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
-        if (formKey.currentState != null) {
-          formKey.currentState!.save();
-          final currentValue = formKey.currentState!.value;
-          if (currentValue.isNotEmpty) {
-            formDataNotifier.saveFormData(currentValue);
-          }
-        }
-      });
-      return timer.cancel;
     }, [isActive]);
-
-    // 当父组件异步加载到 initialSupplier 后，同步到当前表单字段
-    useEffect(() {
-      if (initialSupplier == null) return null;
-      if (!isActive) return null; // 仅在激活状态下设置
-      if (formKey.currentState == null) return null;
-
-      // 仅在当前表单还没有供应商值时设置，避免覆盖用户已选择的值
-      final currentSupplier = formKey.currentState!.fields['supplier']?.value;
-      if (currentSupplier != null && currentSupplier.isNotEmpty) return null;
-
-      // 使用 addPostFrameCallback 确保表单完全构建后再设置值
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // 再次检查表单状态和字段是否存在
-        final supplierField = formKey.currentState?.fields['supplier'];
-        if (supplierField != null) {
-          // 如果字段还没有值，才设置
-          final currentValue = supplierField.value;
-          if (currentValue == null ||
-              (currentValue is Map && currentValue.isEmpty)) {
-            formKey.currentState?.patchValue({
-              'supplier': initialSupplier,
-            });
-          }
-        }
-      });
-
-      return null;
-    }, [initialSupplier, isActive]);
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -611,27 +577,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('添加报价产品'),
-      //   backgroundColor: Colors.white,
-      //   surfaceTintColor: Colors.transparent,
-      //   actions: [
-      //     TextButton(
-      //       onPressed: () async {
-      //         context.router.push(QuoteProductAddAdaptiveRoute(
-      //           initialMode: 1,
-      //         ));
-      //       },
-      //       child: Text(
-      //         "平板模式",
-      //         style: TextStyle(
-      //           color: colorScheme.primary,
-      //           fontSize: 16,
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      // ),
       body: Column(
         children: [
           Expanded(
@@ -640,11 +585,17 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: FormBuilder(
                   key: formKey,
-                  // initialValue: initialSupplier != null
-                  //     ? <String, dynamic>{
-                  //         'supplyQuote': initialSupplier,
-                  //       }
-                  //     : <String, dynamic>{},
+                  onChanged: () {
+                    if (isActive) {
+                      formKey.currentState?.save();
+                      final currentData = formKey.currentState?.value;
+                      if (currentData != null) {
+                        ref
+                            .read(quoteProductAddFormProvider.notifier)
+                            .updateForm(currentData);
+                      }
+                    }
+                  },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [

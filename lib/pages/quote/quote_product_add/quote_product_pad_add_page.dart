@@ -5,6 +5,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
@@ -16,7 +17,6 @@ import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
-import 'package:cloud/providers/quote_product_form_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
@@ -48,8 +48,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final formDataNotifier = ref.read(quoteProductFormDataProvider.notifier);
-    final savedFormData = ref.watch(quoteProductFormDataProvider);
 
     final configParams = useMemoized(() => FieldConfigParams(
           storageKey: 'quote_product_add_form_v1',
@@ -404,49 +402,31 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       return rows;
     }
 
-    // 从 provider 同步表单数据：仅在非激活状态时接收更新，避免覆盖正在编辑的数据
+    final formData = ref.watch(quoteProductAddFormProvider);
+    final formDataNotifier = ref.read(quoteProductAddFormProvider.notifier);
+
+    ref.listen(quoteProductAddFormProvider, (previous, next) {
+      if (!isActive && next.isNotEmpty) {
+        if (formKey.currentState != null) {
+          logger.d('屏幕切走22$isActive');
+          formKey.currentState?.patchValue(next);
+        }
+      }
+    });
+
     useEffect(() {
-      logger.d('savedFormData$savedFormData');
-      if (!isActive && savedFormData != null && formKey.currentState != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          formKey.currentState?.patchValue(savedFormData);
-        });
+      if (isActive) {
+        if (formData.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (formKey.currentState != null) {
+              logger.d('横屏激活：加载数据 $formData');
+              formKey.currentState?.patchValue(formData);
+            }
+          });
+        }
       }
       return null;
-    }, [savedFormData, isActive]);
-
-    //使用定时器定期保存表单数据到 provider，仅在当前激活时运行
-    useEffect(() {
-      if (!isActive) return null;
-      final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
-        if (formKey.currentState != null) {
-          formKey.currentState!.save();
-          final currentValue = formKey.currentState!.value;
-          if (currentValue.isNotEmpty) {
-            formDataNotifier.saveFormData(currentValue);
-          }
-        }
-      });
-      return timer.cancel;
     }, [isActive]);
-
-    // 当父组件异步加载到 initialSupplier 后，同步到当前表单字段
-    useEffect(() {
-      if (initialSupplier == null) return null;
-      if (formKey.currentState == null) return null;
-
-      final currentSupplyQuote =
-          formKey.currentState!.fields['supplyQuote']?.value;
-      if (currentSupplyQuote != null) return null;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        formKey.currentState?.patchValue({
-          'supplyQuote': initialSupplier,
-        });
-      });
-
-      return null;
-    }, [initialSupplier]);
 
     bool isVisible(String name) {
       return fieldConfigs
@@ -687,6 +667,17 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       ),
       body: FormBuilder(
         key: formKey,
+        onChanged: () {
+          if (isActive) {
+            formKey.currentState?.save();
+            final currentData = formKey.currentState?.value;
+            if (currentData != null) {
+              ref
+                  .read(quoteProductAddFormProvider.notifier)
+                  .updateForm(currentData);
+            }
+          }
+        },
         initialValue: initialSupplier != null
             ? <String, dynamic>{
                 'supplyQuote': initialSupplier,
