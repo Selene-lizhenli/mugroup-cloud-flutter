@@ -214,9 +214,7 @@ class LoginWay extends HookConsumerWidget {
                         child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: MuProgressIndicator(
-                            barWidth: 3,
-                          ),
+                          child: MuProgressIndicator(),
                         ),
                       ),
                     )

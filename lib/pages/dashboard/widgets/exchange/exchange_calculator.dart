@@ -4,6 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+/// 人民币占位，用于换算中的基准币种（1:1 的 reverse 参与跨币种换算）
+ExchangeRate get _cnyRate => const ExchangeRate(
+      name: '人民币',
+      shortName: 'CNY',
+      exchangeRate: '1',
+      reverseExchangeRate: '1',
+    );
+
+bool _isCny(ExchangeRate r) =>
+    r.shortName == 'CNY' || r.name == '人民币';
+
+double _getReverse(ExchangeRate r) =>
+    double.tryParse(r.reverseExchangeRate ?? '0') ?? 0.0;
+
 class ExchangeCalculatorDialog extends HookConsumerWidget {
   final ExchangeRate? selectedDimension; // 维度选择的币种
   final List<ExchangeRate?>? list;
@@ -16,9 +30,11 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedCurrencyIndex = useState<int?>(null); //选中的货币索引
-    final currencyAmountController = useTextEditingController();
-    final cnyAmountController = useTextEditingController();
+    // 两个换算币种：默认人民币 + 默认维度币种；用 ExchangeRate 作为选中值
+    final selectedFrom = useState<ExchangeRate?>(null);
+    final selectedTo = useState<ExchangeRate?>(null);
+    final fromAmountController = useTextEditingController();
+    final toAmountController = useTextEditingController();
     final isUpdating = useState<bool>(false);
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -35,39 +51,32 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       return list!.whereType<ExchangeRate>().toList();
     }, [list]);
 
-    // 从 list 动态构建币种名称到代码的映射
-    final dimensionCurrencyMap = useMemoized(() {
-      final map = <String, String>{};
-      for (final rate in rates) {
-        if (rate.name != null && rate.shortName != null) {
-          map[rate.name!] = rate.shortName!;
-        }
-      }
-      return map;
+    /// 供选择的币种列表：人民币 + 接口返回的列表（若接口含人民币则不再重复）
+    final choiceList = useMemoized(() {
+      final rest = rates.where((r) => !_isCny(r)).toList();
+      return [_cnyRate, ...rest];
     }, [rates]);
 
-    /// 根据维度选择的币种查找对应的索引
-    int? findCurrencyIndex(List<ExchangeRate> rates, String? dimension) {
-      if (dimension == null || rates.isEmpty) return null;
-
-      // 先尝试通过名称查找
-      for (int i = 0; i < rates.length; i++) {
-        if (rates[i].name?.contains(dimension) == true) {
-          return i;
-        }
+    /// 在 rates 中按 shortName 查找与 target 相同的项
+    ExchangeRate? findInRates(ExchangeRate? target) {
+      if (target == null || rates.isEmpty) return null;
+      for (final r in rates) {
+        if (r.shortName == target.shortName) return r;
       }
-
-      // 如果找不到，尝试通过货币代码查找
-      final currency = dimensionCurrencyMap[dimension];
-      if (currency != null) {
-        for (int i = 0; i < rates.length; i++) {
-          if (rates[i].shortName?.toUpperCase() == currency.toUpperCase()) {
-            return i;
-          }
-        }
-      }
-
       return null;
+    }
+
+    /// 换算率：1 [from] = ? [to]
+    double calcaToRate(ExchangeRate from, ExchangeRate to) {
+      if (_isCny(from) && _isCny(to)) return 1.0;
+      if (_isCny(from) && !_isCny(to)) return _getReverse(to);
+      if (!_isCny(from) && _isCny(to)) {
+        final r = _getReverse(from);
+        return r > 0 ? 1.0 / r : 0;
+      }
+      final rf = _getReverse(from);
+      final rt = _getReverse(to);
+      return rf > 0 ? rt / rf : 0;
     }
 
     String formatNumber(double value) {
@@ -87,82 +96,76 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       isUpdating.value = false;
     }
 
-    void calculateFromCurrency() {
-      if (selectedCurrencyIndex.value == null || rates.isEmpty) return;
-      if (selectedCurrencyIndex.value! >= rates.length) return;
+    void calculateFromLeft() {
+      final from = selectedFrom.value;
+      final to = selectedTo.value;
+      if (from == null || to == null) return;
 
-      final text = currencyAmountController.text;
+      final text = fromAmountController.text;
       if (text.isEmpty) {
-        updateController(cnyAmountController, '');
+        updateController(toAmountController, '');
         return;
       }
       final amount = double.tryParse(text);
       if (amount != null) {
-        final rate = rates[selectedCurrencyIndex.value!];
-        final reverseRate =
-            double.tryParse(rate.reverseExchangeRate?.toString() ?? '0') ?? 0.0;
-        if (reverseRate > 0) {
-          updateController(
-              cnyAmountController, formatNumber(amount / reverseRate));
+        final rate = calcaToRate(from, to);
+        if (rate > 0) {
+          updateController(toAmountController, formatNumber(amount * rate));
         }
       }
     }
 
-    void calculateFromCNY() {
-      if (selectedCurrencyIndex.value == null || rates.isEmpty) return;
-      if (selectedCurrencyIndex.value! >= rates.length) return;
+    void calculateFromRight() {
+      final from = selectedFrom.value;
+      final to = selectedTo.value;
+      if (from == null || to == null) return;
 
-      final text = cnyAmountController.text;
+      final text = toAmountController.text;
       if (text.isEmpty) {
-        updateController(currencyAmountController, '');
+        updateController(fromAmountController, '');
         return;
       }
       final amount = double.tryParse(text);
       if (amount != null) {
-        final rate = rates[selectedCurrencyIndex.value!];
-        final reverseRate =
-            double.tryParse(rate.reverseExchangeRate?.toString() ?? '0') ?? 0.0;
-        updateController(
-            currencyAmountController, formatNumber(amount * reverseRate));
+        final rate = calcaToRate(from, to);
+        if (rate > 0) {
+          updateController(fromAmountController, formatNumber(amount / rate));
+        }
       }
     }
 
     // 设置监听器
     useEffect(() {
-      void onCurrencyAmountChanged() {
-        if (!isUpdating.value) calculateFromCurrency();
+      void onFromChanged() {
+        if (!isUpdating.value) calculateFromLeft();
       }
 
-      void onCnyAmountChanged() {
-        if (!isUpdating.value) calculateFromCNY();
+      void onToChanged() {
+        if (!isUpdating.value) calculateFromRight();
       }
 
-      currencyAmountController.addListener(onCurrencyAmountChanged);
-      cnyAmountController.addListener(onCnyAmountChanged);
+      fromAmountController.addListener(onFromChanged);
+      toAmountController.addListener(onToChanged);
 
       return () {
-        currencyAmountController.removeListener(onCurrencyAmountChanged);
-        cnyAmountController.removeListener(onCnyAmountChanged);
+        fromAmountController.removeListener(onFromChanged);
+        toAmountController.removeListener(onToChanged);
       };
-    }, [currencyAmountController, cnyAmountController]);
+    }, [fromAmountController, toAmountController]);
 
-    // 初始化选中的币种索引（只在第一次时设置）
+    // 初始化：默认人民币 + 维度币种，用 ExchangeRate 作为选中值
     useEffect(() {
-      if (selectedCurrencyIndex.value == null && rates.isNotEmpty) {
-        final index = findCurrencyIndex(rates, selectedDimension?.name);
-        selectedCurrencyIndex.value = index ?? 0;
+      selectedFrom.value ??= _cnyRate;
+      if (selectedTo.value == null && choiceList.isNotEmpty) {
+        selectedTo.value = findInRates(selectedDimension) ??
+            selectedDimension ??
+            (choiceList.length > 1 ? choiceList[1] : choiceList.first);
       }
       return null;
-    }, [rates]);
+    }, [choiceList, selectedDimension]);
 
-    // 确保索引有效
-    if (selectedCurrencyIndex.value != null &&
-        selectedCurrencyIndex.value! >= rates.length) {
-      selectedCurrencyIndex.value = rates.isEmpty ? null : 0;
-    }
-
-    // 如果没有数据，显示空状态
-    if (rates.isEmpty) {
+    // 如果没有可选的除人民币外的币种，显示空状态
+    if (choiceList.length <= 1) {
       return Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -206,26 +209,76 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       );
     }
 
-    final currentCurrency = rates[selectedCurrencyIndex.value ?? 0];
+    final from = selectedFrom.value ?? _cnyRate;
+    final to = selectedTo.value;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     String getRateText() {
-      if (selectedCurrencyIndex.value == null ||
-          selectedCurrencyIndex.value! >= rates.length) {
-        return '';
-      }
-      final rate = rates[selectedCurrencyIndex.value!];
-      final reverseRate =
-          double.tryParse(rate.reverseExchangeRate?.toString() ?? '0') ?? 0.0;
-      return '1 CNY ≈ ${reverseRate.toStringAsFixed(4)} ${rate.name}';
+      if (to == null) return '';
+      final r = calcaToRate(from, to);
+      if (r <= 0) return '';
+      return '1 ${from.name} ≈ ${r.toStringAsFixed(4)} ${to.name}';
     }
 
+    void showCurrencySelector(
+      BuildContext ctx,
+      List<ExchangeRate> options, {
+      required ExchangeRate? selectedValue,
+      required ValueChanged<ExchangeRate> onSelect,
+    }) {
+      showModalBottomSheet(
+        context: ctx,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (ctx2) => DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (ctx2, scrollController) {
+            return _CurrencySearchList(
+              options: options,
+              selectedValue: selectedValue,
+              scrollController: scrollController,
+              onSelect: (r) {
+                onSelect(r);
+                Navigator.pop(ctx);
+              },
+            );
+          },
+        ),
+      );
+    }
+
+    void showSelectorForFrom() => showCurrencySelector(context, choiceList,
+        selectedValue: from, onSelect: (r) {
+      selectedFrom.value = r;
+      if (fromAmountController.text.isNotEmpty) {
+        calculateFromLeft();
+      } else {
+        toAmountController.clear();
+      }
+    });
+
+    void showSelectorForTo() => showCurrencySelector(context, choiceList,
+        selectedValue: to, onSelect: (r) {
+      selectedTo.value = r;
+      if (toAmountController.text.isNotEmpty) {
+        calculateFromRight();
+      } else {
+        fromAmountController.clear();
+      }
+    });
+
     Widget buildInputRow({
-      required String currencyName,
+      required ExchangeRate currency,
       required TextEditingController controller,
       required bool isPrimary,
       VoidCallback? onTapSelector,
     }) {
+      final currencyName = currency.name ?? '';
       return Container(
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -308,38 +361,6 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       );
     }
 
-    void showCurrencySelector() {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-        builder: (context) => DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return _CurrencySearchList(
-              exchangeRates: rates,
-              selectedIndex: selectedCurrencyIndex.value ?? 0,
-              scrollController: scrollController,
-              onSelect: (index) {
-                selectedCurrencyIndex.value = index;
-                if (cnyAmountController.text.isNotEmpty) {
-                  calculateFromCNY();
-                } else {
-                  currencyAmountController.clear();
-                }
-                Navigator.pop(context);
-              },
-            );
-          },
-        ),
-      );
-    }
-
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -385,17 +406,17 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
               Column(
                 children: [
                   buildInputRow(
-                    currencyName: '人民币',
-                    controller: cnyAmountController,
+                    currency: from,
+                    controller: fromAmountController,
                     isPrimary: true,
-                    onTapSelector: showCurrencySelector,
+                    onTapSelector: showSelectorForFrom,
                   ),
                   const SizedBox(height: 4),
                   buildInputRow(
-                    currencyName: currentCurrency.name ?? '',
-                    controller: currencyAmountController,
-                    isPrimary: true,
-                    onTapSelector: showCurrencySelector,
+                    currency: to ?? _cnyRate,
+                    controller: toAmountController,
+                    isPrimary: false,
+                    onTapSelector: showSelectorForTo,
                   ),
                 ],
               ),
@@ -439,14 +460,14 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
 }
 
 class _CurrencySearchList extends HookWidget {
-  final List<ExchangeRate> exchangeRates;
-  final int selectedIndex;
+  final List<ExchangeRate> options;
+  final ExchangeRate? selectedValue;
   final ScrollController scrollController;
-  final ValueChanged<int> onSelect;
+  final ValueChanged<ExchangeRate> onSelect;
 
   const _CurrencySearchList({
-    required this.exchangeRates,
-    required this.selectedIndex,
+    required this.options,
+    required this.selectedValue,
     required this.scrollController,
     required this.onSelect,
   });
@@ -456,21 +477,13 @@ class _CurrencySearchList extends HookWidget {
     final keyword = useState<String>('');
     final colorScheme = Theme.of(context).colorScheme;
     final primaryColor = colorScheme.primary;
-    final secondaryColor = colorScheme.secondary;
 
-    final filteredIndices = useMemoized(() {
-      if (keyword.value.isEmpty) {
-        return List.generate(exchangeRates.length, (i) => i);
-      } else {
-        final indices = <int>[];
-        for (int i = 0; i < exchangeRates.length; i++) {
-          if ((exchangeRates[i].name ?? '').contains(keyword.value)) {
-            indices.add(i);
-          }
-        }
-        return indices;
-      }
-    }, [keyword.value, exchangeRates]);
+    final filteredList = useMemoized(() {
+      if (keyword.value.isEmpty) return options;
+      return options
+          .where((r) => (r.name ?? '').contains(keyword.value))
+          .toList();
+    }, [keyword.value, options]);
 
     return Column(
       children: [
@@ -497,25 +510,22 @@ class _CurrencySearchList extends HookWidget {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none),
             ),
-            onChanged: (value) {
-              keyword.value = value;
-            },
+            onChanged: (value) => keyword.value = value,
           ),
         ),
         const Divider(height: 1, color: Color(0xFFEEEEEE)),
         Expanded(
-          child: filteredIndices.isEmpty
+          child: filteredList.isEmpty
               ? const Center(
                   child: Text('未找到相关货币', style: TextStyle(color: Colors.grey)))
               : ListView.separated(
                   controller: scrollController,
-                  itemCount: filteredIndices.length,
+                  itemCount: filteredList.length,
                   separatorBuilder: (_, __) => const Divider(
                       height: 1, indent: 16, color: Color(0xFFEEEEEE)),
                   itemBuilder: (context, index) {
-                    final realIndex = filteredIndices[index];
-                    final item = exchangeRates[realIndex];
-                    final isSelected = realIndex == selectedIndex;
+                    final item = filteredList[index];
+                    final isSelected = selectedValue?.shortName == item.shortName;
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -544,7 +554,7 @@ class _CurrencySearchList extends HookWidget {
                       trailing: isSelected
                           ? Icon(Icons.check_circle, color: primaryColor)
                           : null,
-                      onTap: () => onSelect(realIndex),
+                      onTap: () => onSelect(item),
                     );
                   },
                 ),

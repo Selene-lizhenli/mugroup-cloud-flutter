@@ -298,9 +298,7 @@ class ProductListSheet extends HookConsumerWidget {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
-                  child: MuProgressIndicator(
-                    barWidth: 2,
-                  ),
+                  child: MuProgressIndicator(),
                 ),
               );
             } else if (!state.hasMore && products.isNotEmpty) {

@@ -21,7 +21,7 @@ class LineChartDemo extends ConsumerStatefulWidget {
 }
 
 class _LineChartDemoState extends ConsumerState<LineChartDemo> {
-  int? _touchedIndex; 
+  int? _touchedIndex;
   ExchangeRate? _selectedDimension; // 选中的维度，默认选中美元
   bool _isLoading = false;
   String? _errorMessage;
@@ -31,8 +31,6 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
   ExchangeRateHistory? _exchangeData; //波动图的数据
   List<ExchangeRate>? _currencyList; //列表的数据
 
-
- 
   // /// 将货币代码转换为中文名称
   // String _getCurrencyChineseName(String? currencyCode) {
   //   if (currencyCode == null || currencyCode.isEmpty) {
@@ -197,7 +195,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
     }
 
     return Column(children: [
-      ExchangeChartHeader(  
+      ExchangeChartHeader(
         selectedDimension: _selectedDimension,
         onDimensionSelected: onDimensionSelected,
         currencyList: _currencyList,
@@ -224,6 +222,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
               color: colorScheme.surface),
           child: const Center(
               child: MuProgressIndicator(
+            showText: true,
             text: '加载中...',
           )),
         )
@@ -636,6 +635,4 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         )
     ]);
   }
-
-  
 }

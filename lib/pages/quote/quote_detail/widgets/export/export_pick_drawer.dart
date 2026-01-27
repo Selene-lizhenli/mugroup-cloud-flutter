@@ -248,7 +248,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                               _channel = ExportChannel.wework;
                             });
                           },
-                        ), 
+                        ),
                         const SizedBox(width: 12),
                         _ChannelOption(
                           label: '邮箱',
@@ -431,9 +431,7 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: MuProgressIndicator(
-                                  barWidth: 2, 
-                                ),
+                                child: MuProgressIndicator(),
                               )
                             : Text(
                                 '确认',
@@ -567,12 +565,11 @@ class _ChannelOption extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(
-              assetPath,
-              width: 20,
-              height: 20, 
-              colorFilter: ColorFilter.mode(iconColor??fgColor, BlendMode.srcIn)  
-            ),
+            SvgPicture.asset(assetPath,
+                width: 20,
+                height: 20,
+                colorFilter:
+                    ColorFilter.mode(iconColor ?? fgColor, BlendMode.srcIn)),
             const SizedBox(width: 8),
             Text(
               label,

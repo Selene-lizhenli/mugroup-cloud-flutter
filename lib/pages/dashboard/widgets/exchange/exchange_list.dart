@@ -27,7 +27,7 @@ class ExchangeRatesValueList extends StatelessWidget {
       return const SizedBox(
         height: 150,
         child: Center(
-          child: MuProgressIndicator(text: '加载中...'),
+          child: MuProgressIndicator(showText: true, text: '加载中...'),
         ),
       );
     }
@@ -103,7 +103,6 @@ class ExchangeRatesValueList extends StatelessWidget {
                           color: colorScheme.primary,
                         ),
                       ),
-                    
                     ],
                   ),
                 );
