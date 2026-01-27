@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -11,27 +12,6 @@ import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-class ColumnConfig {
-  final String key;
-  final String label;
-  final double width;
-  const ColumnConfig(this.key, this.label, {this.width = 80.0});
-}
-
-const List<ColumnConfig> _kTableColumns = [
-  ColumnConfig('price', '供应商报价', width: 80),
-  ColumnConfig('out_carton', '外装箱量', width: 70),
-  ColumnConfig('inner_pack', '内装箱量', width: 70),
-  ColumnConfig('size', '尺寸', width: 90),
-  ColumnConfig('weight', '重量(g)', width: 60),
-  ColumnConfig('packaging_type', '包装方式', width: 70),
-  ColumnConfig('unit', '单位', width: 50),
-  ColumnConfig('volume', '体积', width: 60),
-  ColumnConfig('moq', '起订量', width: 60),
-  ColumnConfig('capacity', '容量', width: 60),
-  ColumnConfig('description', '描述', width: 120),
-];
 
 class ProductDraftItem {
   final Map<String, String> data;
@@ -66,22 +46,26 @@ class ProductAiAddState {
   final List<ProductDraftItem> items;
   final bool isGlobalLoading;
   final bool isSubmitting;
+  final String currentTemplateId;
 
   ProductAiAddState({
     this.items = const [],
     this.isGlobalLoading = false,
     this.isSubmitting = false,
-  });
+    String? currentTemplateId,
+  }) : currentTemplateId = currentTemplateId ?? kDefaultTemplateId;
 
   ProductAiAddState copyWith({
     List<ProductDraftItem>? items,
     bool? isGlobalLoading,
     bool? isSubmitting,
+    String? currentTemplateId,
   }) {
     return ProductAiAddState(
       items: items ?? this.items,
       isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      currentTemplateId: currentTemplateId ?? this.currentTemplateId,
     );
   }
 }
@@ -90,6 +74,12 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   @override
   ProductAiAddState build() {
     return ProductAiAddState();
+  }
+
+  /// 切换模板
+  void changeTemplate(String templateId) {
+    if (state.currentTemplateId == templateId) return;
+    state = state.copyWith(currentTemplateId: templateId);
   }
 
   Future<void> onImagesChanged(
@@ -134,7 +124,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       Map<String, String> rowMap = {};
 
       try {
-        final result = await identifyOcr('ExtractQtnBasic', {
+        final result = await identifyOcr('{*}Basic', {
+          "tempalte_id": state.currentTemplateId,
           "department": user?.department?.name,
           "employee_name": user?.name,
           "employee_number": user?.jobNumber,
@@ -145,27 +136,26 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             result['success'] == true &&
             (result['data'] as List).isNotEmpty) {
           final item = result['data'].first;
-          for (var col in _kTableColumns) {
+
+          for (var col in AppColumns.all) {
             String rawVal = (item[col.key] ?? '').toString().trim();
             rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
           }
         } else {
-          for (var col in _kTableColumns) {
+          for (var col in AppColumns.all) {
             rowMap[col.key] = '-';
           }
           rowMap['price'] = '未识别';
         }
       } catch (e) {
-        // 异常处理，防止一直 loading
-        for (var col in _kTableColumns) {
+        for (var col in AppColumns.all) {
           rowMap[col.key] = '-';
         }
         rowMap['price'] = '识别错误';
       }
 
-      // 注意：检查索引防止用户在识别中途删除了图片导致数组越界
       if (i < state.items.length) {
-        tempItems = List.from(state.items); // 获取最新的 state 防止覆盖删除操作
+        tempItems = List.from(state.items);
         tempItems[i] = tempItems[i].copyWith(
           data: rowMap,
           isRecognizing: false,
@@ -213,7 +203,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       final List<Map<String, dynamic>> submitList = [];
 
       for (var item in state.items) {
-        // 双重保险，跳过识别中的
         if (item.isRecognizing) continue;
 
         final row = item.data;
@@ -224,20 +213,20 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           'supply_quotes': [
             {
               "supplier_id": supplierId,
-              'supplier_price': val('price'),
-              'outer_capacity': val('out_carton'),
-              'inner_capacity': val('inner_pack'),
-              'weight': val('weight'),
-              'packaging': val('packaging_type'),
-              'unit': val('unit'),
-              'outer_volume': val('volume'),
-              'supplier_moq': val('moq'),
+              'supplier_price': val(AppColumns.price.key),
+              'outer_capacity': val(AppColumns.outCarton.key),
+              'inner_capacity': val(AppColumns.innerPack.key),
+              'weight': val(AppColumns.weight.key),
+              'packaging': val(AppColumns.packagingType.key),
+              'unit': val(AppColumns.unit.key),
+              'outer_volume': val(AppColumns.volume.key),
+              'supplier_moq': val(AppColumns.moq.key),
             }
           ],
-          'spec': val('size'),
-          'description_cn': val('description'),
+          'spec': val(AppColumns.size.key),
+          'description_cn': val(AppColumns.description.key),
           'image': [item.media],
-          'item_type': 'market_product'
+          'item_type': 'market_product',
         });
       }
 
@@ -257,12 +246,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       EasyLoading.showError('保存失败: $e');
       return false;
     } finally {
-      // 无论成功失败，取消提交状态
       state = state.copyWith(isSubmitting: false);
     }
   }
 
-  /// 清空所有数据（成功后调用）
   void clear() {
     state = ProductAiAddState();
   }
@@ -286,6 +273,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
 
+    final currentTemplate = getTemplateById(providerState.currentTemplateId);
+
     final currentMediaList = providerState.items.map((e) => e.media).toList();
 
     return Scaffold(
@@ -297,6 +286,11 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
+                  _buildTemplateSelector(
+                      context, providerState.currentTemplateId, colorScheme,
+                      (newId) {
+                    controller.changeTemplate(newId);
+                  }),
                   // 图片上传区域
                   _buildUploadArea(currentMediaList, (newImages) {
                     controller.onImagesChanged(newImages, ref);
@@ -320,6 +314,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                           context,
                           index,
                           item,
+                          currentTemplate, // 传入当前模板对象
                           (key, val) => controller.updateCell(index, key, val),
                         );
                       },
@@ -341,7 +336,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       children: [
         Expanded(
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 8),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
@@ -402,7 +397,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   }
 
   Widget _buildDataRow(BuildContext context, int index, ProductDraftItem item,
-      Function(String key, String val) onUpdate) {
+      TemplateOption template, Function(String key, String val) onUpdate) {
     const double rowHeight = 72.0;
 
     if (item.isRecognizing) {
@@ -465,7 +460,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: Row(
-                children: _kTableColumns.map((col) {
+                children: template.columns.map((col) {
                   final text = item.getValue(col.key);
                   final bool isEmpty = text == '-' || text.isEmpty;
 
@@ -527,7 +522,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     );
   }
 
-  /// 优化后的底部按钮
   Widget _buildBottomAction(
     BuildContext context,
     ColorScheme colorScheme,
@@ -604,4 +598,118 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+Widget _buildTemplateSelector(
+  BuildContext context,
+  String currentId,
+  ColorScheme colorScheme,
+  Function(String id) onSelect,
+) {
+  return SizedBox(
+    height: 80,
+    child: ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      scrollDirection: Axis.horizontal,
+      itemCount: kQuoteAiTemplates.length, // 使用新的配置常量
+      separatorBuilder: (c, i) => const SizedBox(width: 10),
+      itemBuilder: (context, index) {
+        final t = kQuoteAiTemplates[index];
+        final bool isSelected = t.id == currentId;
+
+        final borderColor = isSelected ? colorScheme.primary : Colors.grey[300];
+        final bgColor =
+            isSelected ? colorScheme.primary.withOpacity(0.05) : Colors.white;
+        final textColor = isSelected ? colorScheme.primary : Colors.black87;
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onSelect(t.id),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              width: 160,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: borderColor!, width: isSelected ? 1.5 : 1),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.table_chart_outlined,
+                        size: 20, color: Colors.grey),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          t.name,
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: textColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          isSelected ? '当前使用' : '点击切换',
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : Colors.grey[500]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (ctx) {
+                            return Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: GestureDetector(
+                                onTap: () => Navigator.pop(ctx),
+                                child: InteractiveViewer(
+                                  child: Image.network(
+                                    t.previewImageUrl,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => Container(
+                                        color: Colors.white,
+                                        height: 300,
+                                        child:
+                                            const Center(child: Text('预览规则图'))),
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Icon(Icons.visibility_outlined,
+                          size: 18, color: Colors.grey[400]),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
 }
