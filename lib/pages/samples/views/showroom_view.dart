@@ -20,7 +20,8 @@ class SamplesPageView extends HookConsumerWidget {
     final screenHeight = MediaQuery.of(context)
         .size
         .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
-    final imageHeight = screenHeight * 0.2;
+    final isPad =  MediaQuery.of(context).size.width > 600;
+    final imageHeight = screenHeight * (isPad ? 0.25 : 0.2);
 
     useEffect(() {
       Future.microtask(() async {
@@ -53,7 +54,8 @@ class SamplesPageView extends HookConsumerWidget {
                 EdgeInsets.only(bottom: index == warehouses.length - 1 ? 0 : 8),
             child: WarehouseShowCard(
               warehouse: warehouse,
-              imageHeight: imageHeight,
+              isPad: isPad,
+              imageHeight:imageHeight,
             ),
           ),
         );

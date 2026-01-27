@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
@@ -9,12 +10,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // 每个样品间 名称及图片
 class WarehouseShowCard extends ConsumerWidget {
   final Warehouse warehouse;
+  final bool? isPad;
   final double imageHeight;
 
   const WarehouseShowCard({
     super.key,
     required this.warehouse,
     required this.imageHeight,
+    this.isPad,
   });
 
   void showImagePreview(BuildContext context, List<WarehouseImage> images,
@@ -252,14 +255,23 @@ class WarehouseShowCard extends ConsumerWidget {
 
   List<WarehouseImage> orderImages(Warehouse warehouse) {
     final images = warehouse.image ?? [];
-    final buildingImages = images.where((img) => isBuildingImage(img)).toList();
-    final otherImages = images.where((img) => !isBuildingImage(img)).toList();
-    return [...buildingImages, ...otherImages];
+    final startImages =
+        images.where((img) => isSpecialImage(img, 'bs')).toList();
+    final endImages = images.where((img) => isSpecialImage(img, 'be')).toList();
+    final otherImages =
+        images.where((img) => isNotSpecialImage(img, 'bs', 'be')).toList();
+    return [...startImages, ...otherImages, ...endImages];
   }
 
-  bool isBuildingImage(WarehouseImage image) {
+  bool isSpecialImage(WarehouseImage image, String specialName) {
     final name = (image.filename ?? image.name ?? '').toLowerCase();
-    return name.startsWith('building');
+    return name.startsWith(specialName);
+  }
+
+  bool isNotSpecialImage(
+      WarehouseImage image, String specialName1, String specialName2) {
+    final name = (image.filename ?? image.name ?? '').toLowerCase();
+    return !name.startsWith(specialName1) && !name.startsWith(specialName2);
   }
 
   @override
@@ -311,6 +323,7 @@ class WarehouseShowCard extends ConsumerWidget {
                 images: orderedImages,
                 warehouseName: warehouse.name ?? '-',
                 onImageTap: onTrumbImageTap,
+                isPad: isPad,
               ),
             ),
           ),
@@ -321,15 +334,19 @@ class WarehouseShowCard extends ConsumerWidget {
 }
 
 // 独立的图片画廊 Widget，使用 RepaintBoundary 优化性能
+/// 每屏最多显示 3 张图片，其余需左右滑动查看
 class _ImageGallery extends StatelessWidget {
   final List<WarehouseImage> images;
   final String warehouseName;
+
   final Function(BuildContext, List<WarehouseImage>, int, String) onImageTap;
+  final bool? isPad;
 
   const _ImageGallery({
     required this.images,
     required this.warehouseName,
     required this.onImageTap,
+    this.isPad,
   });
 
   @override
@@ -341,30 +358,35 @@ class _ImageGallery extends StatelessWidget {
       );
     }
 
-    // 计算图片尺寸，限制内存使用 
     final screenWidth = MediaQuery.of(context).size.width;
-    final imageSize = (screenWidth * 0.5).round(); // 大约屏幕宽度的20%
+    const padding = 8.0;
+    // 左右 padding 各 8，3 张图之间 2 个间隔各 8 => 8*4=32
+    final itemWidth = isPad == true
+        ? (screenWidth - padding * 10) / 5
+        : (screenWidth - padding * 8) / 3;
+    final imageSize = itemWidth.round();
 
     return Container(
       color: Colors.transparent,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(8),
-        cacheExtent: 200, // 限制水平列表的缓存范围
+        padding:
+            const EdgeInsets.symmetric(horizontal: padding, vertical: padding),
+        cacheExtent: 200,
         itemCount: images.length,
         itemBuilder: (context, index) {
           final image = images[index];
-
           final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
           return RepaintBoundary(
             child: Padding(
               padding: EdgeInsets.only(
-                right: index == images.length - 1 ? 0 : 8,
+                right: index == images.length - 1 ? 0 : padding,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: AspectRatio(
-                  aspectRatio: 1 / 1,
+              child: SizedBox(
+                width: itemWidth,
+                // height: itemWidth,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
                   child: Container(
                     color: Colors.grey.shade300,
                     child: imageUrl != null && imageUrl.isNotEmpty
@@ -374,9 +396,11 @@ class _ImageGallery extends StatelessWidget {
                             child: ImageShow(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              memCacheWidth: image.thumbUrl == null ? imageSize : null,
-                              memCacheHeight: image.thumbUrl == null ? imageSize : null,
-                              enablePreview: false, // 禁用默认预览，使用自定义预览
+                              memCacheWidth:
+                                  image.thumbUrl == null ? imageSize : null,
+                              memCacheHeight:
+                                  image.thumbUrl == null ? imageSize : null,
+                              enablePreview: false,
                             ),
                           )
                         : const Icon(Icons.image_not_supported,

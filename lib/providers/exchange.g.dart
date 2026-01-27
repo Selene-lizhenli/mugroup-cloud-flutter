@@ -6,7 +6,7 @@ part of 'exchange.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$exchangeHash() => r'f2d1407e98c5a5d5057a3050756e26a396361d6a';
+String _$exchangeHash() => r'828a2fabebd3feb859eb80071cf40eb0b7dba739';
 
 /// See also [Exchange].
 @ProviderFor(Exchange)

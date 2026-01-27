@@ -30,6 +30,7 @@ class LoginWay extends HookConsumerWidget {
 
     final accountController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
 
     final qrcodeTimer = useRef<Timer?>(null);
     final qrcodeLoading = useState(false);
@@ -283,11 +284,11 @@ class LoginWay extends HookConsumerWidget {
               child: ElevatedButton(
                 onPressed: handleAccountLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: colorScheme.primary,
                   shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
                 ),
-                child:
-                    const Text(style: TextStyle(color: Colors.black), '立即登录'),
+                child: Text(
+                    style: TextStyle(color: colorScheme.onPrimary), '立即登录'),
               ),
             ),
         ],
