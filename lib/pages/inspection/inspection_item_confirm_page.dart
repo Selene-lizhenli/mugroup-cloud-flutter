@@ -386,33 +386,33 @@ class _PhotoCard extends HookConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F6FA),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildToggleItem(
-                                label: '拍照',
-                                isActive: isDirectCamera.value,
-                                icon: Icons.check,
-                                color: blue,
-                                onTap: () => isDirectCamera.value = true,
-                              ),
-                              _buildToggleItem(
-                                label: '相册',
-                                isActive: !isDirectCamera.value,
-                                icon: Icons.radio_button_unchecked,
-                                color: blue,
-                                onTap: () => isDirectCamera.value = false,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
+                        // Container(
+                        //   padding: const EdgeInsets.all(2),
+                        //   decoration: BoxDecoration(
+                        //     color: const Color(0xFFF5F6FA),
+                        //     borderRadius: BorderRadius.circular(16),
+                        //   ),
+                        //   child: Row(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     children: [
+                        //       _buildToggleItem(
+                        //         label: '拍照',
+                        //         isActive: isDirectCamera.value,
+                        //         icon: Icons.check,
+                        //         color: blue,
+                        //         onTap: () => isDirectCamera.value = true,
+                        //       ),
+                        //       _buildToggleItem(
+                        //         label: '相册',
+                        //         isActive: !isDirectCamera.value,
+                        //         icon: Icons.radio_button_unchecked,
+                        //         color: blue,
+                        //         onTap: () => isDirectCamera.value = false,
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(width: 12),
                         GestureDetector(
                           onTap: () {
                             showModalBottomSheet(
@@ -504,8 +504,8 @@ class _PhotoCard extends HookConsumerWidget {
                       maxCount: 50,
                       value: detailsList,
                       customIcon: Icons.camera_alt,
-                      directCamera: isDirectCamera.value,
-                      directGallery: !isDirectCamera.value,
+                      // directCamera: isDirectCamera.value,
+                      // directGallery: !isDirectCamera.value,
                       enableContinuous: true,
                       onContinuousCapture: handleAutoDistribute,
                       onChanged: (list) => onMediaChanged('details', list),
@@ -591,11 +591,11 @@ class _PhotoCard extends HookConsumerWidget {
               alignment: Alignment.centerLeft,
               child: ImageUploader(
                 label: null,
-                maxCount: 1,
+                maxCount: 56,
                 customIcon: Icons.camera_alt,
                 value: mediaMap[apiKey] ?? [],
-                directCamera: isDirectCamera,
-                directGallery: !isDirectCamera,
+                // directCamera: isDirectCamera,
+                // directGallery: !isDirectCamera,
                 enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
                 onContinuousCapture: onContinuousCapture,
