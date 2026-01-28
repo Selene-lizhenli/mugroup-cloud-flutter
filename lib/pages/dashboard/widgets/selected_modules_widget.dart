@@ -1,10 +1,9 @@
-import 'package:cloud/pages/dashboard/widgets/market/market_purchase_chart.dart';
+
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
-import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
-import 'package:cloud/pages/dashboard/widgets/modules/news_board.dart';
+import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart'; 
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_module.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/sample_room.main.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

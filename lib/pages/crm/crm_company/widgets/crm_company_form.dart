@@ -70,19 +70,16 @@ class CrmCompanyForm extends HookConsumerWidget {
                     ? {}
                     : {
                         ...initial!.toJson(),
-                        'domain':
-                            initial!.domain?.whereType<String>().toList() ?? [],
-                        'email':
-                            initial!.email?.whereType<String>().toList() ?? [],
-                        'facebook':
-                            initial!.facebook?.whereType<String>().toList() ??
-                                [],
-                        'linkedin':
-                            initial!.linkedin?.whereType<String>().toList() ??
-                                [],
-                        'whatsapp':
-                            initial!.whatsapp?.whereType<String>().toList() ??
-                                [],
+                        'domain': List<String>.from(
+                            initial!.domain?.whereType<String>().toList() ?? []),
+                        'email': List<String>.from(
+                            initial!.email?.whereType<String>().toList() ?? []),
+                        'facebook': List<String>.from(
+                            initial!.facebook?.whereType<String>().toList() ?? []),
+                        'linkedin': List<String>.from(
+                            initial!.linkedin?.whereType<String>().toList() ?? []),
+                        'whatsapp': List<String>.from(
+                            initial!.whatsapp?.whereType<String>().toList() ?? []),
                       },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

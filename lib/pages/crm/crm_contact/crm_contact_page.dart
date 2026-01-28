@@ -20,12 +20,15 @@ class CrmContactPage extends HookConsumerWidget {
         try {
           final resp =
               await getCrmContacts(queryParameters: {'company_id': companyId});
-          contacts.value = resp.data;
+          if (context.mounted) {
+            contacts.value = resp.data;
+          }
         } finally {
-          isLoading.value = false;
+          if (context.mounted) {
+            isLoading.value = false;
+          }
         }
       }();
-      return null;
     }, [companyId]);
 
     if (isLoading.value) {

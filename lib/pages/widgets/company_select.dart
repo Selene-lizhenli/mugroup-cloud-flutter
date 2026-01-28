@@ -152,13 +152,13 @@ class _CompanySelectSheet extends HookConsumerWidget {
     useEffect(() {
       Future<void> loadCompanies() async {
         try {
-          isLoading.value = true;
+          if (context.mounted) isLoading.value = true;
           final resp = await getCrmCompanies(
             queryParameters: {"search": search.value},
           );
           companies.value = resp.data;
         } finally {
-          isLoading.value = false;
+          if (context.mounted) isLoading.value = false;
         }
       }
 

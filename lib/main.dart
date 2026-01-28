@@ -70,6 +70,7 @@ class MyApp extends ConsumerWidget {
     final core = ref.watch(coreProvider);
     if (core.isLoading) {
       return MaterialApp(
+        key: const ValueKey('loading'),
         home: const Scaffold(
           body: SizedBox(),
         ),
@@ -83,6 +84,7 @@ class MyApp extends ConsumerWidget {
           : core.error.toString();
 
       return MaterialApp(
+        key: const ValueKey('error'),
         home: Scaffold(
           body: Center(
             child: Column(
@@ -150,7 +152,8 @@ class MyApp extends ConsumerWidget {
           },
         ),
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color.fromARGB(255, 240, 239, 240),//纸张背景色
+        scaffoldBackgroundColor:
+            const Color.fromARGB(255, 240, 239, 240), //纸张背景色
         colorScheme: ColorScheme.light(
           primary: primaryColor,
           onPrimary: Colors.white, //玫粉色上的颜色
@@ -171,12 +174,13 @@ class MyApp extends ConsumerWidget {
         ),
         // 补充主题色：橘色(Color(0xFFFF9800))、绿色(Color(0xFF4CAF50))已添加到tdTheme.colorMap
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF3F4F6), 
+          backgroundColor: Color(0xFFF3F4F6),
           centerTitle: true,
-          titleTextStyle: TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 18),
+          titleTextStyle:
+              TextStyle(color: Color.fromARGB(255, 18, 18, 18), fontSize: 18),
           scrolledUnderElevation: 0,
           elevation: 0,
-          foregroundColor:Color.fromARGB(255, 74, 74, 74) ,
+          foregroundColor: Color.fromARGB(255, 74, 74, 74),
           toolbarHeight: 50,
         ),
       ),

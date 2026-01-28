@@ -66,7 +66,19 @@ class CrmCotactForm extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: FormBuilder(
                 key: formKey,
-                initialValue: initial?.toJson() ?? {},
+                initialValue: initial == null
+                    ? {}
+                    : {
+                        ...initial!.toJson(),
+                        'email': List<String>.from(
+                            initial!.email ?? []),
+                        'whatsapp': List<String>.from(
+                            initial!.whatsapp ?? []),
+                        'linkedin': List<String>.from(
+                            initial!.linkedin ?? []),
+                        'facebook': List<String>.from(
+                            initial!.facebook ?? []),
+                      },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
