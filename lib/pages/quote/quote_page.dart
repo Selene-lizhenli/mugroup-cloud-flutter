@@ -294,7 +294,7 @@ class QuotePage extends HookConsumerWidget {
       );
     }
 
-    final displayList = list.take(3).toList();
+    final displayList = list.take(2).toList();
 
     return Column(
       children: [

@@ -167,7 +167,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(items: newItems);
   }
 
-  Future<bool> submitProducts(String? supplierId) async {
+  Future<bool> submitProducts(int? quoteId, String? supplierId) async {
     if (state.isSubmitting) return false;
     if (state.items.any((element) => element.isRecognizing)) {
       EasyLoading.showToast('请等待所有图片识别完成');
@@ -190,6 +190,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             (row[key] == null || row[key] == '-') ? null : row[key];
 
         submitList.add({
+          'quotation_id': quoteId,
+          "quotation": {},
           'supply_quotes': [
             {
               "supplier_id": supplierId,
@@ -714,7 +716,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         child: ElevatedButton(
           onPressed: canSubmit
               ? () async {
-                  await controller.submitProducts(supplierId);
+                  await controller.submitProducts(quoteId, supplierId);
                 }
               : null,
           style: ElevatedButton.styleFrom(
