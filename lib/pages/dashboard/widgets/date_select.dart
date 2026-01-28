@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 enum DateRange {
   allTime,
   lastYear,
-  lastHalfYear, 
+  lastHalfYear,
   lastMonth,
 }
 
@@ -39,12 +39,14 @@ class TimeRangeSelect extends StatefulWidget {
   final void Function(DateRange range, Map<String, String> params)?
       onRangeChanged;
   final EdgeInsetsGeometry? padding;
+  final bool? useAllTime;
 
   const TimeRangeSelect({
     super.key,
     this.initialRange = DateRange.allTime,
     this.onRangeChanged,
     this.padding,
+    this.useAllTime = true,
   });
 
   @override
@@ -68,17 +70,19 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
 
   @override
   Widget build(BuildContext context) {
+    final useAllTime = widget.useAllTime;
     return Padding(
       padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _RangeChip(
-            label: '所有时间',
-            isSelected: _selectedRange == DateRange.allTime,
-            onTap: () => _selectRange(DateRange.allTime),
-          ),
+          if (useAllTime == true)
+            _RangeChip(
+              label: '所有时间',
+              isSelected: _selectedRange == DateRange.allTime,
+              onTap: () => _selectRange(DateRange.allTime),
+            ),
           _RangeChip(
             label: '最近一年',
             isSelected: _selectedRange == DateRange.lastYear,
@@ -88,7 +92,7 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
             label: '最近半年',
             isSelected: _selectedRange == DateRange.lastHalfYear,
             onTap: () => _selectRange(DateRange.lastHalfYear),
-          ), 
+          ),
           _RangeChip(
             label: '最近一个月',
             isSelected: _selectedRange == DateRange.lastMonth,

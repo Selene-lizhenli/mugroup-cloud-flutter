@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
@@ -54,7 +55,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         'currency': currency,
         'start': dateParams['start']!,
         'end': dateParams['end']!,
-      };
+      }; 
       final data = await getExchangeRateHistory(params: paramsData);
 
       if (mounted) {
