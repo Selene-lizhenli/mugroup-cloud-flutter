@@ -99,8 +99,7 @@ class DashboardStats extends _$DashboardStats {
   Future<DashboardStatsState> _fetch() async {
     // 获取市场采购相关统计数据（根据当前时间维度）
     final params = _buildDateRangeParams(state.timeDimension);
-    final summary = await getStatsSummary(params: params);
-    logger.d('params${params}');
+    final summary = await getStatsSummary(params: params); 
     if (summary?.data == null || summary!.data!.isEmpty) {
       return DashboardStatsState(
         timeLabels: [],
@@ -140,8 +139,7 @@ class DashboardStats extends _$DashboardStats {
       inspectionData: inspectionData,
       timeDimension: state.timeDimension,
       sampleRoomDimension: state.sampleRoomDimension,
-    );
-    logger.d('sa${sa.toString()}');
+    ); 
     return sa;
   }
 }

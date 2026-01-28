@@ -47,8 +47,8 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 报价排行
   List<ShipTopStats> _shipTopDimensionData = []; //  数据 出货排行
-  final DateRange _shipDateRange = DateRange.lastYear; // 出货排行时间范围 初始值
-  final DateRange _quoteDateRange = DateRange.lastYear; // 报价次数排行时间范围 初始值
+  final DateRange _shipDateRange = DateRange.allTime; // 出货排行时间范围 初始值
+  final DateRange _quoteDateRange = DateRange.allTime; // 报价次数排行时间范围 初始值
 
   bool _isLoading = false; // 数据加载状态
 
@@ -71,7 +71,6 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       _quoteTopDimensionData = [];
     });
     try {
-      logger.d('handleQuoteRankData params: $params');
       final resp = await getQuoteStatsSummary(params: params);
       if (mounted) {
         setState(() {
@@ -117,13 +116,12 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     setState(() {
       _isLoading = true;
     });
-    logger.d('dimension: $dimension');
     try {
       if (dimension == sampleDimensionConfigs[1]['value']) {
-        handleQuoteRankData(null);
+        handleQuoteRankData(null); // 默认是所有时间DateRange.allTime，所以这里传入null
       } else if (dimension == sampleDimensionConfigs[0]['value'] ||
           dimension == sampleDimensionConfigs[2]['value']) {
-        handleShipRankData(null);
+        handleShipRankData(null); // 默认是所有时间DateRange.allTime，所以这里传入null
       } else {
         if (mounted) {
           setState(() {

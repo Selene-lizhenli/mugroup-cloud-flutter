@@ -11,14 +11,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 
-export 'package:cloud/pages/dashboard/widgets/date_select.dart'
-    show DateRange;
+export 'package:cloud/pages/dashboard/widgets/date_select.dart' show DateRange;
 
 /// 样品间---统计排行图表&列表组件
 class ShipTopChartContent extends StatefulWidget {
   final List<ShipTopStats> data;
   final DateRange selectedRange;
-  final void Function(DateRange range, Map<String, String> params)? onRangeChanged;
+  final void Function(DateRange range, Map<String, String> params)?
+      onRangeChanged;
   final bool? isLoading;
   final void Function(GlobalKey)? handleExpandScroll;
 
@@ -227,14 +227,6 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                                                 .withOpacity(0.72),
                                             fontSize: 10),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '出货次数：${formatCurrencyAmount(item.shippingCount)}',
-                                        style: TextStyle(
-                                            color: colorScheme.onSurface
-                                                .withOpacity(0.72),
-                                            fontSize: 10),
-                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 4),
@@ -360,8 +352,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                         return BarTooltipItem(
                           '${item.sampleName ?? ''}\n'
                           '编号: ${item.sampleNo ?? '未知'}\n'
-                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)}\n'
-                          '出货次数: ${formatCurrencyAmount(item.shippingCount ?? 0)}',
+                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)} ',
                           TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 10,

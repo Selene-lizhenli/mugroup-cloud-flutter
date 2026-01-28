@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// 时间范围枚举（最近一年、最近半年、最近一个月）
+/// 时间范围枚举（所有时间、最近一年、最近半年、最近一个月）
 enum DateRange {
+  allTime,
   lastYear,
-  lastHalfYear,
-  lastThreeMonths,
+  lastHalfYear, 
   lastMonth,
 }
 
@@ -20,12 +20,11 @@ Map<String, String> trnasDateRangeToParams(DateRange range) {
     case DateRange.lastHalfYear:
       start = DateTime(now.year, now.month - 6, now.day);
       break;
-    case DateRange.lastThreeMonths:
-      start = DateTime(now.year, now.month - 3, now.day);
-      break;
     case DateRange.lastMonth:
       start = DateTime(now.year, now.month - 1, now.day);
       break;
+    case DateRange.allTime:
+      return {'start': '', 'end': ''};
   }
   String format(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -43,7 +42,7 @@ class TimeRangeSelect extends StatefulWidget {
 
   const TimeRangeSelect({
     super.key,
-    this.initialRange = DateRange.lastYear,
+    this.initialRange = DateRange.allTime,
     this.onRangeChanged,
     this.padding,
   });
@@ -76,6 +75,11 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _RangeChip(
+            label: '所有时间',
+            isSelected: _selectedRange == DateRange.allTime,
+            onTap: () => _selectRange(DateRange.allTime),
+          ),
+          _RangeChip(
             label: '最近一年',
             isSelected: _selectedRange == DateRange.lastYear,
             onTap: () => _selectRange(DateRange.lastYear),
@@ -84,12 +88,7 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
             label: '最近半年',
             isSelected: _selectedRange == DateRange.lastHalfYear,
             onTap: () => _selectRange(DateRange.lastHalfYear),
-          ),
-          _RangeChip(
-            label: '最近三个月',
-            isSelected: _selectedRange == DateRange.lastThreeMonths,
-            onTap: () => _selectRange(DateRange.lastThreeMonths),
-          ),
+          ), 
           _RangeChip(
             label: '最近一个月',
             isSelected: _selectedRange == DateRange.lastMonth,

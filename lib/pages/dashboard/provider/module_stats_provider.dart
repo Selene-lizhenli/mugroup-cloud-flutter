@@ -72,8 +72,7 @@ class ModuleStats extends _$ModuleStats {
   Future<ModuleStatsState> _fetch() async {
     // 获取统计数据（根据当前时间维度）
     final params = _buildDateRangeParams(state.timeDimension);
-    final summary = await getStatsSummary(params: params);
-    logger.d('Module ${state.moduleId} params: ${params}');
+    final summary = await getStatsSummary(params: params); 
     
     if (summary?.data == null || summary!.data!.isEmpty) {
       return state.copyWith(
