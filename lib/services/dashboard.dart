@@ -27,21 +27,17 @@ Future<List<ExchangeRate>?> getExchangesList() async {
 }
 
 /// 获取汇率历史数据
-/// [currency] 货币代码，如 USD, AUD 等
-/// [start] 开始日期，格式：YYYY-MM-DD
-/// [end] 结束日期，格式：YYYY-MM-DD
+/// [params] 需包含 currency、start、end（格式 YYYY-MM-DD）
 Future<ExchangeRateHistory?> getExchangeRateHistory({
-  required String currency,
-  required String start,
-  required String end,
+  required Map<String, dynamic> params,
 }) async {
   try {
     final res = await api.get(
       'api/tenant/exchanges/trend',
       data: {
-        'currency': currency,
-        'start': start,
-        'end': end,
+        'currency': params['currency'],
+        'start': params['start'],
+        'end': params['end'],
       },
     );
 
@@ -85,7 +81,7 @@ Future<List<QuoteTopStats>?> getQuoteStatsSummary({
     returnedData = (res.data as List)
         .map((e) => QuoteTopStats.fromJson(e as Map<String, dynamic>))
         .toList();
-  } 
+  }
   return returnedData;
 }
 

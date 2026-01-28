@@ -32,7 +32,7 @@ class SamplesPageView extends HookConsumerWidget {
 
     if (home.isLoadingWarehouses) {
       return const Center(
-        child: MuProgressIndicator(),
+        child: MuProgressIndicator(showText: true,),
       );
     }
     if (warehouses.isEmpty) {

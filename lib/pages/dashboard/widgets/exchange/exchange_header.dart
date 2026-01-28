@@ -147,36 +147,69 @@ class ExchangeChartHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              InkWell(
-                onTap: () => _showExchangeCalculator(context),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.calculator,
-                      size: 16,
-                      color: Colors.grey.shade600,
+              Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                child: InkWell(
+                  onTap: () => _showExchangeCalculator(context),
+                  borderRadius: BorderRadius.circular(100),
+                  highlightColor: colorScheme.primary.withOpacity(0.1),
+                  splashColor: colorScheme.primary.withOpacity(0.2),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          FontAwesomeIcons.calculator,
+                          size: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ), 
-              TextButton(
-                onPressed: () => _openDimensionBottomSheet(context),
-                style: TextButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.tune,
-                      size: 20,
-                      color: Colors.grey.shade600,
-                    ),
-                  ],
+                  ),
                 ),
               ),
+              Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                child: InkWell(
+                  onTap: () => _openDimensionBottomSheet(context),
+                  borderRadius: BorderRadius.circular(100),
+                  highlightColor: colorScheme.primary.withOpacity(0.1),
+                  splashColor: colorScheme.primary.withOpacity(0.2),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.tune,
+                          size: 20,
+                          color: Colors.grey.shade600,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // TextButton(
+              //   onPressed: () => _openDimensionBottomSheet(context),
+              //   style: TextButton.styleFrom(
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              //   ),
+              //   child: Row(
+              //     mainAxisSize: MainAxisSize.min,
+              //     children: [
+              //       Icon(
+              //         Icons.tune,
+              //         size: 20,
+              //         color: Colors.grey.shade600,
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ],

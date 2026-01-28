@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
 import 'package:cloud/pages/setting/widgets/setting_modlue_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_module.dart';
+import 'package:cloud/pages/dashboard/widgets/showroom/sample_room.main.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

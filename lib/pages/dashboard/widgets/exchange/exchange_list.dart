@@ -4,7 +4,7 @@ import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/pages/widgets/show_Error.dart';
 import 'package:flutter/material.dart';
 
-/// 未选择维度时：展示汇率列表表格
+///展示汇率列表表格（ 未选择维度时）
 class ExchangeRatesValueList extends StatelessWidget {
   final List<ExchangeRate>? list;
   final bool? loading;

@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart';
+import 'package:cloud/pages/dashboard/widgets/date_select.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -12,15 +12,15 @@ import 'package:cloud/pages/widgets/image_show.dart';
 /// 样品间---统计排行图表&列表组件
 class QuoteTopChartContent extends StatefulWidget {
   final List<QuoteTopStats> data;
-  final ShipDateRange selectedRange;
-  final ValueChanged<ShipDateRange>? onRangeChanged;
+  final DateRange selectedRange;
+  final void Function(DateRange range, Map<String, String> params)? onRangeChanged;
   final bool? isLoading;
   final void Function(GlobalKey)? handleExpandScroll;
 
   const QuoteTopChartContent({
     super.key,
     required this.data,
-    this.selectedRange = ShipDateRange.lastYear,
+    this.selectedRange = DateRange.lastYear,
     this.onRangeChanged,
     this.isLoading,
     this.handleExpandScroll,
@@ -50,8 +50,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final colorScheme = Theme.of(context).colorScheme; 
     // 只取前9条数据
     final displayData = widget.data.take(9).toList();
     final isLoading = widget.isLoading;
@@ -87,7 +86,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
 
         /// 时间范围选择
         TimeRangeSelect(
-          selectedRange: widget.selectedRange,
+          initialRange: widget.selectedRange,
           onRangeChanged: widget.onRangeChanged,
         ),
         const SizedBox(height: 16),
@@ -101,7 +100,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '$dimenLabel统计数据',
+                  '$dimenLabel排行数据',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
