@@ -179,8 +179,8 @@ class ExchangeTrend extends StatelessWidget {
                                       return FlDotCirclePainter(
                                         radius: 5,
                                         color: index == maxIndex
-                                            ? colorScheme.primary
-                                            : colorScheme.secondary,
+                                            ? colorScheme.secondary
+                                            : colorScheme.primary,
                                         strokeWidth: 2,
                                         strokeColor: Colors.white,
                                       );

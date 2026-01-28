@@ -129,14 +129,14 @@ class MinMaxLabels extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(
-              color: colorScheme.primary,
+              color: colorScheme.secondary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               maxText,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
-                color: Colors.white,
+                color: colorScheme.secondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -149,14 +149,14 @@ class MinMaxLabels extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(
-              color: colorScheme.secondary,
+              color: colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               minText,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
-                color: Colors.white,
+                color: colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
