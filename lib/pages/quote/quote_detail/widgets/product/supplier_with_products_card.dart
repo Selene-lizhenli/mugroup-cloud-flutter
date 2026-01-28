@@ -102,7 +102,7 @@ class _SupplierWithProductsCardState
                   onTap: () async {
                     await context.router.push(
                       QuoteProductNewAddRoute(
-                        quoteId: 0,
+                        quoteId: quoteId,
                         supplierId: supplierId?.toString(),
                       ),
                     );

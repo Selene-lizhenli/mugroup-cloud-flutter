@@ -14,7 +14,6 @@ import 'dart:async';
 String? _mapCountryToLanguage(String? country) {
   if (country == null || country.isEmpty) return null;
 
-  // 国家名称到语言代码的映射（不区分大小写）
   final countryLower = country.toLowerCase();
 
   // 英语国家
@@ -74,8 +73,8 @@ String? _mapCountryToLanguage(String? country) {
       countryLower.contains('法国') ||
       countryLower.contains('belgium') ||
       countryLower.contains('比利时') ||
-      (countryLower.contains('switzerland') &&
-          countryLower.contains('french')) ||
+      countryLower.contains('switzerland') &&
+          countryLower.contains('french') ||
       (countryLower.contains('canada') && countryLower.contains('quebec'))) {
     return 'fr';
   }
@@ -95,26 +94,21 @@ String? _mapCountryToLanguage(String? country) {
 }
 
 /// 获取翻译目标语言
-/// 优先使用报价单语言，如果没有则根据客户国家映射
 String _getTranslationLanguage(String? quoteLanguage, String? customerCountry) {
-  // 优先使用报价单语言
   if (quoteLanguage != null && quoteLanguage.isNotEmpty) {
-    // 将大写的语言代码转换为小写（如 'EN' -> 'en'）
     return quoteLanguage.toLowerCase();
   }
-
-  // 如果没有报价单语言，则根据客户国家映射
   final countryLanguage = _mapCountryToLanguage(customerCountry);
-  return countryLanguage ?? 'en'; // 默认使用英语
+  return countryLanguage ?? 'en';
 }
 
 @RoutePage()
-class QuoteProductAddAdaptivePage extends HookConsumerWidget { 
+class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   final int? initialMode;
-  final String? supplierId; // 页面级参数：供应商 ID
+  final String? supplierId;
 
   const QuoteProductAddAdaptivePage({
-    super.key, 
+    super.key,
     this.initialMode,
     this.supplierId,
   });
@@ -123,16 +117,20 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final orientation = MediaQuery.of(context).orientation;
     final hasAppliedInitial = useRef(false);
+    
+    // 默认模式：竖屏为0，横屏为1
     final currentMode = useState<int>(
         initialMode ?? (orientation == Orientation.portrait ? 0 : 1));
+        
     final initialSupplier = useState<Map<String, dynamic>?>(null);
     final quoteDetailState = ref.watch(quoteDetailProvider);
-    final quoteLanguage =
-        quoteDetailState.baseInfo?.language; // 报价单语言代码（如 'EN', 'JA', 'ES' 等）
-    final customerCountry =
-        quoteDetailState.baseInfo!.company?.location; // 客户国家
-    final quoteId = quoteDetailState.baseInfo?.id;
-    final companyId =  quoteDetailState.baseInfo!.company?.id;
+
+    // === 修复点：使用 ?. 安全访问，防止 baseInfo 为 null 时崩溃 ===
+    final baseInfo = quoteDetailState.baseInfo;
+    final quoteLanguage = baseInfo?.language;
+    final customerCountry = baseInfo?.company?.location;
+    final quoteId = baseInfo?.id;
+    final companyId = baseInfo?.company?.id;
 
     // 页面加载后，如果有 supplierId，则请求供应商数据
     useEffect(() {
@@ -153,13 +151,13 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
       return null;
     }, [supplierId]);
 
+    // 监听方向变化或初始模式变化
     useEffect(() {
       if (initialMode != null && !hasAppliedInitial.value) {
         currentMode.value = initialMode!;
         hasAppliedInitial.value = true;
         return null;
       }
-
       currentMode.value = orientation == Orientation.portrait ? 0 : 1;
       return null;
     }, [orientation, initialMode]);
@@ -168,8 +166,6 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
     final translationLanguage =
         _getTranslationLanguage(quoteLanguage, customerCountry);
 
-    // 使用 IndexedStack 保持两个widget的状态，避免切换时重建导致的hooks冲突
-    // 两个widget各自有独立的formKey，通过provider同步数据
     return IndexedStack(
       index: currentMode.value,
       children: [

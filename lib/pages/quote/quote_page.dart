@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -321,39 +322,13 @@ class _QuotePageState extends State<QuotePage>
   }
 
   Widget _buildQuickActionsPlaceholder() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      mainAxisSpacing: 16,
-      children: [
-        _buildActionIcon(Icons.add_a_photo_outlined, "拍照开单"),
-        _buildActionIcon(Icons.qr_code_scanner, "扫码识别"),
-        _buildActionIcon(Icons.analytics_outlined, "销售报表"),
-        _buildActionIcon(Icons.settings_outlined, "设置"),
-      ],
-    );
-  }
-
-  Widget _buildActionIcon(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: Colors.grey[700], size: 24),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-        ),
-      ],
+    return const SizedBox(
+      height: 600,
+      child: QuoteProductNewAddPage(
+        quoteId: 0, //todo
+        isEmbedded: true,
+        supplierId: '335', //todo
+      ),
     );
   }
 
