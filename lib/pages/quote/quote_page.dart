@@ -205,7 +205,7 @@ class QuotePage extends HookConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
             ],
           ),
         ),
