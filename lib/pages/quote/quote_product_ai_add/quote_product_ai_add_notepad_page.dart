@@ -221,7 +221,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(groups: newGroups);
   }
 
-  Future<bool> submitProducts(String? supplierId) async {
+  Future<bool> submitProducts(int? quoteId, String? supplierId) async {
     // 1. 状态检查
     if (state.isSubmitting) return false;
 
@@ -253,6 +253,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
               (row[key] == null || row[key] == '-') ? null : row[key];
 
           submitList.add({
+            'quotation_id': quoteId,
+            "quotation": {},
             'supply_quotes': [
               {
                 "supplier_id": supplierId,
@@ -666,7 +668,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
         child: ElevatedButton(
           onPressed: canSubmit
               ? () async {
-                  await controller.submitProducts(supplierId);
+                  await controller.submitProducts(quoteId, supplierId);
                 }
               : null,
           style: ElevatedButton.styleFrom(
