@@ -70,7 +70,7 @@ class ExchangeRatesValueList extends StatelessWidget {
                 final item = list?[index];
                 return Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: colorScheme.primary.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(2),
@@ -83,14 +83,16 @@ class ExchangeRatesValueList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${item?.name} ${item?.shortName}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11,
-                          height: 1,
-                          color: colorScheme.onSurface,
+                      Expanded(
+                        child: Text(
+                          '${item?.name} ${item?.shortName}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            height: 1,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       Text(
