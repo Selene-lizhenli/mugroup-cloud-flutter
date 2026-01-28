@@ -3,93 +3,76 @@ import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
+import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/quote_select.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()
-class QuotePage extends StatefulWidget {
+class QuotePage extends HookConsumerWidget {
   const QuotePage({super.key});
 
   @override
-  State<QuotePage> createState() => _QuotePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-class _QuotePageState extends State<QuotePage>
-    with AutomaticKeepAliveClientMixin {
-  int tabIndex = 0;
-  late final TextEditingController _searchController;
-  String _lastSearch = '';
-  final ScrollController _scrollController = ScrollController();
+    useAutomaticKeepAlive(wantKeepAlive: true);
 
-  String? quoteAt;
-  List<QuotationList> list = [];
-  bool isLoading = true;
-  final int pageSize = 20;
+    final isLoading = useState(true);
+    final list = useState<List<QuotationList>>([]);
+    final selectedQuote = useState<Map<String, dynamic>?>(null);
+    final selectedSupplier = useState<Map<String, dynamic>?>(null);
 
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-    _searchController.addListener(_onSearchChanged);
-    _fetchData();
-  }
+    final searchController = useTextEditingController();
+    final scrollController = useScrollController();
 
-  @override
-  void dispose() {
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
+    final lastSearch = useRef('');
 
-  void _onSearchChanged() {
-    final current = _searchController.text.trim();
-    if (current == _lastSearch) return;
-    _lastSearch = current;
-    _fetchData();
-  }
+    Future<void> fetchData() async {
+      isLoading.value = true;
+      final searchText = searchController.text.trim();
 
-  Future<void> _fetchData() async {
-    setState(() => isLoading = true);
+      final paramsData = {
+        "search": searchText,
+        "page": "1",
+        "pageSize": "20",
+        "type": "market",
+        // 如果有 quoteAt 逻辑，可以在这里加
+      };
 
-    final search = _searchController.text;
-    final paramsData = {
-      "search": search,
-      "page": "1",
-      "pageSize": pageSize.toString(),
-      if (quoteAt != null) 'quote_at': quoteAt!,
-      "type": "market",
-    };
+      try {
+        final newData = await getShowroomQuotation(paramsData);
 
-    try {
-      final newData = await getShowroomQuotation(paramsData);
-      if (mounted) {
-        setState(() {
-          list = newData.data;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => isLoading = false);
+        if (context.mounted) {
+          list.value = newData.data;
+          isLoading.value = false;
+        }
+      } catch (e) {
+        if (context.mounted) {
+          isLoading.value = false;
+        }
       }
     }
-  }
 
-  Future<void> _onRefresh() async {
-    await _fetchData();
-  }
+    useEffect(() {
+      fetchData();
 
-  @override
-  bool get wantKeepAlive => true;
+      void onSearchChanged() {
+        final current = searchController.text.trim();
+        if (current == lastSearch.value) return;
+        lastSearch.value = current;
+        fetchData();
+      }
 
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    final colorScheme = Theme.of(context).colorScheme;
+      searchController.addListener(onSearchChanged);
+      return () => searchController.removeListener(onSearchChanged);
+    }, []);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -103,19 +86,16 @@ class _QuotePageState extends State<QuotePage>
               color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
-        actions: const [],
       ),
       body: RefreshIndicator(
-        onRefresh: _onRefresh,
+        onRefresh: fetchData,
         child: SingleChildScrollView(
-          controller: _scrollController,
+          controller: scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(
             children: [
-              QuoteSearchBar(controller: _searchController),
-
-              // === 区域一：近期记录 (核心业务) ===
+              QuoteSearchBar(controller: searchController),
               _buildSectionCard(
                 context,
                 title: "近期记录",
@@ -124,15 +104,13 @@ class _QuotePageState extends State<QuotePage>
                 action: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 刷新按钮
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       icon: Icon(Icons.refresh,
                           color: Colors.grey[600], size: 22),
                       tooltip: "刷新",
-                      onPressed: _onRefresh,
+                      onPressed: fetchData,
                     ),
-
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       icon: Icon(Icons.add_circle_outline,
@@ -142,30 +120,91 @@ class _QuotePageState extends State<QuotePage>
                     ),
                   ],
                 ),
-                content: _buildRecentRecordsContent(context),
+                content: _buildRecentRecordsContent(
+                    context, isLoading.value, list.value),
               ),
-
               const SizedBox(height: 16),
-
               _buildSectionCard(
                 context,
                 title: "带客记录详情",
-                icon: Icons.list_alt_rounded, // 换个图标
+                icon: Icons.list_alt_rounded,
                 iconColor: Colors.orangeAccent,
-                content: _buildDetailList(context), // 调用新的详情构建方法
+                content: _buildDetailList(context, isLoading.value, list.value),
               ),
-
               const SizedBox(height: 16),
-
-              // === 区域三：快捷功能 ===
               _buildSectionCard(
                 context,
                 title: "创建产品",
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
-                content: _buildQuickActionsPlaceholder(),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        final result =
+                            await showModalBottomSheet<Map<String, dynamic>>(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const QuoteSelect(),
+                        );
+                        if (result != null) {
+                          selectedQuote.value = result;
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: Input(
+                          label: '带客记录',
+                          showClearButton: false,
+                          isRequired: true,
+                          value: selectedQuote.value == null
+                              ? ''
+                              : (selectedQuote.value?['company']?.name ?? ''),
+                          hintText: '请选择带客记录',
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final result =
+                            await showModalBottomSheet<Map<String, dynamic>>(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const SupplierSelect(),
+                        );
+                        if (result != null) {
+                          selectedSupplier.value = result;
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: Input(
+                          label: '供应商',
+                          showClearButton: false,
+                          isRequired: true,
+                          value: selectedSupplier.value == null
+                              ? ''
+                              : (selectedSupplier.value?['short_name'] ??
+                                  selectedSupplier.value?['name'] ??
+                                  ''),
+                          hintText: '请选择供应商',
+                        ),
+                      ),
+                    ),
+                    const Divider(
+                        height: 24, thickness: 0.5, indent: 16, endIndent: 16),
+                    SizedBox(
+                      height: 600,
+                      child: QuoteProductNewAddPage(
+                        isEmbedded: true,
+                        quoteId: selectedQuote.value?['id'],
+                        supplierId: selectedSupplier.value?['id'].toString(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-
               const SizedBox(height: 40),
             ],
           ),
@@ -198,10 +237,8 @@ class _QuotePageState extends State<QuotePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题栏
           Padding(
-            padding:
-                const EdgeInsets.fromLTRB(16, 12, 8, 8), // 右侧padding减小以适应按钮
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
             child: Row(
               children: [
                 Container(
@@ -227,14 +264,14 @@ class _QuotePageState extends State<QuotePage>
             ),
           ),
           const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
-          // 内容
           content,
         ],
       ),
     );
   }
 
-  Widget _buildRecentRecordsContent(BuildContext context) {
+  Widget _buildRecentRecordsContent(
+      BuildContext context, bool isLoading, List<QuotationList> list) {
     if (isLoading) {
       return const Padding(
         padding: EdgeInsets.all(20),
@@ -257,18 +294,16 @@ class _QuotePageState extends State<QuotePage>
       );
     }
 
-    // 截取前3条
     final displayList = list.take(3).toList();
 
     return Column(
       children: [
-        // 1. 列表内容
         ...displayList.map((item) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: QuoteCard(
               item: item,
-              tabIndex: tabIndex,
+              tabIndex: 0,
               onTap: () {
                 final tempId = item.id;
                 if (tempId == null) return;
@@ -277,26 +312,20 @@ class _QuotePageState extends State<QuotePage>
             ),
           );
         }),
-
-        // 2. 【修改点2】底部的“查看全部”按钮
-        // 只有当有数据时才显示
         if (displayList.isNotEmpty) ...[
-          // 分割线，让按钮看起来是独立的 footer
           Divider(height: 1, thickness: 0.5, color: Colors.grey[100]),
           InkWell(
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("跳转全部记录页面")),
               );
-              // context.router.push(QuoteListRoute());
             },
-            // 底部圆角适配
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(16),
               bottomRight: Radius.circular(16),
             ),
             child: Container(
-              height: 48, // 增加高度，方便点击
+              height: 48,
               alignment: Alignment.center,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -321,20 +350,8 @@ class _QuotePageState extends State<QuotePage>
     );
   }
 
-  Widget _buildQuickActionsPlaceholder() {
-    return const SizedBox(
-      height: 600,
-      child: QuoteProductNewAddPage(
-        quoteId: 0, //todo
-        isEmbedded: true,
-        supplierId: '335', //todo
-      ),
-    );
-  }
-
   Widget _buildDetailList(
-    BuildContext context,
-  ) {
+      BuildContext context, bool isLoading, List<QuotationList> list) {
     if (isLoading) {
       return const Padding(
         padding: EdgeInsets.all(24),
@@ -353,12 +370,11 @@ class _QuotePageState extends State<QuotePage>
       );
     }
 
-    // 获取上方展示的相同数据 (前3条)
     final detailList = list.take(3).toList();
 
     return ListView.separated(
-      shrinkWrap: true, // 关键：在Column中使用ListView需要这个
-      physics: const NeverScrollableScrollPhysics(), // 禁用内部滚动，跟随页面滚动
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: detailList.length,
       separatorBuilder: (context, index) =>
@@ -396,10 +412,8 @@ class _QuotePageState extends State<QuotePage>
                       constraints: const BoxConstraints(maxWidth: 80),
                       child: Text(
                         "外销员: ${item.creator?.name ?? '暂无'}",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -417,10 +431,8 @@ class _QuotePageState extends State<QuotePage>
                         item.createdAt != null
                             ? DateFormat('yyyy-MM-dd').format(item.createdAt!)
                             : '--',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ),
                   ],
@@ -435,8 +447,7 @@ class _QuotePageState extends State<QuotePage>
                 height: 32,
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: 按钮1逻辑
-                    print("点击了按钮1: ${item.id}");
+                    // 逻辑
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -452,13 +463,11 @@ class _QuotePageState extends State<QuotePage>
                 ),
               ),
               const SizedBox(width: 8),
-              // 按钮 2 (例如：操作/跟进)
               SizedBox(
                 height: 32,
                 child: FilledButton(
                   onPressed: () {
-                    // TODO: 按钮2逻辑
-                    print("点击了按钮2: ${item.id}");
+                    // 逻辑
                   },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
