@@ -1,3 +1,4 @@
+import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
@@ -253,7 +254,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         )
       else
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: colorScheme.surface),
@@ -291,11 +292,11 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                             titlesData: FlTitlesData(
                               leftTitles: SideTitles(
                                 showTitles: false,
-                                reservedSize: 30,
-                                getTitles: (value) {
-                                  // 格式化Y轴标签，保留4位小数
-                                  return value.toStringAsFixed(4);
-                                },
+                                reservedSize: 25,
+                                // getTitles: (value) {
+                                //   // 格式化Y轴标签，保留4位小数
+                                //   return value.toStringAsFixed(4);
+                                // },
                                 getTextStyles: (_) => TextStyle(
                                   fontSize: 10,
                                   color: Colors.grey.shade600,
@@ -303,7 +304,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                               ),
                               bottomTitles: SideTitles(
                                 showTitles: false,
-                                reservedSize: 30,
+                                reservedSize: 25,
                                 getTitles: (value) {
                                   final index = value.toInt();
                                   if (index >= 0 && index < dates.length) {
@@ -466,27 +467,17 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                           ),
                         ),
                         // 显示当前选择的维度注释（右上角）
-
                         if (_selectedDimension != null)
                           Positioned(
                             top: 0,
-                            left: 0,
+                            right: 0,
                             child: IgnorePointer(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  '${_selectedDimension!.name} ${_selectedDimension!.shortName}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                  ),
-                                ),
+                              child: ChartDimenTips(
+                                label:
+                                    '${_selectedDimension!.name} ${_selectedDimension!.shortName}',
                               ),
                             ),
-                          ),
+                          ), 
                       ],
                     );
                   },

@@ -203,7 +203,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
                       );
                       scrollController.animateTo(
                         newOffset,
-                        duration: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                       );
                     }

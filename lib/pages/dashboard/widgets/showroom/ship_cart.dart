@@ -9,6 +9,7 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
+import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 
 export 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart'
     show ShipDateRange;
@@ -62,6 +63,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
     final onRangeChanged = widget.onRangeChanged;
     // 只取前8条数据；shipCount 为 true 时按 shippingCount 从大到小排序后取前 8
     final displayData = widget.data.take(8).toList();
+    final dimenLabel =
+        sampleDimensionConfigs[0]['label'] as String; //当前选中的维度的标签名字
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +90,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
             ),
           )
         else
-          buildBarChart(context, displayData),
+          buildBarChart(context, displayData, dimenLabel),
 
         const SizedBox(height: 16),
 
@@ -109,7 +112,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '${sampleDimensionConfigs[0]['label']}排行',
+                  '$dimenLabel统计数据',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -316,6 +319,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
   Widget buildBarChart(
     BuildContext context,
     List<ShipTopStats> displayData,
+    String? dimenLabel,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -335,6 +339,10 @@ class _TopChartContentState extends State<ShipTopChartContent> {
         builder: (context, constraints) {
           return Stack(
             children: [
+              ChartDimenTips(
+                label: '$dimenLabel排行',
+              ),
+              const SizedBox(height: 10),
               BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,

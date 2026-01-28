@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/date_select.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -53,6 +55,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
     // 只取前9条数据
     final displayData = widget.data.take(9).toList();
     final isLoading = widget.isLoading;
+    final dimenLabel = sampleDimensionConfigs[1]['label'] as String; //当前选中的维度的标签名字
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +81,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             ),
           )
         else
-          buildBarChart(context, displayData),
+          buildBarChart(context, displayData, dimenLabel),
 
         const SizedBox(height: 16),
 
@@ -98,7 +101,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '报价次数排行',
+                  '$dimenLabel统计数据',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -115,7 +118,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isExpanded ? '收起' : '展开',
+                        _isExpanded ? '收起' : '更多',
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.primary,
@@ -288,7 +291,8 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
   }
 
   /// 构建柱状图
-  Widget buildBarChart(BuildContext context, List<QuoteTopStats> displayData) {
+  Widget buildBarChart(BuildContext context, List<QuoteTopStats> displayData,
+      String dimenLabel) {
     final colorScheme = Theme.of(context).colorScheme;
 
     // 计算最大数量，用于设置纵轴最大值
@@ -309,6 +313,10 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
         builder: (context, constraints) {
           return Stack(
             children: [
+              ChartDimenTips(
+                label: '$dimenLabel排行',
+              ),
+              const SizedBox(height: 10),
               BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
