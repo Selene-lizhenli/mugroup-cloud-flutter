@@ -15,22 +15,21 @@ class QuoteSearchBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         decoration: InputDecoration(
-          hintText: '搜索报价单',
-          suffixIcon: const Icon(Icons.search), // 改为右边图标
+          hintText: '搜索带客记录',
+          suffixIcon: const Icon(Icons.search),
           filled: true,
-          fillColor: colorScheme.surfaceContainer,
+          fillColor: Colors.white,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-   
         ),
       ),
     );

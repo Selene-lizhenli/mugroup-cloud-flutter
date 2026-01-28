@@ -1,13 +1,12 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/pages/quote/widgets/quote_list.dart';
+import 'package:cloud/pages/quote/widgets/quote_card.dart';
+import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
-import 'package:cloud/pages/quote/widgets/quote_time_tabs.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 @RoutePage()
 class QuotePage extends StatefulWidget {
@@ -21,17 +20,12 @@ class _QuotePageState extends State<QuotePage>
     with AutomaticKeepAliveClientMixin {
   int tabIndex = 0;
   late final TextEditingController _searchController;
-  String _lastSearch = ''; // 保存上一次搜索内容
+  String _lastSearch = '';
   final ScrollController _scrollController = ScrollController();
-  String? quoteAt; // 当前时间筛选状态
-  DateTime? customDate; // 自定义选择的年月
 
+  String? quoteAt;
   List<QuotationList> list = [];
-  bool isLoading = true; // 首次加载
-  bool isLoadingMore = false; // 上拉加载更多
-  bool hasMore = true; // 是否还有更多数据
-
-  int page = 1;
+  bool isLoading = true;
   final int pageSize = 20;
 
   @override
@@ -39,9 +33,7 @@ class _QuotePageState extends State<QuotePage>
     super.initState();
     _searchController = TextEditingController();
     _searchController.addListener(_onSearchChanged);
-    _scrollController.addListener(_onScroll);
-
-    _fetchData(reset: true); // 首次加载
+    _fetchData();
   }
 
   @override
@@ -54,269 +46,40 @@ class _QuotePageState extends State<QuotePage>
 
   void _onSearchChanged() {
     final current = _searchController.text.trim();
-
-    // 如果内容和上次相同，直接返回
     if (current == _lastSearch) return;
-
-    _lastSearch = current; // 更新最后一次搜索内容
-    _fetchData(reset: true); // 调用接口
+    _lastSearch = current;
+    _fetchData();
   }
 
-  void _onTabChanged(int index) {
-    setState(() {
-      tabIndex = index;
-      customDate = null; // 切换标签时清除自定义日期
-      quoteAt = QuoteUtils.buildQuoteAtParam(index);
-    });
-    _fetchData(reset: true); // 使用最新 quoteAt 状态
-  }
-
-  /// 显示自定义日期选择器（年月日），日期列第一个为 “-” 表示只选年月
-  void _showYearMonthPicker() {
-    final now = DateTime.now();
-
-    // ===== 初始化默认值 =====
-    int year = customDate?.year ?? now.year;
-    int month = customDate?.month ?? now.month;
-    // 为了兼容老数据：如果 day==1 也可能是之前只选了年月，这里一律当作“有选日期”处理
-    int? day = customDate?.day;
-
-    // 年列表：近 10 年
-    final years = List<int>.generate(10, (i) => now.year - 5 + i);
-    if (!years.contains(year)) {
-      year = now.year;
-    }
-    int yearIndex = years.indexOf(year);
-
-    // 月列表：1-12
-    final months = List<int>.generate(12, (i) => i + 1);
-    int monthIndex = month - 1;
-
-    // 根据年月计算当月天数
-    int daysInMonth(int y, int m) => DateTime(y, m + 1, 0).day;
-
-    // 日列表：["-", "1", "2", ..., "N"]
-    int maxDay = daysInMonth(year, month);
-    List<String> buildDayOptions(int y, int m) {
-      final max = daysInMonth(y, m);
-      return ['-',
-        ...List<String>.generate(max, (i) => '${i + 1}'),
-      ];
-    }
-
-    List<String> days = buildDayOptions(year, month);
-    int dayIndex;
-    if (day == null || day < 1 || day > maxDay) {
-      dayIndex = 0; // 默认选择 “-”
-    } else {
-      dayIndex = day; // day=1 -> index=1, 与列表对齐
-    }
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        final colorScheme = Theme.of(context).colorScheme;
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            // 当年份或月份变化时，更新天数列表
-            void updateDaysIfNeeded() {
-              final newMax = daysInMonth(year, month);
-              if (newMax + 1 != days.length) {
-                days = buildDayOptions(year, month);
-                if (dayIndex > newMax) {
-                  dayIndex = 0; // 超出范围则重置为 “-”
-                }
-              }
-            }
-
-            updateDaysIfNeeded();
-
-            return SizedBox(
-              height: 260,
-              child: Column(
-                children: [
-                  // 头部
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '选择时间',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        // 年
-                        Expanded(
-                          child: CupertinoPicker(
-                            itemExtent: 32,
-                            scrollController: FixedExtentScrollController(initialItem: yearIndex),
-                            onSelectedItemChanged: (index) {
-                              setModalState(() {
-                                yearIndex = index;
-                                year = years[yearIndex];
-                              });
-                            },
-                            children: years
-                                .map((y) => Center(child: Text('$y年')))
-                                .toList(),
-                          ),
-                        ),
-                        // 月
-                        Expanded(
-                          child: CupertinoPicker(
-                            itemExtent: 32,
-                            scrollController: FixedExtentScrollController(initialItem: monthIndex),
-                            onSelectedItemChanged: (index) {
-                              setModalState(() {
-                                monthIndex = index;
-                                month = months[monthIndex];
-                              });
-                            },
-                            children: months
-                                .map((m) => Center(child: Text('$m月')))
-                                .toList(),
-                          ),
-                        ),
-                        // 日（第一个为 "-"）
-                        Expanded(
-                          child: CupertinoPicker(
-                            itemExtent: 32,
-                            scrollController: FixedExtentScrollController(initialItem: dayIndex),
-                            onSelectedItemChanged: (index) {
-                              setModalState(() {
-                                dayIndex = index;
-                              });
-                            },
-                            children: days
-                                .map((d) => Center(child: Text(d == '-' ? '-' : '$d日')))
-                                .toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // 底部按钮
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16, bottom: 10),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-
-                          final selectedYear = years[yearIndex];
-                          final selectedMonth = months[monthIndex];
-                          final int? selectedDay =
-                              dayIndex == 0 ? null : int.parse(days[dayIndex]);
-
-                          setState(() {
-                            // 使用自定义日期后，时间范围 tabs 不再高亮任何一项
-                            tabIndex = -1;
-                            if (selectedDay == null) {
-                              // 只选择了年月：整月范围
-                              customDate = DateTime(selectedYear, selectedMonth, 1);
-                              final startDate =
-                                  DateTime(selectedYear, selectedMonth, 1);
-                              final endDate =
-                                  DateTime(selectedYear, selectedMonth + 1, 0, 23, 59, 59);
-                              quoteAt =
-                                  '${QuoteUtils._format(startDate)},${QuoteUtils._format(endDate)}';
-                            } else {
-                              // 选择了具体日期：当天范围
-                              customDate =
-                                  DateTime(selectedYear, selectedMonth, selectedDay);
-                              final startDate = DateTime(
-                                  selectedYear, selectedMonth, selectedDay, 0, 0, 0);
-                              final endDate = DateTime(
-                                  selectedYear, selectedMonth, selectedDay, 23, 59, 59);
-                              quoteAt =
-                                  '${QuoteUtils._format(startDate)},${QuoteUtils._format(endDate)}';
-                            }
-                          });
-
-                          _fetchData(reset: true);
-                        },
-                        child: const Text('确定'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 100 &&
-        !isLoadingMore &&
-        hasMore &&
-        !isLoading) {
-      // 滑动到接近底部，加载更多
-      _fetchData(reset: false);
-    }
-  }
-
-  Future<void> _fetchData({required bool reset}) async {
-    if (reset) {
-      setState(() {
-        isLoading = true;
-        page = 1;
-        hasMore = true;
-      });
-    } else {
-      setState(() => isLoadingMore = true);
-      page += 1;
-    }
+  Future<void> _fetchData() async {
+    setState(() => isLoading = true);
 
     final search = _searchController.text;
     final paramsData = {
       "search": search,
-      "page": page.toString(),
+      "page": "1",
       "pageSize": pageSize.toString(),
       if (quoteAt != null) 'quote_at': quoteAt!,
-      "type":"market",//区分市场采购的报价单
+      "type": "market",
     };
-    logger.d(paramsData);
-    final newData = await getShowroomQuotation(paramsData);
-    setState(() {
-      if (reset) {
-        list = newData.data;
-        isLoading = false;
-      } else {
-        list.addAll(newData.data);
-        isLoadingMore = false;
+
+    try {
+      final newData = await getShowroomQuotation(paramsData);
+      if (mounted) {
+        setState(() {
+          list = newData.data;
+          isLoading = false;
+        });
       }
-      hasMore = newData.data.length >= pageSize; // 判断是否还有下一页
-    });
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   Future<void> _onRefresh() async {
-    await _fetchData(reset: true);
+    await _fetchData();
   }
 
   @override
@@ -326,124 +89,419 @@ class _QuotePageState extends State<QuotePage>
   Widget build(BuildContext context) {
     super.build(context);
     final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        backgroundColor: colorScheme.surfaceTint,
-        title: const Text("报价单"), 
-        actions: [
-          // 刷新按钮：重新拉取当前条件下的数据
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: '刷新', 
-            iconSize: 20,
-            onPressed: () => _fetchData(reset: true),
-          ),
-          // 新增按钮：跳转到市场产品列表页
-          TextButton(
-            onPressed: () {
-              context.router.push(  QuoteCreateRoute());
-            },
-            child: const Text(
-              '新增',
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
-          const SizedBox(width: 4),
-        ],
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "带客记录",
+          style: TextStyle(
+              color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
+        actions: const [],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            QuoteSearchBar(controller: _searchController),
-            QuoteTimeTabs(
-              currentIndex: tabIndex,
-              onChanged: _onTabChanged,
-              isCalendarSelected: customDate != null,
-              onCalendarTap: _showYearMonthPicker,
-            ),
-            BuildQuoteList(
-              isLoading: isLoading,
-              isLoadingMore: isLoadingMore,
-              hasMore: hasMore,
-              list: list,
-              tabIndex: tabIndex,
-              scrollController: _scrollController,
-              onRefresh: _onRefresh,
-              onItemTap: (item) {
-                final tempId = item.id;
-                if (tempId == null) return;
-                context.router.push(
-                  QuoteDetailRoute(
-                    id: tempId, 
-                  ),
-                );
-              },
-            ), 
-          ],
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Column(
+            children: [
+              QuoteSearchBar(controller: _searchController),
+
+              // === 区域一：近期记录 (核心业务) ===
+              _buildSectionCard(
+                context,
+                title: "近期记录",
+                icon: Icons.access_time_filled_rounded,
+                iconColor: Colors.blueAccent,
+                action: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 刷新按钮
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(Icons.refresh,
+                          color: Colors.grey[600], size: 22),
+                      tooltip: "刷新",
+                      onPressed: _onRefresh,
+                    ),
+
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(Icons.add_circle_outline,
+                          color: colorScheme.primary, size: 22),
+                      tooltip: "新增",
+                      onPressed: () => context.router.push(QuoteCreateRoute()),
+                    ),
+                  ],
+                ),
+                content: _buildRecentRecordsContent(context),
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildSectionCard(
+                context,
+                title: "带客记录详情",
+                icon: Icons.list_alt_rounded, // 换个图标
+                iconColor: Colors.orangeAccent,
+                content: _buildDetailList(context), // 调用新的详情构建方法
+              ),
+
+              const SizedBox(height: 16),
+
+              // === 区域三：快捷功能 ===
+              _buildSectionCard(
+                context,
+                title: "创建产品",
+                icon: Icons.grid_view_rounded,
+                iconColor: Colors.purpleAccent,
+                content: _buildQuickActionsPlaceholder(),
+              ),
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
-}
- 
 
-class QuoteUtils {
-  static String? buildQuoteAtParam(int index) {
-    final now = DateTime.now();
-    DateTime? start;
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required Widget content,
+    Widget? action,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题栏
+          Padding(
+            padding:
+                const EdgeInsets.fromLTRB(16, 12, 8, 8), // 右侧padding减小以适应按钮
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 18, color: iconColor),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const Spacer(),
+                if (action != null) action,
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
+          // 内容
+          content,
+        ],
+      ),
+    );
+  }
 
-    switch (index) {
-      case 0:
-        return null;
-      case 1:
-        start = DateTime(
-          now.year,
-          now.month - 1,
-          now.day,
-          now.hour,
-          now.minute,
-          now.second,
-        );
-        break;
-      case 2:
-        start = DateTime(
-          now.year,
-          now.month - 3,
-          now.day,
-          now.hour,
-          now.minute,
-          now.second,
-        );
-        break;
-      case 3:
-        start = DateTime(
-          now.year,
-          now.month - 6,
-          now.day,
-          now.hour,
-          now.minute,
-          now.second,
-        );
-        break;
-      case 4:
-        start = DateTime(
-          now.year - 1,
-          now.month,
-          now.day,
-          now.hour,
-          now.minute,
-          now.second,
-        );
-        break;
+  Widget _buildRecentRecordsContent(BuildContext context) {
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(20),
+        child: Center(child: CupertinoActivityIndicator()),
+      );
     }
 
-    return '${_format(start!)},${_format(now)}';
+    if (list.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 30),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Icon(Icons.inbox_outlined, size: 40, color: Colors.grey[300]),
+            const SizedBox(height: 8),
+            Text("暂无近期记录",
+                style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+          ],
+        ),
+      );
+    }
+
+    // 截取前3条
+    final displayList = list.take(3).toList();
+
+    return Column(
+      children: [
+        // 1. 列表内容
+        ...displayList.map((item) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: QuoteCard(
+              item: item,
+              tabIndex: tabIndex,
+              onTap: () {
+                final tempId = item.id;
+                if (tempId == null) return;
+                context.router.push(QuoteDetailRoute(id: tempId));
+              },
+            ),
+          );
+        }),
+
+        // 2. 【修改点2】底部的“查看全部”按钮
+        // 只有当有数据时才显示
+        if (displayList.isNotEmpty) ...[
+          // 分割线，让按钮看起来是独立的 footer
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[100]),
+          InkWell(
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("跳转全部记录页面")),
+              );
+              // context.router.push(QuoteListRoute());
+            },
+            // 底部圆角适配
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+            child: Container(
+              height: 48, // 增加高度，方便点击
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "查看全部",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.keyboard_arrow_right_rounded,
+                      size: 18, color: Colors.grey[500]),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 
-  static String _format(DateTime t) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${t.year}-${two(t.month)}-${two(t.day)}'
-        ' ${two(t.hour)}:${two(t.minute)}:${two(t.second)}';
+  Widget _buildQuickActionsPlaceholder() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 4,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      mainAxisSpacing: 16,
+      children: [
+        _buildActionIcon(Icons.add_a_photo_outlined, "拍照开单"),
+        _buildActionIcon(Icons.qr_code_scanner, "扫码识别"),
+        _buildActionIcon(Icons.analytics_outlined, "销售报表"),
+        _buildActionIcon(Icons.settings_outlined, "设置"),
+      ],
+    );
+  }
+
+  Widget _buildActionIcon(IconData icon, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: Colors.grey[700], size: 24),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailList(
+    BuildContext context,
+  ) {
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CupertinoActivityIndicator()),
+      );
+    }
+
+    if (list.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        alignment: Alignment.center,
+        child: Text(
+          "暂无数据详情",
+          style: TextStyle(color: Colors.grey[400], fontSize: 13),
+        ),
+      );
+    }
+
+    // 获取上方展示的相同数据 (前3条)
+    final detailList = list.take(3).toList();
+
+    return ListView.separated(
+      shrinkWrap: true, // 关键：在Column中使用ListView需要这个
+      physics: const NeverScrollableScrollPhysics(), // 禁用内部滚动，跟随页面滚动
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: detailList.length,
+      separatorBuilder: (context, index) =>
+          const Divider(height: 1, indent: 16, endIndent: 16),
+      itemBuilder: (context, index) {
+        final item = detailList[index];
+        return _buildDetailRowItem(context, item);
+      },
+    );
+  }
+
+  Widget _buildDetailRowItem(BuildContext context, QuotationList item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.company?.name ?? '无客户名称',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 80),
+                      child: Text(
+                        "外销员: ${item.creator?.name ?? '暂无'}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Container(
+                        width: 1,
+                        height: 10,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        item.createdAt != null
+                            ? DateFormat('yyyy-MM-dd').format(item.createdAt!)
+                            : '--',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 32,
+                child: OutlinedButton(
+                  onPressed: () {
+                    // TODO: 按钮1逻辑
+                    print("点击了按钮1: ${item.id}");
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    side: BorderSide(color: Colors.grey.shade300),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "添加供应商",
+                    style: TextStyle(fontSize: 12, color: Colors.black87),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // 按钮 2 (例如：操作/跟进)
+              SizedBox(
+                height: 32,
+                child: FilledButton(
+                  onPressed: () {
+                    // TODO: 按钮2逻辑
+                    print("点击了按钮2: ${item.id}");
+                  },
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "从供应商导入",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
-
