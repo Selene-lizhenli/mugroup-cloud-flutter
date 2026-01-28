@@ -591,7 +591,7 @@ class _PhotoCard extends HookConsumerWidget {
               alignment: Alignment.centerLeft,
               child: ImageUploader(
                 label: null,
-                maxCount: 56,
+                maxCount: 1,
                 customIcon: Icons.camera_alt,
                 value: mediaMap[apiKey] ?? [],
                 // directCamera: isDirectCamera,
