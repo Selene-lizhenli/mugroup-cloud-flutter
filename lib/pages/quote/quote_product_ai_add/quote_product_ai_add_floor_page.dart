@@ -38,9 +38,6 @@ class ProductDraftItem {
   }
 
   String getValue(String key) => data[key] ?? '-';
-
-  @override
-  String toString() => 'ProductDraftItem(data: $data)';
 }
 
 class ProductAiAddState {
@@ -77,7 +74,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     return ProductAiAddState();
   }
 
-  /// 切换模板
   void changeTemplate(String templateId) {
     if (state.currentTemplateId == templateId) return;
     state = state.copyWith(currentTemplateId: templateId);
@@ -88,18 +84,15 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final images = newImages ?? [];
     final currentItems = state.items;
 
-    // 1. 如果图片减少了，直接截取对应的数据
     if (images.length < currentItems.length) {
       state = state.copyWith(items: currentItems.sublist(0, images.length));
       return;
     }
 
-    // 2. 如果图片增加了，保留旧数据，追加新数据占位符
     if (images.length > currentItems.length) {
       final List<ProductDraftItem> newItems = List.from(currentItems);
       final int startIndex = currentItems.length;
 
-      // 先添加占位数据，标记为识别中
       for (int i = startIndex; i < images.length; i++) {
         newItems.add(ProductDraftItem(
           data: {},
@@ -109,8 +102,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       }
 
       state = state.copyWith(items: newItems, isGlobalLoading: true);
-
-      // 开始处理新增图片的 OCR
       await _processOcrQueue(startIndex, images, ref);
     }
   }
@@ -137,7 +128,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             result['success'] == true &&
             (result['data'] as List).isNotEmpty) {
           final item = result['data'].first;
-
           for (var col in AppColumns.all) {
             String rawVal = (item[col.key] ?? '').toString().trim();
             rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
@@ -164,48 +154,37 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         state = state.copyWith(items: tempItems);
       }
     }
-
     state = state.copyWith(isGlobalLoading: false);
   }
 
   void updateCell(int index, String key, String value) {
     if (index >= state.items.length) return;
-
     final item = state.items[index];
     final newData = Map<String, String>.from(item.data);
     newData[key] = value.isEmpty ? '-' : value;
-
     final newItems = List<ProductDraftItem>.from(state.items);
     newItems[index] = item.copyWith(data: newData);
-
     state = state.copyWith(items: newItems);
   }
 
   Future<bool> submitProducts(String? supplierId) async {
-    // 1. 基础校验
     if (state.isSubmitting) return false;
-
-    // 2. 检查是否有未完成的识别
     if (state.items.any((element) => element.isRecognizing)) {
       EasyLoading.showToast('请等待所有图片识别完成');
       return false;
     }
-
     if (state.items.isEmpty) {
       EasyLoading.showToast('请先上传图片');
       return false;
     }
 
-    // 3. 开始提交
     state = state.copyWith(isSubmitting: true);
     EasyLoading.show(status: '保存中...');
 
     try {
       final List<Map<String, dynamic>> submitList = [];
-
       for (var item in state.items) {
         if (item.isRecognizing) continue;
-
         final row = item.data;
         String? val(String key) =>
             (row[key] == null || row[key] == '-') ? null : row[key];
@@ -236,12 +215,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         return false;
       }
 
-      // API 调用
       await batchStoreShowroomSample({'products': submitList});
-
-      // 4. 成功后处理
       EasyLoading.showSuccess('保存成功');
-      clear(); // 清空数据
+      clear();
       return true;
     } catch (e) {
       EasyLoading.showError('保存失败: $e');
@@ -274,10 +250,9 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
 
-    final isTemplateExpanded = useState(false);
+    final isTemplateExpanded = useState(true);
 
     final currentTemplate = getTemplateById(providerState.currentTemplateId);
-
     final currentMediaList = providerState.items.map((e) => e.media).toList();
 
     return Scaffold(
@@ -292,22 +267,21 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   _buildCollapsibleTemplateSelector(
                     context,
                     currentTemplate,
-                    isTemplateExpanded,
-                    colorScheme,
-                    (newId) {
+                    isExpanded: isTemplateExpanded,
+                    colorScheme: colorScheme,
+                    currentMediaList: currentMediaList,
+                    onSelect: (newId) {
                       controller.changeTemplate(newId);
-                      isTemplateExpanded.value = false;
+                    },
+                    onImagesChanged: (newImages) {
+                      controller.onImagesChanged(newImages, ref);
                     },
                   ),
-                  // 图片上传区域
-                  _buildUploadArea(currentMediaList, (newImages) {
-                    controller.onImagesChanged(newImages, ref);
-                  }),
 
                   // 提示栏
                   _buildInfoBar(colorScheme),
 
-                  // 列表区域
+                  // 数据列表
                   if (providerState.items.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     ListView.separated(
@@ -322,7 +296,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                           context,
                           index,
                           item,
-                          currentTemplate, // 传入当前模板对象
+                          currentTemplate,
                           (key, val) => controller.updateCell(index, key, val),
                         );
                       },
@@ -338,57 +312,219 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildUploadArea(List<TemporaryMedia>? value,
-      ValueChanged<List<TemporaryMedia>?> onChanged) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                )
-              ],
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildCollapsibleTemplateSelector(
+    BuildContext context,
+    TemplateOption currentTemplate, {
+    required ValueNotifier<bool> isExpanded,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required Function(List<TemporaryMedia>?) onImagesChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () {
+              isExpanded.value = !isExpanded.value;
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
                 children: [
-                  ImageUploader(
-                    customIcon: Icons.camera_alt,
-                    value: value,
-                    onChanged: onChanged,
+                  Icon(Icons.dashboard_customize_outlined,
+                      size: 18, color: colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    '识别模板 (点击卡片内相机直接上传文件识别)',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  ),
+                  const Spacer(),
+                  AnimatedRotation(
+                    turns: isExpanded.value ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(Icons.keyboard_arrow_down,
+                        color: Colors.grey[500]),
                   ),
                 ],
               ),
             ),
           ),
-        ),
-      ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              height: isExpanded.value ? null : 0,
+              child: Column(
+                children: [
+                  _buildTemplateListContent(
+                    context: context,
+                    currentId: currentTemplate.id,
+                    colorScheme: colorScheme,
+                    onSelect: onSelect,
+                    currentMediaList: currentMediaList,
+                    onImagesChanged: onImagesChanged,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTemplateListContent({
+    required BuildContext context,
+    required String currentId,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required Function(List<TemporaryMedia>?) onImagesChanged,
+  }) {
+    const double kItemHeight = 82.0;
+
+    return SizedBox(
+      height: kItemHeight,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: kQuoteAiTemplates.length,
+        separatorBuilder: (c, i) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final t = kQuoteAiTemplates[index];
+          final bool isSelected = t.id == currentId;
+
+          final primaryColor = colorScheme.primary;
+          final borderColor =
+              isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
+          final bgColor =
+              isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
+
+          return Container(
+            width: 160,
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: borderColor,
+                width: isSelected ? 1 : 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => onSelect(t.id),
+                    borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(10)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 4),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.table_chart_outlined,
+                                size: 16,
+                                color: isSelected
+                                    ? primaryColor
+                                    : Colors.grey[500],
+                              ),
+                              const SizedBox(width: 4),
+                              GestureDetector(
+                                onTap: () => _showPreviewDialog(
+                                    context, t.previewImageUrl),
+                                child: Icon(Icons.visibility_outlined,
+                                    size: 14, color: Colors.grey[400]),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            t.name,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            isSelected ? '当前选中' : '点击切换',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color:
+                                  isSelected ? primaryColor : Colors.grey[400],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 分割线
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Colors.grey.withOpacity(0.1),
+                ),
+
+                Listener(
+                  onPointerDown: (_) {
+                    if (!isSelected) {
+                      onSelect(t.id);
+                    }
+                  },
+                  child: SizedBox(
+                    width: 80,
+                    child: ImageUploader(
+                      customIcon: Icons.camera_alt_rounded,
+                      onChanged: (newImages) {
+                        onImagesChanged(newImages);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildInfoBar(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(6),
+        color: colorScheme.primaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 14),
+          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -608,194 +744,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   }
 }
 
-Widget _buildCollapsibleTemplateSelector(
-  BuildContext context,
-  TemplateOption currentTemplate,
-  ValueNotifier<bool> isExpanded,
-  ColorScheme colorScheme,
-  Function(String id) onSelect,
-) {
-  return Container(
-    color: Colors.white,
-    margin: const EdgeInsets.only(bottom: 8),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 1. 标题栏 (点击可展开/收起)
-        InkWell(
-          onTap: () {
-            isExpanded.value = !isExpanded.value;
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Icon(Icons.dashboard_customize_outlined,
-                    size: 18, color: colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  '当前模板: ',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                ),
-                Text(
-                  currentTemplate.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                const Spacer(),
-                AnimatedRotation(
-                  turns: isExpanded.value ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child:
-                      Icon(Icons.keyboard_arrow_down, color: Colors.grey[500]),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            height: isExpanded.value ? null : 0,
-            child: Column(
-              children: [
-                _buildTemplateListContent(
-                    context, currentTemplate.id, colorScheme, onSelect),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildTemplateListContent(
-  BuildContext context,
-  String currentId,
-  ColorScheme colorScheme,
-  Function(String id) onSelect,
-) {
-  const double kItemHeight = 64.0;
-
-  return SizedBox(
-    height: kItemHeight,
-    child: ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      scrollDirection: Axis.horizontal,
-      itemCount: kQuoteAiTemplates.length,
-      separatorBuilder: (c, i) => const SizedBox(width: 12),
-      itemBuilder: (context, index) {
-        final t = kQuoteAiTemplates[index];
-        final bool isSelected = t.id == currentId;
-
-        final primaryColor = colorScheme.primary;
-        final borderColor =
-            isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
-        final bgColor =
-            isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
-        final iconBgColor = isSelected ? Colors.white : Colors.grey[100];
-        final iconColor = isSelected ? primaryColor : Colors.grey[500];
-
-        return Container(
-          width: 150,
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: borderColor,
-              width: isSelected ? 1.5 : 1,
-            ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => onSelect(t.id),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: iconBgColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.table_chart_outlined,
-                          size: 18,
-                          color: iconColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              t.name,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              isSelected ? '当前使用' : '点击切换',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.grey[400],
-                                fontWeight: isSelected
-                                    ? FontWeight.w500
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            _showPreviewDialog(context, t.previewImageUrl);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Icon(
-                              Icons.visibility_outlined,
-                              size: 16,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    ),
-  );
-}
-
 void _showPreviewDialog(BuildContext context, String imageUrl) {
   showDialog(
     context: context,
@@ -820,15 +768,16 @@ void _showPreviewDialog(BuildContext context, String imageUrl) {
                   height: 200,
                   width: 200,
                   child: Center(
-                      child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.broken_image, color: Colors.grey),
-                      SizedBox(height: 8),
-                      Text('暂无预览图',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    ],
-                  )),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.broken_image, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text('暂无预览图',
+                            style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
