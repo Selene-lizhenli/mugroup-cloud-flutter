@@ -433,48 +433,55 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     borderRadius: const BorderRadius.horizontal(
                         left: Radius.circular(10)),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.table_chart_outlined,
-                                size: 16,
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.grey[500],
+                          for (var config in t.columns) ...[
+                            if (config.key == 'item_no') ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      config.label,
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => _showPreviewDialog(
+                                        context, t.previewImageUrl),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 0),
+                                      child: Icon(
+                                        Icons.visibility_outlined,
+                                        size: 20, // 大眼睛
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 4),
-                              GestureDetector(
-                                onTap: () => _showPreviewDialog(
-                                    context, t.previewImageUrl),
-                                child: Icon(Icons.visibility_outlined,
-                                    size: 14, color: Colors.grey[400]),
+                            ] else ...[
+                              Text(
+                                config.label,
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            t.name,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            isSelected ? '当前选中' : '点击切换',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color:
-                                  isSelected ? primaryColor : Colors.grey[400],
-                            ),
-                          ),
+                            ]
+                          ],
                         ],
                       ),
                     ),
