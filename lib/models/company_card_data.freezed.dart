@@ -24,12 +24,15 @@ mixin _$CompanyCardData {
   String? get address => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
   String? get industry => throw _privateConstructorUsedError;
-  List<String> get domain => throw _privateConstructorUsedError;
-  List<String> get email => throw _privateConstructorUsedError;
-  List<String> get linkedin => throw _privateConstructorUsedError;
-  List<String> get whatsapp => throw _privateConstructorUsedError;
-  List<String> get facebook => throw _privateConstructorUsedError;
-  List<Contact> get contact => throw _privateConstructorUsedError;
+  List<String>? get domain => throw _privateConstructorUsedError;
+  List<String>? get email => throw _privateConstructorUsedError;
+  List<String>? get linkedin => throw _privateConstructorUsedError;
+  List<String>? get whatsapp => throw _privateConstructorUsedError;
+  List<String>? get facebook => throw _privateConstructorUsedError;
+  @JsonKey(
+      toJson: _companyCardDataContactToJson,
+      fromJson: _companyCardDataContactFromJson)
+  Contact? get contact => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -48,12 +51,17 @@ abstract class $CompanyCardDataCopyWith<$Res> {
       String? address,
       String? location,
       String? industry,
-      List<String> domain,
-      List<String> email,
-      List<String> linkedin,
-      List<String> whatsapp,
-      List<String> facebook,
-      List<Contact> contact});
+      List<String>? domain,
+      List<String>? email,
+      List<String>? linkedin,
+      List<String>? whatsapp,
+      List<String>? facebook,
+      @JsonKey(
+          toJson: _companyCardDataContactToJson,
+          fromJson: _companyCardDataContactFromJson)
+      Contact? contact});
+
+  $ContactCopyWith<$Res>? get contact;
 }
 
 /// @nodoc
@@ -73,12 +81,12 @@ class _$CompanyCardDataCopyWithImpl<$Res, $Val extends CompanyCardData>
     Object? address = freezed,
     Object? location = freezed,
     Object? industry = freezed,
-    Object? domain = null,
-    Object? email = null,
-    Object? linkedin = null,
-    Object? whatsapp = null,
-    Object? facebook = null,
-    Object? contact = null,
+    Object? domain = freezed,
+    Object? email = freezed,
+    Object? linkedin = freezed,
+    Object? whatsapp = freezed,
+    Object? facebook = freezed,
+    Object? contact = freezed,
   }) {
     return _then(_value.copyWith(
       name: freezed == name
@@ -97,31 +105,43 @@ class _$CompanyCardDataCopyWithImpl<$Res, $Val extends CompanyCardData>
           ? _value.industry
           : industry // ignore: cast_nullable_to_non_nullable
               as String?,
-      domain: null == domain
+      domain: freezed == domain
           ? _value.domain
           : domain // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      email: null == email
+              as List<String>?,
+      email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      linkedin: null == linkedin
+              as List<String>?,
+      linkedin: freezed == linkedin
           ? _value.linkedin
           : linkedin // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      whatsapp: null == whatsapp
+              as List<String>?,
+      whatsapp: freezed == whatsapp
           ? _value.whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      facebook: null == facebook
+              as List<String>?,
+      facebook: freezed == facebook
           ? _value.facebook
           : facebook // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      contact: null == contact
+              as List<String>?,
+      contact: freezed == contact
           ? _value.contact
           : contact // ignore: cast_nullable_to_non_nullable
-              as List<Contact>,
+              as Contact?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ContactCopyWith<$Res>? get contact {
+    if (_value.contact == null) {
+      return null;
+    }
+
+    return $ContactCopyWith<$Res>(_value.contact!, (value) {
+      return _then(_value.copyWith(contact: value) as $Val);
+    });
   }
 }
 
@@ -138,12 +158,18 @@ abstract class _$$CompanyCardDataImplCopyWith<$Res>
       String? address,
       String? location,
       String? industry,
-      List<String> domain,
-      List<String> email,
-      List<String> linkedin,
-      List<String> whatsapp,
-      List<String> facebook,
-      List<Contact> contact});
+      List<String>? domain,
+      List<String>? email,
+      List<String>? linkedin,
+      List<String>? whatsapp,
+      List<String>? facebook,
+      @JsonKey(
+          toJson: _companyCardDataContactToJson,
+          fromJson: _companyCardDataContactFromJson)
+      Contact? contact});
+
+  @override
+  $ContactCopyWith<$Res>? get contact;
 }
 
 /// @nodoc
@@ -161,12 +187,12 @@ class __$$CompanyCardDataImplCopyWithImpl<$Res>
     Object? address = freezed,
     Object? location = freezed,
     Object? industry = freezed,
-    Object? domain = null,
-    Object? email = null,
-    Object? linkedin = null,
-    Object? whatsapp = null,
-    Object? facebook = null,
-    Object? contact = null,
+    Object? domain = freezed,
+    Object? email = freezed,
+    Object? linkedin = freezed,
+    Object? whatsapp = freezed,
+    Object? facebook = freezed,
+    Object? contact = freezed,
   }) {
     return _then(_$CompanyCardDataImpl(
       name: freezed == name
@@ -185,30 +211,30 @@ class __$$CompanyCardDataImplCopyWithImpl<$Res>
           ? _value.industry
           : industry // ignore: cast_nullable_to_non_nullable
               as String?,
-      domain: null == domain
+      domain: freezed == domain
           ? _value._domain
           : domain // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      email: null == email
+              as List<String>?,
+      email: freezed == email
           ? _value._email
           : email // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      linkedin: null == linkedin
+              as List<String>?,
+      linkedin: freezed == linkedin
           ? _value._linkedin
           : linkedin // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      whatsapp: null == whatsapp
+              as List<String>?,
+      whatsapp: freezed == whatsapp
           ? _value._whatsapp
           : whatsapp // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      facebook: null == facebook
+              as List<String>?,
+      facebook: freezed == facebook
           ? _value._facebook
           : facebook // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      contact: null == contact
-          ? _value._contact
+              as List<String>?,
+      contact: freezed == contact
+          ? _value.contact
           : contact // ignore: cast_nullable_to_non_nullable
-              as List<Contact>,
+              as Contact?,
     ));
   }
 }
@@ -221,18 +247,20 @@ class _$CompanyCardDataImpl implements _CompanyCardData {
       this.address,
       this.location,
       this.industry,
-      final List<String> domain = const [],
-      final List<String> email = const [],
-      final List<String> linkedin = const [],
-      final List<String> whatsapp = const [],
-      final List<String> facebook = const [],
-      final List<Contact> contact = const []})
+      final List<String>? domain = const [],
+      final List<String>? email = const [],
+      final List<String>? linkedin = const [],
+      final List<String>? whatsapp = const [],
+      final List<String>? facebook = const [],
+      @JsonKey(
+          toJson: _companyCardDataContactToJson,
+          fromJson: _companyCardDataContactFromJson)
+      this.contact})
       : _domain = domain,
         _email = email,
         _linkedin = linkedin,
         _whatsapp = whatsapp,
-        _facebook = facebook,
-        _contact = contact;
+        _facebook = facebook;
 
   factory _$CompanyCardDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$CompanyCardDataImplFromJson(json);
@@ -245,59 +273,66 @@ class _$CompanyCardDataImpl implements _CompanyCardData {
   final String? location;
   @override
   final String? industry;
-  final List<String> _domain;
+  final List<String>? _domain;
   @override
   @JsonKey()
-  List<String> get domain {
+  List<String>? get domain {
+    final value = _domain;
+    if (value == null) return null;
     if (_domain is EqualUnmodifiableListView) return _domain;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_domain);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<String> _email;
+  final List<String>? _email;
   @override
   @JsonKey()
-  List<String> get email {
+  List<String>? get email {
+    final value = _email;
+    if (value == null) return null;
     if (_email is EqualUnmodifiableListView) return _email;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_email);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<String> _linkedin;
+  final List<String>? _linkedin;
   @override
   @JsonKey()
-  List<String> get linkedin {
+  List<String>? get linkedin {
+    final value = _linkedin;
+    if (value == null) return null;
     if (_linkedin is EqualUnmodifiableListView) return _linkedin;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_linkedin);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<String> _whatsapp;
+  final List<String>? _whatsapp;
   @override
   @JsonKey()
-  List<String> get whatsapp {
+  List<String>? get whatsapp {
+    final value = _whatsapp;
+    if (value == null) return null;
     if (_whatsapp is EqualUnmodifiableListView) return _whatsapp;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_whatsapp);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<String> _facebook;
+  final List<String>? _facebook;
   @override
   @JsonKey()
-  List<String> get facebook {
+  List<String>? get facebook {
+    final value = _facebook;
+    if (value == null) return null;
     if (_facebook is EqualUnmodifiableListView) return _facebook;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_facebook);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<Contact> _contact;
   @override
-  @JsonKey()
-  List<Contact> get contact {
-    if (_contact is EqualUnmodifiableListView) return _contact;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_contact);
-  }
+  @JsonKey(
+      toJson: _companyCardDataContactToJson,
+      fromJson: _companyCardDataContactFromJson)
+  final Contact? contact;
 
   @override
   String toString() {
@@ -320,7 +355,7 @@ class _$CompanyCardDataImpl implements _CompanyCardData {
             const DeepCollectionEquality().equals(other._linkedin, _linkedin) &&
             const DeepCollectionEquality().equals(other._whatsapp, _whatsapp) &&
             const DeepCollectionEquality().equals(other._facebook, _facebook) &&
-            const DeepCollectionEquality().equals(other._contact, _contact));
+            (identical(other.contact, contact) || other.contact == contact));
   }
 
   @JsonKey(ignore: true)
@@ -336,7 +371,7 @@ class _$CompanyCardDataImpl implements _CompanyCardData {
       const DeepCollectionEquality().hash(_linkedin),
       const DeepCollectionEquality().hash(_whatsapp),
       const DeepCollectionEquality().hash(_facebook),
-      const DeepCollectionEquality().hash(_contact));
+      contact);
 
   @JsonKey(ignore: true)
   @override
@@ -359,12 +394,15 @@ abstract class _CompanyCardData implements CompanyCardData {
       final String? address,
       final String? location,
       final String? industry,
-      final List<String> domain,
-      final List<String> email,
-      final List<String> linkedin,
-      final List<String> whatsapp,
-      final List<String> facebook,
-      final List<Contact> contact}) = _$CompanyCardDataImpl;
+      final List<String>? domain,
+      final List<String>? email,
+      final List<String>? linkedin,
+      final List<String>? whatsapp,
+      final List<String>? facebook,
+      @JsonKey(
+          toJson: _companyCardDataContactToJson,
+          fromJson: _companyCardDataContactFromJson)
+      final Contact? contact}) = _$CompanyCardDataImpl;
 
   factory _CompanyCardData.fromJson(Map<String, dynamic> json) =
       _$CompanyCardDataImpl.fromJson;
@@ -378,17 +416,20 @@ abstract class _CompanyCardData implements CompanyCardData {
   @override
   String? get industry;
   @override
-  List<String> get domain;
+  List<String>? get domain;
   @override
-  List<String> get email;
+  List<String>? get email;
   @override
-  List<String> get linkedin;
+  List<String>? get linkedin;
   @override
-  List<String> get whatsapp;
+  List<String>? get whatsapp;
   @override
-  List<String> get facebook;
+  List<String>? get facebook;
   @override
-  List<Contact> get contact;
+  @JsonKey(
+      toJson: _companyCardDataContactToJson,
+      fromJson: _companyCardDataContactFromJson)
+  Contact? get contact;
   @override
   @JsonKey(ignore: true)
   _$$CompanyCardDataImplCopyWith<_$CompanyCardDataImpl> get copyWith =>

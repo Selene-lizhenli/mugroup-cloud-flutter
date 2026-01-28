@@ -82,7 +82,7 @@ class CrmContactPage extends HookConsumerWidget {
                   final c = contacts.value?[index];
 
                   final name = (c?.name ?? '').trim();
-                  final mobile = (c?.telNumber ?? '').trim();
+                  final mobile = (c?.mobile ?? '').trim();
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),

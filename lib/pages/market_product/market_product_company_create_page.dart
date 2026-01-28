@@ -262,6 +262,16 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
+                              name: "contact_mobile", // 字段重命名
+                              builder: (field) {
+                                return Input(
+                                  label: '手机号',
+                                  value: field.value ?? '',
+                                  onChanged: field.didChange,
+                                );
+                              },
+                            ),
+                            FormBuilderField<String>(
                               name: "contact_position",
                               builder: (field) {
                                 return Input(

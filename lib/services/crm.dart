@@ -108,8 +108,7 @@ Future<Contact?> updateCrmContact(int id, Map<String, dynamic>? data) async {
     (res) {
       if (res.data == null) {
         return null;
-      }
-
+      } 
       return Contact.fromJson(res.data);
     },
   );

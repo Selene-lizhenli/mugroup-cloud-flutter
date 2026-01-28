@@ -25,6 +25,7 @@ _$ContactImpl _$$ContactImplFromJson(Map<String, dynamic> json) =>
       json['head'] == null
           ? null
           : User.fromJson(json['head'] as Map<String, dynamic>),
+      json['mobile'] as String?,
       (json['logs'] as List<dynamic>?)
           ?.map((e) => Log.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -45,5 +46,6 @@ Map<String, dynamic> _$$ContactImplToJson(_$ContactImpl instance) =>
       'linkedin': instance.linkedin,
       'facebook': instance.facebook,
       'head': instance.head,
+      'mobile': instance.mobile,
       'logs': instance.logs,
     };

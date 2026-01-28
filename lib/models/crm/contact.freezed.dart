@@ -35,6 +35,7 @@ mixin _$Contact {
   List<String>? get linkedin => throw _privateConstructorUsedError;
   List<String>? get facebook => throw _privateConstructorUsedError;
   User? get head => throw _privateConstructorUsedError;
+  String? get mobile => throw _privateConstructorUsedError;
   List<Log>? get logs => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -61,6 +62,7 @@ abstract class $ContactCopyWith<$Res> {
       List<String>? linkedin,
       List<String>? facebook,
       User? head,
+      String? mobile,
       List<Log>? logs});
 
   $CompanyCopyWith<$Res>? get company;
@@ -93,6 +95,7 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
     Object? linkedin = freezed,
     Object? facebook = freezed,
     Object? head = freezed,
+    Object? mobile = freezed,
     Object? logs = freezed,
   }) {
     return _then(_value.copyWith(
@@ -148,6 +151,10 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
           ? _value.head
           : head // ignore: cast_nullable_to_non_nullable
               as User?,
+      mobile: freezed == mobile
+          ? _value.mobile
+          : mobile // ignore: cast_nullable_to_non_nullable
+              as String?,
       logs: freezed == logs
           ? _value.logs
           : logs // ignore: cast_nullable_to_non_nullable
@@ -201,6 +208,7 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
       List<String>? linkedin,
       List<String>? facebook,
       User? head,
+      String? mobile,
       List<Log>? logs});
 
   @override
@@ -233,6 +241,7 @@ class __$$ContactImplCopyWithImpl<$Res>
     Object? linkedin = freezed,
     Object? facebook = freezed,
     Object? head = freezed,
+    Object? mobile = freezed,
     Object? logs = freezed,
   }) {
     return _then(_$ContactImpl(
@@ -288,6 +297,10 @@ class __$$ContactImplCopyWithImpl<$Res>
           ? _value.head
           : head // ignore: cast_nullable_to_non_nullable
               as User?,
+      freezed == mobile
+          ? _value.mobile
+          : mobile // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == logs
           ? _value._logs
           : logs // ignore: cast_nullable_to_non_nullable
@@ -313,6 +326,7 @@ class _$ContactImpl implements _Contact {
       final List<String>? linkedin,
       final List<String>? facebook,
       this.head,
+      this.mobile,
       final List<Log>? logs)
       : _whatsapp = whatsapp,
         _email = email,
@@ -383,6 +397,8 @@ class _$ContactImpl implements _Contact {
 
   @override
   final User? head;
+  @override
+  final String? mobile;
   final List<Log>? _logs;
   @override
   List<Log>? get logs {
@@ -395,7 +411,7 @@ class _$ContactImpl implements _Contact {
 
   @override
   String toString() {
-    return 'Contact(id: $id, name: $name, location: $location, position: $position, birthday: $birthday, telNumber: $telNumber, companyId: $companyId, company: $company, whatsapp: $whatsapp, email: $email, linkedin: $linkedin, facebook: $facebook, head: $head, logs: $logs)';
+    return 'Contact(id: $id, name: $name, location: $location, position: $position, birthday: $birthday, telNumber: $telNumber, companyId: $companyId, company: $company, whatsapp: $whatsapp, email: $email, linkedin: $linkedin, facebook: $facebook, head: $head, mobile: $mobile, logs: $logs)';
   }
 
   @override
@@ -421,6 +437,7 @@ class _$ContactImpl implements _Contact {
             const DeepCollectionEquality().equals(other._linkedin, _linkedin) &&
             const DeepCollectionEquality().equals(other._facebook, _facebook) &&
             (identical(other.head, head) || other.head == head) &&
+            (identical(other.mobile, mobile) || other.mobile == mobile) &&
             const DeepCollectionEquality().equals(other._logs, _logs));
   }
 
@@ -441,6 +458,7 @@ class _$ContactImpl implements _Contact {
       const DeepCollectionEquality().hash(_linkedin),
       const DeepCollectionEquality().hash(_facebook),
       head,
+      mobile,
       const DeepCollectionEquality().hash(_logs));
 
   @JsonKey(ignore: true)
@@ -472,6 +490,7 @@ abstract class _Contact implements Contact {
       final List<String>? linkedin,
       final List<String>? facebook,
       final User? head,
+      final String? mobile,
       final List<Log>? logs) = _$ContactImpl;
 
   factory _Contact.fromJson(Map<String, dynamic> json) = _$ContactImpl.fromJson;
@@ -504,6 +523,8 @@ abstract class _Contact implements Contact {
   List<String>? get facebook;
   @override
   User? get head;
+  @override
+  String? get mobile;
   @override
   List<Log>? get logs;
   @override

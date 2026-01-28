@@ -22,6 +22,7 @@ class Contact with _$Contact {
     List<String>? linkedin,
     List<String>? facebook,
     User? head,
+    String? mobile,
     List<Log>? logs,
   ) = _Contact;
 

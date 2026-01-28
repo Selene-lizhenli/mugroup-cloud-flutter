@@ -2,8 +2,7 @@ import 'package:cloud/models/company_card_data.dart';
 
 /// 智能识别命名后，智能识别的数据格式与表单格式拉齐
 /// 将 CompanyCardData 对象转换为扁平化的 Map 格式，适用于 FormBuilder
-Map<String, dynamic> convertCompanyCardDataToFormValues(
-    CompanyCardData data) {
+Map<String, dynamic> convertCompanyCardDataToFormValues(CompanyCardData data) {
   final Map<String, dynamic> formValues = {
     'name': data.name,
     'address': data.address,
@@ -16,8 +15,8 @@ Map<String, dynamic> convertCompanyCardDataToFormValues(
     'facebook': data.facebook,
   };
 
-  if (data.contact.isNotEmpty) {
-    final contact = data.contact.first;
+  if (data.contact != null) {
+    final contact =  data.contact!;
     formValues['contact_name'] = contact.name;
     formValues['contact_phone'] = contact.phone;
     formValues['contact_mobile'] = contact.mobile;
@@ -25,4 +24,3 @@ Map<String, dynamic> convertCompanyCardDataToFormValues(
   }
   return formValues;
 }
-

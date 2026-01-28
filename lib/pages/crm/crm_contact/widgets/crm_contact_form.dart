@@ -1,6 +1,7 @@
 import 'package:cloud/helper/form_data_converter.dart';
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/models/crm/contact.dart';
+import 'package:cloud/models/company_card_data.dart';
+import 'package:cloud/models/crm/contact.dart' as crm_contact;
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/company_select.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CrmCotactForm extends HookConsumerWidget {
-  final Contact? initial;
+  final crm_contact.Contact? initial;
 
   final Future<void> Function(Map<String, dynamic>) onSubmit;
 
@@ -29,6 +30,29 @@ class CrmCotactForm extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+
+    /// 将 CompanyCardData 对象转换为扁平化的 Map 格式，适用于 FormBuilder
+    Map<String, dynamic> convertCompanyCardDataToFormValues(
+        CompanyCardData data) {
+      final Map<String, dynamic> formValues = {
+        'address': data.address,
+        'location': data.location,
+        'industry': data.industry,
+        'domain': data.domain,
+        'email': data.email,
+        'linkedin': data.linkedin,
+        'whatsapp': data.whatsapp,
+        'facebook': data.facebook,
+      };
+
+      if (data.contact != null) {
+        final contact = data.contact!;
+        formValues['name'] = contact.name;
+        formValues['mobile'] = contact.mobile;
+        formValues['position'] = contact.position;
+      }
+      return formValues;
+    }
 
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
@@ -45,7 +69,7 @@ class CrmCotactForm extends HookConsumerWidget {
       try {
         final result = await identifyCompanyCard({'image': images});
 
-        if (result != null && result is Map<String, dynamic>) {
+        if (result != null) {
           EasyLoading.showSuccess("识别成功");
           final formValues = convertCompanyCardDataToFormValues(result);
           formKey.currentState?.patchValue(formValues);
@@ -70,14 +94,10 @@ class CrmCotactForm extends HookConsumerWidget {
                     ? {}
                     : {
                         ...initial!.toJson(),
-                        'email': List<String>.from(
-                            initial!.email ?? []),
-                        'whatsapp': List<String>.from(
-                            initial!.whatsapp ?? []),
-                        'linkedin': List<String>.from(
-                            initial!.linkedin ?? []),
-                        'facebook': List<String>.from(
-                            initial!.facebook ?? []),
+                        'email': List<String>.from(initial!.email ?? []),
+                        'whatsapp': List<String>.from(initial!.whatsapp ?? []),
+                        'linkedin': List<String>.from(initial!.linkedin ?? []),
+                        'facebook': List<String>.from(initial!.facebook ?? []),
                       },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -163,6 +183,16 @@ class CrmCotactForm extends HookConsumerWidget {
                             return CompanySelect(
                               label: '公司',
                               value: field.value,
+                              onChanged: field.didChange,
+                            );
+                          },
+                        ),
+                        FormBuilderField<String>(
+                          name: "mobile", // 字段重命名
+                          builder: (field) {
+                            return Input(
+                              label: '手机号',
+                              value: field.value ?? '',
                               onChanged: field.didChange,
                             );
                           },

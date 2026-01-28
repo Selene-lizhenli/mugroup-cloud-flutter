@@ -32,10 +32,7 @@ _$CompanyCardDataImpl _$$CompanyCardDataImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
-      contact: (json['contact'] as List<dynamic>?)
-              ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
+      contact: _companyCardDataContactFromJson(json['contact']),
     );
 
 Map<String, dynamic> _$$CompanyCardDataImplToJson(
@@ -50,7 +47,7 @@ Map<String, dynamic> _$$CompanyCardDataImplToJson(
       'linkedin': instance.linkedin,
       'whatsapp': instance.whatsapp,
       'facebook': instance.facebook,
-      'contact': instance.contact,
+      'contact': _companyCardDataContactToJson(instance.contact),
     };
 
 _$ContactImpl _$$ContactImplFromJson(Map<String, dynamic> json) =>

@@ -43,14 +43,13 @@ class CrmCompanyForm extends HookConsumerWidget {
           status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
 
       try {
-        final result = await identifyCompanyCard({'image': images});
-
-        if (result != null && result is Map<String, dynamic>) {
+        final result = await identifyCompanyCard({'image': images}); 
+        if (result != null) {
           EasyLoading.showSuccess("识别成功");
-          final formValues = convertCompanyCardDataToFormValues(result);
+          final formValues = convertCompanyCardDataToFormValues(result!);
           formKey.currentState?.patchValue(formValues);
-        } else {
-          EasyLoading.dismiss();
+        } else { 
+          EasyLoading.showError('未识别到内容');
         }
       } catch (e) {
         logger.d('error$e');

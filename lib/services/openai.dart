@@ -32,7 +32,7 @@ Future<CompanyCardData?> identifyCompanyCard(Map<String, dynamic>? data) async {
       if (res.data == null) {
         return null;
       }
-      return CompanyCardData.fromJson(Map<String, dynamic>.from(res.data));
+      return CompanyCardData.fromJson(res.data);
     },
   );
 }
