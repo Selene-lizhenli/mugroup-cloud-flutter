@@ -480,12 +480,48 @@ class QuotePage extends HookConsumerWidget {
       children: [
         Column(children: [
           if (isReady)
-            Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                    "当前：${quote.value?['company']?.name} / ${supplier.value?['name']}",
-                    style: TextStyle(
-                        color: colors.primary, fontWeight: FontWeight.bold))),
+            GestureDetector(
+              onTap: () => _showPreSelectionSheet(context, quote, supplier),
+              child: Container(
+                margin: const EdgeInsets.all(12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colors.primary.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: colors.primary.withOpacity(0.1)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_note_rounded,
+                        size: 20, color: colors.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                              color: Colors.black87, fontSize: 14),
+                          children: [
+                            const TextSpan(
+                                text: "当前录入：",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                              text:
+                                  "${quote.value?['company']?.name} / ${supplier.value?['short_name'] ?? supplier.value?['name']}",
+                              style: TextStyle(
+                                  color: colors.primary,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 20, color: Colors.grey[400]),
+                  ],
+                ),
+              ),
+            ),
           SizedBox(
               height: 500,
               child: QuoteProductNewAddPage(
@@ -565,6 +601,10 @@ Future<void> _showPreSelectionSheet(
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
     builder: (context) => HookConsumer(builder: (context, ref, child) {
+      final colorScheme = Theme.of(context).colorScheme;
+      final currentQuote = useValueListenable(selectedQuote);
+      final currentSupplier = useValueListenable(selectedSupplier);
+
       return Padding(
         padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
@@ -579,13 +619,15 @@ Future<void> _showPreSelectionSheet(
             onTap: () async {
               final result = await showModalBottomSheet<Map<String, dynamic>>(
                   context: context, builder: (_) => const QuoteSelect());
-              if (result != null) selectedQuote.value = result;
+              if (result != null) {
+                selectedQuote.value = result;
+              }
             },
             child: AbsorbPointer(
                 child: Input(
                     label: '带客记录',
                     isRequired: true,
-                    value: selectedQuote.value?['company']?.name ?? '',
+                    value: currentQuote?['company']?.name ?? '',
                     hintText: '请选择带客记录')),
           ),
           const SizedBox(height: 16),
@@ -593,14 +635,16 @@ Future<void> _showPreSelectionSheet(
             onTap: () async {
               final result = await showModalBottomSheet<Map<String, dynamic>>(
                   context: context, builder: (_) => const SupplierSelect());
-              if (result != null) selectedSupplier.value = result;
+              if (result != null) {
+                selectedSupplier.value = result;
+              }
             },
             child: AbsorbPointer(
                 child: Input(
                     label: '供应商',
                     isRequired: true,
-                    value: selectedSupplier.value?['short_name'] ??
-                        selectedSupplier.value?['name'] ??
+                    value: currentSupplier?['short_name'] ??
+                        currentSupplier?['name'] ??
                         '',
                     hintText: '请选择供应商')),
           ),
@@ -608,15 +652,18 @@ Future<void> _showPreSelectionSheet(
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
+                backgroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12))),
             onPressed: () {
-              if (selectedQuote.value != null &&
-                  selectedSupplier.value != null) {
+              if (currentQuote != null && currentSupplier != null) {
                 Navigator.pop(context);
               }
             },
-            child: const Text("确定"),
+            child: const Text(
+              "确定",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ]),
       );
