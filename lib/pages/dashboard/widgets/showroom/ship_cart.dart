@@ -342,8 +342,8 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                   minY: 0,
                   barTouchData: BarTouchData(
                     enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      tooltipBgColor: colorScheme.onSurface.withOpacity(0.06),
+                    touchTooltipData: BarTouchTooltipData( 
+                      tooltipBgColor: colorScheme.onPrimary.withOpacity(0.89),
                       fitInsideHorizontally: true,
                       tooltipRoundedRadius: 8,
                       tooltipMargin: 8,

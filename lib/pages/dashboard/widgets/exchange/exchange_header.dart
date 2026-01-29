@@ -92,8 +92,8 @@ class ExchangeChartHeader extends StatelessWidget {
                           dense: true,
                           leading: Icon(
                             isSelected
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_unchecked,
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank,
                             size: 18,
                             color: isSelected
                                 ? colorScheme.primary

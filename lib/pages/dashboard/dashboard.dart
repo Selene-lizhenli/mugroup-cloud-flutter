@@ -62,7 +62,8 @@ class DashboardPage extends HookConsumerWidget {
 
     return Container(
       color: colorScheme.surfaceTint,
-      child: SafeArea(
+      child: SafeArea( 
+        bottom:false,
         child: Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceTint,
