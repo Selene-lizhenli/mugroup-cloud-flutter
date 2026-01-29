@@ -4,6 +4,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/pages/login/shared.dart';
+import 'package:cloud/pages/login/constants.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
@@ -128,18 +129,25 @@ class LoginWay extends HookConsumerWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.fromLTRB(14, 25, 14, 30),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: primaryColorBlue.withOpacity(0.12),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-            ),
-            getLableByLoginWay(loginWay),
-          ),
-
+          Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                getLableByLoginWay(loginWay),
+              )),
           // 账号密码
           if (loginWay == "account") ...[
             if (appleIdentityToken != null)
@@ -154,24 +162,25 @@ class LoginWay extends HookConsumerWidget {
                 ),
               ),
             const SizedBox(
-              height: 50,
+              height: 20,
             ),
             TextField(
               controller: accountController,
-              style: const TextStyle(
-                fontSize: 12,
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: '账号',
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: colorScheme.outline.withOpacity(0.8),
                     width: 0.3,
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: colorScheme.outline.withOpacity(0.8),
                     width: 0.3,
                   ),
                 ),
@@ -208,8 +217,8 @@ class LoginWay extends HookConsumerWidget {
                 children: [
                   if (qrcodeLoading.value)
                     const SizedBox(
-                      width: 220,
-                      height: 220,
+                      width: 200,
+                      height: 200,
                       child: Center(
                         child: SizedBox(
                           width: 50,
@@ -220,8 +229,8 @@ class LoginWay extends HookConsumerWidget {
                     )
                   else if (qrcode.value?.userId != null)
                     SizedBox(
-                      width: 220,
-                      height: 220,
+                      width: 200,
+                      height: 200,
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -229,13 +238,13 @@ class LoginWay extends HookConsumerWidget {
                             Text(
                               qrcode.value!.user?.name ?? '未知用户',
                               style: const TextStyle(
-                                  color: Colors.blue, fontSize: 16),
+                                  color: primaryColorBlue, fontSize: 16),
                             ),
                             const SizedBox(height: 18), // 添加间距
                             Text(
                               qrcode.value!.user?.jobNumber ?? '',
                               style: const TextStyle(
-                                  color: Colors.blue, fontSize: 14),
+                                  color: primaryColorBlue, fontSize: 14),
                             ),
                             const SizedBox(
                               height: 18,
@@ -253,20 +262,21 @@ class LoginWay extends HookConsumerWidget {
                     Column(
                       children: [
                         SizedBox(
-                          width: 220,
-                          height: 220,
+                          width: 200,
+                          height: 200,
                           child: QrImageView(
                             data:
                                 '${tenant.baseUrl}login/qrcode/${qrcode.value!.id}',
                             version: QrVersions.auto,
-                            size: 220.0,
+                            size: 200.0,
                             backgroundColor: Colors.white,
                           ),
                         ),
-                        const Text(
+                        const SizedBox(height: 5),
+                        Text(
                           "请使用企业微信扫码登录",
-                          style:
-                              TextStyle(color: Color(0xFF707070), fontSize: 14),
+                          style: TextStyle(
+                              color: colorScheme.outline, fontSize: 14),
                         )
                       ],
                     ),
@@ -282,7 +292,7 @@ class LoginWay extends HookConsumerWidget {
               child: ElevatedButton(
                 onPressed: handleAccountLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
+                  backgroundColor: primaryColorBlue,
                   shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
                 ),
                 child: Text(

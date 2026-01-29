@@ -6,7 +6,7 @@ String getLableByLoginWay(String loginWay) {
   }
 
   if (loginWay == "wxwork") {
-    return "扫码登录";
+    return "企微扫码登录";
   }
 
   return "";

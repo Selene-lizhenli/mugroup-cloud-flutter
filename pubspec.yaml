@@ -167,6 +167,7 @@ flutter:
     - assets/coming.png 
     - assets/building2d.png
     - assets/noImage.png
+    - assets/photo/trival_small.jpg
     - assets/icon.png
     - assets/logo.webp
     - assets/splash.png 
