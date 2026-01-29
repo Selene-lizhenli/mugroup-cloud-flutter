@@ -155,32 +155,64 @@ class QuotePage extends HookConsumerWidget {
                 title: "店铺列表",
                 icon: Icons.list_alt_rounded,
                 iconColor: Colors.orangeAccent,
-                action: ActionPillButton(
-                  label: '供应商',
-                  icon: Icons.add,
-                  backgroundColor: colorScheme.primary,
-                  textColor: colorScheme.onSecondary,
-                  onTap: () {
-                    final boundQuote = boundQuoteForSupplier.value;
+                action: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ActionPillButton(
+                      label: '新增店铺',
+                      // icon: Icons.add,
+                      backgroundColor: colorScheme.primary,
+                      textColor: colorScheme.onSecondary,
+                      onTap: () {
+                        final boundQuote = boundQuoteForSupplier.value;
 
-                    if (boundQuote == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("请先在下方选择关联的带客记录"),
-                          duration: Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                      return;
-                    }
+                        if (boundQuote == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("请先在下方选择关联的带客记录"),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
 
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => AddSupplierSheet(
-                        quotationId: boundQuote['id'],
-                      ),
-                    );
-                  },
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => AddSupplierSheet(
+                            quotationId: boundQuote['id'],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    ActionPillButton(
+                      label: '关联店铺',
+                      // icon: Icons.add,
+                      backgroundColor: colorScheme.primary,
+                      textColor: colorScheme.onSecondary,
+                      onTap: () {
+                        final boundQuote = boundQuoteForSupplier.value;
+
+                        if (boundQuote == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("请先在下方选择关联的带客记录"),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+
+                        context.router.push(
+                          ProductBatchImportRoute(
+                            quotationId: boundQuote['id'],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 content: Column(
                   children: [
@@ -196,71 +228,64 @@ class QuotePage extends HookConsumerWidget {
                 title: "添加产品",
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                content: Stack(
                   children: [
-                    GestureDetector(
-                      onTap: () async {
-                        final result =
-                            await showModalBottomSheet<Map<String, dynamic>>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => const QuoteSelect(),
-                        );
-                        if (result != null) {
-                          selectedQuote.value = result;
-                        }
-                      },
-                      child: AbsorbPointer(
-                        child: Input(
-                          label: '带客记录',
-                          showClearButton: false,
-                          isRequired: true,
-                          value: selectedQuote.value == null
-                              ? ''
-                              : (selectedQuote.value?['company']?.name ?? ''),
-                          hintText: '请选择带客记录',
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (selectedQuote.value != null)
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                                "当前录入：${selectedQuote.value?['company']?.name} - ${selectedSupplier.value?['name']}",
+                                style: TextStyle(
+                                    color: colorScheme.primary,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        const Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            indent: 16,
+                            endIndent: 16),
+                        SizedBox(
+                          height: 600,
+                          child: QuoteProductNewAddPage(
+                            isEmbedded: true,
+                            quoteId: selectedQuote.value?['id'],
+                            supplierId:
+                                selectedSupplier.value?['id'].toString(),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // --- 关键拦截层 ---
+                    // 如果还没选好，盖一层透明层在上面，点击即弹出刚才定义的选择框
+                    if (selectedQuote.value == null ||
+                        selectedSupplier.value == null)
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _showPreSelectionSheet(
+                              context, selectedQuote, selectedSupplier),
+                          child: Container(
+                            color: Colors.white.withOpacity(0.5), // 稍微变灰，提示不可用
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.touch_app,
+                                      size: 40, color: Colors.grey[400]),
+                                  const SizedBox(height: 8),
+                                  Text("点击完善关联信息后开始录入",
+                                      style:
+                                          TextStyle(color: Colors.grey[600])),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        final result =
-                            await showModalBottomSheet<Map<String, dynamic>>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => const SupplierSelect(),
-                        );
-                        if (result != null) {
-                          selectedSupplier.value = result;
-                        }
-                      },
-                      child: AbsorbPointer(
-                        child: Input(
-                          label: '供应商',
-                          showClearButton: false,
-                          isRequired: true,
-                          value: selectedSupplier.value == null
-                              ? ''
-                              : (selectedSupplier.value?['short_name'] ??
-                                  selectedSupplier.value?['name'] ??
-                                  ''),
-                          hintText: '请选择供应商',
-                        ),
-                      ),
-                    ),
-                    const Divider(
-                        height: 24, thickness: 0.5, indent: 16, endIndent: 16),
-                    SizedBox(
-                      height: 600,
-                      child: QuoteProductNewAddPage(
-                        isEmbedded: true,
-                        quoteId: selectedQuote.value?['id'],
-                        supplierId: selectedSupplier.value?['id'].toString(),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -612,7 +637,7 @@ class QuotePage extends HookConsumerWidget {
                     ),
                     Expanded(
                       child: Text(
-                        '${item.address}',
+                        item.address ?? '暂无',
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
@@ -658,4 +683,95 @@ class QuotePage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _showPreSelectionSheet(
+    BuildContext context,
+    ValueNotifier<Map<String, dynamic>?> selectedQuote,
+    ValueNotifier<Map<String, dynamic>?> selectedSupplier) async {
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      // 使用 HookConsumer 局部刷新弹窗内的 UI
+      return HookConsumer(builder: (context, ref, child) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            top: 20,
+            left: 16,
+            right: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("完善录入信息",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              // --- 带客记录选择 ---
+              GestureDetector(
+                onTap: () async {
+                  final result =
+                      await showModalBottomSheet<Map<String, dynamic>>(
+                    context: context,
+                    builder: (_) => const QuoteSelect(),
+                  );
+                  if (result != null) selectedQuote.value = result;
+                },
+                child: AbsorbPointer(
+                  child: Input(
+                    label: '带客记录',
+                    isRequired: true,
+                    value: selectedQuote.value?['company']?.name ?? '',
+                    hintText: '请选择带客记录',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // --- 供应商选择 ---
+              GestureDetector(
+                onTap: () async {
+                  final result =
+                      await showModalBottomSheet<Map<String, dynamic>>(
+                    context: context,
+                    builder: (_) => const SupplierSelect(),
+                  );
+                  if (result != null) selectedSupplier.value = result;
+                },
+                child: AbsorbPointer(
+                  child: Input(
+                    label: '供应商',
+                    isRequired: true,
+                    value: selectedSupplier.value?['short_name'] ??
+                        selectedSupplier.value?['name'] ??
+                        '',
+                    hintText: '请选择供应商',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  if (selectedQuote.value != null &&
+                      selectedSupplier.value != null) {
+                    Navigator.pop(context); // 选好了，关闭弹窗
+                  }
+                },
+                child: const Text("确定"),
+              ),
+            ],
+          ),
+        );
+      });
+    },
+  );
 }
