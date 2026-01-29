@@ -184,7 +184,7 @@ class QuotePage extends HookConsumerWidget {
                         if (boundQuote == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("请先在下方选择关联的带客记录"),
+                              content: Text("请先在下方选择关联客户"),
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -212,7 +212,7 @@ class QuotePage extends HookConsumerWidget {
                         if (boundQuote == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("请先在下方选择关联的带客记录"),
+                              content: Text("请先在下方选择关联的客户"),
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -426,7 +426,7 @@ class QuotePage extends HookConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isBound ? "当前关联记录" : "未关联带客记录",
+                        isBound ? "当前关联客户" : "未关联客户",
                         style: TextStyle(
                           fontSize: 11,
                           color:
@@ -438,7 +438,7 @@ class QuotePage extends HookConsumerWidget {
                       Text(
                         isBound
                             ? (boundState.value?['company']?.name ?? '未知客户')
-                            : "点击选择以添加带客记录",
+                            : "点击选择以添加关联客户",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight:
@@ -526,7 +526,7 @@ class QuotePage extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "查看全部",
+                    "查看更多",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -588,7 +588,11 @@ class QuotePage extends HookConsumerWidget {
                         GestureDetector(
                           onTap: () {
                             if (boundQuote == null) {
-                              _showError(context, "请先选择关联的带客记录");
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("请先选择关联的客户"),
+                                behavior: SnackBarBehavior.floating,
+                              ));
                               return;
                             }
                             context.router.push(SupplierProductsRoute(
@@ -627,7 +631,12 @@ class QuotePage extends HookConsumerWidget {
                     textColor: Colors.white,
                     onTap: () async {
                       if (boundQuote == null) {
-                        _showError(context, "请先选择关联的带客记录");
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("请先选择关联的客户"),
+                          behavior: SnackBarBehavior.floating,
+                        ));
+
                         return;
                       }
                       await context.router.push(QuoteProductNewAddRoute(
@@ -679,14 +688,6 @@ class QuotePage extends HookConsumerWidget {
         );
       },
     );
-  }
-
-// 提取的错误提示辅助方法
-  void _showError(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg),
-      behavior: SnackBarBehavior.floating,
-    ));
   }
 }
 
