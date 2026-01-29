@@ -23,38 +23,41 @@ class QuotePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-
     useAutomaticKeepAlive(wantKeepAlive: true);
 
+    // 基础数据状态
     final isLoading = useState(true);
     final list = useState<List<QuotationList>>([]);
-
     final quoteSampleSupplierList = useState<List<QuotationSample>>([]);
 
+    // 关联状态
     final selectedQuote = useState<Map<String, dynamic>?>(null);
     final selectedSupplier = useState<Map<String, dynamic>?>(null);
-
     final boundQuoteForSupplier = useState<Map<String, dynamic>?>(null);
+
+    // --- 分页与展开状态 ---
+    final isRecordsExpanded = useState(false);
+    final recordsPage = useState(0);
+    final isSuppliersExpanded = useState(false);
+    final suppliersPage = useState(0);
 
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
-
     final lastSearch = useRef('');
 
+    // 获取带客记录列表
     Future<void> fetchData() async {
       isLoading.value = true;
       final searchText = searchController.text.trim();
-
       final quoteParams = {
         "search": searchText,
         "page": "1",
-        "pageSize": "20",
+        "pageSize": "50",
         "type": "market",
       };
 
       try {
         final response = await getShowroomQuotation(quoteParams);
-
         if (context.mounted) {
           list.value = response.data;
         }
@@ -69,12 +72,10 @@ class QuotePage extends HookConsumerWidget {
 
     useEffect(() {
       fetchData();
-
       void onSearchChanged() {
         final current = searchController.text.trim();
         if (current == lastSearch.value) return;
         lastSearch.value = current;
-
         fetchData();
       }
 
@@ -83,33 +84,33 @@ class QuotePage extends HookConsumerWidget {
     }, []);
 
     useEffect(() {
-      void fetchData() async {
+      Future<void> fetchSupplierData() async {
         final boundQuote = boundQuoteForSupplier.value;
-        if (boundQuote?['id'] == null) return;
-        final params = {
-          "page": '1',
-          "pageSize": 100000000,
-        };
-        final resp =
-            await getQuotationProductListByProductId(boundQuote?['id'], params);
-        quoteSampleSupplierList.value = resp.data;
+        if (boundQuote?['id'] == null) {
+          quoteSampleSupplierList.value = [];
+          return;
+        }
+        final params = {"page": '1', "pageSize": 1000};
+        try {
+          final resp = await getQuotationProductListByProductId(
+              boundQuote?['id'], params);
+          quoteSampleSupplierList.value = resp.data;
+        } catch (e) {
+          debugPrint("Fetch Supplier Error: $e");
+        }
       }
 
-      fetchData();
+      fetchSupplierData();
     }, [boundQuoteForSupplier.value]);
 
-    // 将列表按供应商名称分组
+    // 分组逻辑
     final groupedData = useMemoized(() {
       Map<String, List<QuotationSample>> groups = {};
-
       for (var item in quoteSampleSupplierList.value) {
         final supplierName = item.supplyQuote?.supplier?.shortName ??
             item.supplyQuote?.supplier?.name ??
             '未知供应商';
-
-        if (!groups.containsKey(supplierName)) {
-          groups[supplierName] = [];
-        }
+        if (!groups.containsKey(supplierName)) groups[supplierName] = [];
         groups[supplierName]!.add(item);
       }
       return groups;
@@ -121,11 +122,11 @@ class QuotePage extends HookConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
-          "带客记录",
-          style: TextStyle(
-              color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
-        ),
+        title: const Text("带客记录",
+            style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 18)),
         centerTitle: true,
       ),
       body: RefreshIndicator(
@@ -142,27 +143,12 @@ class QuotePage extends HookConsumerWidget {
                 title: "带客记录",
                 icon: Icons.access_time_filled_rounded,
                 iconColor: Colors.blueAccent,
-                action: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      icon: Icon(Icons.refresh,
-                          color: Colors.grey[600], size: 22),
-                      tooltip: "刷新",
-                      onPressed: fetchData,
-                    ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      icon: Icon(Icons.add_circle_outline,
-                          color: colorScheme.primary, size: 22),
-                      tooltip: "新增",
-                      onPressed: () => context.router.push(QuoteCreateRoute()),
-                    ),
-                  ],
-                ),
-                content: _buildRecentRecordsContent(
-                    context, isLoading.value, list.value),
+                action: IconButton(
+                    icon: const Icon(Icons.add_circle_outline,
+                        color: Colors.blueAccent),
+                    onPressed: () => context.router.push(QuoteCreateRoute())),
+                content: _buildRecentRecordsContent(context, isLoading.value,
+                    list.value, isRecordsExpanded, recordsPage),
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
@@ -171,38 +157,26 @@ class QuotePage extends HookConsumerWidget {
                 icon: Icons.list_alt_rounded,
                 iconColor: Colors.orangeAccent,
                 action: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     ActionPillButton(
                       label: '新增店铺',
-                      // icon: Icons.add,
                       backgroundColor: colorScheme.primary,
-                      textColor: colorScheme.onSecondary,
+                      textColor: Colors.white,
                       onTap: () {
-                        final boundQuote = boundQuoteForSupplier.value;
-
-                        if (boundQuote == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("请先在下方选择关联客户"),
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                        if (boundQuoteForSupplier.value == null) {
+                          _showError(context, "请先选择关联客户");
                           return;
                         }
-
                         showModalBottomSheet(
-                          context: context,
-                          builder: (context) => AddSupplierSheet(
-                            quotationId: boundQuote['id'],
-                          ),
-                        );
+                            context: context,
+                            builder: (context) => AddSupplierSheet(
+                                quotationId:
+                                    boundQuoteForSupplier.value!['id']));
                       },
                     ),
                     const SizedBox(width: 10),
                     ActionPillButton(
-                      label: '关联店铺',
+                      label: '导入店铺',
                       // icon: Icons.add,
                       backgroundColor: colorScheme.primary,
                       textColor: colorScheme.onSecondary,
@@ -232,13 +206,16 @@ class QuotePage extends HookConsumerWidget {
                 content: Column(
                   children: [
                     _buildBoundQuoteBar(context, boundQuoteForSupplier, () {
-                      //清除关联
                       boundQuoteForSupplier.value = null;
-
                       quoteSampleSupplierList.value = [];
                     }),
-                    _buildDetailList(context, isLoading.value, groupedData,
-                        boundQuoteForSupplier.value),
+                    _buildDetailList(
+                        context,
+                        isLoading.value,
+                        groupedData,
+                        boundQuoteForSupplier.value,
+                        isSuppliersExpanded,
+                        suppliersPage),
                   ],
                 ),
               ),
@@ -248,68 +225,10 @@ class QuotePage extends HookConsumerWidget {
                 title: "添加产品",
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
-                content: Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (selectedQuote.value != null)
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                                "当前录入：${selectedQuote.value?['company']?.name} - ${selectedSupplier.value?['name']}",
-                                style: TextStyle(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                        const Divider(
-                            height: 1,
-                            thickness: 0.5,
-                            indent: 16,
-                            endIndent: 16),
-                        SizedBox(
-                          height: 600,
-                          child: QuoteProductNewAddPage(
-                            isEmbedded: true,
-                            quoteId: selectedQuote.value?['id'],
-                            supplierId:
-                                selectedSupplier.value?['id'].toString(),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // --- 关键拦截层 ---
-                    // 如果还没选好，盖一层透明层在上面，点击即弹出刚才定义的选择框
-                    if (selectedQuote.value == null ||
-                        selectedSupplier.value == null)
-                      Positioned.fill(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => _showPreSelectionSheet(
-                              context, selectedQuote, selectedSupplier),
-                          child: Container(
-                            color: Colors.white.withOpacity(0.5), // 稍微变灰，提示不可用
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.touch_app,
-                                      size: 40, color: Colors.grey[400]),
-                                  const SizedBox(height: 8),
-                                  Text("点击完善关联信息后开始录入",
-                                      style:
-                                          TextStyle(color: Colors.grey[600])),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                content: _buildProductAddSection(
+                    context, selectedQuote, selectedSupplier, colorScheme),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -317,57 +236,32 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildSectionCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required Color iconColor,
-    required Widget content,
-    Widget? action,
-  }) {
+  Widget _buildSectionCard(BuildContext context,
+      {required String title,
+      required IconData icon,
+      required Color iconColor,
+      required Widget content,
+      Widget? action}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+          color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, size: 18, color: iconColor),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
+            padding: const EdgeInsets.fromLTRB(16, 12, 12, 8),
+            child: Row(children: [
+              Icon(icon, size: 18, color: iconColor),
+              const SizedBox(width: 8),
+              Text(title,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const Spacer(),
-                if (action != null) action,
-              ],
-            ),
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+              const Spacer(),
+              if (action != null) action,
+            ]),
           ),
-          const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
+          const Divider(height: 1),
           content,
         ],
       ),
@@ -375,320 +269,261 @@ class QuotePage extends HookConsumerWidget {
   }
 
   Widget _buildBoundQuoteBar(BuildContext context,
-      ValueNotifier<Map<String, dynamic>?> boundState, VoidCallback onPressed) {
-    final colorScheme = Theme.of(context).colorScheme;
+      ValueNotifier<Map<String, dynamic>?> boundState, VoidCallback onClear) {
     final isBound = boundState.value != null;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        // 未绑定显示浅灰，绑定显示主题色背景
         color: isBound
-            ? colorScheme.primary.withOpacity(0.08)
+            ? colorScheme.primary.withOpacity(0.05)
             : const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          // 绑定后显示边框
-          color: isBound
-              ? colorScheme.primary.withOpacity(0.3)
-              : Colors.transparent,
-          width: 1,
-        ),
+            color: isBound
+                ? colorScheme.primary.withOpacity(0.2)
+                : Colors.transparent),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: () async {
-            final result = await showModalBottomSheet<Map<String, dynamic>>(
+      child: ListTile(
+        dense: true,
+        leading: Icon(isBound ? Icons.link : Icons.link_off,
+            color: isBound ? colorScheme.primary : Colors.grey),
+        title: Text(
+            isBound
+                ? (boundState.value?['company']?.name ?? '已关联客户')
+                : "点击选择关联客户",
+            style: TextStyle(
+                fontWeight: isBound ? FontWeight.bold : FontWeight.normal)),
+        onTap: () async {
+          final result = await showModalBottomSheet<Map<String, dynamic>>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const QuoteSelect(),
-            );
-            if (result != null) {
-              boundState.value = result;
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Icon(
-                  isBound ? Icons.link_rounded : Icons.link_off_rounded,
-                  size: 20,
-                  color: isBound ? colorScheme.primary : Colors.grey[500],
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isBound ? "当前关联客户" : "未关联客户",
-                        style: TextStyle(
-                          fontSize: 11,
-                          color:
-                              isBound ? colorScheme.primary : Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        isBound
-                            ? (boundState.value?['company']?.name ?? '未知客户')
-                            : "点击选择以添加关联客户",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight:
-                              isBound ? FontWeight.bold : FontWeight.normal,
-                          color: isBound ? Colors.black87 : Colors.grey[500],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(Icons.close_rounded,
-                      size: 20, color: colorScheme.primary),
-                  onPressed: onPressed,
-                )
-              ],
-            ),
-          ),
-        ),
+              builder: (_) => const QuoteSelect());
+          if (result != null) boundState.value = result;
+        },
+        trailing: isBound
+            ? IconButton(
+                icon: const Icon(Icons.close_rounded, size: 18),
+                onPressed: onClear)
+            : const Icon(Icons.chevron_right),
       ),
     );
   }
 
   Widget _buildRecentRecordsContent(
-      BuildContext context, bool isLoading, List<QuotationList> list) {
+      BuildContext context,
+      bool isLoading,
+      List<QuotationList> data,
+      ValueNotifier<bool> isExpanded,
+      ValueNotifier<int> page) {
     if (isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(20),
-        child: Center(child: CupertinoActivityIndicator()),
-      );
+      return const Center(
+          child: Padding(
+              padding: EdgeInsets.all(20),
+              child: CupertinoActivityIndicator()));
     }
+    if (data.isEmpty) return _buildEmpty("暂无记录");
 
-    if (list.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(vertical: 30),
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            Icon(Icons.inbox_outlined, size: 40, color: Colors.grey[300]),
-            const SizedBox(height: 8),
-            Text("暂无近期记录",
-                style: TextStyle(color: Colors.grey[400], fontSize: 13)),
-          ],
-        ),
-      );
-    }
-
-    final displayList = list.take(2).toList();
+    final itemsPerPage = isExpanded.value ? 5 : 2;
+    final totalPages = (data.length / itemsPerPage).ceil();
+    final displayList =
+        data.skip(page.value * itemsPerPage).take(itemsPerPage).toList();
 
     return Column(
       children: [
-        ...displayList.map((item) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: QuoteCard(
-              item: item,
-              tabIndex: 0,
-              onTap: () {
-                final tempId = item.id;
-                if (tempId == null) return;
-                context.router.push(QuoteDetailRoute(id: tempId));
-              },
-            ),
-          );
-        }),
-        if (displayList.isNotEmpty) ...[
-          Divider(height: 1, thickness: 0.5, color: Colors.grey[100]),
-          InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("跳转全部记录页面")),
-              );
-            },
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-            ),
-            child: Container(
-              height: 48,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "查看更多",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_right_rounded,
-                      size: 18, color: Colors.grey[500]),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ...displayList.map((item) => QuoteCard(
+            item: item,
+            tabIndex: 0,
+            onTap: () => context.router.push(QuoteDetailRoute(id: item.id!)))),
+        if (isExpanded.value && totalPages > 1) _buildPager(page, totalPages),
+        if (data.length > 2) _buildToggleBtn(isExpanded, page, "记录"),
       ],
     );
   }
 
-  Widget _buildDetailList(BuildContext context, bool isLoading,
-      Map<String, List<QuotationSample>> groupedSuppliers, dynamic boundQuote) {
+  Widget _buildDetailList(
+      BuildContext context,
+      bool isLoading,
+      Map<String, List<QuotationSample>> grouped,
+      dynamic boundQuote,
+      ValueNotifier<bool> isExpanded,
+      ValueNotifier<int> page) {
     if (isLoading) {
-      return const Padding(
-          padding: EdgeInsets.all(20),
-          child: Center(child: CupertinoActivityIndicator()));
-    }
-    if (groupedSuppliers.isEmpty) {
       return const Center(
-          child: Padding(padding: EdgeInsets.all(20), child: Text("暂无供应商数据")));
+          child: Padding(
+              padding: EdgeInsets.all(20),
+              child: CupertinoActivityIndicator()));
     }
+    if (grouped.isEmpty) return _buildEmpty("暂无供应商");
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final supplierNames = groupedSuppliers.keys.toList();
+    final names = grouped.keys.toList();
+    final itemsPerPage = isExpanded.value ? 5 : 2;
+    final totalPages = (names.length / itemsPerPage).ceil();
+    final displayNames =
+        names.skip(page.value * itemsPerPage).take(itemsPerPage).toList();
 
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: supplierNames.length,
-      separatorBuilder: (context, index) =>
-          const Divider(height: 1, indent: 16, endIndent: 16),
-      itemBuilder: (context, index) {
-        final name = supplierNames[index];
-        final List<QuotationSample> products = groupedSuppliers[name]!;
-
-        final supplier = products.first.supplyQuote?.supplier;
-        if (supplier == null) return const SizedBox.shrink();
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return Column(
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: displayNames.length,
+          separatorBuilder: (_, __) =>
+              const Divider(height: 1, indent: 16, endIndent: 16),
+          itemBuilder: (context, index) {
+            final name = displayNames[index];
+            final prods = grouped[name]!;
+            final supplier = prods.first.supplyQuote?.supplier;
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (boundQuote == null) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text("请先选择关联的客户"),
-                                behavior: SnackBarBehavior.floating,
-                              ));
-                              return;
-                            }
-                            context.router.push(SupplierProductsRoute(
-                              quotationId: boundQuote['id'],
-                              supplierId: supplier.id!,
-                              supplierNo: supplier.supplierNo ?? '',
-                              supplierName: supplier.name ?? '',
-                              companyName: boundQuote['company'].name ?? '',
-                            ));
-                          },
-                          child: Text(
-                            supplier.name ?? '无店铺名称',
-                            style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w600),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Text(supplier.supplierNo ?? '暂无',
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
-                      ],
+                  Row(children: [
+                    Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Text(supplier?.name ?? name,
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                          Text(supplier?.supplierNo ?? '-',
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
+                        ])),
+                    ActionPillButton(
+                        label: '产品',
+                        icon: Icons.add,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        textColor: Colors.white,
+                        onTap: () {
+                          context.router.push(QuoteProductNewAddRoute(
+                              quoteId: boundQuote?['id'],
+                              supplierId: supplier?.id?.toString()));
+                        }),
+                  ]),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 70,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: prods.length,
+                      itemBuilder: (context, pIdx) {
+                        final img =
+                            (prods[pIdx].showroomSample?.image?.isNotEmpty ??
+                                    false)
+                                ? prods[pIdx].showroomSample!.image![0].url
+                                : null;
+                        return Container(
+                          width: 70,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(4)),
+                          child: img != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.network(img, fit: BoxFit.cover))
+                              : const Icon(Icons.image_outlined,
+                                  color: Colors.grey),
+                        );
+                      },
                     ),
-                  ),
-                  ActionPillButton(
-                    label: '产品',
-                    icon: Icons.add,
-                    backgroundColor: colorScheme.primary,
-                    textColor: Colors.white,
-                    onTap: () async {
-                      if (boundQuote == null) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("请先选择关联的客户"),
-                          behavior: SnackBarBehavior.floating,
-                        ));
-
-                        return;
-                      }
-                      await context.router.push(QuoteProductNewAddRoute(
-                        quoteId: boundQuote['id'],
-                        supplierId: supplier.id?.toString(),
-                      ));
-                    },
-                  ),
+                  )
                 ],
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: products.length,
-                  itemBuilder: (context, pIndex) {
-                    final prod = products[pIndex];
-                    final imageUrl =
-                        (prod.showroomSample?.image?.isNotEmpty ?? false)
-                            ? prod.showroomSample!.image![0].url
-                            : null;
-
-                    return Container(
-                      width: 80,
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: imageUrl != null
-                            ? Image.network(imageUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.broken_image,
-                                        size: 20, color: Colors.grey))
-                            : const Icon(Icons.image_outlined,
-                                size: 20, color: Colors.grey),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+        if (isExpanded.value && totalPages > 1) _buildPager(page, totalPages),
+        if (names.length > 2) _buildToggleBtn(isExpanded, page, "供应商"),
+      ],
     );
   }
+
+  Widget _buildProductAddSection(
+      BuildContext context,
+      ValueNotifier<Map<String, dynamic>?> quote,
+      ValueNotifier<Map<String, dynamic>?> supplier,
+      ColorScheme colors) {
+    final isReady = quote.value != null && supplier.value != null;
+    return Stack(
+      children: [
+        Column(children: [
+          if (isReady)
+            Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                    "当前：${quote.value?['company']?.name} / ${supplier.value?['name']}",
+                    style: TextStyle(
+                        color: colors.primary, fontWeight: FontWeight.bold))),
+          SizedBox(
+              height: 500,
+              child: QuoteProductNewAddPage(
+                  isEmbedded: true,
+                  quoteId: quote.value?['id'],
+                  supplierId: supplier.value?['id']?.toString())),
+        ]),
+        if (!isReady)
+          Positioned.fill(
+              child: GestureDetector(
+            onTap: () => _showPreSelectionSheet(context, quote, supplier),
+            child: Container(
+                color: Colors.white.withOpacity(0.8),
+                child: const Center(
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.touch_app, size: 40, color: Colors.grey),
+                  Text("点击完善关联信息后开始录入")
+                ]))),
+          ))
+      ],
+    );
+  }
+
+  Widget _buildToggleBtn(
+      ValueNotifier<bool> isExpanded, ValueNotifier<int> page, String label) {
+    return InkWell(
+      onTap: () {
+        isExpanded.value = !isExpanded.value;
+        page.value = 0;
+      },
+      child: Container(
+          height: 44,
+          alignment: Alignment.center,
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(isExpanded.value ? "收起$label" : "查看更多$label",
+                style: const TextStyle(color: Colors.blueAccent, fontSize: 13)),
+            Icon(
+                isExpanded.value
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
+                size: 16,
+                color: Colors.blueAccent)
+          ])),
+    );
+  }
+
+  Widget _buildPager(ValueNotifier<int> page, int total) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: page.value > 0 ? () => page.value-- : null),
+      Text("${page.value + 1} / $total"),
+      IconButton(
+          icon: const Icon(Icons.chevron_right),
+          onPressed: page.value < total - 1 ? () => page.value++ : null),
+    ]);
+  }
+
+  Widget _buildEmpty(String txt) => Center(
+      child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(txt, style: const TextStyle(color: Colors.grey))));
+
+  void _showError(BuildContext context, String msg) =>
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
 }
 
 Future<void> _showPreSelectionSheet(
@@ -700,84 +535,63 @@ Future<void> _showPreSelectionSheet(
     isScrollControlled: true,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      // 使用 HookConsumer 局部刷新弹窗内的 UI
-      return HookConsumer(builder: (context, ref, child) {
-        return Padding(
-          padding: EdgeInsets.only(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (context) => HookConsumer(builder: (context, ref, child) {
+      return Padding(
+        padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
             top: 20,
             left: 16,
-            right: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("完善录入信息",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              // --- 带客记录选择 ---
-              GestureDetector(
-                onTap: () async {
-                  final result =
-                      await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context,
-                    builder: (_) => const QuoteSelect(),
-                  );
-                  if (result != null) selectedQuote.value = result;
-                },
-                child: AbsorbPointer(
-                  child: Input(
+            right: 16),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text("完善录入信息",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () async {
+              final result = await showModalBottomSheet<Map<String, dynamic>>(
+                  context: context, builder: (_) => const QuoteSelect());
+              if (result != null) selectedQuote.value = result;
+            },
+            child: AbsorbPointer(
+                child: Input(
                     label: '带客记录',
                     isRequired: true,
                     value: selectedQuote.value?['company']?.name ?? '',
-                    hintText: '请选择带客记录',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // --- 供应商选择 ---
-              GestureDetector(
-                onTap: () async {
-                  final result =
-                      await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context,
-                    builder: (_) => const SupplierSelect(),
-                  );
-                  if (result != null) selectedSupplier.value = result;
-                },
-                child: AbsorbPointer(
-                  child: Input(
+                    hintText: '请选择带客记录')),
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () async {
+              final result = await showModalBottomSheet<Map<String, dynamic>>(
+                  context: context, builder: (_) => const SupplierSelect());
+              if (result != null) selectedSupplier.value = result;
+            },
+            child: AbsorbPointer(
+                child: Input(
                     label: '供应商',
                     isRequired: true,
                     value: selectedSupplier.value?['short_name'] ??
                         selectedSupplier.value?['name'] ??
                         '',
-                    hintText: '请选择供应商',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  if (selectedQuote.value != null &&
-                      selectedSupplier.value != null) {
-                    Navigator.pop(context); // 选好了，关闭弹窗
-                  }
-                },
-                child: const Text("确定"),
-              ),
-            ],
+                    hintText: '请选择供应商')),
           ),
-        );
-      });
-    },
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
+            onPressed: () {
+              if (selectedQuote.value != null &&
+                  selectedSupplier.value != null) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("确定"),
+          ),
+        ]),
+      );
+    }),
   );
 }
