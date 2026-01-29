@@ -382,16 +382,44 @@ class QuotePage extends HookConsumerWidget {
                 children: [
                   Row(children: [
                     Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque, // 确保空白处也能点击
+                        onTap: () {
+                          final quoteId = boundQuote?['id'];
+                          final supplierId = supplier?.id;
+
+                          if (quoteId != null && supplierId != null) {
+                            context.router.push(
+                              SupplierProductsRoute(
+                                quotationId: quoteId,
+                                supplierId: supplierId,
+                                supplierNo: supplier?.supplierNo ?? '',
+                                supplierName: supplier?.name ?? '',
+                                companyName: boundQuote?['company']?.name ?? '',
+                              ),
+                            );
+                          }
+                        },
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                          Text(supplier?.name ?? name,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              supplier?.name ?? name,
                               style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold)),
-                          Text(supplier?.supplierNo ?? '-',
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              supplier?.supplierNo ?? '-',
                               style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey)),
-                        ])),
+                                  fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     ActionPillButton(
                         label: '产品',
                         icon: Icons.add,
