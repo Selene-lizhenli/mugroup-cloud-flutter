@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
@@ -10,8 +10,7 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/services/sample.dart';
-import 'package:cloud/services/supply.dart';
+import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,7 +28,8 @@ class QuotePage extends HookConsumerWidget {
 
     final isLoading = useState(true);
     final list = useState<List<QuotationList>>([]);
-    final supplierList = useState<List<Supplier>>([]);
+
+    final quoteSampleSupplierList = useState<List<QuotationSample>>([]);
 
     final selectedQuote = useState<Map<String, dynamic>?>(null);
     final selectedSupplier = useState<Map<String, dynamic>?>(null);
@@ -45,7 +45,6 @@ class QuotePage extends HookConsumerWidget {
       isLoading.value = true;
       final searchText = searchController.text.trim();
 
-      // 1. 准备带客记录参数
       final quoteParams = {
         "search": searchText,
         "page": "1",
@@ -53,31 +52,14 @@ class QuotePage extends HookConsumerWidget {
         "type": "market",
       };
 
-      // 2. 准备供应商参数
-      final supplierParams = {
-        "search": searchText,
-        "page": "1",
-        "pageSize": "20",
-      };
-
       try {
-        // 并行请求两个接口，提高效率
-        final results = await Future.wait([
-          getShowroomQuotation(quoteParams),
-          getSupplySuppliers(queryParameters: supplierParams),
-        ]);
+        final response = await getShowroomQuotation(quoteParams);
 
         if (context.mounted) {
-          // 更新带客记录
-          final quoteData = results[0] as dynamic; // 根据实际返回类型强转
-          list.value = quoteData.data;
-
-          // 更新供应商列表
-          final supplierData = results[1] as dynamic; // 根据实际返回类型强转
-          supplierList.value = supplierData.data;
+          list.value = response.data;
         }
       } catch (e) {
-        debugPrint("Error fetching data: $e");
+        debugPrint("Error fetching quotation data: $e");
       } finally {
         if (context.mounted) {
           isLoading.value = false;
@@ -99,6 +81,39 @@ class QuotePage extends HookConsumerWidget {
       searchController.addListener(onSearchChanged);
       return () => searchController.removeListener(onSearchChanged);
     }, []);
+
+    useEffect(() {
+      void fetchData() async {
+        final boundQuote = boundQuoteForSupplier.value;
+        if (boundQuote?['id'] == null) return;
+        final params = {
+          "page": '1',
+          "pageSize": 100000000,
+        };
+        final resp =
+            await getQuotationProductListByProductId(boundQuote?['id'], params);
+        quoteSampleSupplierList.value = resp.data;
+      }
+
+      fetchData();
+    }, [boundQuoteForSupplier.value]);
+
+    // 将列表按供应商名称分组
+    final groupedData = useMemoized(() {
+      Map<String, List<QuotationSample>> groups = {};
+
+      for (var item in quoteSampleSupplierList.value) {
+        final supplierName = item.supplyQuote?.supplier?.shortName ??
+            item.supplyQuote?.supplier?.name ??
+            '未知供应商';
+
+        if (!groups.containsKey(supplierName)) {
+          groups[supplierName] = [];
+        }
+        groups[supplierName]!.add(item);
+      }
+      return groups;
+    }, [quoteSampleSupplierList.value]);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -217,8 +232,8 @@ class QuotePage extends HookConsumerWidget {
                 content: Column(
                   children: [
                     _buildBoundQuoteBar(context, boundQuoteForSupplier),
-                    _buildDetailList(context, isLoading.value,
-                        supplierList.value, boundQuoteForSupplier.value),
+                    _buildDetailList(context, isLoading.value, groupedData,
+                        boundQuoteForSupplier.value),
                   ],
                 ),
               ),
@@ -524,164 +539,148 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDetailList(
-      BuildContext context,
-      bool isLoading,
-      List<Supplier> supplierList,
-      Map<String, dynamic>? boundQuoteForSupplier) {
+  Widget _buildDetailList(BuildContext context, bool isLoading,
+      Map<String, List<QuotationSample>> groupedSuppliers, dynamic boundQuote) {
     if (isLoading) {
       return const Padding(
-        padding: EdgeInsets.all(24),
-        child: Center(child: CupertinoActivityIndicator()),
-      );
+          padding: EdgeInsets.all(20),
+          child: Center(child: CupertinoActivityIndicator()));
+    }
+    if (groupedSuppliers.isEmpty) {
+      return const Center(
+          child: Padding(padding: EdgeInsets.all(20), child: Text("暂无供应商数据")));
     }
 
-    if (supplierList.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        alignment: Alignment.center,
-        child: Text(
-          "暂无数据详情",
-          style: TextStyle(color: Colors.grey[400], fontSize: 13),
-        ),
-      );
-    }
-
-    final detailList = supplierList.take(2).toList();
+    final colorScheme = Theme.of(context).colorScheme;
+    final supplierNames = groupedSuppliers.keys.toList();
 
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: detailList.length,
+      itemCount: supplierNames.length,
       separatorBuilder: (context, index) =>
           const Divider(height: 1, indent: 16, endIndent: 16),
       itemBuilder: (context, index) {
-        final item = detailList[index];
-        return _buildDetailRowItem(context, item, boundQuoteForSupplier);
+        final name = supplierNames[index];
+        final List<QuotationSample> products = groupedSuppliers[name]!;
+
+        final supplier = products.first.supplyQuote?.supplier;
+        if (supplier == null) return const SizedBox.shrink();
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (boundQuote == null) {
+                              _showError(context, "请先选择关联的带客记录");
+                              return;
+                            }
+                            context.router.push(SupplierProductsRoute(
+                              quotationId: boundQuote['id'],
+                              supplierId: supplier.id!,
+                              supplierNo: supplier.supplierNo ?? '',
+                              supplierName: supplier.name ?? '',
+                              companyName: boundQuote['company'].name ?? '',
+                            ));
+                          },
+                          child: Text(
+                            supplier.name ?? '无店铺名称',
+                            style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w600),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Text(supplier.supplierNo ?? '暂无',
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  ActionPillButton(
+                    label: '产品',
+                    icon: Icons.add,
+                    backgroundColor: colorScheme.primary,
+                    textColor: Colors.white,
+                    onTap: () async {
+                      if (boundQuote == null) {
+                        _showError(context, "请先选择关联的带客记录");
+                        return;
+                      }
+                      await context.router.push(QuoteProductNewAddRoute(
+                        quoteId: boundQuote['id'],
+                        supplierId: supplier.id?.toString(),
+                      ));
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: products.length,
+                  itemBuilder: (context, pIndex) {
+                    final prod = products[pIndex];
+                    final imageUrl =
+                        (prod.showroomSample?.image?.isNotEmpty ?? false)
+                            ? prod.showroomSample!.image![0].url
+                            : null;
+
+                    return Container(
+                      width: 80,
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: imageUrl != null
+                            ? Image.network(imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.broken_image,
+                                        size: 20, color: Colors.grey))
+                            : const Icon(Icons.image_outlined,
+                                size: 20, color: Colors.grey),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 
-  Widget _buildDetailRowItem(BuildContext context, Supplier item,
-      Map<String, dynamic>? boundQuoteForSupplier) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    final boundQuote = boundQuoteForSupplier;
-
-                    if (boundQuote == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("请先在下方选择关联的带客记录"),
-                          duration: Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                      return;
-                    }
-
-                    final quoteId = boundQuote['id'];
-                    final supplierId = item.id;
-                    if (quoteId != null && supplierId != null) {
-                      context.router.push(
-                        SupplierProductsRoute(
-                          quotationId: boundQuote['id'],
-                          supplierId: supplierId,
-                          supplierNo: item.supplierNo ?? '',
-                          supplierName: item.name ?? '',
-                          companyName: boundQuote['company'].name ?? '',
-                        ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    item.name ?? '无店铺名称',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 80),
-                      child: Text(
-                        item.supplierNo ?? '暂无',
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Container(
-                        width: 1,
-                        height: 10,
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        item.address ?? '暂无',
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ActionPillButton(
-                label: '产品',
-                icon: Icons.add,
-                backgroundColor: colorScheme.primary,
-                textColor: Colors.white,
-                onTap: () async {
-                  final boundQuote = boundQuoteForSupplier;
-
-                  if (boundQuote == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("请先在下方选择关联的带客记录"),
-                        duration: Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-                  final supplierId = item.id;
-                  await context.router.push(
-                    QuoteProductNewAddRoute(
-                      quoteId: boundQuote['id'],
-                      supplierId: supplierId?.toString(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+// 提取的错误提示辅助方法
+  void _showError(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      behavior: SnackBarBehavior.floating,
+    ));
   }
 }
 
