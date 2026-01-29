@@ -105,12 +105,15 @@ class InspectionDetailPage extends HookConsumerWidget {
         ],
       ),
       body: isLoading.value
-          ? const Center(child: MuProgressIndicator())
+          ? const Center(
+              child: MuProgressIndicator(
+              showText: true,
+            ))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _buildInfoCard(context, inspection.value, primaryColor,
+                  _buildInfoCard(context, inspection.value, colorScheme,
                       textDark, progress, progressText),
                   const SizedBox(height: 12),
                   Container(
@@ -126,7 +129,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                             allItems.length,
                             textDark,
                             textGrey,
-                            primaryColor,
+                            colorScheme,
                             searchController,
                             currentTab, () async {
                           await showModalBottomSheet(
@@ -174,7 +177,7 @@ class InspectionDetailPage extends HookConsumerWidget {
   Widget _buildInfoCard(
       BuildContext context,
       Inspection? inspection,
-      Color primaryColor,
+      ColorScheme colorScheme,
       Color textDark,
       double progress,
       String progressText) {
@@ -217,24 +220,23 @@ class InspectionDetailPage extends HookConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              height: 24,
+              height: 14,
               width: double.infinity,
-              color: const Color(0xFFE0E0E0),
+              color: colorScheme.secondary.withOpacity(0.25),
               child: Stack(
                 children: [
                   LayoutBuilder(builder: (context, constraints) {
                     return Container(
                       width: constraints.maxWidth * progress,
-                      color: primaryColor,
+                      color: colorScheme.secondary.withOpacity(0.6),
                     );
                   }),
                   Center(
                     child: Text(progressText,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1)),
+                        style: TextStyle(
+                            color: colorScheme.onSecondary,
+                            fontSize: 10,
+                            height: 1)),
                   ),
                 ],
               ),
@@ -251,7 +253,7 @@ class InspectionDetailPage extends HookConsumerWidget {
       int totalCount,
       Color textDark,
       Color textGrey,
-      Color primaryColor,
+      ColorScheme colorScheme,
       TextEditingController controller,
       ValueNotifier<int> currentTab,
       VoidCallback onTap) {
@@ -261,7 +263,8 @@ class InspectionDetailPage extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
           child: Row(
             children: [
-              Icon(Icons.format_list_bulleted, color: primaryColor, size: 20),
+              Icon(Icons.format_list_bulleted,
+                  color: colorScheme.primary, size: 20),
               const SizedBox(width: 8),
               const Text('验货SKU列表',
                   style: TextStyle(
@@ -287,7 +290,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                 onPressed: onTap,
                 child: Text(
                   '新增',
-                  style: TextStyle(color: primaryColor, fontSize: 16),
+                  style: TextStyle(color: colorScheme.primary, fontSize: 16),
                 ),
               ),
             ],
@@ -334,19 +337,19 @@ class InspectionDetailPage extends HookConsumerWidget {
                 '全部',
                 isSelected: currentTab.value == 0,
                 onTap: () => currentTab.value = 0,
-                primaryColor: primaryColor,
+                primaryColor: colorScheme.primary,
               ),
               _buildTabItem(
                 '已验货',
                 isSelected: currentTab.value == 1,
                 onTap: () => currentTab.value = 1,
-                primaryColor: primaryColor,
+                primaryColor: colorScheme.primary,
               ),
               _buildTabItem(
                 '未验货',
                 isSelected: currentTab.value == 2,
                 onTap: () => currentTab.value = 2,
-                primaryColor: primaryColor,
+                primaryColor: colorScheme.primary,
               ),
             ],
           ),
@@ -532,7 +535,7 @@ class ExportInspectionDialog extends HookWidget {
                 alignment: Alignment.center,
                 children: [
                   const Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.topLeft,
                     child: Text(
                       '导出验货清单',
                       style: TextStyle(
@@ -543,7 +546,7 @@ class ExportInspectionDialog extends HookWidget {
                     ),
                   ),
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.topRight,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -556,58 +559,59 @@ class ExportInspectionDialog extends HookWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  const Text(
-                    '邮箱',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF666666),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: TextField(
-                        controller: emailController,
-                        enabled: !isDownloading.value,
-                        style: const TextStyle(fontSize: 14),
-                        decoration: InputDecoration(
-                          hintText: '请输入接收验货清单的邮箱',
-                          hintStyle:
-                              TextStyle(color: Colors.grey[400], fontSize: 13),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 0),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: primaryColor),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey[200]!),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '如果不需要发送到邮箱，请点击下载',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
-                ),
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+              // const SizedBox(height: 24),
+              // Row(
+              //   children: [
+              //     const Text(
+              //       '邮箱',
+              //       style: TextStyle(
+              //         fontSize: 15,
+              //         color: Color(0xFF666666),
+              //         fontWeight: FontWeight.w500,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 16),
+              //     Expanded(
+              //       child: SizedBox(
+              //         height: 40,
+              //         child: TextField(
+              //           controller: emailController,
+              //           enabled: !isDownloading.value,
+              //           style: const TextStyle(fontSize: 14),
+              //           decoration: InputDecoration(
+              //             hintText: '请输入接收验货清单的邮箱',
+              //             hintStyle:
+              //                 TextStyle(color: Colors.grey[400], fontSize: 13),
+              //             contentPadding: const EdgeInsets.symmetric(
+              //                 horizontal: 10, vertical: 0),
+              //             enabledBorder: OutlineInputBorder(
+              //               borderSide: BorderSide(color: borderColor),
+              //               borderRadius: BorderRadius.circular(4),
+              //             ),
+              //             focusedBorder: OutlineInputBorder(
+              //               borderSide: BorderSide(color: primaryColor),
+              //               borderRadius: BorderRadius.circular(4),
+              //             ),
+              //             disabledBorder: OutlineInputBorder(
+              //               borderSide: BorderSide(color: Colors.grey[200]!),
+              //               borderRadius: BorderRadius.circular(4),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 16),
+              // Align(
+              //   alignment: Alignment.center,
+              //   child: Text(
+              //     '如果不需要发送到邮箱，请点击下载',
+              //     style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              //   ),
+              // ),
+              // const SizedBox(height: 24),
               Row(
                 children: [
                   Expanded(
@@ -669,7 +673,7 @@ class ExportInspectionDialog extends HookWidget {
                         backgroundColor: colorScheme.secondary,
                       ),
                       child: Text(
-                        '下载图片文件',
+                        '导出图片',
                         style: TextStyle(color: colorScheme.onSecondary),
                       ),
                     ),
@@ -735,7 +739,7 @@ class ExportInspectionDialog extends HookWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      child: const Text('下载xlsx文件'),
+                      child: const Text('导出xlsx'),
                     ),
                   ),
                   const SizedBox(width: 12),

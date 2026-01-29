@@ -154,7 +154,7 @@ class InspectionView extends HookConsumerWidget {
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.only(top: 4, bottom: 8),
+                    padding: const EdgeInsets.only(top:4, bottom: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

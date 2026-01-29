@@ -19,14 +19,6 @@ class InspectionPage extends HookConsumerWidget {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           actions: [
-            IconButton(
-              onPressed: () {
-                WidgetsBinding.instance.addPostFrameCallback((_) async {
-                  await refreshFnRef.value();
-                });
-              },
-              icon: const Icon(Icons.refresh, size: 20),
-            ), 
             TextButton(
               onPressed: () async {
                 final result = await context.router.push<bool>(
@@ -40,7 +32,7 @@ class InspectionPage extends HookConsumerWidget {
                 "新增",
                 style: TextStyle(
                   color: colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ),

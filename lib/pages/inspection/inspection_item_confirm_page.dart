@@ -30,6 +30,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 
     final inspectionItem = useState<InspectionItem?>(null);
     final isLoading = useState(true);
+    final isSubmitting = useState(false);
 
     final mediaMap = useState<Map<String, List<TemporaryMedia>>>({});
     void updateMedia(String key, List<TemporaryMedia> medias) {
@@ -83,6 +84,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
     }, []);
 
     Future<void> handleSubmit() async {
+      if (isSubmitting.value) return;
       final bool hasImages =
           mediaMap.value.values.any((medias) => medias.isNotEmpty);
 
@@ -90,28 +92,33 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         EasyLoading.showInfo('请至少上传一张验货图片');
         return;
       }
-      final Map<String, dynamic> submitData = {};
+      isSubmitting.value = true;
+      try {
+        final Map<String, dynamic> submitData = {};
 
-      mediaMap.value.forEach((key, medias) {
-        if (medias.isNotEmpty) {
-          submitData[key] = medias
-              .map((e) => {
-                    'id': e.id,
-                    'url': e.url,
-                    'thumb_url': e.thumbUrl,
-                    if (e.uuid != null) 'uuid': e.uuid,
-                  })
-              .toList();
-        }
-      });
+        mediaMap.value.forEach((key, medias) {
+          if (medias.isNotEmpty) {
+            submitData[key] = medias
+                .map((e) => {
+                      'id': e.id,
+                      'url': e.url,
+                      'thumb_url': e.thumbUrl,
+                      if (e.uuid != null) 'uuid': e.uuid,
+                    })
+                .toList();
+          }
+        });
 
-      submitData['remark'] = remarkController.text;
-      submitData['status'] = 1;
+        submitData['remark'] = remarkController.text;
+        submitData['status'] = 1;
 
-      await updateInspectionItem(id, submitData);
+        await updateInspectionItem(id, submitData);
 
-      EasyLoading.showSuccess('验货完成');
-      if (context.mounted) Navigator.pop(context);
+        EasyLoading.showSuccess('验货完成');
+        if (context.mounted) Navigator.pop(context);
+      } finally {
+        isSubmitting.value = false;
+      }
     }
 
     return Scaffold(
@@ -154,7 +161,11 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
               ],
             ),
           ),
-          _buildBottomBtn(onPressed: handleSubmit, primaryColor: primaryColor),
+          _buildBottomBtn(
+            onPressed: handleSubmit,
+            primaryColor: primaryColor,
+            isSubmitting: isSubmitting.value,
+          ),
         ],
       ),
     );
@@ -163,24 +174,45 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
   Widget _buildBottomBtn({
     VoidCallback? onPressed,
     required Color primaryColor,
+    required bool isSubmitting,
   }) =>
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         color: Colors.white,
         child: SafeArea(
           child: ElevatedButton(
-            onPressed: onPressed,
+            onPressed: isSubmitting ? null : onPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               minimumSize: const Size(double.infinity, 44),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
             ),
-            child: const Text('完成验货',
-                style: TextStyle(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isSubmitting == true) ...[
+                  const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  isSubmitting == true ? '正在提交' : '完成验货',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white)),
+                    color: Colors.white,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       );

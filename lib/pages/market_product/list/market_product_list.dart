@@ -36,7 +36,7 @@ class MarketProductListPage extends HookConsumerWidget {
                 "新增",
                 style: TextStyle(
                   color: colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ),

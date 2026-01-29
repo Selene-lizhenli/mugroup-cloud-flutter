@@ -577,38 +577,42 @@ class CartPage extends HookConsumerWidget {
                     EasyLoading.showInfo("请先选择用户!");
                     return;
                   }
-                  EasyLoading.show(status: '加载中...');
-                  final data = {
-                    "sample_items": items
-                        .map((item) => {
-                              "sample_id": item.sample.id,
-                              "price": item.price,
-                              "qty": item.count
-                            })
-                        .toList(),
-                    "user_id": user.value?.id,
-                    "curreny": quotationInfo?.curreny,
-                    "exchange": quotationInfo?.exchange,
-                    "commission_rate": quotationInfo?.commissionRate,
-                    "is_tax_inclusive": quotationInfo?.showTaxRatePrice
-                  };
-                  await storeShowroomQuotation(data);
-                  EasyLoading.showSuccess('创建报价单成功!');
-                  cart.clear();
-                  user.value = null;
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
+                  try {
+                    EasyLoading.show(status: '加载中...');
+                    final data = {
+                      "sample_items": items
+                          .map((item) => {
+                                "sample_id": item.sample.id,
+                                "price": item.price,
+                                "qty": item.count
+                              })
+                          .toList(),
+                      "user_id": user.value?.id,
+                      "curreny": quotationInfo?.curreny,
+                      "exchange": quotationInfo?.exchange,
+                      "commission_rate": quotationInfo?.commissionRate,
+                      "is_tax_inclusive": quotationInfo?.showTaxRatePrice
+                    };
+                    await storeShowroomQuotation(data);
+                    EasyLoading.showSuccess('创建报价单成功!'); 
+                    cart.clear();
+                    user.value = null;
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  } catch (e) {
+                    EasyLoading.showError('创建报价单失败,$e');
+                  } finally {}
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "提交",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: colorScheme.onPrimary),
                 ),
               ),
             ],
@@ -664,19 +668,17 @@ class CartPage extends HookConsumerWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                           
                                 Text(
                                   "以下设置将对选样车中的所有样品生效",
                                   style: TextStyle(
                                     fontSize: 13,
-                                          color:
+                                    color:
                                         colorScheme.onSurface.withOpacity(0.6),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 10),
-
                             Row(
                               children: [
                                 Text(
@@ -728,7 +730,6 @@ class CartPage extends HookConsumerWidget {
                                 ),
                               ],
                             ),
-                         
                             Row(
                               children: [
                                 Text(
@@ -811,7 +812,8 @@ class CartPage extends HookConsumerWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: colorScheme.outline.withOpacity(0.30),
+                                    color:
+                                        colorScheme.outline.withOpacity(0.30),
                                     width: 0.5,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -988,7 +990,7 @@ class CartPage extends HookConsumerWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.secondary,
                               padding: const EdgeInsets.symmetric(
-                                horizontal:24,
+                                horizontal: 24,
                                 vertical: 12,
                               ),
                               shape: RoundedRectangleBorder(
