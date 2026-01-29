@@ -231,7 +231,12 @@ class QuotePage extends HookConsumerWidget {
                 ),
                 content: Column(
                   children: [
-                    _buildBoundQuoteBar(context, boundQuoteForSupplier),
+                    _buildBoundQuoteBar(context, boundQuoteForSupplier, () {
+                      //清除关联
+                      boundQuoteForSupplier.value = null;
+
+                      quoteSampleSupplierList.value = [];
+                    }),
                     _buildDetailList(context, isLoading.value, groupedData,
                         boundQuoteForSupplier.value),
                   ],
@@ -369,8 +374,8 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBoundQuoteBar(
-      BuildContext context, ValueNotifier<Map<String, dynamic>?> boundState) {
+  Widget _buildBoundQuoteBar(BuildContext context,
+      ValueNotifier<Map<String, dynamic>?> boundState, VoidCallback onPressed) {
     final colorScheme = Theme.of(context).colorScheme;
     final isBound = boundState.value != null;
 
@@ -446,11 +451,12 @@ class QuotePage extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_drop_down_circle_outlined,
-                  size: 20,
-                  color: isBound ? colorScheme.primary : Colors.grey[400],
-                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(Icons.close_rounded,
+                      size: 20, color: colorScheme.primary),
+                  onPressed: onPressed,
+                )
               ],
             ),
           ),
