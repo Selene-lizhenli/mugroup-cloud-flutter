@@ -1195,6 +1195,7 @@ class QuoteProductNewAddRoute
     _i62.Key? key,
     int? quoteId,
     String? supplierId,
+    bool isEmbedded = false,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           QuoteProductNewAddRoute.name,
@@ -1202,6 +1203,7 @@ class QuoteProductNewAddRoute
             key: key,
             quoteId: quoteId,
             supplierId: supplierId,
+            isEmbedded: isEmbedded,
           ),
           initialChildren: children,
         );
@@ -1217,6 +1219,7 @@ class QuoteProductNewAddRoute
         key: args.key,
         quoteId: args.quoteId,
         supplierId: args.supplierId,
+        isEmbedded: args.isEmbedded,
       );
     },
   );
@@ -1227,6 +1230,7 @@ class QuoteProductNewAddRouteArgs {
     this.key,
     this.quoteId,
     this.supplierId,
+    this.isEmbedded = false,
   });
 
   final _i62.Key? key;
@@ -1235,9 +1239,11 @@ class QuoteProductNewAddRouteArgs {
 
   final String? supplierId;
 
+  final bool isEmbedded;
+
   @override
   String toString() {
-    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId}';
+    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId, isEmbedded: $isEmbedded}';
   }
 }
 
@@ -1587,6 +1593,7 @@ class SupplierProductsRoute
     required int supplierId,
     required String supplierNo,
     required String supplierName,
+    String? companyName,
     List<_i59.PageRouteInfo>? children,
   }) : super(
           SupplierProductsRoute.name,
@@ -1596,12 +1603,14 @@ class SupplierProductsRoute
             supplierId: supplierId,
             supplierNo: supplierNo,
             supplierName: supplierName,
+            companyName: companyName,
           ),
           rawPathParams: {
             'quotationId': quotationId,
             'supplierId': supplierId,
             'supplierNo': supplierNo,
             'supplierName': supplierName,
+            'companyName': companyName,
           },
           initialChildren: children,
         );
@@ -1618,6 +1627,7 @@ class SupplierProductsRoute
                 supplierId: pathParams.getInt('supplierId'),
                 supplierNo: pathParams.getString('supplierNo'),
                 supplierName: pathParams.getString('supplierName'),
+                companyName: pathParams.optString('companyName'),
               ));
       return _i44.SupplierProductsPage(
         key: args.key,
@@ -1625,6 +1635,7 @@ class SupplierProductsRoute
         supplierId: args.supplierId,
         supplierNo: args.supplierNo,
         supplierName: args.supplierName,
+        companyName: args.companyName,
       );
     },
   );
@@ -1637,6 +1648,7 @@ class SupplierProductsRouteArgs {
     required this.supplierId,
     required this.supplierNo,
     required this.supplierName,
+    this.companyName,
   });
 
   final _i62.Key? key;
@@ -1649,9 +1661,11 @@ class SupplierProductsRouteArgs {
 
   final String supplierName;
 
+  final String? companyName;
+
   @override
   String toString() {
-    return 'SupplierProductsRouteArgs{key: $key, quotationId: $quotationId, supplierId: $supplierId, supplierNo: $supplierNo, supplierName: $supplierName}';
+    return 'SupplierProductsRouteArgs{key: $key, quotationId: $quotationId, supplierId: $supplierId, supplierNo: $supplierNo, supplierName: $supplierName, companyName: $companyName}';
   }
 }
 

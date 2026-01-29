@@ -17,6 +17,7 @@ class SupplierProductsPage extends HookConsumerWidget {
   final int supplierId;
   final String supplierNo;
   final String supplierName;
+  final String? companyName;
 
   const SupplierProductsPage({
     super.key,
@@ -24,6 +25,7 @@ class SupplierProductsPage extends HookConsumerWidget {
     @pathParam required this.supplierId,
     @pathParam required this.supplierNo,
     @pathParam required this.supplierName,
+    @pathParam this.companyName,
   });
 
   @override
@@ -83,9 +85,45 @@ class SupplierProductsPage extends HookConsumerWidget {
       ),
       body: Column(
         children: [
+          if (companyName != null)
+            Container(
+              margin: const EdgeInsets.fromLTRB(12, 2, 12, 2),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.person,
+                    color: colorScheme.secondary,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '客户: ',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      companyName ?? '暂无',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           // 供应商信息卡片
           Container(
-            margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            margin: const EdgeInsets.fromLTRB(12, 2, 12, 2),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: colorScheme.surface,
@@ -98,13 +136,13 @@ class SupplierProductsPage extends HookConsumerWidget {
                   color: colorScheme.secondary,
                   size: 24,
                 ),
-                // const SizedBox(width: 8),
-                // Text(
-                //   '供应商: ',
-                //   style: theme.textTheme.bodyMedium?.copyWith(
-                //     color: colorScheme.onSurfaceVariant,
-                //   ),
-                // ),
+                const SizedBox(width: 8),
+                Text(
+                  '供应商: ',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

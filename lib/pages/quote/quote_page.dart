@@ -573,6 +573,7 @@ class QuotePage extends HookConsumerWidget {
                           supplierId: supplierId,
                           supplierNo: item.supplierNo ?? '',
                           supplierName: item.name ?? '',
+                          companyName: boundQuote['company'].name ?? '',
                         ),
                       );
                     }
