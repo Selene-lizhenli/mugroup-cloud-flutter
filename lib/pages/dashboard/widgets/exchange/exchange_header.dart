@@ -39,85 +39,105 @@ class ExchangeChartHeader extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (sheetContext) {
         final maxHeight = MediaQuery.of(sheetContext).size.height * 0.7;
-        return SafeArea(
-          child: Container(
-            constraints: BoxConstraints(maxHeight: maxHeight),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '选择维度',
-                          style: Theme.of(sheetContext)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
+        return Container(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical:0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  // 顶部渐变背景（不影响下面的列表区域）
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            colorScheme.primary.withOpacity(0.18),
+                            colorScheme.surface.withOpacity(0.0),
+                          ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.of(sheetContext).pop(),
-                        icon: Icon(
-                          Icons.close,
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(height: 1, color: colorScheme.outlineVariant),
-                if (currencyList != null && currencyList!.isNotEmpty)
-                  Flexible(
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      itemCount: currencyList!.length,
-                      separatorBuilder: (_, __) =>
-                          Divider(height: 1, color: colorScheme.outlineVariant),
-                      itemBuilder: (ctx, index) {
-                        final dimension = currencyList![index];
-                        final isSelected =
-                            selectedDimension?.shortName == dimension.shortName;
-
-                        return ListTile(
-                          dense: true,
-                          leading: Icon(
-                            isSelected
-                                ? Icons.check_box
-                                : Icons.check_box_outline_blank,
-                            size: 18,
-                            color: isSelected
-                                ? colorScheme.primary
-                                : colorScheme.outline,
-                          ),
-                          title: Text(
-                            '${dimension.name} ${dimension.shortName}',
-                            style: TextStyle(
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurface,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                          onTap: () =>
-                              Navigator.of(sheetContext).pop(dimension),
-                        );
-                      },
                     ),
                   ),
-              ],
-            ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '选择维度',
+                            style: Theme.of(sheetContext)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                          icon: Icon(
+                            Icons.close,
+                            color: colorScheme.outline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Divider(height: 1, color: colorScheme.outlineVariant),
+              if (currencyList != null && currencyList!.isNotEmpty)
+                Flexible(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    itemCount: currencyList!.length,
+                    separatorBuilder: (_, __) =>
+                        Divider(height: 1, color: colorScheme.outlineVariant),
+                    itemBuilder: (ctx, index) {
+                      final dimension = currencyList![index];
+                      final isSelected =
+                          selectedDimension?.shortName == dimension.shortName;
+
+                      return ListTile(
+                        dense: true,
+                        leading: Icon(
+                          isSelected
+                              ? Icons.check_box
+                              : Icons.check_box_outline_blank,
+                          size: 18,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.outline,
+                        ),
+                        title: Text(
+                          '${dimension.name} ${dimension.shortName}',
+                          style: TextStyle(
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.onSurface,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        onTap: () => Navigator.of(sheetContext).pop(dimension),
+                      );
+                    },
+                  ),
+                ),
+            ],
           ),
         );
       },

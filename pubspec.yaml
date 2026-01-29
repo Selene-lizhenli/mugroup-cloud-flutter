@@ -173,6 +173,8 @@ flutter:
     - assets/splash.png 
     - assets/icons/wxwork.svg
     - assets/element/empty.png
+    - assets/mu/gongpai.png
+    - assets/mu/kaiyueren.png
 
   #
   # For details regarding fonts from package dependencies,
