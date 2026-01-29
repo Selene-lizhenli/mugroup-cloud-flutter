@@ -166,8 +166,7 @@ class QuoteSelect extends HookConsumerWidget {
                                     borderRadius: BorderRadius.circular(8),
                                     onTap: () {
                                       if (context.mounted) {
-                                        context.router.push(
-                                            const MarketProductSupplierCreateRoute());
+                                        context.router.push(QuoteCreateRoute());
                                         return;
                                       }
                                     },
@@ -185,7 +184,7 @@ class QuoteSelect extends HookConsumerWidget {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '创建新供应商',
+                                                '创建新带客记录',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
