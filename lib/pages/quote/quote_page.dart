@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/models/supply/supplier.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
@@ -8,11 +11,11 @@ import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
 @RoutePage()
 class QuotePage extends HookConsumerWidget {
@@ -26,6 +29,7 @@ class QuotePage extends HookConsumerWidget {
 
     final isLoading = useState(true);
     final list = useState<List<QuotationList>>([]);
+    final supplierList = useState<List<Supplier>>([]);
     final selectedQuote = useState<Map<String, dynamic>?>(null);
     final selectedSupplier = useState<Map<String, dynamic>?>(null);
 
@@ -38,22 +42,40 @@ class QuotePage extends HookConsumerWidget {
       isLoading.value = true;
       final searchText = searchController.text.trim();
 
-      final paramsData = {
+      // 1. 准备带客记录参数
+      final quoteParams = {
+        "search": searchText,
+        "page": "1",
+        "pageSize": "20", // 这里的 pageSize 可以根据需要调整，首页展示可能不需要那么多
+        "type": "market",
+      };
+
+      // 2. 准备供应商参数
+      final supplierParams = {
         "search": searchText,
         "page": "1",
         "pageSize": "20",
-        "type": "market",
-        // 如果有 quoteAt 逻辑，可以在这里加
       };
 
       try {
-        final newData = await getShowroomQuotation(paramsData);
+        // 并行请求两个接口，提高效率
+        final results = await Future.wait([
+          getShowroomQuotation(quoteParams),
+          getSupplySuppliers(queryParameters: supplierParams),
+        ]);
 
         if (context.mounted) {
-          list.value = newData.data;
-          isLoading.value = false;
+          // 更新带客记录
+          final quoteData = results[0] as dynamic; // 根据实际返回类型强转
+          list.value = quoteData.data;
+
+          // 更新供应商列表
+          final supplierData = results[1] as dynamic; // 根据实际返回类型强转
+          supplierList.value = supplierData.data;
         }
       } catch (e) {
+        debugPrint("Error fetching data: $e");
+      } finally {
         if (context.mounted) {
           isLoading.value = false;
         }
@@ -67,6 +89,7 @@ class QuotePage extends HookConsumerWidget {
         final current = searchController.text.trim();
         if (current == lastSearch.value) return;
         lastSearch.value = current;
+
         fetchData();
       }
 
@@ -98,7 +121,7 @@ class QuotePage extends HookConsumerWidget {
               QuoteSearchBar(controller: searchController),
               _buildSectionCard(
                 context,
-                title: "近期记录",
+                title: "带客记录",
                 icon: Icons.access_time_filled_rounded,
                 iconColor: Colors.blueAccent,
                 action: Row(
@@ -126,15 +149,30 @@ class QuotePage extends HookConsumerWidget {
               const SizedBox(height: 16),
               _buildSectionCard(
                 context,
-                title: "带客记录详情",
+                title: "店铺列表",
                 icon: Icons.list_alt_rounded,
                 iconColor: Colors.orangeAccent,
-                content: _buildDetailList(context, isLoading.value, list.value),
+                action: ActionPillButton(
+                  label: '供应商',
+                  icon: Icons.add,
+                  // radius: 12,
+                  backgroundColor: colorScheme.primary,
+                  textColor: colorScheme.onSecondary,
+                  onTap: () {
+                    //选择客户 就是报价单
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) => AddSupplierSheet(quotationId: 1),
+                    );
+                  },
+                ),
+                content: _buildDetailList(
+                    context, isLoading.value, supplierList.value),
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
                 context,
-                title: "创建产品",
+                title: "添加产品",
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
                 content: Column(
@@ -351,7 +389,7 @@ class QuotePage extends HookConsumerWidget {
   }
 
   Widget _buildDetailList(
-      BuildContext context, bool isLoading, List<QuotationList> list) {
+      BuildContext context, bool isLoading, List<Supplier> supplierList) {
     if (isLoading) {
       return const Padding(
         padding: EdgeInsets.all(24),
@@ -359,7 +397,7 @@ class QuotePage extends HookConsumerWidget {
       );
     }
 
-    if (list.isEmpty) {
+    if (supplierList.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 24),
         alignment: Alignment.center,
@@ -370,7 +408,7 @@ class QuotePage extends HookConsumerWidget {
       );
     }
 
-    final detailList = list.take(3).toList();
+    final detailList = supplierList.take(2).toList();
 
     return ListView.separated(
       shrinkWrap: true,
@@ -386,7 +424,8 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDetailRowItem(BuildContext context, QuotationList item) {
+  Widget _buildDetailRowItem(BuildContext context, Supplier item) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -395,15 +434,32 @@ class QuotePage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.company?.name ?? '无客户名称',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () {
+                    //要在这里确定报价单的id 弹窗
+                    final quoteId = 1;
+                    final supplierId = item.id;
+                    if (quoteId != null && supplierId != null) {
+                      context.router.push(
+                        SupplierProductsRoute(
+                          quotationId: quoteId,
+                          supplierId: supplierId,
+                          supplierNo: item?.supplierNo ?? '',
+                          supplierName: item?.name ?? '',
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    item.name ?? '无店铺名称',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -411,7 +467,7 @@ class QuotePage extends HookConsumerWidget {
                     Container(
                       constraints: const BoxConstraints(maxWidth: 80),
                       child: Text(
-                        "外销员: ${item.creator?.name ?? '暂无'}",
+                        "店铺号: ${item.supplierNo ?? '暂无'}",
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                         maxLines: 1,
@@ -428,9 +484,7 @@ class QuotePage extends HookConsumerWidget {
                     ),
                     Expanded(
                       child: Text(
-                        item.createdAt != null
-                            ? DateFormat('yyyy-MM-dd').format(item.createdAt!)
-                            : '--',
+                        '${item.address}',
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
@@ -443,64 +497,14 @@ class QuotePage extends HookConsumerWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                height: 32,
-                child: OutlinedButton(
-                  onPressed: () {
-                    // 逻辑
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    side: BorderSide(color: Colors.grey.shade300),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "添加供应商",
-                    style: TextStyle(fontSize: 12, color: Colors.black87),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 32,
-                child: FilledButton(
-                  onPressed: () {
-                    // 逻辑
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "从供应商导入",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 32,
-                child: FilledButton(
-                  onPressed: () {
-                    // 逻辑
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "新建",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
+              ActionPillButton(
+                label: '产品',
+                icon: Icons.add,
+                backgroundColor: colorScheme.primary,
+                textColor: Colors.white,
+                onTap: () {
+                  // 你的逻辑
+                },
               ),
             ],
           ),
