@@ -172,9 +172,7 @@ flutter:
     - assets/logo.webp
     - assets/splash.png 
     - assets/icons/wxwork.svg
-    - assets/element/empty.png
-    - assets/mu/gongpai.png
-    - assets/mu/kaiyueren.png
+    - assets/element/empty.png 
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
     - assets/aiTemplets/notepad_001.jpg
