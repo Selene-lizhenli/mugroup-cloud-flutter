@@ -73,8 +73,7 @@ String? _mapCountryToLanguage(String? country) {
       countryLower.contains('法国') ||
       countryLower.contains('belgium') ||
       countryLower.contains('比利时') ||
-      countryLower.contains('switzerland') &&
-          countryLower.contains('french') ||
+      countryLower.contains('switzerland') && countryLower.contains('french') ||
       (countryLower.contains('canada') && countryLower.contains('quebec'))) {
     return 'fr';
   }
@@ -105,11 +104,13 @@ String _getTranslationLanguage(String? quoteLanguage, String? customerCountry) {
 @RoutePage()
 class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   final int? initialMode;
+  final int? quoteId;
   final String? supplierId;
 
   const QuoteProductAddAdaptivePage({
     super.key,
     this.initialMode,
+    this.quoteId,
     this.supplierId,
   });
 
@@ -117,11 +118,11 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final orientation = MediaQuery.of(context).orientation;
     final hasAppliedInitial = useRef(false);
-    
+
     // 默认模式：竖屏为0，横屏为1
     final currentMode = useState<int>(
         initialMode ?? (orientation == Orientation.portrait ? 0 : 1));
-        
+
     final initialSupplier = useState<Map<String, dynamic>?>(null);
     final quoteDetailState = ref.watch(quoteDetailProvider);
 
@@ -129,7 +130,11 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
     final baseInfo = quoteDetailState.baseInfo;
     final quoteLanguage = baseInfo?.language;
     final customerCountry = baseInfo?.company?.location;
-    final quoteId = baseInfo?.id;
+
+
+    //先看quoteDetailState有没有报价单id 然后再看外面传进来的有没有
+    final quoteIdDate = baseInfo?.id ?? quoteId;
+
     final companyId = baseInfo?.company?.id;
 
     // 页面加载后，如果有 supplierId，则请求供应商数据
@@ -171,7 +176,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
       children: [
         QuoteProductAddPortraitView(
           key: const ValueKey('portrait'),
-          quoteId: quoteId,
+          quoteId: quoteIdDate,
           companyId: companyId,
           initialSupplier: initialSupplier.value,
           isActive: currentMode.value == 0,
@@ -179,7 +184,7 @@ class QuoteProductAddAdaptivePage extends HookConsumerWidget {
         ),
         QuoteProductAddLandscapeView(
           key: const ValueKey('landscape'),
-          quoteId: quoteId,
+          quoteId: quoteIdDate,
           companyId: companyId,
           initialSupplier: initialSupplier.value,
           isActive: currentMode.value == 1,

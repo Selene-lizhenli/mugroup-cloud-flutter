@@ -46,6 +46,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
         KeepAliveWrapper(
           child: QuoteProductAddAdaptivePage(
             initialMode: 0,
+            quoteId: quoteId,
             supplierId: supplierId,
           ),
         ),

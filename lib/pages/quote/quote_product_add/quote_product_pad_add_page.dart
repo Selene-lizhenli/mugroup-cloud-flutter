@@ -468,7 +468,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       if (formState?.saveAndValidate() ?? false) {
         final Map<String, dynamic> submitValues = Map.from(formState!.value);
 
-        final supplier = submitValues['supplier'];
+        if (quoteId == null && initialSupplier == null) {
+          EasyLoading.showInfo('没有关联到带客记录或无供应商');
+          return;
+        }
+        final supplier = initialSupplier!;
 
         submitValues['supply_quotes'] = [
           {
@@ -503,7 +507,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           await EasyLoading.show(status: '提交中...');
           await storeShowroomSample({
             ...submitValues,
-            "supplier_id": supplier?['id'],
+            "supplier_id": supplier['id'],
             "quotation_id": quoteId,
             'item_type': 'market_product'
           });
@@ -910,6 +914,45 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                           showActionButtons: true,
                                         ),
                                       );
+                                    } else if (value == 'sku') {
+                                      final currentImages = formKey
+                                          .currentState?.fields['image']?.value;
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => SkuSettingsDialog(
+                                          currentImages: currentImages is List
+                                              ? currentImages
+                                              : [],
+                                          onConfirm: (generatedSku,
+                                              syncSupplier, syncCustomer) {
+                                            if (generatedSku.isEmpty) {
+                                              return;
+                                            }
+
+                                            Map<String, dynamic> patchData = {};
+
+                                            patchData['product_no'] =
+                                                generatedSku;
+
+                                            // 3. 根据勾选同步更新
+                                            if (syncSupplier) {
+                                              patchData['supplier_sku'] =
+                                                  generatedSku;
+                                            }
+                                            if (syncCustomer) {
+                                              patchData['customer_sku'] =
+                                                  generatedSku;
+                                            }
+
+                                            formKey.currentState
+                                                ?.patchValue(patchData);
+
+                                            EasyLoading.showSuccess(
+                                                'SKU已生成并填充');
+                                          },
+                                        ),
+                                      );
                                     }
                                   },
                                   itemBuilder: (BuildContext context) {
@@ -947,6 +990,31 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                           ],
                                         ),
                                       ),
+                                      PopupMenuItem<String>(
+                                        value: 'sku',
+                                        height: 44,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.primary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Icon(
+                                                Icons.settings_rounded,
+                                                size: 16,
+                                                color: colorScheme.primary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text('SKU设置', style: textStyle),
+                                          ],
+                                        ),
+                                      ),
                                       const PopupMenuDivider(height: 1),
                                       PopupMenuItem<String>(
                                         value: 'setting',
@@ -977,132 +1045,132 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                   },
                                 ),
                                 children: [
-                                  FormBuilderField<Map<String, dynamic>>(
-                                    name: 'supplier',
-                                    builder: (field) {
-                                      final supplier = field.value;
-                                      return Row(
-                                        children: [
-                                          Expanded(
-                                              child: GestureDetector(
-                                            onTap: () async {
-                                              final selectedSupplier =
-                                                  await showModalBottomSheet<
-                                                      Map<String, dynamic>>(
-                                                context: context,
-                                                isScrollControlled: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                builder: (_) =>
-                                                    const SupplierSelect(),
-                                              );
+                                  // FormBuilderField<Map<String, dynamic>>(
+                                  //   name: 'supplier',
+                                  //   builder: (field) {
+                                  //     final supplier = field.value;
+                                  //     return Row(
+                                  //       children: [
+                                  //         Expanded(
+                                  //             child: GestureDetector(
+                                  //           onTap: () async {
+                                  //             final selectedSupplier =
+                                  //                 await showModalBottomSheet<
+                                  //                     Map<String, dynamic>>(
+                                  //               context: context,
+                                  //               isScrollControlled: true,
+                                  //               backgroundColor:
+                                  //                   Colors.transparent,
+                                  //               builder: (_) =>
+                                  //                   const SupplierSelect(),
+                                  //             );
 
-                                              if (selectedSupplier != null) {
-                                                field.didChange(
-                                                    selectedSupplier);
-                                              }
-                                            },
-                                            child: AbsorbPointer(
-                                              child: Input(
-                                                label: '供应商',
-                                                showClearButton: false,
-                                                isRequired: true,
-                                                value: supplier == null
-                                                    ? ''
-                                                    : (supplier['short_name'] ??
-                                                        supplier['name'] ??
-                                                        ''),
-                                                hintText: '请选择供应商',
-                                                errorText: field.errorText,
-                                              ),
-                                            ),
-                                          )),
-                                          const SizedBox(width: 8), // 间距
-                                          Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 28),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  final currentImages = formKey
-                                                      .currentState
-                                                      ?.fields['image']
-                                                      ?.value;
+                                  //             if (selectedSupplier != null) {
+                                  //               field.didChange(
+                                  //                   selectedSupplier);
+                                  //             }
+                                  //           },
+                                  //           child: AbsorbPointer(
+                                  //             child: Input(
+                                  //               label: '供应商',
+                                  //               showClearButton: false,
+                                  //               isRequired: true,
+                                  //               value: supplier == null
+                                  //                   ? ''
+                                  //                   : (supplier['short_name'] ??
+                                  //                       supplier['name'] ??
+                                  //                       ''),
+                                  //               hintText: '请选择供应商',
+                                  //               errorText: field.errorText,
+                                  //             ),
+                                  //           ),
+                                  //         )),
+                                  //         const SizedBox(width: 8), // 间距
+                                  //         Padding(
+                                  //             padding: const EdgeInsets.only(
+                                  //                 top: 28),
+                                  //             child: InkWell(
+                                  //               onTap: () {
+                                  //                 final currentImages = formKey
+                                  //                     .currentState
+                                  //                     ?.fields['image']
+                                  //                     ?.value;
 
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        SkuSettingsDialog(
-                                                      currentImages:
-                                                          currentImages is List
-                                                              ? currentImages
-                                                              : [],
-                                                      onConfirm: (generatedSku,
-                                                          syncSupplier,
-                                                          syncCustomer) {
-                                                        if (generatedSku
-                                                            .isEmpty) {
-                                                          return;
-                                                        }
+                                  //                 showDialog(
+                                  //                   context: context,
+                                  //                   builder: (context) =>
+                                  //                       SkuSettingsDialog(
+                                  //                     currentImages:
+                                  //                         currentImages is List
+                                  //                             ? currentImages
+                                  //                             : [],
+                                  //                     onConfirm: (generatedSku,
+                                  //                         syncSupplier,
+                                  //                         syncCustomer) {
+                                  //                       if (generatedSku
+                                  //                           .isEmpty) {
+                                  //                         return;
+                                  //                       }
 
-                                                        Map<String, dynamic>
-                                                            patchData = {};
+                                  //                       Map<String, dynamic>
+                                  //                           patchData = {};
 
-                                                        patchData[
-                                                                'product_no'] =
-                                                            generatedSku;
+                                  //                       patchData[
+                                  //                               'product_no'] =
+                                  //                           generatedSku;
 
-                                                        if (syncSupplier) {
-                                                          patchData[
-                                                                  'supplier_sku'] =
-                                                              generatedSku;
-                                                        }
-                                                        if (syncCustomer) {
-                                                          patchData[
-                                                                  'customer_sku'] =
-                                                              generatedSku;
-                                                        }
+                                  //                       if (syncSupplier) {
+                                  //                         patchData[
+                                  //                                 'supplier_sku'] =
+                                  //                             generatedSku;
+                                  //                       }
+                                  //                       if (syncCustomer) {
+                                  //                         patchData[
+                                  //                                 'customer_sku'] =
+                                  //                             generatedSku;
+                                  //                       }
 
-                                                        formKey.currentState
-                                                            ?.patchValue(
-                                                                patchData);
+                                  //                       formKey.currentState
+                                  //                           ?.patchValue(
+                                  //                               patchData);
 
-                                                        EasyLoading.showSuccess(
-                                                            'SKU已生成并填充');
-                                                      },
-                                                    ),
-                                                  );
-                                                },
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: colorScheme
-                                                            .primary),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                    color: colorScheme.primary,
-                                                  ),
-                                                  child: const Text(
-                                                    "SKU设置",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ))
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                  //                       EasyLoading.showSuccess(
+                                  //                           'SKU已生成并填充');
+                                  //                     },
+                                  //                   ),
+                                  //                 );
+                                  //               },
+                                  //               borderRadius:
+                                  //                   BorderRadius.circular(4),
+                                  //               child: Container(
+                                  //                 padding: const EdgeInsets
+                                  //                     .symmetric(
+                                  //                     horizontal: 8,
+                                  //                     vertical: 8),
+                                  //                 decoration: BoxDecoration(
+                                  //                   border: Border.all(
+                                  //                       color: colorScheme
+                                  //                           .primary),
+                                  //                   borderRadius:
+                                  //                       BorderRadius.circular(
+                                  //                           4),
+                                  //                   color: colorScheme.primary,
+                                  //                 ),
+                                  //                 child: const Text(
+                                  //                   "SKU设置",
+                                  //                   style: TextStyle(
+                                  //                     fontSize: 12,
+                                  //                     color: Colors.white,
+                                  //                     fontWeight:
+                                  //                         FontWeight.w500,
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             ))
+                                  //       ],
+                                  //     );
+                                  //   },
+                                  // ),
                                   ...buildFlowSection(basicInfoFieldNames),
                                 ],
                               ),
