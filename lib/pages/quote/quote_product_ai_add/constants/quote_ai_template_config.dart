@@ -82,7 +82,24 @@ const List<TemplateOption> kQuoteAiTemplates = [
   ),
 ];
 
+const List<TemplateOption> kQuoteAiNotePadTemplates = [
+  TemplateOption(
+    id: '001',
+    name: '模板1',
+    previewImageUrl:
+        'https://s3.woyou.fun:12223/tenant-cloud/showroom/sample/MU202601260033/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260126122836_75_26.jpg',
+    columns: [
+      AppColumns.itemNo,
+      AppColumns.price,
+      AppColumns.outCarton,
+      AppColumns.volume,
+      AppColumns.description,
+    ],
+  ),
+];
 String get kDefaultTemplateId => kQuoteAiTemplates.first.id;
+
+String get kDefaultNotePadTemplateId => kQuoteAiNotePadTemplates.first.id;
 
 TemplateOption getTemplateById(String id) {
   return kQuoteAiTemplates.firstWhere((t) => t.id == id,

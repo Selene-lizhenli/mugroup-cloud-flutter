@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -10,22 +11,8 @@ import 'package:cloud/services/sample.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-class ColumnConfig {
-  final String key;
-  final String label;
-  final double width;
-  const ColumnConfig(this.key, this.label, {this.width = 80.0});
-}
-
-const List<ColumnConfig> _kTableColumns = [
-  ColumnConfig('price', '供应商报价', width: 80),
-  ColumnConfig('out_carton', '外装箱量', width: 80),
-  ColumnConfig('item_no', '供应商货号', width: 80),
-  ColumnConfig('size', '尺寸', width: 80),
-  ColumnConfig('description', '描述', width: 120),
-];
 
 /// 单个产品条目（一行数据）
 class ProductDraftItem {
@@ -72,17 +59,20 @@ class ProductAiAddState {
   final List<ImageProductGroup> groups;
   final bool isGlobalLoading;
   final bool isSubmitting;
+  final String currentTemplateId;
 
   ProductAiAddState({
     this.groups = const [],
     this.isGlobalLoading = false,
     this.isSubmitting = false,
-  });
+    String? currentTemplateId,
+  }) : currentTemplateId = currentTemplateId ?? kDefaultNotePadTemplateId;
 
   ProductAiAddState copyWith({
     List<ImageProductGroup>? groups,
     bool? isGlobalLoading,
     bool? isSubmitting,
+    String? currentTemplateId,
   }) {
     return ProductAiAddState(
       groups: groups ?? this.groups,
@@ -96,6 +86,11 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   @override
   ProductAiAddState build() {
     return ProductAiAddState();
+  }
+
+  void changeTemplate(String templateId) {
+    if (state.currentTemplateId == templateId) return;
+    state = state.copyWith(currentTemplateId: templateId);
   }
 
   // 图片列表变化时，同步 Groups
@@ -135,7 +130,11 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
     final user = ref.read(userProvider).user;
 
-    List<ImageProductGroup> tempGroups = List.from(state.groups);
+    // 1. 获取当前选中的模板配置
+    final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
+      (t) => t.id == state.currentTemplateId,
+      orElse: () => kQuoteAiNotePadTemplates.first,
+    );
 
     for (int i = startIndex; i < images.length; i++) {
       final imageUrl = images[i].url;
@@ -143,6 +142,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
       try {
         final result = await identifyOcr('ExtractQtnNbBasic', {
+          "template_id": state.currentTemplateId, // 传递模板 ID 给后端
           "department": user?.department?.name,
           "employee_name": user?.name,
           "employee_number": user?.jobNumber,
@@ -153,40 +153,37 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             result['success'] == true &&
             result['data'] is List) {
           final dataList = result['data'] as List;
-
-          if (dataList.isNotEmpty) {
-            for (var itemData in dataList) {
-              Map<String, String> rowMap = {};
-              for (var col in _kTableColumns) {
-                String rawVal = (itemData[col.key] ?? '').toString().trim();
-                rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
-              }
-              recognizedProducts.add(ProductDraftItem(data: rowMap));
+          for (var itemData in dataList) {
+            Map<String, String> rowMap = {};
+            // 2. 关键：根据当前模板定义的 columns 动态提取 key
+            for (var col in currentTemplate.columns) {
+              String rawVal = (itemData[col.key] ?? '').toString().trim();
+              rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
             }
+            recognizedProducts.add(ProductDraftItem(data: rowMap));
           }
         }
       } catch (e) {
         debugPrint('OCR Error: $e');
       }
 
+      // 3. 如果识别为空，生成带当前模板所有 key 的空行
       if (recognizedProducts.isEmpty) {
-        Map<String, String> errorMap = {};
-        for (var col in _kTableColumns) {
-          errorMap[col.key] = '-';
+        Map<String, String> emptyMap = {};
+        for (var col in currentTemplate.columns) {
+          emptyMap[col.key] = '-';
         }
-        recognizedProducts.add(ProductDraftItem(data: errorMap));
+        recognizedProducts.add(ProductDraftItem(data: emptyMap));
       }
 
+      // 更新状态逻辑保持不变...
       if (i < state.groups.length) {
-        // 重新获取最新的 list 防止期间被删除
-        tempGroups = List.from(state.groups);
-        if (i < tempGroups.length) {
-          tempGroups[i] = tempGroups[i].copyWith(
-            products: recognizedProducts,
-            isRecognizing: false,
-          );
-          state = state.copyWith(groups: tempGroups);
-        }
+        final tempGroups = List<ImageProductGroup>.from(state.groups);
+        tempGroups[i] = tempGroups[i].copyWith(
+          products: recognizedProducts,
+          isRecognizing: false,
+        );
+        state = state.copyWith(groups: tempGroups);
       }
     }
     state = state.copyWith(isGlobalLoading: false);
@@ -315,7 +312,14 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
 
+    final isTemplateExpanded = useState(true);
+
     final currentMediaList = providerState.groups.map((e) => e.media).toList();
+
+    final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
+      (t) => t.id == providerState.currentTemplateId,
+      orElse: () => kQuoteAiNotePadTemplates.first,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -326,10 +330,17 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
-                  // 1. 顶部图片上传
-                  _buildUploadArea(currentMediaList, (newImages) {
-                    controller.onImagesChanged(newImages, ref);
-                  }),
+                  _buildCollapsibleTemplateSelector(
+                    context,
+                    currentTemplate,
+                    isExpanded: isTemplateExpanded,
+                    colorScheme: colorScheme,
+                    onSelect: (id) => controller.changeTemplate(id),
+                    currentMediaList: currentMediaList,
+                    onImagesChanged: (newImages) {
+                      controller.onImagesChanged(newImages, ref);
+                    },
+                  ),
 
                   // 2. 提示栏
                   _buildInfoBar(colorScheme),
@@ -353,7 +364,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       itemBuilder: (context, groupIndex) {
                         final group = providerState.groups[groupIndex];
                         return _buildGroupCard(context, groupIndex, group,
-                            controller, colorScheme);
+                            currentTemplate, controller, colorScheme);
                       },
                     ),
                 ],
@@ -366,35 +377,210 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildUploadArea(List<TemporaryMedia>? value,
-      ValueChanged<List<TemporaryMedia>?> onChanged) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2))
-              ],
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              scrollDirection: Axis.horizontal,
-              child: ImageUploader(
-                customIcon: Icons.camera_alt,
-                value: value,
-                onChanged: onChanged,
+  Widget _buildCollapsibleTemplateSelector(
+    BuildContext context,
+    TemplateOption currentTemplate, {
+    required ValueNotifier<bool> isExpanded,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required Function(List<TemporaryMedia>?) onImagesChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () {
+              isExpanded.value = !isExpanded.value;
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.dashboard_customize_outlined,
+                      size: 18, color: colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    '识别模板 (点击卡片内相机直接上传文件识别)',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  ),
+                  const Spacer(),
+                  AnimatedRotation(
+                    turns: isExpanded.value ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(Icons.keyboard_arrow_down,
+                        color: Colors.grey[500]),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-      ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              height: isExpanded.value ? null : 0,
+              child: Column(
+                children: [
+                  _buildTemplateListContent(
+                    context: context,
+                    currentId: currentTemplate.id,
+                    colorScheme: colorScheme,
+                    onSelect: onSelect,
+                    currentMediaList: currentMediaList,
+                    onImagesChanged: onImagesChanged,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTemplateListContent({
+    required BuildContext context,
+    required String currentId,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required Function(List<TemporaryMedia>?) onImagesChanged,
+  }) {
+    const double kItemHeight = 82.0;
+
+    return SizedBox(
+      height: kItemHeight,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: kQuoteAiNotePadTemplates.length,
+        separatorBuilder: (c, i) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final t = kQuoteAiNotePadTemplates[index];
+          final bool isSelected = t.id == currentId;
+
+          final primaryColor = colorScheme.primary;
+          final borderColor =
+              isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
+          final bgColor =
+              isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
+
+          return Container(
+            width: 160,
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: borderColor,
+                width: isSelected ? 1 : 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => onSelect(t.id),
+                    borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(10)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (var config in t.columns) ...[
+                            if (config.key == 'item_no') ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      config.label,
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => _showPreviewDialog(
+                                        context, t.previewImageUrl),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 0),
+                                      child: Icon(
+                                        Icons.visibility_outlined,
+                                        size: 20, // 大眼睛
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else ...[
+                              Text(
+                                config.label,
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ]
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 分割线
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Colors.grey.withOpacity(0.1),
+                ),
+
+                Listener(
+                  onPointerDown: (_) {
+                    if (!isSelected) {
+                      onSelect(t.id);
+                    }
+                  },
+                  child: SizedBox(
+                    width: 80,
+                    child: ImageUploader(
+                      customIcon: Icons.camera_alt_rounded,
+                      onChanged: (newImages) {
+                        onImagesChanged(newImages);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -430,6 +616,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       BuildContext context,
       int groupIndex,
       ImageProductGroup group,
+      TemplateOption currentTemplate,
       ProductAiAddController controller,
       ColorScheme colorScheme) {
     return Container(
@@ -539,6 +726,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                   return _buildProductRow(
                     context,
                     product,
+                    currentTemplate,
                     isLastRow,
                     (key, val) => controller.updateCell(
                         groupIndex, productIndex, key, val),
@@ -551,19 +739,26 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildProductRow(BuildContext context, ProductDraftItem product,
-      bool isLastRow, Function(String key, String val) onUpdate) {
+  Widget _buildProductRow(
+    BuildContext context,
+    ProductDraftItem product,
+    TemplateOption template, // 传入当前模板
+    bool isLastRow,
+    Function(String key, String val) onUpdate,
+  ) {
     return Column(
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          physics: const ClampingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
-            children: _kTableColumns.asMap().entries.map((colEntry) {
+            // 使用传入模板的 columns 动态生成列
+            children: template.columns.asMap().entries.map((colEntry) {
               final int colIndex = colEntry.key;
               final colConfig = colEntry.value;
               final text = product.getValue(colConfig.key);
-              final isLastCol = colIndex == _kTableColumns.length - 1;
+              final isLastCol = colIndex == template.columns.length - 1;
 
               return Row(
                 children: [
@@ -703,4 +898,48 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+void _showPreviewDialog(BuildContext context, String imageUrl) {
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(ctx),
+          child: InteractiveViewer(
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 500),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.broken_image, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text('暂无预览图',
+                            style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
