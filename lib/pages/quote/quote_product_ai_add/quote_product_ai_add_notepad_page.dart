@@ -78,6 +78,7 @@ class ProductAiAddState {
       groups: groups ?? this.groups,
       isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      currentTemplateId: currentTemplateId ?? this.currentTemplateId,
     );
   }
 }
@@ -93,56 +94,71 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(currentTemplateId: templateId);
   }
 
-  // 图片列表变化时，同步 Groups
+  // --- 新增：删除整个组 ---
+  void removeGroup(int index) {
+    if (index >= state.groups.length) return;
+    final newList = List<ImageProductGroup>.from(state.groups);
+    newList.removeAt(index);
+    state = state.copyWith(groups: newList);
+  }
+
+  // --- 新增：删除组内单个产品行 ---
+  void removeProduct(int groupIndex, int productIndex) {
+    if (groupIndex >= state.groups.length) return;
+    final groups = List<ImageProductGroup>.from(state.groups);
+    final group = groups[groupIndex];
+    if (productIndex >= group.products.length) return;
+
+    final newProducts = List<ProductDraftItem>.from(group.products);
+    newProducts.removeAt(productIndex);
+
+    groups[groupIndex] = group.copyWith(products: newProducts);
+    state = state.copyWith(groups: groups);
+  }
+
+  // --- 修改：追加逻辑 ---
   Future<void> onImagesChanged(
       List<TemporaryMedia>? newImages, WidgetRef ref) async {
     final images = newImages ?? [];
+    if (images.isEmpty) return;
+
     final currentGroups = state.groups;
+    final int startIndex = currentGroups.length;
 
-    // 1. 如果图片减少，直接截取对应数量的组
-    if (images.length < currentGroups.length) {
-      state = state.copyWith(groups: currentGroups.sublist(0, images.length));
-      return;
-    }
+    // 创建新增的占位组
+    final List<ImageProductGroup> addedGroups = images
+        .map((img) => ImageProductGroup(
+              media: img,
+              products: [],
+              isRecognizing: true,
+            ))
+        .toList();
 
-    // 2. 如果图片增加，处理新增的图片
-    if (images.length > currentGroups.length) {
-      final List<ImageProductGroup> newGroups = List.from(currentGroups);
-      final int startIndex = currentGroups.length;
+    // 追加到末尾，不覆盖旧组
+    state = state.copyWith(
+      groups: [...currentGroups, ...addedGroups],
+      isGlobalLoading: true,
+    );
 
-      // 先为新图片添加“加载中”的占位组
-      for (int i = startIndex; i < images.length; i++) {
-        newGroups.add(ImageProductGroup(
-          media: images[i],
-          products: [], // 此时还没有产品
-          isRecognizing: true,
-        ));
-      }
-
-      state = state.copyWith(groups: newGroups, isGlobalLoading: true);
-
-      // 异步处理OCR
-      await _processOcrQueue(startIndex, images, ref);
-    }
+    // 异步处理OCR
+    await _processOcrQueue(startIndex, images, ref);
   }
 
   Future<void> _processOcrQueue(
-      int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
+      int startIndex, List<TemporaryMedia> newImages, WidgetRef ref) async {
     final user = ref.read(userProvider).user;
-
-    // 1. 获取当前选中的模板配置
     final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
       (t) => t.id == state.currentTemplateId,
       orElse: () => kQuoteAiNotePadTemplates.first,
     );
 
-    for (int i = startIndex; i < images.length; i++) {
-      final imageUrl = images[i].url;
+    for (var media in newImages) {
+      final imageUrl = media.url;
       List<ProductDraftItem> recognizedProducts = [];
 
       try {
         final result = await identifyOcr('ExtractQtnNbBasic', {
-          "template_id": state.currentTemplateId, // 传递模板 ID 给后端
+          "template_id": state.currentTemplateId,
           "department": user?.department?.name,
           "employee_name": user?.name,
           "employee_number": user?.jobNumber,
@@ -155,7 +171,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           final dataList = result['data'] as List;
           for (var itemData in dataList) {
             Map<String, String> rowMap = {};
-            // 2. 关键：根据当前模板定义的 columns 动态提取 key
             for (var col in currentTemplate.columns) {
               String rawVal = (itemData[col.key] ?? '').toString().trim();
               rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
@@ -167,23 +182,23 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         debugPrint('OCR Error: $e');
       }
 
-      // 3. 如果识别为空，生成带当前模板所有 key 的空行
       if (recognizedProducts.isEmpty) {
-        Map<String, String> emptyMap = {};
-        for (var col in currentTemplate.columns) {
-          emptyMap[col.key] = '-';
-        }
+        Map<String, String> emptyMap = {
+          for (var col in currentTemplate.columns) col.key: '-'
+        };
         recognizedProducts.add(ProductDraftItem(data: emptyMap));
       }
 
-      // 更新状态逻辑保持不变...
-      if (i < state.groups.length) {
-        final tempGroups = List<ImageProductGroup>.from(state.groups);
-        tempGroups[i] = tempGroups[i].copyWith(
+      // --- 安全更新逻辑 ---
+      final latestGroups = List<ImageProductGroup>.from(state.groups);
+      final targetIndex = latestGroups.indexWhere((g) => g.media == media);
+
+      if (targetIndex != -1) {
+        latestGroups[targetIndex] = latestGroups[targetIndex].copyWith(
           products: recognizedProducts,
           isRecognizing: false,
         );
-        state = state.copyWith(groups: tempGroups);
+        state = state.copyWith(groups: latestGroups);
       }
     }
     state = state.copyWith(isGlobalLoading: false);
@@ -199,56 +214,37 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
   void updateCell(int groupIndex, int productIndex, String key, String value) {
     if (groupIndex >= state.groups.length) return;
-
     final group = state.groups[groupIndex];
     if (productIndex >= group.products.length) return;
-
     final product = group.products[productIndex];
     final newData = Map<String, String>.from(product.data);
     newData[key] = value.isEmpty ? '-' : value;
-
-    // 构建新的产品列表
     final newProducts = List<ProductDraftItem>.from(group.products);
     newProducts[productIndex] = product.copyWith(data: newData);
-
-    // 构建新的组列表
     final newGroups = List<ImageProductGroup>.from(state.groups);
     newGroups[groupIndex] = group.copyWith(products: newProducts);
-
     state = state.copyWith(groups: newGroups);
   }
 
   Future<bool> submitProducts(int? quoteId, String? supplierId) async {
-    // 1. 状态检查
     if (state.isSubmitting) return false;
-
-    // 2. 检查是否有正在识别的组
     if (state.groups.any((g) => g.isRecognizing)) {
       EasyLoading.showToast('请等待所有图片识别完成');
       return false;
     }
-
     if (state.groups.isEmpty) {
       EasyLoading.showToast('请先上传图片');
       return false;
     }
-
-    // 3. 开始提交
     state = state.copyWith(isSubmitting: true);
     EasyLoading.show(status: '保存中...');
-
     try {
       final List<Map<String, dynamic>> submitList = [];
-
       for (var group in state.groups) {
-        if (group.isRecognizing) continue;
-
         for (var product in group.products) {
           final row = product.data;
-
           String? val(String key) =>
               (row[key] == null || row[key] == '-') ? null : row[key];
-
           submitList.add({
             if (quoteId != null) "quotation_id": quoteId,
             if (quoteId != null) "quotation": {},
@@ -262,22 +258,14 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             ],
             'spec': val('size'),
             'description_cn': val('description'),
-            // 修复：这里使用 group.media，因为是一图多品，产品共享图片的
-            // 'image': [group.media],
+            'image': [group.media],
             'item_type': 'market_product'
           });
         }
       }
-
-      if (submitList.isEmpty) {
-        EasyLoading.showInfo('没有有效数据可提交');
-        return false;
-      }
-
       await batchStoreShowroomSample({'products': submitList});
-
       EasyLoading.showSuccess('保存成功');
-      clear(); // 清空
+      clear();
       return true;
     } catch (e) {
       EasyLoading.showError('保存失败: $e');
@@ -287,7 +275,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     }
   }
 
-  // 清空数据
   void clear() {
     state = ProductAiAddState();
   }
@@ -295,14 +282,12 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
 final productAiAddProvider =
     NotifierProvider.autoDispose<ProductAiAddController, ProductAiAddState>(
-  ProductAiAddController.new,
-);
+        ProductAiAddController.new);
 
 @RoutePage()
 class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
   final int? quoteId;
   final String? supplierId;
-
   const QuoteProductAiAddNotepadPage(
       {super.key, this.quoteId, this.supplierId});
 
@@ -311,15 +296,11 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final providerState = ref.watch(productAiAddProvider);
     final controller = ref.read(productAiAddProvider.notifier);
-
     final isTemplateExpanded = useState(true);
-
     final currentMediaList = providerState.groups.map((e) => e.media).toList();
-
     final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
-      (t) => t.id == providerState.currentTemplateId,
-      orElse: () => kQuoteAiNotePadTemplates.first,
-    );
+        (t) => t.id == providerState.currentTemplateId,
+        orElse: () => kQuoteAiNotePadTemplates.first);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -330,30 +311,19 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
-                  _buildCollapsibleTemplateSelector(
-                    context,
-                    currentTemplate,
-                    isExpanded: isTemplateExpanded,
-                    colorScheme: colorScheme,
-                    onSelect: (id) => controller.changeTemplate(id),
-                    currentMediaList: currentMediaList,
-                    onImagesChanged: (newImages) {
-                      controller.onImagesChanged(newImages, ref);
-                    },
-                  ),
-
-                  // 2. 提示栏
+                  _buildCollapsibleTemplateSelector(context, currentTemplate,
+                      isExpanded: isTemplateExpanded,
+                      colorScheme: colorScheme,
+                      onSelect: (id) => controller.changeTemplate(id),
+                      currentMediaList: currentMediaList,
+                      onImagesChanged: (newImages) =>
+                          controller.onImagesChanged(newImages, ref)),
                   _buildInfoBar(colorScheme),
-
-                  // 3. 列表区域
-                  // 全局 Loading (备用)
                   if (providerState.groups.isEmpty &&
                       providerState.isGlobalLoading)
                     const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: CircularProgressIndicator(),
-                    ),
-
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator()),
                   if (providerState.groups.isNotEmpty)
                     ListView.separated(
                       padding: const EdgeInsets.all(10),
@@ -378,33 +348,25 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
   }
 
   Widget _buildCollapsibleTemplateSelector(
-    BuildContext context,
-    TemplateOption currentTemplate, {
-    required ValueNotifier<bool> isExpanded,
-    required ColorScheme colorScheme,
-    required Function(String id) onSelect,
-    required List<TemporaryMedia> currentMediaList,
-    required Function(List<TemporaryMedia>?) onImagesChanged,
-  }) {
+      BuildContext context, TemplateOption currentTemplate,
+      {required ValueNotifier<bool> isExpanded,
+      required ColorScheme colorScheme,
+      required Function(String id) onSelect,
+      required List<TemporaryMedia> currentMediaList,
+      required Function(List<TemporaryMedia>?) onImagesChanged}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
             color: Colors.black.withOpacity(0.03),
             offset: const Offset(0, 2),
-            blurRadius: 4,
-          ),
-        ],
-      ),
+            blurRadius: 4)
+      ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: () {
-              isExpanded.value = !isExpanded.value;
-            },
+            onTap: () => isExpanded.value = !isExpanded.value,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -412,17 +374,14 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                   Icon(Icons.dashboard_customize_outlined,
                       size: 18, color: colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    '识别模板 (点击卡片内相机直接上传文件识别)',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                  ),
+                  Text('识别模板 (点击卡片内相机直接上传文件识别)',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13)),
                   const Spacer(),
                   AnimatedRotation(
-                    turns: isExpanded.value ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(Icons.keyboard_arrow_down,
-                        color: Colors.grey[500]),
-                  ),
+                      turns: isExpanded.value ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(Icons.keyboard_arrow_down,
+                          color: Colors.grey[500])),
                 ],
               ),
             ),
@@ -436,13 +395,12 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               child: Column(
                 children: [
                   _buildTemplateListContent(
-                    context: context,
-                    currentId: currentTemplate.id,
-                    colorScheme: colorScheme,
-                    onSelect: onSelect,
-                    currentMediaList: currentMediaList,
-                    onImagesChanged: onImagesChanged,
-                  ),
+                      context: context,
+                      currentId: currentTemplate.id,
+                      colorScheme: colorScheme,
+                      onSelect: onSelect,
+                      currentMediaList: currentMediaList,
+                      onImagesChanged: onImagesChanged),
                   const SizedBox(height: 12),
                 ],
               ),
@@ -453,18 +411,15 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildTemplateListContent({
-    required BuildContext context,
-    required String currentId,
-    required ColorScheme colorScheme,
-    required Function(String id) onSelect,
-    required List<TemporaryMedia> currentMediaList,
-    required Function(List<TemporaryMedia>?) onImagesChanged,
-  }) {
-    const double kItemHeight = 82.0;
-
+  Widget _buildTemplateListContent(
+      {required BuildContext context,
+      required String currentId,
+      required ColorScheme colorScheme,
+      required Function(String id) onSelect,
+      required List<TemporaryMedia> currentMediaList,
+      required Function(List<TemporaryMedia>?) onImagesChanged}) {
     return SizedBox(
-      height: kItemHeight,
+      height: 82,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -473,109 +428,69 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
         itemBuilder: (context, index) {
           final t = kQuoteAiNotePadTemplates[index];
           final bool isSelected = t.id == currentId;
-
-          final primaryColor = colorScheme.primary;
-          final borderColor =
-              isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
-          final bgColor =
-              isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
-
           return Container(
             width: 160,
             decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: borderColor,
-                width: isSelected ? 1 : 1,
-              ),
-            ),
+                color: isSelected
+                    ? colorScheme.primary.withOpacity(0.04)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                    color: isSelected
+                        ? colorScheme.primary
+                        : Colors.grey.withOpacity(0.2))),
             child: Row(
               children: [
                 Expanded(
-                  child: InkWell(
-                    onTap: () => onSelect(t.id),
-                    borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var config in t.columns) ...[
-                            if (config.key == 'item_no') ...[
-                              Row(
+                    child: InkWell(
+                        onTap: () => onSelect(t.id),
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      config.label,
-                                      style: TextStyle(
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey[600],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => _showPreviewDialog(
-                                        context, t.previewImageUrl),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 0),
-                                      child: Icon(
-                                        Icons.visibility_outlined,
-                                        size: 20, // 大眼睛
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ] else ...[
-                              Text(
-                                config.label,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ]
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 分割线
+                                  for (var config in t.columns)
+                                    config.key == 'item_no'
+                                        ? Row(children: [
+                                            Expanded(
+                                                child: Text(config.label,
+                                                    style: TextStyle(
+                                                        fontSize: 8,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Colors.grey[600]),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis)),
+                                            GestureDetector(
+                                                onTap: () => _showPreviewDialog(
+                                                    context, t.previewImageUrl),
+                                                child: Icon(
+                                                    Icons.visibility_outlined,
+                                                    size: 20,
+                                                    color: Colors.grey[600]))
+                                          ])
+                                        : Text(config.label,
+                                            style: TextStyle(
+                                                fontSize: 8,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis)
+                                ])))),
                 Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.grey.withOpacity(0.1),
-                ),
-
+                    width: 1, height: 40, color: Colors.grey.withOpacity(0.1)),
                 Listener(
-                  onPointerDown: (_) {
-                    if (!isSelected) {
-                      onSelect(t.id);
-                    }
-                  },
-                  child: SizedBox(
-                    width: 80,
-                    child: ImageUploader(
-                      customIcon: Icons.camera_alt_rounded,
-                      onChanged: (newImages) {
-                        onImagesChanged(newImages);
-                      },
-                    ),
-                  ),
-                ),
+                    onPointerDown: (_) {
+                      if (!isSelected) onSelect(t.id);
+                    },
+                    child: SizedBox(
+                        width: 80,
+                        child: ImageUploader(
+                            customIcon: Icons.camera_alt_rounded,
+                            onChanged: onImagesChanged))),
               ],
             ),
           );
@@ -590,25 +505,19 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 14),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'AI自动识别中，点击表格文字可进行修改，支持一图多品。',
-              style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
+          color: colorScheme.primaryContainer.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: colorScheme.primary.withOpacity(0.1))),
+      child: Row(children: [
+        Icon(Icons.auto_awesome, color: colorScheme.primary, size: 14),
+        const SizedBox(width: 8),
+        Expanded(
+            child: Text('AI自动识别中，点击表格文字可进行修改，支持一图多品。',
+                style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500)))
+      ]),
     );
   }
 
@@ -619,63 +528,41 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       TemplateOption currentTemplate,
       ProductAiAddController controller,
       ColorScheme colorScheme) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          )
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => controller.toggleGroupExpand(groupIndex),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              color: Colors.grey[50],
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      showFlanImagePreview(
-                        context,
-                        images: [group.media.url],
-                        loop: false,
-                      );
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(4),
-                        image: DecorationImage(
-                          image: NetworkImage(group.media.url),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "图片 ${groupIndex + 1}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        const SizedBox(height: 2),
-                        if (group.isRecognizing)
-                          Row(
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Column(
+          children: [
+            InkWell(
+              onTap: () => controller.toggleGroupExpand(groupIndex),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                color: Colors.grey[50],
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () => showFlanImagePreview(context,
+                            images: [group.media.url], loop: false),
+                        child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(4),
+                                image: DecorationImage(
+                                    image: NetworkImage(group.media.url),
+                                    fit: BoxFit.cover)))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                          Text("图片 ${groupIndex + 1}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14)),
+                          const SizedBox(height: 2),
+                          if (group.isRecognizing)
+                            Row(children: [
                               SizedBox(
                                   width: 10,
                                   height: 10,
@@ -685,136 +572,146 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                               const SizedBox(width: 6),
                               Text("AI 识别中...",
                                   style: TextStyle(
-                                      color: colorScheme.primary,
-                                      fontSize: 12)),
-                            ],
-                          )
-                        else
-                          Text(
-                            "识别出 ${group.products.length} 项产品",
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 12),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    group.isExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    color: Colors.grey,
-                  ),
-                ],
+                                      color: colorScheme.primary, fontSize: 12))
+                            ])
+                          else
+                            Text("识别出 ${group.products.length} 项产品",
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 12))
+                        ])),
+                    Icon(
+                        group.isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.grey),
+                  ],
+                ),
               ),
             ),
-          ),
-          if (group.isExpanded) ...[
-            if (group.isRecognizing)
-              const Padding(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                    child: Text("正在分析图片内容...",
-                        style: TextStyle(color: Colors.grey))),
-              )
-            else
-              Column(
-                children: group.products.asMap().entries.map((entry) {
-                  final int productIndex = entry.key;
-                  final product = entry.value;
-                  final isLastRow = productIndex == group.products.length - 1;
-
-                  return _buildProductRow(
-                    context,
-                    product,
-                    currentTemplate,
-                    isLastRow,
-                    (key, val) => controller.updateCell(
-                        groupIndex, productIndex, key, val),
-                  );
-                }).toList(),
-              ),
+            if (group.isExpanded) ...[
+              if (group.isRecognizing)
+                const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                        child: Text("正在分析图片内容...",
+                            style: TextStyle(color: Colors.grey))))
+              else
+                Column(
+                    children: group.products
+                        .asMap()
+                        .entries
+                        .map((entry) => _buildProductRow(
+                            context,
+                            groupIndex,
+                            entry.key,
+                            entry.value,
+                            currentTemplate,
+                            entry.key == group.products.length - 1,
+                            controller))
+                        .toList()),
+            ],
           ],
-        ],
-      ),
+        ),
+        Positioned(
+          top: -5,
+          left: -5,
+          child: GestureDetector(
+            onTap: () {
+              controller.removeGroup(groupIndex);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                  color: Colors.red, shape: BoxShape.circle),
+              child: const Icon(Icons.close, size: 12, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildProductRow(
-    BuildContext context,
-    ProductDraftItem product,
-    TemplateOption template, // 传入当前模板
-    bool isLastRow,
-    Function(String key, String val) onUpdate,
-  ) {
+      BuildContext context,
+      int groupIndex,
+      int productIndex,
+      ProductDraftItem product,
+      TemplateOption template,
+      bool isLastRow,
+      ProductAiAddController controller) {
     return Column(
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            // 使用传入模板的 columns 动态生成列
-            children: template.columns.asMap().entries.map((colEntry) {
-              final int colIndex = colEntry.key;
-              final colConfig = colEntry.value;
-              final text = product.getValue(colConfig.key);
-              final isLastCol = colIndex == template.columns.length - 1;
-
-              return Row(
-                children: [
-                  SizedBox(
-                    width: colConfig.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const ClampingScrollPhysics(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: template.columns.asMap().entries.map((colEntry) {
+                    final colConfig = colEntry.value;
+                    final text = product.getValue(colConfig.key);
+                    return Row(
                       children: [
-                        Text(
-                          colConfig.label,
-                          style:
-                              const TextStyle(fontSize: 10, color: Colors.grey),
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 4),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            EditDialog.show(
-                              context,
-                              initialText: text == '-' ? '' : text,
-                              onConfirm: (newText) =>
-                                  onUpdate(colConfig.key, newText),
-                            );
-                          },
-                          child: Container(
-                            constraints: const BoxConstraints(minHeight: 24),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              text,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: text == '-'
-                                    ? Colors.grey[400]
-                                    : Colors.black87,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                        SizedBox(
+                          width: colConfig.width,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(colConfig.label,
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.grey),
+                                  maxLines: 1),
+                              const SizedBox(height: 4),
+                              GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () => EditDialog.show(context,
+                                      initialText: text == '-' ? '' : text,
+                                      onConfirm: (newText) =>
+                                          controller.updateCell(
+                                              groupIndex,
+                                              productIndex,
+                                              colConfig.key,
+                                              newText)),
+                                  child: Container(
+                                      constraints:
+                                          const BoxConstraints(minHeight: 24),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(text,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: text == '-'
+                                                  ? Colors.grey[400]
+                                                  : Colors.black87),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis))),
+                            ],
                           ),
                         ),
+                        if (colEntry.key != template.columns.length - 1)
+                          Container(
+                              width: 1,
+                              height: 24,
+                              color: Colors.grey[200],
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 8)),
                       ],
-                    ),
-                  ),
-                  if (!isLastCol)
-                    Container(
-                      width: 1,
-                      height: 24,
-                      color: Colors.grey[200],
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                ],
-              );
-            }).toList(),
-          ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            // --- 新增：单行产品删除按钮 ---
+            IconButton(
+              icon: const Icon(Icons.remove_circle_outline,
+                  color: Colors.grey, size: 18),
+              onPressed: () =>
+                  controller.removeProduct(groupIndex, productIndex),
+            )
+          ],
         ),
         if (!isLastRow)
           const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
@@ -822,80 +719,49 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomAction(
-    BuildContext context,
-    ColorScheme colorScheme,
-    ProductAiAddState state,
-    ProductAiAddController controller,
-  ) {
-    // 1. 计算总产品数
+  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
+      ProductAiAddState state, ProductAiAddController controller) {
     final int totalProducts =
         state.groups.fold(0, (sum, g) => sum + g.products.length);
-
-    // 2. 检查是否有组在识别中
     final bool hasRecognizing = state.groups.any((g) => g.isRecognizing);
-
-    // 3. 按钮是否可用 (有产品 且 无识别中 且 非提交中)
     final bool canSubmit =
         totalProducts > 0 && !hasRecognizing && !state.isSubmitting;
-
-    // 4. 按钮文案
-    String buttonText = '保存产品 ($totalProducts)';
-    if (hasRecognizing) {
-      buttonText = 'AI识别中...';
-    } else if (state.isSubmitting) {
-      buttonText = '提交中...';
-    }
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-          .copyWith(bottom: MediaQuery.of(context).padding.bottom + 8),
+      padding: EdgeInsets.fromLTRB(
+          16, 8, 16, MediaQuery.of(context).padding.bottom + 8),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))
-        ],
-      ),
-      child: SizedBox(
-        height: 44,
-        child: ElevatedButton(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Color(0xFFEEEEEE)))),
+      child: ElevatedButton(
           onPressed: canSubmit
               ? () async {
                   await controller.submitProducts(quoteId, supplierId);
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
-            disabledForegroundColor: Colors.white.withOpacity(0.8),
-            elevation: canSubmit ? 0 : 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-            textStyle:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (hasRecognizing || state.isSubmitting) ...[
-                const SizedBox(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22)),
+              minimumSize: const Size(double.infinity, 44)),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            if (hasRecognizing || state.isSubmitting) ...[
+              const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Text(buttonText),
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(Colors.white))),
+              const SizedBox(width: 8)
             ],
-          ),
-        ),
-      ),
+            Text(hasRecognizing
+                ? 'AI识别中...'
+                : state.isSubmitting
+                    ? '提交中...'
+                    : '保存产品 ($totalProducts)')
+          ])),
     );
   }
 }
