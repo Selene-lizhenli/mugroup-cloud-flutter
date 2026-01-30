@@ -56,8 +56,7 @@ const List<TemplateOption> kQuoteAiTemplates = [
   TemplateOption(
     id: '001',
     name: '模板1',
-    previewImageUrl:
-        'https://s3.woyou.fun:12223/tenant-cloud/showroom/sample/MU202601260033/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260126122836_75_26.jpg',
+    previewImageUrl: 'assets/aiTemplets/floor_001.jpg',
     columns: [
       AppColumns.itemNo,
       AppColumns.price,
@@ -69,8 +68,7 @@ const List<TemplateOption> kQuoteAiTemplates = [
   TemplateOption(
     id: '002',
     name: '模板2',
-    previewImageUrl:
-        'https://s3.woyou.fun:12223/tenant-cloud/showroom/sample/MU202601260033/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260126122837_76_26.jpg',
+    previewImageUrl: 'assets/aiTemplets/floor_002.jpg',
     columns: [
       AppColumns.itemNo,
       AppColumns.price,
@@ -86,8 +84,7 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
   TemplateOption(
     id: '001',
     name: '模板1',
-    previewImageUrl:
-        'https://s3.woyou.fun:12223/tenant-cloud/showroom/sample/MU202601260033/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260126122836_75_26.jpg',
+    previewImageUrl: 'assets/aiTemplets/notepad_001.jpg',
     columns: [
       AppColumns.itemNo,
       AppColumns.price,

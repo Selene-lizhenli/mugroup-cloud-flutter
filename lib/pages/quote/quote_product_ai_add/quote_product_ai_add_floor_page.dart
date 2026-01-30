@@ -770,7 +770,7 @@ void _showPreviewDialog(BuildContext context, String imageUrl) {
                 color: Colors.white,
               ),
               padding: const EdgeInsets.all(8),
-              child: Image.network(
+              child: Image.asset(
                 imageUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => const SizedBox(
