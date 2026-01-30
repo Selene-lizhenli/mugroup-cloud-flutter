@@ -30,10 +30,9 @@ class QuotePage extends HookConsumerWidget {
     final list = useState<List<QuotationList>>([]);
     final quoteSampleSupplierList = useState<List<QuotationSample>>([]);
 
-    // 关联状态
-    final selectedQuote = useState<Map<String, dynamic>?>(null);
+    // --- 统一使用这个变量作为当前选中的客户上下文 ---
+    final currentQuote = useState<Map<String, dynamic>?>(null);
     final selectedSupplier = useState<Map<String, dynamic>?>(null);
-    final boundQuoteForSupplier = useState<Map<String, dynamic>?>(null);
 
     // --- 分页与展开状态 ---
     final isRecordsExpanded = useState(false);
@@ -44,6 +43,17 @@ class QuotePage extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final lastSearch = useRef('');
+
+    // 辅助方法：统一客户选择逻辑
+    Future<void> pickQuote() async {
+      final result = await showModalBottomSheet<Map<String, dynamic>>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => const QuoteSelect());
+      if (result != null) {
+        currentQuote.value = result;
+      }
+    }
 
     // 获取带客记录列表
     Future<void> fetchData() async {
@@ -84,7 +94,7 @@ class QuotePage extends HookConsumerWidget {
     }, []);
 
     Future<void> fetchSupplierData() async {
-      final boundQuote = boundQuoteForSupplier.value;
+      final boundQuote = currentQuote.value;
       if (boundQuote?['id'] == null) {
         quoteSampleSupplierList.value = [];
         return;
@@ -102,7 +112,7 @@ class QuotePage extends HookConsumerWidget {
     useEffect(() {
       fetchSupplierData();
       return null;
-    }, [boundQuoteForSupplier.value]);
+    }, [currentQuote.value]);
 
     // 分组逻辑
     final groupedData = useMemoized(() {
@@ -167,66 +177,47 @@ class QuotePage extends HookConsumerWidget {
                       backgroundColor: colorScheme.primary,
                       textColor: Colors.white,
                       onTap: () async {
-                        if (boundQuoteForSupplier.value == null) {
-                          final result =
-                              await showModalBottomSheet<Map<String, dynamic>>(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (_) => const QuoteSelect());
-                          if (result != null) {
-                            boundQuoteForSupplier.value = result;
-                          }
+                        if (currentQuote.value == null) {
+                          await pickQuote();
                         }
 
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) => AddSupplierSheet(
-                                quotationId:
-                                    boundQuoteForSupplier.value?['id']));
+                        if (currentQuote.value != null) {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) => AddSupplierSheet(
+                                  quotationId: currentQuote.value?['id']));
+                        }
                       },
                     ),
                     const SizedBox(width: 10),
                     ActionPillButton(
                       label: '导入供应商',
-                      // icon: Icons.add,
                       backgroundColor: colorScheme.primary,
                       textColor: colorScheme.onSecondary,
                       onTap: () async {
-                        final boundQuote = boundQuoteForSupplier.value;
-
-                        if (boundQuoteForSupplier.value == null) {
-                          final result =
-                              await showModalBottomSheet<Map<String, dynamic>>(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (_) => const QuoteSelect());
-                          if (result != null) {
-                            boundQuoteForSupplier.value = result;
-                          }
+                        if (currentQuote.value == null) {
+                          await pickQuote();
                         }
 
-                        context.router.push(
-                          ProductBatchImportRoute(
-                            quotationId: boundQuote?['id'],
-                          ),
-                        );
+                        if (currentQuote.value != null) {
+                          context.router.push(
+                            ProductBatchImportRoute(
+                              quotationId: currentQuote.value?['id'],
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],
                 ),
                 content: Column(
                   children: [
-                    _buildBoundQuoteBar(context, boundQuoteForSupplier, () {
-                      boundQuoteForSupplier.value = null;
+                    _buildBoundQuoteBar(context, currentQuote, () {
+                      currentQuote.value = null;
                       quoteSampleSupplierList.value = [];
                     }),
-                    _buildDetailList(
-                        context,
-                        isLoading.value,
-                        groupedData,
-                        boundQuoteForSupplier.value,
-                        isSuppliersExpanded,
-                        suppliersPage),
+                    _buildDetailList(context, isLoading.value, groupedData,
+                        currentQuote.value, isSuppliersExpanded, suppliersPage),
                   ],
                 ),
               ),
@@ -259,7 +250,7 @@ class QuotePage extends HookConsumerWidget {
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
                 content: _buildProductAddSection(
-                    context, selectedQuote, selectedSupplier, colorScheme),
+                    context, currentQuote, selectedSupplier, colorScheme),
               ),
               const SizedBox(height: 20),
             ],
@@ -418,7 +409,7 @@ class QuotePage extends HookConsumerWidget {
                   Row(children: [
                     Expanded(
                       child: GestureDetector(
-                        behavior: HitTestBehavior.opaque, // 确保空白处也能点击
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           final quoteId = boundQuote?['id'];
                           final supplierId = supplier?.id;
@@ -569,7 +560,7 @@ class QuotePage extends HookConsumerWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => _showPreSelectionSheet(context, quote, supplier),
-              child: const SizedBox.expand(), // 占满所有可用空间
+              child: const SizedBox.expand(),
             ),
           )
       ],
@@ -615,10 +606,6 @@ class QuotePage extends HookConsumerWidget {
       child: Padding(
           padding: const EdgeInsets.all(20),
           child: Text(txt, style: const TextStyle(color: Colors.grey))));
-
-  void _showError(BuildContext context, String msg) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
 }
 
 Future<void> _showPreSelectionSheet(
@@ -657,7 +644,6 @@ Future<void> _showPreSelectionSheet(
             child: AbsorbPointer(
                 child: Input(
                     label: '客户',
-                    // isRequired: true,
                     value: currentQuote?['company']?.name ?? '',
                     hintText: '请选择客户')),
           ),
