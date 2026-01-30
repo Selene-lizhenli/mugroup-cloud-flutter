@@ -144,7 +144,7 @@ class QuotePage extends HookConsumerWidget {
               QuoteSearchBar(controller: searchController),
               _buildSectionCard(
                 context,
-                title: "带客记录",
+                title: "客户列表",
                 icon: Icons.access_time_filled_rounded,
                 iconColor: Colors.blueAccent,
                 action: IconButton(
@@ -157,13 +157,13 @@ class QuotePage extends HookConsumerWidget {
               const SizedBox(height: 16),
               _buildSectionCard(
                 context,
-                title: "店铺列表",
+                title: "供应商列表",
                 icon: Icons.list_alt_rounded,
                 iconColor: Colors.orangeAccent,
                 action: Row(
                   children: [
                     ActionPillButton(
-                      label: '新增店铺',
+                      label: '新增供应商',
                       backgroundColor: colorScheme.primary,
                       textColor: Colors.white,
                       onTap: () {
@@ -180,7 +180,7 @@ class QuotePage extends HookConsumerWidget {
                     ),
                     const SizedBox(width: 10),
                     ActionPillButton(
-                      label: '导入店铺',
+                      label: '导入供应商',
                       // icon: Icons.add,
                       backgroundColor: colorScheme.primary,
                       textColor: colorScheme.onSecondary,
@@ -226,7 +226,29 @@ class QuotePage extends HookConsumerWidget {
               const SizedBox(height: 16),
               _buildSectionCard(
                 context,
-                title: "添加产品",
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    const Text(
+                      '添加产品',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '请完善相关信息',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
                 content: _buildProductAddSection(
@@ -241,7 +263,7 @@ class QuotePage extends HookConsumerWidget {
   }
 
   Widget _buildSectionCard(BuildContext context,
-      {required String title,
+      {required dynamic title,
       required IconData icon,
       required Color iconColor,
       required Widget content,
@@ -258,9 +280,11 @@ class QuotePage extends HookConsumerWidget {
             child: Row(children: [
               Icon(icon, size: 18, color: iconColor),
               const SizedBox(width: 8),
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              title is Widget
+                  ? title
+                  : Text(title.toString(),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
               const Spacer(),
               if (action != null) action,
             ]),
@@ -542,7 +566,7 @@ class QuotePage extends HookConsumerWidget {
                 child: const Center(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.touch_app, size: 40, color: Colors.grey),
-                  Text("点击完善关联信息后开始录入")
+                  Text("点击完善相关信息后开始录入")
                 ]))),
           ))
       ],
@@ -616,7 +640,7 @@ Future<void> _showPreSelectionSheet(
             left: 16,
             right: 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text("完善录入信息",
+          const Text("完善相关信息",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           GestureDetector(
@@ -629,10 +653,10 @@ Future<void> _showPreSelectionSheet(
             },
             child: AbsorbPointer(
                 child: Input(
-                    label: '带客记录',
+                    label: '客户',
                     isRequired: true,
                     value: currentQuote?['company']?.name ?? '',
-                    hintText: '请选择带客记录')),
+                    hintText: '请选择客户')),
           ),
           const SizedBox(height: 16),
           GestureDetector(
