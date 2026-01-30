@@ -641,8 +641,10 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
           minimumSize: const Size(double.infinity, 44),
         ),
-        child:
-            Text(hasRecognizing ? 'AI识别中...' : '确认保存 (${state.items.length})'),
+        child: Text(
+          hasRecognizing ? 'AI识别中...' : '保存产品 (${state.items.length})',
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
