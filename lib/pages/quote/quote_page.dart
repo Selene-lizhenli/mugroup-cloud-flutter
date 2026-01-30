@@ -83,24 +83,25 @@ class QuotePage extends HookConsumerWidget {
       return () => searchController.removeListener(onSearchChanged);
     }, []);
 
-    useEffect(() {
-      Future<void> fetchSupplierData() async {
-        final boundQuote = boundQuoteForSupplier.value;
-        if (boundQuote?['id'] == null) {
-          quoteSampleSupplierList.value = [];
-          return;
-        }
-        final params = {"page": '1', "pageSize": 1000};
-        try {
-          final resp = await getQuotationProductListByProductId(
-              boundQuote?['id'], params);
-          quoteSampleSupplierList.value = resp.data;
-        } catch (e) {
-          debugPrint("Fetch Supplier Error: $e");
-        }
+    Future<void> fetchSupplierData() async {
+      final boundQuote = boundQuoteForSupplier.value;
+      if (boundQuote?['id'] == null) {
+        quoteSampleSupplierList.value = [];
+        return;
       }
+      final params = {"page": '1', "pageSize": 1000};
+      try {
+        final resp =
+            await getQuotationProductListByProductId(boundQuote?['id'], params);
+        quoteSampleSupplierList.value = resp.data;
+      } catch (e) {
+        debugPrint("Fetch Supplier Error: $e");
+      }
+    }
 
+    useEffect(() {
       fetchSupplierData();
+      return null;
     }, [boundQuoteForSupplier.value]);
 
     // 分组逻辑
@@ -130,7 +131,10 @@ class QuotePage extends HookConsumerWidget {
         centerTitle: true,
       ),
       body: RefreshIndicator(
-        onRefresh: fetchData,
+        onRefresh: () async {
+          fetchData();
+          fetchSupplierData();
+        },
         child: SingleChildScrollView(
           controller: scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
