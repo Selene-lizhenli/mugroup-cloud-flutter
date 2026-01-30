@@ -42,13 +42,14 @@ class EntryGridModule extends ConsumerWidget {
                 route: const SamplesListRoute(),
                 color: colorScheme.primary,
               ),
-              // _EntryItem(
-              //   width: itemWidth,
-              //   icon: Icons.store,
-              //   label: '市场带客',
-              //   route: const QuoteRoute(),
-              //   color: colorScheme.primary,
-              // ),
+              _EntryItem(
+                width: itemWidth,
+                icon:
+                    'assets/mu/warehouse_${isPinkTheme ? "pink" : "blue"}.png',
+                label: '市场带客',
+                route: const QuoteRoute(),
+                color: colorScheme.primary,
+              ),
               _EntryItem(
                 width: itemWidth,
                 icon: 'assets/mu/cust_${isPinkTheme ? "pink" : "blue"}.png',
@@ -111,7 +112,7 @@ class _EntryItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
-           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               height: 40,
