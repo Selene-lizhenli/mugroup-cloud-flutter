@@ -55,7 +55,7 @@ class AddSupplierSheet extends HookConsumerWidget {
         final supplier = await storeSupplySupplier(data);
         if (supplier != null && context.mounted) {
           Navigator.pop(context);
-          if (quotationId != null && supplier.id != null) {
+          if (supplier.id != null) {
             await context.router.push(
               QuoteProductNewAddRoute(
                 supplierId: supplier.id.toString(),

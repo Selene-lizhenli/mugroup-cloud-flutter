@@ -250,8 +250,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
               (row[key] == null || row[key] == '-') ? null : row[key];
 
           submitList.add({
-            'quotation_id': quoteId,
-            "quotation": {},
+            if (quoteId != null) "quotation_id": quoteId,
+            if (quoteId != null) "quotation": {},
             'supply_quotes': [
               {
                 "supplier_id": supplierId,

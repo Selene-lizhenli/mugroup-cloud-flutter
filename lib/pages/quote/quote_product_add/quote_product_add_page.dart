@@ -1058,8 +1058,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                           final Map<String, dynamic> submitValues =
                               Map.from(formState!.value);
 
-                          if (quoteId == null && initialSupplier == null) {
-                            EasyLoading.showInfo('没有关联到带客记录或无供应商');
+                          if (initialSupplier == null) {
+                            EasyLoading.showInfo('没有供应商');
                             return;
                           }
                           final supplier = initialSupplier!;
@@ -1099,7 +1099,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                           await storeShowroomSample({
                             ...submitValues,
                             "supplier_id": supplier['id'],
-                            "quotation_id": quoteId,
+                            if (quoteId != null) "quotation_id": quoteId,
                             'item_type': 'market_product'
                           });
                           logger.d({

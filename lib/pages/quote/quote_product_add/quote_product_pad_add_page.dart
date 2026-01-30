@@ -13,7 +13,6 @@ import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/spacing_row.dart';
-import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/field_config_provider.dart';
@@ -468,8 +467,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       if (formState?.saveAndValidate() ?? false) {
         final Map<String, dynamic> submitValues = Map.from(formState!.value);
 
-        if (quoteId == null && initialSupplier == null) {
-          EasyLoading.showInfo('没有关联到带客记录或无供应商');
+        if (initialSupplier == null) {
+          EasyLoading.showInfo('没有供应商');
           return;
         }
         final supplier = initialSupplier!;
@@ -508,7 +507,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           await storeShowroomSample({
             ...submitValues,
             "supplier_id": supplier['id'],
-            "quotation_id": quoteId,
+            if (quoteId != null) "quotation_id": quoteId,
             'item_type': 'market_product'
           });
           EasyLoading.dismiss();
