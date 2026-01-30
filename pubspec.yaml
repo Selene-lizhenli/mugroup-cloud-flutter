@@ -178,6 +178,20 @@ flutter:
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
     - assets/aiTemplets/notepad_001.jpg
+    - assets/element/empty.png 
+    - assets/mu/kaiyueren_yuqiuyu_pink.png
+    - assets/mu/kaiyueren_yuqiuyu_blue.png
+    - assets/mu/benben_c.png
+    - assets/mu/benben_s.png
+    - assets/mu/factory_blue.png
+    - assets/mu/factory_pink.png  
+    - assets/mu/warehouse_pink.png
+    - assets/mu/warehouse_blue.png
+    - assets/mu/cust_pink.png
+    - assets/mu/cust_blue.png
+    - assets/mu/insp_blue.png
+    - assets/mu/insp_pink.png 
+    
 
   #
   # For details regarding fonts from package dependencies,

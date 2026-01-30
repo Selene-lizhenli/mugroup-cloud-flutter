@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
@@ -8,7 +7,7 @@ import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/services/dashboard.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// main 
+/// main
 class LineChartDemo extends ConsumerStatefulWidget {
   const LineChartDemo({
     super.key,
@@ -27,6 +26,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
   // 存储当前货币的历史数据
   ExchangeRateHistory? _exchangeData; //波动图的数据
   List<ExchangeRate>? _currencyList; //列表的数据
+  bool _showTrendView = false; // true 表示显示趋势图，false 表示显示列表
 
   /// 加载汇率数据
   /// [params] 有值时使用其 start/end 请求接口，否则用 [selectedRange] 换算
@@ -55,7 +55,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         'currency': currency,
         'start': dateParams['start']!,
         'end': dateParams['end']!,
-      }; 
+      };
       final data = await getExchangeRateHistory(params: paramsData);
 
       if (mounted) {
@@ -136,6 +136,12 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         selectedDimension: _selectedDimension,
         onDimensionSelected: onDimensionSelected,
         currencyList: _currencyList,
+        onViewToggle: (bool val) {
+          setState(() {
+            _showTrendView = val;
+          });
+        },
+        showTrendView: _showTrendView,
       ),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -145,13 +151,8 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 未选择维度：展示汇率列表 
-            if (_selectedDimension == null)
-              ExchangeRatesValueList(
-                list: _currencyList,
-                loading: _isListLoading,
-              )
-            else
+            // 根据切换状态和维度选择状态决定显示哪个视图
+            if (_showTrendView && _selectedDimension != null)
               ExchangeTrend(
                 isLoading: _isLoading,
                 errorMessage: _errorMessage,
@@ -160,9 +161,16 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                 selectedRange: selectedRange,
                 onRetry: () => _loadExchangeData(),
                 onRangeChanged: (DateRange range, Map<String, String> params) {
-                  setState(() => selectedRange = range);
+                  setState(() {
+                    selectedRange = range; 
+                  });
                   _loadExchangeData(params);
                 },
+              )
+            else
+              ExchangeRatesValueList(
+                list: _currencyList,
+                loading: _isListLoading,
               )
           ],
         ),

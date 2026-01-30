@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/my/widgets/user_info.dart';
 import 'package:cloud/pages/my/widgets/user_operator.dart';
-import 'package:cloud/providers/app_provider.dart';  
-import 'package:flutter/material.dart'; 
+import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/theme_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
@@ -13,16 +14,26 @@ class MyPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider).user;
     final colorScheme = Theme.of(context).colorScheme;
+    final themeType = ref.watch(appThemeProvider);
+    final kaiyuerenImage = themeType == ThemeType.pink
+        ? 'assets/mu/kaiyueren_yuqiuyu_pink.png'
+        : 'assets/mu/kaiyueren_yuqiuyu_blue.png';
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
+        automaticallyImplyLeading: false,
         title: Image.asset(
-          'assets/mu/kaiyueren.png',
-          width: 70,
+          kaiyuerenImage,
+          width: 65,
           fit: BoxFit.contain,
         ),
+        leading: IconButton(
+            onPressed: () {
+              context.router.maybePop();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 21)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -37,8 +48,8 @@ class MyPage extends HookConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                UserInfoHeader(user: user, colorScheme: colorScheme), 
-                const UserOperatorSection(), 
+                UserInfoHeader(user: user, colorScheme: colorScheme),
+                const UserOperatorSection(),
               ],
             ),
           ),
@@ -46,6 +57,4 @@ class MyPage extends HookConsumerWidget {
       ),
     );
   }
-
-
 }

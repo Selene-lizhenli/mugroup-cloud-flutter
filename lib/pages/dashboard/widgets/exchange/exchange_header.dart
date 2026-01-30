@@ -9,11 +9,17 @@ class ExchangeChartHeader extends StatelessWidget {
   final ValueChanged<ExchangeRate> onDimensionSelected;
   final List<ExchangeRate>? currencyList;
 
+  /// 视图切换回调：传入目标视图是否为趋势图（true = 展示趋势图，false = 展示列表）
+  final ValueChanged<bool>? onViewToggle;
+  final bool showTrendView; // true 表示显示趋势图，false 表示显示列表
+
   const ExchangeChartHeader({
     super.key,
     required this.selectedDimension,
     required this.onDimensionSelected,
     this.currencyList,
+    this.onViewToggle,
+    this.showTrendView = false,
   });
 
   void _showExchangeCalculator(
@@ -45,7 +51,7 @@ class ExchangeChartHeader extends StatelessWidget {
             color: colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical:0),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -143,6 +149,8 @@ class ExchangeChartHeader extends StatelessWidget {
       },
     ).then((value) {
       if (value != null) {
+        // 选择维度后自动切到趋势视图
+        onViewToggle?.call(true);
         onDimensionSelected(value);
       }
     });
@@ -167,6 +175,33 @@ class ExchangeChartHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              if (onViewToggle != null)
+                Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    // 点击图标在列表视图与趋势视图之间切换
+                    onTap: () => onViewToggle?.call(!showTrendView),
+                    borderRadius: BorderRadius.circular(100),
+                    highlightColor: colorScheme.primary.withOpacity(0.1),
+                    splashColor: colorScheme.primary.withOpacity(0.2),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            !showTrendView && selectedDimension != null
+                                ? Icons.show_chart
+                                : Icons.grid_view,
+                            size: 20,
+                            color: Colors.grey.shade600,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               Material(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
@@ -176,7 +211,7 @@ class ExchangeChartHeader extends StatelessWidget {
                   highlightColor: colorScheme.primary.withOpacity(0.1),
                   splashColor: colorScheme.primary.withOpacity(0.2),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -199,7 +234,7 @@ class ExchangeChartHeader extends StatelessWidget {
                   highlightColor: colorScheme.primary.withOpacity(0.1),
                   splashColor: colorScheme.primary.withOpacity(0.2),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -213,23 +248,6 @@ class ExchangeChartHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              // TextButton(
-              //   onPressed: () => _openDimensionBottomSheet(context),
-              //   style: TextButton.styleFrom(
-              //     padding:
-              //         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              //   ),
-              //   child: Row(
-              //     mainAxisSize: MainAxisSize.min,
-              //     children: [
-              //       Icon(
-              //         Icons.tune,
-              //         size: 20,
-              //         color: Colors.grey.shade600,
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ],

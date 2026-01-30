@@ -30,8 +30,8 @@ class UserInfoHeader extends StatelessWidget {
           children: [
             const SizedBox(height: 8),
             Image.asset(
-              'assets/mu/gongpai.png',
-              width: 50,
+              'assets/mu/benben_s.png',
+              width: 45,
               fit: BoxFit.contain,
             ),
             Column(
@@ -43,7 +43,7 @@ class UserInfoHeader extends StatelessWidget {
                 Text(
                   "${user?.name}",
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 23,
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),

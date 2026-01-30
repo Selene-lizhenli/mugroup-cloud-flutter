@@ -332,96 +332,101 @@ class _TopChartContentState extends State<ShipTopChartContent> {
           return Stack(
             children: [
               ChartDimenTips(
-                label: '$dimenLabel排行',
-              ),
-              const SizedBox(height: 10),
-              BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: maxY,
-                  minY: 0,
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData( 
-                      tooltipBgColor: colorScheme.onPrimary.withOpacity(0.89),
-                      fitInsideHorizontally: true,
-                      tooltipRoundedRadius: 8,
-                      tooltipMargin: 8,
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final item = displayData[groupIndex];
-                        return BarTooltipItem(
-                          '${item.sampleName ?? ''}\n'
-                          '编号: ${item.sampleNo ?? '未知'}\n'
-                          '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)} ',
-                          TextStyle(
-                            color: colorScheme.onSurface,
-                            fontSize: 10,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(0.12),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: SideTitles(showTitles: false),
-                    topTitles: SideTitles(showTitles: false),
-                    bottomTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 0,
-                      getTitles: (value) {
-                        final index = value.toInt();
-                        if (index >= 1 && index <= displayData.length) {
-                          final item = displayData[index - 1];
-                          return item.sampleNo ?? '';
-                        }
-                        return '';
-                      },
-                      getTextStyles: (_) => TextStyle(
-                        color: colorScheme.onSurface.withOpacity(0.5),
-                        fontSize: 8,
+                  label: '$dimenLabel排行',
+                  extra: Text(
+                    '单位：人民币',
+                    style: TextStyle(fontSize: 10, color: colorScheme.outline),
+                  )),
+              Padding(
+                padding: const EdgeInsets.only(top: 15),
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: maxY,
+                    minY: 0,
+                    barTouchData: BarTouchData(
+                      enabled: true,
+                      touchTooltipData: BarTouchTooltipData(
+                        tooltipBgColor: colorScheme.onPrimary.withOpacity(0.89),
+                        fitInsideHorizontally: true,
+                        tooltipRoundedRadius: 8,
+                        tooltipMargin: 8,
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          final item = displayData[groupIndex];
+                          return BarTooltipItem(
+                            '${item.sampleName ?? ''}\n'
+                            '编号: ${item.sampleNo ?? '未知'}\n'
+                            '出货金额(CNY): ${formatCurrencyAmount(item.shippingAmount ?? 0)} ',
+                            TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 10,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.12),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    leftTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.2),
-                        width: 1,
-                      ),
-                      left: BorderSide.none,
-                    ),
-                  ),
-                  barGroups: displayData.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-                    final shippingAmount = item.shippingAmount ?? 0;
-                    return BarChartGroupData(
-                      x: index + 1,
-                      barRods: [
-                        BarChartRodData(
-                          y: shippingAmount.toDouble(),
-                          colors: [colorScheme.secondary],
-                          width: 24,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(4),
-                          ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      rightTitles: SideTitles(showTitles: false),
+                      topTitles: SideTitles(showTitles: false),
+                      bottomTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 0,
+                        getTitles: (value) {
+                          final index = value.toInt();
+                          if (index >= 1 && index <= displayData.length) {
+                            final item = displayData[index - 1];
+                            return item.sampleNo ?? '';
+                          }
+                          return '';
+                        },
+                        getTextStyles: (_) => TextStyle(
+                          color: colorScheme.onSurface.withOpacity(0.5),
+                          fontSize: 8,
                         ),
-                      ],
-                      barsSpace: 8,
-                    );
-                  }).toList(),
+                      ),
+                      leftTitles: SideTitles(
+                        showTitles: false,
+                      ),
+                    ),
+                    gridData: FlGridData(show: false),
+                    borderData: FlBorderData(
+                      show: true,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: colorScheme.outline.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        left: BorderSide.none,
+                      ),
+                    ),
+                    barGroups: displayData.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      final shippingAmount = item.shippingAmount ?? 0;
+                      return BarChartGroupData(
+                        x: index + 1,
+                        barRods: [
+                          BarChartRodData(
+                            y: shippingAmount.toDouble(),
+                            colors: [colorScheme.secondary],
+                            width: 24,
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(4),
+                            ),
+                          ),
+                        ],
+                        barsSpace: 8,
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
               // 在柱子正上方显示数量（无背景色）
@@ -438,7 +443,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                           maxY <= 0 ? 0.0 : (data / maxY) * chartAreaHeight;
                       final barTop = chartAreaHeight - barHeight;
                       // 往上抬一点点，让数字“贴”在柱顶上方
-                      final dy = (barTop - 14).clamp(0.0, chartAreaHeight);
+                      final dy = (barTop - 5).clamp(0.0, chartAreaHeight);
 
                       return Expanded(
                         child: Align(
