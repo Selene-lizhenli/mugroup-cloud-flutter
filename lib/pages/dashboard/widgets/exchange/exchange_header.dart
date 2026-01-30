@@ -181,7 +181,12 @@ class ExchangeChartHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: InkWell(
                     // 点击图标在列表视图与趋势视图之间切换
-                    onTap: () => onViewToggle?.call(!showTrendView),
+                    onTap: () => {
+                      if (selectedDimension == null && !showTrendView) //当前是列表且没有选中维度
+                        _openDimensionBottomSheet(context)
+                      else
+                        onViewToggle?.call(!showTrendView),
+                    },
                     borderRadius: BorderRadius.circular(100),
                     highlightColor: colorScheme.primary.withOpacity(0.1),
                     splashColor: colorScheme.primary.withOpacity(0.2),
@@ -191,9 +196,7 @@ class ExchangeChartHeader extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            !showTrendView && selectedDimension != null
-                                ? Icons.show_chart
-                                : Icons.grid_view,
+                            !showTrendView ? Icons.show_chart : Icons.grid_view,
                             size: 20,
                             color: Colors.grey.shade600,
                           ),
