@@ -510,7 +510,7 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<Map<String, dynamic>?> quote,
       ValueNotifier<Map<String, dynamic>?> supplier,
       ColorScheme colors) {
-    final isReady = quote.value != null && supplier.value != null;
+    final isReady = supplier.value != null;
     return Stack(
       children: [
         Column(children: [
@@ -542,7 +542,7 @@ class QuotePage extends HookConsumerWidget {
                                 style: TextStyle(color: Colors.grey)),
                             TextSpan(
                               text:
-                                  "${quote.value?['company']?.name} / ${supplier.value?['short_name'] ?? supplier.value?['name']}",
+                                  "客户：${quote.value?['company']?.name ?? '未选择'} 供应商： ${supplier.value?['short_name'] ?? supplier.value?['name']}",
                               style: TextStyle(
                                   color: colors.primary,
                                   fontWeight: FontWeight.w600),
@@ -566,16 +566,12 @@ class QuotePage extends HookConsumerWidget {
         ]),
         if (!isReady)
           Positioned.fill(
-              child: GestureDetector(
-            onTap: () => _showPreSelectionSheet(context, quote, supplier),
-            child: Container(
-                color: Colors.white.withOpacity(0.8),
-                child: const Center(
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.touch_app, size: 40, color: Colors.grey),
-                  Text("点击完善相关信息后开始录入")
-                ]))),
-          ))
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _showPreSelectionSheet(context, quote, supplier),
+              child: const SizedBox.expand(), // 占满所有可用空间
+            ),
+          )
       ],
     );
   }
@@ -661,7 +657,7 @@ Future<void> _showPreSelectionSheet(
             child: AbsorbPointer(
                 child: Input(
                     label: '客户',
-                    isRequired: true,
+                    // isRequired: true,
                     value: currentQuote?['company']?.name ?? '',
                     hintText: '请选择客户')),
           ),
@@ -691,7 +687,7 @@ Future<void> _showPreSelectionSheet(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12))),
             onPressed: () {
-              if (currentQuote != null && currentSupplier != null) {
+              if (currentSupplier != null) {
                 Navigator.pop(context);
               }
             },
