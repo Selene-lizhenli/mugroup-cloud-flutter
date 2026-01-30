@@ -166,16 +166,23 @@ class QuotePage extends HookConsumerWidget {
                       label: '新增供应商',
                       backgroundColor: colorScheme.primary,
                       textColor: Colors.white,
-                      onTap: () {
+                      onTap: () async {
                         if (boundQuoteForSupplier.value == null) {
-                          _showError(context, "请先选择关联客户");
-                          return;
+                          final result =
+                              await showModalBottomSheet<Map<String, dynamic>>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (_) => const QuoteSelect());
+                          if (result != null) {
+                            boundQuoteForSupplier.value = result;
+                          }
                         }
+
                         showModalBottomSheet(
                             context: context,
                             builder: (context) => AddSupplierSheet(
                                 quotationId:
-                                    boundQuoteForSupplier.value!['id']));
+                                    boundQuoteForSupplier.value?['id']));
                       },
                     ),
                     const SizedBox(width: 10),
@@ -184,23 +191,23 @@ class QuotePage extends HookConsumerWidget {
                       // icon: Icons.add,
                       backgroundColor: colorScheme.primary,
                       textColor: colorScheme.onSecondary,
-                      onTap: () {
+                      onTap: () async {
                         final boundQuote = boundQuoteForSupplier.value;
 
-                        if (boundQuote == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("请先在下方选择关联的客户"),
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                          return;
+                        if (boundQuoteForSupplier.value == null) {
+                          final result =
+                              await showModalBottomSheet<Map<String, dynamic>>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (_) => const QuoteSelect());
+                          if (result != null) {
+                            boundQuoteForSupplier.value = result;
+                          }
                         }
 
                         context.router.push(
                           ProductBatchImportRoute(
-                            quotationId: boundQuote['id'],
+                            quotationId: boundQuote?['id'],
                           ),
                         );
                       },

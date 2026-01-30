@@ -82,9 +82,22 @@ class QuoteSelect extends HookConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("选择带客记录",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    const Text("选择带客记录",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 6),
+                    Text(
+                      '不选择代表不关联客户',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   icon: const Icon(Icons.close, size: 20, color: Colors.grey),
@@ -157,7 +170,7 @@ class QuoteSelect extends HookConsumerWidget {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: colorScheme.secondary,
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                                 child: Material(
@@ -174,7 +187,7 @@ class QuoteSelect extends HookConsumerWidget {
                                       children: [
                                         Icon(
                                           Icons.add,
-                                          color: colorScheme.secondary,
+                                          color: colorScheme.primary,
                                           size: 24,
                                         ),
                                         const SizedBox(width: 12),
@@ -188,7 +201,7 @@ class QuoteSelect extends HookConsumerWidget {
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
-                                                  color: colorScheme.secondary,
+                                                  color: colorScheme.primary,
                                                 ),
                                               ),
                                             ],
