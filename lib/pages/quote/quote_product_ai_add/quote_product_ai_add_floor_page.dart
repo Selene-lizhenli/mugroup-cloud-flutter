@@ -79,40 +79,47 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(currentTemplateId: templateId);
   }
 
-  Future<void> onImagesChanged(
-      List<TemporaryMedia>? newImages, WidgetRef ref) async {
-    final images = newImages ?? [];
-    final currentItems = state.items;
-
-    if (images.length < currentItems.length) {
-      state = state.copyWith(items: currentItems.sublist(0, images.length));
-      return;
-    }
-
-    if (images.length > currentItems.length) {
-      final List<ProductDraftItem> newItems = List.from(currentItems);
-      final int startIndex = currentItems.length;
-
-      for (int i = startIndex; i < images.length; i++) {
-        newItems.add(ProductDraftItem(
-          data: {},
-          media: images[i],
-          isRecognizing: true,
-        ));
-      }
-
-      state = state.copyWith(items: newItems, isGlobalLoading: true);
-      await _processOcrQueue(startIndex, images, ref);
-    }
+  // 删除某一项
+  void removeItem(int index) {
+    if (index >= state.items.length) return;
+    final newList = List<ProductDraftItem>.from(state.items);
+    newList.removeAt(index);
+    state = state.copyWith(items: newList);
   }
 
-  Future<void> _processOcrQueue(
-      int startIndex, List<TemporaryMedia> images, WidgetRef ref) async {
-    final user = ref.read(userProvider).user;
-    List<ProductDraftItem> tempItems = List.from(state.items);
+  // 变更图片：实现追加逻辑
+  Future<void> onImagesChanged(
+      List<TemporaryMedia>? newImages, WidgetRef ref) async {
+    if (newImages == null || newImages.isEmpty) return;
 
-    for (int i = startIndex; i < images.length; i++) {
-      final imageUrl = images[i].url;
+    final currentItems = state.items;
+
+    final List<ProductDraftItem> addedItems = newImages
+        .map((media) => ProductDraftItem(
+              data: {},
+              media: media,
+              isRecognizing: true,
+            ))
+        .toList();
+
+    // 2. 这里的逻辑改为【追加】，不删除旧数据
+    final int startIndex = currentItems.length;
+    final List<ProductDraftItem> updatedList = [...currentItems, ...addedItems];
+
+    state = state.copyWith(items: updatedList, isGlobalLoading: true);
+
+    // 3. 开始处理 OCR 队列
+    await _processOcrQueue(
+        startIndex, addedItems.map((e) => e.media).toList(), ref);
+  }
+
+  // 处理 OCR 识别
+  Future<void> _processOcrQueue(int startIndexInNew,
+      List<TemporaryMedia> newMedias, WidgetRef ref) async {
+    final user = ref.read(userProvider).user;
+
+    for (var media in newMedias) {
+      final imageUrl = media.url;
       Map<String, String> rowMap = {};
 
       try {
@@ -127,31 +134,30 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         if (result != null &&
             result['success'] == true &&
             (result['data'] as List).isNotEmpty) {
-          final item = result['data'].first;
+          final itemData = result['data'].first;
           for (var col in AppColumns.all) {
-            String rawVal = (item[col.key] ?? '').toString().trim();
+            String rawVal = (itemData[col.key] ?? '').toString().trim();
             rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
           }
         } else {
-          for (var col in AppColumns.all) {
-            rowMap[col.key] = '-';
-          }
+          rowMap = {for (var col in AppColumns.all) col.key: '-'};
           rowMap['price'] = '未识别';
         }
       } catch (e) {
-        for (var col in AppColumns.all) {
-          rowMap[col.key] = '-';
-        }
+        rowMap = {for (var col in AppColumns.all) col.key: '-'};
         rowMap['price'] = '识别错误';
       }
 
-      if (i < state.items.length) {
-        tempItems = List.from(state.items);
-        tempItems[i] = tempItems[i].copyWith(
+      final currentList = [...state.items];
+      final targetIndex =
+          currentList.indexWhere((element) => element.media == media);
+
+      if (targetIndex != -1) {
+        currentList[targetIndex] = currentList[targetIndex].copyWith(
           data: rowMap,
           isRecognizing: false,
         );
-        state = state.copyWith(items: tempItems);
+        state = state.copyWith(items: currentList);
       }
     }
     state = state.copyWith(isGlobalLoading: false);
@@ -184,7 +190,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     try {
       final List<Map<String, dynamic>> submitList = [];
       for (var item in state.items) {
-        if (item.isRecognizing) continue;
         final row = item.data;
         String? val(String key) =>
             (row[key] == null || row[key] == '-') ? null : row[key];
@@ -210,11 +215,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           'image': [item.media],
           'item_type': 'market_product',
         });
-      }
-
-      if (submitList.isEmpty) {
-        EasyLoading.showInfo('没有有效数据可提交');
-        return false;
       }
 
       await batchStoreShowroomSample({'products': submitList});
@@ -253,7 +253,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     final controller = ref.read(productAiAddProvider.notifier);
 
     final isTemplateExpanded = useState(true);
-
     final currentTemplate = getTemplateById(providerState.currentTemplateId);
     final currentMediaList = providerState.items.map((e) => e.media).toList();
 
@@ -272,18 +271,11 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     isExpanded: isTemplateExpanded,
                     colorScheme: colorScheme,
                     currentMediaList: currentMediaList,
-                    onSelect: (newId) {
-                      controller.changeTemplate(newId);
-                    },
-                    onImagesChanged: (newImages) {
-                      controller.onImagesChanged(newImages, ref);
-                    },
+                    onSelect: (newId) => controller.changeTemplate(newId),
+                    onImagesChanged: (newImages) =>
+                        controller.onImagesChanged(newImages, ref),
                   ),
-
-                  // 提示栏
                   _buildInfoBar(colorScheme),
-
-                  // 数据列表
                   if (providerState.items.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     ListView.separated(
@@ -300,6 +292,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                           item,
                           currentTemplate,
                           (key, val) => controller.updateCell(index, key, val),
+                          () => controller.removeItem(index),
                         );
                       },
                     ),
@@ -329,19 +322,16 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            offset: const Offset(0, 2),
-            blurRadius: 4,
-          ),
+              color: Colors.black.withOpacity(0.03),
+              offset: const Offset(0, 2),
+              blurRadius: 4),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: () {
-              isExpanded.value = !isExpanded.value;
-            },
+            onTap: () => isExpanded.value = !isExpanded.value,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -349,10 +339,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   Icon(Icons.dashboard_customize_outlined,
                       size: 18, color: colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    '识别模板 (点击卡片内相机直接上传文件识别)',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                  ),
+                  Text('识别模板 (点击卡片内相机直接上传文件识别)',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13)),
                   const Spacer(),
                   AnimatedRotation(
                     turns: isExpanded.value ? 0.5 : 0,
@@ -366,8 +354,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            alignment: Alignment.topCenter,
             child: SizedBox(
               height: isExpanded.value ? null : 0,
               child: Column(
@@ -399,7 +385,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     required Function(List<TemporaryMedia>?) onImagesChanged,
   }) {
     const double kItemHeight = 82.0;
-
     return SizedBox(
       height: kItemHeight,
       child: ListView.separated(
@@ -410,34 +395,27 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         itemBuilder: (context, index) {
           final t = kQuoteAiTemplates[index];
           final bool isSelected = t.id == currentId;
-
-          final primaryColor = colorScheme.primary;
-          final borderColor =
-              isSelected ? primaryColor : Colors.grey.withOpacity(0.2);
-          final bgColor =
-              isSelected ? primaryColor.withOpacity(0.04) : Colors.white;
-
           return Container(
             width: 160,
             decoration: BoxDecoration(
-              color: bgColor,
+              color: isSelected
+                  ? colorScheme.primary.withOpacity(0.04)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
-                color: borderColor,
-                width: isSelected ? 1 : 1,
-              ),
+                  color: isSelected
+                      ? colorScheme.primary
+                      : Colors.grey.withOpacity(0.2)),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: InkWell(
                     onTap: () => onSelect(t.id),
-                    borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           for (var config in t.columns) ...[
@@ -489,28 +467,13 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     ),
                   ),
                 ),
-
-                // 分割线
                 Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.grey.withOpacity(0.1),
-                ),
-
-                Listener(
-                  onPointerDown: (_) {
-                    if (!isSelected) {
-                      onSelect(t.id);
-                    }
-                  },
-                  child: SizedBox(
-                    width: 80,
-                    child: ImageUploader(
-                      customIcon: Icons.camera_alt_rounded,
-                      onChanged: (newImages) {
-                        onImagesChanged(newImages);
-                      },
-                    ),
+                    width: 1, height: 40, color: Colors.grey.withOpacity(0.1)),
+                SizedBox(
+                  width: 80,
+                  child: ImageUploader(
+                    customIcon: Icons.camera_alt_rounded,
+                    onChanged: (newImages) => onImagesChanged(newImages),
                   ),
                 ),
               ],
@@ -524,230 +487,162 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   Widget _buildInfoBar(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
       ),
       child: Row(
         children: [
           Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'AI自动识别中，点击数据可直接修改',
-              style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500),
-            ),
-          ),
+          Text('AI识别结果仅供参考，点击下方单元格可手动修正',
+              style: TextStyle(color: colorScheme.primary, fontSize: 12)),
         ],
       ),
     );
   }
 
-  Widget _buildDataRow(BuildContext context, int index, ProductDraftItem item,
-      TemplateOption template, Function(String key, String val) onUpdate) {
+  Widget _buildDataRow(
+    BuildContext context,
+    int index,
+    ProductDraftItem item,
+    TemplateOption template,
+    Function(String key, String val) onUpdate,
+    VoidCallback onDelete,
+  ) {
     const double rowHeight = 72.0;
 
-    if (item.isRecognizing) {
-      return Container(
-        height: rowHeight,
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(8)),
-        child: const Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          height: rowHeight,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1))
+            ],
           ),
-        ),
-      );
-    }
-
-    return Container(
-      height: rowHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 4,
-              offset: const Offset(0, 1))
-        ],
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              showFlanImagePreview(context,
-                  images: [item.media.url], loop: false);
-            },
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.network(
-                  item.media.url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => const Center(
-                      child: Icon(Icons.broken_image_outlined,
-                          color: Colors.grey, size: 20)),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              child: Row(
-                children: template.columns.map((col) {
-                  final text = item.getValue(col.key);
-                  final bool isEmpty = text == '-' || text.isEmpty;
-
-                  return Container(
-                    width: col.width,
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(4),
-                        onTap: () {
-                          EditDialog.show(
-                            context,
-                            initialText: isEmpty ? '' : text,
-                            onConfirm: (newText) => onUpdate(col.key, newText),
-                          );
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              col.label,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey[500],
-                                fontWeight: FontWeight.normal,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              text,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isEmpty
-                                    ? FontWeight.normal
-                                    : FontWeight.w600,
-                                color: isEmpty
-                                    ? Colors.grey[300]
-                                    : const Color(0xFF333333),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomAction(
-    BuildContext context,
-    ColorScheme colorScheme,
-    ProductAiAddState state,
-    ProductAiAddController controller,
-  ) {
-    // 1. 判断是否还有正在识别的项目
-    final bool hasRecognizingItems =
-        state.items.any((item) => item.isRecognizing);
-
-    // 2. 列表是否为空
-    final bool isEmpty = state.items.isEmpty;
-
-    // 3. 计算按钮是否可用 (非空 且 无识别中 且 非提交中)
-    final bool canSubmit =
-        !isEmpty && !hasRecognizingItems && !state.isSubmitting;
-
-    // 4. 计算按钮文案
-    String buttonText = '保存产品 (${state.items.length})';
-    if (hasRecognizingItems) {
-      buttonText = 'AI识别中...';
-    } else if (state.isSubmitting) {
-      buttonText = '提交中...';
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
-          .copyWith(bottom: MediaQuery.of(context).padding.bottom + 10),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))
-        ],
-      ),
-      child: SizedBox(
-        height: 44,
-        child: ElevatedButton(
-          onPressed: canSubmit
-              ? () async {
-                  await controller.submitProducts(quoteId, supplierId);
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
-            disabledForegroundColor: Colors.white.withOpacity(0.8),
-            elevation: canSubmit ? 1 : 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
+          padding: const EdgeInsets.all(8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (hasRecognizingItems || state.isSubmitting) ...[
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
+              // 图片预览
+              GestureDetector(
+                onTap: () =>
+                    showFlanImagePreview(context, images: [item.media.url]),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: item.isRecognizing
+                        ? const Center(
+                            child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)))
+                        : Image.network(item.media.url, fit: BoxFit.cover),
                   ),
                 ),
-                const SizedBox(width: 8),
-              ],
-              Text(buttonText),
+              ),
+              const SizedBox(width: 12),
+              // 数据列表
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: template.columns.map((col) {
+                      final text = item.getValue(col.key);
+                      final bool isEmpty = text == '-' || text.isEmpty;
+                      return Container(
+                        width: col.width,
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          onTap: () => EditDialog.show(context,
+                              initialText: isEmpty ? '' : text,
+                              onConfirm: (v) => onUpdate(col.key, v)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(col.label,
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.grey[500])),
+                              Text(text,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: isEmpty
+                                          ? FontWeight.normal
+                                          : FontWeight.w600,
+                                      color: isEmpty
+                                          ? Colors.grey[300]
+                                          : const Color(0xFF333333)),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
+        // 删除按钮：红色悬浮圆圈
+        Positioned(
+          top: -5,
+          left: -5,
+          child: GestureDetector(
+            onTap: onDelete,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                  color: Colors.red, shape: BoxShape.circle),
+              child: const Icon(Icons.close, size: 12, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
+      ProductAiAddState state, ProductAiAddController controller) {
+    final bool hasRecognizing = state.items.any((item) => item.isRecognizing);
+    final bool canSubmit =
+        state.items.isNotEmpty && !hasRecognizing && !state.isSubmitting;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(
+          16, 10, 16, MediaQuery.of(context).padding.bottom + 10),
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Color(0xFFEEEEEE)))),
+      child: ElevatedButton(
+        onPressed: canSubmit
+            ? () => controller.submitProducts(quoteId, supplierId)
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+          minimumSize: const Size(double.infinity, 44),
+        ),
+        child:
+            Text(hasRecognizing ? 'AI识别中...' : '确认保存 (${state.items.length})'),
       ),
     );
   }
