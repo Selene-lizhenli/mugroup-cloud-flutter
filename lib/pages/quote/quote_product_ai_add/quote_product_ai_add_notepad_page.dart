@@ -756,11 +756,14 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       valueColor: AlwaysStoppedAnimation(Colors.white))),
               const SizedBox(width: 8)
             ],
-            Text(hasRecognizing
-                ? 'AI识别中...'
-                : state.isSubmitting
-                    ? '提交中...'
-                    : '保存产品 ($totalProducts)')
+            Text(
+              hasRecognizing
+                  ? 'AI识别中...'
+                  : state.isSubmitting
+                      ? '提交中...'
+                      : '保存产品 ($totalProducts)',
+              style: const TextStyle(color: Colors.white),
+            )
           ])),
     );
   }
