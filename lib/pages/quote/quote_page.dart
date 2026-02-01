@@ -70,6 +70,12 @@ class QuotePage extends HookConsumerWidget {
         final response = await getShowroomQuotation(quoteParams);
         if (context.mounted) {
           list.value = response.data;
+          //默认关联第一个报价
+          if (currentQuote.value == null && response.data.isNotEmpty) {
+            final firstItem = response.data.first;
+
+            currentQuote.value = firstItem.toJson();
+          }
         }
       } catch (e) {
         debugPrint("Error fetching quotation data: $e");
