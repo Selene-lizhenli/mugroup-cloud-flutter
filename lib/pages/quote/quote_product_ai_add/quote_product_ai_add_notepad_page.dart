@@ -743,7 +743,6 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
           style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: Colors.white,
-              disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(22)),
               minimumSize: const Size(double.infinity, 44)),
