@@ -67,8 +67,9 @@ class ConfirmDialog extends StatelessWidget {
                       color: Color(0xFF323233),
                     ),
                   ),
-                  const SizedBox(height: 8),
                 ],
+                if (title.isNotEmpty && content.isNotEmpty)
+                  const SizedBox(height: 8),
                 Text(
                   content,
                   textAlign: TextAlign.center,

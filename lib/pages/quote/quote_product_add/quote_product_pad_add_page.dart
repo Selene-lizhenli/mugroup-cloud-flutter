@@ -523,9 +523,9 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           final isContinue = await ConfirmDialog.show(
             context,
             title: '创建成功',
-            content: '创建成功，是否继续添加？',
-            cancelText: '不，直接返回',
-            confirmText: '继续添加',
+            content: '',
+            cancelText: '返回',
+            confirmText: '继续创建',
             confirmColor: colorScheme.primary,
           );
           if (isContinue == true) {
