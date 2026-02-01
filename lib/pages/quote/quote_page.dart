@@ -597,15 +597,40 @@ class QuotePage extends HookConsumerWidget {
   }
 
   Widget _buildPager(ValueNotifier<int> page, int total) {
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      IconButton(
-          icon: const Icon(Icons.chevron_left),
-          onPressed: page.value > 0 ? () => page.value-- : null),
-      Text("${page.value + 1} / $total"),
-      IconButton(
-          icon: const Icon(Icons.chevron_right),
-          onPressed: page.value < total - 1 ? () => page.value++ : null),
-    ]);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // 上翻按钮
+        TextButton.icon(
+          onPressed: page.value > 0 ? () => page.value-- : null,
+          label: const Text("上翻", style: TextStyle(fontSize: 13)),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.blueAccent,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ),
+
+        // 页码显示
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "${page.value + 1} / $total",
+            style: const TextStyle(
+                color: Colors.grey, fontWeight: FontWeight.bold),
+          ),
+        ),
+
+        // 下翻按钮
+        TextButton.icon(
+          onPressed: page.value < total - 1 ? () => page.value++ : null,
+          label: const Text("下翻", style: TextStyle(fontSize: 13)),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.blueAccent,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildEmpty(String txt) => Center(
