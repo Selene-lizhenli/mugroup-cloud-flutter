@@ -569,6 +569,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         padding: const EdgeInsets.only(right: 8),
                         child: InkWell(
                           onTap: () => EditDialog.show(context,
+                              title: col.label,
                               initialText: isEmpty ? '' : text,
                               onConfirm: (v) => onUpdate(col.key, v)),
                           child: Column(

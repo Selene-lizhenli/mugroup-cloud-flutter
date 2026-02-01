@@ -668,6 +668,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                               GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: () => EditDialog.show(context,
+                                      title: colConfig.label,
                                       initialText: text == '-' ? '' : text,
                                       onConfirm: (newText) =>
                                           controller.updateCell(
