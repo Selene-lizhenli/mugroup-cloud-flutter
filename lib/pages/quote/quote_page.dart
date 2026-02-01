@@ -452,38 +452,59 @@ class QuotePage extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    ActionPillButton(
-                        label: '产品',
-                        icon: Icons.add,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        textColor: Colors.white,
-                        onTap: () {
-                          context.router.push(QuoteProductNewAddRoute(
-                              quoteId: boundQuote?['id'],
-                              supplierId: supplier?.id?.toString()));
-                        }),
                   ]),
                   const SizedBox(height: 10),
                   SizedBox(
                     height: 70,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: prods.length,
+                      itemCount: prods.length + 1,
                       itemBuilder: (context, pIdx) {
+                        if (pIdx == 0) {
+                          return GestureDetector(
+                            onTap: () {
+                              context.router.push(QuoteProductNewAddRoute(
+                                  quoteId: boundQuote?['id'],
+                                  supplierId: supplier?.id?.toString()));
+                            },
+                            child: Container(
+                              width: 70,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.2)),
+                              ),
+                              child: Icon(Icons.add,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 28),
+                            ),
+                          );
+                        }
+
+                        final dataIdx = pIdx - 1;
                         final img =
-                            (prods[pIdx].showroomSample?.image?.isNotEmpty ??
+                            (prods[dataIdx].showroomSample?.image?.isNotEmpty ??
                                     false)
-                                ? prods[pIdx].showroomSample!.image![0].url
+                                ? prods[dataIdx].showroomSample!.image![0].url
                                 : null;
+
                         return Container(
                           width: 70,
                           margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
                               color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(4)),
+                              borderRadius: BorderRadius.circular(8)),
                           child: img != null
                               ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Image.network(img, fit: BoxFit.cover))
                               : const Icon(Icons.image_outlined,
                                   color: Colors.grey),
