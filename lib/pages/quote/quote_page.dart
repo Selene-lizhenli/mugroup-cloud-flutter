@@ -536,41 +536,40 @@ class QuotePage extends HookConsumerWidget {
             GestureDetector(
               onTap: () => _showPreSelectionSheet(context, quote, supplier),
               child: Container(
-                margin: const EdgeInsets.all(12),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: colors.primary.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colors.primary.withOpacity(0.1)),
+                  color: colors.primary.withOpacity(0.03),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: colors.primary.withOpacity(0.08)),
                 ),
                 child: Row(
                   children: [
                     Icon(Icons.edit_note_rounded,
-                        size: 20, color: colors.primary),
-                    const SizedBox(width: 8),
+                        size: 16, color: colors.primary.withOpacity(0.7)),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: RichText(
                         text: TextSpan(
                           style: const TextStyle(
-                              color: Colors.black87, fontSize: 14),
+                              color: Colors.black54, fontSize: 12),
                           children: [
-                            const TextSpan(
-                                text: "当前录入：",
-                                style: TextStyle(color: Colors.grey)),
+                            const TextSpan(text: "当前录入："),
                             TextSpan(
                               text:
-                                  "客户：${quote.value?['company']?.name ?? '未选择'} 供应商： ${supplier.value?['short_name'] ?? supplier.value?['name']}",
+                                  "${quote.value?['company']?.name ?? '未选择'} / ${supplier.value?['short_name'] ?? supplier.value?['name'] ?? '未选择'}",
                               style: TextStyle(
-                                  color: colors.primary,
-                                  fontWeight: FontWeight.w600),
+                                color: colors.primary.withOpacity(0.8),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
                     Icon(Icons.chevron_right_rounded,
-                        size: 20, color: Colors.grey[400]),
+                        size: 16, color: Colors.grey[300]),
                   ],
                 ),
               ),
