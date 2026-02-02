@@ -88,14 +88,14 @@ class InspectionCard extends HookConsumerWidget {
                       fontSize: 13,
                     ),
                   ),
-                  // const SizedBox(width: 12),
-                  // InkWell(
-                  //   onTap: () async {
-                  //     onDelete!();
-                  //   },
-                  //   child: Icon(Icons.delete_outline,
-                  //       size: 18, color: Colors.red[300]),
-                  // ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () async {
+                      onDelete!();
+                    },
+                    child: Icon(Icons.delete_outline,
+                        size: 18, color: Colors.red[300]),
+                  ),
                 ],
               ),
               Padding(

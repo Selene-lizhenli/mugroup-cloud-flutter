@@ -154,7 +154,7 @@ class InspectionView extends HookConsumerWidget {
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.only(top:4, bottom: 8),
+                    padding: const EdgeInsets.only(top: 4, bottom: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -283,6 +283,13 @@ class InspectionView extends HookConsumerWidget {
                             );
                           },
                           onDelete: () async {
+                            if (inspection.items!.isNotEmpty) {
+                              await ConfirmDialog.show(
+                                context,
+                                content: '该验货任务下有任务项不得删除？',
+                              );
+                              return;
+                            }
                             final bool isConfirmed = await ConfirmDialog.show(
                               context,
                               content: '确定要删除验货任务${inspection.name}？',
