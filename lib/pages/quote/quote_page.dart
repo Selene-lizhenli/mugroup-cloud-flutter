@@ -6,7 +6,9 @@ import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
+import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,6 +25,7 @@ class QuotePage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     useAutomaticKeepAlive(wantKeepAlive: true);
 
+    // 基础数据状态
     final isLoading = useState(true);
     final list = useState<List<QuotationList>>([]);
     final quoteSampleSupplierList = useState<List<QuotationSample>>([]);
@@ -30,7 +33,7 @@ class QuotePage extends HookConsumerWidget {
     final currentQuote = useState<Map<String, dynamic>?>(null);
     final selectedSupplier = useState<Map<String, dynamic>?>(null);
 
-    // --- 这里的 State 改为展示数量控制 ---
+    // --- 展示数量控制 ---
     final recordsDisplayCount = useState(2);
     final suppliersDisplayCount = useState(2);
 
@@ -227,8 +230,7 @@ class QuotePage extends HookConsumerWidget {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: Colors.black.withOpacity(0.08), width: 1), // 清晰边框
+          border: Border.all(color: Colors.black.withOpacity(0.08), width: 1),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(0.02),
@@ -474,37 +476,154 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
+  // --- 修正后的添加产品遮罩层逻辑 ---
   Widget _buildProductAddSection(
       BuildContext context,
       ValueNotifier<Map<String, dynamic>?> quote,
       ValueNotifier<Map<String, dynamic>?> supplier,
       ColorScheme colors) {
     final isReady = supplier.value != null;
-    return Column(children: [
-      if (isReady)
-        Container(
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                color: colors.primary.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(8)),
-            child: Text(
-                "录入至：${quote.value?['company']?.name} / ${supplier.value?['name']}",
-                style: TextStyle(
-                    color: colors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold))),
-      SizedBox(
-          height: 500,
-          child: QuoteProductNewAddPage(
-              isEmbedded: true,
-              quoteId: quote.value?['id'],
-              supplierId: supplier.value?['id']?.toString())),
-    ]);
+    return Stack(
+      children: [
+        Column(children: [
+          // 如果已选择供应商，显示信息条
+          if (isReady)
+            GestureDetector(
+              onTap: () => _showPreSelectionSheet(context, quote, supplier),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: colors.primary.withOpacity(0.03),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: colors.primary.withOpacity(0.08)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_note_rounded,
+                        size: 16, color: colors.primary.withOpacity(0.7)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 12),
+                          children: [
+                            const TextSpan(text: "当前录入："),
+                            TextSpan(
+                              text:
+                                  "${quote.value?['company']?.name ?? '未选择'} / ${supplier.value?['short_name'] ?? supplier.value?['name'] ?? '未选择'}",
+                              style: TextStyle(
+                                color: colors.primary.withOpacity(0.8),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 16, color: Colors.grey[300]),
+                  ],
+                ),
+              ),
+            ),
+          // 实际的录入页面
+          SizedBox(
+              height: 500,
+              child: QuoteProductNewAddPage(
+                  isEmbedded: true,
+                  quoteId: quote.value?['id'],
+                  supplierId: supplier.value?['id']?.toString())),
+        ]),
+        // --- 遮罩层核心逻辑 ---
+        if (!isReady)
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _showPreSelectionSheet(context, quote, supplier),
+              child: const SizedBox.expand(),
+            ),
+          )
+      ],
+    );
   }
 
   Widget _buildEmpty(String txt) => Center(
       child: Padding(
           padding: const EdgeInsets.all(30),
           child: Text(txt, style: const TextStyle(color: Colors.grey))));
+}
+
+// 预选信息弹窗
+Future<void> _showPreSelectionSheet(
+    BuildContext context,
+    ValueNotifier<Map<String, dynamic>?> selectedQuote,
+    ValueNotifier<Map<String, dynamic>?> selectedSupplier) async {
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (context) => HookConsumer(builder: (context, ref, child) {
+      final colorScheme = Theme.of(context).colorScheme;
+      final currentQuote = useValueListenable(selectedQuote);
+      final currentSupplier = useValueListenable(selectedSupplier);
+
+      return Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            top: 20,
+            left: 16,
+            right: 16),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text("完善相关信息",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () async {
+              final result = await showModalBottomSheet<Map<String, dynamic>>(
+                  context: context, builder: (_) => const QuoteSelect());
+              if (result != null) selectedQuote.value = result;
+            },
+            child: AbsorbPointer(
+                child: Input(
+                    label: '客户',
+                    value: currentQuote?['company']?.name ?? '',
+                    hintText: '请选择客户')),
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () async {
+              final result = await showModalBottomSheet<Map<String, dynamic>>(
+                  context: context, builder: (_) => const SupplierSelect());
+              if (result != null) selectedSupplier.value = result;
+            },
+            child: AbsorbPointer(
+                child: Input(
+                    label: '供应商',
+                    isRequired: true,
+                    value: currentSupplier?['short_name'] ??
+                        currentSupplier?['name'] ??
+                        '',
+                    hintText: '请选择供应商')),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                backgroundColor: colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
+            onPressed: () {
+              if (selectedSupplier.value != null) Navigator.pop(context);
+            },
+            child: const Text("确定", style: TextStyle(color: Colors.white)),
+          ),
+        ]),
+      );
+    }),
+  );
 }
