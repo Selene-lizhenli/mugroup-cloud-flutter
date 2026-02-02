@@ -175,7 +175,12 @@ class _QuoteCardState extends State<QuoteCard> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: items.length + 1,
         itemBuilder: (context, index) {
-          if (index == 0) return _buildAddBtn(quote: items[0]);
+          if (index == 0) {
+            final quoteData =
+                items.isNotEmpty ? items.first : {'id': widget.item.id};
+            return _buildAddBtn(quoteData);
+          }
+
           final itemData = items[index - 1];
           return _buildSquareCard(colorScheme, itemData['data'],
               selectedSupplierId == itemData['id'], itemData['id']);
@@ -268,7 +273,7 @@ class _QuoteCardState extends State<QuoteCard> {
     );
   }
 
-  Widget _buildAddBtn({required Map<String, dynamic> quote}) {
+  Widget _buildAddBtn(Map<String, dynamic> quote) {
     return Container(
       width: 70,
       height: 70,
@@ -282,7 +287,7 @@ class _QuoteCardState extends State<QuoteCard> {
             showModalBottomSheet(
                 context: context,
                 builder: (context) =>
-                    AddSupplierSheet(quotationId: quote['id']));
+                    AddSupplierSheet(quotationId: quote?['id']));
           },
           child: const Center(
             child: Icon(
