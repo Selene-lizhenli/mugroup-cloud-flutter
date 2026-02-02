@@ -4,7 +4,8 @@ class MuSearchBar extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String buttonText;
-  final VoidCallback onSearch;
+  /// 搜索回调，透出当前输入的文本
+  final ValueChanged<String?> onSearch;
   final EdgeInsetsGeometry? padding;
   final Color? themeColor;
   final Color? fillColor;
@@ -40,14 +41,14 @@ class MuSearchBar extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 textInputAction: TextInputAction.search,
-                onSubmitted: (_) => onSearch(),
+                // 回车搜索时透出当前文本
+                onSubmitted: onSearch,
                 cursorColor: effectiveThemeColor,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
                   hintText: hintText,
                   isDense: true,
-                  filled: true,
-                  
+                  filled: true, 
                   focusColor: effectiveThemeColor,
                   fillColor: effectiveFillColor,
                   contentPadding: const EdgeInsets.symmetric(
@@ -82,7 +83,8 @@ class MuSearchBar extends StatelessWidget {
           SizedBox(
             height: 40,
             child: FilledButton(
-              onPressed: onSearch,
+              // 点击按钮时也透出当前输入框内容
+              onPressed: () => onSearch(controller.text),
               style: FilledButton.styleFrom(
                 backgroundColor: effectiveThemeColor,
                 foregroundColor: onThemeColor,

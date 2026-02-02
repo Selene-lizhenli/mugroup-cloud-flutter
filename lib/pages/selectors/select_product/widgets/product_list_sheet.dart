@@ -58,7 +58,7 @@ class ProductListSheet extends HookConsumerWidget {
     final allSelected =
         validIds.isNotEmpty && validIds.every((id) => selectedIds.contains(id));
 
-    Future<void> handleSearch() async {
+    Future<void> handleSearch(value) async {
       await notifier.fetchProducts(
           search: searchController.text.trim(), reset: true);
     }

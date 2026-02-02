@@ -18,7 +18,7 @@ class InspectionCard extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final TextStyle greyTextStyle = TextStyle(
       color: Colors.grey[600],
-      fontSize: 13,
+      fontSize: 11,
     );
     const Color lightBlueBg = Color(0xFFEEF0FF);
 
@@ -51,7 +51,7 @@ class InspectionCard extends HookConsumerWidget {
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey.shade200, width: 1),
             boxShadow: [
@@ -72,20 +72,20 @@ class InspectionCard extends HookConsumerWidget {
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                   const Spacer(),
-                  Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
+                  Icon(Icons.person_outline, size: 16, color:  colorScheme.outline),
                   const SizedBox(width: 4),
                   Text('${user?.name}', style: greyTextStyle),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 6),
                   Text(
                     '#${inspection.id}',
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      fontSize: 12,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -99,7 +99,7 @@ class InspectionCard extends HookConsumerWidget {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child:
                     Divider(height: 1, thickness: 1, color: Colors.grey[100]),
               ),
@@ -124,7 +124,7 @@ class InspectionCard extends HookConsumerWidget {
                     ),
                   ),
                   Container(
-                    height: 32,
+                    height: 26,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       color: lightBlueBg,
@@ -142,8 +142,9 @@ class InspectionCard extends HookConsumerWidget {
                         );
                       },
                       borderRadius: BorderRadius.circular(16),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                      child: Row( 
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.person_add_alt_1,
                               size: 14, color: colorScheme.secondary),
@@ -152,7 +153,7 @@ class InspectionCard extends HookConsumerWidget {
                             '协作',
                             style: TextStyle(
                               color: colorScheme.secondary,
-                              fontSize: 13,
+                              fontSize: 11,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -162,11 +163,11 @@ class InspectionCard extends HookConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  height: 14,
+                  height: 13,
                   width: double.infinity,
                   color: colorScheme.outlineVariant,
                   child: Stack(

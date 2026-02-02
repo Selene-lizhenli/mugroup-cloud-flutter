@@ -2,7 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
+import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -160,24 +162,12 @@ class InspectionView extends HookConsumerWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: TextField(
+                          child: MuSearchBar(
                             controller: searchController,
-                            textInputAction: TextInputAction.search,
-                            decoration: InputDecoration(
-                              hintText: '搜索验货任务',
-                              hintStyle: TextStyle(color: Colors.grey[400]),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 0, horizontal: 16),
-                              prefixIcon: const Icon(Icons.search),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(24),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            onSubmitted: (value) async {
-                              search.value = value.isEmpty ? null : value;
+                            hintText: '搜索产品编码/名称',
+                            buttonText: '搜索',
+                            onSearch: (value) async {
+                              search.value = value;
                               await fetchPage(init: true);
                             },
                           ),
@@ -185,7 +175,7 @@ class InspectionView extends HookConsumerWidget {
                         const SizedBox(height: 12),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Row(
                             children: [
                               _buildFilterChip(
@@ -252,7 +242,7 @@ class InspectionView extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                // const SliverToBoxAdapter(child: SizedBox(height: 10)),
                 if (inspections.value.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -268,10 +258,10 @@ class InspectionView extends HookConsumerWidget {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     sliver: SliverMasonryGrid.count(
                       crossAxisCount: 1,
-                      mainAxisSpacing: 4,
+                      mainAxisSpacing: 0,
                       childCount: inspections.value.length,
                       itemBuilder: (context, index) {
                         final inspection = inspections.value[index];
@@ -322,20 +312,24 @@ class InspectionView extends HookConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary : Colors.grey[100],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: isSelected ? colorScheme.primary : Colors.grey[100],
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-      ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? colorScheme.surface
+                    : colorScheme.onSurface.withOpacity(0.8),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                height: 1,
+              ),
+            ),
+          )),
     );
   }
 }
