@@ -44,7 +44,7 @@ class Supplier with _$Supplier {
     @JsonKey(name: 'showroom_photos') List<Media>? showroomPhotos,
     @JsonKey(name: 'device_photos') List<Media>? devicePhotos,
     List<Contact>? contacts,
-    List<Media>? images,
+    List<Media>? media,
   ) = _Supplier;
 
   factory Supplier.fromJson(Map<String, dynamic> json) =>

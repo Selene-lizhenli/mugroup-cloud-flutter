@@ -52,7 +52,7 @@ _$SupplierImpl _$$SupplierImplFromJson(Map<String, dynamic> json) =>
       (json['contacts'] as List<dynamic>?)
           ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['images'] as List<dynamic>?)
+      (json['media'] as List<dynamic>?)
           ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -95,5 +95,5 @@ Map<String, dynamic> _$$SupplierImplToJson(_$SupplierImpl instance) =>
       'showroom_photos': instance.showroomPhotos,
       'device_photos': instance.devicePhotos,
       'contacts': instance.contacts,
-      'images': instance.images,
+      'media': instance.media,
     };
