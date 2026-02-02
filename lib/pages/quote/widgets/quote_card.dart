@@ -59,14 +59,18 @@ class _QuoteCardState extends State<QuoteCard> {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.08),
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
