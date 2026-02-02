@@ -153,7 +153,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     );
 
     for (var media in newImages) {
-      final imageUrl = media.url;
+      final imageUrl = media.thumbUrl;
       List<ProductDraftItem> recognizedProducts = [];
 
       try {

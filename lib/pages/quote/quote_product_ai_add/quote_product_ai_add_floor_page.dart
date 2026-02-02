@@ -119,11 +119,11 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final user = ref.read(userProvider).user;
 
     for (var media in newMedias) {
-      final imageUrl = media.url;
+      final imageUrl = media.thumbUrl;
       Map<String, String> rowMap = {};
 
       try {
-        final result = await identifyOcr('{*}Basic', {
+        final result = await identifyOcr('ExtractQtnBasic', {
           "tempalte_id": state.currentTemplateId,
           "department": user?.department?.name,
           "employee_name": user?.name,
