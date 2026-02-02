@@ -1,8 +1,9 @@
 import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
 import 'package:flutter/material.dart';
 
-class QuoteCard extends StatelessWidget {
+class QuoteCard extends StatefulWidget {
   final QuotationList item;
   final VoidCallback? onTap;
   final int? tabIndex;
@@ -15,283 +16,317 @@ class QuoteCard extends StatelessWidget {
   });
 
   @override
+  State<QuoteCard> createState() => _QuoteCardState();
+}
+
+class _QuoteCardState extends State<QuoteCard> {
+  int? selectedSupplierId;
+
+  List<Map<String, dynamic>> _getProcessedSuppliers() {
+    final quotes = widget.item.supplyQuotes ?? [];
+    final Map<int, Map<String, dynamic>> supplierMap = {};
+
+    for (var q in quotes) {
+      final s = q.supplier;
+      if (s?.id != null) {
+        if (!supplierMap.containsKey(s!.id)) {
+          supplierMap[s.id!] = {
+            'data': q,
+            'count': 1,
+            'id': s.id,
+          };
+        } else {
+          supplierMap[s.id]!['count'] =
+              (supplierMap[s.id]!['count'] as int) + 1;
+        }
+      }
+    }
+    return supplierMap.values.toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final processedSuppliers = _getProcessedSuppliers();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Material(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        elevation: 0.5,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(colorScheme, context, item),
-                // const SizedBox(height: 3),
-                // const Divider(height: 1, color: Color(0xFFF0F0F0)),
-                const SizedBox(height: 6),
-                _buildMiddleRow(colorScheme),
-                const SizedBox(height: 8),
-                _buildFooter(colorScheme),
-              ],
-            ),
+    int displayCount = widget.item.productCount ?? 0;
+    if (selectedSupplierId != null) {
+      try {
+        final selected =
+            processedSuppliers.firstWhere((e) => e['id'] == selectedSupplierId);
+        displayCount = selected['count'];
+      } catch (_) {}
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-        ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: _buildHeader(colorScheme, displayCount),
+          ),
+          _buildSupplierHorizontalList(processedSuppliers, colorScheme),
+          const SizedBox(height: 12),
+        ],
       ),
     );
   }
 
-  // /// 顶部：日期 + 客户 + 编号
-  // Widget _buildHeader(ColorScheme colorScheme) {
-  //   return Row(
-  //     children: [
-  //       Text(
-  //         item.user?.name ?? "",
-  //         style: TextStyle(
-  //           fontSize: 14,
-  //           fontWeight: FontWeight.w600,
-  //           color: colorScheme.primary,
-  //         ),
-  //         maxLines: 1,
-  //         overflow: TextOverflow.ellipsis,
-  //       ),
-  //       const SizedBox(
-  //         width: 4,
-  //       ),
-  //       Text(
-  //         item.quoteAt ?? '',
-  //         style: TextStyle(
-  //           color: colorScheme.surfaceContainerHighest,
-  //           fontWeight: FontWeight.w500,
-  //           fontSize: 11,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Widget _buildHeader(ColorScheme colorScheme, int displayCount) {
+    final customerName =
+        widget.item.company?.name ?? widget.item.user?.name ?? '未知客户';
+    final creatorName = widget.item.creator?.name ?? '系统';
+    final isFiltered = selectedSupplierId != null;
 
-  Widget _buildHeader(
-      ColorScheme colorScheme, BuildContext context, QuotationList item) {
-    // 格式化日期：从 "2025-12-23 11:23:15" 提取 "2025-12-23"
-    String formatDate(String? dateStr) {
-      if (dateStr == null || dateStr.isEmpty) return '';
-      try {
-        final parts = dateStr.split(' ');
-        return parts.isNotEmpty ? parts[0] : '';
-      } catch (e) {
-        return dateStr;
-      }
-    }
-
-    final formattedDate = formatDate(item.quoteAt);
-    final customerName = item.company?.name ?? item.user?.name ?? '';
+    final collaborators = widget.item.collaborators;
+    final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
+    final collabText = hasCollaborators
+        ? collaborators.map((e) => e.name ?? '').join('、')
+        : '暂无';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // 左侧：日期 + 客户名
         Expanded(
           child: Row(
             children: [
-              if (formattedDate.isNotEmpty) ...[
-                Text(
-                  formattedDate,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: colorScheme.primary,
+              Flexible(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: widget.onTap,
+                  child: Text(
+                    customerName,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-              ],
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '创建人: $creatorName',
+                style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+              ),
+              const SizedBox(width: 8),
               Expanded(
+                flex: 3,
                 child: Text(
-                  customerName,
+                  '协作: $collabText',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
+                    fontSize: 11,
+                    color:
+                        hasCollaborators ? Colors.green[600] : Colors.grey[400],
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
+              _buildCountTag(displayCount, isFiltered),
             ],
           ),
         ),
-        // 右侧：协作按钮
-        _buildCollaborateButton(colorScheme, context, item),
+        const SizedBox(width: 8),
+        _buildCollaborateButton(colorScheme),
       ],
     );
   }
 
-  Widget _buildCollaborateButton(
-      ColorScheme colorScheme, BuildContext context, QuotationList item) {
-    return Material(
-      color: colorScheme.primaryContainer.withOpacity(0.08),
-      borderRadius: BorderRadius.circular(6),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(6),
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            useSafeArea: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
-          );
+  Widget _buildCountTag(int count, bool isFiltered) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color:
+            isFiltered ? Colors.blue.withOpacity(0.1) : const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '$count个产品',
+        style: TextStyle(
+          fontSize: 10,
+          color: isFiltered ? Colors.blue[700] : Colors.grey[600],
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSupplierHorizontalList(
+      List<Map<String, dynamic>> items, ColorScheme colorScheme) {
+    return SizedBox(
+      height: 70,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: items.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) return _buildAddBtn(quote: items[0]);
+          final itemData = items[index - 1];
+          return _buildSquareCard(colorScheme, itemData['data'],
+              selectedSupplierId == itemData['id'], itemData['id']);
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.people_outline,
-                size: 14,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '协作',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.primary,
+      ),
+    );
+  }
+
+  Widget _buildSquareCard(
+      ColorScheme colorScheme, dynamic quote, bool isSelected, int id) {
+    final supplier = quote.supplier;
+    final String name = supplier?.name ?? '未知';
+    final String? imageUrl =
+        (supplier?.images?.isNotEmpty == true) ? supplier.images.first : null;
+
+    return Container(
+      width: 70,
+      height: 70,
+      margin: const EdgeInsets.only(right: 8),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () =>
+                  setState(() => selectedSupplierId = isSelected ? null : id),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        isSelected ? colorScheme.primary : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: imageUrl != null
+                      ? Image.network(imageUrl, fit: BoxFit.cover)
+                      : Container(
+                          padding: const EdgeInsets.all(4),
+                          alignment: Alignment.center,
+                          child: Text(
+                            name,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 9, color: Color(0xFF333333)),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                 ),
               ),
-            ],
+            ),
+          ),
+          if (imageUrl != null && isSelected)
+            Align(
+              alignment: Alignment.center,
+              child: GestureDetector(
+                onTap: () => _showImagePreview(imageUrl),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.fullscreen_rounded,
+                      color: Colors.white, size: 20),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showImagePreview(String url) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black.withOpacity(0.9),
+      pageBuilder: (context, _, __) => GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child:
+            InteractiveViewer(child: Image.network(url, fit: BoxFit.contain)),
+      ),
+    );
+  }
+
+  Widget _buildAddBtn({required Map<String, dynamic> quote}) {
+    return Container(
+      width: 70,
+      height: 70,
+      margin: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            showModalBottomSheet(
+                context: context,
+                builder: (context) =>
+                    AddSupplierSheet(quotationId: quote['id']));
+          },
+          child: const Center(
+            child: Icon(
+              Icons.add_rounded,
+              color: Colors.grey,
+              size: 24,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMiddleRow(ColorScheme colorScheme) {
-    // 格式化编号：添加 # 前缀
-    String formatQuoteNo(String? quoteNo) {
-      if (quoteNo == null || quoteNo.isEmpty) return '';
-      return quoteNo.startsWith('#') ? quoteNo : '#$quoteNo';
-    }
-
-    final TextStyle greyTextStyle = TextStyle(
-      color: Colors.grey[600],
-      fontSize: 11,
-    );
-
-    final quoteNo = formatQuoteNo(item.quoteNo);
-    final creatorName = item.creator?.name ?? '';
-
-    final collaborators = item.collaborators;
-    final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
-    final collabText = hasCollaborators
-        ? collaborators.map((e) => e.name ?? '').join('、')
-        : '暂无协作';
-
-    final collabStyle = hasCollaborators
-        ? const TextStyle(color: Colors.green, fontSize: 11)
-        : greyTextStyle;
-
-    return Row(
-      children: [
-        if (quoteNo.isNotEmpty) ...[
-          Text(
-            quoteNo,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.surfaceContainerHighest,
-            ),
-          ),
-          if (creatorName.isNotEmpty) ...[
-            const SizedBox(width: 14),
+  Widget _buildCollaborateButton(ColorScheme colorScheme) {
+    return GestureDetector(
+      onTap: () => showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) =>
+            CollaborationBottomSheet(quoteId: widget.item.id!),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: colorScheme.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.people_alt_rounded,
+                size: 16, color: colorScheme.primary),
+            const SizedBox(width: 4),
             Text(
-              '创建人: $creatorName',
+              '协作',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 12,
+                color: colorScheme.primary,
                 fontWeight: FontWeight.w500,
-                color: colorScheme.surfaceContainerHighest,
               ),
             ),
           ],
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(
-              '协作: $collabText',
-              style: collabStyle,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ] else if (creatorName.isNotEmpty) ...[
-          Text(
-            '创建人: $creatorName',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.surfaceContainerHighest,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  /// 底部：产品数量、总数量、总金额
-  Widget _buildFooter(ColorScheme colorScheme) {
-    final productCount = item.productCount ?? 0;
-    final sumQty = item.sumQty ?? '';
-
-    // TODO: 如果有总金额字段，在这里使用
-    // 目前模型中没有总金额字段，暂时不显示
-    // final currency = item.curreny ?? 'JPY';
-    // final totalAmount = item.sumAmount ?? '0.00';
-
-    return Row(
-      children: [
-        // 左侧：产品数量标签
-        if (productCount > 0)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              '$productCount个产品',
-              style: TextStyle(
-                fontSize: 11,
-                color: colorScheme.surfaceContainerHighest,
-              ),
-            ),
-          ),
-        if (productCount > 0 && sumQty.isNotEmpty) const SizedBox(width: 12),
-        // 中间：总数量
-        if (sumQty.isNotEmpty)
-          Text(
-            '总数量: $sumQty',
-            style: TextStyle(
-              fontSize: 11,
-              color: colorScheme.surfaceContainerHighest,
-            ),
-          ),
-        // 右侧：总金额（暂时不显示，因为模型中没有该字段）
-        // 如果将来添加了总金额字段，取消下面的注释并删除 currency 变量的注释
-        // const Spacer(),
-        // Text(
-        //   '总金额($currency): $totalAmount',
-        //   style: TextStyle(
-        //     fontSize: 11,
-        //     color: colorScheme.surfaceContainerHighest,
-        //   ),
-        // ),
-      ],
+        ),
+      ),
     );
   }
 }

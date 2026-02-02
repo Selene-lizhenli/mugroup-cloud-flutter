@@ -64,6 +64,7 @@ class QuotePage extends HookConsumerWidget {
         "page": "1",
         "pageSize": "50",
         "type": "market",
+        "includes": 'supplyQuotes.supplier'
       };
 
       try {

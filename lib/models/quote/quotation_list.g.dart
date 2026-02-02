@@ -51,6 +51,9 @@ _$QuotationListImpl _$$QuotationListImplFromJson(Map<String, dynamic> json) =>
       collaborators: (json['collaborators'] as List<dynamic>?)
           ?.map((e) => User.fromJson(e as Map<String, dynamic>))
           .toList(),
+      supplyQuotes: (json['supplyQuotes'] as List<dynamic>?)
+          ?.map((e) => Quote.fromJson(e as Map<String, dynamic>))
+          .toList(),
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
@@ -102,6 +105,7 @@ Map<String, dynamic> _$$QuotationListImplToJson(_$QuotationListImpl instance) =>
       'contact_id': instance.contactId,
       'last_sent_at': instance.lastSentAt?.toIso8601String(),
       'collaborators': instance.collaborators,
+      'supplyQuotes': instance.supplyQuotes,
       'user': instance.user,
       'creator': instance.creator,
       'company': instance.company,
