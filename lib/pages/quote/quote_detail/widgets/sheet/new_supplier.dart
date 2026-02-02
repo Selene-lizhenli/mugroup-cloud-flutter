@@ -58,6 +58,7 @@ class AddSupplierSheet extends HookConsumerWidget {
           if (supplier.id != null) {
             await context.router.push(
               QuoteProductNewAddRoute(
+                quoteId: quotationId,
                 supplierId: supplier.id.toString(),
               ),
             );
