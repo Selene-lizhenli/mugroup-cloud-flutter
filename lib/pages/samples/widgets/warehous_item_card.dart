@@ -19,7 +19,7 @@ class WarehouseShowCard extends ConsumerWidget {
     required this.imageHeight,
     this.isPad,
   });
-
+  //大图查看图片
   void showImagePreview(BuildContext context, List<WarehouseImage> images,
       int initialIndex, String warehouseName) {
     int currentIndex = initialIndex;
@@ -36,25 +36,25 @@ class WarehouseShowCard extends ConsumerWidget {
               onTap: () => Navigator.of(context).pop(),
               child: Stack(
                 children: [
-                  // 图片查看器
-                  PageView.builder(
-                    controller: pageController,
-                    itemCount: images.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      final image = images[index];
-                      final imageUrl =
-                          image.url ?? image.thumbUrl ?? image.whiteUrl;
+                  // 图片查看器（支持全屏缩放）
+                  InteractiveViewer(
+                    panEnabled: true,
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: PageView.builder(
+                      controller: pageController,
+                      itemCount: images.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        final image = images[index];
+                        final imageUrl =
+                            image.url ?? image.thumbUrl ?? image.whiteUrl;
 
-                      return Center(
-                        child: InteractiveViewer(
-                          panEnabled: true,
-                          minScale: 0.5,
-                          maxScale: 4.0,
+                        return Center(
                           child: imageUrl != null && imageUrl.isNotEmpty
                               ? Image.network(
                                   imageUrl,
@@ -76,9 +76,9 @@ class WarehouseShowCard extends ConsumerWidget {
                                 )
                               : const Icon(Icons.image_not_supported,
                                   color: Colors.grey, size: 48),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                   // 顶部标题栏
                   Positioned(
