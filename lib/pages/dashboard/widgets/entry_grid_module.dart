@@ -39,6 +39,13 @@ class EntryGridModule extends ConsumerWidget {
         route: const SamplesListRoute(),
       ),
       _EntryConfig(
+        featureKey: EntryFeatures.marketPurchase.id,
+        label: EntryFeatures.marketPurchase.title,
+        iconAsset: 'assets/mu/market_$theme.png',
+        iconSize: 35,
+        route: const QuoteRoute(),
+      ),
+      _EntryConfig(
         featureKey: EntryFeatures.crmCompany.id,
         label: EntryFeatures.crmCompany.title,
         iconAsset: 'assets/mu/cust_$theme.png',
