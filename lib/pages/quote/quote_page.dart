@@ -168,7 +168,7 @@ class QuotePage extends HookConsumerWidget {
                         textColor: Colors.white,
                         onTap: () async {
                           if (currentQuote.value == null) await pickQuote();
-                          if (currentQuote.value != null && context.mounted) {
+                          if (context.mounted) {
                             showModalBottomSheet(
                                 context: context,
                                 builder: (context) => AddSupplierSheet(
@@ -181,8 +181,10 @@ class QuotePage extends HookConsumerWidget {
                         backgroundColor: colorScheme.primary,
                         textColor: Colors.white,
                         onTap: () async {
-                          if (currentQuote.value == null) await pickQuote();
-                          if (currentQuote.value != null && context.mounted) {
+                          if (currentQuote.value == null) {
+                            await pickQuote();
+                          }
+                          if (context.mounted) {
                             context.router.push(ProductBatchImportRoute(
                                 quotationId: currentQuote.value?['id']));
                           }
