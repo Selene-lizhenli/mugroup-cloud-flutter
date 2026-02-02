@@ -42,7 +42,7 @@ class EntryGridModule extends ConsumerWidget {
         featureKey: EntryFeatures.marketPurchase.id,
         label: EntryFeatures.marketPurchase.title,
         iconAsset: 'assets/mu/market_$theme.png',
-        iconSize: 35,
+        iconSize: 26,
         route: const QuoteRoute(),
       ),
       _EntryConfig(
