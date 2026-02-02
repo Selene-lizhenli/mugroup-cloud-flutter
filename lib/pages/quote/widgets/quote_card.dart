@@ -301,7 +301,7 @@ class _QuoteCardState extends State<QuoteCard> {
             showModalBottomSheet(
                 context: context,
                 builder: (context) =>
-                    AddSupplierSheet(quotationId: quote?['id']));
+                    AddSupplierSheet(quotationId: widget.item.id));
           },
           child: const Center(
             child: Icon(
