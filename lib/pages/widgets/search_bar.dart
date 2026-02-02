@@ -4,6 +4,7 @@ class MuSearchBar extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String buttonText;
+
   /// 搜索回调，透出当前输入的文本
   final ValueChanged<String?> onSearch;
   final EdgeInsetsGeometry? padding;
@@ -26,8 +27,8 @@ class MuSearchBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final effectiveThemeColor = themeColor ?? colorScheme.primary;
     final effectiveFillColor =
-        fillColor ?? const Color.fromARGB(255, 247, 247, 247);
-    
+        fillColor ??  Colors.transparent;
+
     // 计算对比色：根据主题颜色亮度选择白色或黑色
     final onThemeColor = _getContrastColor(effectiveThemeColor);
 
@@ -44,11 +45,11 @@ class MuSearchBar extends StatelessWidget {
                 // 回车搜索时透出当前文本
                 onSubmitted: onSearch,
                 cursorColor: effectiveThemeColor,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14, height: 1),
                 decoration: InputDecoration(
                   hintText: hintText,
                   isDense: true,
-                  filled: true, 
+                  filled: true,
                   focusColor: effectiveThemeColor,
                   fillColor: effectiveFillColor,
                   contentPadding: const EdgeInsets.symmetric(
@@ -59,22 +60,22 @@ class MuSearchBar extends StatelessWidget {
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
                         bottomLeft: Radius.circular(12)),
-                    borderSide: BorderSide(
-                        color: effectiveThemeColor, width: 1),
+                    borderSide:
+                        BorderSide(color: effectiveThemeColor, width: 1),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
                         bottomLeft: Radius.circular(12)),
-                    borderSide: BorderSide(
-                        color: effectiveThemeColor, width: 1),
+                    borderSide:
+                        BorderSide(color: effectiveThemeColor, width: 1),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
                         bottomLeft: Radius.circular(12)),
-                    borderSide: BorderSide(
-                        color: effectiveThemeColor, width: 1),
+                    borderSide:
+                        BorderSide(color: effectiveThemeColor, width: 1),
                   ),
                 ),
               ),
@@ -114,4 +115,3 @@ class MuSearchBar extends StatelessWidget {
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 }
-
