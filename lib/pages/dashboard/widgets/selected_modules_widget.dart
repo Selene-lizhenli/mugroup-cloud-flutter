@@ -1,7 +1,7 @@
-
+import 'package:cloud/constants/app_feature_constants.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/customer_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
-import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart'; 
+import 'package:cloud/pages/dashboard/widgets/modules/inspection_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/modules/supplier_chart.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/sample_room.main.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -32,14 +32,14 @@ class DashboardModules {
   static List<ModuleInfo> getAllModules() {
     return [
       ModuleInfo(
-        id: 'sample_room',
-        title: 'Top榜单',
+        id: EntryFeatures.showroomSample.id,
+        title: EntryFeatures.showroomSample.title,
         contentBuilder: () => const SampleRoomChart(),
         group: '数据统计',
       ),
       ModuleInfo(
-        id: 'inspection',
-        title: '验货',
+        id: EntryFeatures.inspection.id,
+        title: EntryFeatures.inspection.title,
         contentBuilder: () => const InspectionChart(),
         group: '数据统计',
       ),
@@ -50,14 +50,14 @@ class DashboardModules {
       //   group: '数据统计',
       // ),
       ModuleInfo(
-        id: 'customer',
-        title: '客户',
+        id: EntryFeatures.crmCompany.id,
+        title: EntryFeatures.crmCompany.title,
         contentBuilder: () => const CustomerChart(),
         group: '数据统计',
       ),
       ModuleInfo(
-        id: 'supplier',
-        title: '供应商',
+        id: EntryFeatures.supplySupplier.id,
+        title: EntryFeatures.supplySupplier.title,
         contentBuilder: () => const SupplierChart(),
         group: '数据统计',
       ),
@@ -80,8 +80,8 @@ class DashboardModules {
   static Future<List<ModuleInfo>> getSelectedModules() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedIds =
-        prefs.getStringList(_storageKey) ?? ['rate', 'sample_room'];
-    final orderIds = prefs.getStringList(_orderKey) ?? ['rate', 'sample_room'];
+        prefs.getStringList(_storageKey) ?? ['rate', EntryFeatures.showroomSample.id];
+    final orderIds = prefs.getStringList(_orderKey) ?? ['rate', EntryFeatures.showroomSample.id];
 
     if (selectedIds.isEmpty) {
       return [];

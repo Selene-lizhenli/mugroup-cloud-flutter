@@ -23,6 +23,7 @@ abstract class Tenant with _$Tenant {
     @JsonKey(name: 'login_ways') List<String>? loginWays,
     @JsonKey(name: 'base_url') String? baseUrl,
     TenantWxwork? wxwork,
+    @JsonKey(name: 'app_features') List<String?>? appFeatures, 
   }) = _Tenant;
 
   factory Tenant.fromJson(Map<String, dynamic> json) => _$TenantFromJson(json);

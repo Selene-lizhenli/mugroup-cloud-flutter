@@ -1,11 +1,68 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/app_feature_constants.dart';
+import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/widgets/empty.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/theme_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+/// 单个入口配置
+class _EntryConfig {
+  final String featureKey;
+  final String label;
+  final String iconAsset;
+  final double iconSize;
+  final dynamic route;
+
+  const _EntryConfig({
+    required this.featureKey,
+    required this.label,
+    required this.iconAsset,
+    this.iconSize = 28,
+    this.route,
+  });
+}
+
 class EntryGridModule extends ConsumerWidget {
   const EntryGridModule({super.key});
+
+  static List<_EntryConfig> _buildEntryConfigs(bool isPinkTheme) {
+    final theme = isPinkTheme ? 'pink' : 'blue';
+    return [
+      _EntryConfig(
+        featureKey: EntryFeatures.showroomSample.id,
+        label: EntryFeatures.showroomSample.title,
+        iconAsset: 'assets/mu/warehouse_$theme.png',
+        iconSize: 35,
+        route: const SamplesListRoute(),
+      ),
+      _EntryConfig(
+        featureKey: EntryFeatures.crmCompany.id,
+        label: EntryFeatures.crmCompany.title,
+        iconAsset: 'assets/mu/cust_$theme.png',
+        iconSize: 26,
+        route: const CrmCompanyRoute(),
+      ),
+      _EntryConfig(
+        featureKey: EntryFeatures.supplySupplier.id,
+        label: EntryFeatures.supplySupplier.title,
+        iconAsset: 'assets/mu/factory_$theme.png',
+        iconSize: 35,
+        route: const SupplySupplierRoute(),
+      ),
+  
+   
+      _EntryConfig(
+        featureKey: EntryFeatures.inspection.id,
+        label: EntryFeatures.inspection.title,
+        iconAsset: 'assets/mu/insp_$theme.png',
+        iconSize: 31,
+        route: const InspectionRoute(),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,6 +71,34 @@ class EntryGridModule extends ConsumerWidget {
     const double spacing = 6.0;
     final themeType = ref.watch(appThemeProvider);
     final isPinkTheme = themeType == ThemeType.pink ? true : false;
+
+    final cloud = ref.watch(coreProvider).value!;
+    final tenant = cloud.currentTenant;
+    final appFeatures = tenant?.appFeatures ?? [];
+    final featureSet = appFeatures
+        .whereType<String>()
+        .map((e) => e.trim().toLowerCase())
+        .toSet();
+
+    final allEntries = _buildEntryConfigs(isPinkTheme);
+    final visibleEntries = allEntries 
+        .where((e) => featureSet.contains(e.featureKey.toLowerCase()))
+        .toList(); 
+
+    if (visibleEntries.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+            child: Empty(
+          text: '暂无模块',
+          height: 24,
+        )),
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
@@ -32,49 +117,18 @@ class EntryGridModule extends ConsumerWidget {
             spacing: spacing,
             runSpacing: spacing,
             alignment: WrapAlignment.center,
-            children: [
-              _EntryItem(
-                width: itemWidth,
-                iconSize: 35,
-                icon:
-                    'assets/mu/warehouse_${isPinkTheme ? "pink" : "blue"}.png',
-                label: '样品间',
-                route: const SamplesListRoute(),
-                color: colorScheme.primary,
-              ),
-              _EntryItem(
-                width: itemWidth,
-                icon:
-                    'assets/mu/warehouse_${isPinkTheme ? "pink" : "blue"}.png',
-                label: '市场带客',
-                route: const QuoteRoute(),
-                color: colorScheme.primary,
-              ),
-              _EntryItem(
-                width: itemWidth,
-                icon: 'assets/mu/cust_${isPinkTheme ? "pink" : "blue"}.png',
-                label: '客户',
-                iconSize: 26,
-                route: const CrmCompanyRoute(),
-                color: colorScheme.primary,
-              ),
-              _EntryItem(
-                width: itemWidth,
-                iconSize: 35,
-                icon: 'assets/mu/factory_${isPinkTheme ? "pink" : "blue"}.png',
-                label: '供应商',
-                route: const SupplySupplierRoute(),
-                color: colorScheme.primary,
-              ),
-              _EntryItem(
-                width: itemWidth,
-                iconSize: 31,
-                icon: 'assets/mu/insp_${isPinkTheme ? "pink" : "blue"}.png',
-                label: '验货',
-                route: const InspectionRoute(),
-                color: colorScheme.primary,
-              ),
-            ],
+            children: visibleEntries
+                .map(
+                  (config) => _EntryItem(
+                    width: itemWidth,
+                    iconSize: config.iconSize,
+                    icon: config.iconAsset,
+                    label: config.label,
+                    route: config.route,
+                    color: colorScheme.primary,
+                  ),
+                )
+                .toList(),
           );
         },
       ),

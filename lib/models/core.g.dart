@@ -30,6 +30,9 @@ _$TenantImpl _$$TenantImplFromJson(Map<String, dynamic> json) => _$TenantImpl(
       wxwork: json['wxwork'] == null
           ? null
           : TenantWxwork.fromJson(json['wxwork'] as Map<String, dynamic>),
+      appFeatures: (json['app_features'] as List<dynamic>?)
+          ?.map((e) => e as String?)
+          .toList(),
     );
 
 Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
@@ -39,4 +42,5 @@ Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
       'login_ways': instance.loginWays,
       'base_url': instance.baseUrl,
       'wxwork': instance.wxwork,
+      'app_features': instance.appFeatures,
     };

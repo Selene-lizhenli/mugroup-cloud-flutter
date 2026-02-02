@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:flutter/material.dart';
 
 /// 可复用空态组件：空 icon + 文案，上下布局
@@ -30,7 +31,7 @@ class Empty extends StatelessWidget {
     this.iconSize = 44,
     this.textStyle,
     this.iconColor,
-    this.padding = 0,
+    this.padding,
     this.height,
     this.showImage = false,
     this.fontSize = 12,
@@ -44,9 +45,10 @@ class Empty extends StatelessWidget {
     final effectiveTextStyle =
         textStyle ?? TextStyle(color: colorScheme.outline, fontSize: fontSize);
     final effectivePadding = padding != null ? padding! * 2 : 120;
-
+    final containerHeight =
+        height ?? (showImage == true ? picHeight : 0.0) + effectivePadding;
     return SizedBox(
-      height: height ?? picHeight + effectivePadding,
+      height: containerHeight,
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -58,14 +60,15 @@ class Empty extends StatelessWidget {
               size: iconSize,
               color: effectiveIconColor,
             ),
+            const SizedBox(height: 10),
           ] else if (showImage == true) ...[
             Image.asset(
               'assets/element/empty.png',
               height: picHeight,
               fit: BoxFit.contain,
             ),
+            const SizedBox(height: 10),
           ],
-          const SizedBox(height: 10),
           if (textSpans != null) ...[
             SizedBox(
               width: double.infinity,

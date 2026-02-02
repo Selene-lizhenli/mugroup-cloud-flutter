@@ -148,6 +148,13 @@ class LoginWay extends HookConsumerWidget {
                 ),
                 getLableByLoginWay(loginWay),
               )),
+          if (tenant.title != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              tenant.title ?? '',
+              style: TextStyle(color: colorScheme.onSurface, fontSize: 12),
+            ),
+          ],
           // 账号密码
           if (loginWay == "account") ...[
             if (appleIdentityToken != null)
@@ -162,7 +169,7 @@ class LoginWay extends HookConsumerWidget {
                 ),
               ),
             const SizedBox(
-              height: 20,
+              height: 16,
             ),
             TextField(
               controller: accountController,

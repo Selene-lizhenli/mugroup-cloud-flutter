@@ -1,5 +1,6 @@
 import 'package:cloud/core/rx_bus.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/models/core.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -133,28 +134,32 @@ class Home extends _$Home {
     );
   }
 
-  Future<void> fetchWarehouses() async {
+  Future<void> fetchWarehouses(Tenant? currentTenant) async {
     state = state.copyWith(isLoadingWarehouses: true);
 
     final resp = await getWarehouses();
     final warehouses = resp.data ?? [];
-
-    // 添加独立样品间
-    const independentWarehouse = Warehouse(
-      name: '独立(部门)样品间',
-      image: [
-        WarehouseImage(
-          url: 'assets/building2d.png',
-          thumbUrl: 'assets/building2d.png',
+    var independentWarehouse = <Warehouse>[];
+    // 若当前租户为 id==6，新增一项独立(部门)样品间
+    if (currentTenant != null && (currentTenant.id == 6)) {
+      independentWarehouse = [
+        const Warehouse(
+          name: '独立(部门)样品间',
+          image: [
+            WarehouseImage(
+              url: 'assets/building2d.png',
+              thumbUrl: 'assets/building2d.png',
+            ),
+          ],
         ),
-      ],
-    );
+      ];
+    }
     // 过滤掉废弃的样品间
     final filteredWarehouses =
         warehouses.where((warehouse) => warehouse.abandoned != true).toList();
 
     state = state.copyWith(
-      warehouses: [...filteredWarehouses, independentWarehouse],
+      warehouses: [...filteredWarehouses, ...independentWarehouse],
       isLoadingWarehouses: false,
     );
   }

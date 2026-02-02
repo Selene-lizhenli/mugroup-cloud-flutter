@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/app_feature_constants.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
 import 'package:cloud/pages/setting/widgets/setting_modlue_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
@@ -34,9 +35,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   /// =======================
   Future<void> _initModules() async {
     final prefs = await SharedPreferences.getInstance();
-    final selectedIds =
-        prefs.getStringList(_storageKey) ?? ['rate', 'sample_room'];
-    final orderIds = prefs.getStringList(_orderKey) ?? ['rate', 'sample_room'];
+    final selectedIds = prefs.getStringList(_storageKey) ??
+        ['rate', EntryFeatures.showroomSample.id];
+    final orderIds = prefs.getStringList(_orderKey) ??
+        ['rate', EntryFeatures.showroomSample.id];
 
     /// 所有模块（固定定义）
     final allModules = [
@@ -48,11 +50,11 @@ class _SettingPageState extends ConsumerState<SettingPage> {
         selected: selectedIds.contains('rate'),
       ),
       DashboardModule(
-        id: 'sample_room',
-        title: 'Top榜单',
+        id: EntryFeatures.showroomSample.id,
+        title: EntryFeatures.showroomSample.title,
         content: const SampleRoomChart(),
         group: '数据统计', // 添加分组
-        selected: selectedIds.contains('sample_room'),
+        selected: selectedIds.contains(EntryFeatures.showroomSample.id),
       ),
       // DashboardModule(
       //   id: 'news',
@@ -62,32 +64,33 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       //   selected: selectedIds.contains('news'),
       // ),
       // DashboardModule(
-      //   id: 'market_purchase',
-      //   title: '市场带客',
+      //  id: EntryFeatures.marketPurchase.id,
+      // title: EntryFeatures.marketPurchase.title,
       //   content: const MarketPurchaseChart(),
       //   group: '数据统计', // 添加分组
       //   selected: selectedIds.contains('market_purchase'),
       // ),
       // DashboardModule(
-      //   id: 'customer',
-      //   title: '客户',
+      //   id: EntryFeatures.crmCompany.id,
+      //   title: EntryFeatures.crmCompany.title,
       //   content: const CustomerChart(),
       //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains('customer'),
+      //   selected: selectedIds.contains(EntryFeatures.crmCompany.id),
       // ),
       // DashboardModule(
-      //   id: 'supplier',
-      //   title: '供应商',
+      //   id: EntryFeatures.supplySupplier.id,
+      //   title: EntryFeatures.supplySupplier.title,
       //   content: const SupplierChart(),
       //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains('supplier'),
+      //   selected: selectedIds.contains(EntryFeatures.supplySupplier.id),
       // ),
+
       // DashboardModule(
-      //   id: 'inspection',
-      //   title: '验货',
+      //   id: EntryFeatures.inspection.id,
+      //   title: EntryFeatures.inspection.title,
       //   content: const InspectionChart(),
       //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains('inspection'),
+      //   selected: selectedIds.contains(EntryFeatures.inspection.id),
       // ),
     ];
 

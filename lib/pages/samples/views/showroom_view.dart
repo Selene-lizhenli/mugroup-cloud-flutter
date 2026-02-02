@@ -1,6 +1,7 @@
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,19 +21,23 @@ class SamplesPageView extends HookConsumerWidget {
     final screenHeight = MediaQuery.of(context)
         .size
         .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
-    final isPad =  MediaQuery.of(context).size.width > 600;
+    final isPad = MediaQuery.of(context).size.width > 600;
     final imageHeight = screenHeight * (isPad ? 0.26 : 0.19);
+    final cloud = ref.watch(coreProvider).value!;
+    final currentTenant = cloud.currentTenant;  //当前租户
 
     useEffect(() {
       Future.microtask(() async {
-        await homeNotifier.fetchWarehouses();
+        await homeNotifier.fetchWarehouses( currentTenant);
       });
       return null;
     }, []);
 
     if (home.isLoadingWarehouses) {
       return const Center(
-        child: MuProgressIndicator(showText: true,),
+        child: MuProgressIndicator(
+          showText: true,
+        ),
       );
     }
     if (warehouses.isEmpty) {
@@ -55,7 +60,7 @@ class SamplesPageView extends HookConsumerWidget {
             child: WarehouseShowCard(
               warehouse: warehouse,
               isPad: isPad,
-              imageHeight:imageHeight,
+              imageHeight: imageHeight,
             ),
           ),
         );
