@@ -197,10 +197,18 @@ class _QuoteCardState extends State<QuoteCard> {
       ColorScheme colorScheme, dynamic quote, bool isSelected, int id) {
     final supplier = quote.supplier;
     final String name = supplier?.name ?? '未知';
-    final String? imageUrl = (supplier?.media?.firstWhereOrNull(
-                (img) => img.collectionName == 'bussiness_card') ??
-            supplier?.media?.firstOrNull)
-        ?.url;
+    final String? imageUrl = () {
+      if (supplier?.media == null || supplier!.media!.isEmpty) return null;
+
+      final businessCards = supplier.media!
+          .where((img) => img.collectionName == 'bussiness_card');
+
+      if (businessCards.isNotEmpty) {
+        return businessCards.first.url;
+      }
+
+      return null;
+    }();
 
     return Container(
       width: 70,

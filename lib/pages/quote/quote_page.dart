@@ -57,7 +57,7 @@ class QuotePage extends HookConsumerWidget {
         "page": "1",
         "pageSize": "50",
         "type": "market",
-        "includes": 'supplyQuotes.supplier'
+        "includes": 'supplyQuotes.supplier.media'
       };
       try {
         final response = await getShowroomQuotation(quoteParams);
