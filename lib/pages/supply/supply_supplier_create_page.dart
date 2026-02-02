@@ -19,7 +19,15 @@ class SupplySupplierCreatePage extends HookConsumerWidget {
       ),
       body: SupplySupplierForm(
         initial: null,
-        onSubmit: (data) async { 
+        onSubmit: (data) async {
+          if (data['images'] != null && data['images'] is List) {
+            data['images'] = (data['images'] as List).map((item) {
+              if (item is Map && !item.containsKey('collection_name')) {
+                item['collection_name'] = 'bussiness_card';
+              }
+              return item;
+            }).toList();
+          }
           await storeSupplySupplier(data);
           EasyLoading.showSuccess("创建成功");
           if (context.mounted) {

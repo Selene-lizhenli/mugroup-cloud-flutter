@@ -148,7 +148,16 @@ class SupplySupplierEditPage extends HookConsumerWidget {
                 SupplySupplierForm(
                   key: ValueKey('info_${refreshKey.value}'),
                   initial: supplier.value,
-                  onSubmit: (data) async {  
+                  onSubmit: (data) async {
+                    if (data['images'] != null && data['images'] is List) {
+                      data['images'] = (data['images'] as List).map((item) {
+                        if (item is Map &&
+                            !item.containsKey('collection_name')) {
+                          item['collection_name'] = 'bussiness_card';
+                        }
+                        return item;
+                      }).toList();
+                    }
                     await updateSupplySupplier(id, data);
                     EasyLoading.showSuccess("编辑成功");
                   },

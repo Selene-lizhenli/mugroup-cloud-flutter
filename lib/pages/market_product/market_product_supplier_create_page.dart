@@ -331,6 +331,20 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                           'stall_address': '$area$stall',
                         };
 
+                        if (data['images'] != null && data['images'] is List) {
+                          data['images'] = (data['images'] as List).map((item) {
+                            Map<String, dynamic> itemMap = item is Map
+                                ? Map<String, dynamic>.from(item)
+                                : item.toJson();
+
+                            if (!itemMap.containsKey('collection_name')) {
+                              itemMap['collection_name'] = 'bussiness_card';
+                            }
+
+                            return itemMap;
+                          }).toList();
+                        }
+
                         final newSupplier = await storeSupplySupplier(data);
 
                         // 3. 检查是否有联系人数据需要提交
