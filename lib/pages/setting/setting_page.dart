@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/constants/app_feature_constants.dart';
+import 'package:cloud/constants/app_feature_constants.dart'; 
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
 import 'package:cloud/pages/setting/widgets/setting_modlue_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
@@ -51,7 +51,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       ),
       DashboardModule(
         id: EntryFeatures.showroomSample.id,
-        title: EntryFeatures.showroomSample.title,
+        title: "Top榜单",
         content: const SampleRoomChart(),
         group: '数据统计', // 添加分组
         selected: selectedIds.contains(EntryFeatures.showroomSample.id),
