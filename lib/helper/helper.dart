@@ -41,7 +41,7 @@ String formatCurrencyAmount(amount) {
   if (amountDouble >= 10000) {
     double wanAmount = amountDouble / 10000;
     // 使用 toStringAsFixed(1) 保留一位小数，例如 123456 -> 12.3w
-    return "${wanAmount.toStringAsFixed(1)}w";
+    return wanAmount.toStringAsFixed(2);
   } else {
     // 金额小于10000，直接显示原始金额
     return amountDouble.toStringAsFixed(0);

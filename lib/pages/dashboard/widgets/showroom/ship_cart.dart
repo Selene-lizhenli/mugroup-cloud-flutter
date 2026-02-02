@@ -334,7 +334,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
               ChartDimenTips(
                   label: '$dimenLabel排行',
                   extra: Text(
-                    '单位：人民币',
+                    '单位：万人民币',
                     style: TextStyle(fontSize: 10, color: colorScheme.outline),
                   )),
               Padding(

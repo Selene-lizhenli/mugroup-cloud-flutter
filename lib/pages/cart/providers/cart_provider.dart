@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud/app/app.dart';
+import 'package:cloud/constants/core.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
@@ -70,7 +71,7 @@ class Cart extends _$Cart {
       cartName: defaultCart != null ? cartNames[defaultCart.type] : null,
     );
 
-    if (cloud.currentTenant?.id == 6) {
+    if (cloud.currentTenant?.id == TenantConstants.warehouseMainTenantId) {
       cacheKey = "cart_v1";
     } else if (cloud.currentTenant?.id != null) {
       cacheKey = "tenant${cloud.currentTenant!.id!}_cart_v1";

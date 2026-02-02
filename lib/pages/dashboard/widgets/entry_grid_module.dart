@@ -51,9 +51,7 @@ class EntryGridModule extends ConsumerWidget {
         iconAsset: 'assets/mu/factory_$theme.png',
         iconSize: 35,
         route: const SupplySupplierRoute(),
-      ),
-  
-   
+      ), 
       _EntryConfig(
         featureKey: EntryFeatures.inspection.id,
         label: EntryFeatures.inspection.title,

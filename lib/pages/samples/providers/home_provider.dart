@@ -1,6 +1,9 @@
+import 'package:cloud/app/app.dart';
+import 'package:cloud/constants/core.dart';
 import 'package:cloud/core/rx_bus.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/core.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
@@ -141,7 +144,8 @@ class Home extends _$Home {
     final warehouses = resp.data ?? [];
     var independentWarehouse = <Warehouse>[];
     // 若当前租户为 id==6，新增一项独立(部门)样品间
-    if (currentTenant != null && (currentTenant.id == 6)) {
+    if (currentTenant != null &&
+        (currentTenant.id == TenantConstants.warehouseMainTenantId)) {
       independentWarehouse = [
         const Warehouse(
           name: '独立(部门)样品间',
@@ -185,46 +189,59 @@ class Home extends _$Home {
     bool? init = false,
     TemporaryMedia? searchMedia,
   }) async {
-    // 准备查询参数（使用当前状态）
-    final currentPage = init == true ? 1 : state.productCurrentPage;
-    final queryParameters = {
-      "search": searchText ?? state.search,
-      if (searchMedia != null) "image": searchMedia.id,
-      "item_type": "sample", // 样品间数据
-      "page": currentPage,
-      "pageSize": 20,
-      "includes": 'supplyQuotes.supplier',
-      if (state.isDetailedMode == true) ...state.query,
-      if (state.currentSelectedWarehouse != null)
-        'warehouse_id': state.currentSelectedWarehouse!.id.toString()
-    };
-    logger.d('样品列表查询参数$queryParameters');
-    final resp = await getSamples(queryParameters: queryParameters);
-
-    // 使用 addPostFrameCallback 延迟状态更新，避免在构建过程中修改状态
-
-    var updatedState = state.copyWith(
-      search: searchText,
-      // media: searchMedia != null ? [searchMedia] : state.media,
-      currentMediaId: searchMedia?.id,
-      productListLoading: false,
-      samples: (init == true || currentPage == 1)
-          ? resp.data
-          : [...state.samples, ...resp.data],
-      productNoMore: resp.data.length < 20,
+    state = state.copyWith(
+      productListLoading: true,
     );
-    if (state.productCurrentPage == 1 && state.facetCounts.isEmpty) {
-      updatedState = updatedState.copyWith(
-        facetCounts: resp.meta?.facetCounts ?? [],
-      );
-    }
-    if (resp.data.length >= 20) {
-      updatedState = updatedState.copyWith(
-        productCurrentPage: state.productCurrentPage + 1,
-      );
-    }
-    state = updatedState;
+    try {
+      // 准备查询参数（使用当前状态）
+      final currentPage = init == true ? 1 : state.productCurrentPage;
+      final core = app.container.read(coreProvider).value;
+      final tenant = core?.currentTenant;
+      final queryParameters = {
+        "search": searchText ?? state.search,
+        if (searchMedia != null) "image": searchMedia.id,
+        "item_type": "sample", // 样品间数据
+        "page": currentPage,
+        "pageSize": 20,
+        "includes": 'supplyQuotes.supplier',
+        if (state.isDetailedMode == true) ...state.query,
+        if (tenant?.id == TenantConstants.warehouseMainTenantId &&
+            state.currentSelectedWarehouse != null)
+          'warehouse_id': state.currentSelectedWarehouse!.id.toString(),
+      };
+      logger.d('样品列表查询参数$queryParameters');
+      final resp = await getSamples(queryParameters: queryParameters);
 
-    return resp;
+      // 使用 addPostFrameCallback 延迟状态更新，避免在构建过程中修改状态
+
+      var updatedState = state.copyWith(
+        search: searchText,
+        // media: searchMedia != null ? [searchMedia] : state.media,
+        currentMediaId: searchMedia?.id,
+        productListLoading: false,
+        samples: (init == true || currentPage == 1)
+            ? resp.data
+            : [...state.samples, ...resp.data],
+        productNoMore: resp.data.length < 20,
+      );
+      if (state.productCurrentPage == 1 && state.facetCounts.isEmpty) {
+        updatedState = updatedState.copyWith(
+          facetCounts: resp.meta?.facetCounts ?? [],
+        );
+      }
+      if (resp.data.length >= 20) {
+        updatedState = updatedState.copyWith(
+          productCurrentPage: state.productCurrentPage + 1,
+        );
+      }
+      state = updatedState;
+      return resp;
+    } catch (e, st) {
+      logger.e('fetchSamples 失败', error: e, stackTrace: st);
+      state = state.copyWith(
+        productListLoading: false,
+      );
+      return const ApiResponse.data(<Sample>[], null);
+    }
   }
 }
