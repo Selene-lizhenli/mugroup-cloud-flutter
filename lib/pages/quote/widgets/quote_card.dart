@@ -3,11 +3,13 @@ import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
 import 'package:flutter/material.dart';
 
-class QuoteCard extends StatefulWidget {
+class QuoteCard extends StatelessWidget {
   final QuotationList item;
   final VoidCallback? onTap;
   final int? tabIndex;
 
+  // 【新增】接收外部传入的选中ID
+  final int? selectedSupplierId;
   final void Function(int? supplierId)? onSupplierSelected;
 
   const QuoteCard({
@@ -16,17 +18,11 @@ class QuoteCard extends StatefulWidget {
     this.onTap,
     this.tabIndex,
     this.onSupplierSelected,
+    this.selectedSupplierId, // 接收外部传入的 ID
   });
 
-  @override
-  State<QuoteCard> createState() => _QuoteCardState();
-}
-
-class _QuoteCardState extends State<QuoteCard> {
-  int? selectedSupplierId;
-
   List<Map<String, dynamic>> _getProcessedSuppliers() {
-    final quotes = widget.item.supplyQuotes ?? [];
+    final quotes = item.supplyQuotes ?? [];
     final Map<int, Map<String, dynamic>> supplierMap = {};
     for (var q in quotes) {
       final s = q.supplier;
@@ -40,7 +36,6 @@ class _QuoteCardState extends State<QuoteCard> {
       }
     }
 
-    //最新创建的放在前面
     return supplierMap.values.toList().reversed.toList();
   }
 
@@ -49,7 +44,8 @@ class _QuoteCardState extends State<QuoteCard> {
     final colorScheme = Theme.of(context).colorScheme;
     final processedSuppliers = _getProcessedSuppliers();
 
-    int displayCount = widget.item.productCount ?? 0;
+    // 计算显示数量，但使用传入的 selectedSupplierId
+    int displayCount = item.productCount ?? 0;
     if (selectedSupplierId != null) {
       try {
         final selected =
@@ -76,22 +72,23 @@ class _QuoteCardState extends State<QuoteCard> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-            child: _buildHeader(colorScheme, displayCount),
+            child: _buildHeader(context, colorScheme, displayCount),
           ),
-          _buildSupplierHorizontalList(processedSuppliers, colorScheme),
+          _buildSupplierHorizontalList(
+              context, processedSuppliers, colorScheme),
           const SizedBox(height: 12),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(ColorScheme colorScheme, int displayCount) {
-    final customerName =
-        widget.item.company?.name ?? widget.item.user?.name ?? '未知客户';
-    final creatorName = widget.item.creator?.name ?? '系统';
+  Widget _buildHeader(
+      BuildContext context, ColorScheme colorScheme, int displayCount) {
+    final customerName = item.company?.name ?? item.user?.name ?? '未知客户';
+    final creatorName = item.creator?.name ?? '系统';
     final isFiltered = selectedSupplierId != null;
 
-    final collaborators = widget.item.collaborators;
+    final collaborators = item.collaborators;
     final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
     final collabText = hasCollaborators
         ? collaborators.map((e) => e.name ?? '').join('、')
@@ -105,7 +102,7 @@ class _QuoteCardState extends State<QuoteCard> {
               Flexible(
                 flex: 5,
                 child: GestureDetector(
-                  onTap: widget.onTap,
+                  onTap: onTap,
                   child: Text(
                     customerName,
                     style: const TextStyle(
@@ -140,7 +137,7 @@ class _QuoteCardState extends State<QuoteCard> {
           ),
         ),
         const SizedBox(width: 8),
-        _buildCollaborateButton(colorScheme),
+        _buildCollaborateButton(context, colorScheme),
       ],
     );
   }
@@ -164,7 +161,7 @@ class _QuoteCardState extends State<QuoteCard> {
     );
   }
 
-  Widget _buildSupplierHorizontalList(
+  Widget _buildSupplierHorizontalList(BuildContext context,
       List<Map<String, dynamic>> items, ColorScheme colorScheme) {
     return SizedBox(
       height: 70,
@@ -173,10 +170,11 @@ class _QuoteCardState extends State<QuoteCard> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: items.length + 1,
         itemBuilder: (context, index) {
-          if (index == 0) return _buildAddBtn();
+          if (index == 0) return _buildAddBtn(context);
 
           final itemData = items[index - 1];
           final id = itemData['id'];
+          // 【核心变化】使用外部传入的 selectedSupplierId 判断
           final isSelected = selectedSupplierId == id;
           final supplier = itemData['data'].supplier;
 
@@ -199,8 +197,8 @@ class _QuoteCardState extends State<QuoteCard> {
                   child: GestureDetector(
                     onTap: () {
                       final newId = isSelected ? null : id;
-                      setState(() => selectedSupplierId = newId);
-                      widget.onSupplierSelected?.call(newId);
+                      // 【核心变化】直接调用外部回调，不在此维护 state
+                      onSupplierSelected?.call(newId);
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -233,7 +231,7 @@ class _QuoteCardState extends State<QuoteCard> {
                   Align(
                     alignment: Alignment.center,
                     child: GestureDetector(
-                      onTap: () => _showImagePreview(imageUrl),
+                      onTap: () => _showImagePreview(context, imageUrl),
                       child: Container(
                         width: 30,
                         height: 30,
@@ -241,11 +239,8 @@ class _QuoteCardState extends State<QuoteCard> {
                           color: Colors.black.withOpacity(0.5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.fullscreen_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                        child: const Icon(Icons.fullscreen_rounded,
+                            color: Colors.white, size: 20),
                       ),
                     ),
                   ),
@@ -257,7 +252,7 @@ class _QuoteCardState extends State<QuoteCard> {
     );
   }
 
-  void _showImagePreview(String url) {
+  void _showImagePreview(BuildContext context, String url) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -271,7 +266,7 @@ class _QuoteCardState extends State<QuoteCard> {
     );
   }
 
-  Widget _buildAddBtn() {
+  Widget _buildAddBtn(BuildContext context) {
     return Container(
         width: 70,
         height: 70,
@@ -284,18 +279,18 @@ class _QuoteCardState extends State<QuoteCard> {
                     context: context,
                     isScrollControlled: true,
                     builder: (context) =>
-                        AddSupplierSheet(quotationId: widget.item.id)),
+                        AddSupplierSheet(quotationId: item.id)),
                 child: const Center(
                     child: Icon(Icons.add_rounded, color: Colors.grey)))));
   }
 
-  Widget _buildCollaborateButton(ColorScheme colorScheme) {
+  Widget _buildCollaborateButton(
+      BuildContext context, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: () => showModalBottomSheet(
         context: context,
         isScrollControlled: true,
-        builder: (context) =>
-            CollaborationBottomSheet(quoteId: widget.item.id!),
+        builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -309,14 +304,11 @@ class _QuoteCardState extends State<QuoteCard> {
             Icon(Icons.people_alt_rounded,
                 size: 16, color: colorScheme.primary),
             const SizedBox(width: 4),
-            Text(
-              '协作',
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text('协作',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w500)),
           ],
         ),
       ),

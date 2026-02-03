@@ -1,9 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
@@ -28,38 +25,24 @@ class QuotePage extends HookConsumerWidget {
 
     // --- 基础数据状态 ---
     final isLoading = useState(true);
-    final list = useState<List<QuotationList>>([]); // 主列表数据
-    final quoteSampleSupplierList =
-        useState<List<QuotationSample>>([]); // 底部“供应商列表”板块的数据池
+    final list = useState<List<QuotationList>>([]);
 
-    // --- 选中与联动状态 ---
-    final currentQuote = useState<Map<String, dynamic>?>(null); // 底部看板关联的客户
-    final selectedSupplier =
-        useState<Map<String, dynamic>?>(null); // 添加产品时选中的供应商
-
-    final selectedSupplierId = useState<int?>(null); // 客户列表选中的供应商ID
-
-    // --- 客户列表卡片内预览的状态 ---
+    // --- 选中与联动状态 (真理来源) ---
+    final activeQuoteId = useState<int?>(null); // 当前展开预览的卡片 ID
+    final selectedSupplierId = useState<int?>(null); // 当前选中的供应商 ID
     final activeProducts =
         useState<List<QuotationSample>>([]); // 存储卡片内点击请求回来的详细产品
-    final activeQuoteId = useState<int?>(null); // 当前展开预览的卡片 ID
     final isProductLoading = useState(false); // 预览产品的加载状态
+
+    // --- 添加产品板块的独立状态 ---
+    final currentQuote = useState<Map<String, dynamic>?>(null);
+    final selectedSupplier = useState<Map<String, dynamic>?>(null);
 
     // --- 控制与搜索 ---
     final recordsDisplayCount = useState(2);
-    final suppliersDisplayCount = useState(2);
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final lastSearch = useRef('');
-
-    // 选择关联客户弹窗
-    Future<void> pickQuote() async {
-      final result = await showModalBottomSheet<Map<String, dynamic>>(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => const QuoteSelect());
-      if (result != null) currentQuote.value = result;
-    }
 
     // 获取主列表数据
     Future<void> fetchData() async {
@@ -84,19 +67,28 @@ class QuotePage extends HookConsumerWidget {
       }
     }
 
-    // 获取底部“供应商列表”分组数据
-    Future<void> fetchSupplierData() async {
-      final boundQuote = currentQuote.value;
-      if (boundQuote?['id'] == null) {
-        quoteSampleSupplierList.value = [];
+    // 专门刷新当前卡片下选中的供应商产品 (支持 await)
+    Future<void> fetchActiveProducts() async {
+      if (activeQuoteId.value == null || selectedSupplierId.value == null) {
+        activeProducts.value = [];
         return;
       }
+
+      isProductLoading.value = true;
       try {
         final resp = await getQuotationProductListByProductId(
-            boundQuote?['id'], {"page": '1', "pageSize": 1000});
-        quoteSampleSupplierList.value = resp.data;
+            activeQuoteId.value!, {"page": '1', "pageSize": 1000});
+
+        final filtered = (resp.data)
+            .where(
+                (s) => s.supplyQuote?.supplier?.id == selectedSupplierId.value)
+            .toList();
+
+        activeProducts.value = filtered;
       } catch (e) {
-        debugPrint("Error: $e");
+        debugPrint("Fetch Active Products Error: $e");
+      } finally {
+        isProductLoading.value = false;
       }
     }
 
@@ -114,25 +106,6 @@ class QuotePage extends HookConsumerWidget {
       return () => searchController.removeListener(onSearchChanged);
     }, []);
 
-    // 监听关联客户变化，刷新底部看板数据
-    useEffect(() {
-      fetchSupplierData();
-      return null;
-    }, [currentQuote.value]);
-
-    // 格式化底部看板的供应商分组数据
-    final groupedData = useMemoized(() {
-      Map<String, List<QuotationSample>> groups = {};
-      for (var item in quoteSampleSupplierList.value) {
-        final supplierName = item.supplyQuote?.supplier?.shortName ??
-            item.supplyQuote?.supplier?.name ??
-            '未知供应商';
-        if (!groups.containsKey(supplierName)) groups[supplierName] = [];
-        groups[supplierName]!.add(item);
-      }
-      return groups;
-    }, [quoteSampleSupplierList.value]);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -147,8 +120,12 @@ class QuotePage extends HookConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          // 1. 刷新主列表
           await fetchData();
-          await fetchSupplierData();
+          // 2. 如果当前有展开项，同步刷新明细产品
+          if (activeQuoteId.value != null && selectedSupplierId.value != null) {
+            await fetchActiveProducts();
+          }
         },
         child: SingleChildScrollView(
           controller: scrollController,
@@ -156,7 +133,6 @@ class QuotePage extends HookConsumerWidget {
           child: Column(
             children: [
               QuoteSearchBar(controller: searchController),
-
               _buildSectionCard(
                 context,
                 title: "客户列表",
@@ -175,61 +151,10 @@ class QuotePage extends HookConsumerWidget {
                     activeProducts,
                     activeQuoteId,
                     selectedSupplierId,
-                    isProductLoading),
+                    isProductLoading,
+                    fetchActiveProducts),
               ),
-
               const SizedBox(height: 16),
-
-              // --- 2. 供应商列表看板 ---
-              // _buildSectionCard(
-              //   context,
-              //   title: "供应商列表",
-              //   icon: Icons.list_alt_rounded,
-              //   iconColor: Colors.orangeAccent,
-              //   action: Row(
-              //     children: [
-              //       ActionPillButton(
-              //           label: '新增供应商',
-              //           backgroundColor: colorScheme.primary,
-              //           textColor: Colors.white,
-              //           onTap: () async {
-              //             if (currentQuote.value == null) await pickQuote();
-              //             if (context.mounted) {
-              //               showModalBottomSheet(
-              //                   context: context,
-              //                   builder: (context) => AddSupplierSheet(
-              //                       quotationId: currentQuote.value?['id']));
-              //             }
-              //           }),
-              //       const SizedBox(width: 10),
-              //       ActionPillButton(
-              //           label: '导入供应商',
-              //           backgroundColor: colorScheme.primary,
-              //           textColor: Colors.white,
-              //           onTap: () async {
-              //             if (currentQuote.value == null) await pickQuote();
-              //             if (context.mounted) {
-              //               context.router.push(ProductBatchImportRoute(
-              //                   quotationId: currentQuote.value?['id']));
-              //             }
-              //           }),
-              //     ],
-              //   ),
-              //   content: Column(
-              //     children: [
-              //       _buildBoundQuoteBar(context, currentQuote, () {
-              //         currentQuote.value = null;
-              //         quoteSampleSupplierList.value = [];
-              //       }),
-              //       _buildDetailList(context, isLoading.value, groupedData,
-              //           currentQuote.value, suppliersDisplayCount),
-              //     ],
-              //   ),
-              // ),
-
-              // const SizedBox(height: 16),
-
-              // --- 3. 添加产品板块 ---
               _buildSectionCard(
                 context,
                 title: "添加产品",
@@ -246,6 +171,7 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
+  // 客户列表内容渲染
   Widget _buildRecentRecordsContent(
       BuildContext context,
       bool isLoading,
@@ -255,7 +181,8 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<List<QuotationSample>> activeProducts,
       ValueNotifier<int?> activeQuoteId,
       ValueNotifier<int?> selectedSupplierId,
-      ValueNotifier<bool> isProductLoading) {
+      ValueNotifier<bool> isProductLoading,
+      Future<void> Function() fetchActiveProducts) {
     if (isLoading) {
       return const Center(
           child: Padding(
@@ -271,48 +198,34 @@ class QuotePage extends HookConsumerWidget {
     return Column(
       children: [
         ...displayList.map((item) {
-          final isExpanded = activeQuoteId.value == item.id;
+          // 判断当前卡片是否为激活展开状态
+          final isCurrentExpanded = activeQuoteId.value == item.id;
 
           return Column(
             children: [
               QuoteCard(
                 item: item,
-                tabIndex: 0,
+                // 【核心】将页面级状态传给卡片，实现刷新后的状态找回
+                selectedSupplierId:
+                    isCurrentExpanded ? selectedSupplierId.value : null,
                 onSupplierSelected: (supplierId) async {
                   if (supplierId == null) {
                     activeQuoteId.value = null;
+                    selectedSupplierId.value = null;
                     activeProducts.value = [];
-                    return;
-                  }
-                  selectedSupplierId.value = supplierId;
-                  activeQuoteId.value = item.id;
-                  isProductLoading.value = true;
-                  try {
-                    // 异步请求该卡片下的完整产品信息
-                    final resp = await getQuotationProductListByProductId(
-                        item.id!, {"page": '1', "pageSize": 1000});
-                    final filtered = (resp.data)
-                        .where((s) => s.supplyQuote?.supplier?.id == supplierId)
-                        .toList();
-                    activeProducts.value = filtered;
-                  } catch (e) {
-                    debugPrint("Fetch Products Error: $e");
-                  } finally {
-                    isProductLoading.value = false;
+                  } else {
+                    activeQuoteId.value = item.id;
+                    selectedSupplierId.value = supplierId;
+                    // 点击后立即执行异步刷新
+                    await fetchActiveProducts();
                   }
                 },
                 onTap: () =>
                     context.router.push(QuoteDetailRoute(id: item.id!)),
               ),
-              // 如果此行被激活，显示产品横轴预览
-              if (isExpanded)
-                _buildExpandableProductStrip(
-                    context,
-                    isProductLoading.value,
-                    activeProducts.value,
-                    item.id, // 传入当前记录 ID
-                    selectedSupplierId.value // 传入选中的供应商 ID
-                    ),
+              if (isCurrentExpanded)
+                _buildExpandableProductStrip(context, isProductLoading.value,
+                    activeProducts.value, item.id, selectedSupplierId.value),
               const SizedBox(height: 4),
             ],
           );
@@ -326,14 +239,11 @@ class QuotePage extends HookConsumerWidget {
             if (canCollapse)
               _buildTextBtn("收起", Icons.keyboard_arrow_up, () {
                 displayCount.value = 2;
-
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (scrollController.hasClients) {
-                    scrollController.animateTo(
-                      0,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.fastOutSlowIn,
-                    );
+                    scrollController.animateTo(0,
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.fastOutSlowIn);
                   }
                 });
               }, isGrey: true),
@@ -343,15 +253,9 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  // 卡片内展开的产品预览条
-  // 展示展开后的产品条 (前面带加号)
-  Widget _buildExpandableProductStrip(
-      BuildContext context, // 增加 context 用于跳转
-      bool loading,
-      List<QuotationSample> products,
-      int? quoteId, // 传入当前报价单ID
-      int? supplierId // 传入当前供应商ID
-      ) {
+  // 展开的产品预览横条
+  Widget _buildExpandableProductStrip(BuildContext context, bool loading,
+      List<QuotationSample> products, int? quoteId, int? supplierId) {
     return Container(
       height: 80,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -364,10 +268,8 @@ class QuotePage extends HookConsumerWidget {
           : ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(8),
-              // 数量 + 1 (为了放加号)
               itemCount: products.length + 1,
               itemBuilder: (context, index) {
-                // --- 第一个元素：加号按钮 ---
                 if (index == 0) {
                   return GestureDetector(
                     onTap: () => context.router.push(QuoteProductNewAddRoute(
@@ -380,9 +282,9 @@ class QuotePage extends HookConsumerWidget {
                         color: Theme.of(context).primaryColor.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.1),
-                            style: BorderStyle.solid),
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withOpacity(0.1)),
                       ),
                       child: Icon(Icons.add_rounded,
                           color: Theme.of(context).primaryColor, size: 28),
@@ -390,7 +292,6 @@ class QuotePage extends HookConsumerWidget {
                   );
                 }
 
-                // --- 后续元素：产品图片 (注意索引要 -1) ---
                 final sample = products[index - 1].showroomSample;
                 final imgUrl =
                     (sample?.image != null && sample!.image!.isNotEmpty)
@@ -399,11 +300,10 @@ class QuotePage extends HookConsumerWidget {
 
                 return GestureDetector(
                   onTap: () {
-                    final sampleId = sample?.id;
-                    if (sampleId == null) return;
-                    context.router.push(
-                      ShowroomSampleDetailRoute(id: sampleId),
-                    );
+                    if (sample?.id != null) {
+                      context.router
+                          .push(ShowroomSampleDetailRoute(id: sample!.id!));
+                    }
                   },
                   child: Container(
                     width: 64,
@@ -428,127 +328,7 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  // --- 板块 2: 供应商分组详情列表渲染 ---
-  Widget _buildDetailList(
-      BuildContext context,
-      bool isLoading,
-      Map<String, List<QuotationSample>> grouped,
-      dynamic boundQuote,
-      ValueNotifier<int> displayCount) {
-    if (isLoading) {
-      return const Center(
-          child: Padding(
-              padding: EdgeInsets.all(20),
-              child: CupertinoActivityIndicator()));
-    }
-    if (grouped.isEmpty) return _buildEmpty("暂无供应商");
-
-    final names = grouped.keys.toList();
-    final displayNames = names.take(displayCount.value).toList();
-    final hasMore = names.length > displayCount.value;
-    final canCollapse = displayCount.value > 2;
-
-    return Column(
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: displayNames.length,
-          separatorBuilder: (_, __) =>
-              const Divider(height: 1, indent: 16, endIndent: 16),
-          itemBuilder: (context, index) {
-            final name = displayNames[index];
-            final prods = grouped[name]!;
-            final supplier = prods.first.supplyQuote?.supplier;
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(supplier?.name ?? name,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  _buildSupplierHorizontalImages(
-                      context, prods, boundQuote, supplier),
-                ],
-              ),
-            );
-          },
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (hasMore)
-              _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
-                  () => displayCount.value += 5),
-            if (canCollapse)
-              _buildTextBtn(
-                  "收起", Icons.keyboard_arrow_up, () => displayCount.value = 2,
-                  isGrey: true),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // 供应商图片组渲染（底部看板用）
-  Widget _buildSupplierHorizontalImages(BuildContext context,
-      List<QuotationSample> prods, dynamic boundQuote, dynamic supplier) {
-    return SizedBox(
-      height: 72,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: prods.length + 1,
-        itemBuilder: (context, pIdx) {
-          if (pIdx == 0) {
-            return GestureDetector(
-              onTap: () => context.router.push(QuoteProductNewAddRoute(
-                  quoteId: boundQuote?['id'],
-                  supplierId: supplier?.id?.toString())),
-              child: Container(
-                width: 72,
-                height: 72,
-                margin: const EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.1))),
-                child: Icon(Icons.add,
-                    color: Theme.of(context).colorScheme.primary, size: 24),
-              ),
-            );
-          }
-          final sample = prods[pIdx - 1].showroomSample;
-          final img = (sample?.image?.isNotEmpty ?? false)
-              ? sample!.image![0].url
-              : null;
-          return Container(
-            width: 72,
-            height: 72,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black.withOpacity(0.05))),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(11),
-                child: img != null
-                    ? Image.network(img, fit: BoxFit.cover)
-                    : const Icon(Icons.image_outlined,
-                        color: Colors.grey, size: 20)),
-          );
-        },
-      ),
-    );
-  }
-
-  // --- 板块 3: 添加产品嵌入板块逻辑 ---
+  // 添加产品板块
   Widget _buildProductAddSection(
       BuildContext context,
       ValueNotifier<Map<String, dynamic>?> quote,
@@ -576,22 +356,12 @@ class QuotePage extends HookConsumerWidget {
                         size: 16, color: colors.primary.withOpacity(0.7)),
                     const SizedBox(width: 6),
                     Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                              color: Colors.black54, fontSize: 12),
-                          children: [
-                            const TextSpan(text: "当前录入："),
-                            TextSpan(
-                              text:
-                                  "${quote.value?['company']?.name ?? '未选择'} / ${supplier.value?['short_name'] ?? supplier.value?['name'] ?? '未选择'}",
-                              style: TextStyle(
-                                color: colors.primary.withOpacity(0.8),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: Text(
+                        "当前录入：${quote.value?['company']?.name ?? '未选择'} / ${supplier.value?['short_name'] ?? supplier.value?['name'] ?? '未选择'}",
+                        style: TextStyle(
+                            color: colors.primary.withOpacity(0.8),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
                       ),
                     ),
                     Icon(Icons.chevron_right_rounded,
@@ -612,15 +382,14 @@ class QuotePage extends HookConsumerWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => _showPreSelectionSheet(context, quote, supplier),
-              child: const SizedBox.expand(),
+              child: Container(color: Colors.transparent),
             ),
           )
       ],
     );
   }
 
-  // --- 通用/辅助 UI 组件 ---
-
+  // 通用卡片外壳
   Widget _buildSectionCard(BuildContext context,
       {required dynamic title,
       required IconData icon,
@@ -632,7 +401,7 @@ class QuotePage extends HookConsumerWidget {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.black.withOpacity(0.08), width: 1),
+          border: Border.all(color: Colors.black.withOpacity(0.08)),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(0.02),
@@ -656,48 +425,9 @@ class QuotePage extends HookConsumerWidget {
               if (action != null) action,
             ]),
           ),
-          Divider(height: 1, color: Colors.black.withOpacity(0.05)),
+          const Divider(height: 1),
           content,
         ],
-      ),
-    );
-  }
-
-  Widget _buildBoundQuoteBar(BuildContext context,
-      ValueNotifier<Map<String, dynamic>?> boundState, VoidCallback onClear) {
-    final isBound = boundState.value != null;
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isBound
-            ? colorScheme.primary.withOpacity(0.05)
-            : const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: isBound
-                ? colorScheme.primary.withOpacity(0.2)
-                : Colors.black12),
-      ),
-      child: ListTile(
-        dense: true,
-        leading: Icon(isBound ? Icons.link : Icons.link_off,
-            color: isBound ? colorScheme.primary : Colors.grey),
-        title: Text(isBound
-            ? (boundState.value?['company']?.name ?? '已关联客户')
-            : "点击选择关联客户"),
-        onTap: () async {
-          final result = await showModalBottomSheet<Map<String, dynamic>>(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => const QuoteSelect());
-          if (result != null) boundState.value = result;
-        },
-        trailing: isBound
-            ? IconButton(
-                icon: const Icon(Icons.close_rounded, size: 18),
-                onPressed: onClear)
-            : const Icon(Icons.chevron_right),
       ),
     );
   }
@@ -730,7 +460,7 @@ class QuotePage extends HookConsumerWidget {
           child: Text(txt, style: const TextStyle(color: Colors.grey))));
 }
 
-// 辅助：弹窗完善信息（用于添加产品板块）
+// 辅助：弹窗完善信息
 Future<void> _showPreSelectionSheet(
     BuildContext context,
     ValueNotifier<Map<String, dynamic>?> selectedQuote,
