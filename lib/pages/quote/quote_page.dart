@@ -287,11 +287,11 @@ class QuotePage extends HookConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (hasMore)
-              _buildTextBtn("加载更多记录", Icons.keyboard_arrow_down,
+              _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
                   () => displayCount.value += 5),
             if (canCollapse)
               _buildTextBtn(
-                  "收起记录", Icons.keyboard_arrow_up, () => displayCount.value = 2,
+                  "收起", Icons.keyboard_arrow_up, () => displayCount.value = 2,
                   isGrey: true),
           ],
         ),
@@ -350,10 +350,10 @@ class QuotePage extends HookConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (hasMore)
-              _buildTextBtn("加载更多供应商", Icons.keyboard_arrow_down,
+              _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
                   () => displayCount.value += 5),
             if (canCollapse)
-              _buildTextBtn("收起供应商", Icons.keyboard_arrow_up,
+              _buildTextBtn("收起", Icons.keyboard_arrow_up,
                   () => displayCount.value = 2,
                   isGrey: true),
           ],
