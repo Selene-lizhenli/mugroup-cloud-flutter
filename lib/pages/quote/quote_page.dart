@@ -37,6 +37,8 @@ class QuotePage extends HookConsumerWidget {
     final selectedSupplier =
         useState<Map<String, dynamic>?>(null); // 添加产品时选中的供应商
 
+    final selectedSupplierId = useState<int?>(null); // 客户列表选中的供应商ID
+
     // --- 客户列表卡片内预览的状态 ---
     final activeProducts =
         useState<List<QuotationSample>>([]); // 存储卡片内点击请求回来的详细产品
@@ -175,6 +177,7 @@ class QuotePage extends HookConsumerWidget {
                     recordsDisplayCount,
                     activeProducts,
                     activeQuoteId,
+                    selectedSupplierId,
                     isProductLoading),
               ),
 
@@ -253,6 +256,7 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<int> displayCount,
       ValueNotifier<List<QuotationSample>> activeProducts,
       ValueNotifier<int?> activeQuoteId,
+      ValueNotifier<int?> selectedSupplierId,
       ValueNotifier<bool> isProductLoading) {
     if (isLoading) {
       return const Center(
@@ -282,6 +286,7 @@ class QuotePage extends HookConsumerWidget {
                     activeProducts.value = [];
                     return;
                   }
+                  selectedSupplierId.value = supplierId;
                   activeQuoteId.value = item.id;
                   isProductLoading.value = true;
                   try {
@@ -304,7 +309,12 @@ class QuotePage extends HookConsumerWidget {
               // 如果此行被激活，显示产品横轴预览
               if (isExpanded)
                 _buildExpandableProductStrip(
-                    isProductLoading.value, activeProducts.value),
+                    context,
+                    isProductLoading.value,
+                    activeProducts.value,
+                    item.id, // 传入当前记录 ID
+                    selectedSupplierId.value // 传入选中的供应商 ID
+                    ),
               const SizedBox(height: 4),
             ],
           );
@@ -326,8 +336,14 @@ class QuotePage extends HookConsumerWidget {
   }
 
   // 卡片内展开的产品预览条
+  // 展示展开后的产品条 (前面带加号)
   Widget _buildExpandableProductStrip(
-      bool loading, List<QuotationSample> products) {
+      BuildContext context, // 增加 context 用于跳转
+      bool loading,
+      List<QuotationSample> products,
+      int? quoteId, // 传入当前报价单ID
+      int? supplierId // 传入当前供应商ID
+      ) {
     return Container(
       height: 80,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -337,39 +353,61 @@ class QuotePage extends HookConsumerWidget {
           border: Border.all(color: Colors.black.withOpacity(0.03))),
       child: loading
           ? const Center(child: CupertinoActivityIndicator())
-          : products.isEmpty
-              ? const Center(
-                  child: Text("暂无产品图片",
-                      style: TextStyle(fontSize: 12, color: Colors.grey)))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(8),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final sample = products[index].showroomSample;
-                    final imgUrl =
-                        (sample?.image != null && sample!.image!.isNotEmpty)
-                            ? sample.image![0].url
-                            : null;
-                    return Container(
+          : ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.all(8),
+              // 数量 + 1 (为了放加号)
+              itemCount: products.length + 1,
+              itemBuilder: (context, index) {
+                // --- 第一个元素：加号按钮 ---
+                if (index == 0) {
+                  return GestureDetector(
+                    onTap: () => context.router.push(QuoteProductNewAddRoute(
+                        quoteId: quoteId, supplierId: supplierId?.toString())),
+                    child: Container(
                       width: 64,
                       height: 64,
                       margin: const EdgeInsets.only(right: 10),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                              color: Colors.black.withOpacity(0.05))),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(7),
-                        child: imgUrl != null
-                            ? Image.network(imgUrl, fit: BoxFit.cover)
-                            : const Icon(Icons.image_outlined,
-                                color: Colors.grey, size: 20),
+                        color: Theme.of(context).primaryColor.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color:
+                                Theme.of(context).primaryColor.withOpacity(0.1),
+                            style: BorderStyle.solid),
                       ),
-                    );
-                  },
-                ),
+                      child: Icon(Icons.add_rounded,
+                          color: Theme.of(context).primaryColor, size: 28),
+                    ),
+                  );
+                }
+
+                // --- 后续元素：产品图片 (注意索引要 -1) ---
+                final sample = products[index - 1].showroomSample;
+                final imgUrl =
+                    (sample?.image != null && sample!.image!.isNotEmpty)
+                        ? sample.image![0].url
+                        : null;
+
+                return Container(
+                  width: 64,
+                  height: 64,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border:
+                          Border.all(color: Colors.black.withOpacity(0.05))),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: imgUrl != null
+                        ? Image.network(imgUrl, fit: BoxFit.cover)
+                        : const Icon(Icons.image_outlined,
+                            color: Colors.grey, size: 20),
+                  ),
+                );
+              },
+            ),
     );
   }
 
