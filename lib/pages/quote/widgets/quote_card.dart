@@ -280,6 +280,7 @@ class _QuoteCardState extends State<QuoteCard> {
             child: InkWell(
                 onTap: () => showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
                     builder: (context) =>
                         AddSupplierSheet(quotationId: widget.item.id)),
                 child: const Center(
