@@ -101,7 +101,7 @@ class _QuoteCardState extends State<QuoteCard> {
           child: Row(
             children: [
               Flexible(
-                flex: 2,
+                flex: 5,
                 child: GestureDetector(
                   onTap: widget.onTap,
                   child: Text(
