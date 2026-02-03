@@ -384,7 +384,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     required List<TemporaryMedia> currentMediaList,
     required Function(List<TemporaryMedia>?) onImagesChanged,
   }) {
-    const double kItemHeight = 82.0;
+    const double kItemHeight = 92.0;
     return SizedBox(
       height: kItemHeight,
       child: ListView.separated(
@@ -470,8 +470,10 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                 Container(
                     width: 1, height: 40, color: Colors.grey.withOpacity(0.1)),
                 SizedBox(
-                  width: 80,
+                  width: 90,
                   child: ImageUploader(
+                    width: 90,
+                    height: 90,
                     customIcon: Icons.camera_alt_rounded,
                     onChanged: (newImages) => onImagesChanged(newImages),
                   ),
@@ -568,10 +570,39 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         width: col.width,
                         padding: const EdgeInsets.only(right: 8),
                         child: InkWell(
-                          onTap: () => EditDialog.show(context,
-                              title: col.label,
-                              initialText: isEmpty ? '' : text,
-                              onConfirm: (v) => onUpdate(col.key, v)),
+                          onTap: () {
+                            const numberKeys = {
+                              'price',
+                              'out_carton',
+                              'inner_pack',
+                              'weight',
+                              'volume',
+                              'moq',
+                              'capacity'
+                            };
+
+                            final bool isNumberField =
+                                numberKeys.contains(col.key);
+                            EditDialog.show(context,
+                                title: col.label,
+                                initialText: isEmpty ? '' : text,
+                                keyboardType: isNumberField
+                                    ? const TextInputType.numberWithOptions(
+                                        decimal: true)
+                                    : TextInputType.text,
+                                // 3. 传入校验函数
+                                validator: (value) {
+                                  if (isNumberField && value.isNotEmpty) {
+                                    // 正则校验：支持整数或小数
+                                    final reg = RegExp(r'^\d+(\.\d+)?$');
+                                    if (!reg.hasMatch(value)) {
+                                      return '请输入有效的数字';
+                                    }
+                                  }
+                                  return null; // 返回 null 表示校验通过
+                                },
+                                onConfirm: (v) => onUpdate(col.key, v));
+                          },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,

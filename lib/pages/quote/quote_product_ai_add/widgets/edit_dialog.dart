@@ -4,12 +4,17 @@ class EditDialog extends StatefulWidget {
   final String initialText;
   final String title;
   final Function(String) onConfirm;
+  // 新增：键盘类型和校验回调
+  final TextInputType? keyboardType;
+  final String? Function(String)? validator;
 
   const EditDialog({
     super.key,
     required this.initialText,
     required this.onConfirm,
     this.title = "修改内容",
+    this.keyboardType,
+    this.validator,
   });
 
   static void show(
@@ -17,6 +22,8 @@ class EditDialog extends StatefulWidget {
     required String initialText,
     String title = "修改内容",
     required Function(String newValue) onConfirm,
+    TextInputType? keyboardType, // 允许传入键盘类型（如数字键盘）
+    String? Function(String)? validator, // 允许传入校验逻辑
   }) {
     showDialog(
       context: context,
@@ -25,6 +32,8 @@ class EditDialog extends StatefulWidget {
           initialText: initialText,
           title: title,
           onConfirm: onConfirm,
+          keyboardType: keyboardType,
+          validator: validator,
         );
       },
     );
@@ -36,11 +45,12 @@ class EditDialog extends StatefulWidget {
 
 class _EditDialogState extends State<EditDialog> {
   late TextEditingController _controller;
+  // 新增：错误信息状态
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
-
     _controller = TextEditingController(text: widget.initialText);
   }
 
@@ -48,6 +58,21 @@ class _EditDialogState extends State<EditDialog> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  // 内部执行校验的逻辑
+  void _handleConfirm() {
+    if (widget.validator != null) {
+      final error = widget.validator!(_controller.text);
+      if (error != null) {
+        setState(() {
+          _errorText = error;
+        });
+        return; // 校验不通过，拦截提交
+      }
+    }
+    widget.onConfirm(_controller.text);
+    Navigator.pop(context);
   }
 
   @override
@@ -58,6 +83,7 @@ class _EditDialogState extends State<EditDialog> {
     const colorInputBg = Color(0xFFF7F8FA);
     const colorBlue = Color(0xFF1989FA);
     const colorDivider = Color(0xFFEBEDF0);
+    const colorRed = Colors.red; // 错误信息颜色
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -82,25 +108,52 @@ class _EditDialogState extends State<EditDialog> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: colorInputBg,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: TextField(
-                controller: _controller,
-                autofocus: true,
-                style: const TextStyle(fontSize: 14, color: colorBlack),
-                cursorColor: colorBlue,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "请输入内容",
-                  hintStyle: TextStyle(color: colorGrayHint),
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorInputBg,
+                    borderRadius: BorderRadius.circular(4),
+                    // 如果有错误，可以给边框加点颜色提醒（可选）
+                    border: _errorText != null
+                        ? Border.all(color: colorRed, width: 0.5)
+                        : null,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: TextField(
+                    controller: _controller,
+                    autofocus: true,
+                    keyboardType: widget.keyboardType, // 使用传入的键盘类型
+                    style: const TextStyle(fontSize: 14, color: colorBlack),
+                    cursorColor: colorBlue,
+                    onChanged: (val) {
+                      // 用户输入时，如果当前有错误信息，则清除它
+                      if (_errorText != null) {
+                        setState(() {
+                          _errorText = null;
+                        });
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "请输入内容",
+                      hintStyle: TextStyle(color: colorGrayHint),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
-              ),
+                // 新增：错误信息展示，不改变原有布局间距
+                if (_errorText != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4, left: 2),
+                    child: Text(
+                      _errorText!,
+                      style: const TextStyle(color: colorRed, fontSize: 11),
+                    ),
+                  ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -125,10 +178,7 @@ class _EditDialogState extends State<EditDialog> {
                 Container(width: 0.5, color: colorDivider),
                 Expanded(
                   child: TextButton(
-                    onPressed: () {
-                      widget.onConfirm(_controller.text);
-                      Navigator.pop(context);
-                    },
+                    onPressed: _handleConfirm, // 调用封装好的确认逻辑
                     style: TextButton.styleFrom(
                       foregroundColor: colorBlue,
                       textStyle: const TextStyle(fontWeight: FontWeight.w500),

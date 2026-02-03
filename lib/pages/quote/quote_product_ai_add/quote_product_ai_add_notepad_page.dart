@@ -667,15 +667,47 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                               const SizedBox(height: 4),
                               GestureDetector(
                                   behavior: HitTestBehavior.opaque,
-                                  onTap: () => EditDialog.show(context,
-                                      title: colConfig.label,
-                                      initialText: text == '-' ? '' : text,
-                                      onConfirm: (newText) =>
-                                          controller.updateCell(
-                                              groupIndex,
-                                              productIndex,
-                                              colConfig.key,
-                                              newText)),
+                                  onTap: () {
+                                    const numberKeys = {
+                                      'price',
+                                      'out_carton',
+                                      'inner_pack',
+                                      'weight',
+                                      'volume',
+                                      'moq',
+                                      'capacity'
+                                    };
+
+                                    final bool isNumberField =
+                                        numberKeys.contains(colConfig.key);
+                                    EditDialog.show(context,
+                                        title: colConfig.label,
+                                        initialText: text == '-' ? '' : text,
+                                        keyboardType: isNumberField
+                                            ? const TextInputType
+                                                .numberWithOptions(
+                                                decimal: true)
+                                            : TextInputType.text,
+                                        // 3. 传入校验函数
+                                        validator: (value) {
+                                          if (isNumberField &&
+                                              value.isNotEmpty) {
+                                            // 正则校验：支持整数或小数
+                                            final reg =
+                                                RegExp(r'^\d+(\.\d+)?$');
+                                            if (!reg.hasMatch(value)) {
+                                              return '请输入有效的数字';
+                                            }
+                                          }
+                                          return null; // 返回 null 表示校验通过
+                                        },
+                                        onConfirm: (newText) =>
+                                            controller.updateCell(
+                                                groupIndex,
+                                                productIndex,
+                                                colConfig.key,
+                                                newText));
+                                  },
                                   child: Container(
                                       constraints:
                                           const BoxConstraints(minHeight: 24),
