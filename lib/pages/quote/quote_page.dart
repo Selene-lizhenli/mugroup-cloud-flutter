@@ -76,10 +76,6 @@ class QuotePage extends HookConsumerWidget {
         final response = await getShowroomQuotation(quoteParams);
         if (context.mounted) {
           list.value = response.data;
-          // 初始化时如果没有关联，默认关联第一个
-          if (currentQuote.value == null && response.data.isNotEmpty) {
-            currentQuote.value = response.data.first.toJson();
-          }
         }
       } catch (e) {
         debugPrint("Error: $e");
