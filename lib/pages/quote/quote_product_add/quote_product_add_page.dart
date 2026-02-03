@@ -756,118 +756,118 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                       ),
                       BuildFormCard(
                         title: '基本信息',
-                        action: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: handleCopyLastItem,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.content_copy,
-                                    size: 16,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "复制上一条",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            GestureDetector(
-                              onTap: () {
-                                final currentImages = formKey
-                                    .currentState?.fields['image']?.value;
+                        action: Container(
+                          constraints: BoxConstraints(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.55),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: handleCopyLastItem,
+                                  child: Row(children: [
+                                    Icon(Icons.content_copy,
+                                        size: 16,
+                                        color: Theme.of(context).primaryColor),
+                                    const SizedBox(width: 4),
+                                    Text("复制上一条",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                  ]),
+                                ),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    final currentImages = formKey
+                                        .currentState?.fields['image']?.value;
 
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => SkuSettingsDialog(
-                                    currentImages: currentImages is List
-                                        ? currentImages
-                                        : [],
-                                    onConfirm: (generatedSku, syncSupplier,
-                                        syncCustomer) {
-                                      if (generatedSku.isEmpty) {
-                                        return;
-                                      }
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => SkuSettingsDialog(
+                                        currentImages: currentImages is List
+                                            ? currentImages
+                                            : [],
+                                        onConfirm: (generatedSku, syncSupplier,
+                                            syncCustomer) {
+                                          if (generatedSku.isEmpty) {
+                                            return;
+                                          }
 
-                                      Map<String, dynamic> patchData = {};
+                                          Map<String, dynamic> patchData = {};
 
-                                      patchData['product_no'] = generatedSku;
+                                          patchData['product_no'] =
+                                              generatedSku;
 
-                                      // 3. 根据勾选同步更新
-                                      if (syncSupplier) {
-                                        patchData['supplier_sku'] =
-                                            generatedSku;
-                                      }
-                                      if (syncCustomer) {
-                                        patchData['customer_sku'] =
-                                            generatedSku;
-                                      }
+                                          // 3. 根据勾选同步更新
+                                          if (syncSupplier) {
+                                            patchData['supplier_sku'] =
+                                                generatedSku;
+                                          }
+                                          if (syncCustomer) {
+                                            patchData['customer_sku'] =
+                                                generatedSku;
+                                          }
 
-                                      formKey.currentState
-                                          ?.patchValue(patchData);
+                                          formKey.currentState
+                                              ?.patchValue(patchData);
 
-                                      EasyLoading.showSuccess('SKU已生成并填充');
-                                    },
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  Icon(Icons.settings,
-                                      size: 16,
-                                      color: Theme.of(context).primaryColor),
-                                  const SizedBox(width: 4),
-                                  Text("SKU设置",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color:
-                                              Theme.of(context).primaryColor)),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (ctx) {
-                                    return FieldSelector(
-                                      fields: fieldConfigs,
-                                      companyId: companyId,
-                                      defaultFields: quoteSampleDefaultFields,
-                                      onConfigChanged:
-                                          (List<FieldConfig> newConfigs) {
-                                        notifier.updateConfigs(newConfigs);
-                                      },
-                                      showActionButtons: true,
+                                          EasyLoading.showSuccess('SKU已生成并填充');
+                                        },
+                                      ),
                                     );
                                   },
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  Icon(Icons.settings,
-                                      size: 16,
-                                      color: Theme.of(context).primaryColor),
-                                  const SizedBox(width: 4),
-                                  Text("字段设置",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color:
-                                              Theme.of(context).primaryColor)),
-                                ],
-                              ),
+                                  child: Row(children: [
+                                    Icon(Icons.settings,
+                                        size: 16,
+                                        color: Theme.of(context).primaryColor),
+                                    Text("SKU设置",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                  ]),
+                                ),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (ctx) {
+                                        return FieldSelector(
+                                          fields: fieldConfigs,
+                                          companyId: companyId,
+                                          defaultFields:
+                                              quoteSampleDefaultFields,
+                                          onConfigChanged:
+                                              (List<FieldConfig> newConfigs) {
+                                            notifier.updateConfigs(newConfigs);
+                                          },
+                                          showActionButtons: true,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Row(children: [
+                                    Icon(Icons.settings,
+                                        size: 16,
+                                        color: Theme.of(context).primaryColor),
+                                    Text("字段设置",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                  ]),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                         children: [
                           // FormBuilderField<Map<String, dynamic>>(
