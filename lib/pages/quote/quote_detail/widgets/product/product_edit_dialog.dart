@@ -27,7 +27,7 @@ class ProductEditDialog extends HookConsumerWidget {
     final isConverting = useState(false);
 
     final shippingQty = useState(row.qty?.toString() ?? ''); //采购数量
-    final supplierPrice = useState(row.price?.toString() ?? ''); //供应商报价
+    final supplierPrice = useState(row.supplyQuote?.supplierPrice?.toString() ?? ''); //供应商报价
     final customerPrice = useState<String>(
         row.supplyQuote?.customerPrice?.toString() ?? ''); //客户报价
     final internalSku = useState(row.supplyQuote?.internalSku ?? ''); //公司货号

@@ -53,6 +53,8 @@ mixin _$Quote {
   int? get shippingQty => throw _privateConstructorUsedError;
   @JsonKey(name: 'customer_price')
   String? get customerPrice => throw _privateConstructorUsedError;
+  @JsonKey(name: 'supplier_price')
+  String? get supplierPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'internal_sku')
   String? get internalSku => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_sku')
@@ -90,6 +92,7 @@ abstract class $QuoteCopyWith<$Res> {
       @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
       @JsonKey(name: 'shipping_qty') int? shippingQty,
       @JsonKey(name: 'customer_price') String? customerPrice,
+      @JsonKey(name: 'supplier_price') String? supplierPrice,
       @JsonKey(name: 'internal_sku') String? internalSku,
       @JsonKey(name: 'supplier_sku') String? supplierSku,
       @JsonKey(name: 'customer_sku') String? customerSku});
@@ -129,6 +132,7 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
     Object? supplierProductNo = freezed,
     Object? shippingQty = freezed,
     Object? customerPrice = freezed,
+    Object? supplierPrice = freezed,
     Object? internalSku = freezed,
     Object? supplierSku = freezed,
     Object? customerSku = freezed,
@@ -210,6 +214,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
           ? _value.customerPrice
           : customerPrice // ignore: cast_nullable_to_non_nullable
               as String?,
+      supplierPrice: freezed == supplierPrice
+          ? _value.supplierPrice
+          : supplierPrice // ignore: cast_nullable_to_non_nullable
+              as String?,
       internalSku: freezed == internalSku
           ? _value.internalSku
           : internalSku // ignore: cast_nullable_to_non_nullable
@@ -265,6 +273,7 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
       @JsonKey(name: 'shipping_qty') int? shippingQty,
       @JsonKey(name: 'customer_price') String? customerPrice,
+      @JsonKey(name: 'supplier_price') String? supplierPrice,
       @JsonKey(name: 'internal_sku') String? internalSku,
       @JsonKey(name: 'supplier_sku') String? supplierSku,
       @JsonKey(name: 'customer_sku') String? customerSku});
@@ -303,6 +312,7 @@ class __$$QuoteImplCopyWithImpl<$Res>
     Object? supplierProductNo = freezed,
     Object? shippingQty = freezed,
     Object? customerPrice = freezed,
+    Object? supplierPrice = freezed,
     Object? internalSku = freezed,
     Object? supplierSku = freezed,
     Object? customerSku = freezed,
@@ -384,6 +394,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
           ? _value.customerPrice
           : customerPrice // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == supplierPrice
+          ? _value.supplierPrice
+          : supplierPrice // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == internalSku
           ? _value.internalSku
           : internalSku // ignore: cast_nullable_to_non_nullable
@@ -423,6 +437,7 @@ class _$QuoteImpl implements _Quote {
       @JsonKey(name: 'supplier_product_no') this.supplierProductNo,
       @JsonKey(name: 'shipping_qty') this.shippingQty,
       @JsonKey(name: 'customer_price') this.customerPrice,
+      @JsonKey(name: 'supplier_price') this.supplierPrice,
       @JsonKey(name: 'internal_sku') this.internalSku,
       @JsonKey(name: 'supplier_sku') this.supplierSku,
       @JsonKey(name: 'customer_sku') this.customerSku);
@@ -483,6 +498,9 @@ class _$QuoteImpl implements _Quote {
   @JsonKey(name: 'customer_price')
   final String? customerPrice;
   @override
+  @JsonKey(name: 'supplier_price')
+  final String? supplierPrice;
+  @override
   @JsonKey(name: 'internal_sku')
   final String? internalSku;
   @override
@@ -494,7 +512,7 @@ class _$QuoteImpl implements _Quote {
 
   @override
   String toString() {
-    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
+    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, supplierPrice: $supplierPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
   }
 
   @override
@@ -535,6 +553,8 @@ class _$QuoteImpl implements _Quote {
                 other.shippingQty == shippingQty) &&
             (identical(other.customerPrice, customerPrice) ||
                 other.customerPrice == customerPrice) &&
+            (identical(other.supplierPrice, supplierPrice) ||
+                other.supplierPrice == supplierPrice) &&
             (identical(other.internalSku, internalSku) ||
                 other.internalSku == internalSku) &&
             (identical(other.supplierSku, supplierSku) ||
@@ -566,6 +586,7 @@ class _$QuoteImpl implements _Quote {
         supplierProductNo,
         shippingQty,
         customerPrice,
+        supplierPrice,
         internalSku,
         supplierSku,
         customerSku
@@ -606,6 +627,7 @@ abstract class _Quote implements Quote {
       @JsonKey(name: 'supplier_product_no') final String? supplierProductNo,
       @JsonKey(name: 'shipping_qty') final int? shippingQty,
       @JsonKey(name: 'customer_price') final String? customerPrice,
+      @JsonKey(name: 'supplier_price') final String? supplierPrice,
       @JsonKey(name: 'internal_sku') final String? internalSku,
       @JsonKey(name: 'supplier_sku') final String? supplierSku,
       @JsonKey(name: 'customer_sku') final String? customerSku) = _$QuoteImpl;
@@ -664,6 +686,9 @@ abstract class _Quote implements Quote {
   @override
   @JsonKey(name: 'customer_price')
   String? get customerPrice;
+  @override
+  @JsonKey(name: 'supplier_price')
+  String? get supplierPrice;
   @override
   @JsonKey(name: 'internal_sku')
   String? get internalSku;
