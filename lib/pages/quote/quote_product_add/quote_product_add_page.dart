@@ -479,9 +479,11 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
           final data = jsonDecode(jsonStr) as Map<String, dynamic>;
 
           data.remove('id');
-          data.remove('product_no');
           data.remove('image');
           data.remove('images');
+
+          data['supplier_sku'] = '';
+          data['customer_sku'] = '';
 
           if (data['spec'] != null && data['spec'].toString().isNotEmpty) {
             final parts = data['spec'].toString().split('x');
