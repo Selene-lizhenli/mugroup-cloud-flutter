@@ -175,6 +175,7 @@ class QuotePage extends HookConsumerWidget {
                     isLoading.value,
                     list.value,
                     recordsDisplayCount,
+                    scrollController,
                     activeProducts,
                     activeQuoteId,
                     selectedSupplierId,
@@ -254,6 +255,7 @@ class QuotePage extends HookConsumerWidget {
       bool isLoading,
       List<QuotationList> data,
       ValueNotifier<int> displayCount,
+      ScrollController scrollController,
       ValueNotifier<List<QuotationSample>> activeProducts,
       ValueNotifier<int?> activeQuoteId,
       ValueNotifier<int?> selectedSupplierId,
@@ -326,9 +328,19 @@ class QuotePage extends HookConsumerWidget {
               _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
                   () => displayCount.value += 5),
             if (canCollapse)
-              _buildTextBtn(
-                  "收起", Icons.keyboard_arrow_up, () => displayCount.value = 2,
-                  isGrey: true),
+              _buildTextBtn("收起", Icons.keyboard_arrow_up, () {
+                displayCount.value = 2;
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (scrollController.hasClients) {
+                    scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.fastOutSlowIn,
+                    );
+                  }
+                });
+              }, isGrey: true),
           ],
         ),
       ],
