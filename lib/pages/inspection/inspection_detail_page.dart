@@ -5,6 +5,7 @@ import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/widgets/progress.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:flutter/material.dart';
@@ -217,30 +218,10 @@ class InspectionDetailPage extends HookConsumerWidget {
           ),
           const SizedBox(height: 12),
           // 进度条
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              height: 14,
-              width: double.infinity,
-              color: colorScheme.secondary.withOpacity(0.25),
-              child: Stack(
-                children: [
-                  LayoutBuilder(builder: (context, constraints) {
-                    return Container(
-                      width: constraints.maxWidth * progress,
-                      color: colorScheme.secondary.withOpacity(0.6),
-                    );
-                  }),
-                  Center(
-                    child: Text(progressText,
-                        style: TextStyle(
-                            color: colorScheme.onSecondary,
-                            fontSize: 10,
-                            height: 1)),
-                  ),
-                ],
-              ),
-            ),
+          AppProgressBar(
+            progress: progress,
+            progressText: progressText,
+            height: 10,
           ),
         ],
       ),

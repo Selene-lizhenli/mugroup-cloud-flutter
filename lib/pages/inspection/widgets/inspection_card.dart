@@ -1,5 +1,7 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/collaboration_dialog.dart';
+import 'package:cloud/pages/widgets/progress.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -52,7 +54,7 @@ class InspectionCard extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey.shade200, width: 1),
             boxShadow: [
               BoxShadow(
@@ -72,7 +74,7 @@ class InspectionCard extends HookConsumerWidget {
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 15,
                     ),
                   ),
                   const Spacer(),
@@ -90,13 +92,16 @@ class InspectionCard extends HookConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  InkWell(
-                    onTap: () async {
-                      onDelete!();
-                    },
-                    child: Icon(Icons.delete_outline,
-                        size: 18, color: Colors.red[300]),
-                  ),
+                  if (inspection.items!.isEmpty) ...[
+                    InkWell(
+                      onTap: () async {
+                        onDelete!();
+                      },
+                      child: Icon(Icons.delete_outline,
+                          size: 18, color: colorScheme.error),
+                    )
+                  ] else
+                    const SizedBox(width: 18),
                 ],
               ),
               Padding(
@@ -165,37 +170,12 @@ class InspectionCard extends HookConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  height: 13,
-                  width: double.infinity,
-                  color: colorScheme.outlineVariant,
-                  child: Stack(
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final double currentWidth =
-                              constraints.maxWidth * progress;
-                          return Container(
-                            width: currentWidth,
-                            color: colorScheme.secondary,
-                          );
-                        },
-                      ),
-                      Center(
-                        child: Text(
-                          progressText,
-                          style: TextStyle(
-                            color: colorScheme.onSecondary,
-                            fontSize: 10,
-                            height: 1,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              AppProgressBar(
+                progress: progress,
+                progressText: progressText,
+                height: 4,
+                valueColor: colorScheme.primary,
+                trackColor: colorScheme.outlineVariant,
               ),
             ],
           ),

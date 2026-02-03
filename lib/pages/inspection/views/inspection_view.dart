@@ -272,7 +272,7 @@ class InspectionView extends HookConsumerWidget {
                             if (inspection.items!.isNotEmpty) {
                               await ConfirmDialog.show(
                                 context,
-                                content: '该验货任务下有任务项不得删除？',
+                                content: '该记录下有验货任务，禁止删除!',
                               );
                               return;
                             }
