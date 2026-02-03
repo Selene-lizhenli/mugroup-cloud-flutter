@@ -100,7 +100,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '$dimenLabel排行数据',
+                  '$dimenLabel数据',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -313,7 +313,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
           return Stack(
             children: [
               ChartDimenTips(
-                label: '$dimenLabel排行',
+                label: '$dimenLabel',
               ),
               const SizedBox(height: 10),
               BarChart(

@@ -112,7 +112,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '$dimenLabel排行数据',
+                  '$dimenLabel数据',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -332,7 +332,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
           return Stack(
             children: [
               ChartDimenTips(
-                  label: '$dimenLabel排行',
+                  label: '$dimenLabel',
                   extra: Text(
                     '单位：万人民币',
                     style: TextStyle(fontSize: 10, color: colorScheme.outline),
