@@ -8,11 +8,14 @@ class QuoteCard extends StatefulWidget {
   final VoidCallback? onTap;
   final int? tabIndex;
 
+  final void Function(int? supplierId)? onSupplierSelected;
+
   const QuoteCard({
     super.key,
     required this.item,
     this.onTap,
     this.tabIndex,
+    this.onSupplierSelected,
   });
 
   @override
@@ -25,16 +28,11 @@ class _QuoteCardState extends State<QuoteCard> {
   List<Map<String, dynamic>> _getProcessedSuppliers() {
     final quotes = widget.item.supplyQuotes ?? [];
     final Map<int, Map<String, dynamic>> supplierMap = {};
-
     for (var q in quotes) {
       final s = q.supplier;
       if (s?.id != null) {
         if (!supplierMap.containsKey(s!.id)) {
-          supplierMap[s.id!] = {
-            'data': q,
-            'count': 1,
-            'id': s.id,
-          };
+          supplierMap[s.id!] = {'data': q, 'count': 1, 'id': s.id};
         } else {
           supplierMap[s.id]!['count'] =
               (supplierMap[s.id]!['count'] as int) + 1;
@@ -63,20 +61,15 @@ class _QuoteCardState extends State<QuoteCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.black.withOpacity(0.08),
-          width: 1.0,
-        ),
+        border: Border.all(color: Colors.black.withOpacity(0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -101,7 +94,6 @@ class _QuoteCardState extends State<QuoteCard> {
     final collabText = hasCollaborators
         ? collaborators.map((e) => e.name ?? '').join('、')
         : '暂无';
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -179,96 +171,86 @@ class _QuoteCardState extends State<QuoteCard> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: items.length + 1,
         itemBuilder: (context, index) {
-          if (index == 0) {
-            final quoteData =
-                items.isNotEmpty ? items.first : {'id': widget.item.id};
-            return _buildAddBtn(quoteData);
-          }
+          if (index == 0) return _buildAddBtn();
 
           final itemData = items[index - 1];
-          return _buildSquareCard(colorScheme, itemData['data'],
-              selectedSupplierId == itemData['id'], itemData['id']);
-        },
-      ),
-    );
-  }
+          final id = itemData['id'];
+          final isSelected = selectedSupplierId == id;
+          final supplier = itemData['data'].supplier;
 
-  Widget _buildSquareCard(
-      ColorScheme colorScheme, dynamic quote, bool isSelected, int id) {
-    final supplier = quote.supplier;
-    final String name = supplier?.name ?? '未知';
-    final String? imageUrl = () {
-      if (supplier?.media == null || supplier!.media!.isEmpty) return null;
+          final String? imageUrl = () {
+            if (supplier?.media == null || supplier!.media!.isEmpty) {
+              return null;
+            }
+            final businessCards = supplier.media!
+                .where((img) => img.collectionName == 'bussiness_card');
+            return businessCards.isNotEmpty ? businessCards.first.url : null;
+          }();
 
-      final businessCards = supplier.media!
-          .where((img) => img.collectionName == 'bussiness_card');
-
-      if (businessCards.isNotEmpty) {
-        return businessCards.first.url;
-      }
-
-      return null;
-    }();
-
-    return Container(
-      width: 70,
-      height: 70,
-      margin: const EdgeInsets.only(right: 8),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () =>
-                  setState(() => selectedSupplierId = isSelected ? null : id),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color:
-                        isSelected ? colorScheme.primary : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: imageUrl != null
-                      ? Image.network(imageUrl, fit: BoxFit.cover)
-                      : Container(
-                          padding: const EdgeInsets.all(4),
-                          alignment: Alignment.center,
-                          child: Text(
-                            name,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 9, color: Color(0xFF333333)),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+          return Container(
+            width: 70,
+            height: 70,
+            margin: const EdgeInsets.only(right: 8),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () {
+                      final newId = isSelected ? null : id;
+                      setState(() => selectedSupplierId = newId);
+                      widget.onSupplierSelected?.call(newId);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? colorScheme.primary
+                              : Colors.transparent,
+                          width: 2,
                         ),
-                ),
-              ),
-            ),
-          ),
-          if (imageUrl != null && isSelected)
-            Align(
-              alignment: Alignment.center,
-              child: GestureDetector(
-                onTap: () => _showImagePreview(imageUrl),
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: imageUrl != null
+                            ? Image.network(imageUrl, fit: BoxFit.cover)
+                            : Center(
+                                child: Text(
+                                  supplier?.name ?? '',
+                                  style: const TextStyle(fontSize: 9),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.fullscreen_rounded,
-                      color: Colors.white, size: 20),
                 ),
-              ),
+                if (imageUrl != null && isSelected)
+                  Align(
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      onTap: () => _showImagePreview(imageUrl),
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.fullscreen_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -287,32 +269,21 @@ class _QuoteCardState extends State<QuoteCard> {
     );
   }
 
-  Widget _buildAddBtn(Map<String, dynamic> quote) {
+  Widget _buildAddBtn() {
     return Container(
-      width: 70,
-      height: 70,
-      margin: const EdgeInsets.only(right: 8),
-      child: Material(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            showModalBottomSheet(
-                context: context,
-                builder: (context) =>
-                    AddSupplierSheet(quotationId: widget.item.id));
-          },
-          child: const Center(
-            child: Icon(
-              Icons.add_rounded,
-              color: Colors.grey,
-              size: 24,
-            ),
-          ),
-        ),
-      ),
-    );
+        width: 70,
+        height: 70,
+        margin: const EdgeInsets.only(right: 8),
+        child: Material(
+            color: const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+                onTap: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) =>
+                        AddSupplierSheet(quotationId: widget.item.id)),
+                child: const Center(
+                    child: Icon(Icons.add_rounded, color: Colors.grey)))));
   }
 
   Widget _buildCollaborateButton(ColorScheme colorScheme) {
