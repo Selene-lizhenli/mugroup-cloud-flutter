@@ -178,14 +178,14 @@ class ImageUploader extends HookConsumerWidget {
             FlanActionSheetAction(
               name: "拍摄",
               callback: (action) async {
-                if (context.mounted) Navigator.of(context).maybePop();
+                Navigator.pop(context);
                 await openStandardCamera();
               },
             ),
             FlanActionSheetAction(
               name: "从手机相册选择",
               callback: (action) async {
-                if (context.mounted) Navigator.of(context).maybePop();
+                Navigator.pop(context);
                 await openGallery();
               },
             ),
