@@ -205,9 +205,20 @@ class QuotePage extends HookConsumerWidget {
               const SizedBox(height: 16),
               _buildSectionCard(
                 context,
-                title: const Text('添加产品',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                title: GestureDetector(
+                  onTap: () {
+                    //跳转
+                    // context.router.push(QuoteProductNewAddRoute());
+                  },
+                  child: const Text(
+                    '添加产品',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
                 icon: Icons.grid_view_rounded,
                 iconColor: Colors.purpleAccent,
                 content: _buildProductAddSection(
@@ -353,8 +364,8 @@ class QuotePage extends HookConsumerWidget {
               _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
                   () => displayCount.value += 5),
             if (canCollapse)
-              _buildTextBtn("收起", Icons.keyboard_arrow_up,
-                  () => displayCount.value = 2,
+              _buildTextBtn(
+                  "收起", Icons.keyboard_arrow_up, () => displayCount.value = 2,
                   isGrey: true),
           ],
         ),
