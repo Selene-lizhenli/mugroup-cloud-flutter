@@ -58,6 +58,8 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
 
     final autoValidateMode = useState(AutovalidateMode.disabled);
 
+    final isSubmitting = useState(false);
+
     const basicInfoFieldNames = {
       'product_no',
       'product_brand',
@@ -465,6 +467,12 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     Future<void> handleSubmit() async {
       final formState = formKey.currentState;
       if (formState?.saveAndValidate() ?? false) {
+        isSubmitting.value = true;
+        EasyLoading.show(
+          status: '正在提交...',
+          maskType: EasyLoadingMaskType.clear,
+        );
+
         final Map<String, dynamic> submitValues = Map.from(formState!.value);
 
         if (initialSupplier == null) {
@@ -510,6 +518,9 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             if (quoteId != null) "quotation_id": quoteId,
             'item_type': 'market_product'
           });
+
+          isSubmitting.value = false;
+
           EasyLoading.dismiss();
 
           final prefs = await SharedPreferences.getInstance();
@@ -541,8 +552,10 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           } else {
             if (context.mounted) Navigator.of(context).pop(true);
           }
-        } catch (e) {
-          EasyLoading.showError(e.toString());
+        } finally {
+          // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
+          isSubmitting.value = false;
+          if (EasyLoading.isShow) EasyLoading.dismiss();
         }
       } else {
         autoValidateMode.value = AutovalidateMode.onUserInteraction;
@@ -1236,12 +1249,21 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: handleSubmit,
-                            child: const Text(
-                              '提交',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w500),
-                            ),
+                            onPressed: isSubmitting.value ? null : handleSubmit,
+                            child: isSubmitting.value
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    '提交',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                           ),
                         ),
                       ),

@@ -60,6 +60,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
     final autoValidateMode = useState(AutovalidateMode.disabled);
 
+    final isSubmitting = useState(false);
+
     const basicInfoFieldNames = {
       'product_no',
       'product_brand',
@@ -1050,106 +1052,150 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        disabledBackgroundColor:
+                            colorScheme.primary.withOpacity(0.6),
                       ),
-                      onPressed: () async {
-                        final formState = formKey.currentState;
-                        if (formState?.saveAndValidate() ?? false) {
-                          final Map<String, dynamic> submitValues =
-                              Map.from(formState!.value);
 
-                          if (initialSupplier == null) {
-                            EasyLoading.showInfo('没有供应商');
-                            return;
-                          }
-                          final supplier = initialSupplier!;
+                      onPressed: isSubmitting.value
+                          ? null
+                          : () async {
+                              final formState = formKey.currentState;
+                              if (formState?.saveAndValidate() ?? false) {
+                                isSubmitting.value = true;
+                                EasyLoading.show(
+                                  status: '正在提交...',
+                                  maskType: EasyLoadingMaskType.clear,
+                                );
 
-                          submitValues['supply_quotes'] = [
-                            {
-                              "supplier_id": supplier['id'],
-                              'supplier': supplier,
-                              "product_no": submitValues["product_no"],
-                              'product_brand': submitValues["product_brand"],
-                              'supplier_sku': submitValues["supplier_sku"],
-                              "customer_sku": submitValues["customer_sku"],
-                              'supplier_price': submitValues["supplier_price"],
-                              "deliver_day": submitValues["deliver_day"],
-                              "supplier_moq": submitValues["supplier_moq"],
-                              "customer_price": submitValues["customer_price"],
-                              "customer_qty": submitValues["customer_qty"],
-                              "unit": submitValues["unit"],
-                              "material": submitValues["material"],
-                              "inner_capacity": submitValues["inner_capacity"],
-                              "weight": submitValues["weight"],
-                              "packing": submitValues["packing"],
-                              "outer_capacity": submitValues["outer_capacity"],
-                              "outer_volume": submitValues["outer_volume"],
-                            }
-                          ];
+                                try {
+                                  final Map<String, dynamic> submitValues =
+                                      Map.from(formState!.value);
 
-                          final length =
-                              submitValues['length']?.toString() ?? '';
-                          final width = submitValues['width']?.toString() ?? '';
-                          final height =
-                              submitValues['heigth']?.toString() ?? '';
+                                  if (initialSupplier == null) {
+                                    EasyLoading.showInfo('没有供应商');
+                                    isSubmitting.value = false;
+                                    return;
+                                  }
+                                  final supplier = initialSupplier!;
 
-                          final spec = [length, width, height].join('x');
-                          submitValues['spec'] = spec;
+                                  submitValues['supply_quotes'] = [
+                                    {
+                                      "supplier_id": supplier['id'],
+                                      'supplier': supplier,
+                                      "product_no": submitValues["product_no"],
+                                      'product_brand':
+                                          submitValues["product_brand"],
+                                      'supplier_sku':
+                                          submitValues["supplier_sku"],
+                                      "customer_sku":
+                                          submitValues["customer_sku"],
+                                      'supplier_price':
+                                          submitValues["supplier_price"],
+                                      "deliver_day":
+                                          submitValues["deliver_day"],
+                                      "supplier_moq":
+                                          submitValues["supplier_moq"],
+                                      "customer_price":
+                                          submitValues["customer_price"],
+                                      "customer_qty":
+                                          submitValues["customer_qty"],
+                                      "unit": submitValues["unit"],
+                                      "material": submitValues["material"],
+                                      "inner_capacity":
+                                          submitValues["inner_capacity"],
+                                      "weight": submitValues["weight"],
+                                      "packing": submitValues["packing"],
+                                      "outer_capacity":
+                                          submitValues["outer_capacity"],
+                                      "outer_volume":
+                                          submitValues["outer_volume"],
+                                    }
+                                  ];
 
-                          await storeShowroomSample({
-                            ...submitValues,
-                            "supplier_id": supplier['id'],
-                            if (quoteId != null) "quotation_id": quoteId,
-                            'item_type': 'market_product'
-                          });
-                          logger.d({
-                            ...submitValues,
-                            "supplier_id": supplier['id'],
-                            "quotation_id": quoteId,
-                            'item_type': 'market_product'
-                          });
-                          final prefs = await SharedPreferences.getInstance();
+                                  final length =
+                                      submitValues['length']?.toString() ?? '';
+                                  final width =
+                                      submitValues['width']?.toString() ?? '';
+                                  final height =
+                                      submitValues['heigth']?.toString() ?? '';
 
-                          const storageKey = 'last_quote_product_add';
-                          await prefs.setString(
-                              storageKey, jsonEncode(submitValues));
+                                  final spec =
+                                      [length, width, height].join('x');
+                                  submitValues['spec'] = spec;
 
-                          if (!context.mounted) return;
+                                  // 2. 发起网络请求
+                                  await storeShowroomSample({
+                                    ...submitValues,
+                                    "supplier_id": supplier['id'],
+                                    if (quoteId != null)
+                                      "quotation_id": quoteId,
+                                    'item_type': 'market_product'
+                                  });
 
-                          formDataNotifier.clearFormData();
+                                  isSubmitting.value = false;
 
-                          final isContinue = await ConfirmDialog.show(
-                            context,
-                            title: '创建成功',
-                            content: '',
-                            cancelText: '返回',
-                            confirmText: '继续创建',
-                            confirmColor: colorScheme.primary,
-                          );
-                          if (isContinue == true) {
-                            final currentSupplier = formState.value['supplier'];
-                            formState.reset();
-                            formDataNotifier.clearFormData();
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  const storageKey = 'last_quote_product_add';
+                                  await prefs.setString(
+                                      storageKey, jsonEncode(submitValues));
 
-                            if (currentSupplier != null) {
-                              formKey.currentState?.patchValue({
-                                'supplier': currentSupplier,
-                              });
-                            }
-                          } else {
-                            if (context.mounted) {
-                              Navigator.of(context).pop(true);
-                            }
-                          }
-                        } else {
-                          autoValidateMode.value =
-                              AutovalidateMode.onUserInteraction;
-                        }
-                      },
-                      child: const Text(
-                        '提交',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                                  EasyLoading.dismiss();
+
+                                  if (!context.mounted) return;
+
+                                  formDataNotifier.clearFormData();
+
+                                  final isContinue = await ConfirmDialog.show(
+                                    context,
+                                    title: '创建成功',
+                                    content: '',
+                                    cancelText: '返回',
+                                    confirmText: '继续创建',
+                                    confirmColor: colorScheme.primary,
+                                  );
+
+                                  if (isContinue == true) {
+                                    final currentSupplier =
+                                        formState.value['supplier'];
+                                    formState.reset();
+                                    formDataNotifier.clearFormData();
+
+                                    if (currentSupplier != null) {
+                                      formKey.currentState?.patchValue({
+                                        'supplier': currentSupplier,
+                                      });
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop(true);
+                                    }
+                                  }
+                                } finally {
+                                  // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
+                                  isSubmitting.value = false;
+                                  if (EasyLoading.isShow) EasyLoading.dismiss();
+                                }
+                              } else {
+                                autoValidateMode.value =
+                                    AutovalidateMode.onUserInteraction;
+                              }
+                            },
+                      // 根据状态切换按钮内部显示
+                      child: isSubmitting.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              '提交',
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
                   ),
                 )
