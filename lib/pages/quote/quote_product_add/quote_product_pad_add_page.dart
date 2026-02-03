@@ -15,6 +15,7 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/spacing_row.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
