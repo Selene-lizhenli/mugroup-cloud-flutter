@@ -39,7 +39,9 @@ class _QuoteCardState extends State<QuoteCard> {
         }
       }
     }
-    return supplierMap.values.toList();
+
+    //最新创建的放在前面
+    return supplierMap.values.toList().reversed.toList();
   }
 
   @override
