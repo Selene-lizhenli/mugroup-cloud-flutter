@@ -3,6 +3,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/theme_provider.dart';
+import 'package:cloud/widgets/watermark/watermark_wrapper.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +185,12 @@ class MyApp extends ConsumerWidget {
           toolbarHeight: 48,
         ),
       ),
-      builder: EasyLoading.init(),
+      builder: (context, child) {
+        return EasyLoading.init()(
+          context,
+          WatermarkWrapper(child: child ?? const SizedBox.shrink()),
+        );
+      },
     );
   }
 }
