@@ -15,6 +15,8 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class ImageUploader extends HookConsumerWidget {
   final String? label;
+  final double? width;
+  final double? height;
   final int? maxCount;
   final List<TemporaryMedia>? value;
   final ValueChanged<List<TemporaryMedia>>? onChanged;
@@ -50,6 +52,8 @@ class ImageUploader extends HookConsumerWidget {
   const ImageUploader({
     super.key,
     this.label,
+    this.width = 80,
+    this.height = 80,
     this.maxCount,
     this.value,
     this.onChanged,
@@ -394,8 +398,8 @@ class ImageUploader extends HookConsumerWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        width: 80,
-        height: 80,
+        width: width,
+        height: height,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 243, 243, 243),
           borderRadius: BorderRadius.circular(6),

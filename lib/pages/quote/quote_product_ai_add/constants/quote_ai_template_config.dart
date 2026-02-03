@@ -62,6 +62,8 @@ const List<TemplateOption> kQuoteAiTemplates = [
       AppColumns.price,
       AppColumns.outCarton,
       AppColumns.innerPack,
+      AppColumns.volume,
+      AppColumns.packagingType,
       AppColumns.description,
     ],
   ),
