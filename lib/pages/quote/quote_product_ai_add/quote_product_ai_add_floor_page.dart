@@ -337,17 +337,30 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  Icon(Icons.dashboard_customize_outlined,
-                      size: 18, color: colorScheme.primary),
+                  Icon(
+                    Icons.dashboard_customize_outlined,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
-                  Text('识别模板 (点击卡片内相机直接上传文件识别)',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      '识别模板 (点击卡片内相机直接上传文件识别)',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                   AnimatedRotation(
                     turns: isExpanded.value ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: Icon(Icons.keyboard_arrow_down,
-                        color: Colors.grey[500]),
+                    child: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey[500],
+                    ),
                   ),
                 ],
               ),
@@ -500,8 +513,17 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
         children: [
           Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
           const SizedBox(width: 8),
-          Text('AI识别结果仅供参考，点击下方单元格可手动修正',
-              style: TextStyle(color: colorScheme.primary, fontSize: 12)),
+          Expanded(
+            child: Text(
+              'AI识别结果点击下方单元格可手动修正',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontSize: 12,
+              ),
+            ),
+          ),
         ],
       ),
     );
