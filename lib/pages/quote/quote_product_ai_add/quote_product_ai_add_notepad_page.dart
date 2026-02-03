@@ -256,6 +256,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
                 'supplier_sku': val('item_no'),
               }
             ],
+            "product_no": val(AppColumns.itemNo.key),
             'spec': val('size'),
             'description_cn': val('description'),
             'image': [group.media],
