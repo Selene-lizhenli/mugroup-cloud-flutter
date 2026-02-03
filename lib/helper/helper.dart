@@ -47,3 +47,4 @@ String formatCurrencyAmount(amount) {
     return amountDouble.toStringAsFixed(0);
   }
 }
+

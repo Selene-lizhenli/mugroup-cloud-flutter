@@ -22,10 +22,13 @@ User _$UserFromJson(Map<String, dynamic> json) {
 mixin _$User {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  String? get position => throw _privateConstructorUsedError; //后勤类
   @JsonKey(name: 'job_number')
   String? get jobNumber => throw _privateConstructorUsedError;
   Department? get department => throw _privateConstructorUsedError;
   List<String>? get permissions => throw _privateConstructorUsedError;
+  @JsonKey(name: 'work_location')
+  String? get workLocation => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -40,9 +43,11 @@ abstract class $UserCopyWith<$Res> {
   $Res call(
       {int? id,
       String? name,
+      String? position,
       @JsonKey(name: 'job_number') String? jobNumber,
       Department? department,
-      List<String>? permissions});
+      List<String>? permissions,
+      @JsonKey(name: 'work_location') String? workLocation});
 
   $DepartmentCopyWith<$Res>? get department;
 }
@@ -62,9 +67,11 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   $Res call({
     Object? id = freezed,
     Object? name = freezed,
+    Object? position = freezed,
     Object? jobNumber = freezed,
     Object? department = freezed,
     Object? permissions = freezed,
+    Object? workLocation = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -74,6 +81,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
               as String?,
       jobNumber: freezed == jobNumber
           ? _value.jobNumber
@@ -87,6 +98,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.permissions
           : permissions // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      workLocation: freezed == workLocation
+          ? _value.workLocation
+          : workLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -113,9 +128,11 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   $Res call(
       {int? id,
       String? name,
+      String? position,
       @JsonKey(name: 'job_number') String? jobNumber,
       Department? department,
-      List<String>? permissions});
+      List<String>? permissions,
+      @JsonKey(name: 'work_location') String? workLocation});
 
   @override
   $DepartmentCopyWith<$Res>? get department;
@@ -133,9 +150,11 @@ class __$$UserImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? name = freezed,
+    Object? position = freezed,
     Object? jobNumber = freezed,
     Object? department = freezed,
     Object? permissions = freezed,
+    Object? workLocation = freezed,
   }) {
     return _then(_$UserImpl(
       id: freezed == id
@@ -145,6 +164,10 @@ class __$$UserImplCopyWithImpl<$Res>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
               as String?,
       jobNumber: freezed == jobNumber
           ? _value.jobNumber
@@ -158,6 +181,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value._permissions
           : permissions // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      workLocation: freezed == workLocation
+          ? _value.workLocation
+          : workLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -168,9 +195,11 @@ class _$UserImpl implements _User {
   const _$UserImpl(
       {this.id,
       this.name,
+      this.position,
       @JsonKey(name: 'job_number') this.jobNumber,
       this.department,
-      final List<String>? permissions})
+      final List<String>? permissions,
+      @JsonKey(name: 'work_location') this.workLocation})
       : _permissions = permissions;
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
@@ -180,6 +209,9 @@ class _$UserImpl implements _User {
   final int? id;
   @override
   final String? name;
+  @override
+  final String? position;
+//后勤类
   @override
   @JsonKey(name: 'job_number')
   final String? jobNumber;
@@ -196,8 +228,12 @@ class _$UserImpl implements _User {
   }
 
   @override
+  @JsonKey(name: 'work_location')
+  final String? workLocation;
+
+  @override
   String toString() {
-    return 'User(id: $id, name: $name, jobNumber: $jobNumber, department: $department, permissions: $permissions)';
+    return 'User(id: $id, name: $name, position: $position, jobNumber: $jobNumber, department: $department, permissions: $permissions, workLocation: $workLocation)';
   }
 
   @override
@@ -207,18 +243,29 @@ class _$UserImpl implements _User {
             other is _$UserImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.position, position) ||
+                other.position == position) &&
             (identical(other.jobNumber, jobNumber) ||
                 other.jobNumber == jobNumber) &&
             (identical(other.department, department) ||
                 other.department == department) &&
             const DeepCollectionEquality()
-                .equals(other._permissions, _permissions));
+                .equals(other._permissions, _permissions) &&
+            (identical(other.workLocation, workLocation) ||
+                other.workLocation == workLocation));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, jobNumber, department,
-      const DeepCollectionEquality().hash(_permissions));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      position,
+      jobNumber,
+      department,
+      const DeepCollectionEquality().hash(_permissions),
+      workLocation);
 
   @JsonKey(ignore: true)
   @override
@@ -238,9 +285,11 @@ abstract class _User implements User {
   const factory _User(
       {final int? id,
       final String? name,
+      final String? position,
       @JsonKey(name: 'job_number') final String? jobNumber,
       final Department? department,
-      final List<String>? permissions}) = _$UserImpl;
+      final List<String>? permissions,
+      @JsonKey(name: 'work_location') final String? workLocation}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -249,12 +298,17 @@ abstract class _User implements User {
   @override
   String? get name;
   @override
+  String? get position;
+  @override //后勤类
   @JsonKey(name: 'job_number')
   String? get jobNumber;
   @override
   Department? get department;
   @override
   List<String>? get permissions;
+  @override
+  @JsonKey(name: 'work_location')
+  String? get workLocation;
   @override
   @JsonKey(ignore: true)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>

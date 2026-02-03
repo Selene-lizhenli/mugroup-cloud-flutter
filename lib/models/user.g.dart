@@ -9,6 +9,7 @@ part of 'user.dart';
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       id: (json['id'] as num?)?.toInt(),
       name: json['name'] as String?,
+      position: json['position'] as String?,
       jobNumber: json['job_number'] as String?,
       department: json['department'] == null
           ? null
@@ -16,13 +17,16 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       permissions: (json['permissions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      workLocation: json['work_location'] as String?,
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'position': instance.position,
       'job_number': instance.jobNumber,
       'department': instance.department,
       'permissions': instance.permissions,
+      'work_location': instance.workLocation,
     };

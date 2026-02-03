@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/constants/app_feature_constants.dart'; 
-import 'package:cloud/pages/dashboard/widgets/exchange/exchange_chart_main.dart';
+import 'package:cloud/constants/app_stat_module.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/setting/widgets/setting_modlue_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/sample_room.main.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,7 +21,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   static const _storageKey = 'selected_module_ids';
   static const _orderKey = 'module_order_ids';
 
-  late List<DashboardModule> modules;
+  late List<ModuleInfo> modules;
   bool _loading = true;
 
   @override
@@ -34,90 +34,11 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   /// 初始化：从本地读取选中模块和排序顺序
   /// =======================
   Future<void> _initModules() async {
-    final prefs = await SharedPreferences.getInstance();
-    final selectedIds = prefs.getStringList(_storageKey) ??
-        ['rate', EntryFeatures.showroomSample.id];
-    final orderIds = prefs.getStringList(_orderKey) ??
-        ['rate', EntryFeatures.showroomSample.id];
-
-    /// 所有模块（固定定义）
-    final allModules = [
-      DashboardModule(
-        id: 'rate',
-        title: '汇率',
-        content: const LineChartDemo(),
-        group: '应用', // 添加分组
-        selected: selectedIds.contains('rate'),
-      ),
-      DashboardModule(
-        id: EntryFeatures.showroomSample.id,
-        title: "Top榜单",
-        content: const SampleRoomChart(),
-        group: '数据统计', // 添加分组
-        selected: selectedIds.contains(EntryFeatures.showroomSample.id),
-      ),
-      // DashboardModule(
-      //   id: 'news',
-      //   title: '集团资讯',
-      //   content: const NewsBoard(),
-      //   group: '应用', // 添加分组
-      //   selected: selectedIds.contains('news'),
-      // ),
-      // DashboardModule(
-      //  id: EntryFeatures.marketPurchase.id,
-      // title: EntryFeatures.marketPurchase.title,
-      //   content: const MarketPurchaseChart(),
-      //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains('market_purchase'),
-      // ),
-      // DashboardModule(
-      //   id: EntryFeatures.crmCompany.id,
-      //   title: EntryFeatures.crmCompany.title,
-      //   content: const CustomerChart(),
-      //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains(EntryFeatures.crmCompany.id),
-      // ),
-      // DashboardModule(
-      //   id: EntryFeatures.supplySupplier.id,
-      //   title: EntryFeatures.supplySupplier.title,
-      //   content: const SupplierChart(),
-      //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains(EntryFeatures.supplySupplier.id),
-      // ),
-
-      // DashboardModule(
-      //   id: EntryFeatures.inspection.id,
-      //   title: EntryFeatures.inspection.title,
-      //   content: const InspectionChart(),
-      //   group: '数据统计', // 添加分组
-      //   selected: selectedIds.contains(EntryFeatures.inspection.id),
-      // ),
-    ];
-
-    // 如果存在排序顺序，按照保存的顺序重新排列
-    if (orderIds.isNotEmpty) {
-      final orderedModules = <DashboardModule>[];
-      final moduleMap = {for (var m in allModules) m.id: m};
-
-      // 首先添加已排序的模块
-      for (final id in orderIds) {
-        if (moduleMap.containsKey(id)) {
-          orderedModules.add(moduleMap[id]!);
-        }
-      }
-
-      // 然后添加未排序的新模块
-      for (final module in allModules) {
-        if (!orderIds.contains(module.id)) {
-          orderedModules.add(module);
-        }
-      }
-
-      modules = orderedModules;
-    } else {
-      modules = allModules;
-    }
-
+    // 读取「应用入口权限布尔表」（initState 中不能用 watch，这里用 read 一次性读取快照）
+    final permissionBools = ref.read(entryFeaturePermissionBoolsProvider); 
+    modules = await DashboardModules.getOrderedModules(permissionBools,
+        isSelected: false);
+    logger.d('setting页面modules: ${modules.map((e) => '${e.id} ${e.visible} ${e.selected}')}');
     setState(() {
       _loading = false;
     });
@@ -155,7 +76,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       }
 
       // 获取该组已选中的模块，保持它们在 modules 列表中的原始顺序
-      final selectedInGroup = <DashboardModule>[];
+      final selectedInGroup = <ModuleInfo>[];
       for (final module in modules) {
         if (module.group == group && module.selected) {
           selectedInGroup.add(module);
@@ -174,7 +95,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       selectedInGroup.insert(newIndex, item);
 
       // 重新构建整个 modules 列表，保持组之间的相对位置
-      final newModules = <DashboardModule>[];
+      final newModules = <ModuleInfo>[];
       int selectedIndex = 0; // 用于跟踪已选中的新顺序索引
 
       // 遍历原始列表，保持相对位置，只更新该组已选中的顺序
@@ -203,7 +124,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       }
 
       // 获取该组未选中的模块，保持它们在 modules 列表中的原始顺序
-      final unselectedInGroup = <DashboardModule>[];
+      final unselectedInGroup = <ModuleInfo>[];
       for (final module in modules) {
         if (module.group == group && !module.selected) {
           unselectedInGroup.add(module);
@@ -222,7 +143,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
       unselectedInGroup.insert(newIndex, item);
 
       // 重新构建整个 modules 列表，保持组之间的相对位置
-      final newModules = <DashboardModule>[];
+      final newModules = <ModuleInfo>[];
       int unselectedIndex = 0; // 用于跟踪未选中的新顺序索引
 
       // 遍历原始列表，保持相对位置，只更新该组未选中的顺序
@@ -386,33 +307,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 }
 
 /// =======================
-/// 模块模型
-/// =======================
-class DashboardModule {
-  final String id;
-  final String title;
-  final Widget content;
-  final String group; // 添加分组字段
-  bool selected;
-
-  DashboardModule({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.group, // 添加分组字段
-    required this.selected,
-  });
-}
-
-/// =======================
 /// 可拖拽排序的模块列表
 /// =======================
 class _ReorderableModuleList extends StatelessWidget {
-  final List<DashboardModule> modules;
+  final List<ModuleInfo> modules;
   final bool selected;
   final String group;
   final Function(String, int, int) onReorder;
-  final Function(DashboardModule) onToggle;
+  final Function(ModuleInfo) onToggle;
 
   const _ReorderableModuleList({
     required this.modules,

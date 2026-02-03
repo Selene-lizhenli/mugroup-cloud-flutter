@@ -9,9 +9,11 @@ abstract class User with _$User {
   const factory User({
     int? id,
     String? name,
+    String? position, //eg:后勤类
     @JsonKey(name: 'job_number') String? jobNumber,
     Department? department,
     List<String>? permissions,
+    @JsonKey(name: 'work_location') String? workLocation,  //eg:义乌
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
