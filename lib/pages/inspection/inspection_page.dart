@@ -16,7 +16,6 @@ class InspectionPage extends HookConsumerWidget {
         appBar: AppBar(
           title: const Text('验货任务列表'),
           elevation: 0,
-          backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           actions: [
             TextButton(

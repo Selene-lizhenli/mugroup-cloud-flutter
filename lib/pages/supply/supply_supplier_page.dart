@@ -2,6 +2,7 @@ import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/supply/widgets/supplier_view.dart';
+import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -49,15 +50,16 @@ class SupplySupplierPage extends HookConsumerWidget {
               height: 8,
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: HomeAppBar(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+              child: MuSearchBar(
                 controller: home.searchTextController,
-                onSearchText: (search) {
-                  homeNotifier.setSearch(search);
+                hintText: '搜索产品编码/名称',
+                buttonText: '搜索',
+                onSearch: (search) {
+                  homeNotifier.setSearch(search ?? '');
                   home.bus.dispatch(
-                      SearchEvent(search: search, media: home.currentMedia));
+                      SearchEvent(search: search ?? ''));
                 },
-                enableImageSearch: false,
               ),
             ),
             Expanded(

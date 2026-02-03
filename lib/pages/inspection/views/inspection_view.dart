@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
-import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -153,95 +152,92 @@ class InspectionView extends HookConsumerWidget {
           slivers: [
             MultiSliver(
               children: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.only(top: 4, bottom: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: MuSearchBar(
-                            controller: searchController,
-                            hintText: '搜索产品编码/名称',
-                            buttonText: '搜索',
-                            onSearch: (value) async {
-                              search.value = value;
-                              await fetchPage(init: true);
-                            },
-                          ),
+                Container(
+                  padding: const EdgeInsets.only(top: 4, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: MuSearchBar(
+                          controller: searchController,
+                          hintText: '搜索产品编码/名称',
+                          buttonText: '搜索',
+                          onSearch: (value) async {
+                            search.value = value;
+                            await fetchPage(init: true);
+                          },
                         ),
-                        const SizedBox(height: 12),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: Row(
-                            children: [
-                              _buildFilterChip(
-                                context: context,
-                                label: '全部',
-                                isSelected: filterDate.value == null,
-                                onTap: () async {
-                                  filterDate.value = null;
-                                  await fetchPage(init: true);
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              ...getRecentMonths().map((date) {
-                                final isSelected =
-                                    filterDate.value?.year == date.year &&
-                                        filterDate.value?.month == date.month;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: _buildFilterChip(
-                                    context: context,
-                                    label: '${date.month}月',
-                                    isSelected: isSelected,
-                                    onTap: () async {
-                                      filterDate.value = date;
-                                      await fetchPage(init: true);
-                                    },
-                                  ),
-                                );
-                              }),
-                              // 日历选择器按钮
-                              GestureDetector(
-                                onTap: showYearMonthPicker,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: (filterDate.value != null &&
-                                            !getRecentMonths().any((d) =>
-                                                d.year ==
-                                                    filterDate.value!.year &&
-                                                d.month ==
-                                                    filterDate.value!.month))
-                                        ? colorScheme.primary.withOpacity(0.1)
-                                        : Colors.grey[100],
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.calendar_month_outlined,
-                                    size: 20,
-                                    color: (filterDate.value != null &&
-                                            !getRecentMonths().any((d) =>
-                                                d.year ==
-                                                    filterDate.value!.year &&
-                                                d.month ==
-                                                    filterDate.value!.month))
-                                        ? colorScheme.primary
-                                        : Colors.grey[600],
-                                  ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Row(
+                          children: [
+                            _buildFilterChip(
+                              context: context,
+                              label: '全部',
+                              isSelected: filterDate.value == null,
+                              onTap: () async {
+                                filterDate.value = null;
+                                await fetchPage(init: true);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            ...getRecentMonths().map((date) {
+                              final isSelected =
+                                  filterDate.value?.year == date.year &&
+                                      filterDate.value?.month == date.month;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: _buildFilterChip(
+                                  context: context,
+                                  label: '${date.month}月',
+                                  isSelected: isSelected,
+                                  onTap: () async {
+                                    filterDate.value = date;
+                                    await fetchPage(init: true);
+                                  },
+                                ),
+                              );
+                            }),
+                            // 日历选择器按钮
+                            GestureDetector(
+                              onTap: showYearMonthPicker,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: (filterDate.value != null &&
+                                          !getRecentMonths().any((d) =>
+                                              d.year ==
+                                                  filterDate.value!.year &&
+                                              d.month ==
+                                                  filterDate.value!.month))
+                                      ? colorScheme.primary.withOpacity(0.1)
+                                      : Colors.grey[100],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.calendar_month_outlined,
+                                  size: 20,
+                                  color: (filterDate.value != null &&
+                                          !getRecentMonths().any((d) =>
+                                              d.year ==
+                                                  filterDate.value!.year &&
+                                              d.month ==
+                                                  filterDate.value!.month))
+                                      ? colorScheme.primary
+                                      : Colors.grey[600],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      )
+                    ],
                   ),
                 ),
+
                 // const SliverToBoxAdapter(child: SizedBox(height: 10)),
                 if (inspections.value.isEmpty)
                   SliverFillRemaining(
@@ -318,7 +314,7 @@ class InspectionView extends HookConsumerWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 8),
             child: Text(
               label,
               style: TextStyle(

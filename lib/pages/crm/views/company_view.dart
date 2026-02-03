@@ -98,7 +98,7 @@ class CompanyView extends HookConsumerWidget {
         clipBehavior: Clip.hardEdge,
         child: EasyRefresh(
           controller: refreshController,
-          refreshOnStart: false,
+          refreshOnStart: true,
           onRefresh: () async {
             try {
               await fetchData(

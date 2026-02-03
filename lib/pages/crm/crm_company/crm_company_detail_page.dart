@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,10 +16,7 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final company = useState<Company?>(null);
-    final isLoading = useState(true);
-
-    const backgroundColor = Color(0xFFF2F4F7);
-
+    final isLoading = useState(true); 
     Future loadCompany() async {
       try {
         final data = await showCrmCompany(id);
@@ -33,12 +31,10 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
       return null;
     }, []);
 
-    return Scaffold(
-      backgroundColor: backgroundColor,
+    return Scaffold( 
       appBar: AppBar(
         title: const Text("客户详情"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        centerTitle: true, 
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -51,7 +47,17 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Column(
                     children: [
-                      _buildHeaderCard(context, company.value!),
+                      _buildHeaderCard(
+                        context,
+                        company.value!,
+                        onEdit: () async {
+                          final shouldRefresh = await context.router
+                              .push(CrmCompanyEditRoute(id: company.value!.id!));
+                          if (shouldRefresh == true) {
+                            loadCompany();
+                          }
+                        },
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -119,80 +125,103 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context, Company data) {
+  Widget _buildHeaderCard(
+    BuildContext context,
+    Company data, {
+    Future<void> Function()? onEdit,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final shortName = (data.name ?? "C").substring(0, 1).toUpperCase();
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 大头像
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              shortName,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 大头像
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  shortName,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // 名字
+              Text(
+                data.name ?? "未命名公司",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A1A),
+                ),
+              ),
+              const SizedBox(height: 6),
+              // 行业
+              Text(
+                data.industry ?? "行业未填写",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 16),
+              // 标签
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  if (data.source != null) _buildPillTag(data.source!, Colors.blue),
+                  if (data.location != null)
+                    _buildPillTag(data.location!, Colors.orange),
+                  if (data.address != null)
+                    _buildPillTag(data.address!, Colors.teal),
+                ],
+              ),
+            ],
+          ),
+        ),
+        if (onEdit != null)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => onEdit(),
+              style: IconButton.styleFrom(
+                foregroundColor: colorScheme.primary,
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          // 名字
-          Text(
-            data.name ?? "未命名公司",
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
-            ),
-          ),
-          const SizedBox(height: 6),
-          // 行业
-          Text(
-            data.industry ?? "行业未填写",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 16),
-          // 标签
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            children: [
-              if (data.source != null) _buildPillTag(data.source!, Colors.blue),
-              if (data.location != null)
-                _buildPillTag(data.location!, Colors.orange),
-              if (data.address != null)
-                _buildPillTag(data.address!, Colors.teal),
-            ],
-          ),
-        ],
-      ),
+      ],
     );
   }
 

@@ -49,30 +49,56 @@ class CrmCompanyCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          company.name ?? "未命名客户",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F2937),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              company.name ?? "未命名客户",
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1F2937),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            if (onEdit != null)
+                              Material(
+                                color: colorScheme.primary.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
+                                child: InkWell(
+                                  onTap: onEdit,
+                                  borderRadius: BorderRadius.circular(8),
+                                  splashColor:
+                                      colorScheme.primary.withOpacity(0.2),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    child: Icon(
+                                      Icons.edit_outlined,
+                                      size: 16,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
                         if (company.address != null &&
                             company.address!.isNotEmpty)
                           Row(
                             children: [
+                              const SizedBox(height: 2),
                               Icon(Icons.location_on_outlined,
-                                  size: 14, color: Colors.grey[400]),
-                              const SizedBox(width: 2),
+                                  size: 14, color: colorScheme.outline), 
                               Expanded(
                                 child: Text(
-                                  company.address!,
+                                  company.address ?? '',
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                    color:
+                                        colorScheme.onSurface.withOpacity(0.75),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -83,31 +109,13 @@ class CrmCompanyCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (onEdit != null)
-                    Material(
-                      color: colorScheme.primary.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      child: InkWell(
-                        onTap: onEdit,
-                        borderRadius: BorderRadius.circular(8),
-                        splashColor: colorScheme.primary.withOpacity(0.2),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(
-                            Icons.edit_outlined,
-                            size: 16,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
               ),
               if (firstContact != null) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9FAFB),
                     borderRadius: BorderRadius.circular(8),
@@ -119,6 +127,7 @@ class CrmCompanyCard extends StatelessWidget {
                         icon: Icons.person,
                         text: firstContact.name ?? "未知姓名",
                         isBold: true,
+                        colorScheme: colorScheme,
                       ),
                     ],
                   ),
@@ -175,11 +184,13 @@ class _ContactPill extends StatelessWidget {
   final IconData icon;
   final String text;
   final bool isBold;
+  final ColorScheme colorScheme;
 
   const _ContactPill({
     required this.icon,
     required this.text,
     this.isBold = false,
+    required this.colorScheme,
   });
 
   @override
@@ -187,7 +198,7 @@ class _ContactPill extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: Colors.grey[500]),
+        Icon(icon, size: 12, color: colorScheme.outline),
         const SizedBox(width: 6),
         Flexible(
           child: Text(
@@ -195,8 +206,8 @@ class _ContactPill extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+              fontSize: 12,
+              fontWeight: isBold ? FontWeight.normal : FontWeight.normal,
             ),
           ),
         ),

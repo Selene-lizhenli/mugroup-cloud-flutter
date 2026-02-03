@@ -26,8 +26,7 @@ class MuSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final effectiveThemeColor = themeColor ?? colorScheme.primary;
-    final effectiveFillColor =
-        fillColor ??  Colors.transparent;
+    final effectiveFillColor = fillColor ?? Colors.transparent;
 
     // 计算对比色：根据主题颜色亮度选择白色或黑色
     final onThemeColor = _getContrastColor(effectiveThemeColor);
@@ -37,14 +36,13 @@ class MuSearchBar extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: 40,
+            child: SizedBox( 
               child: TextField(
                 controller: controller,
                 textInputAction: TextInputAction.search,
                 // 回车搜索时透出当前文本
                 onSubmitted: onSearch,
-                cursorColor: effectiveThemeColor,
+                cursorColor: effectiveThemeColor, 
                 style: const TextStyle(fontSize: 14, height: 1),
                 decoration: InputDecoration(
                   hintText: hintText,
@@ -54,7 +52,7 @@ class MuSearchBar extends StatelessWidget {
                   fillColor: effectiveFillColor,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 12,
+                    vertical: 10.5,
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.only(
@@ -82,7 +80,7 @@ class MuSearchBar extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 40,
+            height: 36,
             child: FilledButton(
               // 点击按钮时也透出当前输入框内容
               onPressed: () => onSearch(controller.text),
@@ -98,7 +96,7 @@ class MuSearchBar extends StatelessWidget {
               ),
               child: Text(
                 buttonText,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14, height: 1),
               ),
             ),
           ),

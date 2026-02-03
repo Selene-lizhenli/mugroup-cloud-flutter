@@ -43,7 +43,7 @@ class InspectionCard extends HookConsumerWidget {
     // 进度百分比 (0.0 - 1.0)
     final double progress = total > 0 ? (finished / total) : 0.0;
     // 显示文本
-    final String progressText = '$finished/$total'; 
+    final String progressText = '$finished/$total';
 
     return InkWell(
         onTap: onTap,
@@ -76,7 +76,8 @@ class InspectionCard extends HookConsumerWidget {
                     ),
                   ),
                   const Spacer(),
-                  Icon(Icons.person_outline, size: 16, color:  colorScheme.outline),
+                  Icon(Icons.person_outline,
+                      size: 16, color: colorScheme.outline),
                   const SizedBox(width: 4),
                   Text('${user?.name}', style: greyTextStyle),
                   const SizedBox(width: 6),
@@ -142,7 +143,7 @@ class InspectionCard extends HookConsumerWidget {
                         );
                       },
                       borderRadius: BorderRadius.circular(16),
-                      child: Row( 
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
