@@ -16,6 +16,7 @@ import 'package:cloud/pages/widgets/spacing_row.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
@@ -443,6 +444,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
       final images = formKey.currentState?.value['image'];
+      final user = ref.read(userProvider).user;
 
       if (images == null || (images is List && images.isEmpty)) {
         EasyLoading.showInfo("请先上传图片");
@@ -453,16 +455,60 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
           status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
 
       try {
-        final result = await identifySample({'image': images});
+        final result = await identifyOcr('ExtractQtnBasic', {
+          "department": user?.department?.name,
+          "employee_name": user?.name,
+          "employee_number": user?.jobNumber,
+          "image": images[0].thumbUrl,
+        });
 
-        if (result != null && result is Map<String, dynamic>) {
-          EasyLoading.showSuccess("识别成功");
+        if (result != null &&
+            result is Map<String, dynamic> &&
+            result['success'] == true) {
+          // 1. 获取内部的数据列表
+          final List? dataList = result['data'];
 
-          formKey.currentState?.patchValue(result);
-        } else {
-          EasyLoading.dismiss();
+          if (dataList != null && dataList.isNotEmpty) {
+            // 2. 取出第一个条目作为处理对象
+            final Map<String, dynamic> rawItem =
+                Map<String, dynamic>.from(dataList.first);
+            final Map<String, dynamic> processedData = {};
+
+            final Map<String, String> fieldMapping = {
+              'item_no': 'product_no',
+              'price': 'supplier_price',
+              'out_carton': 'outer_capacity',
+              'inner_pack': 'inner_capacity',
+              'size': 'spec',
+              'weight': 'weight',
+              'packaging_type': 'packing',
+              'unit': 'unit',
+              'volume': 'outer_volume',
+              'moq': 'supplier_moq',
+              'description': 'description_cn',
+            };
+
+            // 3. 执行映射转换（遍历 mapping 而不是遍历结果，更安全）
+            fieldMapping.forEach((oldKey, newKey) {
+              if (rawItem.containsKey(oldKey)) {
+                // 转换值为 String，因为 Input 组件通常接收 String
+                processedData[newKey] = rawItem[oldKey].toString();
+              }
+            });
+
+            EasyLoading.showSuccess("识别成功");
+
+            // 4. 打印转换后的扁平化数据
+            logger.d(processedData);
+
+            // 5. 填充表单
+            formKey.currentState?.patchValue(processedData);
+          } else {
+            EasyLoading.showInfo("未识别到有效内容");
+          }
         }
       } catch (e) {
+        logger.d(e);
         EasyLoading.showError('识别失败');
       }
     }
