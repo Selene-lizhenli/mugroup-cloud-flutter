@@ -185,12 +185,19 @@ flutter:
     - assets/mu/factory_pink.png  
     - assets/mu/warehouse_pink.png
     - assets/mu/warehouse_blue.png
-    - assets/mu/cust_pink.png
-    - assets/mu/cust_blue.png
+    - assets/mu/customer_pink.png
+    - assets/mu/customer_blue.png
     - assets/mu/insp_blue.png
     - assets/mu/insp_pink.png 
     - assets/mu/market_pink.png
     - assets/mu/market_blue.png 
+    - assets/mu/cart_blue.png 
+    - assets/mu/cart_pink.png 
+    - assets/mu/station_blue.png 
+    - assets/mu/station_pink.png 
+    
+
+    
     
 
   #

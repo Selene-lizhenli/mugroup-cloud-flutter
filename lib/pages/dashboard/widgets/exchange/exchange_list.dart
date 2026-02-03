@@ -72,7 +72,7 @@ class ExchangeRatesValueList extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.04),
+                    color: colorScheme.primary.withOpacity(0.03),
                     borderRadius: BorderRadius.circular(2),
                     // border: Border.all(
                     //   color: colorScheme.primary,
