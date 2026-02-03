@@ -401,21 +401,30 @@ class QuotePage extends HookConsumerWidget {
                         ? sample.image![0].url
                         : null;
 
-                return Container(
-                  width: 64,
-                  height: 64,
-                  margin: const EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border:
-                          Border.all(color: Colors.black.withOpacity(0.05))),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(7),
-                    child: imgUrl != null
-                        ? Image.network(imgUrl, fit: BoxFit.cover)
-                        : const Icon(Icons.image_outlined,
-                            color: Colors.grey, size: 20),
+                return GestureDetector(
+                  onTap: () {
+                    final sampleId = sample?.id;
+                    if (sampleId == null) return;
+                    context.router.push(
+                      ShowroomSampleDetailRoute(id: sampleId),
+                    );
+                  },
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    margin: const EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border:
+                            Border.all(color: Colors.black.withOpacity(0.05))),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(7),
+                      child: imgUrl != null
+                          ? Image.network(imgUrl, fit: BoxFit.cover)
+                          : const Icon(Icons.image_outlined,
+                              color: Colors.grey, size: 20),
+                    ),
                   ),
                 );
               },
