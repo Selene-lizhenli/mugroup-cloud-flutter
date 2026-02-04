@@ -103,15 +103,15 @@ class EntryGridModule extends ConsumerWidget {
 
     if (visibleEntries.isEmpty) {
       return Container(
-        padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Center(
             child: Empty(
-          text: '暂无模块',
-          height: 24,
+          text: '暂无可用模块',
+          height: 28,
         )),
       );
     }

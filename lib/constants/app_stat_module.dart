@@ -92,13 +92,26 @@ class DashboardModules {
   static Future<List<ModuleInfo>> getOrderedModules(
       Map<String, bool>? permissionBools,
       {bool isSelected = false}) async {
+
+    // app初始化时默认展示模块：公开模块 （rate） + 有权限的应用
+    final initAppDefaultModules = <String>['rate'];
+    if (permissionBools != null) {
+      for (final e in permissionBools.entries) {
+        if (e.value == true) {
+          initAppDefaultModules.add(e.key);
+        }
+      }
+    }
+    // app初始化时，storageKeyList orderKeyList的值是null，
+    // 用户设置选中0个模块时，storageKeyList orderKeyList的值是 list empty
     final prefs = await SharedPreferences.getInstance();
     final storageKeyList = prefs.getStringList(storageKey);
-    final localSelectedIds = storageKeyList ?? ['rate']; 
-    final orderKeyList = prefs.getStringList(orderKey);
-    final orderIds = orderKeyList ?? ['rate'];
+    final storageOrderKeyList = prefs.getStringList(orderKey);
+    final localSelectedIds = storageKeyList ?? initAppDefaultModules;
+    final orderIds = storageOrderKeyList ?? initAppDefaultModules;
 
-    if (isSelected && localSelectedIds.isEmpty) { //只返回选中的情况：本地没有。就直接返回空吧~~
+    if (isSelected && localSelectedIds.isEmpty) {
+      //只返回选中的情况：本地没有。就直接返回空吧~~
       return [];
     }
 
