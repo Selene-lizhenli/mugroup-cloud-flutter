@@ -34,8 +34,6 @@ class SupplierSelect extends HookConsumerWidget {
         isLoading.value = true;
         final resp = await getSupplySuppliers(queryParameters: {
           "search": search.value,
-          //添加时间戳参数防止缓存
-          "t": DateTime.now().millisecondsSinceEpoch.toString(),
         });
         suppliers.value = resp.data;
       } finally {
