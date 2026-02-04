@@ -21,8 +21,8 @@ class EntryFeatures {
       EntryFeature('ecommerce_product_comparison', '采购助手',
           'showroom.product_comparison.show');
   static const marketPurchase =
-      EntryFeature('market_purchase', '市场带客', 'market_product.show');
-  static const independentSite =
+      EntryFeature('market_purchase', '市场带客', 'showroom.market_product.show');
+  static const independentWebsite =
       EntryFeature('showroom_station', '独立站', 'showroom.station.show');
   static const inspection =
       EntryFeature('inspection', '验货', 'inspection.task.show');
@@ -33,7 +33,7 @@ class EntryFeatures {
     supplySupplier,
     ecommerceProductComparison,
     marketPurchase,
-    independentSite, 
+    independentWebsite, 
     inspection,
   ];
 

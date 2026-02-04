@@ -72,13 +72,13 @@ class EntryGridModule extends ConsumerWidget {
       //   iconSize: 30,
       //   route: const InspectionRoute(),
       // ),
-      _EntryConfig(
-        id: EntryFeatures.independentSite.id,
-        label: EntryFeatures.independentSite.title,
-        iconAsset: 'assets/mu/station_$theme.png',
-        iconSize: 25,
-        route: const InspectionRoute(), 
-      ),
+      // _EntryConfig(
+      //   id: EntryFeatures.independentWebsite.id,
+      //   label: EntryFeatures.independentWebsite.title,
+      //   iconAsset: 'assets/mu/station_$theme.png',
+      //   iconSize: 25,
+      //   route: const InspectionRoute(), 
+      // ),
     ];
   }
 
