@@ -30,21 +30,21 @@ class QuoteSelect extends HookConsumerWidget {
 
     final debounceTimer = useRef<Timer?>(null);
 
+    Future<void> loadQuotes() async {
+      try {
+        isLoading.value = true;
+        final resp = await getShowroomQuotation({
+          "search": search.value,
+          "type": "market",
+        });
+        quotes.value = resp.data;
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
     // 2. 接口请求逻辑
     useEffect(() {
-      Future<void> loadQuotes() async {
-        try {
-          isLoading.value = true;
-          final resp = await getShowroomQuotation({
-            "search": search.value,
-            "type": "market",
-          });
-          quotes.value = resp.data;
-        } finally {
-          isLoading.value = false;
-        }
-      }
-
       loadQuotes();
       return () => debounceTimer.value?.cancel();
     }, [search.value]);
@@ -177,10 +177,12 @@ class QuoteSelect extends HookConsumerWidget {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
+                                    onTap: () async {
+                                      await context.router
+                                          .push(QuoteCreateRoute());
+
                                       if (context.mounted) {
-                                        context.router.push(QuoteCreateRoute());
-                                        return;
+                                        loadQuotes();
                                       }
                                     },
                                     child: Row(

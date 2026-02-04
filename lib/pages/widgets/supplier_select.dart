@@ -29,20 +29,22 @@ class SupplierSelect extends HookConsumerWidget {
 
     final debounceTimer = useRef<Timer?>(null);
 
+    Future<void> loadSuppliers() async {
+      try {
+        isLoading.value = true;
+        final resp = await getSupplySuppliers(queryParameters: {
+          "search": search.value,
+          //添加时间戳参数防止缓存
+          "t": DateTime.now().millisecondsSinceEpoch.toString(),
+        });
+        suppliers.value = resp.data;
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
     // 2. 接口请求逻辑
     useEffect(() {
-      Future<void> loadSuppliers() async {
-        try {
-          isLoading.value = true;
-          final resp = await getSupplySuppliers(queryParameters: {
-            "search": search.value,
-          });
-          suppliers.value = resp.data;
-        } finally {
-          isLoading.value = false;
-        }
-      }
-
       loadSuppliers();
       return () => debounceTimer.value?.cancel();
     }, [search.value]);
@@ -162,11 +164,13 @@ class SupplierSelect extends HookConsumerWidget {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
+                                    onTap: () async {
+                                      await context.router.push(
+                                          const MarketProductSupplierCreateRoute());
+
+                                      // 【核心改动】页面返回后，手动触发当前弹窗列表的刷新
                                       if (context.mounted) {
-                                        context.router.push(
-                                            const MarketProductSupplierCreateRoute());
-                                        return;
+                                        loadSuppliers();
                                       }
                                     },
                                     child: Row(
