@@ -25,7 +25,7 @@ class EntryFeatures {
   static const independentSite =
       EntryFeature('showroom_station', '独立站', 'showroom.station.show');
   static const inspection =
-      EntryFeature('inspection', '验货', 'inspection.show');
+      EntryFeature('inspection', '验货', 'inspection.task.show');
 
   static const values = [
     showroomSample,
