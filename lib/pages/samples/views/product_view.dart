@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
@@ -113,7 +114,7 @@ class ProductView extends HookConsumerWidget {
               await homeNotifier.fetchSamples(
                 searchText: home.search,
                 searchMedia: home.currentMedia,
-                init: false,
+                init: true,
               );
               refreshController.finishRefresh();
             } catch (e) {
@@ -123,15 +124,19 @@ class ProductView extends HookConsumerWidget {
             }
           },
           onLoad: () async {
-            final resp = await homeNotifier.fetchSamples(
-              searchText: home.search,
-              searchMedia: home.currentMedia,
-              init: true,
-            );
-
-            refreshController.finishLoad(resp.data.length >= pageSize
-                ? IndicatorResult.success
-                : IndicatorResult.noMore);
+            logger.d('xialajiazaigengduo0');
+            try {
+              final resp = await homeNotifier.fetchSamples(
+                searchText: home.search,
+                searchMedia: home.currentMedia,
+                init: false,
+              );
+              refreshController.finishLoad(resp.data.length >= pageSize
+                  ? IndicatorResult.success
+                  : IndicatorResult.noMore);
+            } catch (e) {
+              refreshController.finishLoad(IndicatorResult.fail, false);
+            }
           },
           child: CustomScrollView(
             slivers: [

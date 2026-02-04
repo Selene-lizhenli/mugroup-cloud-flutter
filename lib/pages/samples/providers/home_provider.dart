@@ -189,9 +189,10 @@ class Home extends _$Home {
     bool? init = false,
     TemporaryMedia? searchMedia,
   }) async {
-    state = state.copyWith(
-      productListLoading: true,
-    );
+    // 仅首次/刷新时显示全屏 loading，加载更多时不占位，避免列表被替换导致滚动回顶
+    if (init == true) {
+      state = state.copyWith(productListLoading: true, productCurrentPage: 1);
+    }
     try {
       // 准备查询参数（使用当前状态）
       final currentPage = init == true ? 1 : state.productCurrentPage;
@@ -229,7 +230,12 @@ class Home extends _$Home {
           facetCounts: resp.meta?.facetCounts ?? [],
         );
       }
-      if (resp.data.length >= 20) {
+      // 刷新(init)时重置页码为下一页；加载更多时递增页码
+      if (init == true) {
+        updatedState = updatedState.copyWith(
+          productCurrentPage: resp.data.length >= 20 ? 2 : 1,
+        );
+      } else if (resp.data.length >= 20) {
         updatedState = updatedState.copyWith(
           productCurrentPage: state.productCurrentPage + 1,
         );
