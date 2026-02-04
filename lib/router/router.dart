@@ -38,6 +38,18 @@ class AppRouter extends RootStackRouter {
         page: SettingRoute.page,
         path: "/setting",
       ),
+         AutoRoute(
+        page: SingleStationRoute.page,
+        path: '/single_station',
+      ),
+      AutoRoute(
+        page: InquiryMessageRoute.page,
+        path: '/single_station/inquiry_message',
+      ),
+      AutoRoute(
+        page: SingleStationDetailRoute.page,
+        path: '/single_station/detail',
+      ),
       AutoRoute(
           page: MarketProductListRoute.page,
           path: "/market_product/market_product_list"),

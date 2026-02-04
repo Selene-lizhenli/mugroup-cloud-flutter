@@ -22,7 +22,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
 mixin _$User {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
-  String? get position => throw _privateConstructorUsedError; //后勤类
+  String? get position => throw _privateConstructorUsedError; //eg:后勤类
   @JsonKey(name: 'job_number')
   String? get jobNumber => throw _privateConstructorUsedError;
   Department? get department => throw _privateConstructorUsedError;
@@ -211,7 +211,7 @@ class _$UserImpl implements _User {
   final String? name;
   @override
   final String? position;
-//后勤类
+//eg:后勤类
   @override
   @JsonKey(name: 'job_number')
   final String? jobNumber;
@@ -299,7 +299,7 @@ abstract class _User implements User {
   String? get name;
   @override
   String? get position;
-  @override //后勤类
+  @override //eg:后勤类
   @JsonKey(name: 'job_number')
   String? get jobNumber;
   @override

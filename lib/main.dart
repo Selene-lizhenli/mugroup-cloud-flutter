@@ -32,7 +32,7 @@ Future<void> main() async {
         readyText: '刷新中...',
         processingText: '刷新中...',
         processedText: '成功了',
-        noMoreText: '没有更多',
+        noMoreText: '没有更多了',
         failedText: '失败了',
         messageText: '最后更新于 %T',
       );
@@ -43,7 +43,7 @@ Future<void> main() async {
         readyText: '加载中...',
         processingText: '加载中...',
         processedText: '成功了',
-        noMoreText: '没有更多',
+        noMoreText: '没有更多了',
         failedText: '失败了',
         messageText: '最后更新于 %T',
       );
