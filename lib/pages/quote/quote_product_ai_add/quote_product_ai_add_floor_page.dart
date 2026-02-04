@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductDraftItem {
   final Map<String, String> data;
@@ -38,6 +40,20 @@ class ProductDraftItem {
   }
 
   String getValue(String key) => data[key] ?? '-';
+
+  // --- 新增：持久化支持 ---
+  Map<String, dynamic> toJson() => {
+        'data': data,
+        'media': media.toJson(),
+        'isRecognizing': isRecognizing,
+      };
+
+  factory ProductDraftItem.fromJson(Map<String, dynamic> json) =>
+      ProductDraftItem(
+        data: Map<String, String>.from(json['data']),
+        media: TemporaryMedia.fromJson(json['media']),
+        isRecognizing: json['isRecognizing'] ?? false,
+      );
 }
 
 class ProductAiAddState {
@@ -69,9 +85,41 @@ class ProductAiAddState {
 }
 
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
+  static const String _kStorageKey = 'product_ai_add_draft_v1';
+
   @override
   ProductAiAddState build() {
+    _initLoad(); // 初始化时尝试加载
     return ProductAiAddState();
+  }
+
+  // --- 新增：持久化逻辑 ---
+  Future<void> _initLoad() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? jsonStr = prefs.getString(_kStorageKey);
+      if (jsonStr != null && jsonStr.isNotEmpty) {
+        final List<dynamic> decoded = jsonDecode(jsonStr);
+        final List<ProductDraftItem> loadedItems = decoded
+            .map((item) => ProductDraftItem.fromJson(item))
+            .map((item) => item.copyWith(isRecognizing: false))
+            .toList();
+        state = state.copyWith(items: loadedItems);
+      }
+    } catch (e) {
+      debugPrint('Draft load error: $e');
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String jsonStr =
+          jsonEncode(state.items.map((e) => e.toJson()).toList());
+      await prefs.setString(_kStorageKey, jsonStr);
+    } catch (e) {
+      debugPrint('Draft save error: $e');
+    }
   }
 
   void changeTemplate(String templateId) {
@@ -85,6 +133,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newList = List<ProductDraftItem>.from(state.items);
     newList.removeAt(index);
     state = state.copyWith(items: newList);
+    _saveDraft(); // 变更后保存
   }
 
   // 变更图片：实现追加逻辑
@@ -102,13 +151,13 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             ))
         .toList();
 
-    // 2. 这里的逻辑改为【追加】，不删除旧数据
     final int startIndex = currentItems.length;
     final List<ProductDraftItem> updatedList = [...currentItems, ...addedItems];
 
     state = state.copyWith(items: updatedList, isGlobalLoading: true);
+    _saveDraft(); // 变更后保存
 
-    // 3. 开始处理 OCR 队列
+    // 开始处理 OCR 队列
     await _processOcrQueue(
         startIndex, addedItems.map((e) => e.media).toList(), ref);
   }
@@ -158,6 +207,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           isRecognizing: false,
         );
         state = state.copyWith(items: currentList);
+        _saveDraft(); // 识别成功后保存
       }
     }
     state = state.copyWith(isGlobalLoading: false);
@@ -171,6 +221,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newItems = List<ProductDraftItem>.from(state.items);
     newItems[index] = item.copyWith(data: newData);
     state = state.copyWith(items: newItems);
+    _saveDraft(); // 修改单元格后保存
   }
 
   Future<bool> submitProducts(int? quoteId, String? supplierId) async {
@@ -230,8 +281,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     }
   }
 
-  void clear() {
+  void clear() async {
     state = ProductAiAddState();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kStorageKey); // 清空状态时移除持久化数据
   }
 }
 
@@ -613,16 +666,14 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                                     ? const TextInputType.numberWithOptions(
                                         decimal: true)
                                     : TextInputType.text,
-                                // 3. 传入校验函数
                                 validator: (value) {
                                   if (isNumberField && value.isNotEmpty) {
-                                    // 正则校验：支持整数或小数
                                     final reg = RegExp(r'^\d+(\.\d+)?$');
                                     if (!reg.hasMatch(value)) {
                                       return '请输入有效的数字';
                                     }
                                   }
-                                  return null; // 返回 null 表示校验通过
+                                  return null;
                                 },
                                 onConfirm: (v) => onUpdate(col.key, v));
                           },

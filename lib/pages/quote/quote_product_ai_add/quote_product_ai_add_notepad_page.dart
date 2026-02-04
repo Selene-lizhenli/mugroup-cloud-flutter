@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
-import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
+import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 单个产品条目（一行数据）
 class ProductDraftItem {
@@ -25,6 +27,11 @@ class ProductDraftItem {
   }
 
   String getValue(String key) => data[key] ?? '-';
+
+  // --- 新增：持久化 ---
+  Map<String, dynamic> toJson() => {'data': data};
+  factory ProductDraftItem.fromJson(Map<String, dynamic> json) =>
+      ProductDraftItem(data: Map<String, String>.from(json['data']));
 }
 
 class ImageProductGroup {
@@ -53,6 +60,23 @@ class ImageProductGroup {
       isExpanded: isExpanded ?? this.isExpanded,
     );
   }
+
+  // --- 新增：持久化 ---
+  Map<String, dynamic> toJson() => {
+        'media': media.toJson(),
+        'products': products.map((e) => e.toJson()).toList(),
+        'isExpanded': isExpanded,
+      };
+
+  factory ImageProductGroup.fromJson(Map<String, dynamic> json) =>
+      ImageProductGroup(
+        media: TemporaryMedia.fromJson(json['media']),
+        products: (json['products'] as List)
+            .map((e) => ProductDraftItem.fromJson(e))
+            .toList(),
+        isExpanded: json['isExpanded'] ?? true,
+        isRecognizing: false, // 重启后默认不处于识别状态
+      );
 }
 
 class ProductAiAddState {
@@ -84,9 +108,38 @@ class ProductAiAddState {
 }
 
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
+  static const String _kStorageKey = 'product_ai_notepad_draft'; // 存储Key
+
   @override
   ProductAiAddState build() {
+    _loadDraft(); // 初始化时加载
     return ProductAiAddState();
+  }
+
+  // --- 新增：持久化读写 ---
+  Future<void> _loadDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_kStorageKey);
+      if (jsonStr != null && jsonStr.isNotEmpty) {
+        final List<dynamic> decoded = jsonDecode(jsonStr);
+        final loadedGroups =
+            decoded.map((e) => ImageProductGroup.fromJson(e)).toList();
+        state = state.copyWith(groups: loadedGroups);
+      }
+    } catch (e) {
+      debugPrint('加载草稿失败: $e');
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = jsonEncode(state.groups.map((e) => e.toJson()).toList());
+      await prefs.setString(_kStorageKey, jsonStr);
+    } catch (e) {
+      debugPrint('保存草稿失败: $e');
+    }
   }
 
   void changeTemplate(String templateId) {
@@ -94,15 +147,14 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(currentTemplateId: templateId);
   }
 
-  // --- 新增：删除整个组 ---
   void removeGroup(int index) {
     if (index >= state.groups.length) return;
     final newList = List<ImageProductGroup>.from(state.groups);
     newList.removeAt(index);
     state = state.copyWith(groups: newList);
+    _saveDraft(); // 保存
   }
 
-  // --- 新增：删除组内单个产品行 ---
   void removeProduct(int groupIndex, int productIndex) {
     if (groupIndex >= state.groups.length) return;
     final groups = List<ImageProductGroup>.from(state.groups);
@@ -114,9 +166,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
     groups[groupIndex] = group.copyWith(products: newProducts);
     state = state.copyWith(groups: groups);
+    _saveDraft(); // 保存
   }
 
-  // --- 修改：追加逻辑 ---
   Future<void> onImagesChanged(
       List<TemporaryMedia>? newImages, WidgetRef ref) async {
     final images = newImages ?? [];
@@ -125,7 +177,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final currentGroups = state.groups;
     final int startIndex = currentGroups.length;
 
-    // 创建新增的占位组
     final List<ImageProductGroup> addedGroups = images
         .map((img) => ImageProductGroup(
               media: img,
@@ -134,13 +185,12 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             ))
         .toList();
 
-    // 追加到末尾，不覆盖旧组
     state = state.copyWith(
       groups: [...currentGroups, ...addedGroups],
       isGlobalLoading: true,
     );
+    _saveDraft(); // 保存占位状态
 
-    // 异步处理OCR
     await _processOcrQueue(startIndex, images, ref);
   }
 
@@ -189,7 +239,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         recognizedProducts.add(ProductDraftItem(data: emptyMap));
       }
 
-      // --- 安全更新逻辑 ---
       final latestGroups = List<ImageProductGroup>.from(state.groups);
       final targetIndex = latestGroups.indexWhere((g) => g.media == media);
 
@@ -199,6 +248,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           isRecognizing: false,
         );
         state = state.copyWith(groups: latestGroups);
+        _saveDraft(); // 识别完一个组保存一次
       }
     }
     state = state.copyWith(isGlobalLoading: false);
@@ -210,6 +260,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final group = newGroups[groupIndex];
     newGroups[groupIndex] = group.copyWith(isExpanded: !group.isExpanded);
     state = state.copyWith(groups: newGroups);
+    _saveDraft(); // 保存折叠状态
   }
 
   void updateCell(int groupIndex, int productIndex, String key, String value) {
@@ -224,6 +275,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newGroups = List<ImageProductGroup>.from(state.groups);
     newGroups[groupIndex] = group.copyWith(products: newProducts);
     state = state.copyWith(groups: newGroups);
+    _saveDraft(); // 保存修改内容
   }
 
   Future<bool> submitProducts(int? quoteId, String? supplierId) async {
@@ -276,8 +328,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     }
   }
 
-  void clear() {
+  void clear() async {
     state = ProductAiAddState();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kStorageKey); // 清除本地缓存
   }
 }
 
@@ -710,18 +764,16 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                                 .numberWithOptions(
                                                 decimal: true)
                                             : TextInputType.text,
-                                        // 3. 传入校验函数
                                         validator: (value) {
                                           if (isNumberField &&
                                               value.isNotEmpty) {
-                                            // 正则校验：支持整数或小数
                                             final reg =
                                                 RegExp(r'^\d+(\.\d+)?$');
                                             if (!reg.hasMatch(value)) {
                                               return '请输入有效的数字';
                                             }
                                           }
-                                          return null; // 返回 null 表示校验通过
+                                          return null;
                                         },
                                         onConfirm: (newText) =>
                                             controller.updateCell(
@@ -759,7 +811,6 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                 ),
               ),
             ),
-            // --- 新增：单行产品删除按钮 ---
             IconButton(
               icon: const Icon(Icons.remove_circle_outline,
                   color: Colors.grey, size: 18),
