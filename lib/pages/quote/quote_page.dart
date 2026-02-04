@@ -318,8 +318,10 @@ class QuotePage extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(7),
                       child: imgUrl != null
                           ? Image.network(imgUrl, fit: BoxFit.cover)
-                          : const Icon(Icons.image_outlined,
-                              color: Colors.grey, size: 20),
+                          : Image.asset(
+                              'assets/noImage.png',
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
                 );
