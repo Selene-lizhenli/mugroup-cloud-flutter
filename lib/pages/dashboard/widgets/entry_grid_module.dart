@@ -62,7 +62,7 @@ class EntryGridModule extends ConsumerWidget {
         id: EntryFeatures.inspection.id,
         label: EntryFeatures.inspection.title,
         iconAsset: 'insp',
-        iconSize: 26,
+        iconSize: 25,
         route: const InspectionRoute(),
       ),
       _EntryConfig(
@@ -72,13 +72,13 @@ class EntryGridModule extends ConsumerWidget {
         iconSize: 25,
         route: const SingleStationRoute(),
       ),
-      // _EntryConfig(
-      //   featureKey: EntryFeatures.ecommerceProductComparison.id,
-      //   label: EntryFeatures.ecommerceProductComparison.title,
-      //   iconAsset: 'assets/mu/cart_$theme.png',
-      //   iconSize: 30,
-      //   route: const InspectionRoute(),
-      // ),
+      _EntryConfig(
+        id: EntryFeatures.ecommerceProductComparison.id,
+        label: EntryFeatures.ecommerceProductComparison.title,
+        iconAsset: 'cart',
+        iconSize: 26,
+        route: const PurchaseAssistRoute(),
+      ),
     ];
   }
 

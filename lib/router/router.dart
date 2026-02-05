@@ -43,6 +43,10 @@ class AppRouter extends RootStackRouter {
         path: '/single_station',
       ),
       AutoRoute(
+        page: PurchaseAssistRoute.page,
+        path: '/purchase_assist',
+      ),
+      AutoRoute(
         page: InquiryMessageRoute.page,
         path: '/single_station/inquiry_message',
       ),
