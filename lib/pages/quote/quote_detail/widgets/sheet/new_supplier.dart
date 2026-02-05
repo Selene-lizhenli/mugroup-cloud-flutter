@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -22,20 +23,31 @@ class AddSupplierSheet extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 
+    // 状态定义
     final supplierName = useState('');
     final shopNumber = useState('');
     final businessCard = useState<List<TemporaryMedia>>([]);
 
-    // 1. 焦点与滚动控制
+    // 关键：用于回显和逻辑判断的供应商 ID
+    final selectedSupplierId = useState<String?>(null);
+
+    // 焦点与滚动控制
     final supplierNameFocus = useFocusNode();
     final shopNumberFocus = useFocusNode();
     final scrollController = useScrollController();
 
-    // 获取环境信息
+    // 环境信息
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final keyboardHeight = mediaQuery.viewInsets.bottom;
     final isKeyboardOpen = keyboardHeight > 0;
+
+    // 处理“选择现有”后的回显逻辑
+    void handleSelect(Map<String, dynamic> result) {
+      selectedSupplierId.value = result['id']?.toString();
+      supplierName.value = result['name']?.toString() ?? '';
+      shopNumber.value = result['stall_address']?.toString() ?? '';
+    }
 
     void forceScrollToBottom() {
       Future.delayed(const Duration(milliseconds: 350), () {
@@ -67,13 +79,25 @@ class AddSupplierSheet extends HookConsumerWidget {
       }
 
       try {
-        // 构建提交数据
+        // 逻辑分支：如果是选择的现有供应商，直接跳转
+        if (selectedSupplierId.value != null) {
+          Navigator.pop(context);
+          await context.router.push(
+            QuoteProductNewAddRoute(
+              quoteId: quotationId,
+              supplierId: selectedSupplierId.value!,
+            ),
+          );
+          return;
+        }
+
+        // 逻辑分支：正常创建流程
         final data = <String, dynamic>{
           'name': supplierName.value.trim(),
           'collection_name': "bussiness_card",
           'stall_address': shopNumber.value.trim(),
         };
-        // 处理名片图片 - 转换为包含 collection_name 的格式
+
         if (businessCard.value.isNotEmpty) {
           data['images'] = businessCard.value
               .map((e) => {
@@ -98,9 +122,7 @@ class AddSupplierSheet extends HookConsumerWidget {
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('创建供应商失败: ${e.toString()}'),
-            ),
+            SnackBar(content: Text('操作失败: ${e.toString()}')),
           );
         }
       }
@@ -138,7 +160,6 @@ class AddSupplierSheet extends HookConsumerWidget {
             ),
           ),
 
-          // 内容区域
           Flexible(
             child: SingleChildScrollView(
               controller: scrollController,
@@ -162,6 +183,7 @@ class AddSupplierSheet extends HookConsumerWidget {
                     recognizeApi: identifySupplierShopCard,
                     onRecognizeResult: (data) {
                       if (data != null && data is Map<String, dynamic>) {
+                        selectedSupplierId.value = null; // 重新识别视为新输入
                         if (data['supplier_name'] != null) {
                           supplierName.value = data['supplier_name'].toString();
                         }
@@ -174,26 +196,67 @@ class AddSupplierSheet extends HookConsumerWidget {
                     onChanged: (value) => businessCard.value = value,
                   ),
                   const SizedBox(height: 16),
-                  Input(
-                    label: '供应商名称',
-                    value: supplierName.value,
-                    onChanged: (value) => supplierName.value = value,
-                    focusNode: supplierNameFocus,
-                    hintText: '请输入供应商名称',
-                    isRequired: true,
+
+                  // 供应商名称 + 选择现有按钮
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Input(
+                          label: '供应商名称',
+                          value: supplierName.value,
+                          onChanged: (value) {
+                            supplierName.value = value;
+                            selectedSupplierId.value = null; // 手动修改则视为新建
+                          },
+                          focusNode: supplierNameFocus,
+                          hintText: '请输入供应商名称',
+                          isRequired: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: SizedBox(
+                          height: 36,
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              final result = await showModalBottomSheet<
+                                      Map<String, dynamic>>(
+                                  context: context,
+                                  builder: (_) => const SupplierSelect());
+                              if (result != null) handleSelect(result);
+                            },
+                            icon: const Icon(Icons.list_alt, size: 18),
+                            label: const Text('选择现有'),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: colorScheme.primary),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 16),
                   Input(
                     label: '店铺号',
                     value: shopNumber.value,
                     onChanged: (value) => shopNumber.value = value,
-                    // 绑定焦点 Node
                     focusNode: shopNumberFocus,
                     hintText: '请输入店铺号',
                   ),
                   const SizedBox(height: 32),
-                  _buildActionButtons(context, colorScheme, supplierName,
-                      shopNumber, businessCard, onSubmit),
+
+                  _buildActionButtons(
+                    context,
+                    colorScheme,
+                    onSubmit,
+                    isExisting: selectedSupplierId.value != null,
+                  ),
                 ],
               ),
             ),
@@ -204,7 +267,8 @@ class AddSupplierSheet extends HookConsumerWidget {
   }
 
   Widget _buildActionButtons(
-      context, colorScheme, supplierName, shopNumber, businessCard, onSubmit) {
+      BuildContext context, ColorScheme colorScheme, VoidCallback onSubmit,
+      {bool isExisting = false}) {
     return Row(
       children: [
         Expanded(
@@ -223,13 +287,14 @@ class AddSupplierSheet extends HookConsumerWidget {
           child: ElevatedButton(
             onPressed: onSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
+              backgroundColor:
+                  isExisting ? Colors.orange.shade700 : colorScheme.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('创建供应商'),
+            child: Text(isExisting ? '使用该供应商' : '保存供应商'),
           ),
         ),
       ],
