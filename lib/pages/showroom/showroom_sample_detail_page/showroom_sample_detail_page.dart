@@ -468,188 +468,135 @@ class SupplyQuoteCard extends HookConsumerWidget {
     const slate100 = Color(0xFFF1F5F9);
     const slate200 = Color(0xFFE2E8F0);
     const slate400 = Color(0xFF94A3B8);
-    const slate600 = Color(0xFF475569);
     const slate800 = Color(0xFF1E293B);
 
-    // 价格处理逻辑
-    final priceParts = (quote.purchaseCost ?? '0.00').split('.');
-    final priceInt = priceParts[0];
-    final priceDec = priceParts.length > 1 ? priceParts[1] : '00';
-    final currencySymbol = quote.currency == 'USD' ? '\$' : '¥';
+    final province = quote.supplier?.province ?? '';
+    final city = quote.supplier?.city ?? '';
+    final hasLocation = province.isNotEmpty || city.isNotEmpty;
+
+    final specItems = [
+      if (quote.material != null)
+        _buildRowItem(Icons.category_outlined, "材质", quote.material!),
+      if (quote.packing != null)
+        _buildRowItem(Icons.all_inbox_outlined, "包装", quote.packing!),
+      if (quote.moq != null)
+        _buildRowItem(Icons.shopping_cart_outlined, "MOQ", "${quote.moq}"),
+      if (quote.outerCapacity != null)
+        _buildRowItem(Icons.inventory_2_outlined, "装箱", quote.outerCapacity!),
+      if (quote.outerVolume != null)
+        _buildRowItem(Icons.straighten_outlined, "体积", quote.outerVolume!),
+      if (quote.outerGrossWeight != null)
+        _buildRowItem(Icons.scale_outlined, "毛重", quote.outerGrossWeight!),
+      if (quote.shippingQty != null)
+        _buildRowItem(
+            Icons.local_shipping_outlined, "出货", "${quote.shippingQty}"),
+      if (quote.sampleLocation != null)
+        _buildRowItem(Icons.place_outlined, "样品位", quote.sampleLocation!),
+    ];
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: slate200,
-            width: 1,
-          ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: slate200, width: 1),
         ),
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (context.mounted) {
-                      final supplierId = quote.supplier?.id;
-                      if (supplierId == null) return;
-                      context.router
-                          .push(SupplySupplierDetailRoute(id: supplierId));
-
-                      return;
-                    }
-                  },
-                  child: Text(
-                    quote.supplier?.shortName ?? "未知工厂",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: slate800),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                // 地址
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 12, color: slate400),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        "${quote.supplier?.province ?? ''} ${quote.supplier?.city ?? ''}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12, color: slate400),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: slate50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: slate100),
-              ),
-              child: Column(
-                children: [
-                  _buildSpecItem(
-                    Icons.all_inbox_outlined,
-                    '包装:',
-                    quote.packing ?? '-',
-                    slate400,
-                    slate600,
-                  ),
-                  const SizedBox(height: 4),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 4),
-                  _buildSpecItem(
-                    Icons.inventory_2_outlined,
-                    '装箱:',
-                    quote.outerCapacity ?? '-',
-                    slate400,
-                    slate600,
-                  ),
-                  const SizedBox(height: 4),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 4),
-                  _buildSpecItem(
-                    Icons.check_box_outlined,
-                    '体积:',
-                    quote.outerVolume ?? '-',
-                    slate400,
-                    slate600,
-                  ),
-                  const SizedBox(height: 4),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 4),
-                  // 交期
-                  _buildSpecItem(
-                    Icons.calendar_today_outlined,
-                    '出货日期:',
-                    quote.chuhuoAt != null
-                        ? "${quote.chuhuoAt!.year}-${quote.chuhuoAt!.month}-${quote.chuhuoAt!.day}"
-                        : '待定',
-                    slate400,
-                    slate600,
-                    isFullWidth: true,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Text(
+                    (quote.supplier?.shortName ?? quote.supplier?.name) ??
+                        "未知工厂",
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: slate800),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (quote.recordUser != null)
+                  Text(quote.recordUser!,
+                      style: const TextStyle(fontSize: 10, color: slate400)),
+              ],
+            ),
+            if (hasLocation) ...[
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  const Icon(Icons.location_on_outlined,
+                      size: 10, color: slate400),
+                  const SizedBox(width: 2),
+                  Text("$province $city",
+                      style: const TextStyle(fontSize: 11, color: slate400)),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            if (quote.internalSku != null ||
+                quote.supplierSku != null ||
+                quote.customerSku != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          currencySymbol,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: orange600,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          priceInt,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: orange600,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        Text(
-                          '.$priceDec',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: orange600,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Row(
-                          children: [
-                            if (quote.canBill ?? false)
-                              _buildBottomTag(
-                                label: '含税${quote.taxRate ?? ''}',
-                                color: Colors.indigo,
-                                bgColor: const Color(0xFFEEF2FF),
-                                borderColor: const Color(0xFFC7D2FE),
-                              )
-                            else
-                              _buildBottomTag(
-                                label: '不含税',
-                                color: Colors.grey,
-                                bgColor: slate50,
-                                borderColor: slate200,
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    if (quote.internalSku != null)
+                      _buildTag("内部:${quote.internalSku}", Colors.blue),
+                    if (quote.supplierSku != null)
+                      _buildTag("工厂:${quote.supplierSku}", Colors.teal),
+                    if (quote.customerSku != null)
+                      _buildTag("客户:${quote.customerSku}", Colors.purple),
                   ],
                 ),
+              ),
+            if (specItems.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  color: slate50,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: slate100),
+                ),
+                child: Column(
+                  children: specItems
+                      .expand((widget) => [widget, const SizedBox(height: 4)])
+                      .toList()
+                    ..removeLast(),
+                ),
+              ),
+            const SizedBox(height: 10),
+            if (quote.customerPrice != null || quote.supplierPrice != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    if (quote.customerPrice != null)
+                      _buildSmallPrice("客户价:", quote.customerPrice!),
+                    const SizedBox(width: 12),
+                    if (quote.supplierPrice != null)
+                      _buildSmallPrice("报价:", quote.supplierPrice!),
+                  ],
+                ),
+              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildMainPrice(quote, orange600),
+                if (quote.chuhuoAt != null)
+                  Text(
+                    "交期:${quote.chuhuoAt!.month}/${quote.chuhuoAt!.day}",
+                    style: const TextStyle(fontSize: 10, color: slate400),
+                  ),
               ],
             ),
           ],
@@ -658,24 +605,21 @@ class SupplyQuoteCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String label, String value,
-      Color labelColor, Color valueColor,
-      {bool isFullWidth = false}) {
+  Widget _buildRowItem(IconData icon, String label, String value) {
     return Row(
-      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: labelColor),
+        Icon(icon, size: 12, color: const Color(0xFF94A3B8)),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(fontSize: 10, color: labelColor),
-        ),
+        Text("$label:",
+            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
             value,
-            style: TextStyle(
-                fontSize: 10, color: valueColor, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -683,34 +627,66 @@ class SupplyQuoteCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBottomTag({
-    required String label,
-    IconData? icon,
-    required Color color,
-    required Color bgColor,
-    required Color borderColor,
-  }) {
+  Widget _buildTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 0.5),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 10, color: color),
-            const SizedBox(width: 2),
-          ],
-          Text(
-            label,
+      child: Text(text,
+          style: TextStyle(
+              fontSize: 10, color: color, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _buildSmallPrice(String label, String price) {
+    return Text("$label ¥$price",
+        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)));
+  }
+
+  Widget _buildMainPrice(Quote quote, Color activeColor) {
+    // 修复点 3: 极致安全的价格分割逻辑
+    final rawPrice = quote.purchaseCost ?? '0.00';
+    final parts = rawPrice.split('.');
+
+    // 确保 parts 至少有一个元素，即使 rawPrice 为空字符串
+    final String intPart =
+        parts.isNotEmpty ? (parts[0].isEmpty ? '0' : parts[0]) : '0';
+    final String decPart = parts.length > 1 ? parts[1] : '00';
+
+    final currency = quote.currency == 'USD' ? '\$' : '¥';
+    final isTax = quote.canBill ?? false;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(currency,
             style: TextStyle(
-                fontSize: 10, color: color, fontWeight: FontWeight.w500),
+                fontSize: 14, color: activeColor, fontWeight: FontWeight.bold)),
+        Text(intPart,
+            style: TextStyle(
+                fontSize: 22, color: activeColor, fontWeight: FontWeight.bold)),
+        Text(".$decPart",
+            style: TextStyle(
+                fontSize: 14, color: activeColor, fontWeight: FontWeight.bold)),
+        const SizedBox(width: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          decoration: BoxDecoration(
+            color: isTax ? const Color(0xFFEEF2FF) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(4),
           ),
-        ],
-      ),
+          child: Text(
+            isTax ? '含税${quote.taxRate ?? ''}' : '不含税',
+            style: TextStyle(
+                fontSize: 10,
+                color: isTax ? Colors.indigo : const Color(0xFF64748B),
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
     );
   }
 }
