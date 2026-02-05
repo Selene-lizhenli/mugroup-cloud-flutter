@@ -163,12 +163,21 @@ class SupplierSelect extends HookConsumerWidget {
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8),
                                     onTap: () async {
-                                      await context.router.push(
+                                      final resp = await context.router.push(
                                           const MarketProductSupplierCreateRoute());
 
                                       // 【核心改动】页面返回后，手动触发当前弹窗列表的刷新
-                                      if (context.mounted) {
-                                        loadSuppliers();
+                                      if (resp != null && context.mounted) {
+                                        // 1. 刷新列表（确保后台数据同步）
+                                        await loadSuppliers();
+
+                                        if (resp is Supplier) {
+                                          Navigator.of(context)
+                                              .pop(resp.toJson());
+                                        } else if (resp
+                                            is Map<String, dynamic>) {
+                                          Navigator.of(context).pop(resp);
+                                        }
                                       }
                                     },
                                     child: Row(

@@ -376,7 +376,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
 
                         EasyLoading.showSuccess("创建成功");
                         if (context.mounted) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(newSupplier);
                         }
                       } catch (e) {
                         EasyLoading.showError("创建失败: $e");
