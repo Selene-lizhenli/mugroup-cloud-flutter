@@ -1,19 +1,21 @@
-import 'package:auto_route/auto_route.dart';
+ 
+ 
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/single_station/single_station_item.dart';
 import 'package:cloud/pages/single_station/provider/provider.dart';
-import 'package:cloud/pages/single_station/widgets/station_item_card.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/widgets/empty.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/pages/single_station/station/station_product_card.dart'; 
+import 'package:cloud/pages/widgets/empty.dart'; 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-class StationList extends HookConsumerWidget {
-  const StationList({super.key});
+class StationSamplesTab extends HookConsumerWidget {
+  const StationSamplesTab({super.key, required this.stationItem});
+
+  final SingleStationItem? stationItem;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,13 +27,22 @@ class StationList extends HookConsumerWidget {
     );
     final stationNotifier = ref.read(singleStationProvider.notifier);
 
-    if (state.isLoading && state.list.isEmpty) {
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        stationNotifier.loadStationSamples();
+      });
+      return () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            stationNotifier.cleanStationSamples();
+          });
+    }, const []);
+
+    if (state.isLoading && state.stationSampleList.isEmpty) {
       return const Center(
-        child: MuProgressIndicator(text: '加载中...', showText: true),
+        child: CircularProgressIndicator(),
       );
     }
 
-    if (state.errorMessage != null && state.list.isEmpty) {
+    if (state.errorMessage != null && state.stationSampleList.isEmpty) {
       return Center(
         child: Text(
           state.errorMessage!,
@@ -41,23 +52,18 @@ class StationList extends HookConsumerWidget {
       );
     }
 
-    if (state.list.isEmpty) {
+    if (state.stationSampleList.isEmpty) {
       return const Center(
         child: Empty(
-          text: '暂无数据', 
+          text: '暂无数据',
         ),
       );
     }
 
-    void onTap(SingleStationItem? item) {
-      context.router.push(SingleStationDetailRoute(item: item));
-    }
-
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 2, 12, 0),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceTint,
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration( 
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
           topRight: Radius.circular(8),
         ),
@@ -65,10 +71,10 @@ class StationList extends HookConsumerWidget {
       clipBehavior: Clip.hardEdge,
       child: EasyRefresh(
         controller: refreshController,
-        refreshOnStart: true,
+        refreshOnStart: false,
         onRefresh: () async {
           try {
-            await stationNotifier.load();
+            await stationNotifier.loadStationSamples();
             refreshController.finishRefresh();
           } catch (e) {
             refreshController.finishRefresh(IndicatorResult.fail, false);
@@ -77,7 +83,7 @@ class StationList extends HookConsumerWidget {
           }
         },
         onLoad: () async {
-          await stationNotifier.load(
+          await stationNotifier.loadStationSamples(
             refresh: false,
           );
           refreshController.finishLoad(
@@ -92,13 +98,11 @@ class StationList extends HookConsumerWidget {
                   sliver: SliverMasonryGrid.count(
                     crossAxisCount: 1,
                     mainAxisSpacing: 0,
-                    childCount: state.list.length,
+                    childCount: state.stationSampleList.length,
+                    
                     itemBuilder: (context, index) {
-                      final itemValue = state.list[index];
-                      return StationItemCard(
-                        item: itemValue,
-                        onTap: () => onTap(itemValue),
-                      );
+                      final itemValue = state.stationSampleList[index];
+                      return StationProductCard(stationSample: itemValue);
                     },
                   ),
                 ),

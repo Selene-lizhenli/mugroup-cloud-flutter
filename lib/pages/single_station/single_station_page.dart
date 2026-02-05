@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/single_station/provider/provider.dart';
-import 'package:cloud/pages/single_station/widgets/station_list.dart';
+import 'package:cloud/pages/single_station/station/single_station_list.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/pages/widgets/icon.dart';
@@ -25,9 +25,10 @@ class SingleStationPage extends HookConsumerWidget {
       ),
     );
     useEffect(() {
-      return () => refreshController.dispose();
+      return () =>
+          {refreshController.dispose(), stationNotifier.cleanSearchKeyWord};
     }, const []);
- 
+
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         stationNotifier.load();
@@ -66,7 +67,7 @@ class SingleStationPage extends HookConsumerWidget {
             ),
           ),
           const Expanded(
-            child: StationList(),
+            child: SingleStationList(),
           ),
         ],
       ),

@@ -78,7 +78,7 @@ import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i43;
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
     as _i44;
 import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i45;
-import 'package:cloud/pages/single_station/detail/single_station_detail_page.dart'
+import 'package:cloud/pages/single_station/station/detail/single_station_detail_page.dart'
     as _i46;
 import 'package:cloud/pages/single_station/inquiry/inquiry_message_page.dart'
     as _i10;

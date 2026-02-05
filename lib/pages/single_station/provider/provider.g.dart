@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$singleStationHash() => r'a55264720db2a2d16266dd19125e0e2eb4eced72';
+String _$singleStationHash() => r'5f1fb3bbfb1556bbadaec7c41eeea562ed262dd4';
 
 /// 独立站列表 Provider：页面加载后调用 [load] 拉取列表，通过 [singleStationProvider] 读取状态
 ///

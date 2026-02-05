@@ -48,3 +48,115 @@ String formatCurrencyAmount(amount) {
   }
 }
 
+/// 将时间字符串格式化为 "yyyy-MM-dd HH:mm:ss"
+/// - 支持直接传入 ISO8601 / 标准 DateTime 字符串
+/// - 解析失败时返回原始字符串或 '—'
+String formatDateTimeFull(String? value) {
+  if (value == null || value.isEmpty) return '—';
+  try {
+    final dt = DateTime.tryParse(value);
+    if (dt == null) return value;
+
+    String two(int n) => n.toString().padLeft(2, '0');
+
+    final y = dt.year.toString().padLeft(4, '0');
+    final m = two(dt.month);
+    final d = two(dt.day);
+    final h = two(dt.hour);
+    final min = two(dt.minute);
+    final s = two(dt.second);
+
+    return '$y-$m-$d $h:$min:$s';
+  } catch (_) {
+    return value;
+  }
+}
+
+/// 设备类型枚举
+enum DeviceType {
+  iosPhone, // 苹果手机（iPhone/iPod）
+  iosPad, // 苹果平板（iPad）
+  macOs, // 苹果电脑（MacOS）
+  windows, // Windows 电脑
+  linux, // Linux 电脑
+  androidPhone, // Android 手机
+  androidPad, // Android 平板
+  unknown, // 未知设备
+}
+
+/// 解析 UA 并返回设备类型
+/// [ua]：用户传入的 User-Agent 字符串
+/// 返回值：包含设备类型枚举和描述的 Map
+Map<String, dynamic> parseUaDeviceType(String? ua) {
+  // 处理空 UA 或空字符串
+  if (ua == null || ua.isEmpty) {
+    return {
+      'type': DeviceType.unknown,
+      'description': '未知设备',
+    };
+  }
+
+  // 统一转为小写，避免大小写干扰
+  final String lowerUa = ua.toLowerCase();
+
+  // 1. 判断苹果设备（优先级：手机/平板 > 电脑）
+  if (lowerUa.contains('iphone') || lowerUa.contains('ipod')) {
+    return {
+      'type': DeviceType.iosPhone,
+      'description': '苹果手机',
+    };
+  } else if (lowerUa.contains('ipad')) {
+    return {
+      'type': DeviceType.iosPad,
+      'description': '苹果平板',
+    };
+  } else if (lowerUa.contains('mac os x') || lowerUa.contains('macos')) {
+    // 排除 iOS 设备伪装（iOS 设备 UA 也会包含 "Mac OS X"，但已先判断过手机/平板）
+    return {
+      'type': DeviceType.macOs,
+      'description': '苹果电脑',
+    };
+  }
+
+  // 2. 判断 Windows 设备
+  else if (lowerUa.contains('windows')) {
+    return {
+      'type': DeviceType.windows,
+      'description': 'Windows 设备',
+    };
+  }
+
+  // 3. 判断 Linux 设备
+  else if (lowerUa.contains('linux')) {
+    return {
+      'type': DeviceType.linux,
+      'description': 'Linux 设备',
+    };
+  }
+
+  // 4. 判断 Android 设备（区分手机/平板）
+  else if (lowerUa.contains('android')) {
+    if (lowerUa.contains('tablet') ||
+        lowerUa.contains('pad') ||
+        (lowerUa.contains('android') && !lowerUa.contains('mobile'))) {
+      return {
+        'type': DeviceType.androidPad,
+        'description': 'Android 平板',
+      };
+    } else {
+      return {
+        'type': DeviceType.androidPhone,
+        'description': 'Android 手机',
+      };
+    }
+  }
+
+  // 5. 未知设备
+  else {
+    return {
+      'type': DeviceType.unknown,
+      'description': '未知设备',
+    };
+  }
+}
+

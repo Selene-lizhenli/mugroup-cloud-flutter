@@ -180,9 +180,8 @@ flutter:
     - assets/mu/kaiyueren_yuqiuyu_pink.png
     - assets/mu/kaiyueren_yuqiuyu_blue.png
     - assets/mu/benben_c.png
-    - assets/mu/benben_s.png
-    - assets/photo/merrychristmas.png 
-    - assets/photo/christmas_tree.png  
+    - assets/mu/benben_s.png 
+    - assets/photo/christmastree.png   
     - assets/mu/factory_blue.png
     - assets/mu/factory_pink.png  
     - assets/mu/warehouse_pink.png
