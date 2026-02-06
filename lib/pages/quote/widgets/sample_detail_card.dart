@@ -128,7 +128,7 @@ class ProductDetailCard extends StatelessWidget {
               onTap: onTap ??
                   () {
                     if (sampleId == null && id == null) return;
-                    if (!context.mounted) return; 
+                    if (!context.mounted) return;
                     context.router
                         .push(ShowroomSampleDetailRoute(id: sampleId ?? id!));
                   },
@@ -160,7 +160,8 @@ class ProductDetailCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         _KeyValue(
                           label: '供应商报价 (CNY)',
-                          value: (data?.price ?? 0).toString(),
+                          value:
+                              (data?.supplyQuote?.purchaseCost ?? 0).toString(),
                           highlight: false,
                         ),
                         const SizedBox(height: 4),

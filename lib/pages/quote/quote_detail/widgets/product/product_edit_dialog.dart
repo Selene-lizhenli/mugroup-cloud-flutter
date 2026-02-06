@@ -27,7 +27,8 @@ class ProductEditDialog extends HookConsumerWidget {
     final isConverting = useState(false);
 
     final shippingQty = useState(row.qty?.toString() ?? ''); //采购数量
-    final supplierPrice = useState(row.supplyQuote?.supplierPrice?.toString() ?? ''); //供应商报价
+    final purchaseCost =
+        useState(row.supplyQuote?.purchaseCost?.toString() ?? ''); //供应商报价
     final customerPrice = useState<String>(
         row.supplyQuote?.customerPrice?.toString() ?? ''); //客户报价
     final internalSku = useState(row.supplyQuote?.internalSku ?? ''); //公司货号
@@ -36,7 +37,7 @@ class ProductEditDialog extends HookConsumerWidget {
 
     // 页面加载后，如果供应商报价不为空且客户报价为空，自动换算
     useEffect(() {
-      final initialPurchaseCost = supplierPrice.value.trim();
+      final initialPurchaseCost = purchaseCost.value.trim();
       final initialCustomerPrice = customerPrice.value.trim();
 
       // 判断条件：供应商报价不为空且客户报价为空
@@ -61,11 +62,11 @@ class ProductEditDialog extends HookConsumerWidget {
         }
       }
       return null;
-    }, [exchangeAsync, currency, supplierPrice]);
+    }, [exchangeAsync, currency, purchaseCost]);
 
     // 供应商报价变化时，自动计算客户报价
     void onPurchaseCostChanged(String value) {
-      supplierPrice.value = value;
+      purchaseCost.value = value;
       if (isConverting.value) return; // 防止循环更新
 
       final purchaseValue = double.tryParse(value);
@@ -142,7 +143,7 @@ class ProductEditDialog extends HookConsumerWidget {
               const SizedBox(height: 10),
               Input(
                 label: '供应商报价 (CNY)',
-                value: supplierPrice.value,
+                value: purchaseCost.value,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 onChanged: onPurchaseCostChanged,
@@ -203,7 +204,7 @@ class ProductEditDialog extends HookConsumerWidget {
                           if (context.mounted) {
                             Navigator.of(context).pop(<String, String>{
                               'shipping_qty': shippingQty.value,
-                              'purchase_cost': supplierPrice.value,
+                              'purchase_cost': purchaseCost.value,
                               'customer_price': customerPrice.value,
                               'internal_sku': internalSku.value,
                               'supplier_sku': supplierSku.value,
