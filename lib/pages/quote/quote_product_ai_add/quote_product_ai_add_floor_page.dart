@@ -167,6 +167,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           if (quoteId != null) "quotation_id": quoteId,
           "supplier_id": supplierId,
           'item_type': 'market_product',
+          'template_id': state.currentTemplateId,
         },
         options: Options(responseType: ResponseType.stream),
       );
@@ -283,8 +284,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     sub?.cancel();
     state = state.copyWith(
       items: state.items.map((item) {
-        if (item.data['old_thumb'] == taskId)
+        if (item.data['old_thumb'] == taskId) {
           return item.copyWith(isRecognizing: false);
+        }
         return item;
       }).toList(),
     );
