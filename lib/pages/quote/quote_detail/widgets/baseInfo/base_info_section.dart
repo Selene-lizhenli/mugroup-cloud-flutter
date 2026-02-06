@@ -176,6 +176,7 @@ class BaseInfoSection extends HookConsumerWidget {
                       width: (constraints.maxWidth - 16) / 2,
                       child: InfoItem(
                         label: '客户名称',
+                        useTrun: true,
                         value: company?.name ?? ' ',
                         showArrow: company != null && company.id != null,
                         onTap: company != null && company.id != null
