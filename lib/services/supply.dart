@@ -206,3 +206,14 @@ Future<Media?> uploadSupplySupplierYanChang(int id, dynamic data) async {
     },
   );
 }
+
+Future<Quote?> updateSupplyQuote(int id, Map<String, dynamic>? data) async {
+  return api.put("api/tenant/supply/quotes/$id", data: data).then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return Quote.fromJson(res.data);
+    },
+  );
+}

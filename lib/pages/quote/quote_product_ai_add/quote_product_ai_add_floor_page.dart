@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
@@ -10,9 +9,12 @@ import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_templa
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/product_upload_zone.dart';
 import 'package:cloud/services/media.dart';
+import 'package:cloud/services/sample.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:dio/dio.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_repair_flutter/json_repair_flutter.dart';
@@ -620,6 +622,48 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   ) {
     const double rowHeight = 72.0;
 
+    int? parseId(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      final s = v.toString().trim();
+      if (s.isEmpty || s == 'null') return null;
+      return int.tryParse(s);
+    }
+
+    //样品的字段
+    const Set<String> showroomFields = {
+      'product_no',
+      'spec',
+      'description_cn',
+    };
+
+    Future<bool> updateRemoteField({
+      required String fieldKey,
+      required dynamic value,
+    }) async {
+      final int? productId = parseId(item.getValue('product_id'));
+      final int? supplyQuoteId = parseId(item.getValue('supply_quote_id'));
+
+      try {
+        if (showroomFields.contains(fieldKey)) {
+          if (productId == null) return false;
+
+          await updateShowroomSample(productId, {
+            fieldKey: value,
+          });
+          return true;
+        } else {
+          if (supplyQuoteId == null) return false;
+
+          await updateSupplyQuote(supplyQuoteId, {
+            fieldKey: value,
+          });
+          return true;
+        }
+      } finally {}
+    }
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -714,11 +758,21 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                                 }
                               }
                               return null;
-                            }, onConfirm: (v) {
-                              logger.d(item.getValue('product_id'));
-                              logger.d(item.getValue('supply_quote_id'));
-                              logger.d(item.getValue('quotation_sample_id'));
-                              // onUpdate(col.key, v);
+                            }, onConfirm: (v) async {
+                              final success = await updateRemoteField(
+                                fieldKey: col.key,
+                                value: v,
+                              );
+
+                              if (!success) {
+                                EasyLoading.showError('编辑失败，请重试');
+
+                                return;
+                              }
+
+                              // ✅ 远端成功后，再更新本地 UI
+                              EasyLoading.showSuccess('编辑成功');
+                              onUpdate(col.key, v);
                             });
                           },
                           child: Column(
