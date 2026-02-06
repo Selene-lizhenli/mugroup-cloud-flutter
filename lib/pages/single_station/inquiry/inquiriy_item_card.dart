@@ -1,5 +1,8 @@
+import 'package:cloud/constants/theme_color_config.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
+import 'package:cloud/pages/widgets/icon.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// 询盘列表 Item 卡片
 class InquiriesItemCard extends StatelessWidget {
@@ -33,28 +36,30 @@ class InquiriesItemCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // 客户名称
-              Row(
-                children: [
-                  if ((item.name ?? '').isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 0),
-                      child: Text(
-                        item.name!,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
+              Row( 
+                children: [ 
+                  Expanded(
+                    child: Text(
+                      item.name!,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                        height: 1.3
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
                     ),
+                  ),
                 ],
               ),
-
               if ((item.email ?? '').isNotEmpty)
                 Padding(
                     padding: const EdgeInsets.only(bottom: 0),
                     child: _InfoRow(
-                      label: '邮箱',
+                      iconType: FontAwesomeIcons.envelope,
                       value: item.email!,
+                      color: Color.fromARGB(255, 215, 184, 12),
                       colorScheme: colorScheme,
                     )),
 
@@ -64,23 +69,26 @@ class InquiriesItemCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 0),
                   child: _InfoRow(
-                    label: '独立站',
+                    iconType: FontAwesomeIcons.store,
                     value: (item.station!.nameCn?.isNotEmpty ?? false)
                         ? item.station!.nameCn!
                         : (''),
+                    color: primaryColorPink,
                     colorScheme: colorScheme,
+                    maxLines: 1,
                   ),
                 ),
-
-              // 电话：放在最下面一行
-              // if ((item.phone ?? '').isNotEmpty)
-              //   _InfoRow(
-              //     label: '电话',
-              //     value: item.phone!,
-              //     colorScheme: colorScheme,
-              //   ),
-
-              // 消息：模型里没有 message 字段，这里暂用 ua 占位
+              if (item.message != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 0),
+                  child: _InfoRow(
+                    iconType: FontAwesomeIcons.commentDots,
+                    value: item.message!,
+                    color: primaryColorBlue,
+                    colorScheme: colorScheme,
+                    maxLines: 1,
+                  ),
+                ),
             ],
           ),
         ),
@@ -91,14 +99,18 @@ class InquiriesItemCard extends StatelessWidget {
 
 class _InfoRow extends StatelessWidget {
   const _InfoRow({
-    required this.label,
+    required this.iconType,
     required this.value,
     required this.colorScheme,
+    this.maxLines = 2,
+    required this.color,
   });
 
-  final String label;
+  final IconData iconType;
   final String value;
   final ColorScheme colorScheme;
+  final int maxLines;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -107,21 +119,22 @@ class _InfoRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            '$label：',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+          // MuIcon(iconType: iconType, iconSize: 15),
+          Icon(
+            iconType,
+            size: 14,
+            color: color,
           ),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurface,
               ),
-              maxLines: 2,
+              maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
             ),
           ),

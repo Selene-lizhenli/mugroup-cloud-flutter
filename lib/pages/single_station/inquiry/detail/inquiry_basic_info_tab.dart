@@ -147,6 +147,7 @@ class InquiryBasicInfoTab extends StatelessWidget {
                     colorScheme),
                 _row('IP 地址', item!.ip, colorScheme),
                 _row('来源', _formatSource(item!.ua), colorScheme),
+                _row('消息内容', item!.message, colorScheme),
               ],
             ),
           ),

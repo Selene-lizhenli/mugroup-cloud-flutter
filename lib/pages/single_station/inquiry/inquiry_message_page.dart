@@ -51,7 +51,7 @@ class InquiryMessagePage extends HookConsumerWidget {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: MuSearchBar(
               controller: searchController,
-              hintText: '请输入关键字进行搜索',
+              hintText: '请输入客户名称进行搜索',
               buttonText: '搜索',
               onSearch: (search) {
                 final keyword = search ?? searchController.text;

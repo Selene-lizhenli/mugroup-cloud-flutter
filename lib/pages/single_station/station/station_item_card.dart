@@ -69,28 +69,24 @@ class StationItemCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              item.nameCn ?? '',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(),
-                            ),
-                          ],
+                        Text(
+                          item.nameCn ?? '',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            if ((item.expireTime ?? '').isNotEmpty) ...[
+                            if ((item.theme ?? '').isNotEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '过期时间：${_formatExpire(item.expireTime)}',
+                                  '主题：${_translateTheme(item.theme)}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -101,11 +97,11 @@ class StationItemCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 15),
                             ],
-                            if ((item.theme ?? '').isNotEmpty) ...[
+                            if ((item.expireTime ?? '').isNotEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '主题：${_translateTheme(item.theme)}',
+                                  '过期时间：${_formatExpire(item.expireTime)}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -145,7 +141,7 @@ class StationItemCard extends StatelessWidget {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          '站点链接：',
+                                          '站点网址：',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall

@@ -78,11 +78,11 @@ import 'package:cloud/pages/showroom/showroom_sample_create_page.dart' as _i43;
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/showroom_sample_detail_page.dart'
     as _i44;
 import 'package:cloud/pages/showroom/showroom_sample_edit_page.dart' as _i45;
-import 'package:cloud/pages/single_station/station/detail/single_station_detail_page.dart'
-    as _i46;
 import 'package:cloud/pages/single_station/inquiry/inquiry_message_page.dart'
     as _i10;
 import 'package:cloud/pages/single_station/single_station_page.dart' as _i47;
+import 'package:cloud/pages/single_station/station/detail/single_station_detail_page.dart'
+    as _i46;
 import 'package:cloud/pages/supply/supply_supplier_activity/supply_supplier_activity_create_page.dart'
     as _i49;
 import 'package:cloud/pages/supply/supply_supplier_cert/supply_supplier_cert_create_page.dart'

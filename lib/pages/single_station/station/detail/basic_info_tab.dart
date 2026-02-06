@@ -112,7 +112,7 @@ class BasicInfoTab extends StatelessWidget {
           SizedBox(
             width: 72,
             child: Text(
-              label,
+              '$label:',
               style: TextStyle(
                 fontSize: 13,
                 color: colorScheme.onSurfaceVariant,
@@ -121,7 +121,7 @@ class BasicInfoTab extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              (value == null || value.isEmpty) ? '—' : value,
+              (value == null || value.isEmpty) ? '无' : value,
               style: const TextStyle(fontSize: 13),
             ),
           ),
@@ -146,7 +146,7 @@ class BasicInfoTab extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: Container(
-            margin: const EdgeInsets.fromLTRB(12, 12, 12,12),
+            margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
             decoration: BoxDecoration(
               color: colorScheme.surface.withOpacity(0.86),
               borderRadius: BorderRadius.circular(12),
@@ -170,7 +170,8 @@ class BasicInfoTab extends StatelessWidget {
                   _row('联系人', item!.contactPerson, colorScheme),
                   _rowWithCopy(context, '邮箱', item!.email, colorScheme),
                   _row('地址', item!.address, colorScheme),
-                  _rowWithCopy(context, '分享链接', item!.stationUrl, colorScheme), 
+                  _rowWithCopy(context, '分享链接', item!.stationUrl, colorScheme),
+                  _row('备注', item!.remark, colorScheme),
                 ],
               ),
             ),

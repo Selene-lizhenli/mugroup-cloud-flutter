@@ -5,6 +5,7 @@ import 'package:cloud/constants/theme_color_config.dart';
 import 'package:cloud/models/single_station/single_station_item.dart';
 import 'package:cloud/pages/single_station/station/detail/basic_info_tab.dart';
 import 'package:cloud/pages/single_station/station/detail/station_samples_tab.dart';
+import 'package:cloud/pages/widgets/text_adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -32,7 +33,9 @@ class DefaultDetailContainer extends HookConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(item?.nameCn ?? item?.nameEn ?? '独立站详情'),
+        title: AdaptiveTitleText(
+          title: item?.nameCn ?? item?.nameEn ?? '独立站详情',
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => context.router.maybePop(),

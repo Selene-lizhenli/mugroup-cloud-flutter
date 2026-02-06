@@ -17,6 +17,7 @@ class SingleStationInquiries with _$SingleStationInquiries {
     String? phone,
     String? ip,
     String? ua,
+    String? message,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     User? user,

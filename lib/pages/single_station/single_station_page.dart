@@ -41,14 +41,17 @@ class SingleStationPage extends HookConsumerWidget {
         title: const Text('独立站'),
         elevation: 0,
         actions: [
-          MuIcon(
-            iconType: 'message',
-            iconSize: 19,
-            tooltip: "询盘消息",
-            onPressed: () {
-              context.router.push(const InquiryMessageRoute());
-            },
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: MuIcon(
+              iconType: 'message',
+              iconSize: 19,
+              tooltip: "询盘消息",
+              onPressed: () {
+                context.router.push(const InquiryMessageRoute());
+              },
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -57,7 +60,7 @@ class SingleStationPage extends HookConsumerWidget {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: MuSearchBar(
               controller: searchController,
-              hintText: '请输入关键字进行搜索',
+              hintText: '请输入标题进行搜索',
               buttonText: '搜索',
               onSearch: (search) {
                 final keyword = search ?? searchController.text;

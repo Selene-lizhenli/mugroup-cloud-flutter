@@ -17,6 +17,7 @@ _$SingleStationInquiriesImpl _$$SingleStationInquiriesImplFromJson(
       phone: json['phone'] as String?,
       ip: json['ip'] as String?,
       ua: json['ua'] as String?,
+      message: json['message'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       user: json['user'] == null
@@ -38,6 +39,7 @@ Map<String, dynamic> _$$SingleStationInquiriesImplToJson(
       'phone': instance.phone,
       'ip': instance.ip,
       'ua': instance.ua,
+      'message': instance.message,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
       'user': instance.user,

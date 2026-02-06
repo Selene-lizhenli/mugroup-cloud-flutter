@@ -31,6 +31,7 @@ mixin _$SingleStationInquiries {
   String? get phone => throw _privateConstructorUsedError;
   String? get ip => throw _privateConstructorUsedError;
   String? get ua => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -59,6 +60,7 @@ abstract class $SingleStationInquiriesCopyWith<$Res> {
       String? phone,
       String? ip,
       String? ua,
+      String? message,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       User? user,
@@ -90,6 +92,7 @@ class _$SingleStationInquiriesCopyWithImpl<$Res,
     Object? phone = freezed,
     Object? ip = freezed,
     Object? ua = freezed,
+    Object? message = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? user = freezed,
@@ -127,6 +130,10 @@ class _$SingleStationInquiriesCopyWithImpl<$Res,
       ua: freezed == ua
           ? _value.ua
           : ua // ignore: cast_nullable_to_non_nullable
+              as String?,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -190,6 +197,7 @@ abstract class _$$SingleStationInquiriesImplCopyWith<$Res>
       String? phone,
       String? ip,
       String? ua,
+      String? message,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       User? user,
@@ -222,6 +230,7 @@ class __$$SingleStationInquiriesImplCopyWithImpl<$Res>
     Object? phone = freezed,
     Object? ip = freezed,
     Object? ua = freezed,
+    Object? message = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? user = freezed,
@@ -260,6 +269,10 @@ class __$$SingleStationInquiriesImplCopyWithImpl<$Res>
           ? _value.ua
           : ua // ignore: cast_nullable_to_non_nullable
               as String?,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -292,6 +305,7 @@ class _$SingleStationInquiriesImpl implements _SingleStationInquiries {
       this.phone,
       this.ip,
       this.ua,
+      this.message,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       this.user,
@@ -319,6 +333,8 @@ class _$SingleStationInquiriesImpl implements _SingleStationInquiries {
   @override
   final String? ua;
   @override
+  final String? message;
+  @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
   @override
@@ -331,7 +347,7 @@ class _$SingleStationInquiriesImpl implements _SingleStationInquiries {
 
   @override
   String toString() {
-    return 'SingleStationInquiries(id: $id, stationId: $stationId, userId: $userId, name: $name, email: $email, phone: $phone, ip: $ip, ua: $ua, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, station: $station)';
+    return 'SingleStationInquiries(id: $id, stationId: $stationId, userId: $userId, name: $name, email: $email, phone: $phone, ip: $ip, ua: $ua, message: $message, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, station: $station)';
   }
 
   @override
@@ -348,6 +364,7 @@ class _$SingleStationInquiriesImpl implements _SingleStationInquiries {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.ip, ip) || other.ip == ip) &&
             (identical(other.ua, ua) || other.ua == ua) &&
+            (identical(other.message, message) || other.message == message) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -359,7 +376,7 @@ class _$SingleStationInquiriesImpl implements _SingleStationInquiries {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, stationId, userId, name,
-      email, phone, ip, ua, createdAt, updatedAt, user, station);
+      email, phone, ip, ua, message, createdAt, updatedAt, user, station);
 
   @JsonKey(ignore: true)
   @override
@@ -386,6 +403,7 @@ abstract class _SingleStationInquiries implements SingleStationInquiries {
       final String? phone,
       final String? ip,
       final String? ua,
+      final String? message,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       final User? user,
@@ -412,6 +430,8 @@ abstract class _SingleStationInquiries implements SingleStationInquiries {
   String? get ip;
   @override
   String? get ua;
+  @override
+  String? get message;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
