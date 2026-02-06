@@ -211,7 +211,7 @@ class SupplierProductsPage extends HookConsumerWidget {
                               textColor: colorScheme.onSecondary,
                               onTap: () {
                                 context.router.push(
-                                  QuoteProductAddAdaptiveRoute(
+                                  QuoteProductNewAddRoute(
                                     supplierId: supplierId.toString(),
                                   ),
                                 );
