@@ -1,19 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
-import 'package:cloud/providers/app_provider.dart';
-import 'package:cloud/services/openai.dart';
-import 'package:cloud/services/sample.dart';
+import 'package:dio/dio.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:json_repair_flutter/json_repair_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductDraftItem {
@@ -41,7 +39,6 @@ class ProductDraftItem {
 
   String getValue(String key) => data[key] ?? '-';
 
-  // --- 新增：持久化支持 ---
   Map<String, dynamic> toJson() => {
         'data': data,
         'media': media.toJson(),
@@ -87,13 +84,17 @@ class ProductAiAddState {
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   static const String _kStorageKey = 'product_ai_add_draft_v1';
 
+  String _sseBuffer = ""; // 累加缓冲区
+  StreamSubscription? _streamSubscription;
+
   @override
   ProductAiAddState build() {
-    _initLoad(); // 初始化时尝试加载
+    _initLoad();
+    // 页面销毁时主动断开 SSE
+    ref.onDispose(() => _streamSubscription?.cancel());
     return ProductAiAddState();
   }
 
-  // --- 新增：持久化逻辑 ---
   Future<void> _initLoad() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -127,23 +128,30 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(currentTemplateId: templateId);
   }
 
-  // 删除某一项
   void removeItem(int index) {
     if (index >= state.items.length) return;
     final newList = List<ProductDraftItem>.from(state.items);
     newList.removeAt(index);
     state = state.copyWith(items: newList);
-    _saveDraft(); // 变更后保存
+    _saveDraft();
   }
 
-  // 变更图片：实现追加逻辑
+  String _cleanKey(String key) {
+    // 移除所有换行符和空格
+    return key.replaceAll('\n', '').replaceAll(' ', '').trim();
+  }
+
+  // --- SSE 识别核心逻辑 ---
   Future<void> onImagesChanged(
-      List<TemporaryMedia>? newImages, WidgetRef ref) async {
+    List<TemporaryMedia>? newImages,
+    WidgetRef ref,
+    int? quoteId,
+    String? supplierId,
+  ) async {
     if (newImages == null || newImages.isEmpty) return;
 
-    final currentItems = state.items;
-
-    final List<ProductDraftItem> addedItems = newImages
+    // 1. 初始化 UI 列表
+    final addedItems = newImages
         .map((media) => ProductDraftItem(
               data: {},
               media: media,
@@ -151,66 +159,107 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             ))
         .toList();
 
-    final int startIndex = currentItems.length;
-    final List<ProductDraftItem> updatedList = [...currentItems, ...addedItems];
+    state = state.copyWith(
+        items: [...state.items, ...addedItems], isGlobalLoading: true);
 
-    state = state.copyWith(items: updatedList, isGlobalLoading: true);
-    _saveDraft(); // 变更后保存
+    _sseBuffer = ""; // 清空缓冲区
 
-    // 开始处理 OCR 队列
-    await _processOcrQueue(
-        startIndex, addedItems.map((e) => e.media).toList(), ref);
+    try {
+      final dio = Dio();
+      final response = await dio.post<ResponseBody>(
+        'https://one.woyou.fun:12234/api/open/agents/sample/store-market-product',
+        data: {
+          "images": newImages,
+          if (quoteId != null) "quotation_id": quoteId,
+          if (quoteId != null) "quotation": {},
+          "supplier_id": supplierId,
+          'item_type': 'market_product',
+        },
+        options: Options(
+          headers: {
+            "Accept": "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          responseType: ResponseType.stream,
+        ),
+      );
+
+      // 2. 转换并处理流
+      _streamSubscription = response.data?.stream
+          .map((Uint8List data) => utf8.decode(data))
+          .transform(const LineSplitter())
+          .listen((String chunk) {
+        if (chunk.startsWith('data:')) {
+          String content = chunk.replaceFirst('data:', '').trim();
+
+          _sseBuffer += content;
+          try {
+            // 4. 实时修复并更新
+            final repaired = repairJson(_sseBuffer);
+
+            Map<String, dynamic>? targetData;
+            if (repaired is List && repaired.isNotEmpty) {
+              var first = repaired.first;
+              if (first is Map<String, dynamic>) targetData = first;
+            } else if (repaired is Map<String, dynamic>) {
+              targetData = repaired;
+            }
+
+            if (targetData != null) {
+              // logger.d(targetData);
+              _handleCleanedUpdate(targetData);
+            }
+          } catch (e) {
+            // 碎片不足以解析时忽略
+          }
+        }
+      },
+              onDone: () => _finalizeRecognition(),
+              onError: (e) => _finalizeRecognition());
+    } catch (e) {
+      debugPrint("请求出错: $e");
+      _finalizeRecognition();
+    }
   }
 
-  // 处理 OCR 识别
-  Future<void> _processOcrQueue(int startIndexInNew,
-      List<TemporaryMedia> newMedias, WidgetRef ref) async {
-    final user = ref.read(userProvider).user;
+  // 核心：实时清洗并更新 UI
+  void _handleCleanedUpdate(Map<String, dynamic> rawData) {
+    // 1. 清洗 Key 和 Value
+    Map<String, dynamic> cleanedData = {};
+    rawData.forEach((key, value) {
+      String newKey = _cleanKey(key);
+      if (newKey.isNotEmpty) {
+        cleanedData[newKey] = value is String
+            ? value.replaceAll('\n', '').replaceAll(' ', '').trim()
+            : value;
+      }
+    });
 
-    for (var media in newMedias) {
-      final imageUrl = media.thumbUrl;
-      Map<String, String> rowMap = {};
-
-      try {
-        final result = await identifyOcr('ExtractQtnBasic', {
-          "tempalte_id": state.currentTemplateId,
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": imageUrl,
-        });
-
-        if (result != null &&
-            result['success'] == true &&
-            (result['data'] as List).isNotEmpty) {
-          final itemData = result['data'].first;
-          for (var col in AppColumns.all) {
-            String rawVal = (itemData[col.key] ?? '').toString().trim();
-            rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
+    // 2. 更新状态
+    final currentList = [...state.items];
+    final newList = currentList.map((item) {
+      if (item.isRecognizing) {
+        Map<String, String> rowMap = Map.from(item.data);
+        // 匹配 AppColumns
+        for (var col in AppColumns.all) {
+          if (cleanedData.containsKey(col.key)) {
+            rowMap[col.key] = cleanedData[col.key].toString();
           }
-        } else {
-          rowMap = {for (var col in AppColumns.all) col.key: '-'};
-          rowMap['price'] = '未识别';
         }
-      } catch (e) {
-        rowMap = {for (var col in AppColumns.all) col.key: '-'};
-        rowMap['price'] = '识别错误';
+        return item.copyWith(data: rowMap);
       }
+      return item;
+    }).toList();
 
-      final currentList = [...state.items];
-      final targetIndex =
-          currentList.indexWhere((element) => element.media == media);
+    state = state.copyWith(items: newList);
+  }
 
-      if (targetIndex != -1) {
-        currentList[targetIndex] = currentList[targetIndex].copyWith(
-          data: rowMap,
-          isRecognizing: false,
-        );
-        state = state.copyWith(items: currentList);
-        _saveDraft(); // 识别成功后保存
-      }
-    }
-    state = state.copyWith(isGlobalLoading: false);
+  void _finalizeRecognition() {
+    _streamSubscription?.cancel();
+    _sseBuffer = "";
+    final finalItems =
+        state.items.map((e) => e.copyWith(isRecognizing: false)).toList();
+    state = state.copyWith(items: finalItems, isGlobalLoading: false);
   }
 
   void updateCell(int index, String key, String value) {
@@ -221,70 +270,13 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newItems = List<ProductDraftItem>.from(state.items);
     newItems[index] = item.copyWith(data: newData);
     state = state.copyWith(items: newItems);
-    _saveDraft(); // 修改单元格后保存
-  }
-
-  Future<bool> submitProducts(int? quoteId, String? supplierId) async {
-    if (state.isSubmitting) return false;
-    if (state.items.any((element) => element.isRecognizing)) {
-      EasyLoading.showToast('请等待所有图片识别完成');
-      return false;
-    }
-    if (state.items.isEmpty) {
-      EasyLoading.showToast('请先上传图片');
-      return false;
-    }
-
-    state = state.copyWith(isSubmitting: true);
-    EasyLoading.show(status: '保存中...');
-
-    try {
-      final List<Map<String, dynamic>> submitList = [];
-      for (var item in state.items) {
-        final row = item.data;
-        String? val(String key) =>
-            (row[key] == null || row[key] == '-') ? null : row[key];
-
-        submitList.add({
-          if (quoteId != null) "quotation_id": quoteId,
-          if (quoteId != null) "quotation": {},
-          'supply_quotes': [
-            {
-              "supplier_id": supplierId,
-              'supplier_price': val(AppColumns.price.key),
-              'outer_capacity': val(AppColumns.outCarton.key),
-              'inner_capacity': val(AppColumns.innerPack.key),
-              'weight': val(AppColumns.weight.key),
-              'packaging': val(AppColumns.packagingType.key),
-              'unit': val(AppColumns.unit.key),
-              'outer_volume': val(AppColumns.volume.key),
-              'supplier_moq': val(AppColumns.moq.key),
-            }
-          ],
-          "product_no": val(AppColumns.itemNo.key),
-          'spec': val(AppColumns.size.key),
-          'description_cn': val(AppColumns.description.key),
-          'image': [item.media],
-          'item_type': 'market_product',
-        });
-      }
-
-      await batchStoreShowroomSample({'products': submitList});
-      EasyLoading.showSuccess('保存成功');
-      clear();
-      return true;
-    } catch (e) {
-      EasyLoading.showError('保存失败: $e');
-      return false;
-    } finally {
-      state = state.copyWith(isSubmitting: false);
-    }
+    _saveDraft();
   }
 
   void clear() async {
     state = ProductAiAddState();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kStorageKey); // 清空状态时移除持久化数据
+    await prefs.remove(_kStorageKey);
   }
 }
 
@@ -326,8 +318,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     colorScheme: colorScheme,
                     currentMediaList: currentMediaList,
                     onSelect: (newId) => controller.changeTemplate(newId),
-                    onImagesChanged: (newImages) =>
-                        controller.onImagesChanged(newImages, ref),
+                    onImagesChanged: (newImages) => controller.onImagesChanged(
+                        newImages, ref, quoteId, supplierId),
                   ),
                   _buildInfoBar(colorScheme),
                   if (providerState.items.isNotEmpty) ...[
@@ -355,7 +347,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               ),
             ),
           ),
-          _buildBottomAction(context, colorScheme, providerState, controller),
         ],
       ),
     );
@@ -721,37 +712,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
-      ProductAiAddState state, ProductAiAddController controller) {
-    final bool hasRecognizing = state.items.any((item) => item.isRecognizing);
-    final bool canSubmit =
-        state.items.isNotEmpty && !hasRecognizing && !state.isSubmitting;
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-          16, 10, 16, MediaQuery.of(context).padding.bottom + 10),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFEEEEEE)))),
-      child: ElevatedButton(
-        onPressed: canSubmit
-            ? () => controller.submitProducts(quoteId, supplierId)
-            : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-          minimumSize: const Size(double.infinity, 44),
-        ),
-        child: Text(
-          hasRecognizing ? 'AI识别中...' : '保存产品 (${state.items.length})',
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
     );
   }
 }
