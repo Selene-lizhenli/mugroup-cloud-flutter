@@ -11,6 +11,13 @@ bool isUrl(String result) {
   return urlRegex.hasMatch(result);
 }
 
+String truncateText(String text, {int maxChars = 8}) {
+  // 按字符数截断，超过则截取前 maxChars 个字符并加省略号
+  if (text.runes.length <= maxChars) return text;
+  final truncated = String.fromCharCodes(text.runes.take(maxChars));
+  return '$truncated...';
+}
+
 /// 格式化数字：大于999使用k表示
 /// 例如：999 -> "999", 1000 -> "1k", 1300 -> "1.3k", 2000 -> "2k"
 ///
@@ -159,4 +166,3 @@ Map<String, dynamic> parseUaDeviceType(String? ua) {
     };
   }
 }
-

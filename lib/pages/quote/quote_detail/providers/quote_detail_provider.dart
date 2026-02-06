@@ -21,8 +21,7 @@ class QuoteDetailNotifier extends StateNotifier<QuoteDetailState> {
     //  并发请求
     await Future.wait([
       _fetchBaseInfo(id),
-      _fetchProducts(id, 1),
-      // _fetchSuppliers(id),
+      _fetchProducts(id, 1), 
     ]);
   }
 

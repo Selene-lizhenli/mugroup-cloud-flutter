@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/base_info_section.dart'; 
-import 'package:cloud/pages/quote/quote_detail/widgets/product/product.dart'; 
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/base_info_section.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/product.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class QuoteDetailBody extends StatelessWidget {
   final QuotationList? item;
@@ -18,17 +19,11 @@ class QuoteDetailBody extends StatelessWidget {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
- 
-    final confirmed = await ConfirmDialog.show(
-      context,
-      title: '提示',
-      content: '抱歉，目前暂时不支持报价单删除操作。',
-      cancelText: '取消',
-      confirmText: '确定',
-    );
-    if (confirmed && context.mounted) {
-      return;
-    }
+    if (item?.id == null) return;
+    await deleteQuotation(item!.id!);
+    EasyLoading.showSuccess('删除成功');
+    // 通知上一个页面执行刷新逻辑
+    context.router.maybePop(true);
   }
 
   @override

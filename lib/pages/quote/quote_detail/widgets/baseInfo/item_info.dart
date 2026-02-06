@@ -1,4 +1,5 @@
  
+import 'package:cloud/helper/helper.dart';
 import 'package:flutter/material.dart';
  
 
@@ -20,23 +21,23 @@ class InfoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
+ 
     Widget content = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          truncateText(label),
           style: textTheme.bodySmall?.copyWith(
             color: colorScheme.surfaceContainerHighest,
             fontSize: 12,
-          ),
+          ), 
         ),
         const SizedBox(width: 8),
         Expanded(
             child: Row(
           children: [
             Text(
-              value,
+              truncateText(value),
               style: textTheme.bodyMedium?.copyWith( 
                 color: onTap != null?colorScheme.primary:colorScheme.onSurface.withOpacity(0.87),
                 fontSize: 12, 

@@ -143,16 +143,24 @@ class QuotePage extends HookConsumerWidget {
                         color: Colors.blueAccent),
                     onPressed: () => context.router.push(QuoteCreateRoute())),
                 content: _buildRecentRecordsContent(
-                    context,
-                    isLoading.value,
-                    list.value,
-                    recordsDisplayCount,
-                    scrollController,
-                    activeProducts,
-                    activeQuoteId,
-                    selectedSupplierId,
-                    isProductLoading,
-                    fetchActiveProducts),
+                  context,
+                  isLoading.value,
+                  list.value,
+                  recordsDisplayCount,
+                  scrollController,
+                  activeProducts,
+                  activeQuoteId,
+                  selectedSupplierId,
+                  isProductLoading,
+                  fetchActiveProducts,
+                  () async {
+                    await fetchData();
+                    if (activeQuoteId.value != null &&
+                        selectedSupplierId.value != null) {
+                      await fetchActiveProducts();
+                    }
+                  },
+                ),
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
@@ -182,7 +190,8 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<int?> activeQuoteId,
       ValueNotifier<int?> selectedSupplierId,
       ValueNotifier<bool> isProductLoading,
-      Future<void> Function() fetchActiveProducts) {
+      Future<void> Function() fetchActiveProducts,
+      Future<void> Function() refreshAll) {
     if (isLoading) {
       return const Center(
           child: Padding(
@@ -220,8 +229,16 @@ class QuotePage extends HookConsumerWidget {
                     await fetchActiveProducts();
                   }
                 },
-                onTap: () =>
-                    context.router.push(QuoteDetailRoute(id: item.id!)),
+                onTap: () async {
+                  final needRefresh =
+                      await context.router.push<bool>(QuoteDetailRoute(
+                    id: item.id!,
+                  ));
+                  if (needRefresh == true) {
+                    // 删除成功后，执行与下拉刷新相同的逻辑
+                    await refreshAll();
+                  }
+                },
               ),
               if (isCurrentExpanded)
                 _buildExpandableProductStrip(context, isProductLoading.value,

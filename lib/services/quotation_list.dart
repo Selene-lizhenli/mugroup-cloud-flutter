@@ -81,7 +81,9 @@ Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
 }
 
 Future<void> deleteQuotation(int id) async {
+  
   await api.delete("api/tenant/showroom/quotations/$id");
+  
 }
 
 // 移除样品明细中的商品

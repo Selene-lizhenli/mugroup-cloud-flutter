@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/baseInfo/item_info.dart';
@@ -52,21 +53,17 @@ class BaseInfoSection extends HookConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                         Text(
-                              company?.name ?? ' ',
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  height: 1.2),
-                              overflow: TextOverflow.ellipsis,
-                            ), 
+                          Text(
+                            company?.name ?? ' ',
+                            style: const TextStyle(fontSize: 12, height: 1.2),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(width: 8),
                           Flexible(
                             flex: 1,
                             child: Text(
                               '币种：${item?.curreny ?? ''}',
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  height: 1.2),
+                              style: const TextStyle(fontSize: 12, height: 1.2),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -75,14 +72,12 @@ class BaseInfoSection extends HookConsumerWidget {
                             flex: 1,
                             child: Text(
                               '语言：${item?.language ?? ''}',
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  height: 1.2),
+                              style: const TextStyle(fontSize: 12, height: 1.2),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ]),
-                  ), 
+                  ),
                   // const Spacer(),
                   InkWell(
                     onTap: () {
@@ -115,7 +110,7 @@ class BaseInfoSection extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      company?.name ?? ' ',
+                      truncateText(company?.name ?? ' ', maxChars: 10),
                       style: theme.textTheme.titleMedium
                           ?.copyWith(fontWeight: FontWeight.w500, height: 1.2),
                     ),
@@ -128,6 +123,42 @@ class BaseInfoSection extends HookConsumerWidget {
                         textColor: colorScheme.primary,
                         onTap: onEdit!,
                         icon: Icons.edit_outlined,
+                        fontSize: 12,
+                        vertical: 4,
+                        horizontal: 9,
+                      ),
+                    ],
+                    if (onDelete != null) ...[
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      ActionPillButton(
+                        label: '删除',
+                        textColor: colorScheme.error,
+                        onTap: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('确认删除'),
+                              content: const Text('确定要删除该带客记录吗？此操作不可恢复。'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: const Text('取消'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  child: const Text('删除'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            onDelete!();
+                          }
+                        },
+                        icon: Icons.delete_outline,
                         fontSize: 12,
                         vertical: 4,
                         horizontal: 9,
