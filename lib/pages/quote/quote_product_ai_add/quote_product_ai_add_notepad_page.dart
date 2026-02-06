@@ -303,7 +303,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             'supply_quotes': [
               {
                 "supplier_id": supplierId,
-                'supplier_price': val('price'),
+                'purchase_cost': val('price'),
                 'outer_capacity': val('out_carton'),
                 'supplier_sku': val('item_no'),
               }

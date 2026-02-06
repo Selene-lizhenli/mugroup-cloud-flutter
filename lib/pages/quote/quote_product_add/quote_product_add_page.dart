@@ -68,7 +68,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       'product_brand',
       'supplier_sku',
       'customer_sku',
-      'supplier_price',
+      'purchase_cost',
       'deliver_day',
       'supplier_moq',
       'customer_price',
@@ -143,9 +143,9 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
             ),
           );
 
-        case 'supplier_price':
+        case 'purchase_cost':
           return FormBuilderField<String>(
-            name: "supplier_price",
+            name: "purchase_cost",
             validator: (value) =>
                 (value == null || value.isEmpty) ? '该项不能为空' : null,
             builder: (field) => Input(
@@ -476,7 +476,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
             final Map<String, String> fieldMapping = {
               'item_no': 'product_no',
-              'price': 'supplier_price',
+              'price': 'purchase_cost',
               'out_carton': 'outer_capacity',
               'inner_pack': 'inner_capacity',
               'size': 'spec',
@@ -1137,8 +1137,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                           submitValues["supplier_sku"],
                                       "customer_sku":
                                           submitValues["customer_sku"],
-                                      'supplier_price':
-                                          submitValues["supplier_price"],
+                                      'purchase_cost':
+                                          submitValues["purchase_cost"],
                                       "deliver_day":
                                           submitValues["deliver_day"],
                                       "supplier_moq":

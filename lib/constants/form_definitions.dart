@@ -18,7 +18,7 @@ final List<FieldConfig> quoteSampleDefaultFields = [
   const FieldConfig(label: '品牌', name: 'product_brand', isVisible: true),
   const FieldConfig(label: '供应商货号', name: 'supplier_sku', isVisible: true),
   const FieldConfig(label: '客户货号', name: 'customer_sku', isVisible: true),
-  const FieldConfig(label: '供应商报价', name: 'supplier_price', isVisible: true),
+  const FieldConfig(label: '供应商报价', name: 'purchase_cost', isVisible: true),
   const FieldConfig(label: '发货天数', name: 'deliver_day', isVisible: true),
   const FieldConfig(label: '供应商MOQ', name: 'supplier_moq', isVisible: true),
   const FieldConfig(label: '客户报价', name: 'customer_price', isVisible: true),
@@ -48,9 +48,8 @@ final List<FieldConfig> inspectionDefaultFields = [
 
 final List<FieldConfig> quoteAIFloorDefaultFields = [
   const FieldConfig(label: '产品货号', name: 'product_no', isVisible: true),
-  const FieldConfig(label: '供应商报价', name: 'supplier_price', isVisible: true),
+  const FieldConfig(label: '供应商报价', name: 'purchase_cost', isVisible: true),
   const FieldConfig(label: '客户货号', name: 'customer_sku', isVisible: true),
-  const FieldConfig(label: '供应商报价', name: 'supplier_price', isVisible: true),
   const FieldConfig(label: '重量', name: 'weight', isVisible: true),
   const FieldConfig(label: '单位', name: 'unit', isVisible: true),
   const FieldConfig(label: '材质', name: 'material', isVisible: true),
