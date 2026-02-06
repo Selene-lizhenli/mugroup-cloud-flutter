@@ -135,38 +135,29 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     _saveDraft();
   }
 
-  String _cleanKey(String key) {
-    // 移除所有换行符和空格
-    return key.replaceAll('\n', '').replaceAll(' ', '').trim();
-  }
-
   Future<void> uploadAndRecognize(
       File file, WidgetRef ref, int? quoteId, String? supplierId) async {
-    // 闭包函数：独立执行上传+识别，不阻塞外部循环
-    Future<void> runTask() async {
-      try {
-        // 1. 上传图片
-        final uploadedMedia = await upload(file: file);
+    try {
+      final media = await upload(file: file);
+      final initialPath = media.thumbUrl ?? ''; // 记录初始路径作为 ID
 
-        // 2. 立即加入列表
-        final newItem = ProductDraftItem(
-            data: {}, media: uploadedMedia, isRecognizing: true);
-        state = state.copyWith(items: [...state.items, newItem]);
+      final newItem = ProductDraftItem(
+          data: {'old_thumb': initialPath}, // 这里的 old_thumb 永远不变，用于匹配
+          media: media,
+          isRecognizing: true);
 
-        // 3. 发起独立的 SSE 识别
-        _startIndividualSse(uploadedMedia, quoteId, supplierId);
-      } catch (e) {
-        debugPrint("Task Error: $e");
-      }
+      state = state.copyWith(items: [...state.items, newItem]);
+      _startIndividualSse(initialPath, media, quoteId, supplierId);
+    } catch (e) {
+      debugPrint("Upload Error: $e");
     }
-
-    runTask(); // 不使用 await，直接触发执行
   }
 
-  void _startIndividualSse(
-      TemporaryMedia media, int? quoteId, String? supplierId) async {
-    String taskBuffer = ""; // 【局部变量】确保每张图识别时缓冲区是隔离的
-    StreamSubscription? subscription;
+  void _startIndividualSse(String taskId, TemporaryMedia media, int? quoteId,
+      String? supplierId) async {
+    String buffer = "";
+    String eventType = "message"; // 默认事件类型
+    StreamSubscription? sub;
 
     try {
       final response = await api.post<ResponseBody>(
@@ -177,86 +168,123 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           "supplier_id": supplierId,
           'item_type': 'market_product',
         },
-        options: Options(
-          headers: {"Accept": "text/event-stream", "Cache-Control": "no-cache"},
-          responseType: ResponseType.stream,
-        ),
+        options: Options(responseType: ResponseType.stream),
       );
 
-      subscription = response.data?.stream
-          .map((Uint8List data) => utf8.decode(data))
+      sub = response.data?.stream
+          .map((d) => utf8.decode(d))
           .transform(const LineSplitter())
-          .listen((String line) {
-        if (line.startsWith('data:')) {
-          String content = line.replaceFirst('data:', '').trim();
-
-          if (content.contains("[DONE]")) {
-            _stopRecognizing(media.thumbUrl);
-            subscription?.cancel();
-            return;
-          }
-
-          taskBuffer += content; // 操作的是局部 buffer
-
-          try {
-            final repaired = repairJson(taskBuffer);
-            Map<String, dynamic>? targetData;
-
-            if (repaired is Map<String, dynamic>) {
-              targetData = repaired;
-            } else if (repaired is List && repaired.isNotEmpty) {
-              if (repaired.first is Map) targetData = repaired.first;
-            }
-
-            if (targetData != null) {
-              // 精准更新当前这张图的数据
-              logger.d(targetData);
-              _handleCleanedUpdate(media.thumbUrl, targetData);
-            }
-          } catch (e) {
-            // 碎片不足忽略
-          }
+          .listen((line) {
+        // logger.d(line);
+        if (line.startsWith('event:')) {
+          eventType = line.replaceFirst('event:', '').trim();
+          return;
         }
-      },
-              onDone: () => _stopRecognizing(media.thumbUrl),
-              onError: (e) => _stopRecognizing(media.thumbUrl));
 
-      // 确保页面退出时销毁订阅
-      ref.onDispose(() => subscription?.cancel());
+        if (!line.startsWith('data:')) return;
+        String content = line.replaceFirst('data:', '').trim();
+
+        if (content.contains("[DONE]")) return _finalize(taskId, sub);
+
+        // --- 关键改进：针对不同 event 重置 buffer 或 增量处理 ---
+        if (eventType == 'created') {
+          // created 通常是单发一次的完整 JSON
+          try {
+            final Map<String, dynamic> raw = jsonDecode(content);
+
+            logger.d(raw);
+            _updateItemData(taskId, raw, isCreated: true);
+          } catch (_) {
+            // 如果解析失败，说明 created 也是分片的
+            buffer += content;
+          }
+        } else {
+          // message 识别信息通常是流式的
+          buffer += content;
+        }
+
+        // logger.d(buffer);
+        // 统一尝试从当前 buffer 修复并更新 OCR 文本
+        _processBufferToUI(taskId, buffer);
+      },
+              onDone: () => _finalize(taskId, sub),
+              onError: (_) => _finalize(taskId, sub));
+
+      ref.onDispose(() => sub?.cancel());
     } catch (e) {
-      _stopRecognizing(media.thumbUrl);
+      _finalize(taskId, sub);
     }
   }
 
-  void _handleCleanedUpdate(String? thumbUrl, Map<String, dynamic> rawData) {
-    final currentList = [...state.items];
-
-    final newList = currentList.map((item) {
-      if (item.media.thumbUrl == thumbUrl) {
-        Map<String, String> rowMap = Map.from(item.data);
-
-        rawData.forEach((key, value) {
-          String newKey = _cleanKey(key);
-          if (newKey.isNotEmpty) {
-            rowMap[newKey] = value is String
-                ? value.replaceAll('\n', '').trim()
-                : value.toString();
-          }
-        });
-        return item.copyWith(data: rowMap);
+  void _processBufferToUI(String taskId, String buffer) {
+    try {
+      final repaired = repairJson(buffer);
+      Map<String, dynamic>? raw;
+      if (repaired is Map) raw = Map<String, dynamic>.from(repaired);
+      if (repaired is List && repaired.isNotEmpty) {
+        raw = Map<String, dynamic>.from(repaired.first);
       }
-      return item;
-    }).toList();
 
-    state = state.copyWith(items: newList);
+      if (raw != null) {
+        _updateItemData(taskId, raw, isCreated: false);
+      }
+    } catch (_) {}
   }
 
-  void _stopRecognizing(String? thumbUrl) {
+  void _updateItemData(String taskId, Map<String, dynamic> raw,
+      {required bool isCreated}) {
+    const businessKeys = {
+      'product_id',
+      'supply_quote_id',
+      'image',
+      'old_thumb',
+      'quotation_sample_id'
+    };
+
     state = state.copyWith(
       items: state.items.map((item) {
-        if (item.media.thumbUrl == thumbUrl) {
-          return item.copyWith(isRecognizing: false);
+        if (item.data['old_thumb'] != taskId) return item;
+
+        final nextData = Map<String, String>.from(item.data);
+        TemporaryMedia nextMedia = item.media;
+
+        // 处理图片和 ID (只在包含对应 key 时更新)
+        if (raw.containsKey('product_id')) {
+          nextData['product_id'] = raw['product_id'].toString();
         }
+        if (raw.containsKey('supply_quote_id')) {
+          nextData['supply_quote_id'] = raw['supply_quote_id'].toString();
+        }
+        if (raw.containsKey('quotation_sample_id')) {
+          nextData['quotation_sample_id'] =
+              raw['quotation_sample_id'].toString();
+        }
+        if (raw.containsKey('image') && raw['image'] is Map) {
+          nextMedia =
+              TemporaryMedia.fromJson(Map<String, dynamic>.from(raw['image']));
+        }
+
+        // 处理 OCR 展示字段：遍历 raw 中所有不在黑名单里的 key
+        raw.forEach((k, v) {
+          if (!businessKeys.contains(k)) {
+            final val = v?.toString().replaceAll('\n', '').trim() ?? '';
+            if (val.isNotEmpty && val != 'null') {
+              nextData[k] = val;
+            }
+          }
+        });
+
+        return item.copyWith(data: nextData, media: nextMedia);
+      }).toList(),
+    );
+  }
+
+  void _finalize(String taskId, StreamSubscription? sub) {
+    sub?.cancel();
+    state = state.copyWith(
+      items: state.items.map((item) {
+        if (item.data['old_thumb'] == taskId)
+          return item.copyWith(isRecognizing: false);
         return item;
       }).toList(),
     );
@@ -627,7 +655,21 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                                 height: 16,
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2)))
-                        : Image.network(item.media.url, fit: BoxFit.cover),
+                        : Image.network(
+                            item.media.url,
+                            key: ValueKey(
+                                item.media.url), // 核心：URL 变了，强制图片 Widget 刷新
+                            fit: BoxFit.cover,
+                            errorBuilder: (c, e, s) => const Center(
+                                child: Icon(Icons.broken_image,
+                                    color: Colors.grey)),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2));
+                            },
+                          ),
                   ),
                 ),
               ),
@@ -663,17 +705,20 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                                 keyboardType: isNumberField
                                     ? const TextInputType.numberWithOptions(
                                         decimal: true)
-                                    : TextInputType.text,
-                                validator: (value) {
-                                  if (isNumberField && value.isNotEmpty) {
-                                    final reg = RegExp(r'^\d+(\.\d+)?$');
-                                    if (!reg.hasMatch(value)) {
-                                      return '请输入有效的数字';
-                                    }
-                                  }
-                                  return null;
-                                },
-                                onConfirm: (v) => onUpdate(col.key, v));
+                                    : TextInputType.text, validator: (value) {
+                              if (isNumberField && value.isNotEmpty) {
+                                final reg = RegExp(r'^\d+(\.\d+)?$');
+                                if (!reg.hasMatch(value)) {
+                                  return '请输入有效的数字';
+                                }
+                              }
+                              return null;
+                            }, onConfirm: (v) {
+                              logger.d(item.getValue('product_id'));
+                              logger.d(item.getValue('supply_quote_id'));
+                              logger.d(item.getValue('quotation_sample_id'));
+                              // onUpdate(col.key, v);
+                            });
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,

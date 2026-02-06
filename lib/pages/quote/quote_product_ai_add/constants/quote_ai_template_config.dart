@@ -6,7 +6,7 @@ class ColumnConfig {
 }
 
 class AppColumns {
-  static const itemNo = ColumnConfig('item_no', '货号', width: 80);
+  static const itemNo = ColumnConfig('product_no', '货号', width: 80);
   static const price = ColumnConfig('price', '供应商报价', width: 80);
   static const outCarton = ColumnConfig('out_carton', '外装箱量', width: 70);
   static const innerPack = ColumnConfig('inner_pack', '内装箱量', width: 70);
