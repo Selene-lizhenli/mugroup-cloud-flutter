@@ -64,17 +64,6 @@ class SupplierSelect extends HookConsumerWidget {
       ),
       child: Column(
         children: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
             child: Row(
@@ -129,188 +118,183 @@ class SupplierSelect extends HookConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(
-            child: isLoading.value
-                ? const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: MuProgressIndicator(barWidth: 2),
-                    ),
-                  )
-                : (suppliers.value == null || suppliers.value!.isEmpty)
-                    ? Center(
-                        child: Text("暂无数据",
-                            style: TextStyle(
-                                color: Colors.grey[400], fontSize: 13)))
-                    : Column(
-                        children: [
-                          if (showCreateSupplier)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(24, 17, 30, 17),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: colorScheme.secondary,
+          if (isLoading.value)
+            const Expanded(
+              child: Center(
+                  child: MuProgressIndicator(
+                text: '加载中...',
+                showText: true,
+              )),
+            )
+          else if (suppliers.value == null || suppliers.value!.isEmpty)
+            Expanded(
+              child: Center(
+                  child: Text(
+                "暂无数据",
+                style: TextStyle(color: Colors.grey[400], fontSize: 13),
+              )),
+            )
+          else
+            Expanded(
+              child: Column(
+                children: [
+                  if (showCreateSupplier)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(24, 17, 30, 17),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: colorScheme.secondary,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () async {
+                              final resp = await context.router.push(
+                                  const MarketProductSupplierCreateRoute());
+
+                              // 【核心改动】页面返回后，手动触发当前弹窗列表的刷新
+                              if (resp != null && context.mounted) {
+                                // 1. 刷新列表（确保后台数据同步）
+                                await loadSuppliers();
+
+                                if (resp is Supplier) {
+                                  Navigator.of(context).pop(resp.toJson());
+                                } else if (resp is Map<String, dynamic>) {
+                                  Navigator.of(context).pop(resp);
+                                }
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  color: colorScheme.secondary,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '创建新供应商',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: colorScheme.secondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () async {
-                                      final resp = await context.router.push(
-                                          const MarketProductSupplierCreateRoute());
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                      child: ListView.separated(
+                    padding: const EdgeInsets.all(4),
+                    itemCount: suppliers.value!.length,
+                    separatorBuilder: (context, index) => Column(
+                      children: [
+                        const SizedBox(height: 4),
+                        Divider(
+                          height: 1,
+                          color: Colors.grey.shade200,
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+                    ),
+                    itemBuilder: (context, index) {
+                      final supplier = suppliers.value![index];
 
-                                      // 【核心改动】页面返回后，手动触发当前弹窗列表的刷新
-                                      if (resp != null && context.mounted) {
-                                        // 1. 刷新列表（确保后台数据同步）
-                                        await loadSuppliers();
+                      final supplierName =
+                          supplier.shortName ?? supplier.name ?? '未知供应商';
 
-                                        if (resp is Supplier) {
-                                          Navigator.of(context)
-                                              .pop(resp.toJson());
-                                        } else if (resp
-                                            is Map<String, dynamic>) {
-                                          Navigator.of(context).pop(resp);
-                                        }
-                                      }
-                                    },
-                                    child: Row(
+                      final supplierNo = supplier.supplierNo;
+
+                      final address = supplier.address;
+
+                      return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () {
+                                Navigator.of(context).pop(supplier.toJson());
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Icon(
-                                          Icons.add,
-                                          color: colorScheme.secondary,
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 12),
                                         Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '创建新供应商',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: colorScheme.secondary,
-                                                ),
-                                              ),
-                                            ],
+                                          child: Text(
+                                            supplierName,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                              // color: colorScheme.secondary,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Text(
+                                          "$supplierNo",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: colorScheme
+                                                .surfaceContainerHighest,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            address ?? '',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: colorScheme
+                                                  .surfaceContainerHighest,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          Expanded(
-                              child: ListView.separated(
-                            padding: const EdgeInsets.all(4),
-                            itemCount: suppliers.value!.length,
-                            separatorBuilder: (context, index) => Column(
-                              children: [
-                                const SizedBox(height: 4),
-                                Divider(
-                                  height: 1,
-                                  color: Colors.grey.shade200,
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                            ),
-                            itemBuilder: (context, index) {
-                              final supplier = suppliers.value![index];
-
-                              final supplierName = supplier.shortName ??
-                                  supplier.name ??
-                                  '未知供应商';
-
-                              final supplierNo = supplier.supplierNo;
-
-                              final address = supplier.address;
-
-                              return Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8),
-                                      onTap: () {
-                                        Navigator.of(context)
-                                            .pop(supplier.toJson());
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 8, 12, 8),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    supplierName,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black87,
-                                                      // color: colorScheme.secondary,
-                                                    ),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "$supplierNo",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: colorScheme
-                                                        .surfaceContainerHighest,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    address ?? '',
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: colorScheme
-                                                          .surfaceContainerHighest,
-                                                    ),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ));
-                            },
-                          )),
-                        ],
-                      ),
-          ),
+                          ));
+                    },
+                  )),
+                ],
+              ),
+            ),
         ],
       ),
     );
