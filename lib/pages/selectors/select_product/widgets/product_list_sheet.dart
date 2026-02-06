@@ -10,7 +10,7 @@ import 'package:cloud/models/sample/sample.dart';
 class ProductListSheet extends HookConsumerWidget {
   final int? supplierId;
   final Function(List<Sample> selected)? onConfirm;
-  final Set<int>? initialSelectedIds;
+  final List<int>? initialSelectedIds;
 
   const ProductListSheet({
     super.key,
@@ -21,21 +21,29 @@ class ProductListSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(productSelectorProvider(supplierId));
-    final notifier = ref.read(productSelectorProvider(supplierId).notifier);
+    final state = ref.watch(productSelectorProvider);
+    final notifier = ref.read(productSelectorProvider.notifier);
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
 
     // 初始化选中状态
     useEffect(() {
+      if (supplierId == null) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifier.fetchProducts(supplierId: supplierId, reset: true);
+      });
+      return null;
+    }, [supplierId]);
+
+    useEffect(() {
       if (initialSelectedIds != null && initialSelectedIds!.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          notifier.selectAll(initialSelectedIds!.toList());
+          notifier.selectAll(initialSelectedIds!); 
         });
       }
       return null;
-    }, []);
+    }, [initialSelectedIds]);
 
     // 监听滚动，实现上拉加载更多（节流逻辑在 notifier.loadMore 内部处理）
     useEffect(() {
@@ -43,7 +51,7 @@ class ProductListSheet extends HookConsumerWidget {
         if (!scrollController.hasClients) return;
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          notifier.loadMore();
+          notifier.loadMore(supplierId: supplierId);
         }
       }
 
@@ -60,11 +68,18 @@ class ProductListSheet extends HookConsumerWidget {
 
     Future<void> handleSearch(value) async {
       await notifier.fetchProducts(
-          search: searchController.text.trim(), reset: true);
+        supplierId: supplierId,
+        search: searchController.text.trim(),
+        reset: true,
+      );
     }
 
     Future<void> handleRefresh() async {
-      await notifier.fetchProducts(search: state.currentSearch, reset: true);
+      await notifier.fetchProducts(
+        supplierId: supplierId,
+        search: state.currentSearch,
+        reset: true,
+      );
     }
 
     final selectedCount = selectedIds.length;

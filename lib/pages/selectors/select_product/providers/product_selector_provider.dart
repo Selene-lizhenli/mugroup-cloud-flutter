@@ -52,20 +52,22 @@ class ProductSelectorState {
 }
 
 class ProductSelectorNotifier extends StateNotifier<ProductSelectorState> {
-  final int? supplierId;
+  ProductSelectorNotifier() : super(const ProductSelectorState());
 
-  ProductSelectorNotifier(this.supplierId) : super(const ProductSelectorState()) {
-    if (supplierId != null) {
-      fetchProducts();
-    }
-  }
-
-  Future<void> fetchProducts({String? search, bool reset = true}) async {
+  /// 拉取产品列表
+  ///
+  /// 现在不再从 provider 创建时传入 supplierId，
+  /// 而是在调用时显式传入 [supplierId]。
+  Future<void> fetchProducts({
+    int? supplierId,
+    String? search,
+    bool reset = true,
+  }) async {
     if (supplierId == null) return;
-    
+
     final isSearchChanged = search != state.currentSearch;
     final shouldReset = reset || isSearchChanged;
-    
+
     // 如果搜索关键词改变，重置分页
     if (shouldReset) {
       state = state.copyWith(
@@ -79,22 +81,25 @@ class ProductSelectorNotifier extends StateNotifier<ProductSelectorState> {
       // 加载更多时，只设置 isLoadingMore
       state = state.copyWith(isLoadingMore: true, error: null);
     }
-    
+
     try {
       final page = shouldReset ? 1 : state.currentPage + 1;
-      final res = await getSamples(queryParameters: {
+      final queryParameters = {
         'supplier_id': supplierId,
         if (search != null && search.isNotEmpty) 'search': search,
         'pageSize': 20,
         'page': page,
-      });
-      
+        'item_type': 'market_product',
+      };
+      final res = await getSamples(queryParameters: queryParameters);
+
       final products = res.data;
       final totalPages = res.meta?.pagination?.totalPages ?? 1;
       final hasMore = page < totalPages;
-      
-      logger.d('fetchProducts: loaded ${products.length} items, page $page/$totalPages');
-      
+
+      logger.d(
+          'fetchProducts: loaded ${products.length} items, page $page/$totalPages');
+      logger.d('queryParameters${queryParameters} ');
       if (shouldReset) {
         state = state.copyWith(
           products: products,
@@ -124,11 +129,15 @@ class ProductSelectorNotifier extends StateNotifier<ProductSelectorState> {
     }
   }
 
-  Future<void> loadMore() async {
+  Future<void> loadMore({int? supplierId}) async {
     if (state.isLoadingMore || !state.hasMore || state.isLoading) {
       return;
     }
-    await fetchProducts(search: state.currentSearch, reset: false);
+    await fetchProducts(
+      supplierId: supplierId,
+      search: state.currentSearch,
+      reset: false,
+    );
   }
 
   void toggleSelect(int id) {
@@ -154,8 +163,7 @@ class ProductSelectorNotifier extends StateNotifier<ProductSelectorState> {
   }
 }
 
-final productSelectorProvider = StateNotifierProvider.family<
-    ProductSelectorNotifier, ProductSelectorState, int?>(
-  (ref, supplierId) => ProductSelectorNotifier(supplierId),
+final productSelectorProvider =
+    StateNotifierProvider<ProductSelectorNotifier, ProductSelectorState>(
+  (ref) => ProductSelectorNotifier(),
 );
-

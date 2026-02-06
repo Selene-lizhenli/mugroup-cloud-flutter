@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
+import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/quote/batch_import/providers/product_batch_import_provider.dart';
 import 'package:cloud/pages/quote/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
@@ -42,6 +44,7 @@ class SupplierProductsPage extends HookConsumerWidget {
     final currentPage = useState(1);
     final totalPages = useState(1);
     final error = useState<String?>(null);
+    final notifier = ref.read(productBatchImportProvider.notifier);
 
     Future<void> fetchProducts({bool showLoading = false}) async {
       try {
@@ -63,6 +66,38 @@ class SupplierProductsPage extends HookConsumerWidget {
         error.value = e.toString();
       } finally {
         isLoading.value = false;
+      }
+    }
+
+    Future<void> handleSave(selected) async {
+      final sampleItems = selected.map((e) {
+        final qty = 1;
+        final supplierPrice = e.purchaseCost ?? 0.0;
+        return {
+          "sample_id": e.id,
+          "qty": qty,
+          "price": supplierPrice,
+        };
+      }).toList();
+
+      final data = {
+        'quotation_id': quotationId,
+        'sample_items': sampleItems,
+        "supplier_id": supplierId,
+      };
+      final result = await addQuotationSamples(data); //TODO 这里的添加，如果之前的取消选择了，并没有进行覆盖。
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('添加成功'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('添加失败')),
+        );
+        Navigator.of(context).pop();
       }
     }
 
@@ -194,13 +229,40 @@ class SupplierProductsPage extends HookConsumerWidget {
                               icon: Icons.download,
                               backgroundColor: colorScheme.primary,
                               textColor: colorScheme.onPrimary,
-                              onTap: () {
-                                context.router.push(
-                                  ProductBatchImportRoute(
-                                    quotationId: quotationId,
-                                    supplierNo: supplierNo.toString(),
-                                  ),
-                                );
+                              onTap: () async {
+                                if (supplierId == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('供应商为空')),
+                                  );
+                                  return;
+                                }
+
+                                if (context.mounted) {
+                                  final result =
+                                      await context.router.push<List<Sample>>(
+                                    SelectProductRoute(
+                                      supplierId: supplierId,
+                                      initialSelectedIds: products.value
+                                          .where((e) =>
+                                              e.showroomSample?.id != null)
+                                          .map((e) => e.showroomSample!.id!)
+                                          .toList(),
+                                    ),
+                                  );
+                                  if (result != null) {
+                                    notifier.setSelected(result);
+                                    handleSave(result);
+                                  } else {
+                                    notifier.clearSelected();
+                                  }
+                                }
+
+                                // context.router.push(
+                                //   ProductBatchImportRoute(
+                                //     quotationId: quotationId,
+                                //     supplierId: supplierId.toString(),
+                                //   ),
+                                // );
                               },
                             ),
                             const SizedBox(width: 8),

@@ -889,14 +889,14 @@ class ProductBatchImportRoute
   ProductBatchImportRoute({
     _i66.Key? key,
     int? quotationId,
-    String? supplierNo,
+    String? supplierId,
     List<_i63.PageRouteInfo>? children,
   }) : super(
           ProductBatchImportRoute.name,
           args: ProductBatchImportRouteArgs(
             key: key,
             quotationId: quotationId,
-            supplierNo: supplierNo,
+            supplierId: supplierId,
           ),
           initialChildren: children,
         );
@@ -911,7 +911,7 @@ class ProductBatchImportRoute
       return _i26.ProductBatchImportPage(
         key: args.key,
         quotationId: args.quotationId,
-        supplierNo: args.supplierNo,
+        supplierId: args.supplierId,
       );
     },
   );
@@ -921,18 +921,18 @@ class ProductBatchImportRouteArgs {
   const ProductBatchImportRouteArgs({
     this.key,
     this.quotationId,
-    this.supplierNo,
+    this.supplierId,
   });
 
   final _i66.Key? key;
 
   final int? quotationId;
 
-  final String? supplierNo;
+  final String? supplierId;
 
   @override
   String toString() {
-    return 'ProductBatchImportRouteArgs{key: $key, quotationId: $quotationId, supplierNo: $supplierNo}';
+    return 'ProductBatchImportRouteArgs{key: $key, quotationId: $quotationId, supplierId: $supplierId}';
   }
 }
 
@@ -1342,12 +1342,14 @@ class SelectProductRoute extends _i63.PageRouteInfo<SelectProductRouteArgs> {
   SelectProductRoute({
     _i66.Key? key,
     int? supplierId,
+    List<int>? initialSelectedIds,
     List<_i63.PageRouteInfo>? children,
   }) : super(
           SelectProductRoute.name,
           args: SelectProductRouteArgs(
             key: key,
             supplierId: supplierId,
+            initialSelectedIds: initialSelectedIds,
           ),
           rawQueryParams: {'supplierId': supplierId},
           initialChildren: children,
@@ -1365,6 +1367,7 @@ class SelectProductRoute extends _i63.PageRouteInfo<SelectProductRouteArgs> {
       return _i37.SelectProductPage(
         key: args.key,
         supplierId: args.supplierId,
+        initialSelectedIds: args.initialSelectedIds,
       );
     },
   );
@@ -1374,15 +1377,18 @@ class SelectProductRouteArgs {
   const SelectProductRouteArgs({
     this.key,
     this.supplierId,
+    this.initialSelectedIds,
   });
 
   final _i66.Key? key;
 
   final int? supplierId;
 
+  final List<int>? initialSelectedIds;
+
   @override
   String toString() {
-    return 'SelectProductRouteArgs{key: $key, supplierId: $supplierId}';
+    return 'SelectProductRouteArgs{key: $key, supplierId: $supplierId, initialSelectedIds: $initialSelectedIds}';
   }
 }
 

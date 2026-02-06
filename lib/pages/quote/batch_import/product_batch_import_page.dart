@@ -4,6 +4,7 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -15,12 +16,12 @@ import 'widgets/selected_product_card.dart';
 @RoutePage()
 class ProductBatchImportPage extends HookConsumerWidget {
   final int? quotationId;
-  final String? supplierNo; // 页面级参数：供应商编号
+  final String? supplierId; // 页面级参数：供应商编号
 
   const ProductBatchImportPage({
     super.key,
     this.quotationId,
-    this.supplierNo,
+    this.supplierId,
   });
 
   @override
@@ -29,29 +30,16 @@ class ProductBatchImportPage extends HookConsumerWidget {
     final notifier = ref.read(productBatchImportProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
     final batchQtyController = useTextEditingController(text: '1');
-
-    // 页面加载后，如果有 supplierNo，则请求供应商数据并设置为默认值
+    // 页面加载后，如果有 supplierId，则请求供应商数据并设置为默认值
     useEffect(() {
-      if (supplierNo == null || supplierNo!.isEmpty) return null;
+      if (supplierId == null || supplierId!.isEmpty) return null;
 
       Future<void> loadInitialSupplier() async {
         try {
-          final resp = await getSupplySuppliers(queryParameters: {
-            "search": supplierNo,
-          });
-
-          if (resp.data.isNotEmpty) {
-            final supplier = resp.data.firstWhere(
-              (s) => s.supplierNo == supplierNo,
-              orElse: () => resp.data.first,
-            );
-            
-            if (supplier.id != null) {
-              final supplierName = supplier.shortName ?? supplier.name ?? '';
-              if (supplierName.isNotEmpty) {
-                notifier.setSupplier(supplier.id!, supplierName);
-              }
-            }
+          final resp = await getSupplier(int.parse(supplierId!));
+          logger.d('resp$resp');
+          if (resp != null) {
+            notifier.setSupplier(resp.id!, resp.name ?? '');
           }
         } catch (e) {
           logger.e('加载供应商失败: $e');
@@ -60,7 +48,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
 
       loadInitialSupplier();
       return null;
-    }, [supplierNo]);
+    }, [supplierId]);
 
     void applyBatchQty() {
       final newQty = batchQtyController.text;
@@ -83,24 +71,27 @@ class ProductBatchImportPage extends HookConsumerWidget {
         return;
       }
       final sampleItems = state.selected.map((e) {
-        final qty = int.tryParse(e.qty) ?? 1; 
-        final supplierPrice =  e.purchaseCost ?? 0.0;
+        final qty = int.tryParse(e.qty) ?? 1;
+        final supplierPrice = e.purchaseCost ?? 0.0;
         return {
           "sample_id": e.id,
-          "qty":qty,
-          "price":supplierPrice, 
+          "qty": qty,
+          "price": supplierPrice,
         };
-      }).toList(); 
-      
+      }).toList();
+
       final data = {
         'quotation_id': quotationId,
         'sample_items': sampleItems,
-        "supplier_id": state.supplierId, 
-      }; 
+        "supplier_id": state.supplierId,
+      };
       final result = await addQuotationSamples(data);
       if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('添加成功'),backgroundColor: Colors.green,),
+          const SnackBar(
+            content: Text('添加成功'),
+            backgroundColor: Colors.green,
+          ),
         );
         // 保存成功后，跳转到报价单详情页面
         if (quotationId != null) {
@@ -110,7 +101,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
             Navigator.of(context).pop();
             context.router.push(
               QuoteDetailRoute(
-                id: quotationId!, 
+                id: quotationId!,
               ),
             );
           }
@@ -159,7 +150,8 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               context: context,
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
-                              builder: (_) => const SupplierSelect(showCreateSupplier: false),
+                              builder: (_) => const SupplierSelect(
+                                  showCreateSupplier: false),
                             );
                             if (result is Map<String, dynamic>) {
                               final name = (result['short_name'] ??
@@ -170,9 +162,15 @@ class ProductBatchImportPage extends HookConsumerWidget {
                                 notifier.setSupplier(id, name);
                                 // 选择完供应商后，自动打开产品选择弹窗
                                 if (context.mounted) {
-                                  final result = await context.router
-                                      .push<List<Sample>>(
-                                          SelectProductRoute(supplierId: id));
+                                  final result =
+                                      await context.router.push<List<Sample>>(
+                                    SelectProductRoute(
+                                      supplierId: id,
+                                      initialSelectedIds: state.selected
+                                          .map((e) => e.id)
+                                          .toList(),
+                                    ),
+                                  );
                                   if (result != null) {
                                     // 用选中的产品替换批量导入列表
                                     notifier.setSelected(result);
@@ -186,12 +184,17 @@ class ProductBatchImportPage extends HookConsumerWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          '产品',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w500),
+                        Row(
+                          children: [
+                            Text(
+                              '产品',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                          
+                          ],
                         ),
                         const SizedBox(height: 8),
                         GestureDetector(
@@ -209,7 +212,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
                             if (result != null) {
                               // 用选中的产品替换批量导入列表
                               notifier.setSelected(result);
-                            } else { 
+                            } else {
                               notifier.clearSelected();
                             }
                           },
@@ -226,10 +229,10 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    '已选 ${state.selected.length} 个产品',
-                                    style: const TextStyle(
+                                    '请点击此处选择商品',
+                                    style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.black87,
+                                      color: colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -245,7 +248,7 @@ class ProductBatchImportPage extends HookConsumerWidget {
                   const SizedBox(height: 12),
                   if (state.selected.isNotEmpty)
                     _SectionCard(
-                      title: '已选产品 (${state.selected.length}个)',
+                      title: '当前已选产品 (${state.selected.length}个)',
                       batchQtyController: batchQtyController,
                       onBatchQtyChanged: applyBatchQty,
                       child: Column(
@@ -395,9 +398,9 @@ class _SelectTile extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
