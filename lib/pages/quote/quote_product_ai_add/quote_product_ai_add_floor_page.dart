@@ -174,7 +174,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         data: {
           "images": [media],
           if (quoteId != null) "quotation_id": quoteId,
-          if (quoteId != null) "quotation": {},
           "supplier_id": supplierId,
           'item_type': 'market_product',
         },
@@ -341,7 +340,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         );
                       },
                     ),
-                  ]
+                  ],
+                  const SizedBox(height: 20)
                 ],
               ),
             ),
