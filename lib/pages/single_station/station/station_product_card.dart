@@ -9,17 +9,17 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class StationProductCard extends HookWidget {
   const StationProductCard({
     super.key,
-    required this.stationSample,
+    required this.item,
   });
 
-  final SingleStationSample stationSample;
+  final SingleStationSample item;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final Sample? sample = stationSample.showroomSample;
-    final int? sampleId = sample?.id ?? stationSample.sampleId;
+    final Sample? sample = item.showroomSample;
+    final int? sampleId = sample?.id ?? item.sampleId;
 
     final nameCn = useMemoized(
       () => sample?.nameCn ?? sample?.nameEn ?? '—',
@@ -43,10 +43,18 @@ class StationProductCard extends HookWidget {
     }, [sampleId]);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      margin: const EdgeInsets.fromLTRB(0, 0, 0, 5),
       decoration: BoxDecoration(
         color: colorScheme.surface.withOpacity(0.85),
         borderRadius: BorderRadius.circular(10),
+           boxShadow: const [
+              BoxShadow(
+                color: Color.fromARGB(19, 0, 0, 0),
+                blurRadius: 6,
+                spreadRadius: 0,
+                offset: Offset.zero,
+              ),
+            ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -103,8 +111,7 @@ class StationProductCard extends HookWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14, 
                         color: colorScheme.onSurface,
                         height: 1.2,
                       ),

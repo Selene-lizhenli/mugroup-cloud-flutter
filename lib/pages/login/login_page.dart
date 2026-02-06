@@ -7,7 +7,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
-import 'package:cloud/pages/login/constants.dart';
+import 'package:cloud/constants/theme_color_config.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:dio/dio.dart';

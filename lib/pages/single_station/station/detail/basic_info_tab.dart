@@ -142,25 +142,37 @@ class BasicInfoTab extends StatelessWidget {
       );
     }
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      children: [
-        Card(
-          elevation: 0,
-          color: colorScheme.surface.withOpacity(0.85),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Column(
-              children: [
-                _row('标题', item!.nameCn ?? item!.nameEn, colorScheme),
-                _row('英文标题', item!.nameEn, colorScheme),
-                _row('主题', _translateTheme(item!.theme), colorScheme),
-                _row('有效期', item!.expireTime, colorScheme),
-                _row('联系人', item!.contactPerson, colorScheme),
-                _rowWithCopy(context, '邮箱', item!.email, colorScheme),
-                _row('地址', item!.address, colorScheme),
-                _rowWithCopy(context, '独立站链接', item!.stationUrl, colorScheme),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 12, 12,12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface.withOpacity(0.86),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                  offset: Offset.zero,
+                ),
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Column(
+                children: [
+                  _row('标题', item!.nameCn ?? item!.nameEn, colorScheme),
+                  _row('英文标题', item!.nameEn, colorScheme),
+                  _row('主题', _translateTheme(item!.theme), colorScheme),
+                  _row('有效期', item!.expireTime, colorScheme),
+                  _row('联系人', item!.contactPerson, colorScheme),
+                  _rowWithCopy(context, '邮箱', item!.email, colorScheme),
+                  _row('地址', item!.address, colorScheme),
+                  _rowWithCopy(context, '分享链接', item!.stationUrl, colorScheme), 
+                ],
+              ),
             ),
           ),
         ),

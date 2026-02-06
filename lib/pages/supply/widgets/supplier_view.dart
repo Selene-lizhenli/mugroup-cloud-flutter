@@ -1,3 +1,4 @@
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -67,6 +68,7 @@ class SupplierView extends HookConsumerWidget {
         "page": page.value,
         "pageSize": pageSize,
       };
+      logger.d('供应商列表查询参数$queryParameters');
       final resp = await getSupplySuppliers(queryParameters: queryParameters);
 
       if (init == true) {

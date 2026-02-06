@@ -1,4 +1,5 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/constants/theme_color_config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -134,11 +135,11 @@ class MyApp extends ConsumerWidget {
 
     // 根据主题类型设置颜色
     final primaryColor = themeType == ThemeType.pink
-        ? const Color(0xFFFA338A) // 玫粉色
-        : const Color(0xFF355EBF); // 蓝色
+        ? primaryColorPink // 玫粉色
+        : primaryColorBlue; // 蓝色
     final secondaryColor = themeType == ThemeType.pink
-        ? const Color(0xFF355EBF) // 蓝色
-        : const Color(0xFFFA338A); // 玫粉色
+        ? primaryColorBlue // 蓝色
+        : primaryColorPink; // 玫粉色
 
     return MaterialApp.router(
       routerConfig: app.router.config(

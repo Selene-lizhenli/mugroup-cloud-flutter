@@ -157,8 +157,7 @@ class SingleStation extends _$SingleStation {
         'page': nextPage,
         'pageSize': 20,
         'station_id': params?['station_id'] ?? state.stationId,
-      };
-      logger.d('loadStationSamples query: $query');
+      }; 
       final resp = await getStationSamplesList(query);
       final data = resp.data;
       final hasMore = (data.length >= 20);

@@ -1,10 +1,8 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
 import 'package:cloud/pages/single_station/provider/provider.dart';
 import 'package:cloud/pages/single_station/inquiry/inquiriy_item_card.dart';
 import 'package:cloud/pages/single_station/inquiry/detail/inquiry_detail_container.dart';
-import 'package:cloud/pages/single_station/widgets/list.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/pages/widgets/list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -27,8 +25,9 @@ class InquiriesList extends HookConsumerWidget {
       );
     }
 
-    return SingleStationListView<SingleStationInquiries>(
+    return MuListView<SingleStationInquiries>(
       state: state,
+      hPadding: 16,
       list: state.inquiriesMessageList,
       onRefresh: () async {
         await stationNotifier.loadInquiriesMessages();
@@ -36,6 +35,7 @@ class InquiriesList extends HookConsumerWidget {
       onLoadMore: () async {
         await stationNotifier.loadInquiriesMessages(refresh: false);
       },
+      refreshOnStart: false,
       itemBuilder: (context, item) => InquiriesItemCard(
         item: item,
         onTap: () => onTap(item),

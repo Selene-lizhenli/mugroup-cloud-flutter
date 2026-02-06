@@ -5,8 +5,8 @@ import 'package:cloud/pages/single_station/station/detail/station_samples_tab.da
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
- 
-class  ChristmasDetailContainer extends HookConsumerWidget {
+
+class ChristmasDetailContainer extends HookConsumerWidget {
   const ChristmasDetailContainer({
     super.key,
     required this.item,
@@ -19,7 +19,7 @@ class  ChristmasDetailContainer extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final tabController = useTabController(initialLength: 2);
 
-    return Scaffold( 
+    return Scaffold(
       appBar: AppBar(
         title: Text(
           item?.nameCn ?? item?.nameEn ?? '独立站详情',
@@ -45,11 +45,19 @@ class  ChristmasDetailContainer extends HookConsumerWidget {
                   end: Alignment.topLeft,
                   colors: [
                     const Color(0xFF165B33), // 绿色
-                    colorScheme.surfaceTint,
-                    colorScheme.surfaceTint,
-                    colorScheme.surfaceTint,
+                    Color.lerp(
+                      const Color(0xFF165B33),
+                      colorScheme.surfaceTint,
+                      0.6,
+                    )!,
+                    Color.lerp(
+                      const Color(0xFF165B33),
+                      colorScheme.surfaceTint,
+                      0.86,
+                    )!,
                     colorScheme.surfaceTint,
                   ],
+                  stops: const [0.0, 0.2, 0.4, 1.0],
                 ),
               ),
             ),
@@ -76,13 +84,17 @@ class  ChristmasDetailContainer extends HookConsumerWidget {
                   ],
                 ),
                 Expanded(
-                  child: TabBarView(
-                    controller: tabController,
-                    children: [
-                      BasicInfoTab(item: item),
-                      StationSamplesTab(
-                          stationItem: item, ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal:
+                            4), // 左右是4 因为BasicInfoTab内部有12的padding，保证总共是16和TabBar一样
+                    child: TabBarView(
+                      controller: tabController,
+                      children: [
+                        BasicInfoTab(item: item),
+                        StationSamplesTab(stationItem: item),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -20,6 +20,9 @@ class SingleStationDetailPage extends HookConsumerWidget {
     if (stationTheme.contains('christmas')) {
       return ChristmasDetailContainer(item: item);
     }
+    if (stationTheme.contains('meimeiimage')) {
+      return DefaultDetailContainer(item: item, stationTheme: stationTheme);
+    }
     return DefaultDetailContainer(item: item);
   }
 }

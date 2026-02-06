@@ -1,30 +1,34 @@
- 
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
-import 'package:cloud/pages/single_station/provider/provider.dart'; 
+import 'package:cloud/pages/single_station/provider/provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/widgets/empty.dart'; 
+import 'package:cloud/pages/widgets/empty.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart'; 
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-/// 可复用的独立站列表组件
-class SingleStationListView<T> extends HookWidget {
-  const SingleStationListView({
+/// 可复用的列表组件
+class MuListView<T> extends HookWidget {
+  
+  final SingleStationState state;
+  final List<T> list;
+  final Widget Function(BuildContext context, T item) itemBuilder;
+  final Future<void> Function() onRefresh;
+  final Future<void> Function() onLoadMore;
+  final bool? refreshOnStart;
+  final double? hPadding;
+
+  const MuListView({
     super.key,
     required this.state,
     required this.list,
     required this.itemBuilder,
     required this.onRefresh,
     required this.onLoadMore,
+    this.refreshOnStart,
+    this.hPadding = 0.0,
   });
-
-  final SingleStationState state;
-  final List<T> list;
-  final Widget Function(BuildContext context, T item) itemBuilder;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function() onLoadMore;
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +63,10 @@ class SingleStationListView<T> extends HookWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 2, 12, 0),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceTint,
-        borderRadius: const BorderRadius.only(
+      margin: EdgeInsets.fromLTRB(hPadding ?? 0, 2, hPadding ?? 0, 0),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
           topRight: Radius.circular(8),
         ),
@@ -70,7 +74,7 @@ class SingleStationListView<T> extends HookWidget {
       clipBehavior: Clip.hardEdge,
       child: EasyRefresh(
         controller: refreshController,
-        refreshOnStart: true,
+        refreshOnStart: refreshOnStart ?? true,
         onRefresh: () async {
           try {
             await onRefresh();
@@ -99,7 +103,19 @@ class SingleStationListView<T> extends HookWidget {
                     childCount: list.length,
                     itemBuilder: (context, index) {
                       final itemValue = list[index];
-                      return itemBuilder(context, itemValue);
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // if (index < list.length - 1)
+                          //   Divider(
+                          //     height: 1,
+                          //     thickness: 1,
+                          //     color:
+                          //         colorScheme.outlineVariant.withOpacity(0.5),
+                          //   ),
+                          itemBuilder(context, itemValue),
+                        ],
+                      );
                     },
                   ),
                 ),
