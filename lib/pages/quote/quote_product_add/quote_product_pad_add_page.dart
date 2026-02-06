@@ -68,7 +68,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       'customer_sku',
       'purchase_cost',
       'deliver_day',
-      'supplier_moq',
+      'moq',
       'customer_price',
       'customer_qty',
       'unit',
@@ -165,9 +165,9 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
               onChanged: field.didChange,
             ),
           );
-        case 'supplier_moq':
+        case 'moq':
           return FormBuilderField<String>(
-            name: "supplier_moq",
+            name: "moq",
             builder: (field) => Input(
               label: '供应商MOQ',
               keyboardType: TextInputType.number,
@@ -482,7 +482,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
               'packaging_type': 'packing',
               'unit': 'unit',
               'volume': 'outer_volume',
-              'moq': 'supplier_moq',
+              'moq': 'moq',
               'description': 'description_cn',
             };
 
@@ -538,7 +538,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             "customer_sku": submitValues["customer_sku"],
             'purchase_cost': submitValues["purchase_cost"],
             "deliver_day": submitValues["deliver_day"],
-            "supplier_moq": submitValues["supplier_moq"],
+            "moq": submitValues["moq"],
             "customer_price": submitValues["customer_price"],
             "customer_qty": submitValues["customer_qty"],
             "unit": submitValues["unit"],
