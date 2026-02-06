@@ -203,7 +203,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           buffer += content;
         }
 
-        // logger.d(buffer);
+        logger.d(buffer);
         // 统一尝试从当前 buffer 修复并更新 OCR 文本
         _processBufferToUI(taskId, buffer);
       },
@@ -510,7 +510,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           for (var config in t.columns) ...[
-                            if (config.key == 'item_no') ...[
+                            if (config.key == 'product_no') ...[
                               Row(
                                 children: [
                                   Expanded(

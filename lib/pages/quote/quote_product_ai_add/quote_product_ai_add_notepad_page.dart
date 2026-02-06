@@ -305,10 +305,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
                 "supplier_id": supplierId,
                 'purchase_cost': val('price'),
                 'outer_capacity': val('out_carton'),
-                'supplier_sku': val('item_no'),
+                'supplier_sku': val('product_no'),
               }
             ],
-            "product_no": val(AppColumns.itemNo.key),
+            "product_no": val(AppColumns.productNo.key),
             'spec': val('size'),
             'description_cn': val('description'),
             'image': [group.media],
@@ -520,7 +520,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   for (var config in t.columns)
-                                    config.key == 'item_no'
+                                    config.key == 'product_no'
                                         ? Row(children: [
                                             Expanded(
                                                 child: Text(config.label,

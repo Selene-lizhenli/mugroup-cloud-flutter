@@ -6,7 +6,7 @@ class ColumnConfig {
 }
 
 class AppColumns {
-  static const itemNo = ColumnConfig('product_no', '货号', width: 80);
+  static const productNo = ColumnConfig('product_no', '货号', width: 80);
   static const price = ColumnConfig('price', '供应商报价', width: 80);
   static const outCarton = ColumnConfig('out_carton', '外装箱量', width: 70);
   static const innerPack = ColumnConfig('inner_pack', '内装箱量', width: 70);
@@ -21,7 +21,7 @@ class AppColumns {
   static const description = ColumnConfig('description', '描述', width: 120);
 
   static const List<ColumnConfig> all = [
-    itemNo,
+    productNo,
     price,
     outCarton,
     innerPack,
@@ -58,7 +58,7 @@ const List<TemplateOption> kQuoteAiTemplates = [
     name: '模板1',
     previewImageUrl: 'assets/aiTemplets/floor_001.jpg',
     columns: [
-      AppColumns.itemNo,
+      AppColumns.productNo,
       AppColumns.price,
       AppColumns.outCarton,
       AppColumns.innerPack,
@@ -72,7 +72,7 @@ const List<TemplateOption> kQuoteAiTemplates = [
     name: '模板2',
     previewImageUrl: 'assets/aiTemplets/floor_002.jpg',
     columns: [
-      AppColumns.itemNo,
+      AppColumns.productNo,
       AppColumns.price,
       AppColumns.outCarton,
       AppColumns.volume,
@@ -88,7 +88,7 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
     name: '模板1',
     previewImageUrl: 'assets/aiTemplets/notepad_001.jpg',
     columns: [
-      AppColumns.itemNo,
+      AppColumns.productNo,
       AppColumns.price,
       AppColumns.outCarton,
       AppColumns.volume,
