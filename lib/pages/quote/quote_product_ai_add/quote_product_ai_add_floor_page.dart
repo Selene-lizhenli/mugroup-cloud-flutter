@@ -688,13 +688,12 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                         child: InkWell(
                           onTap: () {
                             const numberKeys = {
-                              'price',
-                              'out_carton',
-                              'inner_pack',
+                              'purchase_cost',
+                              'outer_capacity',
+                              'inner_capacity',
                               'weight',
-                              'volume',
+                              'outer_volume',
                               'moq',
-                              'capacity'
                             };
 
                             final bool isNumberField =

@@ -303,13 +303,13 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             'supply_quotes': [
               {
                 "supplier_id": supplierId,
-                'purchase_cost': val('price'),
-                'outer_capacity': val('out_carton'),
+                'purchase_cost': val('purchase_cost'),
+                'outer_capacity': val('outer_capacity'),
                 'supplier_sku': val('product_no'),
               }
             ],
-            "product_no": val(AppColumns.productNo.key),
-            'spec': val('size'),
+            "product_no": val('product_no'),
+            'spec': val('spec'),
             'description_cn': val('description'),
             'image': [group.media],
             'item_type': 'market_product'
@@ -745,13 +745,12 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                   behavior: HitTestBehavior.opaque,
                                   onTap: () {
                                     const numberKeys = {
-                                      'price',
-                                      'out_carton',
-                                      'inner_pack',
+                                      'purchase_cost',
+                                      'outer_capacity',
+                                      'inner_capacity',
                                       'weight',
-                                      'volume',
+                                      'outer_volume',
                                       'moq',
-                                      'capacity'
                                     };
 
                                     final bool isNumberField =

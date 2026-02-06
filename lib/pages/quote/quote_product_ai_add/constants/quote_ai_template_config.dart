@@ -7,31 +7,29 @@ class ColumnConfig {
 
 class AppColumns {
   static const productNo = ColumnConfig('product_no', '货号', width: 80);
-  static const price = ColumnConfig('price', '供应商报价', width: 80);
-  static const outCarton = ColumnConfig('out_carton', '外装箱量', width: 70);
-  static const innerPack = ColumnConfig('inner_pack', '内装箱量', width: 70);
-  static const size = ColumnConfig('size', '尺寸', width: 90);
+  static const purchaseCost = ColumnConfig('purchase_cost', '供应商报价', width: 80);
+  static const outCapacity = ColumnConfig('outer_capacity', '外装箱量', width: 70);
+  static const innerCapacity =
+      ColumnConfig('inner_capacity', '内装箱量', width: 70);
+  static const spec = ColumnConfig('spec', '尺寸', width: 90);
   static const weight = ColumnConfig('weight', '重量(g)', width: 60);
-  static const packagingType =
-      ColumnConfig('packaging_type', '包装方式', width: 70);
+  static const packaging = ColumnConfig('packing', '包装方式', width: 70);
   static const unit = ColumnConfig('unit', '单位', width: 50);
-  static const volume = ColumnConfig('volume', '体积', width: 60);
+  static const volume = ColumnConfig('outer_volume', '体积', width: 60);
   static const moq = ColumnConfig('moq', '起订量', width: 60);
-  static const capacity = ColumnConfig('capacity', '容量', width: 60);
-  static const description = ColumnConfig('description', '描述', width: 120);
+  static const description = ColumnConfig('description_cn', '描述', width: 120);
 
   static const List<ColumnConfig> all = [
     productNo,
-    price,
-    outCarton,
-    innerPack,
-    size,
+    purchaseCost,
+    outCapacity,
+    innerCapacity,
+    spec,
     weight,
-    packagingType,
+    packaging,
     unit,
     volume,
     moq,
-    capacity,
     description
   ];
 }
@@ -59,11 +57,11 @@ const List<TemplateOption> kQuoteAiTemplates = [
     previewImageUrl: 'assets/aiTemplets/floor_001.jpg',
     columns: [
       AppColumns.productNo,
-      AppColumns.price,
-      AppColumns.outCarton,
-      AppColumns.innerPack,
+      AppColumns.purchaseCost,
+      AppColumns.outCapacity,
+      AppColumns.innerCapacity,
       AppColumns.volume,
-      AppColumns.packagingType,
+      AppColumns.packaging,
       AppColumns.description,
     ],
   ),
@@ -73,10 +71,10 @@ const List<TemplateOption> kQuoteAiTemplates = [
     previewImageUrl: 'assets/aiTemplets/floor_002.jpg',
     columns: [
       AppColumns.productNo,
-      AppColumns.price,
-      AppColumns.outCarton,
+      AppColumns.purchaseCost,
+      AppColumns.outCapacity,
       AppColumns.volume,
-      AppColumns.packagingType,
+      AppColumns.packaging,
       AppColumns.description,
     ],
   ),
@@ -89,8 +87,8 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
     previewImageUrl: 'assets/aiTemplets/notepad_001.jpg',
     columns: [
       AppColumns.productNo,
-      AppColumns.price,
-      AppColumns.outCarton,
+      AppColumns.purchaseCost,
+      AppColumns.outCapacity,
       AppColumns.volume,
       AppColumns.description,
     ],
