@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
-import 'package:cloud/pages/widgets/image_uploader.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/widgets/product_upload_zone.dart';
+import 'package:cloud/services/media.dart';
 import 'package:dio/dio.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
@@ -84,14 +87,9 @@ class ProductAiAddState {
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   static const String _kStorageKey = 'product_ai_add_draft_v1';
 
-  String _sseBuffer = ""; // 累加缓冲区
-  StreamSubscription? _streamSubscription;
-
   @override
   ProductAiAddState build() {
     _initLoad();
-    // 页面销毁时主动断开 SSE
-    ref.onDispose(() => _streamSubscription?.cancel());
     return ProductAiAddState();
   }
 
@@ -141,111 +139,111 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     return key.replaceAll('\n', '').replaceAll(' ', '').trim();
   }
 
-  // --- SSE 识别核心逻辑 ---
-  Future<void> onImagesChanged(
-    List<TemporaryMedia>? newImages,
-    WidgetRef ref,
-    int? quoteId,
-    String? supplierId,
-  ) async {
-    if (newImages == null || newImages.isEmpty) return;
+  Future<void> uploadAndRecognize(
+      File file, WidgetRef ref, int? quoteId, String? supplierId) async {
+    // 闭包函数：独立执行上传+识别，不阻塞外部循环
+    Future<void> runTask() async {
+      try {
+        // 1. 上传图片
+        final uploadedMedia = await upload(file: file);
 
-    // 1. 初始化 UI 列表
-    final addedItems = newImages
-        .map((media) => ProductDraftItem(
-              data: {},
-              media: media,
-              isRecognizing: true,
-            ))
-        .toList();
+        // 2. 立即加入列表
+        final newItem = ProductDraftItem(
+            data: {}, media: uploadedMedia, isRecognizing: true);
+        state = state.copyWith(items: [...state.items, newItem]);
 
-    state = state.copyWith(
-        items: [...state.items, ...addedItems], isGlobalLoading: true);
+        // 3. 发起独立的 SSE 识别
+        _startIndividualSse(uploadedMedia, quoteId, supplierId);
+      } catch (e) {
+        debugPrint("Task Error: $e");
+      }
+    }
 
-    _sseBuffer = ""; // 清空缓冲区
+    runTask(); // 不使用 await，直接触发执行
+  }
+
+  void _startIndividualSse(
+      TemporaryMedia media, int? quoteId, String? supplierId) async {
+    String taskBuffer = ""; // 【局部变量】确保每张图识别时缓冲区是隔离的
+    StreamSubscription? subscription;
 
     try {
       final dio = Dio();
       final response = await dio.post<ResponseBody>(
         'https://one.woyou.fun:12234/api/open/agents/sample/store-market-product',
         data: {
-          "images": newImages,
+          "images": [media],
           if (quoteId != null) "quotation_id": quoteId,
           if (quoteId != null) "quotation": {},
           "supplier_id": supplierId,
           'item_type': 'market_product',
         },
         options: Options(
-          headers: {
-            "Accept": "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
+          headers: {"Accept": "text/event-stream", "Cache-Control": "no-cache"},
           responseType: ResponseType.stream,
         ),
       );
 
-      // 2. 转换并处理流
-      _streamSubscription = response.data?.stream
+      subscription = response.data?.stream
           .map((Uint8List data) => utf8.decode(data))
           .transform(const LineSplitter())
-          .listen((String chunk) {
-        if (chunk.startsWith('data:')) {
-          String content = chunk.replaceFirst('data:', '').trim();
+          .listen((String line) {
+        if (line.startsWith('data:')) {
+          String content = line.replaceFirst('data:', '').trim();
 
-          _sseBuffer += content;
+          if (content.contains("[DONE]")) {
+            _stopRecognizing(media.thumbUrl);
+            subscription?.cancel();
+            return;
+          }
+
+          taskBuffer += content; // 操作的是局部 buffer
+
           try {
-            // 4. 实时修复并更新
-            final repaired = repairJson(_sseBuffer);
-
+            final repaired = repairJson(taskBuffer);
             Map<String, dynamic>? targetData;
-            if (repaired is List && repaired.isNotEmpty) {
-              var first = repaired.first;
-              if (first is Map<String, dynamic>) targetData = first;
-            } else if (repaired is Map<String, dynamic>) {
+
+            if (repaired is Map<String, dynamic>) {
               targetData = repaired;
+            } else if (repaired is List && repaired.isNotEmpty) {
+              if (repaired.first is Map) targetData = repaired.first;
             }
 
             if (targetData != null) {
-              // logger.d(targetData);
-              _handleCleanedUpdate(targetData);
+              // 精准更新当前这张图的数据
+              logger.d(targetData);
+              _handleCleanedUpdate(media.thumbUrl, targetData);
             }
           } catch (e) {
-            // 碎片不足以解析时忽略
+            // 碎片不足忽略
           }
         }
       },
-              onDone: () => _finalizeRecognition(),
-              onError: (e) => _finalizeRecognition());
+              onDone: () => _stopRecognizing(media.thumbUrl),
+              onError: (e) => _stopRecognizing(media.thumbUrl));
+
+      // 确保页面退出时销毁订阅
+      ref.onDispose(() => subscription?.cancel());
     } catch (e) {
-      debugPrint("请求出错: $e");
-      _finalizeRecognition();
+      _stopRecognizing(media.thumbUrl);
     }
   }
 
-  // 核心：实时清洗并更新 UI
-  void _handleCleanedUpdate(Map<String, dynamic> rawData) {
-    // 1. 清洗 Key 和 Value
-    Map<String, dynamic> cleanedData = {};
-    rawData.forEach((key, value) {
-      String newKey = _cleanKey(key);
-      if (newKey.isNotEmpty) {
-        cleanedData[newKey] = value is String
-            ? value.replaceAll('\n', '').replaceAll(' ', '').trim()
-            : value;
-      }
-    });
-
-    // 2. 更新状态
+  void _handleCleanedUpdate(String? thumbUrl, Map<String, dynamic> rawData) {
     final currentList = [...state.items];
+
     final newList = currentList.map((item) {
-      if (item.isRecognizing) {
+      if (item.media.thumbUrl == thumbUrl) {
         Map<String, String> rowMap = Map.from(item.data);
-        // 匹配 AppColumns
-        for (var col in AppColumns.all) {
-          if (cleanedData.containsKey(col.key)) {
-            rowMap[col.key] = cleanedData[col.key].toString();
+
+        rawData.forEach((key, value) {
+          String newKey = _cleanKey(key);
+          if (newKey.isNotEmpty) {
+            rowMap[newKey] = value is String
+                ? value.replaceAll('\n', '').trim()
+                : value.toString();
           }
-        }
+        });
         return item.copyWith(data: rowMap);
       }
       return item;
@@ -254,12 +252,16 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(items: newList);
   }
 
-  void _finalizeRecognition() {
-    _streamSubscription?.cancel();
-    _sseBuffer = "";
-    final finalItems =
-        state.items.map((e) => e.copyWith(isRecognizing: false)).toList();
-    state = state.copyWith(items: finalItems, isGlobalLoading: false);
+  void _stopRecognizing(String? thumbUrl) {
+    state = state.copyWith(
+      items: state.items.map((item) {
+        if (item.media.thumbUrl == thumbUrl) {
+          return item.copyWith(isRecognizing: false);
+        }
+        return item;
+      }).toList(),
+    );
+    _saveDraft();
   }
 
   void updateCell(int index, String key, String value) {
@@ -311,16 +313,13 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
-                  _buildCollapsibleTemplateSelector(
-                    context,
-                    currentTemplate,
-                    isExpanded: isTemplateExpanded,
-                    colorScheme: colorScheme,
-                    currentMediaList: currentMediaList,
-                    onSelect: (newId) => controller.changeTemplate(newId),
-                    onImagesChanged: (newImages) => controller.onImagesChanged(
-                        newImages, ref, quoteId, supplierId),
-                  ),
+                  _buildCollapsibleTemplateSelector(context, currentTemplate,
+                      isExpanded: isTemplateExpanded,
+                      colorScheme: colorScheme,
+                      currentMediaList: currentMediaList,
+                      onSelect: (newId) => controller.changeTemplate(newId),
+                      controller: controller,
+                      ref: ref),
                   _buildInfoBar(colorScheme),
                   if (providerState.items.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -359,7 +358,9 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     required ColorScheme colorScheme,
     required Function(String id) onSelect,
     required List<TemporaryMedia> currentMediaList,
-    required Function(List<TemporaryMedia>?) onImagesChanged,
+    // required Function(List<TemporaryMedia>?) onImagesChanged,
+    required ProductAiAddController controller,
+    required WidgetRef ref,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -422,7 +423,9 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     colorScheme: colorScheme,
                     onSelect: onSelect,
                     currentMediaList: currentMediaList,
-                    onImagesChanged: onImagesChanged,
+                    // onImagesChanged: onImagesChanged,
+                    controller: controller,
+                    ref: ref,
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -440,7 +443,9 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     required ColorScheme colorScheme,
     required Function(String id) onSelect,
     required List<TemporaryMedia> currentMediaList,
-    required Function(List<TemporaryMedia>?) onImagesChanged,
+    // required Function(List<TemporaryMedia>?) onImagesChanged,
+    required ProductAiAddController controller,
+    required WidgetRef ref,
   }) {
     const double kItemHeight = 92.0;
     return SizedBox(
@@ -529,11 +534,13 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     width: 1, height: 40, color: Colors.grey.withOpacity(0.1)),
                 SizedBox(
                   width: 90,
-                  child: ImageUploader(
+                  child: ProductUploadZone(
                     width: 90,
                     height: 90,
-                    customIcon: Icons.camera_alt_rounded,
-                    onChanged: (newImages) => onImagesChanged(newImages),
+                    onFileSelected: (File file) {
+                      controller.uploadAndRecognize(
+                          file, ref, quoteId, supplierId);
+                    },
                   ),
                 ),
               ],
