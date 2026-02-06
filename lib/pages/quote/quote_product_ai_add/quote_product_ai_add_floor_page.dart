@@ -422,7 +422,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '识别模板 (点击卡片内相机直接上传文件识别)',
+                      '识别模板 (点击卡片内眼睛图标查看示例模板)',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
