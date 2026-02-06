@@ -23,6 +23,7 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+    final isSubmitting = useState(false);
 
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
@@ -49,6 +50,63 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
       } catch (e) {
         logger.d('error$e');
         EasyLoading.showError('识别失败');
+      }
+    }
+
+    Future<void> handleSubmit() async {
+      final formState = formKey.currentState;
+      if (formState?.saveAndValidate() ?? false) {
+        isSubmitting.value = true;
+        try {
+          await EasyLoading.show(status: '提交中...');
+
+          final values = formState!.value;
+
+          final companyData = {
+            'images': values['images'],
+            'name': values['name'],
+            'address': values['address'],
+            'location': values['location'],
+            'industry': values['industry'],
+            'source': values['source'],
+            'domain': values['domain'],
+            'email': values['email'],
+            'linkedin': values['linkedin'],
+            'whatsapp': values['whatsapp'],
+            'facebook': values['facebook'],
+          };
+
+          final newCompany = await storeCrmCompany(companyData);
+
+          final hasContactName = values['contact_name'] != null &&
+              values['contact_name'].toString().isNotEmpty;
+
+          crmContact.Contact? newContact;
+          if (hasContactName) {
+            final companyId = newCompany?.id;
+            final contactData = {
+              'company_id': companyId,
+              'name': values['contact_name'],
+              'position': values['contact_position'],
+              'birthday': values['contact_birthday'],
+              'location': values['contact_location'],
+              'email': values['contact_email'],
+              'whatsapp': values['contact_whatsapp'],
+              'linkedin': values['contact_linkedin'],
+              'facebook': values['contact_facebook'],
+            };
+            newContact = await storeCrmContact(contactData);
+          }
+          EasyLoading.showSuccess("创建成功");
+          if (context.mounted) {
+            Navigator.of(context).pop((newCompany, newContact));
+          }
+        } catch (e) {
+          EasyLoading.showError("创建失败: $e");
+          if (context.mounted) {
+            isSubmitting.value = false;
+          }
+        }
       }
     }
 
@@ -363,65 +421,34 @@ class MarketProductCompanyCreatePage extends HookConsumerWidget {
                     backgroundColor: colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  onPressed: () async {
-                    final formState = formKey.currentState;
-                    if (formState?.saveAndValidate() ?? false) {
-                      final values = formState!.value;
-
-                      try {
-                        await EasyLoading.show(status: '提交中...');
-
-                        // 1. 整理公司数据
-                        final companyData = {
-                          'images': values['images'],
-                          'name': values['name'],
-                          'address': values['address'],
-                          'location': values['location'],
-                          'industry': values['industry'],
-                          'source': values['source'],
-                          'domain': values['domain'],
-                          'email': values['email'],
-                          'linkedin': values['linkedin'],
-                          'whatsapp': values['whatsapp'],
-                          'facebook': values['facebook'],
-                        };
-
-                        final newCompany = await storeCrmCompany(companyData);
-
-                        // 3. 检查是否有联系人数据需要提交
-                        final hasContactName = values['contact_name'] != null &&
-                            values['contact_name'].toString().isNotEmpty;
-
-                        crmContact.Contact? newContact;
-                        if (hasContactName) {
-                          final companyId = newCompany?.id;
-                          // 4. 整理联系人数据 (映射回后端需要的标准字段名)
-                          final contactData = {
-                            'company_id': companyId,
-                            'name': values['contact_name'],
-                            'position': values['contact_position'],
-                            'birthday': values['contact_birthday'],
-                            'location': values['contact_location'],
-                            'email': values['contact_email'],
-                            'whatsapp': values['contact_whatsapp'],
-                            'linkedin': values['contact_linkedin'],
-                            'facebook': values['contact_facebook'],
-                          };
-                          newContact = await storeCrmContact(contactData);
-                        }
-                        EasyLoading.showSuccess("创建成功");
-                        if (context.mounted) {
-                          Navigator.of(context).pop((newCompany, newContact));
-                        }
-                      } catch (e) {
-                        EasyLoading.showError("创建失败: $e");
-                      }
-                    }
-                  },
-                  child: const Text(
-                    '提交',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  onPressed: isSubmitting.value ? null : handleSubmit,
+                  child: isSubmitting.value
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    colorScheme.onPrimary),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '提交中...',
+                              style: TextStyle(color: colorScheme.onPrimary),
+                            )
+                          ],
+                        )
+                      : Text(
+                          '提交',
+                          style: TextStyle(color: colorScheme.onPrimary),
+                        ),
                 ),
               ),
             ),

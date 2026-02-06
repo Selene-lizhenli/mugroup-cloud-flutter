@@ -19,6 +19,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+    final isSubmitting = useState(false);
 
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
@@ -44,6 +45,75 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
         }
       } catch (e) {
         EasyLoading.showError('识别失败');
+      }
+    }
+
+    Future<void> handleSubmit() async {
+      final formState = formKey.currentState;
+      if (formState?.saveAndValidate() ?? false) {
+        isSubmitting.value = true;
+        try {
+          await EasyLoading.show(status: '提交中...');
+
+          final values = formState!.value;
+          final area = values['area']?.toString() ?? '';
+          final stall = values['stall']?.toString() ?? '';
+
+          final data = {
+            'images': values['images'],
+            'name': values['name'],
+            'stall_address': '$area$stall',
+          };
+
+          if (data['images'] != null && data['images'] is List) {
+            data['images'] = (data['images'] as List).map((item) {
+              Map<String, dynamic> itemMap =
+                  item is Map ? Map<String, dynamic>.from(item) : item.toJson();
+
+              if (!itemMap.containsKey('collection_name')) {
+                itemMap['collection_name'] = 'bussiness_card';
+              }
+
+              return itemMap;
+            }).toList();
+          }
+
+          final newSupplier = await storeSupplySupplier(data);
+
+          final hasSupplierName = values['supplier_name'] != null &&
+              values['supplier_name'].toString().isNotEmpty;
+
+          if (hasSupplierName) {
+            final supplierId = newSupplier?.id;
+
+            final supplierData = {
+              'supplier_id': supplierId,
+              'name': values['supplier_name'],
+              'mobile': values['supplier_mobile'],
+              'department': values['supplier_department'],
+              'sex': values['supplier_sex'],
+              'position': values['supplier_position'],
+              'wechat': values['supplier_wechat'],
+              'qq': values['supplier_qq'],
+              'phone': values['supplier_phone'],
+              'email': values['supplier_email'],
+              'fax': values['supplier_fax'],
+              'remark': values['supplier_remark'],
+            };
+
+            await storeSupplySupplierContact(supplierData);
+          }
+
+          EasyLoading.showSuccess("创建成功");
+          if (context.mounted) {
+            Navigator.of(context).pop(newSupplier);
+          }
+        } catch (e) {
+          EasyLoading.showError("创建失败: $e");
+          if (context.mounted) {
+            isSubmitting.value = false;
+          }
+        }
       }
     }
 
@@ -311,82 +381,39 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
+                    backgroundColor: isSubmitting.value
+                        ? colorScheme.primary.withOpacity(0.5)
+                        : colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  onPressed: () async {
-                    final formState = formKey.currentState;
-                    if (formState?.saveAndValidate() ?? false) {
-                      final values = formState!.value;
-
-                      try {
-                        await EasyLoading.show(status: '提交中...');
-
-                        final area = values['area']?.toString() ?? '';
-                        final stall = values['stall']?.toString() ?? '';
-
-                        final data = {
-                          'images': values['images'],
-                          'name': values['name'],
-                          'stall_address': '$area$stall',
-                        };
-
-                        if (data['images'] != null && data['images'] is List) {
-                          data['images'] = (data['images'] as List).map((item) {
-                            Map<String, dynamic> itemMap = item is Map
-                                ? Map<String, dynamic>.from(item)
-                                : item.toJson();
-
-                            if (!itemMap.containsKey('collection_name')) {
-                              itemMap['collection_name'] = 'bussiness_card';
-                            }
-
-                            return itemMap;
-                          }).toList();
-                        }
-
-                        final newSupplier = await storeSupplySupplier(data);
-
-                        // 3. 检查是否有联系人数据需要提交
-                        final hasSupplierName =
-                            values['supplier_name'] != null &&
-                                values['supplier_name'].toString().isNotEmpty;
-
-                        if (hasSupplierName) {
-                          final supplierId = newSupplier?.id;
-
-                          // 4. 整理联系人数据 (映射回后端需要的标准字段名)
-                          final supplierData = {
-                            'supplier_id': supplierId,
-                            'name': values['supplier_name'],
-                            'mobile': values['supplier_mobile'],
-                            'department': values['supplier_department'],
-                            'sex': values['supplier_sex'],
-                            'position': values['supplier_position'],
-                            'wechat': values['supplier_wechat'],
-                            'qq': values['supplier_qq'],
-                            'phone': values['supplier_phone'],
-                            'email': values['supplier_email'],
-                            'fax': values['supplier_fax'],
-                            'remark': values['supplier_remark'],
-                          };
-
-                          await storeSupplySupplierContact(supplierData);
-                        }
-
-                        EasyLoading.showSuccess("创建成功");
-                        if (context.mounted) {
-                          Navigator.of(context).pop(newSupplier);
-                        }
-                      } catch (e) {
-                        EasyLoading.showError("创建失败: $e");
-                      }
-                    }
-                  },
-                  child: const Text(
-                    '提交',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  onPressed: isSubmitting.value ? null : handleSubmit,
+                  child: isSubmitting.value
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    colorScheme.onPrimary),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '提交中...',
+                              style: TextStyle(color: colorScheme.onPrimary),
+                            )
+                          ],
+                        )
+                      : Text(
+                          '提交',
+                          style: TextStyle(color: colorScheme.onPrimary),
+                        ),
                 ),
               ),
             ),
