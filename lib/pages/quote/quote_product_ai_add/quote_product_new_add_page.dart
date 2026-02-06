@@ -35,7 +35,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
       tabs: const [
         Tab(text: "手动录入"),
         Tab(text: "白板识别"),
-        Tab(text: "记录本识别"),
+        // Tab(text: "记录本识别"),
       ],
     );
 
