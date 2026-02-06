@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
@@ -168,9 +169,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     StreamSubscription? subscription;
 
     try {
-      final dio = Dio();
-      final response = await dio.post<ResponseBody>(
-        'https://one.woyou.fun:12234/api/open/agents/sample/store-market-product',
+      final response = await api.post<ResponseBody>(
+        'api/open/agents/sample/store-market-product',
         data: {
           "images": [media],
           if (quoteId != null) "quotation_id": quoteId,
