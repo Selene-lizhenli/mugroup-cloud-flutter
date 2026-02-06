@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_floor_page.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_notepad_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -34,10 +35,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
       tabs: const [
         Tab(text: "手动录入"),
         Tab(text: "白板识别"),
-        // 如果需要启用第三个 Tab，请同时：
-        // 1. 将 TabController 的 initialLength 改为 3
-        // 2. 在 TabBarView 中取消注释第三个子组件
-        // Tab(text: "记录本识别"),
+        Tab(text: "记录本识别"),
       ],
     );
 
@@ -58,12 +56,12 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
             supplierId: supplierId,
           ),
         ),
-        // KeepAliveWrapper(
-        //   child: QuoteProductAiAddNotepadPage(
-        //     quoteId: quoteId,
-        //     supplierId: supplierId,
-        //   ),
-        // ),
+        KeepAliveWrapper(
+          child: QuoteProductAiAddNotepadPage(
+            quoteId: quoteId,
+            supplierId: supplierId,
+          ),
+        ),
       ],
     );
 
