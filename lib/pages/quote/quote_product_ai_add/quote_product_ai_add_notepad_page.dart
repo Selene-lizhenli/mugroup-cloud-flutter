@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
@@ -9,6 +10,7 @@ import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart'
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/product_upload_zone.dart';
 import 'package:cloud/services/media.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:cloud/services/supply.dart';
 import 'package:dio/dio.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
@@ -21,19 +23,49 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 单个产品条目（一行数据）
 class ProductDraftItem {
   final Map<String, String> data;
+  // --- 新增：业务 ID 字段 ---
+  final int? productId;
+  final int? supplyQuoteId;
+  final int? quotationSampleId;
 
-  ProductDraftItem({required this.data});
-
-  ProductDraftItem copyWith({Map<String, String>? data}) {
-    return ProductDraftItem(data: data ?? this.data);
-  }
+  ProductDraftItem({
+    required this.data,
+    this.productId,
+    this.supplyQuoteId,
+    this.quotationSampleId,
+  });
 
   String getValue(String key) => data[key] ?? '-';
 
-  // --- 新增：持久化 ---
-  Map<String, dynamic> toJson() => {'data': data};
+  ProductDraftItem copyWith({
+    Map<String, String>? data,
+    int? productId,
+    int? supplyQuoteId,
+    int? quotationSampleId,
+  }) {
+    return ProductDraftItem(
+      data: data ?? this.data,
+      productId: productId ?? this.productId,
+      supplyQuoteId: supplyQuoteId ?? this.supplyQuoteId,
+      quotationSampleId: quotationSampleId ?? this.quotationSampleId,
+    );
+  }
+
+  // 修改持久化逻辑
+  Map<String, dynamic> toJson() => {
+        'data': data,
+        'productId': productId,
+        'supplyQuoteId': supplyQuoteId,
+        'quotationSampleId': quotationSampleId,
+      };
+
   factory ProductDraftItem.fromJson(Map<String, dynamic> json) =>
-      ProductDraftItem(data: Map<String, String>.from(json['data']));
+      ProductDraftItem(
+        data: Map<String, String>.from(json['data']),
+        productId: json['productId'],
+        supplyQuoteId: json['supplyQuoteId'],
+        quotationSampleId: json['quotationSampleId'],
+      );
 }
 
 class ImageProductGroup {
@@ -202,11 +234,11 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
   void _startSingleImageSse(String taskId, TemporaryMedia media) async {
     String buffer = "";
+    String eventType = "message"; // 默认为 message
     StreamSubscription? sub;
     final currentTemplate = getTemplateById(state.currentTemplateId);
 
     try {
-      // 使用之前讨论过的 silentApi 避开拦截器崩溃问题
       final response = await silentApi.post<ResponseBody>(
         'api/open/agents/sample/store-market-note-product',
         data: {
@@ -218,35 +250,67 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       );
 
       sub = response.data?.stream.map((d) => utf8.decode(d)).listen((chunk) {
-        // 直接监听 chunk，不再等待 LineSplitter 拆行
-        // 因为 chunk 可能是 "data: {\"nam" 这种不完整的字符串
-
-        // 简单的 SSE 协议解析：提取 data: 之后的内容
         final lines = chunk.split('\n');
         for (var line in lines) {
-          if (line.startsWith('data:')) {
-            String content = line.replaceFirst('data:', '').trim();
-
-            if (content.contains("[DONE]")) {
-              _finalizeGroup(taskId, sub);
-              return;
-            }
-
-            buffer += content;
+          if (line.startsWith('event:')) {
+            eventType = line.replaceFirst('event:', '').trim();
+            continue;
           }
-        }
+          if (!line.startsWith('data:')) continue;
+          String content = line.replaceFirst('data:', '').trim();
 
-        // 只要 buffer 发生变化，就尝试修复并更新 UI
-        if (buffer.isNotEmpty) {
-          _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
+          if (content.contains("[DONE]")) {
+            _finalizeGroup(taskId, sub);
+            return;
+          }
+
+          if (eventType == 'created') {
+            // ✅ 处理 ID 绑定
+
+            logger.d(content);
+            _bindIdsToItems(taskId, content);
+          } else {
+            // ✅ 处理实时打字机渲染
+            buffer += content;
+            _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
+          }
         }
       },
           onDone: () => _finalizeGroup(taskId, sub),
           onError: (_) => _finalizeGroup(taskId, sub));
-
-      ref.onDispose(() => sub?.cancel());
     } catch (e) {
       _finalizeGroup(taskId, sub);
+    }
+  }
+
+  // 新增：将 created 数组中的 ID 对应到表格的每一行
+  void _bindIdsToItems(String taskId, String content) {
+    try {
+      final List<dynamic> createdData = jsonDecode(content);
+      state = state.copyWith(
+        groups: state.groups.map((group) {
+          if (group.media.thumbUrl != taskId) return group;
+
+          final updatedProducts = <ProductDraftItem>[];
+          for (int i = 0; i < group.products.length; i++) {
+            final item = group.products[i];
+            // 按照索引一一对应
+            if (i < createdData.length) {
+              final idMap = createdData[i];
+              updatedProducts.add(item.copyWith(
+                productId: idMap['product_id'],
+                supplyQuoteId: idMap['supply_quote_id'],
+                quotationSampleId: idMap['quotation_sample_id'],
+              ));
+            } else {
+              updatedProducts.add(item);
+            }
+          }
+          return group.copyWith(products: updatedProducts);
+        }).toList(),
+      );
+    } catch (e) {
+      debugPrint("解析 ID 失败: $e");
     }
   }
 
@@ -786,6 +850,27 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       TemplateOption template,
       bool isLastRow,
       ProductAiAddController controller) {
+    Future<bool> updateRemoteField({
+      required String fieldKey,
+      required dynamic value,
+      int? productId,
+      int? supplyQuoteId,
+    }) async {
+      const showroomFields = {'product_no', 'spec', 'description_cn'};
+      try {
+        if (showroomFields.contains(fieldKey)) {
+          if (productId == null) return false;
+          await updateShowroomSample(productId, {fieldKey: value});
+        } else {
+          if (supplyQuoteId == null) return false;
+          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+        }
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     return Column(
       children: [
         Row(
@@ -835,22 +920,37 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                                 decimal: true)
                                             : TextInputType.text,
                                         validator: (value) {
-                                          if (isNumberField &&
-                                              value.isNotEmpty) {
-                                            final reg =
-                                                RegExp(r'^\d+(\.\d+)?$');
-                                            if (!reg.hasMatch(value)) {
-                                              return '请输入有效的数字';
-                                            }
-                                          }
-                                          return null;
-                                        },
-                                        onConfirm: (newText) =>
-                                            controller.updateCell(
-                                                groupIndex,
-                                                productIndex,
-                                                colConfig.key,
-                                                newText));
+                                      if (isNumberField && value.isNotEmpty) {
+                                        final reg = RegExp(r'^\d+(\.\d+)?$');
+                                        if (!reg.hasMatch(value)) {
+                                          return '请输入有效的数字';
+                                        }
+                                      }
+                                      return null;
+                                    }, onConfirm: (newText) async {
+                                      logger.d(product.productId);
+                                      logger.d(product.supplyQuoteId);
+                                      if (product.productId != null ||
+                                          product.supplyQuoteId != null) {
+                                        EasyLoading.show(status: '正在同步...');
+                                        final success = await updateRemoteField(
+                                          fieldKey: colConfig.key,
+                                          value: newText,
+                                          productId: product.productId,
+                                          supplyQuoteId: product.supplyQuoteId,
+                                        );
+                                        if (success) {
+                                          EasyLoading.showSuccess('同步成功');
+                                          controller.updateCell(
+                                              groupIndex,
+                                              productIndex,
+                                              colConfig.key,
+                                              newText);
+                                        } else {
+                                          EasyLoading.showError('远程同步失败');
+                                        }
+                                      }
+                                    });
                                   },
                                   child: Container(
                                       constraints:
