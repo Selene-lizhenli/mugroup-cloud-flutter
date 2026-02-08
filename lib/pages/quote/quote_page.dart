@@ -12,6 +12,7 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,16 +66,24 @@ class QuotePage extends HookConsumerWidget {
       return null;
     }, []);
 
-// 2. 自动监听并保存：每当选择变动，实时存入本地
+    // --- 自动保存与清除逻辑 ---
     useEffect(() {
       Future<void> persistData() async {
         final prefs = await SharedPreferences.getInstance();
+
+        // 处理客户数据
         if (currentQuote.value != null) {
           await prefs.setString(quoteCacheKey, jsonEncode(currentQuote.value));
+        } else {
+          await prefs.remove(quoteCacheKey); // 关键：如果是 null，从本地物理删除
         }
+
+        // 处理供应商数据
         if (selectedSupplier.value != null) {
           await prefs.setString(
               supplierCacheKey, jsonEncode(selectedSupplier.value));
+        } else {
+          await prefs.remove(supplierCacheKey); // 关键：如果是 null，从本地物理删除
         }
       }
 
@@ -706,11 +715,7 @@ Future<void> _showPreSelectionSheet(
                 if (selectedSupplier.value != null) {
                   Navigator.pop(context);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("请先选择供应商"),
-                        behavior: SnackBarBehavior.floating),
-                  );
+                  EasyLoading.showInfo("请先选择供应商");
                 }
               },
               child: const Text("确定",
