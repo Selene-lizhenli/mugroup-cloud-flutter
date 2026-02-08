@@ -1,19 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
-import 'package:cloud/pages/widgets/image_uploader.dart';
-import 'package:cloud/providers/app_provider.dart';
-import 'package:cloud/services/openai.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/widgets/product_upload_zone.dart';
+import 'package:cloud/services/media.dart';
 import 'package:cloud/services/sample.dart';
+import 'package:dio/dio.dart';
 import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:json_repair_flutter/json_repair_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 单个产品条目（一行数据）
@@ -169,89 +171,143 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     _saveDraft(); // 保存
   }
 
-  Future<void> onImagesChanged(
-      List<TemporaryMedia>? newImages, WidgetRef ref) async {
-    final images = newImages ?? [];
-    if (images.isEmpty) return;
+  Future<void> uploadAndRecognize(
+      File file, WidgetRef ref, int? quoteId, String? supplierId) async {
+    try {
+      // 1. 先上传文件拿到 TemporaryMedia
+      final media = await upload(file: file);
+      final String taskId = media.thumbUrl ?? "";
 
-    final currentGroups = state.groups;
-    final int startIndex = currentGroups.length;
+      // 2. 立即在 state 中创建一个属于这张图的 Group
+      final newGroup = ImageProductGroup(
+        media: media,
+        // 初始给一个空行，解决你说的“识别完才出现”的问题，实现即时占位
+        products: [
+          ProductDraftItem(data: {
+            for (var col in kQuoteAiNotePadTemplates.first.columns) col.key: '-'
+          })
+        ],
+        isRecognizing: true,
+      );
 
-    final List<ImageProductGroup> addedGroups = images
-        .map((img) => ImageProductGroup(
-              media: img,
-              products: [],
-              isRecognizing: true,
-            ))
-        .toList();
+      state = state.copyWith(groups: [...state.groups, newGroup]);
+      _saveDraft();
 
-    state = state.copyWith(
-      groups: [...currentGroups, ...addedGroups],
-      isGlobalLoading: true,
-    );
-    _saveDraft(); // 保存占位状态
-
-    await _processOcrQueue(startIndex, images, ref);
+      // 3. 立即为这张图开启独立的 SSE 识别任务，不等待其他图片
+      _startSingleImageSse(taskId, media);
+    } catch (e) {
+      debugPrint("上传识别失败: $e");
+    }
   }
 
-  Future<void> _processOcrQueue(
-      int startIndex, List<TemporaryMedia> newImages, WidgetRef ref) async {
-    final user = ref.read(userProvider).user;
-    final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
-      (t) => t.id == state.currentTemplateId,
-      orElse: () => kQuoteAiNotePadTemplates.first,
-    );
+  void _startSingleImageSse(String taskId, TemporaryMedia media) async {
+    String buffer = "";
+    StreamSubscription? sub;
+    final currentTemplate = getTemplateById(state.currentTemplateId);
 
-    for (var media in newImages) {
-      final imageUrl = media.thumbUrl;
-      List<ProductDraftItem> recognizedProducts = [];
+    try {
+      // 使用之前讨论过的 silentApi 避开拦截器崩溃问题
+      final response = await silentApi.post<ResponseBody>(
+        'api/open/agents/sample/store-market-note-product',
+        data: {
+          'item_type': 'market_product',
+          'template_id': state.currentTemplateId,
+          "images": [media],
+        },
+        options: Options(responseType: ResponseType.stream),
+      );
 
-      try {
-        final result = await identifyOcr('ExtractQtnNbBasic', {
-          "template_id": state.currentTemplateId,
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": imageUrl,
-        });
+      sub = response.data?.stream.map((d) => utf8.decode(d)).listen((chunk) {
+        // 直接监听 chunk，不再等待 LineSplitter 拆行
+        // 因为 chunk 可能是 "data: {\"nam" 这种不完整的字符串
 
-        if (result != null &&
-            result['success'] == true &&
-            result['data'] is List) {
-          final dataList = result['data'] as List;
-          for (var itemData in dataList) {
+        // 简单的 SSE 协议解析：提取 data: 之后的内容
+        final lines = chunk.split('\n');
+        for (var line in lines) {
+          if (line.startsWith('data:')) {
+            String content = line.replaceFirst('data:', '').trim();
+
+            if (content.contains("[DONE]")) {
+              _finalizeGroup(taskId, sub);
+              return;
+            }
+
+            buffer += content;
+          }
+        }
+
+        // 只要 buffer 发生变化，就尝试修复并更新 UI
+        if (buffer.isNotEmpty) {
+          _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
+        }
+      },
+          onDone: () => _finalizeGroup(taskId, sub),
+          onError: (_) => _finalizeGroup(taskId, sub));
+
+      ref.onDispose(() => sub?.cancel());
+    } catch (e) {
+      _finalizeGroup(taskId, sub);
+    }
+  }
+
+  void _updateGroupItemsFromBuffer(
+      String taskId, String buffer, TemplateOption template) {
+    try {
+      // 使用 json_repair 修复当前的列表字符串
+      final repaired = repairJson(buffer);
+      List<dynamic> rawList = [];
+
+      if (repaired is List) {
+        rawList = repaired;
+      } else if (repaired is Map) {
+        // 有时刚开始解析会变成单个 Map
+        rawList = [repaired];
+      }
+
+      state = state.copyWith(
+        groups: state.groups.map((group) {
+          if (group.media.thumbUrl != taskId) return group;
+
+          // 将解析出的 raw 数据转为 ProductDraftItem
+          List<ProductDraftItem> currentProducts = rawList.map((itemData) {
             Map<String, String> rowMap = {};
-            for (var col in currentTemplate.columns) {
+            for (var col in template.columns) {
               String rawVal = (itemData[col.key] ?? '').toString().trim();
               rowMap[col.key] = rawVal.isEmpty ? '-' : rawVal;
             }
-            recognizedProducts.add(ProductDraftItem(data: rowMap));
+            return ProductDraftItem(data: rowMap);
+          }).toList();
+
+          // 如果解析为空，保持一个占位行（可选）
+          if (currentProducts.isEmpty) {
+            currentProducts = [
+              ProductDraftItem(
+                  data: {for (var col in template.columns) col.key: '-'})
+            ];
           }
-        }
-      } catch (e) {
-        debugPrint('OCR Error: $e');
-      }
 
-      if (recognizedProducts.isEmpty) {
-        Map<String, String> emptyMap = {
-          for (var col in currentTemplate.columns) col.key: '-'
-        };
-        recognizedProducts.add(ProductDraftItem(data: emptyMap));
-      }
-
-      final latestGroups = List<ImageProductGroup>.from(state.groups);
-      final targetIndex = latestGroups.indexWhere((g) => g.media == media);
-
-      if (targetIndex != -1) {
-        latestGroups[targetIndex] = latestGroups[targetIndex].copyWith(
-          products: recognizedProducts,
-          isRecognizing: false,
-        );
-        state = state.copyWith(groups: latestGroups);
-        _saveDraft(); // 识别完一个组保存一次
-      }
+          return group.copyWith(
+            products: currentProducts,
+            isRecognizing: true, // 仍然在识别中
+          );
+        }).toList(),
+      );
+    } catch (e) {
+      // 解析失败说明 buffer 还没到能修好的地步，保持现状
     }
-    state = state.copyWith(isGlobalLoading: false);
+  }
+
+  void _finalizeGroup(String taskId, StreamSubscription? sub) {
+    sub?.cancel();
+    state = state.copyWith(
+      groups: state.groups.map((group) {
+        if (group.media.thumbUrl == taskId) {
+          return group.copyWith(isRecognizing: false);
+        }
+        return group;
+      }).toList(),
+    );
+    _saveDraft(); // 最终保存一次
   }
 
   void toggleGroupExpand(int groupIndex) {
@@ -371,8 +427,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       colorScheme: colorScheme,
                       onSelect: (id) => controller.changeTemplate(id),
                       currentMediaList: currentMediaList,
-                      onImagesChanged: (newImages) =>
-                          controller.onImagesChanged(newImages, ref)),
+                      controller: controller,
+                      ref: ref),
                   _buildInfoBar(colorScheme),
                   if (providerState.groups.isEmpty &&
                       providerState.isGlobalLoading)
@@ -396,19 +452,21 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
               ),
             ),
           ),
-          _buildBottomAction(context, colorScheme, providerState, controller),
         ],
       ),
     );
   }
 
   Widget _buildCollapsibleTemplateSelector(
-      BuildContext context, TemplateOption currentTemplate,
-      {required ValueNotifier<bool> isExpanded,
-      required ColorScheme colorScheme,
-      required Function(String id) onSelect,
-      required List<TemporaryMedia> currentMediaList,
-      required Function(List<TemporaryMedia>?) onImagesChanged}) {
+    BuildContext context,
+    TemplateOption currentTemplate, {
+    required ValueNotifier<bool> isExpanded,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required ProductAiAddController controller,
+    required WidgetRef ref,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -469,7 +527,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       colorScheme: colorScheme,
                       onSelect: onSelect,
                       currentMediaList: currentMediaList,
-                      onImagesChanged: onImagesChanged),
+                      controller: controller,
+                      ref: ref),
                   const SizedBox(height: 12),
                 ],
               ),
@@ -480,13 +539,15 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildTemplateListContent(
-      {required BuildContext context,
-      required String currentId,
-      required ColorScheme colorScheme,
-      required Function(String id) onSelect,
-      required List<TemporaryMedia> currentMediaList,
-      required Function(List<TemporaryMedia>?) onImagesChanged}) {
+  Widget _buildTemplateListContent({
+    required BuildContext context,
+    required String currentId,
+    required ColorScheme colorScheme,
+    required Function(String id) onSelect,
+    required List<TemporaryMedia> currentMediaList,
+    required ProductAiAddController controller,
+    required WidgetRef ref,
+  }) {
     return SizedBox(
       height: 82,
       child: ListView.separated(
@@ -557,9 +618,14 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                     },
                     child: SizedBox(
                         width: 80,
-                        child: ImageUploader(
-                            customIcon: Icons.camera_alt_rounded,
-                            onChanged: onImagesChanged))),
+                        child: ProductUploadZone(
+                          width: 90,
+                          height: 90,
+                          onFileSelected: (File file) {
+                            controller.uploadAndRecognize(
+                                file, ref, quoteId, supplierId);
+                          },
+                        ))),
               ],
             ),
           );
@@ -664,28 +730,33 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                 ),
               ),
             ),
-            if (group.isExpanded) ...[
-              if (group.isRecognizing)
-                const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Center(
-                        child: Text("正在分析图片内容...",
-                            style: TextStyle(color: Colors.grey))))
-              else
-                Column(
-                    children: group.products
-                        .asMap()
-                        .entries
-                        .map((entry) => _buildProductRow(
-                            context,
-                            groupIndex,
-                            entry.key,
-                            entry.value,
-                            currentTemplate,
-                            entry.key == group.products.length - 1,
-                            controller))
-                        .toList()),
-            ],
+            if (group.isExpanded)
+              Column(
+                children: [
+                  if (group.products.isNotEmpty)
+                    Column(
+                      children: group.products
+                          .asMap()
+                          .entries
+                          .map((entry) => _buildProductRow(
+                                context,
+                                groupIndex,
+                                entry.key,
+                                entry.value,
+                                currentTemplate,
+                                entry.key == group.products.length - 1,
+                                controller,
+                              ))
+                          .toList(),
+                    ),
+                  if (group.isRecognizing && group.products.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text("准备识别...",
+                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ),
+                ],
+              ),
           ],
         ),
         Positioned(
@@ -821,54 +892,6 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
         if (!isLastRow)
           const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
       ],
-    );
-  }
-
-  Widget _buildBottomAction(BuildContext context, ColorScheme colorScheme,
-      ProductAiAddState state, ProductAiAddController controller) {
-    final int totalProducts =
-        state.groups.fold(0, (sum, g) => sum + g.products.length);
-    final bool hasRecognizing = state.groups.any((g) => g.isRecognizing);
-    final bool canSubmit =
-        totalProducts > 0 && !hasRecognizing && !state.isSubmitting;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-          16, 8, 16, MediaQuery.of(context).padding.bottom + 8),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFEEEEEE)))),
-      child: ElevatedButton(
-          onPressed: canSubmit
-              ? () async {
-                  await controller.submitProducts(quoteId, supplierId);
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22)),
-              minimumSize: const Size(double.infinity, 44)),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            if (hasRecognizing || state.isSubmitting) ...[
-              const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(Colors.white))),
-              const SizedBox(width: 8)
-            ],
-            Text(
-              hasRecognizing
-                  ? 'AI识别中...'
-                  : state.isSubmitting
-                      ? '提交中...'
-                      : '保存产品 ($totalProducts)',
-              style: const TextStyle(color: Colors.white),
-            )
-          ])),
     );
   }
 }
