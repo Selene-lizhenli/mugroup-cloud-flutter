@@ -430,43 +430,80 @@ class QuotePage extends HookConsumerWidget {
                     Icon(Icons.edit_note_rounded,
                         size: 16, color: colors.primary.withOpacity(0.7)),
                     const SizedBox(width: 6),
+
+                    // --- 客户展示 + 清除 ---
                     Expanded(
                       flex: 4,
-                      child: Text(
-                        getName(quote.value?['company'], ['name']),
-                        style: TextStyle(
-                          color: colors.primary.withOpacity(0.9),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              getName(quote.value?['company'], ['name']),
+                              style: TextStyle(
+                                color: colors.primary.withOpacity(0.9),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (quote.value != null) // 只有有值时才显示清除
+                            GestureDetector(
+                              onTap: () =>
+                                  quote.value = null, // 直接置空，触发持久化和UI刷新
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(Icons.cancel,
+                                    size: 14, color: Colors.grey[400]),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
 
                     // 分隔符
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text("|",
                           style: TextStyle(
                               color: colors.primary.withOpacity(0.2),
                               fontSize: 12)),
                     ),
 
-                    // 供应商名称
+                    // --- 供应商名称 + 清除 ---
                     Expanded(
                       flex: 5,
-                      child: Text(
-                        getName(supplier.value, ['short_name', 'name']),
-                        style: TextStyle(
-                          color: colors.primary.withOpacity(0.9),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              getName(supplier.value, ['short_name', 'name']),
+                              style: TextStyle(
+                                color: colors.primary.withOpacity(0.9),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (supplier.value != null)
+                            GestureDetector(
+                              onTap: () => supplier.value = null,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(Icons.cancel,
+                                    size: 14, color: Colors.grey[400]),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
+
+                    // 右侧箭头表示可点击进入编辑
                     Icon(Icons.chevron_right_rounded,
                         size: 16, color: Colors.grey[300]),
                   ],
@@ -630,7 +667,11 @@ Future<void> _showPreSelectionSheet(
               },
               child: AbsorbPointer(
                   child: Input(
-                      label: '对应客户', value: companyName, hintText: '请选择客户')),
+                label: '对应客户',
+                value: companyName,
+                hintText: '请选择客户',
+                showClearButton: false,
+              )),
             ),
             const SizedBox(height: 16),
 
@@ -643,10 +684,12 @@ Future<void> _showPreSelectionSheet(
               },
               child: AbsorbPointer(
                   child: Input(
-                      label: '所属供应商',
-                      isRequired: true,
-                      value: supplierName,
-                      hintText: '请选择供应商')),
+                label: '所属供应商',
+                isRequired: true,
+                value: supplierName,
+                hintText: '请选择供应商',
+                showClearButton: false,
+              )),
             ),
             const SizedBox(height: 32),
 
