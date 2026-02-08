@@ -702,18 +702,21 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2)))
                         : Image.network(
-                            item.media.url,
-                            key: ValueKey(
-                                item.media.url), // 核心：URL 变了，强制图片 Widget 刷新
+                            item.media.thumbUrl?.isNotEmpty == true
+                                ? item.media.thumbUrl!
+                                : 'about:blank',
+                            key: ValueKey(item.media.thumbUrl),
                             fit: BoxFit.cover,
                             errorBuilder: (c, e, s) => const Center(
-                                child: Icon(Icons.broken_image,
-                                    color: Colors.grey)),
+                              child:
+                                  Icon(Icons.broken_image, color: Colors.grey),
+                            ),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return const Center(
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2));
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              );
                             },
                           ),
                   ),
