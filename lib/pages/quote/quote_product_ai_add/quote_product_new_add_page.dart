@@ -24,7 +24,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tabController = useTabController(initialLength: 2, initialIndex: 1);
+    final tabController = useTabController(initialLength: 3, initialIndex: 1);
 
     final tabBar = TabBar(
       controller: tabController,
