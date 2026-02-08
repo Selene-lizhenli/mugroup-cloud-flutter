@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class QuotePage extends HookConsumerWidget {
@@ -43,6 +45,44 @@ class QuotePage extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final lastSearch = useRef('');
+
+    const String quoteCacheKey = 'cache_current_quote';
+    const String supplierCacheKey = 'cache_selected_supplier';
+
+// 1. 初始化加载：从本地恢复数据
+    useEffect(() {
+      Future<void> restoreData() async {
+        final prefs = await SharedPreferences.getInstance();
+        final qStr = prefs.getString(quoteCacheKey);
+        final sStr = prefs.getString(supplierCacheKey);
+
+        // 注意：存进去的是 Map，读出来也是 Map，这会解决类型冲突
+        if (qStr != null) currentQuote.value = jsonDecode(qStr);
+        if (sStr != null) selectedSupplier.value = jsonDecode(sStr);
+      }
+
+      restoreData();
+      return null;
+    }, []);
+
+// 2. 自动监听并保存：每当选择变动，实时存入本地
+    useEffect(() {
+      Future<void> persistData() async {
+        final prefs = await SharedPreferences.getInstance();
+        if (currentQuote.value != null) {
+          await prefs.setString(quoteCacheKey, jsonEncode(currentQuote.value));
+        }
+        if (selectedSupplier.value != null) {
+          await prefs.setString(
+              supplierCacheKey, jsonEncode(selectedSupplier.value));
+        }
+      }
+
+      persistData();
+      return null;
+    }, [currentQuote.value, selectedSupplier.value]);
+
+// 3. 辅助函数：安全地从 Map 或 Model 获取名称 (解决之前的报错)
 
     // 获取主列表数据
     Future<void> fetchData() async {
@@ -354,6 +394,22 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<Map<String, dynamic>?> supplier,
       ColorScheme colors) {
     final isReady = supplier.value != null;
+
+    String getName(dynamic data, List<String> keys) {
+      if (data == null) return '';
+      if (data is Map) {
+        for (var key in keys) {
+          if (data[key] != null) return data[key].toString();
+        }
+      }
+      // 如果是强类型对象，尝试通过反射/动态访问属性（针对 _$CompanyImpl）
+      try {
+        if (keys.contains('name')) return data.name;
+        if (keys.contains('short_name')) return data.shortName ?? data.name;
+      } catch (_) {}
+      return '';
+    }
+
     return Stack(
       children: [
         Column(children: [
@@ -375,12 +431,40 @@ class QuotePage extends HookConsumerWidget {
                         size: 16, color: colors.primary.withOpacity(0.7)),
                     const SizedBox(width: 6),
                     Expanded(
+                      flex: 4,
                       child: Text(
-                        "当前录入：${quote.value?['company']?.name ?? '未选择'} / ${supplier.value?['short_name'] ?? supplier.value?['name'] ?? '未选择'}",
+                        getName(quote.value?['company'], ['name']),
                         style: TextStyle(
-                            color: colors.primary.withOpacity(0.8),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500),
+                          color: colors.primary.withOpacity(0.9),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+
+                    // 分隔符
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text("|",
+                          style: TextStyle(
+                              color: colors.primary.withOpacity(0.2),
+                              fontSize: 12)),
+                    ),
+
+                    // 供应商名称
+                    Expanded(
+                      flex: 5,
+                      child: Text(
+                        getName(supplier.value, ['short_name', 'name']),
+                        style: TextStyle(
+                          color: colors.primary.withOpacity(0.9),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Icon(Icons.chevron_right_rounded,
@@ -484,6 +568,21 @@ Future<void> _showPreSelectionSheet(
     BuildContext context,
     ValueNotifier<Map<String, dynamic>?> selectedQuote,
     ValueNotifier<Map<String, dynamic>?> selectedSupplier) async {
+  // 内部工具函数：安全解析名称，兼容 Map 和 Model 对象
+  String getSafeName(dynamic data, List<String> keys) {
+    if (data == null) return '';
+    if (data is Map) {
+      for (var key in keys) {
+        if (data[key] != null) return data[key].toString();
+      }
+    }
+    try {
+      if (keys.contains('name')) return data.name ?? '';
+      if (keys.contains('short_name')) return data.shortName ?? data.name ?? '';
+    } catch (_) {}
+    return '';
+  }
+
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -495,57 +594,90 @@ Future<void> _showPreSelectionSheet(
       final currentQuote = useValueListenable(selectedQuote);
       final currentSupplier = useValueListenable(selectedSupplier);
 
+      // 提取解析后的显示值
+      final companyName = getSafeName(currentQuote?['company'], ['name']);
+      final supplierName = getSafeName(currentSupplier, ['short_name', 'name']);
+
       return Padding(
         padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             top: 20,
-            left: 16,
-            right: 16),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text("完善相关信息",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          GestureDetector(
-            onTap: () async {
-              final result = await showModalBottomSheet<Map<String, dynamic>>(
-                  context: context, builder: (_) => const QuoteSelect());
-              if (result != null) selectedQuote.value = result;
-            },
-            child: AbsorbPointer(
-                child: Input(
-                    label: '客户',
-                    value: currentQuote?['company']?.name ?? '',
-                    hintText: '请选择客户')),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () async {
-              final result = await showModalBottomSheet<Map<String, dynamic>>(
-                  context: context, builder: (_) => const SupplierSelect());
-              if (result != null) selectedSupplier.value = result;
-            },
-            child: AbsorbPointer(
-                child: Input(
-                    label: '供应商',
-                    isRequired: true,
-                    value: currentSupplier?['short_name'] ??
-                        currentSupplier?['name'] ??
-                        '',
-                    hintText: '请选择供应商')),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                backgroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12))),
-            onPressed: () {
-              if (selectedSupplier.value != null) Navigator.pop(context);
-            },
-            child: const Text("确定", style: TextStyle(color: Colors.white)),
-          ),
-        ]),
+            left: 20,
+            right: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 顶部横条指示器
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Text("录入信息确认",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+
+            // 客户选择
+            GestureDetector(
+              onTap: () async {
+                final result = await showModalBottomSheet<Map<String, dynamic>>(
+                    context: context, builder: (_) => const QuoteSelect());
+                if (result != null) selectedQuote.value = result;
+              },
+              child: AbsorbPointer(
+                  child: Input(
+                      label: '对应客户', value: companyName, hintText: '请选择客户')),
+            ),
+            const SizedBox(height: 16),
+
+            // 供应商选择
+            GestureDetector(
+              onTap: () async {
+                final result = await showModalBottomSheet<Map<String, dynamic>>(
+                    context: context, builder: (_) => const SupplierSelect());
+                if (result != null) selectedSupplier.value = result;
+              },
+              child: AbsorbPointer(
+                  child: Input(
+                      label: '所属供应商',
+                      isRequired: true,
+                      value: supplierName,
+                      hintText: '请选择供应商')),
+            ),
+            const SizedBox(height: 32),
+
+            // 确定按钮
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  backgroundColor: colorScheme.primary,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              onPressed: () {
+                // 只有供应商是必填项，满足即可关闭
+                if (selectedSupplier.value != null) {
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("请先选择供应商"),
+                        behavior: SnackBarBehavior.floating),
+                  );
+                }
+              },
+              child: const Text("确定",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
       );
     }),
   );
