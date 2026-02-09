@@ -521,7 +521,7 @@ class QuotePage extends HookConsumerWidget {
               ),
             ),
           SizedBox(
-            height: 500,
+            height: 600,
             child: QuoteProductListPage(
                 initialQuote: quote.value,
                 initialSupplier: supplier.value,
