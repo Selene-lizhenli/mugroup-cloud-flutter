@@ -18,7 +18,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_repair_flutter/json_repair_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductDraftItem {
   final Map<String, String> data;
@@ -44,19 +43,6 @@ class ProductDraftItem {
   }
 
   String getValue(String key) => data[key] ?? '-';
-
-  Map<String, dynamic> toJson() => {
-        'data': data,
-        'media': media.toJson(),
-        'isRecognizing': isRecognizing,
-      };
-
-  factory ProductDraftItem.fromJson(Map<String, dynamic> json) =>
-      ProductDraftItem(
-        data: Map<String, String>.from(json['data']),
-        media: TemporaryMedia.fromJson(json['media']),
-        isRecognizing: json['isRecognizing'] ?? false,
-      );
 }
 
 class ProductAiAddState {
@@ -88,40 +74,9 @@ class ProductAiAddState {
 }
 
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
-  static const String _kStorageKey = 'product_ai_add_draft_v1';
-
   @override
   ProductAiAddState build() {
-    _initLoad();
     return ProductAiAddState();
-  }
-
-  Future<void> _initLoad() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? jsonStr = prefs.getString(_kStorageKey);
-      if (jsonStr != null && jsonStr.isNotEmpty) {
-        final List<dynamic> decoded = jsonDecode(jsonStr);
-        final List<ProductDraftItem> loadedItems = decoded
-            .map((item) => ProductDraftItem.fromJson(item))
-            .map((item) => item.copyWith(isRecognizing: false))
-            .toList();
-        state = state.copyWith(items: loadedItems);
-      }
-    } catch (e) {
-      debugPrint('Draft load error: $e');
-    }
-  }
-
-  Future<void> _saveDraft() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String jsonStr =
-          jsonEncode(state.items.map((e) => e.toJson()).toList());
-      await prefs.setString(_kStorageKey, jsonStr);
-    } catch (e) {
-      debugPrint('Draft save error: $e');
-    }
   }
 
   void changeTemplate(String templateId) {
@@ -134,7 +89,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newList = List<ProductDraftItem>.from(state.items);
     newList.removeAt(index);
     state = state.copyWith(items: newList);
-    _saveDraft();
   }
 
   Future<void> uploadAndRecognize(
@@ -294,7 +248,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         return item;
       }).toList(),
     );
-    _saveDraft();
   }
 
   void updateCell(int index, String key, String value) {
@@ -305,13 +258,10 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newItems = List<ProductDraftItem>.from(state.items);
     newItems[index] = item.copyWith(data: newData);
     state = state.copyWith(items: newItems);
-    _saveDraft();
   }
 
   void clear() async {
     state = ProductAiAddState();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kStorageKey);
   }
 }
 
