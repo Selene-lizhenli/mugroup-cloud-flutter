@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_list_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -520,20 +521,16 @@ class QuotePage extends HookConsumerWidget {
               ),
             ),
           SizedBox(
-              height: 500,
-              child: QuoteProductNewAddPage(
-                  isEmbedded: true,
-                  quoteId: quote.value?['id'],
-                  supplierId: supplier.value?['id']?.toString())),
+            height: 500,
+            child: QuoteProductListPage(
+                initialQuote: quote.value,
+                initialSupplier: supplier.value,
+                onChanged: (quoted, suppliered) {
+                  quote.value = quoted;
+                  supplier.value = suppliered;
+                }),
+          ),
         ]),
-        if (!isReady)
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _showPreSelectionSheet(context, quote, supplier),
-              child: Container(color: Colors.transparent),
-            ),
-          )
       ],
     );
   }
