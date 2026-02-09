@@ -207,7 +207,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       File file, WidgetRef ref, int? quoteId, String? supplierId) async {
     try {
       // 1. 先上传文件拿到 TemporaryMedia
+      EasyLoading.show(status: '上传中...');
       final media = await upload(file: file);
+      EasyLoading.dismiss();
       final String taskId = media.thumbUrl ?? "";
 
       // 2. 立即在 state 中创建一个属于这张图的 Group
@@ -227,8 +229,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
       // 3. 立即为这张图开启独立的 SSE 识别任务，不等待其他图片
       _startSingleImageSse(taskId, media);
-    } catch (e) {
-      debugPrint("上传识别失败: $e");
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 
