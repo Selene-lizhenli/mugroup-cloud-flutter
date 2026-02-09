@@ -18,12 +18,10 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_repair_flutter/json_repair_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-/// 单个产品条目（一行数据）
 class ProductDraftItem {
   final Map<String, String> data;
-  // --- 新增：业务 ID 字段 ---
+
   final int? productId;
   final int? supplyQuoteId;
   final int? quotationSampleId;
@@ -50,22 +48,6 @@ class ProductDraftItem {
       quotationSampleId: quotationSampleId ?? this.quotationSampleId,
     );
   }
-
-  // 修改持久化逻辑
-  Map<String, dynamic> toJson() => {
-        'data': data,
-        'productId': productId,
-        'supplyQuoteId': supplyQuoteId,
-        'quotationSampleId': quotationSampleId,
-      };
-
-  factory ProductDraftItem.fromJson(Map<String, dynamic> json) =>
-      ProductDraftItem(
-        data: Map<String, String>.from(json['data']),
-        productId: json['productId'],
-        supplyQuoteId: json['supplyQuoteId'],
-        quotationSampleId: json['quotationSampleId'],
-      );
 }
 
 class ImageProductGroup {
@@ -94,23 +76,6 @@ class ImageProductGroup {
       isExpanded: isExpanded ?? this.isExpanded,
     );
   }
-
-  // --- 新增：持久化 ---
-  Map<String, dynamic> toJson() => {
-        'media': media.toJson(),
-        'products': products.map((e) => e.toJson()).toList(),
-        'isExpanded': isExpanded,
-      };
-
-  factory ImageProductGroup.fromJson(Map<String, dynamic> json) =>
-      ImageProductGroup(
-        media: TemporaryMedia.fromJson(json['media']),
-        products: (json['products'] as List)
-            .map((e) => ProductDraftItem.fromJson(e))
-            .toList(),
-        isExpanded: json['isExpanded'] ?? true,
-        isRecognizing: false, // 重启后默认不处于识别状态
-      );
 }
 
 class ProductAiAddState {
@@ -142,38 +107,9 @@ class ProductAiAddState {
 }
 
 class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
-  static const String _kStorageKey = 'product_ai_notepad_draft'; // 存储Key
-
   @override
   ProductAiAddState build() {
-    _loadDraft(); // 初始化时加载
     return ProductAiAddState();
-  }
-
-  // --- 新增：持久化读写 ---
-  Future<void> _loadDraft() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonStr = prefs.getString(_kStorageKey);
-      if (jsonStr != null && jsonStr.isNotEmpty) {
-        final List<dynamic> decoded = jsonDecode(jsonStr);
-        final loadedGroups =
-            decoded.map((e) => ImageProductGroup.fromJson(e)).toList();
-        state = state.copyWith(groups: loadedGroups);
-      }
-    } catch (e) {
-      debugPrint('加载草稿失败: $e');
-    }
-  }
-
-  Future<void> _saveDraft() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonStr = jsonEncode(state.groups.map((e) => e.toJson()).toList());
-      await prefs.setString(_kStorageKey, jsonStr);
-    } catch (e) {
-      debugPrint('保存草稿失败: $e');
-    }
   }
 
   void changeTemplate(String templateId) {
@@ -186,7 +122,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newList = List<ImageProductGroup>.from(state.groups);
     newList.removeAt(index);
     state = state.copyWith(groups: newList);
-    _saveDraft(); // 保存
   }
 
   void removeProduct(int groupIndex, int productIndex) {
@@ -200,7 +135,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
     groups[groupIndex] = group.copyWith(products: newProducts);
     state = state.copyWith(groups: groups);
-    _saveDraft(); // 保存
   }
 
   Future<void> uploadAndRecognize(
@@ -225,7 +159,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       );
 
       state = state.copyWith(groups: [...state.groups, newGroup]);
-      _saveDraft();
 
       // 3. 立即为这张图开启独立的 SSE 识别任务，不等待其他图片
       _startSingleImageSse(taskId, media);
@@ -373,7 +306,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         return group;
       }).toList(),
     );
-    _saveDraft(); // 最终保存一次
   }
 
   void toggleGroupExpand(int groupIndex) {
@@ -382,7 +314,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final group = newGroups[groupIndex];
     newGroups[groupIndex] = group.copyWith(isExpanded: !group.isExpanded);
     state = state.copyWith(groups: newGroups);
-    _saveDraft(); // 保存折叠状态
   }
 
   void updateCell(int groupIndex, int productIndex, String key, String value) {
@@ -397,7 +328,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     final newGroups = List<ImageProductGroup>.from(state.groups);
     newGroups[groupIndex] = group.copyWith(products: newProducts);
     state = state.copyWith(groups: newGroups);
-    _saveDraft(); // 保存修改内容
   }
 
   Future<bool> submitProducts(int? quoteId, String? supplierId) async {
@@ -452,8 +382,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
   void clear() async {
     state = ProductAiAddState();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kStorageKey); // 清除本地缓存
   }
 }
 
