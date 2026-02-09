@@ -140,7 +140,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   Future<void> uploadAndRecognize(
       File file, WidgetRef ref, int? quoteId, String? supplierId) async {
     try {
+      EasyLoading.show(status: '上传中...');
       final media = await upload(file: file);
+      EasyLoading.dismiss();
       final initialPath = media.thumbUrl ?? ''; // 记录初始路径作为 ID
 
       final newItem = ProductDraftItem(
@@ -150,8 +152,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
       state = state.copyWith(items: [...state.items, newItem]);
       _startIndividualSse(initialPath, media, quoteId, supplierId);
-    } catch (e) {
-      debugPrint("Upload Error: $e");
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 
