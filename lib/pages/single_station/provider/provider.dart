@@ -2,13 +2,14 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
 import 'package:cloud/models/single_station/single_station_item.dart';
 import 'package:cloud/models/single_station/single_station_products.dart';
+import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/services/single_station.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'provider.g.dart';
 
 /// 独立站列表状态
-class SingleStationState {
+class SingleStationState implements MuListState {
   const SingleStationState({
     this.list = const [],
     this.isLoading = false,

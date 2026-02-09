@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/exchange.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_page.dart';
@@ -9,96 +10,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:async';
 
-/// 国家到语言的映射
-/// 返回小写的语言代码（用于翻译 API）
-String? _mapCountryToLanguage(String? country) {
-  if (country == null || country.isEmpty) return null;
-
-  final countryLower = country.toLowerCase();
-
-  // 英语国家
-  if (countryLower.contains('美国') ||
-      countryLower.contains('united states') ||
-      countryLower.contains('usa') ||
-      countryLower.contains('uk') ||
-      countryLower.contains('united kingdom') ||
-      countryLower.contains('英国') ||
-      countryLower.contains('canada') ||
-      countryLower.contains('加拿大') ||
-      countryLower.contains('australia') ||
-      countryLower.contains('澳大利亚') ||
-      countryLower.contains('new zealand') ||
-      countryLower.contains('新西兰')) {
-    return 'en';
-  }
-
-  // 日语国家
-  if (countryLower.contains('japan') || countryLower.contains('日本')) {
-    return 'ja';
-  }
-
-  // 西班牙语国家
-  if (countryLower.contains('spain') ||
-      countryLower.contains('西班牙') ||
-      countryLower.contains('mexico') ||
-      countryLower.contains('墨西哥') ||
-      countryLower.contains('argentina') ||
-      countryLower.contains('阿根廷') ||
-      countryLower.contains('chile') ||
-      countryLower.contains('智利') ||
-      countryLower.contains('colombia') ||
-      countryLower.contains('哥伦比亚') ||
-      countryLower.contains('peru') ||
-      countryLower.contains('秘鲁')) {
-    return 'es';
-  }
-
-  // 葡萄牙语国家
-  if (countryLower.contains('portugal') ||
-      countryLower.contains('葡萄牙') ||
-      countryLower.contains('brazil') ||
-      countryLower.contains('巴西')) {
-    return 'pt';
-  }
-
-  // 俄语国家
-  if (countryLower.contains('russia') ||
-      countryLower.contains('俄罗斯') ||
-      countryLower.contains('russian')) {
-    return 'ru';
-  }
-
-  // 法语国家
-  if (countryLower.contains('france') ||
-      countryLower.contains('法国') ||
-      countryLower.contains('belgium') ||
-      countryLower.contains('比利时') ||
-      countryLower.contains('switzerland') && countryLower.contains('french') ||
-      (countryLower.contains('canada') && countryLower.contains('quebec'))) {
-    return 'fr';
-  }
-
-  // 德语国家
-  if (countryLower.contains('germany') ||
-      countryLower.contains('德国') ||
-      countryLower.contains('austria') ||
-      countryLower.contains('奥地利') ||
-      countryLower.contains('switzerland') ||
-      countryLower.contains('瑞士')) {
-    return 'de';
-  }
-
-  // 默认返回英语
-  return 'en';
-}
 
 /// 获取翻译目标语言
 String _getTranslationLanguage(String? quoteLanguage, String? customerCountry) {
   if (quoteLanguage != null && quoteLanguage.isNotEmpty) {
     return quoteLanguage.toLowerCase();
   }
-  final countryLanguage = _mapCountryToLanguage(customerCountry);
-  return countryLanguage ?? 'en';
+  final countryLanguage = mapCountryToLanguage(customerCountry);
+  return countryLanguage?['value'] ?? 'en';
 }
 
 @RoutePage()

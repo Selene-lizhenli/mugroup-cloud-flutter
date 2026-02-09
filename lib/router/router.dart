@@ -47,6 +47,10 @@ class AppRouter extends RootStackRouter {
         path: '/purchase_assist',
       ),
       AutoRoute(
+        page: BatchImageSearchResultRoute.page,
+        path: '/purchase_assist/batch_image_search_result',
+      ),
+      AutoRoute(
         page: InquiryMessageRoute.page,
         path: '/single_station/inquiry_message',
       ),

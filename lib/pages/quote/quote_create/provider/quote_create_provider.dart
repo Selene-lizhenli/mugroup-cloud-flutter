@@ -17,13 +17,11 @@ class QuoteCreateState {
   final String? customer; // 最终选中的客户
   final String? contact; // 联系人id
   final LanguageItem? language;
-  final String currency;
+  final String? currency;
 
   final DateTime quoteDate;
-  final String rate;
-  final String addPercentage;
-
-  final bool draftSaved;
+  final String? rate; 
+ 
   final bool submitting; 
   // ================= 客户选择  =================
 
@@ -39,12 +37,11 @@ class QuoteCreateState {
   QuoteCreateState({ 
     this.customer,
     this.contact, // 联系人id
-    this.language = const LanguageItem(name: '英语(EN)', code: 'EN'),
-    this.currency = '美元 (USD)',
+    this.language  ,
+    this.currency ,
     DateTime? quoteDate,
-    this.rate = '1.00000',
-    this.addPercentage = '0', 
-    this.draftSaved = false,
+    this.rate,  
+    // this.rate = '1.00000',  
     this.submitting = false,
 
     // customer select
@@ -63,10 +60,8 @@ class QuoteCreateState {
     String? contact,
     LanguageItem? language,
     String? currency,
-    DateTime? quoteDate,
-    String? addPercentage,
-    String? rate,
-    bool? draftSaved,
+    DateTime? quoteDate, 
+    String? rate, 
     bool? submitting,
 
     // customer select
@@ -84,9 +79,7 @@ class QuoteCreateState {
       language: language ?? this.language,
       currency: currency ?? this.currency,
       quoteDate: quoteDate ?? this.quoteDate,
-      rate: rate ?? this.rate,
-      addPercentage: addPercentage ?? this.addPercentage,
-      draftSaved: draftSaved ?? this.draftSaved,
+      rate: rate ?? this.rate,  
       submitting: submitting ?? this.submitting,
       customers: customers ?? this.customers,
       customerKeyword: customerKeyword ?? this.customerKeyword,
@@ -142,9 +135,7 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
     state = state.copyWith(rate: value);
   }
 
-  void setAddPercentage(String value) {
-    state = state.copyWith(addPercentage: value);
-  }
+ 
 
 //===================== 搜索客户  =================
   Future<void> loadCustomers() async {
@@ -178,9 +169,7 @@ class QuoteCreateNotifier extends StateNotifier<QuoteCreateState> {
       language: state.language,
       currency: state.currency,
       quoteDate: state.quoteDate,
-      rate: state.rate,
-      addPercentage: state.addPercentage, 
-      draftSaved: state.draftSaved,
+      rate: state.rate,  
       submitting: state.submitting,
       customers: state.customers,
       customerKeyword: state.customerKeyword,

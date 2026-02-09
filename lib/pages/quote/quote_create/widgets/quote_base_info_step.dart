@@ -1,21 +1,93 @@
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
+import 'package:cloud/models/dashboard/exchange.dart';
+import 'package:cloud/pages/quote/quote_create/quote_country_defaults.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_contact_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_currency_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_customer_sheet.dart';
 import 'package:cloud/pages/quote/quote_create/widgets/select_language_sheet.dart';
-import 'package:flutter/material.dart'; 
+import 'package:cloud/providers/exchange.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart'; 
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class QuoteBaseInfoStep extends HookConsumerWidget {
   const QuoteBaseInfoStep({
     super.key,
   });
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) { 
-    final state = ref.watch(quoteCreateProvider);
+  /// 根据选中客户 & 汇率数据，自动设置语言、币别、汇率
+  void _applyAutoSettings({
+    required WidgetRef ref,
+    required QuoteCreateState state,
+    required AsyncValue<List<ExchangeRate>> exchangeAsync,
+  }) {
     final notifier = ref.read(quoteCreateProvider.notifier);
+    final company = state.selectedCustomers;
+    final rates = exchangeAsync.value;
+    if (company == null ||
+        company.location == null ||
+        company.location!.trim().isEmpty) {
+      // 没有可用的客户位置信息时，使用默认：英语 + 美金
+      ExchangeRate? usdRate;
+      if (rates != null && rates.isNotEmpty) {
+        for (final r in rates) {
+          if ((r.shortName ?? '').toUpperCase() == 'USD') {
+            usdRate = r;
+            break;
+          }
+        }
+      }
+      final usdExchangeRate = usdRate?.exchangeRate ?? '';
+      notifier.setCurrencyWithRate('USD', usdExchangeRate);
+      notifier.setLanguage(const LanguageItem(name: '英语', code: 'EN'));
+      return;
+    }
+
+    if (rates == null || rates.isEmpty) return;
+
+    final data = findRateByCustomerLocation(company.location, rates);
+    final rate = data?['rate'] as ExchangeRate?;
+    final language = data?['language']
+        as Map<String, String?>?; // {"value": "en", "lable": "英语"}
+
+    if (rate != null) {
+      notifier.setCurrencyWithRate(
+        rate.shortName ?? '',
+        rate.exchangeRate ?? '',
+      );
+    }
+
+    if (language != null) {
+      final name = language['lable'] ?? '';
+      final code = (language['value'] ?? '').toUpperCase();
+      if (name.isNotEmpty && code.isNotEmpty) {
+        notifier.setLanguage(LanguageItem(name: name, code: code));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(quoteCreateProvider);
+    final exchangeAsync = ref.watch(exchangeProvider);
+
+    // 监听客户选择变化，自动匹配语言 & 货币 & 汇率
+    ref.listen<QuoteCreateState>(quoteCreateProvider, (previous, next) {
+      final prevCompany = previous?.selectedCustomers;
+      final nextCompany = next.selectedCustomers;
+
+      // 只有当选中客户（id 或 location）发生变化时才自动匹配，避免死循环
+      final sameId = prevCompany?.id == nextCompany?.id;
+      if (sameId) {
+        return;
+      }
+
+      _applyAutoSettings(
+        ref: ref,
+        state: next,
+        exchangeAsync: exchangeAsync,
+      );
+    });
 
     return SingleChildScrollView(
       child: Column(
@@ -56,17 +128,13 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  // const FormDateTimeField(
-                  //   requiredField: false,
-                  //   label: '报价日期',
-                  // ),
                   Row(
                     children: [
                       Expanded(
                         child: FormSelectField(
                           label: '选择语言',
                           required: false,
-                          value: state.language?.name ?? '',
+                          value: state.language?.name ?? '请选择语言',
                           onTap: () => {
                             showModalBottomSheet(
                               context: context,
@@ -77,12 +145,15 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+                    ],
+                  ),
+                  Row(
+                    children: [
                       Expanded(
                         child: FormSelectField(
                           label: '选择货币',
                           required: false,
-                          value: state.currency,
+                          value: state.currency ?? '请选择货币',
                           onTap: () => showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -91,26 +162,15 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FormInputField(
-                          label: '报价单加点 (%)',
-                          requiredField: false,
-                          value: state.addPercentage ?? '0.0',
-                          onChanged: (value) =>
-                              notifier.setAddPercentage(value),
-                        ),
-                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: FormInputField(
                           label: '汇率',
-                          value: state.rate,
+                          value: state.rate ?? '请选择汇率',
                           requiredField: false,
-                          onChanged: (value) => notifier.setRate(value),
+                          onChanged: (value) => ref
+                              .read(quoteCreateProvider.notifier)
+                              .setRate(value),
                         ),
                       ),
                     ],
@@ -125,8 +185,6 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
       ),
     );
   }
-
-  // ================= UI components =================
 
   Widget _sectionTitle(String text) {
     return Padding(
@@ -151,15 +209,6 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _fieldLabel(String text, bool required) {
-    return Row(
-      children: [
-        if (required) const Text('* ', style: TextStyle(color: Colors.red)),
-        Text(text, style: const TextStyle(fontSize: 13)),
-      ],
     );
   }
 }

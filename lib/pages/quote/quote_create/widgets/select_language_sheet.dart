@@ -26,6 +26,14 @@ const List<LanguageItem> _languages = [
   LanguageItem(name: '德语(DE)', code: 'DE'),
 ];
 
+/// 根据语言代码获取 LanguageItem，用于按国家自动设置语言
+LanguageItem? getLanguageByCode(String code) {
+  for (final e in _languages) {
+    if (e.code == code) return e;
+  }
+  return null;
+}
+
 class SelectLanguageSheet extends ConsumerWidget {
   const SelectLanguageSheet({super.key});
 
@@ -79,8 +87,7 @@ class SelectLanguageSheet extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final item = languages[index];
                   final selected = state.language != null &&
-                      state.language?.code == item.code;
-
+                      state.language?.code == item.code; 
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     title: Text(item.name),

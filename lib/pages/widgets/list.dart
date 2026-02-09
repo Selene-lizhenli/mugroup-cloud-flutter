@@ -1,5 +1,4 @@
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
-import 'package:cloud/pages/single_station/provider/provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -8,10 +7,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+/// 列表状态接口，供 MuListView 复用（如独立站、比价助手、批量图搜等）
+abstract class MuListState {
+  bool get isLoading;
+  String? get errorMessage;
+  bool get hasMore;
+}
+
 /// 可复用的列表组件
 class MuListView<T> extends HookWidget {
-  
-  final SingleStationState state;
+  final MuListState state;
   final List<T> list;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final Future<void> Function() onRefresh;
