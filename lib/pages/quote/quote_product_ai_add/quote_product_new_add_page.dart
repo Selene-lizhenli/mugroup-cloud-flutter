@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_floor_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_notepad_page.dart';
+import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -83,7 +85,21 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
           surfaceTintColor: Colors.transparent,
           bottom: tabBar,
         ),
-        body: tabBarView,
+        body: PopScope(
+          onPopInvoked: (didPop) {
+            if (didPop) {
+              // 当用户通过侧滑手势或系统返回键退出时，也发送刷新信号
+              ref
+                  .read(quotePageRefreshTrigger.notifier)
+                  .update((state) => state + 1);
+
+                  ref
+                  .read(quotePageProductRefresh.notifier)
+                  .update((state) => state + 1);
+            }
+          },
+          child: tabBarView,
+        ),
       );
     }
   }

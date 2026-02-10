@@ -20,6 +20,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cloud/helper/helper.dart';
 
+final quotePageProductRefresh = StateProvider.autoDispose<int>((ref) => 0);
+
 class ProductDraftItem {
   final Map<String, dynamic> data;
   final dynamic media;
@@ -124,8 +126,7 @@ class QuoteProductListPage extends HookConsumerWidget {
           return true;
         }).toList();
 
-        //展示倒序
-        products.value = mappedItems.reversed.toList();
+        products.value = mappedItems;
         hasMore.value = false;
       } catch (e) {
         logger.e("加载列表失败: $e");
@@ -175,6 +176,15 @@ class QuoteProductListPage extends HookConsumerWidget {
             .push(QuoteProductNewAddRoute(quoteId: qId, supplierId: sId));
       }
     }
+
+    ref.listen(quotePageProductRefresh, (previous, next) async {
+      if (next > 0) {
+        debugPrint("模拟重新进入页面2222...");
+
+        // 1. 执行主列表刷新
+        await fetchProducts(isRefresh: true);
+      }
+    });
 
     // 5. UI 构建逻辑
     Widget buildRecognizeTab(List<TemplateOption> templates) {

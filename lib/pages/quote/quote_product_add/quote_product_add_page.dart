@@ -5,6 +5,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -13,7 +14,6 @@ import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/spacing_row.dart';
-import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -1141,8 +1141,7 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                           submitValues["purchase_cost"],
                                       "deliver_day":
                                           submitValues["deliver_day"],
-                                      "moq":
-                                          submitValues["moq"],
+                                      "moq": submitValues["moq"],
                                       "customer_price":
                                           submitValues["customer_price"],
                                       "customer_qty":
@@ -1216,6 +1215,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                     }
                                   } else {
                                     if (context.mounted) {
+                                      ref
+                                          .read(
+                                              quotePageRefreshTrigger.notifier)
+                                          .update((state) => state + 1);
                                       Navigator.of(context).pop(true);
                                     }
                                   }

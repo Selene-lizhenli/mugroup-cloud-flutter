@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_new_add_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_list_page.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
@@ -17,6 +16,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// 使用 AutoDispose 保证页面销毁时重置，使用自增数字触发逻辑
+final quotePageRefreshTrigger = StateProvider.autoDispose<int>((ref) => 0);
 
 @RoutePage()
 class QuotePage extends HookConsumerWidget {
@@ -156,6 +158,21 @@ class QuotePage extends HookConsumerWidget {
       return () => searchController.removeListener(onSearchChanged);
     }, []);
 
+    ref.listen(quotePageRefreshTrigger, (previous, next) async {
+      if (next > 0) {
+        // 这里模拟“重新进入”：清空旧数据或直接重新请求
+        debugPrint("模拟重新进入页面...");
+
+        // 1. 执行主列表刷新
+        await fetchData();
+
+        // 2. 如果有展开项，也刷新产品明细
+        if (activeQuoteId.value != null && selectedSupplierId.value != null) {
+          await fetchActiveProducts();
+        }
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -178,6 +195,7 @@ class QuotePage extends HookConsumerWidget {
           }
         },
         child: SingleChildScrollView(
+          key: const PageStorageKey('quote_page_scroll'),
           controller: scrollController,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(
