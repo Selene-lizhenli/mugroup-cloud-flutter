@@ -50,10 +50,8 @@ class SelectCurrencySheet extends HookConsumerWidget {
       final rateValue = double.tryParse(rateStr) ?? 0.0;
       if (rateValue == 0.0) {
         return '0';
-      }
-      // 除以100并格式化为5位小数
-      final convertedRate = rateValue / 100.0;
-      return convertedRate.toStringAsFixed(4);
+      } 
+      return rateValue.toStringAsFixed(4);
     }
 
     return Container(

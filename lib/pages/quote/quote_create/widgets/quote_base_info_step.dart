@@ -166,7 +166,7 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       Expanded(
                         child: FormInputField(
                           label: '汇率',
-                          value: state.rate ?? '请选择汇率',
+                          value: state.rate ?? '',
                           requiredField: false,
                           onChanged: (value) => ref
                               .read(quoteCreateProvider.notifier)
