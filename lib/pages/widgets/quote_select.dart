@@ -147,11 +147,7 @@ class QuoteSelect extends HookConsumerWidget {
           Expanded(
             child: isLoading.value
                 ? const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: MuProgressIndicator(barWidth: 2),
-                    ),
+                    child: MuProgressIndicator(showText: true,text: '加载中...',),
                   )
                 : (quotes.value == null || quotes.value!.isEmpty)
                     ? Center(
