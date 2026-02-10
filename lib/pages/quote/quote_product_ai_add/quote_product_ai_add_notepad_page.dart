@@ -546,7 +546,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     required WidgetRef ref,
   }) {
     return SizedBox(
-      height: 82,
+      height: 92,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -614,7 +614,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                       if (!isSelected) onSelect(t.id);
                     },
                     child: SizedBox(
-                        width: 80,
+                        width: 90,
                         child: ProductUploadZone(
                           width: 90,
                           height: 90,
