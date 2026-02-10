@@ -173,6 +173,7 @@ flutter:
     - assets/logo.webp
     - assets/splash.png 
     - assets/icons/wxwork.svg
+    - assets/icons/email.svg
     - assets/element/empty.png 
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
@@ -201,6 +202,17 @@ flutter:
     - assets/mu/message_blue.png
     - assets/mu/all_category_blue.png
     - assets/mu/all_category_pink.png
+    - assets/mu/yijian_pink.png
+    - assets/mu/yijian_blue.png
+    - assets/mu/xinyuan_blue.png 
+    - assets/mu/xinyuan_list_blue.png 
+    - assets/mu/xinyuan_list_pink.png 
+    - assets/mu/whs_mag_pink.png 
+    - assets/mu/whs_mag_blue.png 
+
+    
+    
+    
     
     
 

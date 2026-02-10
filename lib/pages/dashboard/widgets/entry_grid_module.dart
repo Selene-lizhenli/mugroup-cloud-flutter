@@ -79,8 +79,25 @@ class EntryGridModule extends ConsumerWidget {
         iconSize: 26,
         route: const PurchaseAssistRoute(),
       ),
+      _EntryConfig(
+        id: EntryFeatures.warehouseManage.id,
+        label: EntryFeatures.warehouseManage.title,
+        iconAsset: 'whs_mag',
+        iconSize: 24,
+        route: const AdviceCollectRoute(),
+      ),
     ];
   }
+
+  static List<_EntryConfig> openedEntry = [
+    _EntryConfig(
+      id: EntryFeatures.adviceCollect.id,
+      label: EntryFeatures.adviceCollect.title,
+      iconAsset: 'xinyuan_list',
+      iconSize: 25,
+      route: const AdviceCollectRoute(),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,6 +113,8 @@ class EntryGridModule extends ConsumerWidget {
     // 只保留当前有权限的入口
     final visibleEntries =
         allEntries.where((e) => permissionBools[e.id] ?? false).toList();
+    // 追加强制开放的入口（不受权限控制）
+    visibleEntries.addAll(openedEntry);
 
     if (visibleEntries.isEmpty) {
       return Container(

@@ -17,15 +17,20 @@ class EntryFeatures {
       EntryFeature('crm_company', '客户', 'crm.company.show');
   static const supplySupplier =
       EntryFeature('supply_supplier', '供应商', 'supply.suppliers.show');
-  static const ecommerceProductComparison =
-      EntryFeature('ecommerce_product_comparison', '采购助手',
-          'showroom.product_comparison.show');
+  static const ecommerceProductComparison = EntryFeature(
+      'ecommerce_product_comparison',
+      '采购助手',
+      'showroom.product_comparison.show');
   static const marketPurchase =
       EntryFeature('market_purchase', '市场带客', 'showroom.market_product.show');
   static const independentWebsite =
       EntryFeature('showroom_station', '独立站', 'showroom.station.show');
   static const inspection =
       EntryFeature('inspection', '验货', 'inspection.task.show');
+  static const adviceCollect =
+      EntryFeature('advice_collect', '意见采集', 'advice.collect');
+  static const warehouseManage =
+      EntryFeature('warehouse_manage', '仓库管理', 'wms.warehouse.show');
 
   static const values = [
     showroomSample,
@@ -33,7 +38,7 @@ class EntryFeatures {
     supplySupplier,
     ecommerceProductComparison,
     marketPurchase,
-    independentWebsite, 
+    independentWebsite,
     inspection,
   ];
 
