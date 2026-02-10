@@ -248,73 +248,107 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                               ),
                             ),
 
-                            // 产品名称区域
+                            // 产品名称 & 规格区域 (规格在市场模式下移到右边)
                             Container(
                               color: Colors.white,
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0, vertical: 6),
-                              child: Text(
-                                sample.value!.nameCn ?? '',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(height: 12), // 添加间隔
-                            // 其他信息区域
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 16.0),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                  horizontal: 12.0, vertical: 8),
+                              child: Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start, // 顶部对齐
                                 children: [
-                                  Text(
-                                    '规格: ${sample.value!.spec}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                  Expanded(
+                                    child: Text(
+                                      sample.value!.nameCn ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    '分类: ${sample.value!.category?.name ?? '未知'}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+
+                                  // 如果是 market_product 类型，显示规格在右边
+                                  if (sample.value!.itemType ==
+                                      'market_product') ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.3),
+                                      child: Text(
+                                        sample.value!.spec ?? '未知',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    '条形码: ${sample.value!.barcode ?? '未知'}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+                                  ],
                                 ],
                               ),
                             ),
+                            if (sample.value!.itemType != 'market_product')
+                              const SizedBox(height: 12),
+
+                            // 2. 其他信息区域 (非 market_product 类型才显示)
+                            if (sample.value!.itemType != 'market_product')
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 16.0),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '规格: ${sample.value!.spec}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '分类: ${sample.value!.category?.name ?? '未知'}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '条形码: ${sample.value!.barcode ?? '未知'}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             const SliverToBoxAdapter(
                                 child: SizedBox(height: 12)),
                             // 工厂报价
