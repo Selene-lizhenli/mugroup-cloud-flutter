@@ -844,43 +844,51 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                     EditDialog.show(context,
                                         title: colConfig.label,
                                         initialText: text == '-' ? '' : text,
+                                        validator: (value) {
+                                          if (value.trim().isEmpty) {
+                                            return '${colConfig.label}不能为空';
+                                          }
+
+                                          if (isNumberField) {
+                                            // 使用正则匹配数字（支持整数和小数）
+                                            final reg =
+                                                RegExp(r'^\d+(\.\d+)?$');
+                                            if (!reg.hasMatch(value)) {
+                                              return '请输入正确的数字格式'; // 这里返回错误提示语
+                                            }
+                                          }
+                                          return null; // 返回 null 表示校验通过
+                                        },
                                         keyboardType: isNumberField
                                             ? const TextInputType
                                                 .numberWithOptions(
                                                 decimal: true)
                                             : TextInputType.text,
-                                        validator: (value) {
-                                      if (isNumberField && value.isNotEmpty) {
-                                        final reg = RegExp(r'^\d+(\.\d+)?$');
-                                        if (!reg.hasMatch(value)) {
-                                          return '请输入有效的数字';
-                                        }
-                                      }
-                                      return null;
-                                    }, onConfirm: (newText) async {
-                                      logger.d(product.productId);
-                                      logger.d(product.supplyQuoteId);
-                                      if (product.productId != null ||
-                                          product.supplyQuoteId != null) {
-                                        EasyLoading.show(status: '正在同步...');
-                                        final success = await updateRemoteField(
-                                          fieldKey: colConfig.key,
-                                          value: newText,
-                                          productId: product.productId,
-                                          supplyQuoteId: product.supplyQuoteId,
-                                        );
-                                        if (success) {
-                                          EasyLoading.showSuccess('同步成功');
-                                          controller.updateCell(
-                                              groupIndex,
-                                              productIndex,
-                                              colConfig.key,
-                                              newText);
-                                        } else {
-                                          EasyLoading.showError('远程同步失败');
-                                        }
-                                      }
-                                    });
+                                        onConfirm: (newText) async {
+                                          logger.d(product.productId);
+                                          logger.d(product.supplyQuoteId);
+                                          if (product.productId != null ||
+                                              product.supplyQuoteId != null) {
+                                            final success =
+                                                await updateRemoteField(
+                                              fieldKey: colConfig.key,
+                                              value: newText,
+                                              productId: product.productId,
+                                              supplyQuoteId:
+                                                  product.supplyQuoteId,
+                                            );
+                                            if (success) {
+                                              EasyLoading.showSuccess('编辑成功');
+                                              controller.updateCell(
+                                                  groupIndex,
+                                                  productIndex,
+                                                  colConfig.key,
+                                                  newText);
+                                            } else {
+                                              EasyLoading.showError('编辑失败');
+                                            }
+                                          }
+                                        });
                                   },
                                   child: Container(
                                       constraints:

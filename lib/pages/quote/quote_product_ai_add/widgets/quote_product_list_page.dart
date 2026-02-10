@@ -395,27 +395,49 @@ class QuoteProductListPage extends HookConsumerWidget {
                         padding: const EdgeInsets.only(right: 8),
                         child: InkWell(
                           onTap: () {
-                            final bool isNumber = {
+                            const numberKeys = {
                               'purchase_cost',
                               'outer_capacity',
-                              'outer_volume'
-                            }.contains(col.key);
+                              'outer_volume',
+                              'inner_capacity', // 建议把相关的都加上
+                              'weight',
+                              'moq',
+                            };
+
+                            final bool isNumberField =
+                                numberKeys.contains(col.key);
+
                             EditDialog.show(context,
                                 title: col.label,
                                 initialText: isEmpty ? '' : text,
-                                keyboardType: isNumber
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return '${col.label}不能为空';
+                                  }
+
+                                  if (isNumberField) {
+                                    // 使用正则匹配数字（支持整数和小数）
+                                    final reg = RegExp(r'^\d+(\.\d+)?$');
+                                    if (!reg.hasMatch(value)) {
+                                      return '请输入正确的数字格式'; // 这里返回错误提示语
+                                    }
+                                  }
+                                  return null; // 返回 null 表示校验通过
+                                },
+                                keyboardType: isNumberField
                                     ? const TextInputType.numberWithOptions(
                                         decimal: true)
-                                    : TextInputType.text, onConfirm: (v) async {
-                              final success = await updateRemoteField(
-                                  fieldKey: col.key, value: v);
-                              if (!success) {
-                                EasyLoading.showError('编辑失败');
-                                return;
-                              }
-                              EasyLoading.showSuccess('编辑成功');
-                              onUpdate(col.key, v);
-                            });
+                                    : TextInputType.text,
+                                onConfirm: (v) async {
+                                  final success = await updateRemoteField(
+                                      fieldKey: col.key, value: v);
+                                  if (!success) {
+                                    EasyLoading.showError('编辑失败');
+                                    return;
+                                  }
+                                  EasyLoading.showSuccess('编辑成功');
+                                  onUpdate(col.key, v);
+                                });
                           },
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

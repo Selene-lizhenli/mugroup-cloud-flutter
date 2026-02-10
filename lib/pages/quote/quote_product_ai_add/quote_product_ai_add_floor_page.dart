@@ -702,33 +702,40 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                             EditDialog.show(context,
                                 title: col.label,
                                 initialText: isEmpty ? '' : text,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return '${col.label}不能为空';
+                                  }
+
+                                  if (isNumberField) {
+                                    // 使用正则匹配数字（支持整数和小数）
+                                    final reg = RegExp(r'^\d+(\.\d+)?$');
+                                    if (!reg.hasMatch(value)) {
+                                      return '请输入正确的数字格式'; // 这里返回错误提示语
+                                    }
+                                  }
+                                  return null; // 返回 null 表示校验通过
+                                },
                                 keyboardType: isNumberField
                                     ? const TextInputType.numberWithOptions(
                                         decimal: true)
-                                    : TextInputType.text, validator: (value) {
-                              if (isNumberField && value.isNotEmpty) {
-                                final reg = RegExp(r'^\d+(\.\d+)?$');
-                                if (!reg.hasMatch(value)) {
-                                  return '请输入有效的数字';
-                                }
-                              }
-                              return null;
-                            }, onConfirm: (v) async {
-                              final success = await updateRemoteField(
-                                fieldKey: col.key,
-                                value: v,
-                              );
+                                    : TextInputType.text,
+                                onConfirm: (v) async {
+                                  final success = await updateRemoteField(
+                                    fieldKey: col.key,
+                                    value: v,
+                                  );
 
-                              if (!success) {
-                                EasyLoading.showError('编辑失败，请重试');
+                                  if (!success) {
+                                    EasyLoading.showError('编辑失败，请重试');
 
-                                return;
-                              }
+                                    return;
+                                  }
 
-                              // ✅ 远端成功后，再更新本地 UI
-                              EasyLoading.showSuccess('编辑成功');
-                              onUpdate(col.key, v);
-                            });
+                                  // ✅ 远端成功后，再更新本地 UI
+                                  EasyLoading.showSuccess('编辑成功');
+                                  onUpdate(col.key, v);
+                                });
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
