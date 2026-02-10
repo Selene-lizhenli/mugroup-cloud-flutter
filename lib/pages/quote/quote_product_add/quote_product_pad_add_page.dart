@@ -5,6 +5,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
@@ -609,7 +610,12 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
               });
             }
           } else {
-            if (context.mounted) Navigator.of(context).pop(true);
+            if (context.mounted) {
+              ref
+                  .read(quotePageRefreshTrigger.notifier)
+                  .update((state) => state + 1);
+              Navigator.of(context).pop(true);
+            }
           }
         } finally {
           // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
