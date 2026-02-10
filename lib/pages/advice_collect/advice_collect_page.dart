@@ -10,7 +10,7 @@ class AdviceCollectPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('云链里'),
+          title: const Text('待上架页面'),
           elevation: 0,
           foregroundColor: Colors.black,
         ),

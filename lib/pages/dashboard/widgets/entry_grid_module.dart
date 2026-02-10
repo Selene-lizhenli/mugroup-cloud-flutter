@@ -77,7 +77,7 @@ class EntryGridModule extends ConsumerWidget {
         label: EntryFeatures.ecommerceProductComparison.title,
         iconAsset: 'cart',
         iconSize: 26,
-        route: const PurchaseAssistRoute(),
+        route: const AdviceCollectRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.warehouseManage.id,

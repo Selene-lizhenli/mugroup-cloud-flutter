@@ -69,7 +69,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
                   transform: const GradientRotation(
                     gradientAngleDegrees * math.pi / 180,
                   ),
-                  colors: [ 
+                  colors: [
                     Color.lerp(
                       headerColor,
                       colorScheme.surface,
@@ -84,7 +84,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
                       headerColor,
                       colorScheme.surface,
                       0.92,
-                    )!, 
+                    )!,
                     Color.lerp(
                       colorScheme.surface,
                       colorScheme.surfaceTint,
@@ -110,13 +110,16 @@ class PurchaseAssistPage extends HookConsumerWidget {
             right: 0,
             top: paddingTop + kToolbarHeight,
             bottom: 0,
-            child: state.hasSearched
-                ? _SearchResultBody(
-                    state: state,
-                    notifier: notifier,
-                    searchController: searchController,
-                  )
-                : _BigSearchBody(notifier: notifier, state: state),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: state.hasSearched
+                  ? _SearchResultBody(
+                      state: state,
+                      notifier: notifier,
+                      searchController: searchController,
+                    )
+                  : _BigSearchBody(notifier: notifier, state: state),
+            ),
           ),
         ]));
   }
@@ -133,42 +136,39 @@ class _BigSearchBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.center,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 平台标签：横向排列，超出可左右滑动
-            TagList(
-              items: searchPlatform,
-              selectedValue: state.selectedPlatform,
-              onSelected: notifier.setSelectedPlatform,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 平台标签：横向排列，超出可左右滑动
+          TagList(
+            items: searchPlatform,
+            selectedValue: state.selectedPlatform,
+            onSelected: notifier.setSelectedPlatform,
+          ),
+          const SizedBox(height: 8),
+          const SearchArea(),
+          if (state.searchImagePaths.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: state.searchImagePaths.map((path) {
+                return Chip(
+                  label: Text(
+                    path.split(Platform.pathSeparator).last,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  onDeleted: () {
+                    notifier.setSearchImagePaths(
+                      state.searchImagePaths.where((p) => p != path).toList(),
+                    );
+                  },
+                );
+              }).toList(),
             ),
-            const SizedBox(height: 8),
-            const SearchArea(),
-            if (state.searchImagePaths.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: state.searchImagePaths.map((path) {
-                  return Chip(
-                    label: Text(
-                      path.split(Platform.pathSeparator).last,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onDeleted: () {
-                      notifier.setSearchImagePaths(
-                        state.searchImagePaths.where((p) => p != path).toList(),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -265,7 +265,7 @@ class SearchArea extends HookConsumerWidget {
                 icon: const Icon(Icons.filter_alt_outlined,
                     color: Colors.black87),
                 tooltip: '筛选',
-                onPressed: () => openCamera(),
+                onPressed: () => {},
               ),
               const Spacer(),
               IconButton(
@@ -309,57 +309,22 @@ class _SearchResultBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // 平台标签：横向滑动
-        Material(
-          color: theme.colorScheme.surface,
-          child: TagList(
-            items: searchPlatform,
-            selectedValue: state.selectedPlatform,
-            onSelected: notifier.setSelectedPlatform,
-            spacing: 8,
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-            fontSize: 12,
-            chipPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          ),
+
+        TagList(
+          items: searchPlatform,
+          selectedValue: state.selectedPlatform,
+          onSelected: notifier.setSelectedPlatform,
+          spacing: 8,
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+          fontSize: 12,
+          chipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         ),
+
         // 顶部收缩的搜索框
-        Material(
-          color: theme.colorScheme.surface,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: searchController,
-                    decoration: const InputDecoration(
-                      hintText: '关键词或图片',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    ),
-                    onChanged: notifier.setSearchKeyword,
-                    onSubmitted: (_) => notifier.loadProducts(refresh: true),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.add_photo_alternate_outlined),
-                  tooltip: '添加图片',
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () => notifier.loadProducts(refresh: true),
-                ),
-              ],
-            ),
-          ),
-        ),
+        const SearchArea(),
         const Divider(height: 1),
         Expanded(
           child: MuListView<PurchaseAssistSearchProduct>(
