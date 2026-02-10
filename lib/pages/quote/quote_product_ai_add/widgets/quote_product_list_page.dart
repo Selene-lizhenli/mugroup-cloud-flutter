@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/media.dart';
+import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
@@ -9,6 +10,7 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flant/components/image_preview.dart';
@@ -43,92 +45,107 @@ class QuoteProductListPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final tabController = useTabController(initialLength: 3, initialIndex: 1);
 
-    // 1. 基础状态
+    // 1. 基础状态：通过 initialValue 初始化，并通过 useEffect 同步
     final selectedQuote = useState<Map<String, dynamic>?>(initialQuote);
     final selectedSupplier = useState<Map<String, dynamic>?>(initialSupplier);
     final isExpandedFloor = useState<bool>(true);
     final currentTemplate = useState<TemplateOption>(kQuoteAiTemplates[0]);
 
+    // 实时同步父组件的变化
+    useEffect(() {
+      selectedQuote.value = initialQuote;
+      return null;
+    }, [initialQuote]);
+
+    useEffect(() {
+      selectedSupplier.value = initialSupplier;
+      return null;
+    }, [initialSupplier]);
+
     // 2. 产品列表分页状态
-    final products = useState<List<ProductDraftItem>>([]);
-    final page = useState<int>(1);
-    const pageSize = 5; // 初始步长
+    final products = useState<List<ProductDraftItem>>(<ProductDraftItem>[]);
     final isLoading = useState<bool>(false);
     final hasMore = useState<bool>(true);
     final scrollController = useScrollController();
 
-    // 3. 加载数据逻辑
     Future<void> fetchProducts({bool isRefresh = false}) async {
-      if (isLoading.value || (!isRefresh && !hasMore.value)) return;
-      isLoading.value = true;
-      if (isRefresh) {
-        page.value = 1;
-        hasMore.value = true;
+      final quoteId = selectedQuote.value?['id'];
+
+      if (quoteId == null) {
+        products.value = <ProductDraftItem>[];
+        isLoading.value = false;
+        hasMore.value = false;
+        return;
       }
 
+      if (isLoading.value && !isRefresh) return;
+      isLoading.value = true;
+
       try {
-        final queryParameters = {
-          "page": page.value,
-          "pageSize": pageSize,
-          "includes": 'supplyQuotes.supplier',
-          "item_type": "market_product",
-        };
+        final resp = await getQuotationProductListByProductId(
+          quoteId,
+          {"page": '1', "pageSize": 1000},
+        );
 
-        // 调用你的 API
-        final resp = await getSamples(queryParameters: queryParameters);
+        if (!context.mounted) return;
 
-        // 将 Sample 转换为 ProductDraftItem
-        final List<ProductDraftItem> newItems = (resp.data ?? []).map((sample) {
-          // 提取供应商报价 ID，假设取第一个
-          final firstQuote = sample.supplyQuotes?.elementAtOrNull(0);
+        final List<dynamic> dataList = resp.data ?? [];
 
-          logger.d(firstQuote);
+        final List<ProductDraftItem> mappedItems =
+            dataList.map<ProductDraftItem>((e) {
+          final item = e is QuotationSample ? e : QuotationSample.fromJson(e);
+          final sample = item.showroomSample;
+          final quote = item.supplyQuote;
 
           return ProductDraftItem(
             data: {
-              'product_id': sample.id,
-              'supply_quote_id': firstQuote?.id,
-              'product_no': sample.productNo,
-              'outer_capacity': firstQuote?.outerCapacity,
-              'description_cn': sample.descriptionCn,
+              'product_id': sample?.id,
+              'supply_quote_id': quote?.id,
+              'product_no': sample?.productNo ?? item.customerProductNo,
               'purchase_cost':
-                  firstQuote?.purchaseCost ?? sample.purchaseCost, // 优先取报价单价格
-              'inner_capacity': firstQuote?.outerCapacity,
-              "packing": sample.packing,
-              "outer_volume": firstQuote?.outerVolume,
+                  item.price ?? quote?.purchaseCost ?? sample?.purchaseCost,
+              'outer_capacity': quote?.outerCapacity,
+              'description_cn': sample?.descriptionCn,
+              'packing': sample?.packing,
+              'outer_volume': quote?.outerVolume,
+              'supplier_id': quote?.supplierId?.toString(),
             },
-            // 映射媒体文件，使用 Sample 里的 cover 逻辑
             media: Media(
-              url: sample.image?.elementAtOrNull(0)?.url ?? '',
-              thumbUrl: sample.cover ?? '',
+              url: sample?.image?.elementAtOrNull(0)?.url ?? '',
+              thumbUrl: sample?.cover ?? '',
             ),
             isRecognizing: false,
           );
+        }).where((item) {
+          if (selectedSupplier.value != null) {
+            final selectedId = selectedSupplier.value!['id']?.toString();
+            return item.data['supplier_id'] == selectedId;
+          }
+          return true;
         }).toList();
 
-        if (isRefresh) {
-          products.value = newItems;
-        } else {
-          products.value = [...products.value, ...newItems];
-        }
-
-        // 根据返回长度判断是否还有下一页
-        hasMore.value = newItems.length == pageSize;
-        page.value++;
+        products.value = mappedItems;
+        hasMore.value = false;
       } catch (e) {
-        EasyLoading.showError("加载数据失败: $e");
+        logger.e("加载列表失败: $e");
+        if (context.mounted) EasyLoading.showError("数据加载失败");
       } finally {
-        isLoading.value = false;
+        if (context.mounted) isLoading.value = false;
       }
     }
 
-    // 4. 初始化加载及滚动监听
+    // 3. 监听关键 ID 变化触发数据加载
     useEffect(() {
       fetchProducts(isRefresh: true);
+      return null;
+    }, [selectedQuote.value?['id'], selectedSupplier.value?['id']]);
+
+    // 滚动监听
+    useEffect(() {
       void listener() {
-        // 滑动到距离底部 200 像素时加载更多
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
+        if (scrollController.hasClients &&
+            scrollController.position.pixels >=
+                scrollController.position.maxScrollExtent - 200) {
           fetchProducts();
         }
       }
@@ -137,15 +154,7 @@ class QuoteProductListPage extends HookConsumerWidget {
       return () => scrollController.removeListener(listener);
     }, []);
 
-    useEffect(() {
-      selectedQuote.value = initialQuote;
-    }, [initialQuote]);
-
-    useEffect(() {
-      selectedSupplier.value = initialSupplier;
-    }, [initialSupplier]);
-
-    // 5. 统一跳转逻辑
+    // 4. 统一跳转与弹窗逻辑
     Future<void> handleNavigation() async {
       if (selectedSupplier.value == null) {
         await _showPreSelectionSheet(
@@ -153,8 +162,6 @@ class QuoteProductListPage extends HookConsumerWidget {
           selectedQuote,
           selectedSupplier,
           onChanged: (quote, supplier) {
-            selectedQuote.value = quote;
-            selectedSupplier.value = supplier;
             onChanged?.call(quote, supplier);
           },
         );
@@ -168,7 +175,7 @@ class QuoteProductListPage extends HookConsumerWidget {
       }
     }
 
-    // 6. 构建识别列表页（白板/记录本通用）
+    // 5. UI 构建逻辑
     Widget buildRecognizeTab(List<TemplateOption> templates) {
       return Container(
         color: Colors.grey[50],
@@ -191,12 +198,12 @@ class QuoteProductListPage extends HookConsumerWidget {
               handleNavigation: handleNavigation,
             ),
             _buildInfoBar(colorScheme),
-            // 产品列表区域
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () => fetchProducts(isRefresh: true),
                 child: ListView.separated(
                   controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   itemCount: products.value.length + 1,
@@ -210,30 +217,26 @@ class QuoteProductListPage extends HookConsumerWidget {
                         item,
                         currentTemplate.value,
                         (key, val) {
-                          // 更新本地数据状态
                           final newList = [...products.value];
                           newList[index].data[key] = val;
                           products.value = newList;
                         },
                         () {
-                          // 删除本地数据状态
                           final newList = [...products.value];
                           newList.removeAt(index);
                           products.value = newList;
                         },
                       );
                     } else {
-                      // 底部加载更多提示
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Center(
-                          child: hasMore.value
+                          child: hasMore.value && isLoading.value
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
                                   child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                )
+                                      CircularProgressIndicator(strokeWidth: 2))
                               : const Text("没有更多数据了",
                                   style: TextStyle(
                                       color: Colors.grey, fontSize: 12)),
@@ -255,11 +258,7 @@ class QuoteProductListPage extends HookConsumerWidget {
       unselectedLabelColor: Colors.grey,
       indicatorColor: colorScheme.primary,
       indicatorSize: TabBarIndicatorSize.label,
-      tabs: const [
-        Tab(text: "手动录入"),
-        Tab(text: "白板识别"),
-        Tab(text: "记录本识别"),
-      ],
+      tabs: const [Tab(text: "手动录入"), Tab(text: "白板识别"), Tab(text: "记录本识别")],
     );
 
     return Column(
@@ -269,7 +268,6 @@ class QuoteProductListPage extends HookConsumerWidget {
           child: TabBarView(
             controller: tabController,
             children: [
-              // Tab 1: 手动录入
               Stack(
                 children: [
                   QuoteProductAddAdaptivePage(
@@ -285,9 +283,7 @@ class QuoteProductListPage extends HookConsumerWidget {
                   ),
                 ],
               ),
-              // Tab 2: 白板
               buildRecognizeTab(kQuoteAiTemplates),
-              // Tab 3: 记录本
               buildRecognizeTab(kQuoteAiNotePadTemplates),
             ],
           ),
@@ -296,32 +292,26 @@ class QuoteProductListPage extends HookConsumerWidget {
     );
   }
 
-  // --- 您提供的数据展示行 (整合左右滚动和编辑) ---
   Widget _buildDataRow(
-    BuildContext context,
-    int index,
-    ProductDraftItem item,
-    TemplateOption template,
-    Function(String key, String val) onUpdate,
-    VoidCallback onDelete,
-  ) {
+      BuildContext context,
+      int index,
+      ProductDraftItem item,
+      TemplateOption template,
+      Function(String key, String val) onUpdate,
+      VoidCallback onDelete) {
     const double rowHeight = 72.0;
 
     int? parseId(dynamic v) {
       if (v == null) return null;
       if (v is int) return v;
-      if (v is num) return v.toInt();
       final s = v.toString().trim();
-      if (s.isEmpty || s == 'null') return null;
       return int.tryParse(s);
     }
 
     const Set<String> showroomFields = {'product_no', 'spec', 'description_cn'};
 
-    Future<bool> updateRemoteField({
-      required String fieldKey,
-      required dynamic value,
-    }) async {
+    Future<bool> updateRemoteField(
+        {required String fieldKey, required dynamic value}) async {
       final int? productId = parseId(item.getValue('product_id'));
       final int? supplyQuoteId = parseId(item.getValue('supply_quote_id'));
       try {
@@ -345,30 +335,26 @@ class QuoteProductListPage extends HookConsumerWidget {
         Container(
           height: rowHeight,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1))
-            ],
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1))
+              ]),
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              // 图片预览
               GestureDetector(
-                onTap: () {
-                  showFlanImagePreview(context, images: [item.media.url]);
-                },
+                onTap: () =>
+                    showFlanImagePreview(context, images: [item.media.url]),
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.grey[300]!)),
                     clipBehavior: Clip.antiAlias,
                     child: item.isRecognizing
                         ? const Center(
@@ -377,18 +363,15 @@ class QuoteProductListPage extends HookConsumerWidget {
                                 height: 16,
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2)))
-                        : (item.media?.thumbUrl != null)
-                            ? Image.network(item.media.thumbUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (c, e, s) => const Icon(
-                                    Icons.broken_image,
-                                    color: Colors.grey))
-                            : const Icon(Icons.image, color: Colors.grey),
+                        : Image.network(item.media.thumbUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (c, e, s) => const Icon(
+                                Icons.broken_image,
+                                color: Colors.grey)),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              // 数据列表 - 支持左右滚动
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -401,21 +384,15 @@ class QuoteProductListPage extends HookConsumerWidget {
                         padding: const EdgeInsets.only(right: 8),
                         child: InkWell(
                           onTap: () {
-                            const numberKeys = {
+                            final bool isNumber = {
                               'purchase_cost',
                               'outer_capacity',
-                              'inner_capacity',
-                              'weight',
-                              'outer_volume',
-                              'moq'
-                            };
-                            final bool isNumberField =
-                                numberKeys.contains(col.key);
-
+                              'outer_volume'
+                            }.contains(col.key);
                             EditDialog.show(context,
                                 title: col.label,
                                 initialText: isEmpty ? '' : text,
-                                keyboardType: isNumberField
+                                keyboardType: isNumber
                                     ? const TextInputType.numberWithOptions(
                                         decimal: true)
                                     : TextInputType.text, onConfirm: (v) async {
@@ -430,25 +407,24 @@ class QuoteProductListPage extends HookConsumerWidget {
                             });
                           },
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(col.label,
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.grey[500])),
-                              Text(text,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: isEmpty
-                                          ? FontWeight.normal
-                                          : FontWeight.w600,
-                                      color: isEmpty
-                                          ? Colors.grey[300]
-                                          : const Color(0xFF333333)),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis),
-                            ],
-                          ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(col.label,
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.grey[500])),
+                                Text(text,
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isEmpty
+                                            ? FontWeight.normal
+                                            : FontWeight.w600,
+                                        color: isEmpty
+                                            ? Colors.grey[300]
+                                            : const Color(0xFF333333)),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis)
+                              ]),
                         ),
                       );
                     }).toList(),
@@ -458,30 +434,26 @@ class QuoteProductListPage extends HookConsumerWidget {
             ],
           ),
         ),
-        // 删除按钮
         Positioned(
-          top: -5,
-          left: -5,
-          child: GestureDetector(
-            onTap: onDelete,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                  color: Colors.red, shape: BoxShape.circle),
-              child: const Icon(Icons.close, size: 12, color: Colors.white),
-            ),
-          ),
-        ),
+            top: -5,
+            left: -5,
+            child: GestureDetector(
+                onTap: onDelete,
+                child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                        color: Colors.red, shape: BoxShape.circle),
+                    child: const Icon(Icons.close,
+                        size: 12, color: Colors.white)))),
       ],
     );
   }
 }
 
-// --- 弹窗逻辑 ---
 Future<void> _showPreSelectionSheet(
     BuildContext context,
-    ValueNotifier<Map<String, dynamic>?> selectedQuote,
-    ValueNotifier<Map<String, dynamic>?> selectedSupplier,
+    ValueNotifier<Map<String, dynamic>?> externalQuote,
+    ValueNotifier<Map<String, dynamic>?> externalSupplier,
     {required Function(
             Map<String, dynamic>? quote, Map<String, dynamic>? supplier)
         onChanged}) async {
@@ -490,6 +462,18 @@ Future<void> _showPreSelectionSheet(
     if (data is Map) {
       for (var key in keys) {
         if (data[key] != null) return data[key].toString();
+      }
+    }
+    try {
+      final mapData = data.toJson();
+      for (var key in keys) {
+        if (mapData[key] != null) return mapData[key].toString();
+      }
+    } catch (e) {
+      if (keys.contains('name')) {
+        try {
+          return data.name.toString();
+        } catch (_) {}
       }
     }
     return '';
@@ -502,10 +486,14 @@ Future<void> _showPreSelectionSheet(
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
     builder: (context) => HookConsumer(builder: (context, ref, child) {
-      final currentQuote = useValueListenable(selectedQuote);
-      final currentSupplier = useValueListenable(selectedSupplier);
-      final companyName = getSafeName(currentQuote?['company'], ['name']);
-      final supplierName = getSafeName(currentSupplier, ['short_name', 'name']);
+      // 【核心】：在弹窗内部维护临时选中的状态，不直接改外部
+      final tempQuote = useState<Map<String, dynamic>?>(externalQuote.value);
+      final tempSupplier =
+          useState<Map<String, dynamic>?>(externalSupplier.value);
+
+      final companyName = getSafeName(tempQuote.value?['company'], ['name']);
+      final supplierName =
+          getSafeName(tempSupplier.value, ['short_name', 'name']);
 
       return Padding(
         padding: EdgeInsets.only(
@@ -530,7 +518,9 @@ Future<void> _showPreSelectionSheet(
               onTap: () async {
                 final result = await showModalBottomSheet<Map<String, dynamic>>(
                     context: context, builder: (_) => const QuoteSelect());
-                if (result != null) selectedQuote.value = result;
+                if (result != null && context.mounted) {
+                  tempQuote.value = result; // 仅修改弹窗内预览
+                }
               },
               child: AbsorbPointer(
                   child: Input(
@@ -544,7 +534,9 @@ Future<void> _showPreSelectionSheet(
               onTap: () async {
                 final result = await showModalBottomSheet<Map<String, dynamic>>(
                     context: context, builder: (_) => const SupplierSelect());
-                if (result != null) selectedSupplier.value = result;
+                if (result != null && context.mounted) {
+                  tempSupplier.value = result; // 仅修改弹窗内预览
+                }
               },
               child: AbsorbPointer(
                   child: Input(
@@ -562,8 +554,15 @@ Future<void> _showPreSelectionSheet(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12))),
               onPressed: () {
-                if (selectedSupplier.value != null) {
-                  onChanged(selectedQuote.value, selectedSupplier.value);
+                if (tempSupplier.value != null) {
+                  onChanged(tempQuote.value, tempSupplier.value);
+
+                  if (tempSupplier.value != null) {
+                    final sId = tempSupplier.value?['id']?.toString();
+                    final qId = tempQuote.value?['id'];
+                    context.router.push(
+                        QuoteProductNewAddRoute(quoteId: qId, supplierId: sId));
+                  }
                   Navigator.pop(context);
                 } else {
                   EasyLoading.showInfo("请先选择供应商");
@@ -616,9 +615,17 @@ Widget _buildCollapsibleTemplateSelector(
                 Icon(Icons.dashboard_customize_outlined,
                     size: 18, color: colorScheme.primary),
                 const SizedBox(width: 8),
-                const Expanded(
-                    child: Text('识别模板',
-                        style: TextStyle(fontSize: 13, color: Colors.grey))),
+                Expanded(
+                  child: Text(
+                    '识别模板 (点击卡片内眼睛图标查看示例模板)',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
                 AnimatedRotation(
                     turns: isExpanded.value ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
@@ -692,43 +699,29 @@ Widget _buildTemplateListContent({
                             Row(
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    config.label,
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[600],
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
+                                    child: Text(config.label,
+                                        style: TextStyle(
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey[600]),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis)),
                                 GestureDetector(
                                   onTap: () => _showPreviewDialog(
                                       context, t.previewImageUrl),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0),
-                                    child: Icon(
-                                      Icons.visibility_outlined,
-                                      size: 20, // 大眼睛
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
+                                  child: Icon(Icons.visibility_outlined,
+                                      size: 20, color: Colors.grey[600]),
                                 ),
                               ],
                             ),
                           ] else ...[
-                            Text(
-                              config.label,
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            Text(config.label,
+                                style: TextStyle(
+                                    fontSize: 8,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis),
                           ]
                         ],
                       ],
@@ -744,16 +737,11 @@ Widget _buildTemplateListContent({
                   width: 90,
                   height: 90,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F3F3),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.camera_alt_rounded,
-                          color: Color(0xFF999999), size: 28),
-                    ],
-                  ),
+                      color: const Color(0xFFF3F3F3),
+                      borderRadius: BorderRadius.circular(6)),
+                  child: const Center(
+                      child: Icon(Icons.camera_alt_rounded,
+                          color: Color(0xFF999999), size: 28)),
                 ),
               ),
             ],
@@ -770,24 +758,17 @@ Widget _buildInfoBar(ColorScheme colorScheme) {
     margin: const EdgeInsets.symmetric(horizontal: 12),
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
     decoration: BoxDecoration(
-      color: colorScheme.primaryContainer.withOpacity(0.3),
-      borderRadius: BorderRadius.circular(8),
-    ),
+        color: colorScheme.primaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8)),
     child: Row(
       children: [
         Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            'AI识别结果点击下方单元格可手动修正',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: colorScheme.primary,
-              fontSize: 12,
-            ),
-          ),
-        ),
+            child: Text('AI识别结果点击下方单元格可手动修正',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: colorScheme.primary, fontSize: 12))),
       ],
     ),
   );
@@ -806,29 +787,21 @@ void _showPreviewDialog(BuildContext context, String imageUrl) {
             child: Container(
               constraints: const BoxConstraints(maxHeight: 500),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.white,
-              ),
+                  borderRadius: BorderRadius.circular(12), color: Colors.white),
               padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const SizedBox(
-                  height: 200,
-                  width: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+              child: Image.asset(imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: Center(
+                          child:
+                              Column(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.broken_image, color: Colors.grey),
                         SizedBox(height: 8),
                         Text('暂无预览图',
-                            style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                            style: TextStyle(color: Colors.grey, fontSize: 12))
+                      ])))),
             ),
           ),
         ),

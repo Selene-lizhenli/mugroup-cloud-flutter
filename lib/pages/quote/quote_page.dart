@@ -403,7 +403,7 @@ class QuotePage extends HookConsumerWidget {
       ValueNotifier<Map<String, dynamic>?> quote,
       ValueNotifier<Map<String, dynamic>?> supplier,
       ColorScheme colors) {
-    final isReady = supplier.value != null;
+    final isReady = supplier.value != null || quote.value != null;
 
     String getName(dynamic data, List<String> keys) {
       if (data == null) return '';
@@ -523,6 +523,7 @@ class QuotePage extends HookConsumerWidget {
           SizedBox(
             height: 600,
             child: QuoteProductListPage(
+                key: ValueKey("${quote.value?['id']}_${supplier.value?['id']}"),
                 initialQuote: quote.value,
                 initialSupplier: supplier.value,
                 onChanged: (quoted, suppliered) {
