@@ -473,17 +473,6 @@ class QuoteProductListPage extends HookConsumerWidget {
             ],
           ),
         ),
-        Positioned(
-            top: -5,
-            left: -5,
-            child: GestureDetector(
-                onTap: onDelete,
-                child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                        color: Colors.red, shape: BoxShape.circle),
-                    child: const Icon(Icons.close,
-                        size: 12, color: Colors.white)))),
       ],
     );
   }
