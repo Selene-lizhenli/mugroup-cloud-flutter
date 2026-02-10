@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class QuoteProductNewAddPage extends HookConsumerWidget {
+  final int initialTabIndex;
   final int? quoteId;
   final String? supplierId;
 
@@ -18,6 +19,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
 
   const QuoteProductNewAddPage({
     super.key,
+    this.initialTabIndex = 1,
     this.quoteId,
     this.supplierId,
     this.isEmbedded = false, // 默认为 false，即独立页面
@@ -26,7 +28,8 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tabController = useTabController(initialLength: 3, initialIndex: 1);
+    final tabController =
+        useTabController(initialLength: 3, initialIndex: initialTabIndex);
 
     final tabBar = TabBar(
       controller: tabController,
@@ -93,7 +96,7 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
                   .read(quotePageRefreshTrigger.notifier)
                   .update((state) => state + 1);
 
-                  ref
+              ref
                   .read(quotePageProductRefresh.notifier)
                   .update((state) => state + 1);
             }

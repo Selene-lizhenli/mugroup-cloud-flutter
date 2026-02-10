@@ -158,11 +158,14 @@ class QuoteProductListPage extends HookConsumerWidget {
 
     // 4. 统一跳转与弹窗逻辑
     Future<void> handleNavigation() async {
+      final currentTabIndex = tabController.index;
+
       if (selectedSupplier.value == null) {
         await _showPreSelectionSheet(
           context,
           selectedQuote,
           selectedSupplier,
+          currentTabIndex: currentTabIndex,
           onChanged: (quote, supplier) {
             onChanged?.call(quote, supplier);
           },
@@ -172,8 +175,11 @@ class QuoteProductListPage extends HookConsumerWidget {
       if (selectedSupplier.value != null) {
         final sId = selectedSupplier.value?['id']?.toString();
         final qId = selectedQuote.value?['id'];
-        context.router
-            .push(QuoteProductNewAddRoute(quoteId: qId, supplierId: sId));
+        context.router.push(QuoteProductNewAddRoute(
+          quoteId: qId,
+          supplierId: sId,
+          initialTabIndex: currentTabIndex,
+        ));
       }
     }
 
@@ -487,7 +493,8 @@ Future<void> _showPreSelectionSheet(
     BuildContext context,
     ValueNotifier<Map<String, dynamic>?> externalQuote,
     ValueNotifier<Map<String, dynamic>?> externalSupplier,
-    {required Function(
+    {required int currentTabIndex,
+    required Function(
             Map<String, dynamic>? quote, Map<String, dynamic>? supplier)
         onChanged}) async {
   String getSafeName(dynamic data, List<String> keys) {

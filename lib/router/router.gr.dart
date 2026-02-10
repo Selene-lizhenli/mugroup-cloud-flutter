@@ -1284,6 +1284,7 @@ class QuoteProductNewAddRoute
     extends _i65.PageRouteInfo<QuoteProductNewAddRouteArgs> {
   QuoteProductNewAddRoute({
     _i68.Key? key,
+    int initialTabIndex = 1,
     int? quoteId,
     String? supplierId,
     bool isEmbedded = false,
@@ -1292,6 +1293,7 @@ class QuoteProductNewAddRoute
           QuoteProductNewAddRoute.name,
           args: QuoteProductNewAddRouteArgs(
             key: key,
+            initialTabIndex: initialTabIndex,
             quoteId: quoteId,
             supplierId: supplierId,
             isEmbedded: isEmbedded,
@@ -1308,6 +1310,7 @@ class QuoteProductNewAddRoute
           orElse: () => const QuoteProductNewAddRouteArgs());
       return _i36.QuoteProductNewAddPage(
         key: args.key,
+        initialTabIndex: args.initialTabIndex,
         quoteId: args.quoteId,
         supplierId: args.supplierId,
         isEmbedded: args.isEmbedded,
@@ -1319,12 +1322,15 @@ class QuoteProductNewAddRoute
 class QuoteProductNewAddRouteArgs {
   const QuoteProductNewAddRouteArgs({
     this.key,
+    this.initialTabIndex = 1,
     this.quoteId,
     this.supplierId,
     this.isEmbedded = false,
   });
 
   final _i68.Key? key;
+
+  final int initialTabIndex;
 
   final int? quoteId;
 
@@ -1334,7 +1340,7 @@ class QuoteProductNewAddRouteArgs {
 
   @override
   String toString() {
-    return 'QuoteProductNewAddRouteArgs{key: $key, quoteId: $quoteId, supplierId: $supplierId, isEmbedded: $isEmbedded}';
+    return 'QuoteProductNewAddRouteArgs{key: $key, initialTabIndex: $initialTabIndex, quoteId: $quoteId, supplierId: $supplierId, isEmbedded: $isEmbedded}';
   }
 }
 
