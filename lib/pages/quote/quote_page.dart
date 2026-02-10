@@ -195,7 +195,6 @@ class QuotePage extends HookConsumerWidget {
           }
         },
         child: SingleChildScrollView(
-          key: const PageStorageKey('quote_page_scroll'),
           controller: scrollController,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(
