@@ -148,7 +148,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                 (value == null || value.isEmpty) ? '该项不能为空' : null,
             builder: (field) => Input(
               label: '供应商报价(￥)',
-              keyboardType: TextInputType.number,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+              ],
               isRequired: true,
               value: field.value ?? '',
               onChanged: field.didChange,
@@ -180,7 +184,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             name: "customer_price",
             builder: (field) => Input(
               label: '客户报价',
-              keyboardType: TextInputType.number,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+              ],
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
@@ -282,7 +290,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             name: "outer_volume",
             builder: (field) => Input(
               label: '体积',
-              keyboardType: TextInputType.number,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+              ],
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
