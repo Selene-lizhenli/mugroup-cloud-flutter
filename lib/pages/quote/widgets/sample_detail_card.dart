@@ -234,8 +234,9 @@ class ProductDetailCard extends StatelessWidget {
 
     if (editData != null && data != null) {
       final values = {
+        /// 不要再改动qty这个字段了 来来回回改了好几次了。。。。
+        "qty": editData['qty'],
         "supply_quote": {
-          "shipping_qty": editData['shipping_qty'],
           "purchase_cost": editData['purchase_cost'],
           "customer_price": editData['customer_price'],
           "internal_sku": editData['internal_sku'],

@@ -26,7 +26,7 @@ class ProductEditDialog extends HookConsumerWidget {
     final currency = quotationInfo.baseInfo?.curreny ?? ''; //报价单货币
     final isConverting = useState(false);
 
-    final shippingQty = useState(row.qty?.toString() ?? ''); //采购数量
+    final qty = useState(row.qty?.toString() ?? ''); // 采购数量 //// 取值是每条记录最外层的qty，编辑的时候同理
     final purchaseCost =
         useState(row.supplyQuote?.purchaseCost?.toString() ?? ''); //供应商报价
     final customerPrice = useState<String>(
@@ -136,9 +136,9 @@ class ProductEditDialog extends HookConsumerWidget {
               const SizedBox(height: 12),
               Input(
                 label: '采购数量',
-                value: shippingQty.value,
+                value: qty.value,
                 keyboardType: TextInputType.number,
-                onChanged: (v) => shippingQty.value = v,
+                onChanged: (v) => qty.value = v,
               ),
               const SizedBox(height: 10),
               Input(
@@ -199,11 +199,10 @@ class ProductEditDialog extends HookConsumerWidget {
                         ),
                       ),
                       onPressed: () async {
-                        try {
-                          EasyLoading.showSuccess('保存成功');
+                        try { 
                           if (context.mounted) {
                             Navigator.of(context).pop(<String, String>{
-                              'shipping_qty': shippingQty.value,
+                              'qty': qty.value, //// 每条记录最外层的qty
                               'purchase_cost': purchaseCost.value,
                               'customer_price': customerPrice.value,
                               'internal_sku': internalSku.value,
