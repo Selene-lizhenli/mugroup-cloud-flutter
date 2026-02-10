@@ -21,6 +21,7 @@ class PurchaseAssistState implements MuListState {
     this.hasMore = true,
     this.searchKeyword = '',
     this.searchImagePaths = const [],
+    this.selectedPlatform = 'cloud',
   });
 
   final bool hasSearched;
@@ -36,6 +37,7 @@ class PurchaseAssistState implements MuListState {
   final bool hasMore;
   final String searchKeyword;
   final List<String> searchImagePaths;
+  final String selectedPlatform;
 
   PurchaseAssistState copyWith({
     bool? hasSearched,
@@ -50,6 +52,7 @@ class PurchaseAssistState implements MuListState {
     bool? hasMore,
     String? searchKeyword,
     List<String>? searchImagePaths,
+    String? selectedPlatform,
   }) {
     return PurchaseAssistState(
       hasSearched: hasSearched ?? this.hasSearched,
@@ -64,6 +67,7 @@ class PurchaseAssistState implements MuListState {
       hasMore: hasMore ?? this.hasMore,
       searchKeyword: searchKeyword ?? this.searchKeyword,
       searchImagePaths: searchImagePaths ?? this.searchImagePaths,
+      selectedPlatform: selectedPlatform ?? this.selectedPlatform,
     );
   }
 }
@@ -82,6 +86,10 @@ class PurchaseAssist extends _$PurchaseAssist {
 
   void setSearchImagePaths(List<String> paths) {
     state = state.copyWith(searchImagePaths: paths);
+  }
+
+  void setSelectedPlatform(String platform) {
+    state = state.copyWith(selectedPlatform: platform);
   }
 
   /// 执行搜索：标记已搜索，搜索框滑到顶部，并触发商品列表加载
@@ -120,7 +128,7 @@ class PurchaseAssist extends _$PurchaseAssist {
         'keywords': state.searchKeyword,
         'page': nextPage,
         'pageSize': 20,
-        'platform': params?['platform'] ?? 'cloud',
+        'platform': params?['platform'] ?? state.selectedPlatform,
       };
       final resp = await getMultiPlatformSearch(data);
       final result = resp.data;
