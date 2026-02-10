@@ -29,7 +29,9 @@ class DefaultDetailContainer extends HookConsumerWidget {
     const double gradientAngleDegrees = 0;
     final pageColor =
         stationTheme == 'meimeiimage' ? primaryColorPink : primaryColorBlue;
-    final headerColor = pageColor.withOpacity(0.55);
+    final headerColor = pageColor.withOpacity(0.45); // 渐变颜色
+    final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -45,78 +47,77 @@ class DefaultDetailContainer extends HookConsumerWidget {
       ),
       body: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                transform: const GradientRotation(
-                  gradientAngleDegrees * math.pi / 180,
+          // 最底层：渐变铺满整页
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  transform: const GradientRotation(
+                    gradientAngleDegrees * math.pi / 180,
+                  ),
+                  colors: [
+                    headerColor,
+                    Color.lerp(
+                      headerColor,
+                      colorScheme.surface,
+                      0.8,
+                    )!,
+                    Color.lerp(
+                      headerColor,
+                      colorScheme.surface,
+                      0.94,
+                    )!,
+                    colorScheme.surface,
+                    colorScheme.surface,
+                    Color.lerp(
+                      colorScheme.surface,
+                      colorScheme.surfaceTint,
+                      0.8,
+                    )!,
+                  ],
+                  stops: null,
                 ),
-                colors: [
-                  headerColor,
-                  Color.lerp(
-                    headerColor,
-                    colorScheme.surface,
-                    0.8,
-                  )!,
-                  Color.lerp(
-                    headerColor,
-                    colorScheme.surface,
-                    0.94,
-                  )!,
-                  colorScheme.surface,
-                  colorScheme.surface,
-                  Color.lerp(
-                    colorScheme.surface,
-                    colorScheme.surfaceTint,
-                    0.8,
-                  )!,
-                ],
-                stops: null,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: kToolbarHeight,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16), //  padding总共是16
-                    child: TabBar(
-                      dividerColor: pageColor,
-                      labelColor: pageColor,
-                      indicatorColor: pageColor,
+          ),
+          // 上层：从 AppBar 下方开始的 TabBar + TabBarView
+          Positioned(
+            left: 0,
+            right: 0,
+            top: paddingTop + kToolbarHeight,
+            bottom: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: TabBar(
+                    dividerColor: pageColor,
+                    labelColor: pageColor,
+                    indicatorColor: pageColor,
+                    controller: tabController,
+                    tabs: const [
+                      Tab(text: '基本信息'),
+                      Tab(text: '样品明细'),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4, right: 4),
+                    child: TabBarView(
                       controller: tabController,
-                      tabs: const [
-                        Tab(text: '基本信息'),
-                        Tab(text: '样品明细'),
+                      children: [
+                        BasicInfoTab(item: item),
+                        StationSamplesTab(stationItem: item),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 4,
-                          right:
-                              4), // 左右是4 因为BasicInfoTab内部有12的padding，保证总共是16和TabBar一样
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          BasicInfoTab(item: item),
-                          StationSamplesTab(stationItem: item),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
