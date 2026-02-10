@@ -104,7 +104,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           media: media,
           isRecognizing: true);
 
-      state = state.copyWith(items: [...state.items, newItem]);
+      state = state.copyWith(items: [newItem, ...state.items]);
       _startIndividualSse(initialPath, media, quoteId, supplierId);
     } finally {
       EasyLoading.dismiss();
