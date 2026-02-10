@@ -124,7 +124,8 @@ class QuoteProductListPage extends HookConsumerWidget {
           return true;
         }).toList();
 
-        products.value = mappedItems;
+        //展示倒序
+        products.value = mappedItems.reversed.toList();
         hasMore.value = false;
       } catch (e) {
         logger.e("加载列表失败: $e");
