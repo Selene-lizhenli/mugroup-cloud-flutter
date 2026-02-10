@@ -161,25 +161,28 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       state = state.copyWith(groups: [...state.groups, newGroup]);
 
       // 3. 立即为这张图开启独立的 SSE 识别任务，不等待其他图片
-      _startSingleImageSse(taskId, media);
+      _startSingleImageSse(taskId, media, quoteId, supplierId);
     } finally {
       EasyLoading.dismiss();
     }
   }
 
-  void _startSingleImageSse(String taskId, TemporaryMedia media) async {
+  void _startSingleImageSse(String taskId, TemporaryMedia media, int? quoteId,
+      String? supplierId) async {
     String buffer = "";
     String eventType = "message"; // 默认为 message
     StreamSubscription? sub;
     final currentTemplate = getTemplateById(state.currentTemplateId);
 
     try {
-      final response = await silentApi.post<ResponseBody>(
+      final response = await api.post<ResponseBody>(
         'api/open/agents/sample/store-market-note-product',
         data: {
           'item_type': 'market_product',
           'template_id': state.currentTemplateId,
           "images": [media],
+          if (quoteId != null) "quotation_id": quoteId,
+          "supplier_id": supplierId,
         },
         options: Options(responseType: ResponseType.stream),
       );
