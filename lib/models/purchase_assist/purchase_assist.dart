@@ -26,16 +26,33 @@ class PurchaseAssistSearchProduct {
   final int? supplier;
   final List<String>? tags;
 
+  /// 解析可能为 String 或 num 的字段，统一转为 int?
+  static int? _intFromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  /// 解析可能为 String 或 int 的字段，统一转为 String?
+  static String? _stringOrIntFromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    if (value is num) return value.toString();
+    return value.toString();
+  }
+
   factory PurchaseAssistSearchProduct.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistSearchProduct(
-      id: (json['id'] as num?)?.toInt(),
+      id: _intFromJson(json['id']),
       name: json['name'] as String?,
-      price: json['price'] as String?,
+      price: _stringOrIntFromJson(json['price']),
+      moq: _stringOrIntFromJson(json['moq']),
+      rateScore: _stringOrIntFromJson(json['rate_score']),
       imageUrl: json['image_url'] as String?,
       productUrl: json['product_url'] as String?,
       location: json['location'] as String?,
-      moq: json['moq'] as String?,
-      rateScore: json['rate_score'] as String?,
       supplierName: json['supplier_name'] as String?,
       supplier: (json['supplier'] as num?)?.toInt(),
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
@@ -226,7 +243,7 @@ class PurchaseAssistTaskListItem {
 
   get title => null;
 }
- 
+
 /// 任务详情中的单个结果商品
 class PurchaseAssistTaskResultProduct {
   const PurchaseAssistTaskResultProduct({
@@ -267,9 +284,7 @@ class PurchaseAssistTaskResultProduct {
       moq: (json['moq'] as num?)?.toInt(),
       rateScore: json['rate_score'] as String?,
       location: json['location'] as String?,
-      tags: (json['tags'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList(),
+      tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
     );
   }
 }

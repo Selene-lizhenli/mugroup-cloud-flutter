@@ -2,8 +2,8 @@ import 'package:cloud/constants/core.dart';
 import 'package:flutter/material.dart';
 
 /// 横向可滑动的标签列表，用于平台等单选标签展示
-class TagList extends StatelessWidget {
-  const TagList({
+class MuTagList extends StatelessWidget {
+  const MuTagList({
     super.key,
     required this.items,
     required this.selectedValue,
@@ -53,6 +53,7 @@ class TagList extends StatelessWidget {
                   item.label,
                   style: TextStyle(
                     fontSize: fontSize,
+                    height: 1,
                     color: isSelected
                         ? theme.colorScheme.onPrimary
                         : theme.colorScheme.onSurfaceVariant,

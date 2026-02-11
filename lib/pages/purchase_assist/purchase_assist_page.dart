@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/core.dart';
-import 'package:cloud/constants/theme_color_config.dart';
-import 'package:cloud/models/purchase_assist.dart';
+import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
+import 'package:cloud/pages/purchase_assist/widgets/assist_product_card.dart';
+import 'package:cloud/pages/purchase_assist/widgets/filter_content.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/pages/widgets/tag_list.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -14,6 +14,34 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:cloud/services/media.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+/// 打开相册选择图片并上传，加入搜索图片列表（供 SearchArea 与 _UploadedImagesRow 共用）
+Future<void> _openGalleryForPurchaseAssist(
+    BuildContext context, WidgetRef ref) async {
+  final notifier = ref.read(purchaseAssistProvider.notifier);
+  final List<AssetEntity>? result = await AssetPicker.pickAssets(
+    context,
+    pickerConfig: const AssetPickerConfig(
+      maxAssets: 10,
+      requestType: RequestType.image,
+    ),
+  );
+  if (result == null || result.isEmpty || !context.mounted) return;
+  for (var entity in result) {
+    final file = await entity.file;
+    if (file == null || !context.mounted) continue;
+    final temporaryMedia = await upload(file: file);
+    if (!context.mounted) return;
+    notifier.addSearchMedia(temporaryMedia);
+  }
+  final currentMedia = ref.read(purchaseAssistProvider).searchMedia;
+  if (context.mounted && currentMedia != null) {
+    await notifier.loadProducts(params: {"media_id": currentMedia.id});
+  }
+}
 
 @RoutePage()
 class PurchaseAssistPage extends HookConsumerWidget {
@@ -22,11 +50,10 @@ class PurchaseAssistPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(purchaseAssistProvider);
-    final notifier = ref.read(purchaseAssistProvider.notifier);
     final searchController =
         useTextEditingController(text: state.searchKeyword);
     final colorScheme = Theme.of(context).colorScheme;
-// 渐变可调参数：角度（度，0=上→下，90=左→右）、颜色分界位置（0~1）
+    // 渐变可调参数：角度（度，0=上→下，90=左→右）、颜色分界位置（0~1）
     const double gradientAngleDegrees = 0;
     final headerColor = colorScheme.primary.withOpacity(0.2); // 渐变颜色
     final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
@@ -108,69 +135,15 @@ class PurchaseAssistPage extends HookConsumerWidget {
           Positioned.fill(
             left: 0,
             right: 0,
-            top: paddingTop + kToolbarHeight,
+            top: state.hasSearched ? paddingTop - 15 + kToolbarHeight : 0,
             bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: state.hasSearched
-                  ? _SearchResultBody(
-                      state: state,
-                      notifier: notifier,
-                      searchController: searchController,
-                    )
-                  : _BigSearchBody(notifier: notifier, state: state),
-            ),
+            child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Center(
+                  child: _SearchResultBody(),
+                )),
           ),
         ]));
-  }
-}
-
-/// 未搜索时：中间大输入框（发消息样式 + 相机/相册），整体盒外阴影
-class _BigSearchBody extends StatelessWidget {
-  const _BigSearchBody({required this.notifier, required this.state});
-
-  final PurchaseAssist notifier;
-  final PurchaseAssistState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 平台标签：横向排列，超出可左右滑动
-          TagList(
-            items: searchPlatform,
-            selectedValue: state.selectedPlatform,
-            onSelected: notifier.setSelectedPlatform,
-          ),
-          const SizedBox(height: 8),
-          const SearchArea(),
-          if (state.searchImagePaths.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: state.searchImagePaths.map((path) {
-                return Chip(
-                  label: Text(
-                    path.split(Platform.pathSeparator).last,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  onDeleted: () {
-                    notifier.setSearchImagePaths(
-                      state.searchImagePaths.where((p) => p != path).toList(),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-          ],
-        ],
-      ),
-    );
   }
 }
 
@@ -182,43 +155,106 @@ class SearchArea extends HookConsumerWidget {
     // 白色圆角输入框 + 盒外阴影，右侧相机 + 加号
     final state = ref.watch(purchaseAssistProvider);
     final notifier = ref.read(purchaseAssistProvider.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentMedia = ref.read(purchaseAssistProvider).searchMedia;
 
-    /// 打开相册，选择照片后把文件路径加入搜索图片列表
+    /// 打开相册，选择照片后上传并加入搜索图片列表
     Future<void> openGallery() async {
-      final result = await AssetPicker.pickAssets(
-        context,
-        pickerConfig: const AssetPickerConfig(
-          maxAssets: 9,
-          requestType: RequestType.image,
-        ),
-      );
-      if (result == null || result.isEmpty || !context.mounted) return;
-      final paths = <String>[];
-      for (final e in result) {
-        final file = await e.file;
-        if (file != null) paths.add(file.path);
-      }
-      if (paths.isNotEmpty) {
-        notifier.setSearchImagePaths([...state.searchImagePaths, ...paths]);
-        // 图片选择成功后自动搜索
-        await notifier.doSearch();
-      }
+      await _openGalleryForPurchaseAssist(context, ref);
     }
 
     /// 打开相机，拍一张后把文件路径加入搜索图片列表
     Future<void> openCamera() async {
-      final entity = await CameraPicker.pickFromCamera(
-        context,
-        pickerConfig: const CameraPickerConfig(enableRecording: false),
-      );
+      final entity = await CameraPicker.pickFromCamera(context,
+          pickerConfig: const CameraPickerConfig(enableRecording: false));
+
       if (entity == null || !context.mounted) return;
+
       final file = await entity.file;
-      if (file != null) {
-        final path = file.path;
-        notifier.setSearchImagePaths([...state.searchImagePaths, path]);
-        // 拍照成功后自动搜索
-        await notifier.doSearch();
+      if (file == null || !context.mounted) return;
+      final temporaryMedia = await upload(file: file);
+      notifier.addSearchMedia(temporaryMedia);
+
+      if (context.mounted && currentMedia != null) {
+        await notifier.loadProducts(params: {"media_id": temporaryMedia.id});
       }
+    }
+
+    Widget getTnputArea() {
+      return Expanded(
+        child: TextField(
+          decoration: const InputDecoration(
+            hintText: '请输入关键字...',
+            hintStyle: TextStyle(color: Colors.grey),
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 8),
+          ),
+          onChanged: notifier.setSearchKeyword,
+          onSubmitted: (_) => notifier.loadProducts(),
+        ),
+      );
+    }
+
+    Widget getFilterBtn() {
+      return IconButton(
+        icon: Icon(Icons.filter_alt_outlined,
+            color: state.hasSearched == true
+                ? colorScheme.primary
+                : Colors.black87),
+        tooltip: '筛选',
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+        constraints: const BoxConstraints(),
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => DraggableScrollableSheet(
+              initialChildSize: 0.5,
+              minChildSize: 0.3,
+              maxChildSize: 0.85,
+              builder: (context, scrollController) => Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: const FilterContent(),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    Widget getPicBtn() {
+      return IconButton(
+        icon: const Icon(Icons.add_outlined, color: Colors.black87, size: 27),
+        tooltip: '从相册选择',
+        onPressed: () => openGallery(),
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+        constraints: const BoxConstraints(),
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      );
+    }
+
+    Widget getcaremaBtn() {
+      return IconButton(
+        icon: const Icon(Icons.camera_alt_outlined,
+            color: Colors.black87, size: 27),
+        tooltip: '拍照',
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+        constraints: const BoxConstraints(),
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        onPressed: () => openCamera(),
+      );
     }
 
     return Container(
@@ -240,53 +276,29 @@ class SearchArea extends HookConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: '请输入关键字...',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  onChanged: notifier.setSearchKeyword,
-                  onSubmitted: (_) => notifier.doSearch(),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.filter_alt_outlined,
-                    color: Colors.black87),
-                tooltip: '筛选',
-                onPressed: () => {},
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.camera_alt_outlined,
-                    color: Colors.black87, size: 28),
-                tooltip: '拍照',
-                onPressed: () => openCamera(),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_photo_alternate_outlined,
-                    color: Colors.black87, size: 25),
-                tooltip: '从相册选择',
-                onPressed: () => openGallery(),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                style: IconButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-            ],
-          )
+          if (state.hasSearched == false) ...[
+            Row(children: [getTnputArea()]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                getFilterBtn(),
+                const Spacer(),
+                getcaremaBtn(),
+                getPicBtn(),
+              ],
+            )
+          ] else ...[
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  getTnputArea(),
+                  getFilterBtn(),
+                  getcaremaBtn(),
+                  getPicBtn(),
+                ]),
+          ]
         ],
       ),
     );
@@ -294,29 +306,50 @@ class SearchArea extends HookConsumerWidget {
 }
 
 /// 已搜索时：顶部搜索栏 + 下方商品列表
-class _SearchResultBody extends StatelessWidget {
-  const _SearchResultBody({
-    required this.state,
-    required this.notifier,
-    required this.searchController,
-  });
-
-  final PurchaseAssistState state;
-  final PurchaseAssist notifier;
-  final TextEditingController searchController;
+class _SearchResultBody extends HookConsumerWidget {
+  const _SearchResultBody();
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(purchaseAssistProvider);
+    final notifier = ref.read(purchaseAssistProvider.notifier);
+    final searchController =
+        useTextEditingController(text: state.searchKeyword);
+
+    useEffect(() {
+      if (state.searchKeyword != searchController.text) {
+        searchController.text = state.searchKeyword;
+      }
+      return null;
+    }, [state.searchKeyword]);
+
+    onTap(item) async {
+      if (!context.mounted) return;
+      if (state.selectedPlatform == searchPlatform[0].value) {
+        context.router.push(ShowroomSampleDetailRoute(id: item.id!));
+      } else {
+        final url = item.productUrl;
+        if (url != null && url.isNotEmpty) {
+          final uri = Uri.tryParse(url);
+          if (uri != null && await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         // 平台标签：横向滑动
-
-        TagList(
+        MuTagList(
           items: searchPlatform,
           selectedValue: state.selectedPlatform,
-          onSelected: notifier.setSelectedPlatform,
+          onSelected: (value) => {
+            notifier.setSelectedPlatform(value),
+            notifier.loadProducts(refresh: true, params: {"platform": value})
+          },
           spacing: 8,
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
           fontSize: 12,
@@ -326,20 +359,153 @@ class _SearchResultBody extends StatelessWidget {
         // 顶部收缩的搜索框
         const SearchArea(),
         const Divider(height: 1),
-        Expanded(
-          child: MuListView<PurchaseAssistSearchProduct>(
-            state: state,
-            list: state.productList,
-            onRefresh: () => notifier.loadProducts(refresh: true),
-            onLoadMore: () => notifier.loadProducts(refresh: false),
-            refreshOnStart: false,
-            itemBuilder: (context, item) => ListTile(
-              title: Text(item.name ?? ''),
-              subtitle: item.id != null ? Text('ID: ${item.id}') : null,
-            ),
-          ),
-        ),
+
+        // 已上传的搜索图片展示
+        if (state.searchMediaList.isNotEmpty) _UploadedImagesRow(),
+
+        state.hasSearched
+            ? Expanded(
+                child: MuListView<PurchaseAssistSearchProduct>(
+                  state: state,
+                  list: state.productList,
+                  onRefresh: () => notifier.loadProducts(refresh: true),
+                  onLoadMore: () => notifier.loadProducts(refresh: false),
+                  refreshOnStart: false,
+                  isAdapColumn: true,
+                  itemBuilder: (context, item) => AssistProductCard(
+                    sample: item,
+                    onTap: () => onTap(item),
+                  ),
+                ),
+              )
+            : const SizedBox(height: 20),
       ],
+    );
+  }
+}
+
+/// 已上传的搜索图片横向列表（首项为加号，点击执行 openGallery）
+class _UploadedImagesRow extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(purchaseAssistProvider);
+    final notifier = ref.read(purchaseAssistProvider.notifier);
+    final list = state.searchMediaList;
+    if (list.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withOpacity(0.3),
+      child: SizedBox(
+        height: 72,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: list.length + 1,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            // 第一项：加号，点击打开相册
+            if (index == list.length) {
+              return GestureDetector(
+                onTap: () => _openGalleryForPurchaseAssist(context, ref),
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withOpacity(0.5),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 32,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withOpacity(0.5),
+                  ),
+                ),
+              );
+            }
+            final media = list[index];
+            final imageUrl = media.thumbUrl ?? media.url;
+            final isSelected = state.searchMedia?.id == media.id;
+            return GestureDetector(
+              onTap: () {
+                notifier.setSearchMedia(media);
+                notifier.loadProducts(params: {"media_id": media.id});
+              },
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.transparent,
+                        width: 3,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
+                                blurRadius: 6,
+                                spreadRadius: 0,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: 72,
+                        height: 72,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: GestureDetector(
+                      onTap: () => notifier.removeSearchMedia(index - 1),
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1),
+                        ),
+                        child: const Icon(Icons.close,
+                            size: 14, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

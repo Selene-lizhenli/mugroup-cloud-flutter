@@ -23,6 +23,7 @@ class MuListView<T> extends HookWidget {
   final Future<void> Function() onLoadMore;
   final bool? refreshOnStart;
   final double? hPadding;
+  final bool? isAdapColumn;
 
   const MuListView({
     super.key,
@@ -33,6 +34,7 @@ class MuListView<T> extends HookWidget {
     required this.onLoadMore,
     this.refreshOnStart,
     this.hPadding = 0.0,
+    this.isAdapColumn = false,
   });
 
   @override
@@ -42,6 +44,19 @@ class MuListView<T> extends HookWidget {
       controlFinishLoad: true,
       controlFinishRefresh: true,
     );
+    var crossAxisCount = 1;
+    if (isAdapColumn == true) {
+      final mediaQuery = MediaQuery.of(context);
+      if (mediaQuery.size.width > 200) {
+        crossAxisCount = 2;
+      }
+      if (mediaQuery.size.width > 500) {
+        crossAxisCount = 3;
+      }
+      if (mediaQuery.size.width > 800) {
+        crossAxisCount = 4;
+      }
+    }
 
     if (state.isLoading && list.isEmpty) {
       return const Center(
@@ -103,21 +118,15 @@ class MuListView<T> extends HookWidget {
                 SliverPadding(
                   padding: const EdgeInsets.all(5),
                   sliver: SliverMasonryGrid.count(
-                    crossAxisCount: 1,
-                    mainAxisSpacing: 0,
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: isAdapColumn == true ? 5 : 0,
+                    crossAxisSpacing: isAdapColumn == true ? 5 : 0,
                     childCount: list.length,
                     itemBuilder: (context, index) {
                       final itemValue = list[index];
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // if (index < list.length - 1)
-                          //   Divider(
-                          //     height: 1,
-                          //     thickness: 1,
-                          //     color:
-                          //         colorScheme.outlineVariant.withOpacity(0.5),
-                          //   ),
                           itemBuilder(context, itemValue),
                         ],
                       );

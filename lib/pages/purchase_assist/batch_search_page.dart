@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/purchase_assist.dart';
+import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/task_list_item_card.dart';
 import 'package:cloud/pages/widgets/list.dart';
@@ -45,7 +45,7 @@ class BatchImageSearchResultPage extends HookConsumerWidget {
         onLoadMore: () => notifier.loadTaskList(),
         refreshOnStart: false,
         itemBuilder: (context, item) => TaskListItemCard(
-          item: item,
+          item: item, 
           onTap: () => onTap(item),
         ),
       ),

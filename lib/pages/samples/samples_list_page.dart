@@ -1,5 +1,4 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
+import 'package:auto_route/auto_route.dart'; 
 import 'package:cloud/pages/samples/events/search_event.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/views/product_view.dart';

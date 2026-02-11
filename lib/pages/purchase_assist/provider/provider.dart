@@ -1,4 +1,5 @@
-import 'package:cloud/models/purchase_assist.dart';
+import 'package:cloud/models/purchase_assist/purchase_assist.dart';
+import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/services/purchase_assist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -20,8 +21,13 @@ class PurchaseAssistState implements MuListState {
     this.page = 1,
     this.hasMore = true,
     this.searchKeyword = '',
-    this.searchImagePaths = const [],
+    this.searchImages = const [],
+    this.searchMedia,
+    this.searchMediaList = const [],
     this.selectedPlatform = 'cloud',
+    this.sortOrder,
+    this.priceMin,
+    this.priceMax,
   });
 
   final bool hasSearched;
@@ -36,8 +42,15 @@ class PurchaseAssistState implements MuListState {
   final int page;
   final bool hasMore;
   final String searchKeyword;
-  final List<String> searchImagePaths;
+  final List<dynamic> searchImages;
+  final TemporaryMedia? searchMedia;
+  final List<TemporaryMedia> searchMediaList;
   final String selectedPlatform;
+
+  /// 排序：'price_desc' 价格降序，'price_asc' 价格升序
+  final String? sortOrder;
+  final String? priceMin;
+  final String? priceMax;
 
   PurchaseAssistState copyWith({
     bool? hasSearched,
@@ -52,25 +65,39 @@ class PurchaseAssistState implements MuListState {
     bool? hasMore,
     String? searchKeyword,
     List<String>? searchImagePaths,
+    TemporaryMedia? searchMedia,
+    List<TemporaryMedia>? searchMediaList,
     String? selectedPlatform,
+    String? sortOrder,
+    String? priceMin,
+    String? priceMax,
   }) {
     return PurchaseAssistState(
       hasSearched: hasSearched ?? this.hasSearched,
       productList: productList ?? this.productList,
       taskList: taskList ?? this.taskList,
       taskDetail: taskDetail ?? this.taskDetail,
-      taskId: taskId ?? taskId,
+      taskId: taskId ?? this.taskId,
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       errorMessage: errorMessage,
       page: page ?? this.page,
       hasMore: hasMore ?? this.hasMore,
       searchKeyword: searchKeyword ?? this.searchKeyword,
-      searchImagePaths: searchImagePaths ?? this.searchImagePaths,
+      searchImages: searchImagePaths ?? this.searchImages,
+      searchMedia: searchMedia ?? this.searchMedia,
+      searchMediaList: searchMediaList ?? this.searchMediaList,
       selectedPlatform: selectedPlatform ?? this.selectedPlatform,
+      sortOrder: sortOrder ?? this.sortOrder,
+      priceMin: priceMin ?? this.priceMin,
+      priceMax: priceMax ?? this.priceMax,
     );
   }
 }
+
+/// 排序选项常量
+const String kSortPriceDesc = 'price_desc';
+const String kSortPriceAsc = 'price_asc';
 
 /// 比价助手 Provider：搜索状态与商品列表，接口占位待补充
 @riverpod
@@ -84,18 +111,50 @@ class PurchaseAssist extends _$PurchaseAssist {
     state = state.copyWith(searchKeyword: keyword);
   }
 
+  void setSearchMedia(TemporaryMedia? media) {
+    state = state.copyWith(searchMedia: media);
+  }
+
   void setSearchImagePaths(List<String> paths) {
     state = state.copyWith(searchImagePaths: paths);
+  }
+
+  /// 添加上传的搜索图片（用于展示与搜索）
+  void addSearchMedia(TemporaryMedia media) {
+    state = state.copyWith(
+      searchMedia: media,
+      searchMediaList: [...state.searchMediaList, media],
+    );
+  }
+
+  /// 移除已上传的搜索图片，并重新切换当前选中项、刷新该图的搜索结果
+  Future<void> removeSearchMedia(int index) async {
+    final list = List<TemporaryMedia>.from(state.searchMediaList)
+      ..removeAt(index);
+    // 删除后优先选中同位置图片，若越界则选最后一张
+    final newIndex = list.isEmpty ? -1 : index.clamp(0, list.length - 1);
+    final newMedia = list.isEmpty ? null : list[newIndex];
+    state = state.copyWith(
+      searchMedia: newMedia,
+      searchMediaList: list,
+    );
+    if (newMedia != null) {
+      await loadProducts(params: {"media_id": newMedia.id});
+    } else {
+      state = state.copyWith(hasSearched: false, productList: []);
+    }
   }
 
   void setSelectedPlatform(String platform) {
     state = state.copyWith(selectedPlatform: platform);
   }
 
-  /// 执行搜索：标记已搜索，搜索框滑到顶部，并触发商品列表加载
-  Future<void> doSearch() async {
-    state = state.copyWith(hasSearched: true, errorMessage: null);
-    await loadProducts(refresh: true);
+  void setSortOrder(String? order) {
+    state = state.copyWith(sortOrder: order);
+  }
+
+  void setPriceRange(String? min, String? max) {
+    state = state.copyWith(priceMin: min, priceMax: max);
   }
 
   void clearSearch() {
@@ -104,6 +163,11 @@ class PurchaseAssist extends _$PurchaseAssist {
       productList: [],
       searchKeyword: '',
       searchImagePaths: [],
+      searchMedia: null,
+      searchMediaList: [],
+      sortOrder: null,
+      priceMin: null,
+      priceMax: null,
       page: 1,
       hasMore: true,
       errorMessage: null,
@@ -122,16 +186,24 @@ class PurchaseAssist extends _$PurchaseAssist {
       isLoading: refresh ? true : state.isLoading,
       isLoadingMore: refresh ? false : true,
       errorMessage: null,
+      hasSearched: true,
     );
     try {
       final data = {
         'keywords': state.searchKeyword,
         'page': nextPage,
         'pageSize': 20,
+        'media_id': params?['media_id'] ?? state.searchMedia?.id,
         'platform': params?['platform'] ?? state.selectedPlatform,
+        if (state.sortOrder != null && state.sortOrder!.isNotEmpty)
+          'sort_order': state.sortOrder,
       };
+      if (state.priceMax != null && state.priceMax!.isNotEmpty ||
+          state.priceMin != null && state.priceMin!.isNotEmpty) {
+        data["priceRange"] = [state.priceMin, state.priceMax];
+      }
       final resp = await getMultiPlatformSearch(data);
-      final result = resp.data;
+      final result = resp;
       const pageSize = 20;
       final hasMore = data.length >= pageSize;
       state = state.copyWith(

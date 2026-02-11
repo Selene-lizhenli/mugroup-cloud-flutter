@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/models/purchase_assist.dart';
+import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:flutter/material.dart';
 
 /// 比价助手任务列表项卡片：源图片、目标平台、进度、创建时间、创建人

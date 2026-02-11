@@ -1,36 +1,23 @@
-import 'dart:convert';
-
-import 'package:cloud/helper/helper.dart';
+ 
+ 
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/response.dart';
-import 'package:cloud/models/purchase_assist.dart';
+import 'package:cloud/models/purchase_assist/purchase_assist.dart'; 
 
 // POST api/tenant/multi-platform/search
 // 比价助手 - 多平台搜索产品列表
 // 入参：keywords, page, pageSize, platform
 // 返回：list，每项结构见 PurchaseAssistSearchProduct
-Future<ApiResponse<List<PurchaseAssistSearchProduct>>> getMultiPlatformSearch(
+Future<List<PurchaseAssistSearchProduct>> getMultiPlatformSearch(
   Map<String, dynamic>? params,
 ) async {
- 
   return api.post('api/tenant/multi-platform/search', data: params).then(
-        (res) => ApiResponse<List<PurchaseAssistSearchProduct>>.fromJson(
-          res.data,
-          (data) {
-            // 接口返回为外层 List，第一项为实际数据列表
-            final outerList = data as List;
-            final innerList =
-                outerList.isNotEmpty ? (outerList[0] as List) : <dynamic>[];
-            if (innerList.isNotEmpty) {
-              logger.d(
-                'getMultiPlatformSearch 第一项: ${const JsonEncoder.withIndent('  ').convert(innerList[0])}',
-              );
-            }
-            final list = innerList.cast<Map<String, dynamic>>();
-            return list.map(PurchaseAssistSearchProduct.fromJson).toList();
-          },
-        ),
-      );
+    (data) {
+      final outerList = data.data as List; 
+      final list = outerList.cast<Map<String, dynamic>>();
+      return list.map(PurchaseAssistSearchProduct.fromJson).toList();
+    },
+  );
 }
 
 // GET api/tenant/product-comparison/tasks?pageSize=20&page=1
@@ -55,18 +42,13 @@ Future<ApiResponse<List<PurchaseAssistTaskListItem>>> getProductComparisonTasks(
 // 返回：list，每项结构见 PurchaseAssistTaskDetailItem
 Future<ApiResponse<List<PurchaseAssistTaskDetailItem>>>
     getProductComparisonTaskDetail(int taskId) async {
-  return api
-      .get('api/tenant/product-comparison/task-detail/$taskId')
-      .then(
-        (res) =>
-            ApiResponse<List<PurchaseAssistTaskDetailItem>>.fromJson(
-              res.data,
-              (data) {
-                final list = (data as List).cast<Map<String, dynamic>>();
-                return list
-                    .map(PurchaseAssistTaskDetailItem.fromJson)
-                    .toList();
-              },
-            ),
+  return api.get('api/tenant/product-comparison/task-detail/$taskId').then(
+        (res) => ApiResponse<List<PurchaseAssistTaskDetailItem>>.fromJson(
+          res.data,
+          (data) {
+            final list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(PurchaseAssistTaskDetailItem.fromJson).toList();
+          },
+        ),
       );
 }
