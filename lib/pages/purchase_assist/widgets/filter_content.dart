@@ -5,23 +5,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 筛选底部抽屉内容：竖向 Tab - 排序、价格区间
 class FilterContent extends HookConsumerWidget {
-  const FilterContent({super.key});
+  const FilterContent({
+    super.key,
+    this.scrollController,
+  });
+
+  /// 来自 `DraggableScrollableSheet` 的滚动控制器（用于内容超出时可上下滑动）
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(purchaseAssistProvider);
     final notifier = ref.read(purchaseAssistProvider.notifier);
     final selectedTabIndex = useState(0);
-    final priceMinController =
-        useTextEditingController(text: state.priceMin ?? '');
-    final priceMaxController =
-        useTextEditingController(text: state.priceMax ?? '');
     final colorScheme = Theme.of(context).colorScheme;
-
-    return Container( 
-        child: Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -34,14 +35,14 @@ class FilterContent extends HookConsumerWidget {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  notifier.setPriceRange(
-                    priceMinController.text.trim().isEmpty
-                        ? null
-                        : priceMinController.text.trim(),
-                    priceMaxController.text.trim().isEmpty
-                        ? null
-                        : priceMaxController.text.trim(),
-                  );
+                  notifier.resetFilterContent();
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                child:
+                    Text('重置', style: TextStyle(color: colorScheme.secondary)),
+              ),
+              TextButton(
+                onPressed: () {
                   notifier.loadProducts(refresh: true);
                   if (context.mounted) Navigator.of(context).pop();
                 },
@@ -78,23 +79,32 @@ class FilterContent extends HookConsumerWidget {
               Expanded(
                 child: Container(
                   color: colorScheme.surface,
-                  padding: const EdgeInsets.all(20),
-                  child: selectedTabIndex.value == 0
-                      ? _SortContent(
-                          currentSort: state.sortOrder,
-                          onSortChanged: notifier.setSortOrder,
-                        )
-                      : _PriceRangeContent(
-                          minController: priceMinController,
-                          maxController: priceMaxController,
-                        ),
+                  padding: const EdgeInsets.all(12),
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: selectedTabIndex.value == 0
+                        ? _SortContent(
+                            currentSort: state.sortOrder,
+                            onSortChanged: notifier.setSortOrder,
+                          )
+                        : _PriceRangeContent(
+                            minValue: state.priceMin,
+                            maxValue: state.priceMax,
+                            onMinChanged: (min) {
+                              notifier.setPriceRange(min, state.priceMax);
+                            },
+                            onMaxChanged: (max) {
+                              notifier.setPriceRange(state.priceMin, max);
+                            },
+                          ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ],
-    ));
+    );
   }
 }
 
@@ -113,8 +123,12 @@ class _FilterTabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: selected ? colorScheme.surface : Colors.transparent,
+      color: selected ? Colors.white : Colors.transparent,
       child: InkWell(
+        focusColor: Colors.white,
+        hoverColor: Colors.white,
+        highlightColor: Colors.white,
+        splashColor: Colors.white,
         onTap: onTap,
         child: Container(
           alignment: Alignment.centerLeft,
@@ -132,7 +146,7 @@ class _FilterTabItem extends StatelessWidget {
   }
 }
 
-/// 排序单选项：价格降序、价格升序
+/// 排序单选项：默认、按价格降序、按价格升序
 class _SortContent extends StatelessWidget {
   final String? currentSort;
   final ValueChanged<String?> onSortChanged;
@@ -149,15 +163,30 @@ class _SortContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RadioListTile<String?>(
-          title: const Text('价格降序'),
-          value: kSortPriceDesc,
+          title: const Text('默认'),
+          value: null,
           groupValue: currentSort,
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          contentPadding: EdgeInsets.zero,
           onChanged: (v) => onSortChanged(v),
         ),
         RadioListTile<String?>(
-          title: const Text('价格升序'),
+          title: const Text('按价格降序'),
+          value: kSortPriceDesc,
+          groupValue: currentSort,
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          contentPadding: EdgeInsets.zero,
+          onChanged: (v) => onSortChanged(v),
+        ),
+        RadioListTile<String?>(
+          title: const Text('按价格升序'),
           value: kSortPriceAsc,
           groupValue: currentSort,
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          contentPadding: EdgeInsets.zero,
           onChanged: (v) => onSortChanged(v),
         ),
       ],
@@ -167,40 +196,56 @@ class _SortContent extends StatelessWidget {
 
 /// 价格区间：最小值、最大值输入框
 class _PriceRangeContent extends StatelessWidget {
-  final TextEditingController minController;
-  final TextEditingController maxController;
+  final String? minValue;
+  final String? maxValue;
+  final ValueChanged<String?> onMinChanged;
+  final ValueChanged<String?> onMaxChanged;
 
   const _PriceRangeContent({
-    required this.minController,
-    required this.maxController,
+    required this.minValue,
+    required this.maxValue,
+    required this.onMinChanged,
+    required this.onMaxChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TextField(
-          controller: minController,
-          decoration: const InputDecoration(
-            labelText: '最低价',
-            hintText: '请输入最小值',
-            border: OutlineInputBorder(),
-            isDense: true,
+        Expanded(
+          child: TextFormField(
+            initialValue: minValue ?? '',
+            decoration: const InputDecoration(
+              labelText: '最低价',
+              hintText: '请输入最小值',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (v) {
+              final text = v.trim();
+              onMinChanged(text.isEmpty ? null : text);
+            },
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
         ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: maxController,
-          decoration: const InputDecoration(
-            labelText: '最高价',
-            hintText: '请输入最大值',
-            border: OutlineInputBorder(),
-            isDense: true,
+        const SizedBox(width: 16),
+        Expanded(
+          child: TextFormField(
+            initialValue: maxValue ?? '',
+            decoration: const InputDecoration(
+              labelText: '最高价',
+              hintText: '请输入最大值',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (v) {
+              final text = v.trim();
+              onMaxChanged(text.isEmpty ? null : text);
+            },
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
         ),
       ],
     );

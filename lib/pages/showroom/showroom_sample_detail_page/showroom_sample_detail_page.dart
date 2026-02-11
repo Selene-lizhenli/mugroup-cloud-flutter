@@ -222,7 +222,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    '¥${(double.tryParse(sample.value!.purchaseCost.toString()) ?? 0.0).toStringAsFixed(2)}',
+                                    '¥${(double.tryParse(sample.value?.purchaseCost?.toString() ?? '0.0') ?? 0.0).toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontSize: 26,
                                       fontWeight: FontWeight.bold,
@@ -237,7 +237,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '产品编号: ${sample.value!.productNo}',
+                                      '产品编号: ${sample.value?.productNo ?? ''}',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey,
@@ -260,7 +260,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      sample.value!.nameCn ?? '',
+                                      sample.value?.nameCn ?? '',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -272,7 +272,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   ),
 
                                   // 如果是 market_product 类型，显示规格在右边
-                                  if (sample.value!.itemType ==
+                                  if (sample.value?.itemType ==
                                       'market_product') ...[
                                     const SizedBox(width: 8),
                                     Container(

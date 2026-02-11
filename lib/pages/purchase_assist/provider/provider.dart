@@ -6,6 +6,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'provider.g.dart';
 
+class _Unset {
+  const _Unset();
+}
+
+const _unset = _Unset();
+
 /// 比价助手主页面状态
 class PurchaseAssistState implements MuListState {
   const PurchaseAssistState({
@@ -68,9 +74,9 @@ class PurchaseAssistState implements MuListState {
     TemporaryMedia? searchMedia,
     List<TemporaryMedia>? searchMediaList,
     String? selectedPlatform,
-    String? sortOrder,
-    String? priceMin,
-    String? priceMax,
+    Object? sortOrder = _unset,
+    Object? priceMin = _unset,
+    Object? priceMax = _unset,
   }) {
     return PurchaseAssistState(
       hasSearched: hasSearched ?? this.hasSearched,
@@ -88,9 +94,12 @@ class PurchaseAssistState implements MuListState {
       searchMedia: searchMedia ?? this.searchMedia,
       searchMediaList: searchMediaList ?? this.searchMediaList,
       selectedPlatform: selectedPlatform ?? this.selectedPlatform,
-      sortOrder: sortOrder ?? this.sortOrder,
-      priceMin: priceMin ?? this.priceMin,
-      priceMax: priceMax ?? this.priceMax,
+      sortOrder:
+          identical(sortOrder, _unset) ? this.sortOrder : sortOrder as String?,
+      priceMin:
+          identical(priceMin, _unset) ? this.priceMin : priceMin as String?,
+      priceMax:
+          identical(priceMax, _unset) ? this.priceMax : priceMax as String?,
     );
   }
 }
@@ -98,6 +107,39 @@ class PurchaseAssistState implements MuListState {
 /// 排序选项常量
 const String kSortPriceDesc = 'price_desc';
 const String kSortPriceAsc = 'price_asc';
+
+/// 按价格前端排序；默认（null/空）不排序，保持接口返回顺序
+List<PurchaseAssistSearchProduct> _sortProductsByPrice(
+  List<PurchaseAssistSearchProduct> list,
+  String? sortOrder,
+) {
+  if (sortOrder == 'default' || sortOrder == null || sortOrder.isEmpty) {
+    return list; // 默认：不排序
+  }
+  final sorted = List<PurchaseAssistSearchProduct>.from(list);
+  double parsePrice(String? s) {
+    if (s == null || s.trim().isEmpty) return double.infinity;
+    return double.tryParse(s.trim()) ?? double.infinity;
+  }
+
+  if (sortOrder == kSortPriceDesc) {
+    sorted.sort((a, b) {
+      final pa = parsePrice(a.price);
+      final pb = parsePrice(b.price);
+      // 无效价格用 negativeInfinity 排到末尾（降序时小值在末尾）
+      final va = pa.isFinite ? pa : double.negativeInfinity;
+      final vb = pb.isFinite ? pb : double.negativeInfinity;
+      return vb.compareTo(va);
+    });
+  } else if (sortOrder == kSortPriceAsc) {
+    sorted.sort((a, b) {
+      final pa = parsePrice(a.price);
+      final pb = parsePrice(b.price);
+      return pa.compareTo(pb);
+    });
+  }
+  return sorted;
+}
 
 /// 比价助手 Provider：搜索状态与商品列表，接口占位待补充
 @riverpod
@@ -178,6 +220,19 @@ class PurchaseAssist extends _$PurchaseAssist {
     state = state.copyWith(taskId: id);
   }
 
+  void resetFilterContent() {
+    state = state.copyWith(
+      sortOrder: "default",
+      priceMin: '',
+      priceMax: '',
+    );
+    loadProducts(refresh: true, params: {
+      "sortOrder": 'fdefault',
+      "priceMin": '',
+      "priceMax": '',
+    });
+  }
+
   /// 加载商品列表（接口占位，后续替换为真实 API）
   Future<void> loadProducts(
       {bool refresh = true, Map<String, dynamic>? params}) async {
@@ -195,19 +250,23 @@ class PurchaseAssist extends _$PurchaseAssist {
         'pageSize': 20,
         'media_id': params?['media_id'] ?? state.searchMedia?.id,
         'platform': params?['platform'] ?? state.selectedPlatform,
-        if (state.sortOrder != null && state.sortOrder!.isNotEmpty)
-          'sort_order': state.sortOrder,
       };
       if (state.priceMax != null && state.priceMax!.isNotEmpty ||
           state.priceMin != null && state.priceMin!.isNotEmpty) {
         data["priceRange"] = [state.priceMin, state.priceMax];
       }
       final resp = await getMultiPlatformSearch(data);
-      final result = resp;
+      var result = resp as List<PurchaseAssistSearchProduct>;
+      // 前端按价格排序
+      result =
+          _sortProductsByPrice(result, params?['sortOrder'] ?? state.sortOrder);
       const pageSize = 20;
       final hasMore = data.length >= pageSize;
       state = state.copyWith(
-        productList: refresh ? result : [...state.productList, ...result],
+        productList: refresh
+            ? result
+            : _sortProductsByPrice([...state.productList, ...result],
+                params?['sortOrder'] ?? state.sortOrder),
         isLoading: false,
         isLoadingMore: false,
         page: nextPage + 1,

@@ -5,6 +5,7 @@ import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/assist_product_card.dart';
 import 'package:cloud/pages/purchase_assist/widgets/filter_content.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/pages/widgets/tag_list.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path/path.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 import 'package:cloud/services/media.dart';
@@ -138,7 +140,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
             top: state.hasSearched ? paddingTop - 15 + kToolbarHeight : 0,
             bottom: 0,
             child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.symmetric(horizontal: 14),
                 child: Center(
                   child: _SearchResultBody(),
                 )),
@@ -154,9 +156,7 @@ class SearchArea extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 白色圆角输入框 + 盒外阴影，右侧相机 + 加号
     final state = ref.watch(purchaseAssistProvider);
-    final notifier = ref.read(purchaseAssistProvider.notifier);
-    final colorScheme = Theme.of(context).colorScheme;
-    final currentMedia = ref.read(purchaseAssistProvider).searchMedia;
+    final notifier = ref.read(purchaseAssistProvider.notifier); 
 
     /// 打开相册，选择照片后上传并加入搜索图片列表
     Future<void> openGallery() async {
@@ -175,9 +175,10 @@ class SearchArea extends HookConsumerWidget {
       final temporaryMedia = await upload(file: file);
       notifier.addSearchMedia(temporaryMedia);
 
-      if (context.mounted && currentMedia != null) {
+      if (context.mounted) {
         await notifier.loadProducts(params: {"media_id": temporaryMedia.id});
       }
+ 
     }
 
     Widget getTnputArea() {
@@ -193,40 +194,6 @@ class SearchArea extends HookConsumerWidget {
           onChanged: notifier.setSearchKeyword,
           onSubmitted: (_) => notifier.loadProducts(),
         ),
-      );
-    }
-
-    Widget getFilterBtn() {
-      return IconButton(
-        icon: Icon(Icons.filter_alt_outlined,
-            color: state.hasSearched == true
-                ? colorScheme.primary
-                : Colors.black87),
-        tooltip: '筛选',
-        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-        constraints: const BoxConstraints(),
-        style: IconButton.styleFrom(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => DraggableScrollableSheet(
-              initialChildSize: 0.5,
-              minChildSize: 0.3,
-              maxChildSize: 0.85,
-              builder: (context, scrollController) => Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                ),
-                child: const FilterContent(),
-              ),
-            ),
-          );
-        },
       );
     }
 
@@ -282,7 +249,6 @@ class SearchArea extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                getFilterBtn(),
                 const Spacer(),
                 getcaremaBtn(),
                 getPicBtn(),
@@ -290,14 +256,14 @@ class SearchArea extends HookConsumerWidget {
             )
           ] else ...[
             Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  getTnputArea(),
-                  getFilterBtn(),
-                  getcaremaBtn(),
-                  getPicBtn(),
-                ]),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                getTnputArea(),
+                getcaremaBtn(),
+                getPicBtn(),
+              ],
+            ),
           ]
         ],
       ),
@@ -315,6 +281,7 @@ class _SearchResultBody extends HookConsumerWidget {
     final notifier = ref.read(purchaseAssistProvider.notifier);
     final searchController =
         useTextEditingController(text: state.searchKeyword);
+    final colorScheme = Theme.of(context).colorScheme;
 
     useEffect(() {
       if (state.searchKeyword != searchController.text) {
@@ -338,47 +305,142 @@ class _SearchResultBody extends HookConsumerWidget {
       }
     }
 
+    Widget getFilterBtn() {
+      final hasActiveFilters = (state.sortOrder != 'default' &&
+              state.sortOrder != null &&
+              state.sortOrder!.isNotEmpty) ||
+          (state.priceMin != null && state.priceMin!.isNotEmpty) ||
+          (state.priceMax != null && state.priceMax!.isNotEmpty);
+      return IconButton(
+        icon: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(
+              Icons.filter_alt_outlined,
+              color: state.hasSearched == true
+                  ? colorScheme.primary
+                  : Colors.black87,
+            ),
+            if (hasActiveFilters)
+              Positioned(
+                right: -1,
+                top: -1,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        tooltip: '筛选',
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+        constraints: const BoxConstraints(),
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (sheetContext) => Padding(
+              padding: EdgeInsets.only(
+                bottom: math.max(
+                  MediaQuery.of(sheetContext).viewInsets.bottom,
+                  0,
+                ),
+              ),
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.6,
+                minChildSize: 0.6,
+                maxChildSize: 0.85,
+                builder: (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
+                  ),
+                  child: FilterContent(scrollController: scrollController),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // 平台标签：横向滑动
-        MuTagList(
-          items: searchPlatform,
-          selectedValue: state.selectedPlatform,
-          onSelected: (value) => {
-            notifier.setSelectedPlatform(value),
-            notifier.loadProducts(refresh: true, params: {"platform": value})
-          },
-          spacing: 8,
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          fontSize: 12,
-          chipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        // 平台标签与筛选同一行，超出时仅 MuTagList 横向滚动
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(width: 4),
+            Expanded(
+              child: MuTagList(
+                items: searchPlatform,
+                selectedValue: state.selectedPlatform,
+                onSelected: (value) {
+                  notifier.setSelectedPlatform(value);
+                  notifier
+                      .loadProducts(refresh: true, params: {"platform": value});
+                },
+                backgroundColor: state.hasSearched
+                    ? colorScheme.surface.withOpacity(0.3)
+                    : null,
+                spacing: 8,
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
+                fontSize: 12,
+                chipPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              ),
+            ),
+            getFilterBtn(),
+            const SizedBox(width: 4),
+          ],
         ),
-
         // 顶部收缩的搜索框
         const SearchArea(),
-        const Divider(height: 1),
 
         // 已上传的搜索图片展示
-        if (state.searchMediaList.isNotEmpty) _UploadedImagesRow(),
-
-        state.hasSearched
-            ? Expanded(
-                child: MuListView<PurchaseAssistSearchProduct>(
-                  state: state,
-                  list: state.productList,
-                  onRefresh: () => notifier.loadProducts(refresh: true),
-                  onLoadMore: () => notifier.loadProducts(refresh: false),
-                  refreshOnStart: false,
-                  isAdapColumn: true,
-                  itemBuilder: (context, item) => AssistProductCard(
-                    sample: item,
-                    onTap: () => onTap(item),
-                  ),
+        if (state.searchMediaList.isNotEmpty) ...[
+          const SizedBox(height: 5),
+          _UploadedImagesRow(),
+        ],
+        if (state.hasSearched) ...[
+          if (state.isLoading)
+            const Expanded(
+              child: Center(
+                child: MuProgressIndicator(),
+              ),
+            )
+          else ...[
+            const SizedBox(height: 8),
+            Expanded(
+              child: MuListView<PurchaseAssistSearchProduct>(
+                state: state,
+                list: state.productList,
+                onRefresh: () => notifier.loadProducts(refresh: true),
+                onLoadMore: () => notifier.loadProducts(refresh: false),
+                refreshOnStart: false,
+                isAdapColumn: true,
+                itemBuilder: (context, item) => AssistProductCard(
+                  sample: item,
+                  onTap: () => onTap(item),
                 ),
-              )
-            : const SizedBox(height: 20),
+              ),
+            ),
+          ]
+        ] else ...[
+          const SizedBox(height: 20)
+        ],
       ],
     );
   }
@@ -394,118 +456,123 @@ class _UploadedImagesRow extends ConsumerWidget {
     if (list.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest
-          .withOpacity(0.3),
-      child: SizedBox(
-        height: 72,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: list.length + 1,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
-          itemBuilder: (context, index) {
-            // 第一项：加号，点击打开相册
-            if (index == list.length) {
-              return GestureDetector(
-                onTap: () => _openGalleryForPurchaseAssist(context, ref),
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withOpacity(0.5),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.add,
-                    size: 32,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withOpacity(0.5),
-                  ),
-                ),
-              );
-            }
-            final media = list[index];
-            final imageUrl = media.thumbUrl ?? media.url;
-            final isSelected = state.searchMedia?.id == media.id;
-            return GestureDetector(
-              onTap: () {
-                notifier.setSearchMedia(media);
-                notifier.loadProducts(params: {"media_id": media.id});
-              },
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.transparent,
-                        width: 3,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.3),
-                                blurRadius: 6,
-                                spreadRadius: 0,
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        width: 72,
-                        height: 72,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: -4,
-                    top: -4,
-                    child: GestureDetector(
-                      onTap: () => notifier.removeSearchMedia(index - 1),
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1),
-                        ),
-                        child: const Icon(Icons.close,
-                            size: 14, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Theme.of(context)
+              .colorScheme
+              .surfaceContainerHighest
+              .withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-    );
+        child: SizedBox(
+            height: 76,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: list.length + 1,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  // 第一项：加号，点击打开相册
+                  if (index == list.length) {
+                    return GestureDetector(
+                      onTap: () => _openGalleryForPurchaseAssist(context, ref),
+                      child: Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withOpacity(0.26),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .outline
+                                .withOpacity(0.5),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          size: 32,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withOpacity(0.4),
+                        ),
+                      ),
+                    );
+                  }
+                  final media = list[index];
+                  final imageUrl = media.thumbUrl ?? media.url;
+                  final isSelected = state.searchMedia?.id == media.id;
+                  return GestureDetector(
+                    onTap: () {
+                      notifier.setSearchMedia(media);
+                      notifier.loadProducts(params: {"media_id": media.id});
+                    },
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.3),
+                                      blurRadius: 6,
+                                      spreadRadius: 0,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: GestureDetector(
+                            onTap: () => notifier.removeSearchMedia(index),
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 1),
+                              ),
+                              child: const Icon(Icons.close,
+                                  size: 14, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            )));
   }
 }

@@ -80,8 +80,7 @@ class MuListView<T> extends HookWidget {
           text: '暂无数据',
         ),
       );
-    }
-
+    } 
     return Container(
       margin: EdgeInsets.fromLTRB(hPadding ?? 0, 2, hPadding ?? 0, 0),
       decoration: const BoxDecoration(
@@ -116,7 +115,7 @@ class MuListView<T> extends HookWidget {
             MultiSliver(
               children: [
                 SliverPadding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(0),
                   sliver: SliverMasonryGrid.count(
                     crossAxisCount: crossAxisCount,
                     mainAxisSpacing: isAdapColumn == true ? 5 : 0,
