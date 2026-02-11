@@ -686,7 +686,20 @@ Future<void> _showPreSelectionSheet(
             GestureDetector(
               onTap: () async {
                 final result = await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context, builder: (_) => const QuoteSelect());
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                      ),
+                      child: const QuoteSelect(),
+                    );
+                  },
+                );
+
                 if (result != null) selectedQuote.value = result;
               },
               child: AbsorbPointer(
@@ -703,7 +716,20 @@ Future<void> _showPreSelectionSheet(
             GestureDetector(
               onTap: () async {
                 final result = await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context, builder: (_) => const SupplierSelect());
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                      ),
+                      child: const SupplierSelect(),
+                    );
+                  },
+                );
+
                 if (result != null) selectedSupplier.value = result;
               },
               child: AbsorbPointer(
