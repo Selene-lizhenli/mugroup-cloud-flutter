@@ -20,55 +20,7 @@ class AssistProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    WidgetSpan? _buildItemTypeSpan(BuildContext context) {
-      String? itemType = sample.rateScore;
-      if (itemType == null) {
-        return null;
-      }
-
-      final colorMap = {
-        "japan": Colors.yellow[800],
-        "market_product": Colors.red
-      };
-      final labelMap = {"japan": "日本产品", "market_product": "内部"};
-
-      final label = labelMap[itemType];
-      final bg = colorMap[itemType] ?? Colors.grey;
-
-      if (label == null) {
-        return null;
-      }
-
-      return WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 4),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: const BorderRadius.all(
-                Radius.circular(4),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 3,
-                vertical: 2,
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 9,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
+ 
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: GestureDetector(

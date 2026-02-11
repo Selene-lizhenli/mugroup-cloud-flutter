@@ -5,6 +5,8 @@ import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/assist_product_card.dart';
 import 'package:cloud/pages/purchase_assist/widgets/filter_content.dart';
+import 'package:cloud/pages/purchase_assist/widgets/search_area.dart';
+import 'package:cloud/pages/purchase_assist/widgets/upload_images_row.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/pages/widgets/tag_list.dart';
@@ -12,16 +14,13 @@ import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:path/path.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
-import 'package:cloud/services/media.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart'; 
+import 'package:wechat_assets_picker/wechat_assets_picker.dart'; 
+import 'package:cloud/services/media.dart'; 
 import 'package:url_launcher/url_launcher.dart';
 
 /// 打开相册选择图片并上传，加入搜索图片列表（供 SearchArea 与 _UploadedImagesRow 共用）
-Future<void> _openGalleryForPurchaseAssist(
+Future<void> openGalleryForPurchaseAssist(
     BuildContext context, WidgetRef ref) async {
   final notifier = ref.read(purchaseAssistProvider.notifier);
   final List<AssetEntity>? result = await AssetPicker.pickAssets(
@@ -149,127 +148,6 @@ class PurchaseAssistPage extends HookConsumerWidget {
   }
 }
 
-class SearchArea extends HookConsumerWidget {
-  const SearchArea({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 白色圆角输入框 + 盒外阴影，右侧相机 + 加号
-    final state = ref.watch(purchaseAssistProvider);
-    final notifier = ref.read(purchaseAssistProvider.notifier); 
-
-    /// 打开相册，选择照片后上传并加入搜索图片列表
-    Future<void> openGallery() async {
-      await _openGalleryForPurchaseAssist(context, ref);
-    }
-
-    /// 打开相机，拍一张后把文件路径加入搜索图片列表
-    Future<void> openCamera() async {
-      final entity = await CameraPicker.pickFromCamera(context,
-          pickerConfig: const CameraPickerConfig(enableRecording: false));
-
-      if (entity == null || !context.mounted) return;
-
-      final file = await entity.file;
-      if (file == null || !context.mounted) return;
-      final temporaryMedia = await upload(file: file);
-      notifier.addSearchMedia(temporaryMedia);
-
-      if (context.mounted) {
-        await notifier.loadProducts(params: {"media_id": temporaryMedia.id});
-      }
- 
-    }
-
-    Widget getTnputArea() {
-      return Expanded(
-        child: TextField(
-          decoration: const InputDecoration(
-            hintText: '请输入关键字...',
-            hintStyle: TextStyle(color: Colors.grey),
-            border: InputBorder.none,
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(vertical: 8),
-          ),
-          onChanged: notifier.setSearchKeyword,
-          onSubmitted: (_) => notifier.loadProducts(),
-        ),
-      );
-    }
-
-    Widget getPicBtn() {
-      return IconButton(
-        icon: const Icon(Icons.add_outlined, color: Colors.black87, size: 27),
-        tooltip: '从相册选择',
-        onPressed: () => openGallery(),
-        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-        constraints: const BoxConstraints(),
-        style: IconButton.styleFrom(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-      );
-    }
-
-    Widget getcaremaBtn() {
-      return IconButton(
-        icon: const Icon(Icons.camera_alt_outlined,
-            color: Colors.black87, size: 27),
-        tooltip: '拍照',
-        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-        constraints: const BoxConstraints(),
-        style: IconButton.styleFrom(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        onPressed: () => openCamera(),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (state.hasSearched == false) ...[
-            Row(children: [getTnputArea()]),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Spacer(),
-                getcaremaBtn(),
-                getPicBtn(),
-              ],
-            )
-          ] else ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                getTnputArea(),
-                getcaremaBtn(),
-                getPicBtn(),
-              ],
-            ),
-          ]
-        ],
-      ),
-    );
-  }
-}
 
 /// 已搜索时：顶部搜索栏 + 下方商品列表
 class _SearchResultBody extends HookConsumerWidget {
@@ -317,9 +195,9 @@ class _SearchResultBody extends HookConsumerWidget {
           children: [
             Icon(
               Icons.filter_alt_outlined,
-              color: state.hasSearched == true
+              color: hasActiveFilters == true
                   ? colorScheme.primary
-                  : Colors.black87,
+                  : colorScheme.onSurface.withOpacity(0.7),
             ),
             if (hasActiveFilters)
               Positioned(
@@ -412,7 +290,7 @@ class _SearchResultBody extends HookConsumerWidget {
         // 已上传的搜索图片展示
         if (state.searchMediaList.isNotEmpty) ...[
           const SizedBox(height: 5),
-          _UploadedImagesRow(),
+          const UploadedImagesRow(),
         ],
         if (state.hasSearched) ...[
           if (state.isLoading)
@@ -444,135 +322,4 @@ class _SearchResultBody extends HookConsumerWidget {
       ],
     );
   }
-}
-
-/// 已上传的搜索图片横向列表（首项为加号，点击执行 openGallery）
-class _UploadedImagesRow extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(purchaseAssistProvider);
-    final notifier = ref.read(purchaseAssistProvider.notifier);
-    final list = state.searchMediaList;
-    if (list.isEmpty) return const SizedBox.shrink();
-
-    return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerHighest
-              .withOpacity(0.3),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: SizedBox(
-            height: 76,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: list.length + 1,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  // 第一项：加号，点击打开相册
-                  if (index == list.length) {
-                    return GestureDetector(
-                      onTap: () => _openGalleryForPurchaseAssist(context, ref),
-                      child: Container(
-                        width: 68,
-                        height: 68,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest
-                              .withOpacity(0.26),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.5),
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          size: 32,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withOpacity(0.4),
-                        ),
-                      ),
-                    );
-                  }
-                  final media = list[index];
-                  final imageUrl = media.thumbUrl ?? media.url;
-                  final isSelected = state.searchMedia?.id == media.id;
-                  return GestureDetector(
-                    onTap: () {
-                      notifier.setSearchMedia(media);
-                      notifier.loadProducts(params: {"media_id": media.id});
-                    },
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              width: 3,
-                            ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.3),
-                                      blurRadius: 6,
-                                      spreadRadius: 0,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              width: 72,
-                              height: 72,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: -4,
-                          top: -4,
-                          child: GestureDetector(
-                            onTap: () => notifier.removeSearchMedia(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 1),
-                              ),
-                              child: const Icon(Icons.close,
-                                  size: 14, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            )));
-  }
-}
+} 
