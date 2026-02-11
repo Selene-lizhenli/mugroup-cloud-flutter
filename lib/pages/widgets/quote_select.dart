@@ -54,11 +54,6 @@ class QuoteSelect extends HookConsumerWidget {
       });
     }
 
-    final showQuickCreate = showCreateQuote &&
-        !isLoading.value &&
-        (quotes.value == null || quotes.value!.isEmpty) &&
-        searchController.text.isNotEmpty;
-
     return Container(
       height: height,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -125,27 +120,24 @@ class QuoteSelect extends HookConsumerWidget {
               ),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                width: showQuickCreate ? 80 : 0,
-                child: showQuickCreate
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: TextButton(
-                          onPressed: () async {
-                            await context.router.push(QuoteCreateRoute());
-                            if (context.mounted) loadQuotes();
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor:
-                                colorScheme.primary.withOpacity(0.1),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text("新增",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                width: 80,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: TextButton(
+                    onPressed: () async {
+                      await context.router.push(QuoteCreateRoute());
+                      if (context.mounted) loadQuotes();
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: colorScheme.primary.withOpacity(0.1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text("新增",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
               ),
             ],
           ),

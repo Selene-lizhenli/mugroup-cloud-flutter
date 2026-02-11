@@ -52,11 +52,6 @@ class SupplierSelect extends HookConsumerWidget {
       });
     }
 
-    final showQuickCreate = showCreateSupplier &&
-        !isLoading.value &&
-        (suppliers.value == null || suppliers.value!.isEmpty) &&
-        searchController.text.isNotEmpty;
-
     return Container(
       height: height,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -123,35 +118,32 @@ class SupplierSelect extends HookConsumerWidget {
               ),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                width: showQuickCreate ? 80 : 0,
-                child: showQuickCreate
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: TextButton(
-                          onPressed: () async {
-                            final resp = await context.router
-                                .push(const MarketProductSupplierCreateRoute());
-                            if (resp != null && context.mounted) {
-                              await loadSuppliers();
-                              if (resp is Supplier) {
-                                Navigator.of(context).pop(resp.toJson());
-                              } else if (resp is Map<String, dynamic>) {
-                                Navigator.of(context).pop(resp);
-                              }
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor:
-                                colorScheme.primary.withOpacity(0.1),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text("新增",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                width: 80,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: TextButton(
+                    onPressed: () async {
+                      final resp = await context.router
+                          .push(const MarketProductSupplierCreateRoute());
+                      if (resp != null && context.mounted) {
+                        await loadSuppliers();
+                        if (resp is Supplier) {
+                          Navigator.of(context).pop(resp.toJson());
+                        } else if (resp is Map<String, dynamic>) {
+                          Navigator.of(context).pop(resp);
+                        }
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: colorScheme.primary.withOpacity(0.1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text("新增",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
               ),
             ],
           ),
