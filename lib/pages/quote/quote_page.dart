@@ -475,15 +475,14 @@ class QuotePage extends HookConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (quote.value != null) // 只有有值时才显示清除
+                          if (quote.value != null)
                             GestureDetector(
-                              onTap: () =>
-                                  quote.value = null, // 直接置空，触发持久化和UI刷新
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.cancel,
-                                    size: 14, color: Colors.grey[400]),
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => quote.value = null,
+                              child: Icon(
+                                Icons.cancel,
+                                size: 22,
+                                color: Colors.grey[400],
                               ),
                             ),
                         ],
@@ -518,19 +517,15 @@ class QuotePage extends HookConsumerWidget {
                           ),
                           if (supplier.value != null)
                             GestureDetector(
+                              behavior: HitTestBehavior.opaque,
                               onTap: () => supplier.value = null,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.cancel,
-                                    size: 14, color: Colors.grey[400]),
-                              ),
+                              child: Icon(Icons.cancel,
+                                  size: 22, color: Colors.grey[400]),
                             ),
                         ],
                       ),
                     ),
 
-                    // 右侧箭头表示可点击进入编辑
                     Icon(Icons.chevron_right_rounded,
                         size: 16, color: Colors.grey[300]),
                   ],
