@@ -249,32 +249,6 @@ class AddSupplierSheet extends HookConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: SizedBox(
-                              height: 40,
-                              child: OutlinedButton.icon(
-                                onPressed: () async {
-                                  final result = await showModalBottomSheet<
-                                          Map<String, dynamic>>(
-                                      context: context,
-                                      builder: (_) => const SupplierSelect());
-                                  if (result != null) handleSelect(result);
-                                },
-                                icon:
-                                    const Icon(Icons.search_rounded, size: 18),
-                                label: const Text('搜已有'),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: colorScheme.primary,
-                                  side: BorderSide(
-                                      color:
-                                          colorScheme.primary.withOpacity(0.5)),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
 

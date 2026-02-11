@@ -150,8 +150,16 @@ class ProductBatchImportPage extends HookConsumerWidget {
                               context: context,
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
-                              builder: (_) => const SupplierSelect(
-                                  showCreateSupplier: false),
+                              builder: (ctx) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(ctx).viewInsets.bottom,
+                                  ),
+                                  child: const SupplierSelect(
+                                      showCreateSupplier: false),
+                                );
+                              },
                             );
                             if (result is Map<String, dynamic>) {
                               final name = (result['short_name'] ??
@@ -193,7 +201,6 @@ class ProductBatchImportPage extends HookConsumerWidget {
                                   .bodyMedium
                                   ?.copyWith(fontWeight: FontWeight.w500),
                             ),
-                          
                           ],
                         ),
                         const SizedBox(height: 8),

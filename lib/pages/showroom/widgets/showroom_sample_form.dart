@@ -563,8 +563,14 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
-                                builder: (BuildContext ctx) {
-                                  return const SupplierSelect();
+                                builder: (ctx) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom:
+                                          MediaQuery.of(ctx).viewInsets.bottom,
+                                    ),
+                                    child: const SupplierSelect(),
+                                  );
                                 },
                               );
 
