@@ -77,7 +77,7 @@ class QuoteSelect extends HookConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("选择带客记录",
+              const Text("选择客户",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.grey),
