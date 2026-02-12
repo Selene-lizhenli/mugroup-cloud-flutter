@@ -103,8 +103,10 @@ class HomeUserHeader extends HookConsumerWidget {
       child: Row(
         children: [
           Image.asset(
-            isSpringFestival ? 'logo_no_icon.png' : 'assets/logo.webp',
-            width: 116,
+            isSpringFestival
+                ? 'assets/element/logonoicon.png'
+                : 'assets/logo.webp',
+            width: isSpringFestival ? 85 : 116,
             fit: BoxFit.contain,
           ),
           const Spacer(),

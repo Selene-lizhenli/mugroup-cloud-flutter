@@ -170,7 +170,7 @@ flutter:
     - assets/noImage.png
     - assets/photo/trival_small.png
     - assets/icon.png
-    - assets/logo_no_icon.png
+    - assets/element/logonoicon.png
     - assets/logo.webp
     - assets/splash.png 
     - assets/icons/wxwork.svg

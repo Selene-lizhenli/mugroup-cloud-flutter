@@ -74,8 +74,8 @@ class DashboardPage extends HookConsumerWidget {
                 end: Alignment.bottomCenter,
                 colors: isSpringFestival
                     ? [
-                        Color.fromARGB(235, 168, 24, 14),
-                        Color.fromARGB(235, 188, 52, 42), 
+                        Color.fromARGB(235, 139, 15, 6),
+                        Color.fromARGB(235, 155, 32, 23), 
                         colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                       ]
