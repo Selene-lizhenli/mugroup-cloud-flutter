@@ -188,6 +188,7 @@ class WarehouseShowCard extends ConsumerWidget {
                   height: 1.2,
                 ),
               ),
+              //  文案换成：有独立样品间的部门请联系数字发展中心进行适配
               const SizedBox(height: 12),
               // 内容描述
               const Text(

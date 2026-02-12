@@ -1,4 +1,5 @@
 import 'package:cloud/constants/dashboard_configs.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart'; 
 import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
@@ -43,6 +44,13 @@ class SampleRoomBody extends ConsumerWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: colorScheme.surface,
+           boxShadow: const [
+            BoxShadow(
+              color: pageShadowColor,
+              blurRadius: 10,
+              offset: Offset(0, 0), // 上下左右均匀阴影
+            ),
+          ],
       ),
       clipBehavior: Clip.none,
       child: Column(

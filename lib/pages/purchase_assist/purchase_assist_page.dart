@@ -8,15 +8,16 @@ import 'package:cloud/pages/purchase_assist/widgets/filter_content.dart';
 import 'package:cloud/pages/purchase_assist/widgets/search_area.dart';
 import 'package:cloud/pages/purchase_assist/widgets/upload_images_row.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/pages/widgets/icon.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/pages/widgets/tag_list.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart'; 
-import 'package:wechat_assets_picker/wechat_assets_picker.dart'; 
-import 'package:cloud/services/media.dart'; 
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:cloud/services/media.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 打开相册选择图片并上传，加入搜索图片列表（供 SearchArea 与 _UploadedImagesRow 共用）
@@ -148,7 +149,6 @@ class PurchaseAssistPage extends HookConsumerWidget {
   }
 }
 
-
 /// 已搜索时：顶部搜索栏 + 下方商品列表
 class _SearchResultBody extends HookConsumerWidget {
   const _SearchResultBody();
@@ -192,13 +192,8 @@ class _SearchResultBody extends HookConsumerWidget {
       return IconButton(
         icon: Stack(
           clipBehavior: Clip.none,
-          children: [
-            Icon(
-              Icons.filter_alt_outlined,
-              color: hasActiveFilters == true
-                  ? colorScheme.primary
-                  : colorScheme.onSurface.withOpacity(0.7),
-            ),
+          children: [ 
+            const MuIcon(iconType: 'filter',iconSize: 24,),
             if (hasActiveFilters)
               Positioned(
                 right: -1,
@@ -322,4 +317,4 @@ class _SearchResultBody extends HookConsumerWidget {
       ],
     );
   }
-} 
+}

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/theme.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -69,15 +70,15 @@ class HomeUserHeader extends HookConsumerWidget {
                   colorScheme,
                   '2.0最新升级内容',
                   [
-                    '✨ 新增功能', 
-                    '  • 新增《验货》模块，记录商品验货数据', 
-                    '  • 新增《客户》模块，管理客户信息', 
-                    '  • 新增《供应商》模块，管理供应商信息',  
+                    '✨ 新增功能',
+                    '  • 新增《验货》模块，记录商品验货数据',
+                    '  • 新增《客户》模块，管理客户信息',
+                    '  • 新增《供应商》模块，管理供应商信息',
                     '  • 新增主题切换功能，提供玫粉色和蓝色两种主题',
                     '  • 新增应用设置， 可自定义首页模块顺序和模块内容',
                     '  • 新增样品间展示， 可查看样品间图片',
-                    '🔧 功能改进', 
-                    '  • PDA扫码后可定位到《选样车》页面', 
+                    '🔧 功能改进',
+                    '  • PDA扫码后可定位到《选样车》页面',
                     '  • 商品列表展示优化，提供两种模式：简洁模式和详细模式',
                     '  • 首页布局优化，展示用户信息、应用模块入口、数据统计等模块',
                   ],
@@ -102,7 +103,7 @@ class HomeUserHeader extends HookConsumerWidget {
       child: Row(
         children: [
           Image.asset(
-            'assets/logo.webp',
+            isSpringFestival ? 'logo_no_icon.png' : 'assets/logo.webp',
             width: 116,
             fit: BoxFit.contain,
           ),
@@ -120,7 +121,7 @@ class HomeUserHeader extends HookConsumerWidget {
                 children: [
                   Icon(Icons.person,
                       size: 24, color: colorScheme.onSurface.withOpacity(0.72)),
-                  const SizedBox(width: 6), 
+                  const SizedBox(width: 6),
                   Text(
                     user?.name ?? "",
                     maxLines: 1,

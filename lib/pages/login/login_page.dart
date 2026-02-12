@@ -7,7 +7,7 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/long_way.dart';
-import 'package:cloud/constants/theme_color_config.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:dio/dio.dart';
@@ -86,7 +86,7 @@ class LoginPage extends HookConsumerWidget {
     }, [enableLoginWays, loginWay.value]);
 
     useEffect(() {
-      logger.d("运行啦${loginWay.value ?? ""}");
+      logger.d("loginWay.value${loginWay.value ?? ""}");
       if (loginWay.value == null) {
         restEnableLoginWays.value = [];
       }
@@ -141,7 +141,7 @@ class LoginPage extends HookConsumerWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/photo/trival_small.jpg',
+            'assets/photo/trival_small.png',
             fit: BoxFit.cover,
           ),
           SafeArea(

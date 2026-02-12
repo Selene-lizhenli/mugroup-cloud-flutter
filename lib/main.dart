@@ -1,5 +1,5 @@
 import 'package:cloud/app/app.dart';
-import 'package:cloud/constants/theme_color_config.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';

@@ -35,10 +35,13 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
     }
 
     // 直接展示所有选中的模块，不分组
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          _selectedModules.map((module) => _buildModuleCard(module)).toList(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:
+            _selectedModules.map((module) => _buildModuleCard(module)).toList(),
+      ),
     );
   }
 

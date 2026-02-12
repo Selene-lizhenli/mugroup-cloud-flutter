@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/helper/theme.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/dashboard/widgets/entry_grid_module.dart';
 import 'package:cloud/pages/dashboard/widgets/home_user_header.dart';
@@ -7,6 +9,7 @@ import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:cloud/constants/theme_config.dart';
 
 @RoutePage()
 class DashboardPage extends HookConsumerWidget {
@@ -60,32 +63,93 @@ class DashboardPage extends HookConsumerWidget {
       await refreshModules();
     }
 
-    return Container(
-      color: colorScheme.surfaceTint,
-      child: SafeArea( 
-        bottom:false,
-        child: Container(
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceTint,
+    return Stack(
+      children: [
+        // 最底层背景色
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isSpringFestival
+                    ? [
+                        Color.fromARGB(235, 168, 24, 14),
+                        Color.fromARGB(235, 188, 52, 42), 
+                        colorScheme.surfaceTint,
+                        colorScheme.surfaceTint,
+                      ]
+                    : [
+                        Color.lerp(
+                            colorScheme.primary, colorScheme.surface, 0.6)!,
+                        colorScheme.surfaceTint,
+                        colorScheme.surfaceTint,
+                        colorScheme.surfaceTint,
+                      ],
+                stops: isSpringFestival
+                    ? const [0.0, 0.2, 0.6, 1.0]
+                    : const [0.0, 0.1, 0.6, 1.0],
+              ),
+            ),
           ),
+        ),
+        // 最底层背景图：顶部对齐（春节期间展示焰火图，否则用主题主色块）
+        if (isSpringFestival)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Image.asset(
+              'assets/photo/yanhua.png',
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter,
+            ),
+          ),
+        SafeArea(
+          bottom: false,
           child: RefreshIndicator(
             onRefresh: onRefresh,
             child: ListView(
               controller: scrollController,
               shrinkWrap: true,
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
               children: [
-                const HomeUserHeader(),
-                const SizedBox(height: 12),
-                const EntryGridModule(),
-                const SizedBox(height: 12),
-                SelectedModulesWidget(key: selectedModulesKey),
+                const Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: pageHorizontalPadding),
+                  child: HomeUserHeader(),
+                ),
+                Container(
+                  height: 45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.transparent,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceTint,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: pageHorizontalPadding),
+                  child: Column(
+                    children: [
+                      Transform.translate(
+                        offset: const Offset(0, -40),
+                        child: const EntryGridModule(),
+                      ),
+                      Transform.translate(
+                        offset: const Offset(0, -30),
+                        child: SelectedModulesWidget(key: selectedModulesKey),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

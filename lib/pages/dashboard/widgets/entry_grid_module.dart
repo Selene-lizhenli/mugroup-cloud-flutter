@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/app_feature_constants.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -132,10 +133,22 @@ class EntryGridModule extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: pageShadowColor,
+            blurRadius: 10,
+            offset: Offset(0, 0), // 上下左右均匀阴影
+          ),
+        ],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -209,7 +222,7 @@ class _EntryItem extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.038),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(80),
                 ),
                 child: MuIcon(
                   iconType: icon,

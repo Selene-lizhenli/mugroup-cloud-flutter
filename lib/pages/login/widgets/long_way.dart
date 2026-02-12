@@ -4,7 +4,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/pages/login/shared.dart';
-import 'package:cloud/constants/theme_color_config.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
@@ -133,7 +133,7 @@ class LoginWay extends HookConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: primaryColorBlue.withOpacity(0.12),
+        color: primaryColorBlue.withOpacity(0.25),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,3 +1,4 @@
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
@@ -146,8 +147,16 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: colorScheme.surface),
+          borderRadius: BorderRadius.circular(12),
+          color: colorScheme.surface,
+          boxShadow: const [
+            BoxShadow(
+              color: pageShadowColor,
+              blurRadius: 10,
+              offset: Offset(0, 0), // 上下左右均匀阴影
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -162,7 +171,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
                 onRetry: () => _loadExchangeData(),
                 onRangeChanged: (DateRange range, Map<String, String> params) {
                   setState(() {
-                    selectedRange = range; 
+                    selectedRange = range;
                   });
                   _loadExchangeData(params);
                 },

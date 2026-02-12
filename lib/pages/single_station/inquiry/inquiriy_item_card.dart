@@ -1,4 +1,4 @@
-import 'package:cloud/constants/theme_color_config.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
 import 'package:cloud/pages/widgets/icon.dart';
 import 'package:flutter/material.dart';
