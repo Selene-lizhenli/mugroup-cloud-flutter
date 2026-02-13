@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$purchaseAssistHash() => r'014c28a13d5156f791a1b2c6e24fa7f300c0d9be';
+String _$purchaseAssistHash() => r'4ae2c95ddae9fc693697829d81e86893ac052487';
 
 /// 比价助手 Provider：搜索状态与商品列表，接口占位待补充
 ///

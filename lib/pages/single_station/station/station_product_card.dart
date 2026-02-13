@@ -185,7 +185,7 @@ class _CoverImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (url == null || url!.isEmpty) {
       return Image.asset(
-        'assets/noImage.png',
+        'assets/icons/no_image.png',
         fit: BoxFit.cover,
       );
     }
@@ -195,7 +195,7 @@ class _CoverImage extends StatelessWidget {
       fit: BoxFit.cover,
       placeholder: (_, __) => const ColoredBox(color: Colors.transparent),
       errorWidget: (_, __, ___) => Image.asset(
-        'assets/noImage.png',
+        'assets/icons/no_image.png',
         fit: BoxFit.cover,
       ),
     );

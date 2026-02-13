@@ -1,5 +1,6 @@
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
+import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -182,7 +183,8 @@ class ExchangeChartHeader extends StatelessWidget {
                   child: InkWell(
                     // 点击图标在列表视图与趋势视图之间切换
                     onTap: () => {
-                      if (selectedDimension == null && !showTrendView) //当前是列表且没有选中维度
+                      if (selectedDimension == null &&
+                          !showTrendView) //当前是列表且没有选中维度
                         _openDimensionBottomSheet(context)
                       else
                         onViewToggle?.call(!showTrendView),
@@ -195,11 +197,10 @@ class ExchangeChartHeader extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            !showTrendView ? Icons.show_chart : Icons.grid_view,
-                            size: 20,
-                            color: Colors.grey.shade600,
-                          ),
+                          MuThemeIcon(
+                            iconType: !showTrendView ? 'fluctuation' : 'list',
+                            iconSize: 15,
+                          )
                         ],
                       ),
                     ),
@@ -218,10 +219,11 @@ class ExchangeChartHeader extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          FontAwesomeIcons.calculator,
-                          size: 16,
-                          color: Colors.grey.shade600,
+                        Image.asset(
+                          'assets/icons/calculator.png',
+                          width: 15,
+                          height: 15,
+                          fit: BoxFit.contain,
                         ),
                       ],
                     ),

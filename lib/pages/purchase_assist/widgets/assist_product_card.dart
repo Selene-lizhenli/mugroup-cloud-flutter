@@ -32,7 +32,7 @@ class AssistProductCard extends StatelessWidget {
             children: [
               sample.imageUrl == null || sample.imageUrl!.isEmpty
                   ? Image.asset(
-                      'assets/noImage.png',
+                      'assets/icons/no_image.png',
                       width: double.infinity,
                       fit: BoxFit.contain,
                     )

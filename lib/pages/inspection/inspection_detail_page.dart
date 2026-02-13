@@ -218,7 +218,7 @@ class InspectionDetailPage extends HookConsumerWidget {
           ),
           const SizedBox(height: 12),
           // 进度条
-          AppProgressBar(
+          MuProgressBar(
             progress: progress,
             progressText: progressText,
             height: 10,

@@ -38,7 +38,7 @@ class ProductCard extends StatelessWidget {
             children: [ 
               sample.cover == null
                   ? Image.asset(
-                      'assets/noImage.png',
+                      'assets/icons/no_image.png',
                       width: double.infinity,
                       fit: BoxFit.contain,
                     )

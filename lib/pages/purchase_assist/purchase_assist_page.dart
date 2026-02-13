@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/core.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/assist_product_card.dart';
@@ -8,7 +9,7 @@ import 'package:cloud/pages/purchase_assist/widgets/filter_content.dart';
 import 'package:cloud/pages/purchase_assist/widgets/search_area.dart';
 import 'package:cloud/pages/purchase_assist/widgets/upload_images_row.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/widgets/icon.dart';
+import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/pages/widgets/tag_list.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -45,6 +46,25 @@ Future<void> openGalleryForPurchaseAssist(
   }
 }
 
+void onProductTap(
+  dynamic item,
+  String selectedPlatform,
+  BuildContext context,
+) async {
+  if (!context.mounted) return;
+  if (selectedPlatform == searchPlatform[0].value) {
+    context.router.push(ShowroomSampleDetailRoute(id: item.id!));
+  } else {
+    final url = item.productUrl;
+    if (url != null && url.isNotEmpty) {
+      final uri = Uri.tryParse(url);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
+  }
+}
+
 @RoutePage()
 class PurchaseAssistPage extends HookConsumerWidget {
   const PurchaseAssistPage({super.key});
@@ -59,6 +79,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
     const double gradientAngleDegrees = 0;
     final headerColor = colorScheme.primary.withOpacity(0.2); // 渐变颜色
     final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
+    final notifier = ref.read(purchaseAssistProvider.notifier);
 
     useEffect(() {
       if (state.searchKeyword != searchController.text) {
@@ -66,6 +87,13 @@ class PurchaseAssistPage extends HookConsumerWidget {
       }
       return null;
     }, [state.searchKeyword]);
+
+    useEffect(() {
+      // 首次进入时加载当前询盘的样品明细
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifier.loadTaskList();
+      });
+    }, const []);
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -76,10 +104,44 @@ class PurchaseAssistPage extends HookConsumerWidget {
           foregroundColor: Colors.black,
           actions: [
             IconButton(
-              icon: const Icon(
-                FontAwesomeIcons.listCheck,
-                size: 20,
-                color: Colors.red,
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(
+                    FontAwesomeIcons.listCheck,
+                    size: 20,
+                    color: Color.fromARGB(255, 119, 78, 47),
+                  ),
+                  if (state.taskList.isNotEmpty)
+                    Positioned(
+                      left: -6,
+                      top: -10,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          state.taskList.length > 99
+                              ? '99+'
+                              : '${state.taskList.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            height: 1,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               tooltip: '任务管理',
               onPressed: () {
@@ -137,7 +199,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
           Positioned.fill(
             left: 0,
             right: 0,
-            top: state.hasSearched ? paddingTop - 15 + kToolbarHeight : 0,
+            top: state.hasSearched ? paddingTop + appbarHeight : 0,
             bottom: 0,
             child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
@@ -160,6 +222,7 @@ class _SearchResultBody extends HookConsumerWidget {
     final searchController =
         useTextEditingController(text: state.searchKeyword);
     final colorScheme = Theme.of(context).colorScheme;
+    final selectedPlatform = state.selectedPlatform;
 
     useEffect(() {
       if (state.searchKeyword != searchController.text) {
@@ -167,21 +230,6 @@ class _SearchResultBody extends HookConsumerWidget {
       }
       return null;
     }, [state.searchKeyword]);
-
-    onTap(item) async {
-      if (!context.mounted) return;
-      if (state.selectedPlatform == searchPlatform[0].value) {
-        context.router.push(ShowroomSampleDetailRoute(id: item.id!));
-      } else {
-        final url = item.productUrl;
-        if (url != null && url.isNotEmpty) {
-          final uri = Uri.tryParse(url);
-          if (uri != null && await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        }
-      }
-    }
 
     Widget getFilterBtn() {
       final hasActiveFilters = (state.sortOrder != 'default' &&
@@ -192,8 +240,11 @@ class _SearchResultBody extends HookConsumerWidget {
       return IconButton(
         icon: Stack(
           clipBehavior: Clip.none,
-          children: [ 
-            const MuIcon(iconType: 'filter',iconSize: 24,),
+          children: [
+            const MuThemeIcon(
+              iconType: 'filter',
+              iconSize: 24,
+            ),
             if (hasActiveFilters)
               Positioned(
                 right: -1,
@@ -259,8 +310,15 @@ class _SearchResultBody extends HookConsumerWidget {
             Expanded(
               child: MuTagList(
                 items: searchPlatform,
-                selectedValue: state.selectedPlatform,
+                selectedValue: selectedPlatform,
                 onSelected: (value) {
+                  if (state.searchMediaList.isEmpty &&
+                      value == 'alibabaglobal') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('国际站不支持关键字搜索')),
+                    );
+                    return;
+                  }
                   notifier.setSelectedPlatform(value);
                   notifier
                       .loadProducts(refresh: true, params: {"platform": value});
@@ -306,13 +364,13 @@ class _SearchResultBody extends HookConsumerWidget {
                 isAdapColumn: true,
                 itemBuilder: (context, item) => AssistProductCard(
                   sample: item,
-                  onTap: () => onTap(item),
+                  onTap: () => onProductTap(item, selectedPlatform, context),
                 ),
               ),
             ),
           ]
         ] else ...[
-          const SizedBox(height: 20)
+          const SizedBox(height: 40)
         ],
       ],
     );

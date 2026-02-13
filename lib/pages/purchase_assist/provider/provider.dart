@@ -1,3 +1,4 @@
+import 'package:cloud/models/purchase_assist/meta.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/list.dart';
@@ -34,6 +35,7 @@ class PurchaseAssistState implements MuListState {
     this.sortOrder,
     this.priceMin,
     this.priceMax,
+    this.taskDetailMeta,
   });
 
   final bool hasSearched;
@@ -57,6 +59,7 @@ class PurchaseAssistState implements MuListState {
   final String? sortOrder;
   final String? priceMin;
   final String? priceMax;
+  final PurchaseAssistMeta? taskDetailMeta;
 
   PurchaseAssistState copyWith({
     bool? hasSearched,
@@ -77,6 +80,7 @@ class PurchaseAssistState implements MuListState {
     Object? sortOrder = _unset,
     Object? priceMin = _unset,
     Object? priceMax = _unset,
+    PurchaseAssistMeta? taskDetailMeta,
   }) {
     return PurchaseAssistState(
       hasSearched: hasSearched ?? this.hasSearched,
@@ -100,6 +104,7 @@ class PurchaseAssistState implements MuListState {
           identical(priceMin, _unset) ? this.priceMin : priceMin as String?,
       priceMax:
           identical(priceMax, _unset) ? this.priceMax : priceMax as String?,
+      taskDetailMeta: taskDetailMeta ?? this.taskDetailMeta,
     );
   }
 }
@@ -150,21 +155,18 @@ class PurchaseAssist extends _$PurchaseAssist {
   }
 
   void setSearchKeyword(String keyword) {
-    state = state.copyWith(searchKeyword: keyword);
+    state = state.copyWith(searchKeyword: keyword, hasSearched: true);
   }
 
   void setSearchMedia(TemporaryMedia? media) {
-    state = state.copyWith(searchMedia: media);
-  }
-
-  void setSearchImagePaths(List<String> paths) {
-    state = state.copyWith(searchImagePaths: paths);
+    state = state.copyWith(searchMedia: media, hasSearched: true);
   }
 
   /// 添加上传的搜索图片（用于展示与搜索）
   void addSearchMedia(TemporaryMedia media) {
     state = state.copyWith(
       searchMedia: media,
+      hasSearched: true,
       searchMediaList: [...state.searchMediaList, media],
     );
   }
@@ -244,13 +246,18 @@ class PurchaseAssist extends _$PurchaseAssist {
       hasSearched: true,
     );
     try {
-      final data = {
-        'keywords': state.searchKeyword,
+      final data = <String, dynamic>{
         'page': nextPage,
         'pageSize': 20,
         'media_id': params?['media_id'] ?? state.searchMedia?.id,
         'platform': params?['platform'] ?? state.selectedPlatform,
       };
+      // 只有当关键字有值且非空时才追加 keywords 字段
+      final keyword = state.searchKeyword.trim();
+      if ((params?['platform'] ?? state.selectedPlatform) != 'alibabaglobal') {
+        data['keywords'] = keyword;
+      }
+
       if (state.priceMax != null && state.priceMax!.isNotEmpty ||
           state.priceMin != null && state.priceMin!.isNotEmpty) {
         data["priceRange"] = [state.priceMin, state.priceMax];
@@ -323,9 +330,12 @@ class PurchaseAssist extends _$PurchaseAssist {
     );
     try {
       final resp = await getProductComparisonTaskDetail(state.taskId!);
-      final data = resp.data;
       state = state.copyWith(
-        taskDetail: data,
+        taskDetail: resp.data,
+        taskDetailMeta: resp.meta ??
+            const PurchaseAssistMeta(
+                pagination: PurchaseAssistPagination(
+                    total: 0, count: 0, totalPages: 0)),
         isLoading: false,
       );
     } catch (e) {

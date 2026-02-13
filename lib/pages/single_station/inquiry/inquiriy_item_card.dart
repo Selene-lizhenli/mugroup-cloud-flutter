@@ -1,6 +1,6 @@
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
-import 'package:cloud/pages/widgets/icon.dart';
+import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -121,7 +121,7 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // MuIcon(iconType: iconType, iconSize: 15),
+          // MuThemeIcon(iconType: iconType, iconSize: 15),
           Icon(
             iconType,
             size: 14,

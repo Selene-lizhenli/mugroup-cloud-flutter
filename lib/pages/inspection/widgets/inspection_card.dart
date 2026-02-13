@@ -170,7 +170,7 @@ class InspectionCard extends HookConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              AppProgressBar(
+              MuProgressBar(
                 progress: progress,
                 progressText: progressText,
                 height: 4,

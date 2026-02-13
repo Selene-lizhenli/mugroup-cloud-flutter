@@ -87,7 +87,7 @@ class WmsTransferConfirmItem extends HookWidget {
                               imageUrl: cover,
                             )
                           : Image.asset(
-                              'assets/noImage.png',
+                              'assets/icons/no_image.png',
                               width: 80,
                               height: 80,
                               fit: BoxFit.contain,

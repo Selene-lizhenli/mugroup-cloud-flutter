@@ -5,7 +5,7 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/pages/widgets/icon.dart';
+import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -224,7 +224,7 @@ class _EntryItem extends StatelessWidget {
                   color: color.withOpacity(0.038),
                   borderRadius: BorderRadius.circular(80),
                 ),
-                child: MuIcon(
+                child: MuThemeIcon(
                   iconType: icon,
                   iconSize: iconSize,
                 )),

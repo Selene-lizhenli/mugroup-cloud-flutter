@@ -183,7 +183,7 @@ class MyApp extends ConsumerWidget {
           scrolledUnderElevation: 0,
           elevation: 0,
           foregroundColor: Color.fromARGB(255, 74, 74, 74),
-          toolbarHeight: 48,
+          toolbarHeight: appbarHeight,
         ),
       ),
       builder: (context, child) {

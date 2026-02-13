@@ -166,53 +166,60 @@ flutter:
 
   assets:
     - assets/coming.png 
-    - assets/building2d.png
-    - assets/noImage.png
-    - assets/photo/trival_small.png
+    - assets/building2d.png 
     - assets/icon.png
     - assets/element/logonoicon.png
     - assets/logo.webp
     - assets/splash.png 
     - assets/icons/wxwork.svg
     - assets/icons/email.svg
+    - assets/icons/calculator.png
+    - assets/icons/checklist.png 
+    - assets/icons/fluctuation.png
+    - assets/icons/no_image.png
     - assets/element/empty.png 
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
     - assets/aiTemplets/notepad_001.jpg
     - assets/element/empty.png 
-    - assets/mu/kaiyueren_yuqiuyu_pink.png
-    - assets/mu/kaiyueren_yuqiuyu_blue.png
-    - assets/mu/benben_c.png
-    - assets/mu/benben_s.png 
-    - assets/photo/christmastree.png   
-    - assets/mu/factory_blue.png
-    - assets/mu/factory_pink.png  
-    - assets/mu/warehouse_pink.png
-    - assets/mu/warehouse_blue.png
-    - assets/mu/customer_pink.png
-    - assets/mu/customer_blue.png
-    - assets/mu/insp_blue.png
-    - assets/mu/insp_pink.png 
-    - assets/mu/market_pink.png
-    - assets/mu/market_blue.png 
-    - assets/mu/cart_blue.png 
-    - assets/mu/cart_pink.png 
-    - assets/mu/station_blue.png 
-    - assets/mu/station_pink.png 
-    - assets/mu/message_pink.png
-    - assets/mu/message_blue.png
-    - assets/mu/all_category_blue.png
-    - assets/mu/all_category_pink.png
-    - assets/mu/yijian_pink.png
-    - assets/mu/yijian_blue.png
-    - assets/mu/xinyuan_blue.png 
-    - assets/mu/xinyuan_list_blue.png 
-    - assets/mu/xinyuan_list_pink.png 
-    - assets/mu/whs_mag_pink.png 
-    - assets/mu/whs_mag_blue.png 
-    - assets/mu/filter_blue.png 
-    - assets/mu/filter_pink.png 
+    - assets/photo/benben_c.png
+    - assets/photo/benben_s.png 
+    - assets/photo/christmastree.png 
     - assets/photo/yanhua.png  
+    - assets/photo/trival_small.png
+    - assets/theme/kaiyueren_yuqiuyu_pink.png
+    - assets/theme/kaiyueren_yuqiuyu_blue.png  
+    - assets/theme/factory_blue.png
+    - assets/theme/factory_pink.png  
+    - assets/theme/warehouse_pink.png
+    - assets/theme/warehouse_blue.png
+    - assets/theme/customer_pink.png
+    - assets/theme/customer_blue.png
+    - assets/theme/insp_blue.png
+    - assets/theme/insp_pink.png 
+    - assets/theme/market_pink.png
+    - assets/theme/market_blue.png 
+    - assets/theme/cart_blue.png 
+    - assets/theme/cart_pink.png 
+    - assets/theme/station_blue.png 
+    - assets/theme/station_pink.png 
+    - assets/theme/message_pink.png
+    - assets/theme/message_blue.png
+    - assets/theme/all_category_blue.png
+    - assets/theme/all_category_pink.png
+    - assets/theme/yijian_pink.png
+    - assets/theme/yijian_blue.png
+    - assets/theme/xinyuan_blue.png 
+    - assets/theme/xinyuan_list_blue.png 
+    - assets/theme/xinyuan_list_pink.png 
+    - assets/theme/whs_mag_pink.png 
+    - assets/theme/whs_mag_blue.png 
+    - assets/theme/filter_blue.png 
+    - assets/theme/filter_pink.png
+    - assets/theme/list_pink.png
+    - assets/theme/list_blue.png
+    - assets/theme/fluctuation_blue.png 
+    - assets/theme/fluctuation_pink.png
    
 
     

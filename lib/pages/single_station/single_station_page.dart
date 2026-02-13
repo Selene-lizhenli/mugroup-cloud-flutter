@@ -2,8 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/single_station/provider/provider.dart';
 import 'package:cloud/pages/single_station/station/single_station_list.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
-import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/pages/widgets/icon.dart';
+import 'package:cloud/pages/widgets/theme_icon.dart';
+import 'package:cloud/router/router.gr.dart'; 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -43,7 +43,7 @@ class SingleStationPage extends HookConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10),
-            child: MuIcon(
+            child: MuThemeIcon(
               iconType: 'message',
               iconSize: 19,
               tooltip: "询盘消息",

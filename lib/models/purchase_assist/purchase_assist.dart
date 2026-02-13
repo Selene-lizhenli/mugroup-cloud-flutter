@@ -1,3 +1,20 @@
+/// 解析可能为 String 或 num 的字段，统一转为 int?
+int? _intFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
+/// 解析可能为 String 或 int 的字段，统一转为 String?
+String? _stringOrIntFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  if (value is num) return value.toString();
+  return value.toString();
+}
+
 /// 比价助手 - 多平台搜索产品项（api/tenant/multi-platform/search 返回列表项）
 class PurchaseAssistSearchProduct {
   const PurchaseAssistSearchProduct({
@@ -25,23 +42,6 @@ class PurchaseAssistSearchProduct {
   final String? supplierName;
   final int? supplier;
   final List<String>? tags;
-
-  /// 解析可能为 String 或 num 的字段，统一转为 int?
-  static int? _intFromJson(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value);
-    return null;
-  }
-
-  /// 解析可能为 String 或 int 的字段，统一转为 String?
-  static String? _stringOrIntFromJson(dynamic value) {
-    if (value == null) return null;
-    if (value is String) return value;
-    if (value is num) return value.toString();
-    return value.toString();
-  }
 
   factory PurchaseAssistSearchProduct.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistSearchProduct(
@@ -173,7 +173,7 @@ class PurchaseAssistTaskMediaItem {
 
   factory PurchaseAssistTaskMediaItem.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistTaskMediaItem(
-      id: (json['id'] as num?)?.toInt(),
+      id: _intFromJson(json['id']),
       name: json['name'] as String?,
       url: json['url'] as String?,
       whiteUrl: json['white_url'] as String?,
@@ -230,10 +230,10 @@ class PurchaseAssistTaskListItem {
           ? null
           : PurchaseAssistTaskUser.fromJson(
               json['user'] as Map<String, dynamic>),
-      summary: json['summary'] == null
-          ? null
-          : PurchaseAssistTaskSummary.fromJson(
-              json['summary'] as Map<String, dynamic>),
+      // summary: json['summary'] == null
+      //     ? null
+      //     : PurchaseAssistTaskSummary.fromJson(
+      //         json['summary'] as Map<String, dynamic>),
       media: (json['media'] as List<dynamic>?)
           ?.map((e) =>
               PurchaseAssistTaskMediaItem.fromJson(e as Map<String, dynamic>))
@@ -274,14 +274,14 @@ class PurchaseAssistTaskResultProduct {
 
   factory PurchaseAssistTaskResultProduct.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistTaskResultProduct(
-      id: (json['id'] as num?)?.toInt(),
+      id: _intFromJson(json['id']),
+      price: _stringOrIntFromJson(json['price']),
+      saleNumber: _intFromJson(json['sale_number']),
+      moq: _intFromJson(json['moq']),
       name: json['name'] as String?,
       imageUrl: json['image_url'] as String?,
       productUrl: json['product_url'] as String?,
-      price: json['price'] as String?,
       supplierName: json['supplier_name'] as String?,
-      saleNumber: (json['sale_number'] as num?)?.toInt(),
-      moq: (json['moq'] as num?)?.toInt(),
       rateScore: json['rate_score'] as String?,
       location: json['location'] as String?,
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
@@ -300,6 +300,7 @@ class PurchaseAssistTaskDetailItem {
     this.createdAt,
     this.updatedAt,
     this.media,
+    this.productUrl,
   });
 
   final int? id;
@@ -310,19 +311,19 @@ class PurchaseAssistTaskDetailItem {
   final String? createdAt;
   final String? updatedAt;
   final PurchaseAssistTaskMediaItem? media;
+  final String? productUrl;
 
   factory PurchaseAssistTaskDetailItem.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistTaskDetailItem(
-      id: (json['id'] as num?)?.toInt(),
-      taskId: (json['task_id'] as num?)?.toInt(),
+      id: _intFromJson(json['id']),
+      taskId: _intFromJson(json['task_id']),
       results: (json['results'] as List<dynamic>?)
           ?.map((e) => PurchaseAssistTaskResultProduct.fromJson(
               e as Map<String, dynamic>))
           .toList(),
       status: json['status'] as String?,
+      productUrl: json['product_url'] as String?,
       selectedItemId: json['selected_item_id'],
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
       media: json['media'] == null
           ? null
           : PurchaseAssistTaskMediaItem.fromJson(

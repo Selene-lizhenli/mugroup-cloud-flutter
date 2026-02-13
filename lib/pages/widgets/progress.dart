@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 通用进度条：左侧为进度条，右侧为文字，同一行、上下居中、左右 spaceBetween。
-class AppProgressBar extends StatelessWidget {
+class MuProgressBar extends StatelessWidget {
   /// 进度值 0.0 ~ 1.0
   final double progress;
 
@@ -23,7 +23,7 @@ class AppProgressBar extends StatelessWidget {
   /// 右侧文字样式，为 null 时使用 theme.secondary、fontSize 10
   final TextStyle? textStyle;
 
-  const AppProgressBar({
+  const MuProgressBar({
     super.key,
     required this.progress,
     required this.progressText,

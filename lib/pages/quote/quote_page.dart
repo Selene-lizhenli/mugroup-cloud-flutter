@@ -403,7 +403,7 @@ class QuotePage extends HookConsumerWidget {
                       child: imgUrl != null
                           ? Image.network(imgUrl, fit: BoxFit.cover)
                           : Image.asset(
-                              'assets/noImage.png',
+                              'assets/icons/no_image.png',
                               fit: BoxFit.contain,
                             ),
                     ),

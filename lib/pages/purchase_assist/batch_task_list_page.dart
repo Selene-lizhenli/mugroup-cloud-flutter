@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/task_list_item_card.dart';
 import 'package:cloud/pages/widgets/list.dart';
@@ -19,18 +21,8 @@ class BatchImageSearchResultPage extends HookConsumerWidget {
     void onTap(PurchaseAssistTaskListItem? item) {
       if (item == null) return;
       notifier.setTaskId(item.id);
+      context.router.push(const BatchSearchDetailRoute());
     }
-
-    useEffect(() {
-      // 首次进入时加载当前询盘的样品明细
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifier.loadTaskList();
-      });
-      // 离开 Tab 时清理数据
-      return () => WidgetsBinding.instance.addPostFrameCallback((_) {
-            // notifier.cleanInquiriesProducts();
-          });
-    }, const []);
 
     return Scaffold(
       appBar: AppBar(
@@ -38,17 +30,20 @@ class BatchImageSearchResultPage extends HookConsumerWidget {
         elevation: 0,
         foregroundColor: Colors.black,
       ),
-      body: MuListView<PurchaseAssistTaskListItem>(
-        state: state,
-        list: state.taskList,
-        onRefresh: () => notifier.loadTaskList(refresh: true),
-        onLoadMore: () => notifier.loadTaskList(),
-        refreshOnStart: false,
-        itemBuilder: (context, item) => TaskListItemCard(
-          item: item, 
-          onTap: () => onTap(item),
-        ),
-      ),
+      body: Padding(
+          padding:
+              const EdgeInsets.symmetric(horizontal: pageHorizontalPadding),
+          child: MuListView<PurchaseAssistTaskListItem>(
+            state: state,
+            list: state.taskList,
+            onRefresh: () => notifier.loadTaskList(refresh: true),
+            onLoadMore: () => notifier.loadTaskList(),
+            refreshOnStart: false,
+            itemBuilder: (context, item) => TaskListItemCard(
+              item: item,
+              onTap: () => onTap(item),
+            ),
+          )),
     );
   }
 }

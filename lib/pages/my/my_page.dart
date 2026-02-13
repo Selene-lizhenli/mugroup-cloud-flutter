@@ -16,8 +16,8 @@ class MyPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final themeType = ref.watch(appThemeProvider);
     final kaiyuerenImage = themeType == ThemeType.pink
-        ? 'assets/mu/kaiyueren_yuqiuyu_pink.png'
-        : 'assets/mu/kaiyueren_yuqiuyu_blue.png';
+        ? 'assets/theme/kaiyueren_yuqiuyu_pink.png'
+        : 'assets/theme/kaiyueren_yuqiuyu_blue.png';
 
     return Scaffold(
       backgroundColor: colorScheme.surface,

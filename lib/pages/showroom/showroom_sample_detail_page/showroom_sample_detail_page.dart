@@ -205,7 +205,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                         ],
                                       )
                                     : Image.asset(
-                                        'assets/noImage.png',
+                                        'assets/icons/no_image.png',
                                         width: double.infinity,
                                         fit: BoxFit.contain,
                                       );

@@ -1,12 +1,9 @@
-
-
- 
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
-import 'package:cloud/pages/purchase_assist/purchase_assist_page.dart'; 
-import 'package:flutter/material.dart'; 
-import 'package:hooks_riverpod/hooks_riverpod.dart'; 
+import 'package:cloud/pages/purchase_assist/purchase_assist_page.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
-import 'package:cloud/services/media.dart'; 
+import 'package:cloud/services/media.dart';
 
 class SearchArea extends HookConsumerWidget {
   const SearchArea({super.key});
@@ -16,6 +13,7 @@ class SearchArea extends HookConsumerWidget {
     // 白色圆角输入框 + 盒外阴影，右侧相机 + 加号
     final state = ref.watch(purchaseAssistProvider);
     final notifier = ref.read(purchaseAssistProvider.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
 
     /// 打开相册，选择照片后上传并加入搜索图片列表
     Future<void> openGallery() async {
@@ -57,7 +55,7 @@ class SearchArea extends HookConsumerWidget {
 
     Widget getPicBtn() {
       return IconButton(
-        icon: const Icon(Icons.add_outlined, color: Colors.black87, size: 27),
+        icon: const Icon(Icons.add_outlined, color: Colors.black54, size: 27),
         tooltip: '从相册选择',
         onPressed: () => openGallery(),
         padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
@@ -71,7 +69,7 @@ class SearchArea extends HookConsumerWidget {
     Widget getcaremaBtn() {
       return IconButton(
         icon: const Icon(Icons.camera_alt_outlined,
-            color: Colors.black87, size: 27),
+            color: Colors.black54, size: 25),
         tooltip: '拍照',
         padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
         constraints: const BoxConstraints(),
@@ -85,8 +83,9 @@ class SearchArea extends HookConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
+        color: Colors.white ,
+        border: Border.all(color: colorScheme.primary,width: 0.4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
