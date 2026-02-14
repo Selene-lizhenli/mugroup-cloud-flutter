@@ -6,23 +6,21 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$purchaseAssistHash() => r'cda062e139304d39a61141a163dcf080dcc41c75';
+String _$adviceCollectHash() => r'dbbc2327e0f1309ba995baf5328803d5e5255288';
 
-/// 比价助手 Provider：搜索状态与商品列表，接口占位待补充
-///
-/// Copied from [PurchaseAssist].
-@ProviderFor(PurchaseAssist)
-final purchaseAssistProvider =
-    AutoDisposeNotifierProvider<PurchaseAssist, PurchaseAssistState>.internal(
-  PurchaseAssist.new,
-  name: r'purchaseAssistProvider',
+/// See also [AdviceCollect].
+@ProviderFor(AdviceCollect)
+final adviceCollectProvider =
+    AutoDisposeNotifierProvider<AdviceCollect, AdviceCollectState>.internal(
+  AdviceCollect.new,
+  name: r'adviceCollectProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$purchaseAssistHash,
+      : _$adviceCollectHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$PurchaseAssist = AutoDisposeNotifier<PurchaseAssistState>;
+typedef _$AdviceCollect = AutoDisposeNotifier<AdviceCollectState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

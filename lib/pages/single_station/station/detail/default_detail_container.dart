@@ -9,6 +9,7 @@ import 'package:cloud/pages/widgets/text_adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:cloud/constants/theme_config.dart';
 
 class DefaultDetailContainer extends HookConsumerWidget {
   const DefaultDetailContainer({
@@ -19,6 +20,7 @@ class DefaultDetailContainer extends HookConsumerWidget {
 
   final SingleStationItem? item;
   final String? stationTheme;
+   
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -86,7 +88,7 @@ class DefaultDetailContainer extends HookConsumerWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: paddingTop + kToolbarHeight,
+            top: paddingTop + appbarHeight,
             bottom: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

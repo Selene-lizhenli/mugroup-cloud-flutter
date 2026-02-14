@@ -67,6 +67,10 @@ class AppRouter extends RootStackRouter {
         path: '/advice_collect',
       ),
       AutoRoute(
+        page: MyAdviceRoute.page,
+        path: '/advice_collect/my_advice',
+      ),
+      AutoRoute(
           page: MarketProductListRoute.page,
           path: "/market_product/market_product_list"),
       AutoRoute(page: InspectionRoute.page, path: "/inspection"),

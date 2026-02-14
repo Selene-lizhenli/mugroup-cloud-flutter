@@ -27,15 +27,15 @@ class InquiryMessagePage extends HookConsumerWidget {
       return () => refreshController.dispose();
     }, const []);
 
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        stationNotifier.loadInquiriesMessages();
-      });
-      return () => WidgetsBinding.instance.addPostFrameCallback((_) {
-            stationNotifier.cleanStationInquiriesMessages();
-            stationNotifier.cleanSearchKeyWord;
-          });
-    }, const []);
+    // useEffect(() {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     stationNotifier.loadInquiriesMessages();
+    //   });
+    //   return () => WidgetsBinding.instance.addPostFrameCallback((_) {
+    //         stationNotifier.cleanStationInquiriesMessages();
+    //         stationNotifier.cleanSearchKeyWord;
+    //       });
+    // }, const []);
 
     return Scaffold(
       appBar: AppBar(
