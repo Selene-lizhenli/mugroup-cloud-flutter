@@ -261,7 +261,7 @@ class _SelectedMessageDetail extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  userName?.isNotEmpty == true ? '$userName' : '',
+                  userName?.isNotEmpty == true ? '$userName' : '匿名',
                   style: TextStyle(
                     fontSize: 12,
                     color: colorScheme.outline,
@@ -332,6 +332,9 @@ class _SelectedMessageDetail extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                const SizedBox(
+                  width: 48,
+                ),
                 Flexible(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
