@@ -1,4 +1,5 @@
 import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/pages/samples/widgets/warehous_item_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -6,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import '../widgets/warehous_item_card.dart';
+ 
 
 // 展示样品间页面
 class SamplesPageView extends HookConsumerWidget {
