@@ -45,7 +45,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
-        manifestPlaceholders = [appName: appName]
+        // 保留 Flutter 插件原有的 manifestPlaceholders（如 applicationName），只追加 appName
+        manifestPlaceholders = (manifestPlaceholders ?: [:]) + [appName: appName]
     }
 
     // 先使用证书轮替， 等后续时间长了 改为配置
@@ -85,7 +86,6 @@ flutter {
 // - versionName / versionCode 来自上面的 flutterVersionName / flutterVersionCode
 tasks.register("copyReleaseApk") {
     doLast {
-        def envName = project.hasProperty("env") ? project.getProperty("env") : "test"
         def apkDir = file("$buildDir/outputs/flutter-apk")
         def oldFile = file("$apkDir/app-release.apk")
         if (oldFile.exists()) {
