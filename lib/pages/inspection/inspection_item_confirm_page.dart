@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reorderables/reorderables.dart';
 
 @RoutePage()
 class InspectionItemConfirmPage extends HookConsumerWidget {
@@ -373,6 +374,35 @@ class _PhotoCard extends HookConsumerWidget {
       }
     }
 
+    final visibleFields = useMemoized(
+      () => fieldConfigs
+          .where((f) => f.isVisible && _photoKeys.contains(f.name))
+          .toList(),
+      [fieldConfigs],
+    );
+
+    void handleReorder(int oldIndex, int newIndex) {
+      final List<FieldConfig> sortedVisibleList = List.from(visibleFields);
+      final movedItem = sortedVisibleList.removeAt(oldIndex);
+      sortedVisibleList.insert(newIndex, movedItem);
+
+      final List<FieldConfig> updatedFullList = List.from(fieldConfigs);
+
+      int visiblePtr = 0;
+      for (int i = 0; i < updatedFullList.length; i++) {
+        final currentField = updatedFullList[i];
+
+        if (currentField.isVisible && _photoKeys.contains(currentField.name)) {
+          updatedFullList[i] = sortedVisibleList[visiblePtr];
+          visiblePtr++;
+        }
+      }
+
+      // 4. 更新状态并触发持久化
+      notifier.updateConfigs(updatedFullList);
+      EasyLoading.showToast('排序已保存');
+    }
+
     return _BaseCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -486,20 +516,14 @@ class _PhotoCard extends HookConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              Wrap(
+              ReorderableWrap(
                 spacing: spacing,
                 runSpacing: 16.0,
-                children: fieldConfigs
-                    .where((field) =>
-                        field.isVisible && _photoKeys.contains(field.name))
-                    .toList()
-                    .asMap()
-                    .entries
-                    .map((entry) {
-                  final int index = entry.key;
-                  final FieldConfig field = entry.value;
-
+                onReorder: handleReorder,
+                reorderAnimationDuration: const Duration(milliseconds: 200),
+                children: visibleFields.map((field) {
                   return _buildGridItem(
+                    key: ValueKey(field.name),
                     apiKey: field.name,
                     label: field.label,
                     width: itemSize,
@@ -594,6 +618,7 @@ class _PhotoCard extends HookConsumerWidget {
   }
 
   Widget _buildGridItem({
+    Key? key,
     required String apiKey,
     required String label,
     required double width,
@@ -605,6 +630,7 @@ class _PhotoCard extends HookConsumerWidget {
     void Function(List<File>)? onContinuousCapture,
   }) {
     return SizedBox(
+      key: key,
       width: width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,7 +736,7 @@ class _TitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 6),
