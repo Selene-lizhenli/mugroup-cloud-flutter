@@ -313,6 +313,7 @@ class _PhotoCard extends HookConsumerWidget {
 
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
+    final colorScheme = Theme.of(context).colorScheme;
 
     // 状态：是否直接拍照 (默认为 true)
     final isDirectCamera = useState(true);
@@ -403,10 +404,10 @@ class _PhotoCard extends HookConsumerWidget {
                         padding: const EdgeInsets.only(
                             bottom: 2), // 微调底部距离，使其视觉上与文字基线对齐
                         child: Text(
-                          '长按连拍',
+                          '(长按相机开启连拍)',
                           style: TextStyle(
-                            fontSize: 11, // 小字号
-                            color: Colors.grey[500], // 灰色提示
+                            fontSize: 12, // 小字号
+                            color: colorScheme.secondary,
                             height: 1.0,
                           ),
                         ),
@@ -709,12 +710,16 @@ class _TitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 6),
           Text(title,
               style: TextStyle(
-                  color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  height: 1)),
         ],
       );
 }
