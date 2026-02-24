@@ -1,12 +1,11 @@
-// import 'package:cloud/models/cx_inventory/cx.inventory.dart';
+
 import 'package:cloud/models/cx_inventory/cx.inventory.dart';
 import 'package:cloud/pages/widgets/list.dart';
 import 'package:cloud/services/inventory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'provider.g.dart'; 
-
-/// 独立站列表状态
+ 
 class CxInventoryState implements MuListState {
   const CxInventoryState({
     this.list = const [],

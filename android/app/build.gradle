@@ -74,3 +74,33 @@ android {
 flutter {
     source = "../.."
 }
+
+// 在 assembleRelease 之后复制一份 APK，保留 Flutter 默认的 app-release.apk
+// 生成的文件名格式：yunlian_<env>_<versionName>+<versionCode>.apk
+// - env 来自 Gradle 参数 -Penv（缺省为 test）
+// - versionName / versionCode 来自上面的 flutterVersionName / flutterVersionCode
+tasks.register("copyReleaseApk") {
+    doLast {
+        def envName = project.hasProperty("env") ? project.getProperty("env") : "test"
+        def apkDir = file("$buildDir/outputs/flutter-apk")
+        def oldFile = file("$apkDir/app-release.apk")
+        if (oldFile.exists()) {
+            def newFile = file("$apkDir/yunlian_${envName}_${flutterVersionName}+${flutterVersionCode}.apk")
+            if (newFile.exists()) {
+                newFile.delete()
+            }
+            newFile.bytes = oldFile.bytes
+            // 绿色输出 APK 路径
+            println "\u001B[32mAPK file location: ${newFile.absolutePath}\u001B[0m"
+        } else {
+            println "Warning: app-release.apk not found, APK with environment naming not generated."
+        }
+    }
+}
+
+// 让 assembleRelease 在完成后自动执行复制任务
+tasks.whenTaskAdded { task ->
+    if (task.name == "assembleRelease") {
+        task.finalizedBy("copyReleaseApk")
+    }
+}
