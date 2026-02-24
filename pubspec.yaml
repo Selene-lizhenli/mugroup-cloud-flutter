@@ -201,8 +201,8 @@ flutter:
     - assets/theme/market_blue.png 
     - assets/theme/cart_blue.png 
     - assets/theme/cart_pink.png 
-    - assets/theme/station_blue.png 
-    - assets/theme/station_pink.png 
+    - assets/theme/computer_blue.png 
+    - assets/theme/computer_pink.png 
     - assets/theme/message_pink.png
     - assets/theme/message_blue.png
     - assets/theme/all_category_blue.png
