@@ -63,7 +63,7 @@ class SearchArea extends HookConsumerWidget {
                   maxLines: lineCount.value,
                   controller: contentController,
                   decoration: const InputDecoration(
-                    hintText: '发送你的建议...',
+                    hintText: '想说什么尽管说...',
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                     isDense: true,
@@ -80,7 +80,7 @@ class SearchArea extends HookConsumerWidget {
                       ? Icons.close_fullscreen
                       : Icons.open_in_full,
                   size: 18,
-                  color: const Color.fromARGB(255, 167, 167, 167),
+                  color: const Color.fromARGB(255, 189, 189, 189),
                 ),
                 tooltip: lineCount.value > _minLines ? '缩小' : '放大',
                 onPressed: () {

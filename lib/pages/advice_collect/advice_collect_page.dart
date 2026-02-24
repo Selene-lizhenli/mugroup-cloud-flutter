@@ -212,7 +212,7 @@ class _SearchResultBody extends ConsumerWidget {
         ),
         if (selectedBook == null) ...[
           const SizedBox(height: 12),
-          Text('（双击查看留言详细内容）',
+          Text('（双击查看详情）',
               style: TextStyle(fontSize: 11, color: colorScheme.outline)),
           const SizedBox(height: 12),
         ],
