@@ -60,8 +60,25 @@ String formatCurrencyAmount(amount) {
 /// - 解析失败时返回原始字符串或 '—'
 String formatDateTimeFull(String? value) {
   if (value == null || value.isEmpty) return '—';
+
+  final v = value.trim();
+
+  // Prefer extracting the wall-clock part from an ISO-like string to avoid
+  // timezone conversion (e.g. "2026-02-24T14:52:43+08:00" -> 14:52:43).
+  final isoLike = RegExp(r'^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2}):(\d{2})')
+      .firstMatch(v);
+  if (isoLike != null) {
+    final y = isoLike.group(1)!;
+    final m = isoLike.group(2)!;
+    final d = isoLike.group(3)!;
+    final h = isoLike.group(4)!;
+    final min = isoLike.group(5)!;
+    final s = isoLike.group(6)!;
+    return '$y-$m-$d $h:$min:$s';
+  }
+
   try {
-    final dt = DateTime.tryParse(value);
+    final dt = DateTime.tryParse(v);
     if (dt == null) return value;
 
     String two(int n) => n.toString().padLeft(2, '0');
