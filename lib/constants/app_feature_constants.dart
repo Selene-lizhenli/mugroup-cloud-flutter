@@ -28,7 +28,7 @@ class EntryFeatures {
   static const inspection =
       EntryFeature('inspection', '验货', 'inspection.task.show');
   static const adviceCollect =
-      EntryFeature('advice_collect', '意见采集', 'advice.collect');
+      EntryFeature('advice_collect', '留言板', 'advice.collect');
   static const warehouseManage =
       EntryFeature('warehouse_manage', '仓库管理', 'wms.warehouse.show');
 

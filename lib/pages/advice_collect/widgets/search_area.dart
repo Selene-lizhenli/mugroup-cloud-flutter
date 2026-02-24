@@ -9,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SearchArea extends HookConsumerWidget {
   const SearchArea({super.key});
 
-  static const int _minLines = 2;
+  static const int _minLines = 1;
   static const int _maxLines = 8;
 
   @override
@@ -18,64 +18,20 @@ class SearchArea extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final lineCount = useState(_minLines);
     final contentController = useTextEditingController();
-    Widget getInputArea() {
-      return Expanded(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: TextField(
-                minLines: lineCount.value,
-                maxLines: lineCount.value,
-                controller: contentController,
-                decoration: const InputDecoration(
-                  hintText: '发送你的建议...',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 8),
-                  alignLabelWithHint: true,
-                ),
-                onChanged: notifier.setSearchKeyword,
-                onSubmitted: (_) async {
-                  final content = contentController.text.trim();
-                  if (content.isEmpty) return;
-                  try {
-                    await notifier.sendMyAdvice({
-                      'anonymous': false,
-                      'content': content,
-                    });
-                    EasyLoading.showSuccess('提交成功！');
-                    context.router.push(const MyAdviceRoute());
-                    contentController.clear();
-                  } catch (e) {
-                    EasyLoading.showError('提交失败');
-                  }
-                },
-              ),
-            ),
-            IconButton(
-              icon: Icon(
-                lineCount.value > _minLines
-                    ? Icons.close_fullscreen
-                    : Icons.open_in_full,
-                size: 20,
-                color: Colors.grey.shade600,
-              ),
-              tooltip: lineCount.value > _minLines ? '缩小' : '放大',
-              onPressed: () {
-                lineCount.value =
-                    lineCount.value > _minLines ? _minLines : _maxLines;
-              },
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(8),
-                minimumSize: const Size(36, 36),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-          ],
-        ),
-      );
+    Future<void> doSend() async {
+      final content = contentController.text.trim();
+      if (content.isEmpty) return;
+      try {
+        await notifier.sendMyAdvice({
+          'anonymous': false,
+          'content': content,
+        });
+        EasyLoading.showSuccess('发送成功！');
+        if (context.mounted) context.router.push(const MyAdviceRoute());
+        contentController.clear();
+      } catch (e) {
+        EasyLoading.showError('发送失败');
+      }
     }
 
     return Container(
@@ -95,10 +51,58 @@ class SearchArea extends HookConsumerWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(children: [getInputArea()]),
+          // 第一行：输入框 + 放大/缩小图标
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  minLines: lineCount.value,
+                  maxLines: lineCount.value,
+                  controller: contentController,
+                  decoration: const InputDecoration(
+                    hintText: '发送你的建议...',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(vertical: 8),
+                    alignLabelWithHint: true,
+                  ),
+                  onChanged: notifier.setSearchKeyword,
+                  onSubmitted: (_) => doSend(),
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  lineCount.value > _minLines
+                      ? Icons.close_fullscreen
+                      : Icons.open_in_full,
+                  size: 18,
+                  color: const Color.fromARGB(255, 167, 167, 167),
+                ),
+                tooltip: lineCount.value > _minLines ? '缩小' : '放大',
+                onPressed: () {
+                  lineCount.value =
+                      lineCount.value > _minLines ? _minLines : _maxLines;
+                },
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(8),
+                  minimumSize: const Size(36, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ],
+          ),
+          // 第二行：发送按钮居右
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: doSend,
+              child: Text('发送', style: TextStyle(color: colorScheme.primary)),
+            ),
+          ),
         ],
       ),
     );

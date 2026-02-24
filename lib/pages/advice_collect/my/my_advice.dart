@@ -18,7 +18,7 @@ class MyAdvicePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我的意见'),
+        title: const Text('我的留言'),
       ),
       body: MuListView<AdviceCollectBook>(
         state: state,

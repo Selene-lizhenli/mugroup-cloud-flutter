@@ -30,7 +30,7 @@ final List<Color> _danmakuBgColors = [
   Colors.cyan.withOpacity(0.18),
 ];
 
-/// 意见列表弹幕区域：单击暂停，双击执行外部回调
+/// 留言列表弹幕区域：单击暂停，双击执行外部回调
 class DanmakuArea extends HookWidget {
   final List<AdviceCollectBook> books;
   final int laneCount;

@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'provider.g.dart';
 
-/// 意见收集页状态（实现 MuListState 供 MuListView 使用）
+/// 留言收集页状态（实现 MuListState 供 MuListView 使用）
 class AdviceCollectState implements MuListState {
   const AdviceCollectState({
     this.bookList = const [],

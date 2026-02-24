@@ -35,7 +35,7 @@ class AdviceCollectPage extends HookConsumerWidget {
     }, [state.searchKeyword]);
 
     useEffect(() {
-      // 首次进入时加载意见列表
+      // 首次进入时加载留言列表
       WidgetsBinding.instance.addPostFrameCallback((_) {
         notifier.loadBooks();
         notifier.loadBooksMyself();
@@ -47,7 +47,7 @@ class AdviceCollectPage extends HookConsumerWidget {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('云链里'),
+          title: const Text('留言板'),
           elevation: 0,
           foregroundColor: Colors.black,
           actions: [
@@ -91,7 +91,7 @@ class AdviceCollectPage extends HookConsumerWidget {
                     ),
                 ],
               ),
-              tooltip: '我的意见',
+              tooltip: '我的留言',
               onPressed: () {
                 context.router.push(const MyAdviceRoute());
               },
@@ -167,30 +167,55 @@ class _SearchResultBody extends ConsumerWidget {
     final state = ref.watch(adviceCollectProvider);
     final notifier = ref.read(adviceCollectProvider.notifier);
     final selectedBook = state.selectedBook;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // 有选中项时：同位置展示该条消息及回复；否则展示弹幕
+        // 有选中项时：在弹幕下方展示该条消息及回复；整体区域可滚动
         Expanded(
           child: state.isLoading
               ? const Center(child: CircularProgressIndicator())
-              : selectedBook != null
-                  ? Align(
-                      alignment: Alignment.topCenter,
-                      child: _SelectedMessageDetail(
-                        book: selectedBook,
-                        onClose: () => notifier.setSelectedBook(null),
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            DanmakuArea(
+                              books: state.bookList,
+                              onItemDoubleTap: (book) {
+                                notifier.setSelectedBook(book);
+                              },
+                            ),
+                            if (selectedBook != null) ...[
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: _SelectedMessageDetail(
+                                  book: selectedBook,
+                                  onClose: () => notifier.setSelectedBook(null),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
-                    )
-                  : DanmakuArea(
-                      books: state.bookList,
-                      onItemDoubleTap: (book) {
-                        notifier.setSelectedBook(book);
-                      },
-                    ),
+                    );
+                  },
+                ),
         ),
+        if (selectedBook == null) ...[
+          const SizedBox(height: 12),
+          Text('（双击查看留言详细内容）',
+              style: TextStyle(fontSize: 11, color: colorScheme.outline)),
+          const SizedBox(height: 12),
+        ],
         const SearchArea(),
         const SizedBox(height: 35),
       ],
@@ -198,7 +223,7 @@ class _SearchResultBody extends ConsumerWidget {
   }
 }
 
-/// 在弹幕同位置展示选中的一条意见及回复，点击关闭返回弹幕
+/// 在弹幕同位置展示选中的一条留言及回复，点击关闭返回弹幕
 class _SelectedMessageDetail extends StatelessWidget {
   const _SelectedMessageDetail({
     required this.book,
@@ -214,81 +239,131 @@ class _SelectedMessageDetail extends StatelessWidget {
     final content = book.content ?? '';
     final reply = book.message;
     final hasReply = reply != null && reply.trim().isNotEmpty;
+    final userName = book.user?.name?.trim();
+    final handlerName = book.handler?.name?.trim();
 
     return GestureDetector(
       onTap: onClose,
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: colorScheme.surface.withOpacity(1),
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '意见内容',
+                  userName?.isNotEmpty == true ? '$userName' : '',
                   style: TextStyle(
                     fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                    color: colorScheme.outline,
+                    fontWeight: FontWeight.w500,
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  onPressed: onClose,
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text(
-              content,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.45,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 16),
+            // 内容气泡（左侧，灰色）
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  '回复',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                Icon(
+                  Icons.account_circle,
+                  size: 26,
+                  color: colorScheme.outline.withOpacity(0.7),
+                ),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondary,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.45,
+                        color: colorScheme.onSecondary,
+                      ),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 48),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+            if (handlerName?.isNotEmpty == true) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    handlerName?.isNotEmpty == true ? handlerName! : '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.outline,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
+            // 回复气泡（右侧，主题色）
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  hasReply ? reply : '暂无回复',
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.45,
-                    color: colorScheme.primary,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      hasReply ? reply : '暂无回复',
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.45,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ),
                 ),
+                hasReply
+                    ? Icon(
+                        Icons.account_circle,
+                        size: 26,
+                        color: colorScheme.outline.withOpacity(0.7),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
             const SizedBox(height: 20),
@@ -296,7 +371,7 @@ class _SelectedMessageDetail extends StatelessWidget {
               '（点击任意区域关闭）',
               style: TextStyle(
                 fontSize: 11,
-                color: colorScheme.onSurface,
+                color: colorScheme.outline,
               ),
             ),
           ],
