@@ -120,22 +120,22 @@ class _RangeChip extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: isSelected
-          ? colorScheme.outline.withOpacity(0.2)
+          ? colorScheme.outline.withOpacity(0.1)
           : colorScheme.outline.withOpacity(0),
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 11.5,
+              fontSize: 11,
               height: 1,
               color: isSelected
-                  ? colorScheme.onSurface.withOpacity(0.7)
-                  : colorScheme.outline,
+                  ? colorScheme.onSurface.withOpacity(0.6)
+                  : colorScheme.outline ,
             ),
           ),
         ),

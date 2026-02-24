@@ -30,7 +30,7 @@ class EntryFeatures {
   static const adviceCollect =
       EntryFeature('advice_collect', '留言板', 'advice.collect');
   static const changxiangInventory =
-      EntryFeature('changxiang_inventory', '在仓管理', 'changxiang.inventory.show');
+      EntryFeature('changxiang_inventory', '仓库管理', 'changxiang.inventory.show');
 
   static const values = [
     showroomSample,
