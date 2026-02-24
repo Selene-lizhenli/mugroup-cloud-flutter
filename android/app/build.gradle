@@ -23,6 +23,9 @@ if (flutterVersionName == null) {
     flutterVersionName = "1.0"
 }
 
+def envName = project.hasProperty("env") ? project.getProperty("env") : "test"
+def appName = envName == "test" ? "云链测试版" : "云链"
+
 android {
     namespace = "com.mugroup.cloud"
     compileSdk = flutter.compileSdkVersion
@@ -42,6 +45,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        manifestPlaceholders = [appName: appName]
     }
 
     // 先使用证书轮替， 等后续时间长了 改为配置
