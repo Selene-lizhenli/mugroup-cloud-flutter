@@ -683,14 +683,22 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                         onTap: () => showFlanImagePreview(context,
                             images: [group.media.url], loop: false),
                         child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(4),
-                                image: DecorationImage(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(4),
+                            image: group.media.url.isNotEmpty
+                                ? DecorationImage(
                                     image: NetworkImage(group.media.url),
-                                    fit: BoxFit.cover)))),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: group.media.url.isEmpty
+                              ? const Icon(Icons.image, color: Colors.grey)
+                              : null,
+                        )),
                     const SizedBox(width: 12),
                     Expanded(
                         child: Column(
