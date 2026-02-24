@@ -81,11 +81,11 @@ class EntryGridModule extends ConsumerWidget {
         route: const PurchaseAssistRoute(),
       ),
       _EntryConfig(
-        id: EntryFeatures.warehouseManage.id,
-        label: EntryFeatures.warehouseManage.title,
+        id: EntryFeatures.changxiangInventory.id,
+        label: EntryFeatures.changxiangInventory.title,
         iconAsset: 'whs_mag',
         iconSize: 24,
-        route: const AdviceCollectRoute(),
+        route: const ChangexiangInventoryRoute(),
       ),
     ];
   }

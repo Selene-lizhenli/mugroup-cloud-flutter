@@ -29,8 +29,8 @@ class EntryFeatures {
       EntryFeature('inspection', '验货', 'inspection.task.show');
   static const adviceCollect =
       EntryFeature('advice_collect', '留言板', 'advice.collect');
-  static const warehouseManage =
-      EntryFeature('warehouse_manage', '仓库管理', 'wms.warehouse.show');
+  static const changxiangInventory =
+      EntryFeature('changxiang_inventory', '在仓管理', 'changxiang.inventory.show');
 
   static const values = [
     showroomSample,
@@ -40,6 +40,7 @@ class EntryFeatures {
     marketPurchase,
     independentWebsite,
     inspection,
+    changxiangInventory,
   ];
 
   /// 按 id 查 title（兼容原有 entryFeatureTitles 用法）

@@ -38,7 +38,7 @@ class AppRouter extends RootStackRouter {
         page: SettingRoute.page,
         path: "/setting",
       ),
-         AutoRoute(
+      AutoRoute(
         page: SingleStationRoute.page,
         path: '/single_station',
       ),
@@ -62,13 +62,17 @@ class AppRouter extends RootStackRouter {
         page: SingleStationDetailRoute.page,
         path: '/single_station/detail',
       ),
-         AutoRoute(
+      AutoRoute(
         page: AdviceCollectRoute.page,
         path: '/advice_collect',
       ),
       AutoRoute(
         page: MyAdviceRoute.page,
         path: '/advice_collect/my_advice',
+      ),
+      AutoRoute(
+        page: ChangexiangInventoryRoute.page,
+        path: '/changexiang_inventory',
       ),
       AutoRoute(
           page: MarketProductListRoute.page,
