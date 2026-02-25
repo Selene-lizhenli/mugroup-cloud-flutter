@@ -13,6 +13,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
+class MediaDragData {
+  final String key;
+  final int index;
+  MediaDragData({required this.key, required this.index});
+}
+
 class ImageUploader extends HookConsumerWidget {
   final String? label;
   final double? width;
@@ -47,6 +53,9 @@ class ImageUploader extends HookConsumerWidget {
 
   final IconData? customIcon;
 
+  final String? uploaderKey;
+  final void Function(MediaDragData source, MediaDragData target)? onSwap;
+
   final void Function(List<File> files)? onContinuousCapture;
 
   const ImageUploader({
@@ -68,6 +77,8 @@ class ImageUploader extends HookConsumerWidget {
     this.enableContinuous = false,
     this.onContinuousCapture,
     this.customIcon,
+    this.uploaderKey,
+    this.onSwap,
   });
 
   @override
@@ -306,6 +317,7 @@ class ImageUploader extends HookConsumerWidget {
                     // 只有开启了连拍，才绑定长按事件
                     onLongPress: enableContinuous ? handleLongPress : null,
                     hasError: hasError,
+                    currentIndex: currentImages.length,
                   ),
               ],
             ),
@@ -344,7 +356,7 @@ class ImageUploader extends HookConsumerWidget {
 
   Widget _buildImageItem(BuildContext context, int index, String? url,
       {required VoidCallback onRemove}) {
-    return Stack(
+    final itemContent = Stack(
       clipBehavior: Clip.none,
       children: [
         GestureDetector(
@@ -388,13 +400,42 @@ class ImageUploader extends HookConsumerWidget {
         ),
       ],
     );
+
+    // 如果没有配置 uploaderKey，就退化为普通不可拖拽的图片
+    if (uploaderKey == null || onSwap == null) return itemContent;
+    return DragTarget<MediaDragData>(
+      onAcceptWithDetails: (details) {
+        onSwap!(details.data, MediaDragData(key: uploaderKey!, index: index));
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isHovered = candidateData.isNotEmpty;
+        return LongPressDraggable<MediaDragData>(
+          data: MediaDragData(key: uploaderKey!, index: index),
+          feedback: Material(
+              color: Colors.transparent,
+              child: Opacity(opacity: 0.8, child: itemContent)),
+          childWhenDragging: Opacity(opacity: 0.3, child: itemContent),
+          child: Container(
+            decoration: BoxDecoration(
+              border: isHovered
+                  ? Border.all(color: Theme.of(context).primaryColor, width: 2)
+                  : Border.all(color: Colors.transparent, width: 2),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: itemContent,
+          ),
+        );
+      },
+    );
   }
 
-  Widget _buildAddButton(
-      {required VoidCallback onTap,
-      VoidCallback? onLongPress,
-      bool hasError = false}) {
-    return GestureDetector(
+  Widget _buildAddButton({
+    required VoidCallback onTap,
+    VoidCallback? onLongPress,
+    bool hasError = false,
+    required int currentIndex, //必须传入当前图片的数量
+  }) {
+    final btnContent = GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
@@ -411,6 +452,30 @@ class ImageUploader extends HookConsumerWidget {
         child: Icon(customIcon ?? Icons.add,
             color: const Color(0xFF999999), size: 28),
       ),
+    );
+
+    //  如果没开启拖拽，直接返回普通按钮
+    if (uploaderKey == null || onSwap == null) return btnContent;
+
+    // 3开启拖拽后，让 + 号也能接收图片
+    return DragTarget<MediaDragData>(
+      onAcceptWithDetails: (details) {
+        onSwap!(details.data,
+            MediaDragData(key: uploaderKey!, index: currentIndex));
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isHovered = candidateData.isNotEmpty;
+        return Container(
+          decoration: isHovered
+              ? BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).primaryColor, width: 2),
+                  borderRadius: BorderRadius.circular(6),
+                )
+              : null,
+          child: btnContent,
+        );
+      },
     );
   }
 }
