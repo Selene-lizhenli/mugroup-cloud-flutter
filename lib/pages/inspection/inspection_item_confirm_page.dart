@@ -381,26 +381,41 @@ class _PhotoCard extends HookConsumerWidget {
       [fieldConfigs],
     );
 
-    void handleReorder(int oldIndex, int newIndex) {
-      final List<FieldConfig> sortedVisibleList = List.from(visibleFields);
-      final movedItem = sortedVisibleList.removeAt(oldIndex);
-      sortedVisibleList.insert(newIndex, movedItem);
+    void handleMediaSwap(MediaDragData source, MediaDragData target) {
+      if (source.key == target.key && source.index == target.index) return;
 
-      final List<FieldConfig> updatedFullList = List.from(fieldConfigs);
+      final sourceList = List<TemporaryMedia>.from(mediaMap[source.key] ?? []);
+      final targetList = List<TemporaryMedia>.from(mediaMap[target.key] ?? []);
 
-      int visiblePtr = 0;
-      for (int i = 0; i < updatedFullList.length; i++) {
-        final currentField = updatedFullList[i];
+      if (source.index >= sourceList.length) return;
 
-        if (currentField.isVisible && _photoKeys.contains(currentField.name)) {
-          updatedFullList[i] = sortedVisibleList[visiblePtr];
-          visiblePtr++;
+      final sourceMedia = sourceList[source.index];
+
+      if (source.key == target.key) {
+        // 同区域内拖拽
+        sourceList.removeAt(source.index);
+        sourceList.insert(target.index, sourceMedia);
+        onMediaChanged(source.key, sourceList);
+      } else {
+        // 网格拖到底部 details，或者底部 details 拖到网格
+        TemporaryMedia? targetMedia =
+            target.index < targetList.length ? targetList[target.index] : null;
+
+        if (targetMedia != null) {
+          sourceList[source.index] = targetMedia;
+        } else {
+          sourceList.removeAt(source.index);
         }
-      }
 
-      // 4. 更新状态并触发持久化
-      notifier.updateConfigs(updatedFullList);
-      EasyLoading.showToast('排序已保存');
+        if (targetMedia != null) {
+          targetList[target.index] = sourceMedia;
+        } else {
+          targetList.add(sourceMedia);
+        }
+
+        onMediaChanged(source.key, sourceList);
+        onMediaChanged(target.key, targetList);
+      }
     }
 
     return _BaseCard(
@@ -516,11 +531,9 @@ class _PhotoCard extends HookConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              ReorderableWrap(
+              Wrap(
                 spacing: spacing,
                 runSpacing: 16.0,
-                onReorder: handleReorder,
-                reorderAnimationDuration: const Duration(milliseconds: 200),
                 children: visibleFields.map((field) {
                   return _buildGridItem(
                     key: ValueKey(field.name),
@@ -532,11 +545,12 @@ class _PhotoCard extends HookConsumerWidget {
                     onMediaChanged: onMediaChanged,
                     enableContinuous: true,
                     onContinuousCapture: handleAutoDistribute,
+                    onSwap: handleMediaSwap, // 传入交换逻辑
                   );
                 }).toList(),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,6 +580,9 @@ class _PhotoCard extends HookConsumerWidget {
                       enableContinuous: true,
                       onContinuousCapture: handleAutoDistribute,
                       onChanged: (list) => onMediaChanged('details', list),
+                      // 内部去处理 80x80 的方块拖拽
+                      uploaderKey: 'details',
+                      onSwap: handleMediaSwap,
                     ),
                   ),
                 ],
@@ -627,8 +644,11 @@ class _PhotoCard extends HookConsumerWidget {
     required Map<String, List<TemporaryMedia>> mediaMap,
     required void Function(String key, List<TemporaryMedia> list)
         onMediaChanged,
+    required void Function(MediaDragData source, MediaDragData target) onSwap,
     void Function(List<File>)? onContinuousCapture,
   }) {
+    final currentImages = mediaMap[apiKey] ?? [];
+
     return SizedBox(
       key: key,
       width: width,
@@ -652,12 +672,14 @@ class _PhotoCard extends HookConsumerWidget {
                 label: null,
                 maxCount: 1,
                 customIcon: Icons.camera_alt,
-                value: mediaMap[apiKey] ?? [],
-                // directCamera: isDirectCamera,
-                // directGallery: !isDirectCamera,
+                value: currentImages,
                 enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
                 onContinuousCapture: onContinuousCapture,
+
+                // 内部去处理 80x80 的方块拖拽
+                uploaderKey: apiKey,
+                onSwap: onSwap,
               ),
             ),
           ),
