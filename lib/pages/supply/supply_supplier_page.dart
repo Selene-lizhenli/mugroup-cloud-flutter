@@ -1,8 +1,8 @@
 import 'package:cloud/pages/market_product/events/search_event.dart';
-import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/supply/widgets/supplier_view.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -17,6 +17,8 @@ class SupplySupplierPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
 
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? [];
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
@@ -29,18 +31,19 @@ class SupplySupplierPage extends HookConsumerWidget {
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.black,
           actions: [
-            TextButton(
-              onPressed: () async {
-                context.router.push(const MarketProductSupplierCreateRoute());
-              },
-              child: Text(
-                "新增",
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 12,
+            if (permissions.contains('supply.suppliers.store'))
+              TextButton(
+                onPressed: () async {
+                  context.router.push(const MarketProductSupplierCreateRoute());
+                },
+                child: Text(
+                  "新增",
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         body: Column(
@@ -57,8 +60,7 @@ class SupplySupplierPage extends HookConsumerWidget {
                 buttonText: '搜索',
                 onSearch: (search) {
                   homeNotifier.setSearch(search ?? '');
-                  home.bus.dispatch(
-                      SearchEvent(search: search ?? ''));
+                  home.bus.dispatch(SearchEvent(search: search ?? ''));
                 },
               ),
             ),
