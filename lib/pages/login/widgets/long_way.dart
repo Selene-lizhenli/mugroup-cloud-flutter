@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud/helper/device_service.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
@@ -98,9 +99,12 @@ class LoginWay extends HookConsumerWidget {
 
       await api.get("api/csrf-cookie");
 
+      final info = await DeviceService.getBaseInfo();
+
       final data = {
         "type": "account",
         "email": account,
+        "brand": info['brand'],
         "password": password,
         if (appleIdentityToken != null)
           "apple": {
