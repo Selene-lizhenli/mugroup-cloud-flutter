@@ -58,7 +58,12 @@ class LoginWay extends HookConsumerWidget {
         qrcode.value = null;
 
         await api.get("api/csrf-cookie");
-        final resp = await api.post("api/tenant/login/qrcodes");
+
+        final info = await DeviceService.getBaseInfo();
+        final data = {
+          "deviceBrand": info['brand'],
+        };
+        final resp = await api.post("api/tenant/login/qrcodes", data: data);
 
         qrcode.value = Qrcode.fromJson(resp.data);
         qrcodeLoading.value = false;
@@ -99,12 +104,9 @@ class LoginWay extends HookConsumerWidget {
 
       await api.get("api/csrf-cookie");
 
-      final info = await DeviceService.getBaseInfo();
-
       final data = {
         "type": "account",
         "email": account,
-        "deviceBrand": info['brand'],
         "password": password,
         if (appleIdentityToken != null)
           "apple": {
