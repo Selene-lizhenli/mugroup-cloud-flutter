@@ -535,15 +535,11 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
 
         final Map<String, dynamic> submitValues = Map.from(formState!.value);
 
-        if (initialSupplier == null) {
-          EasyLoading.showInfo('没有供应商');
-          return;
-        }
-        final supplier = initialSupplier!;
+        final supplier = initialSupplier;
 
         submitValues['supply_quotes'] = [
           {
-            "supplier_id": supplier['id'],
+            "supplier_id": supplier?['id'],
             'supplier': supplier,
             "product_no": submitValues["product_no"],
             'product_brand': submitValues["product_brand"],
@@ -574,7 +570,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           await EasyLoading.show(status: '提交中...');
           await storeShowroomSample({
             ...submitValues,
-            "supplier_id": supplier['id'],
+            "supplier_id": supplier?['id'],
             if (quoteId != null) "quotation_id": quoteId,
             'item_type': 'market_product'
           });

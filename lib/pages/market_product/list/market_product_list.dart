@@ -30,7 +30,7 @@ class MarketProductListPage extends HookConsumerWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                context.router.push(const ShowroomSampleCreateRoute());
+                context.router.push(QuoteProductNewAddRoute());
               },
               child: Text(
                 "新增",
