@@ -104,7 +104,7 @@ class LoginWay extends HookConsumerWidget {
       final data = {
         "type": "account",
         "email": account,
-        "brand": info['brand'],
+        "deviceBrand": info['brand'],
         "password": password,
         if (appleIdentityToken != null)
           "apple": {
