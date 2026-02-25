@@ -11,7 +11,7 @@ class MarketProductPage extends HookConsumerWidget {
     final items = [
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "市场产品"),
       const BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_outlined), label: "报价单"),
+          icon: Icon(Icons.assignment_outlined), label: "带客记录"),
     ];
     return AutoTabsRouter(
       builder: (context, child) {
