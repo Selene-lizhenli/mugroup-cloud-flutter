@@ -4,6 +4,7 @@ import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/pages/crm/crm_company/widgets/crm_company_card.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -22,6 +23,8 @@ class CompanyView extends HookConsumerWidget {
     final refreshController = useEasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     final home = ref.watch(homeProvider);
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? [];
     final search = useState<String?>(null);
     final page = useRef(1);
     final companies = useState<List<Company>>(<Company>[]);
@@ -84,7 +87,7 @@ class CompanyView extends HookConsumerWidget {
       };
     }, []);
 
-    return Container( 
+    return Container(
         margin: const EdgeInsets.fromLTRB(12, 2, 12, 0),
         decoration: BoxDecoration(
           color: colorScheme.surfaceTint,
@@ -151,20 +154,23 @@ class CompanyView extends HookConsumerWidget {
                               context.router
                                   .push(CrmCompanyDetailRoute(id: company.id!));
                             },
-                            onEdit: () async {
-                              final shouldRefresh = await context.router
-                                  .push(CrmCompanyEditRoute(id: company.id!));
+                            onEdit: permissions.contains('crm.company.update')
+                                ? () async {
+                                    final shouldRefresh = await context.router
+                                        .push(CrmCompanyEditRoute(
+                                            id: company.id!));
 
-                              if (shouldRefresh == true) {
-                                await fetchData(
-                                  search.value,
-                                  init: true,
-                                );
+                                    if (shouldRefresh == true) {
+                                      await fetchData(
+                                        search.value,
+                                        init: true,
+                                      );
 
-                                refreshController.finishRefresh();
-                                refreshController.resetFooter();
-                              }
-                            },
+                                      refreshController.finishRefresh();
+                                      refreshController.resetFooter();
+                                    }
+                                  }
+                                : null,
                           );
                         },
                       ),

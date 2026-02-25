@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/crm/company.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/crm.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,10 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? [];
     final company = useState<Company?>(null);
-    final isLoading = useState(true); 
+    final isLoading = useState(true);
     Future loadCompany() async {
       try {
         final data = await showCrmCompany(id);
@@ -31,10 +34,10 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
       return null;
     }, []);
 
-    return Scaffold( 
+    return Scaffold(
       appBar: AppBar(
         title: const Text("客户详情"),
-        centerTitle: true, 
+        centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -50,13 +53,16 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
                       _buildHeaderCard(
                         context,
                         company.value!,
-                        onEdit: () async {
-                          final shouldRefresh = await context.router
-                              .push(CrmCompanyEditRoute(id: company.value!.id!));
-                          if (shouldRefresh == true) {
-                            loadCompany();
-                          }
-                        },
+                        onEdit: permissions.contains('crm.company.update')
+                            ? () async {
+                                final shouldRefresh = await context.router.push(
+                                    CrmCompanyEditRoute(
+                                        id: company.value!.id!));
+                                if (shouldRefresh == true) {
+                                  loadCompany();
+                                }
+                              }
+                            : null,
                       ),
 
                       const SizedBox(height: 16),
@@ -199,7 +205,8 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
                 runSpacing: 8,
                 alignment: WrapAlignment.center,
                 children: [
-                  if (data.source != null) _buildPillTag(data.source!, Colors.blue),
+                  if (data.source != null)
+                    _buildPillTag(data.source!, Colors.blue),
                   if (data.location != null)
                     _buildPillTag(data.location!, Colors.orange),
                   if (data.address != null)
