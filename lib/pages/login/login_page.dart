@@ -141,7 +141,7 @@ class LoginPage extends HookConsumerWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/photo/trival_small.png',
+            'assets/photo/login.png',
             fit: BoxFit.cover,
           ),
           SafeArea(
