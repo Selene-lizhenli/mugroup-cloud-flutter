@@ -11,8 +11,8 @@ class AppColumns {
   static const outCapacity = ColumnConfig('outer_capacity', '外装箱量', width: 70);
   static const innerCapacity =
       ColumnConfig('inner_capacity', '内装箱量', width: 70);
-  static const spec = ColumnConfig('spec', '尺寸', width: 90);
-  static const weight = ColumnConfig('weight', '重量(g)', width: 60);
+  static const spec = ColumnConfig('spec', '产品规格', width: 90);
+  static const weight = ColumnConfig('product_weight', '重量(g)', width: 60);
   static const packaging = ColumnConfig('packing', '包装方式', width: 70);
   static const unit = ColumnConfig('unit', '单位', width: 50);
   static const volume = ColumnConfig('outer_volume', '体积', width: 60);
@@ -73,8 +73,10 @@ const List<TemplateOption> kQuoteAiTemplates = [
       AppColumns.productNo,
       AppColumns.purchaseCost,
       AppColumns.outCapacity,
+      AppColumns.spec,
+      AppColumns.weight,
       AppColumns.volume,
-      AppColumns.packaging,
+      // AppColumns.packaging,
       AppColumns.description,
     ],
   ),
@@ -89,6 +91,8 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
       AppColumns.productNo,
       AppColumns.purchaseCost,
       AppColumns.outCapacity,
+      AppColumns.spec,
+      AppColumns.weight,
       AppColumns.volume,
       AppColumns.description,
     ],
