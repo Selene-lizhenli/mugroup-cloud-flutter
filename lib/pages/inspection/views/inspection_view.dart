@@ -286,6 +286,9 @@ class InspectionView extends HookConsumerWidget {
                               await refreshController.callRefresh();
                             }
                           },
+                          onRefresh: () async {
+                            await refreshController.callRefresh();
+                          },
                         );
                       },
                     ),

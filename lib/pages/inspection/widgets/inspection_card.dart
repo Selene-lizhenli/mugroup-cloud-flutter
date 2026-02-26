@@ -1,4 +1,3 @@
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/pages/inspection/widgets/collaboration_dialog.dart';
 import 'package:cloud/pages/widgets/progress.dart';
@@ -11,9 +10,14 @@ class InspectionCard extends HookConsumerWidget {
   final Inspection inspection;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onRefresh;
 
   const InspectionCard(
-      {super.key, required this.inspection, this.onTap, this.onDelete});
+      {super.key,
+      required this.inspection,
+      this.onTap,
+      this.onDelete,
+      this.onRefresh});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -137,8 +141,8 @@ class InspectionCard extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
+                      onTap: () async {
+                        await showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           useSafeArea: true,
@@ -146,6 +150,10 @@ class InspectionCard extends HookConsumerWidget {
                           builder: (context) => CollaborationBottomSheet(
                               inspectionId: inspection.id!),
                         );
+
+                        if (onRefresh != null) {
+                          onRefresh!();
+                        }
                       },
                       borderRadius: BorderRadius.circular(16),
                       child: Row(
