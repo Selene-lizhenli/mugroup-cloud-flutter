@@ -173,6 +173,8 @@ class _SearchResultBody extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        const SizedBox(height: 6),
+        const SearchArea(),
         // 有选中项时：在弹幕下方展示该条消息及回复；整体区域可滚动
         Expanded(
           child: state.isLoading
@@ -216,7 +218,7 @@ class _SearchResultBody extends ConsumerWidget {
               style: TextStyle(fontSize: 11, color: colorScheme.outline)),
           const SizedBox(height: 12),
         ],
-        const SearchArea(),
+
         const SizedBox(height: 35),
       ],
     );

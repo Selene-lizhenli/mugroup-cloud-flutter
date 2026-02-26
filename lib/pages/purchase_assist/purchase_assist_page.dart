@@ -199,7 +199,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
           Positioned.fill(
             left: 0,
             right: 0,
-            top: state.hasSearched ? paddingTop + appbarHeight : 0,
+            top: paddingTop + appbarHeight,
             bottom: 0,
             child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
@@ -289,8 +289,8 @@ class _SearchResultBody extends HookConsumerWidget {
                   builder: (context, scrollController) => Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(12)),
                     ),
                     child: FilterContent(scrollController: scrollController),
                   ),
@@ -304,7 +304,7 @@ class _SearchResultBody extends HookConsumerWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         // 平台标签与筛选同一行，超出时仅 MuTagList 横向滚动
         Row(
