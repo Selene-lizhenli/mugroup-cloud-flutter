@@ -542,7 +542,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   Widget _buildInfoBar(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.withOpacity(0.3),
@@ -554,7 +554,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'AI识别结果点击下方单元格可手动修正',
+              '支持后台静默识别。支持点击单元格修正 AI 识别结果。',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
