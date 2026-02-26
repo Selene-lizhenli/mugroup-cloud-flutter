@@ -272,24 +272,28 @@ class _SearchResultBody extends HookConsumerWidget {
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (sheetContext) => Padding(
-              padding: EdgeInsets.only(
-                bottom: math.max(
-                  MediaQuery.of(sheetContext).viewInsets.bottom,
-                  0,
-                ),
-              ),
-              child: DraggableScrollableSheet(
-                initialChildSize: 0.6,
-                minChildSize: 0.6,
-                maxChildSize: 0.85,
-                builder: (context, scrollController) => Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(12)),
+            builder: (sheetContext) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Navigator.of(context).pop(),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: math.max(
+                    MediaQuery.of(sheetContext).viewInsets.bottom,
+                    0,
                   ),
-                  child: FilterContent(scrollController: scrollController),
+                ),
+                child: DraggableScrollableSheet(
+                  initialChildSize: 0.6,
+                  minChildSize: 0.6,
+                  maxChildSize: 0.85,
+                  builder: (context, scrollController) => Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12)),
+                    ),
+                    child: FilterContent(scrollController: scrollController),
+                  ),
                 ),
               ),
             ),
