@@ -168,7 +168,7 @@ class ExchangeChartHeader extends StatelessWidget {
         children: [
           // 模块标题
           Text(
-            '汇率波动',
+            '汇率',
             style:
                 Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
           ),
