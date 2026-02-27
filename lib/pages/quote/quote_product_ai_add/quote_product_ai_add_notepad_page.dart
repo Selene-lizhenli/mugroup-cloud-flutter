@@ -569,44 +569,62 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
             child: Row(
               children: [
                 Expanded(
-                    child: InkWell(
-                        onTap: () => onSelect(t.id),
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for (var config in t.columns)
-                                    config.key == 'product_no'
-                                        ? Row(children: [
-                                            Expanded(
-                                                child: Text(config.label,
-                                                    style: TextStyle(
-                                                        fontSize: 8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Colors.grey[600]),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis)),
-                                            GestureDetector(
-                                                onTap: () => _showPreviewDialog(
-                                                    context, t.previewImageUrl),
-                                                child: Icon(
-                                                    Icons.visibility_outlined,
-                                                    size: 20,
-                                                    color: Colors.grey[600]))
-                                          ])
-                                        : Text(config.label,
+                  child: InkWell(
+                    onTap: () => onSelect(t.id),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var config in t.columns)
+                              config.key == 'product_no'
+                                  ? Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            config.label,
                                             style: TextStyle(
-                                                fontSize: 8,
-                                                color: Colors.grey[600],
-                                                fontWeight: FontWeight.bold),
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[600],
+                                            ),
                                             maxLines: 1,
-                                            overflow: TextOverflow.ellipsis)
-                                ])))),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () => _showPreviewDialog(
+                                              context, t.previewImageUrl),
+                                          child: Icon(
+                                            Icons.visibility_outlined,
+                                            size: 20,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.only(bottom: 2),
+                                      child: Text(
+                                        config.label,
+                                        style: TextStyle(
+                                          fontSize: 8,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Container(
                     width: 1, height: 40, color: Colors.grey.withOpacity(0.1)),
                 Listener(

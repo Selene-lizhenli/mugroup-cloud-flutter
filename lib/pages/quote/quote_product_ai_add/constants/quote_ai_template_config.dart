@@ -18,6 +18,7 @@ class AppColumns {
   static const volume = ColumnConfig('outer_volume', '体积', width: 60);
   static const moq = ColumnConfig('moq', '起订量', width: 60);
   static const description = ColumnConfig('description_cn', '描述', width: 120);
+  static const remark = ColumnConfig('remark', '备注', width: 120);
 
   static const List<ColumnConfig> all = [
     productNo,
@@ -74,10 +75,12 @@ const List<TemplateOption> kQuoteAiTemplates = [
       AppColumns.purchaseCost,
       AppColumns.outCapacity,
       AppColumns.spec,
+      AppColumns.unit,
       AppColumns.weight,
       AppColumns.volume,
-      // AppColumns.packaging,
+      AppColumns.packaging,
       AppColumns.description,
+      AppColumns.remark,
     ],
   ),
 ];
@@ -92,9 +95,12 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
       AppColumns.purchaseCost,
       AppColumns.outCapacity,
       AppColumns.spec,
+      AppColumns.unit,
       AppColumns.weight,
       AppColumns.volume,
+      AppColumns.packaging,
       AppColumns.description,
+      AppColumns.remark,
     ],
   ),
 ];

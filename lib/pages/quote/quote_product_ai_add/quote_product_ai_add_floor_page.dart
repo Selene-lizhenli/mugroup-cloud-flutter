@@ -465,55 +465,55 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     onTap: () => onSelect(t.id),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var config in t.columns) ...[
-                            if (config.key == 'product_no') ...[
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      config.label,
-                                      style: TextStyle(
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey[600],
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var config in t.columns) ...[
+                              if (config.key == 'product_no') ...[
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        config.label,
+                                        style: TextStyle(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => _showPreviewDialog(
-                                        context, t.previewImageUrl),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 0),
+                                    GestureDetector(
+                                      onTap: () => _showPreviewDialog(
+                                          context, t.previewImageUrl),
                                       child: Icon(
                                         Icons.visibility_outlined,
-                                        size: 20, // 大眼睛
+                                        size: 18,
                                         color: Colors.grey[600],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ] else ...[
-                              Text(
-                                config.label,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.bold,
+                                  ],
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ]
+                              ] else ...[
+                                Text(
+                                  config.label,
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                              const SizedBox(height: 2),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
