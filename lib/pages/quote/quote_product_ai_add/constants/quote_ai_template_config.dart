@@ -112,3 +112,8 @@ TemplateOption getTemplateById(String id) {
   return kQuoteAiTemplates.firstWhere((t) => t.id == id,
       orElse: () => kQuoteAiTemplates.first);
 }
+
+TemplateOption getTemplateNotePadById(String id) {
+  return kQuoteAiNotePadTemplates.firstWhere((t) => t.id == id,
+      orElse: () => kQuoteAiNotePadTemplates.first);
+}

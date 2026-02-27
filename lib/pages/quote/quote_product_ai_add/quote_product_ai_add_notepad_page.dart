@@ -33,7 +33,21 @@ class ProductDraftItem {
     this.quotationSampleId,
   });
 
-  String getValue(String key) => data[key] ?? '-';
+  String getValue(String key) {
+    final rawValue = data[key];
+
+    if (rawValue == null) return '-';
+
+    final trimmedValue = rawValue.trim();
+
+    if (trimmedValue.isEmpty ||
+        trimmedValue.toLowerCase() == 'null' ||
+        trimmedValue == '-') {
+      return '-';
+    }
+
+    return trimmedValue;
+  }
 
   ProductDraftItem copyWith({
     Map<String, String>? data,
@@ -172,7 +186,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     String buffer = "";
     String eventType = "message"; // 默认为 message
     StreamSubscription? sub;
-    final currentTemplate = getTemplateById(state.currentTemplateId);
+    final currentTemplate = getTemplateNotePadById(state.currentTemplateId);
 
     try {
       final response = await api.post<ResponseBody>(
@@ -210,6 +224,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           } else {
             // ✅ 处理实时打字机渲染
             buffer += content;
+
+            logger.d(buffer);
             _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
           }
         }
@@ -409,6 +425,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
     final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
         (t) => t.id == providerState.currentTemplateId,
         orElse: () => kQuoteAiNotePadTemplates.first);
+
+    logger.d(currentTemplate);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -830,6 +848,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       }
     }
 
+    logger.d(template);
+
     return Column(
       children: [
         Row(
@@ -843,7 +863,11 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                 child: Row(
                   children: template.columns.asMap().entries.map((colEntry) {
                     final colConfig = colEntry.value;
+
+                    logger.d(template);
+                    // logger.d(colConfig);
                     final text = product.getValue(colConfig.key);
+                    // logger.d(text);
                     return Row(
                       children: [
                         SizedBox(
@@ -894,8 +918,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                                                 decimal: true)
                                             : TextInputType.text,
                                         onConfirm: (newText) async {
-                                          logger.d(product.productId);
-                                          logger.d(product.supplyQuoteId);
+                                          // logger.d(product.productId);
+                                          // logger.d(product.supplyQuoteId);
                                           if (product.productId != null ||
                                               product.supplyQuoteId != null) {
                                             final success =
