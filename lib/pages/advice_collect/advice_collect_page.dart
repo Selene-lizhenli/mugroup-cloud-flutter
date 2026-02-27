@@ -1,10 +1,8 @@
-import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/pages/advice_collect/provider/provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/models/advice_collect/advice_collect_item.dart';
-import 'package:cloud/pages/advice_collect/widgets/danmaku_area.dart';
 import 'package:cloud/pages/advice_collect/widgets/search_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,24 +16,13 @@ class AdviceCollectPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(adviceCollectProvider);
-    final searchController =
-        useTextEditingController(text: state.searchKeyword);
     final colorScheme = Theme.of(context).colorScheme;
-    const double gradientAngleDegrees = 0;
     final headerColor = colorScheme.primary.withOpacity(0.2);
     final paddingTop = MediaQuery.of(context).padding.top;
     final notifier = ref.read(adviceCollectProvider.notifier);
     final bookListMyself = state.bookListMyself ?? [];
 
     useEffect(() {
-      if (state.searchKeyword != searchController.text) {
-        searchController.text = state.searchKeyword;
-      }
-      return null;
-    }, [state.searchKeyword]);
-
-    useEffect(() {
-      // 首次进入时加载留言列表
       WidgetsBinding.instance.addPostFrameCallback((_) {
         notifier.loadBooks();
         notifier.loadBooksMyself();
@@ -44,70 +31,38 @@ class AdviceCollectPage extends HookConsumerWidget {
     }, const []);
 
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          title: const Text('留言板'),
-          elevation: 0,
-          foregroundColor: Colors.black,
-          actions: [
-            IconButton(
-              icon: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  const Icon(
-                    FontAwesomeIcons.user,
-                    size: 20,
-                    color: Color.fromARGB(255, 119, 78, 47),
-                  ),
-                  if (bookListMyself.isNotEmpty)
-                    Positioned(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text('留言板'),
+        elevation: 0,
+        foregroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(FontAwesomeIcons.user,
+                    size: 20, color: Color.fromARGB(255, 119, 78, 47)),
+                if (bookListMyself.isNotEmpty)
+                  Positioned(
                       left: -12,
                       top: -10,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          bookListMyself.length > 99
-                              ? '99+'
-                              : '${bookListMyself.length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            height: 1,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              tooltip: '我的留言',
-              onPressed: () {
-                context.router.push(const MyAdviceRoute());
-              },
+                      child: _buildBadge(bookListMyself.length)),
+              ],
             ),
-          ],
-        ),
-        body: Stack(children: [
+            onPressed: () => context.router.push(const MyAdviceRoute()),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  transform: const GradientRotation(
-                    gradientAngleDegrees * math.pi / 180,
-                  ),
                   colors: [
                     Color.lerp(
                       headerColor,
@@ -143,19 +98,31 @@ class AdviceCollectPage extends HookConsumerWidget {
               ),
             ),
           ),
-          // 最底层：渐变铺满整页
           Positioned.fill(
-            left: 0,
-            right: 0,
             top: paddingTop + appbarHeight,
-            bottom: 0,
             child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: Center(
-                  child: _SearchResultBody(),
-                )),
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              child: _SearchResultBody(),
+            ),
           ),
-        ]));
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBadge(int count) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      decoration: BoxDecoration(
+          color: Colors.red,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 1)),
+      alignment: Alignment.center,
+      child: Text(count > 99 ? '99+' : '$count',
+          style: const TextStyle(
+              color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+    );
   }
 }
 
@@ -165,218 +132,218 @@ class _SearchResultBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(adviceCollectProvider);
-    final notifier = ref.read(adviceCollectProvider.notifier);
-    final selectedBook = state.selectedBook;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         const SizedBox(height: 6),
         const SearchArea(),
-        // 有选中项时：在弹幕下方展示该条消息及回复；整体区域可滚动
+        const SizedBox(height: 12),
         Expanded(
           child: state.isLoading
               ? const Center(child: CircularProgressIndicator())
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            DanmakuArea(
-                              books: state.bookList,
-                              onItemDoubleTap: (book) {
-                                notifier.setSelectedBook(book);
-                              },
-                            ),
-                            if (selectedBook != null) ...[
-                              const SizedBox(height: 12),
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: _SelectedMessageDetail(
-                                  book: selectedBook,
-                                  onClose: () => notifier.setSelectedBook(null),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 100), // 为底部留出空间
+                  itemCount: state.bookList.length,
+                  itemBuilder: (context, index) =>
+                      _CommentGroup(book: state.bookList[index]),
                 ),
         ),
-        if (selectedBook == null) ...[
-          const SizedBox(height: 12),
-          Text('（双击查看详情）',
-              style: TextStyle(fontSize: 11, color: colorScheme.outline)),
-          const SizedBox(height: 12),
-        ],
-
-        const SizedBox(height: 35),
       ],
     );
   }
 }
 
-/// 在弹幕同位置展示选中的一条留言及回复，点击关闭返回弹幕
-class _SelectedMessageDetail extends StatelessWidget {
-  const _SelectedMessageDetail({
-    required this.book,
-    required this.onClose,
-  });
-
+class _CommentGroup extends ConsumerWidget {
   final AdviceCollectBook book;
-  final VoidCallback onClose;
+  const _CommentGroup({required this.book});
+
+  // 弹出回复框的方法
+  void _showReplyBottomSheet(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final replyController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // 关键：允许弹窗随键盘推起
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Text('回复 ', style: TextStyle(color: colorScheme.outline)),
+                  Text('@${book.user?.name ?? "匿名"}',
+                      style: TextStyle(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: replyController,
+                autofocus: true,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: '写下你的想法...',
+                  filled: true,
+                  fillColor: colorScheme.surface.withOpacity(0.3),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // 这里执行发送逻辑
+                    print("发送给 ${book.id}: ${replyController.text}");
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('发布留言'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasReply = book.message != null && book.message!.trim().isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 主留言：点击触发弹窗
+        _CommentItem(
+          userName: book.user?.name ?? '匿名',
+          content: book.content ?? '',
+          isReply: false,
+          onTap: () => _showReplyBottomSheet(context, ref),
+        ),
+        // 管理员回复
+        if (hasReply)
+          Padding(
+            padding: const EdgeInsets.only(left: 44, top: 4),
+            child: Container(
+              padding: const EdgeInsets.only(left: 12),
+              decoration: BoxDecoration(
+                  border: Border(
+                      left: BorderSide(
+                          color: colorScheme.outlineVariant.withOpacity(0.5),
+                          width: 2))),
+              child: _CommentItem(
+                userName: book.handler?.name ?? '管理员',
+                content: book.message!,
+                isReply: true,
+                onTap: () {}, // 管理员回复暂不点击或点击查看详情
+              ),
+            ),
+          ),
+        // const SizedBox(height: 20),
+      ],
+    );
+  }
+}
+
+class _CommentItem extends StatelessWidget {
+  final String userName;
+  final String content;
+  final bool isReply;
+  final VoidCallback onTap;
+
+  const _CommentItem(
+      {required this.userName,
+      required this.content,
+      required this.isReply,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final content = book.content ?? '';
-    final reply = book.message;
-    final hasReply = reply != null && reply.trim().isNotEmpty;
-    final userName = book.user?.name?.trim();
-    final handlerName = book.handler?.name?.trim();
 
-    return GestureDetector(
-      onTap: onClose,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withOpacity(1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  userName?.isNotEmpty == true ? '$userName' : '匿名',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.outline,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            CircleAvatar(
+              radius: isReply ? 12 : 16,
+              backgroundColor: isReply
+                  ? colorScheme.secondaryContainer
+                  : colorScheme.primaryContainer,
+              child: Icon(isReply ? Icons.auto_awesome : Icons.person,
+                  size: isReply ? 14 : 18,
+                  color: isReply
+                      ? colorScheme.onSecondaryContainer
+                      : colorScheme.onPrimaryContainer),
             ),
-            const SizedBox(height: 8),
-            // 内容气泡（左侧，灰色）
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.account_circle,
-                  size: 26,
-                  color: colorScheme.outline.withOpacity(0.7),
-                ),
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.secondary,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(4),
-                        topRight: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      content,
-                      style: TextStyle(
-                        fontSize: 14,
-                        height: 1.45,
-                        color: colorScheme.onSecondary,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 48),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (handlerName?.isNotEmpty == true) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    handlerName?.isNotEmpty == true ? handlerName! : '',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colorScheme.outline,
-                      fontWeight: FontWeight.w500,
+                  Row(
+                    children: [
+                      Text(userName,
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.outline)),
+                      if (!isReply) ...[
+                        const SizedBox(width: 8),
+                        Text('回复',
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: colorScheme.primary.withOpacity(0.7))),
+                      ]
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isReply
+                          ? colorScheme.primaryContainer.withOpacity(0.2)
+                          : colorScheme.secondary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12).copyWith(
+                          topLeft: isReply ? null : const Radius.circular(2)),
                     ),
+                    child: Text(content,
+                        style: const TextStyle(fontSize: 14, height: 1.4)),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-            ],
-            // 回复气泡（右侧，主题色）
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const SizedBox(
-                  width: 48,
-                ),
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(4),
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      hasReply ? reply : '暂无回复',
-                      style: TextStyle(
-                        fontSize: 14,
-                        height: 1.45,
-                        color: colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                ),
-                hasReply
-                    ? Icon(
-                        Icons.account_circle,
-                        size: 26,
-                        color: colorScheme.outline.withOpacity(0.7),
-                      )
-                    : const SizedBox.shrink(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              '（点击任意区域关闭）',
-              style: TextStyle(
-                fontSize: 11,
-                color: colorScheme.outline,
               ),
             ),
           ],
