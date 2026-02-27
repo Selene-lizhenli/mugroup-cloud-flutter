@@ -550,7 +550,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
+          Icon(Icons.auto_awesome, color: colorScheme.secondary, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -558,7 +558,7 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: colorScheme.primary,
+                color: colorScheme.secondary,
                 fontSize: 12,
               ),
             ),
