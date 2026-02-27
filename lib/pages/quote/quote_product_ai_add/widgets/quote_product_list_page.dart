@@ -831,13 +831,13 @@ Widget _buildInfoBar(ColorScheme colorScheme) {
         borderRadius: BorderRadius.circular(8)),
     child: Row(
       children: [
-        Icon(Icons.auto_awesome, color: colorScheme.primary, size: 16),
+        Icon(Icons.auto_awesome, color: colorScheme.secondary, size: 16),
         const SizedBox(width: 8),
         Expanded(
             child: Text('AI识别结果点击下方单元格可手动修正',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colorScheme.primary, fontSize: 12))),
+                style: TextStyle(color: colorScheme.secondary, fontSize: 12))),
       ],
     ),
   );
