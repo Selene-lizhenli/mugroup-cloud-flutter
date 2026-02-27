@@ -9,15 +9,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SearchArea extends HookConsumerWidget {
   const SearchArea({super.key});
 
-  static const int _minLines = 1;
-  static const int _maxLines = 8;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(adviceCollectProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
-    final lineCount = useState(_minLines);
     final contentController = useTextEditingController();
+
     Future<void> doSend() async {
       final content = contentController.text.trim();
       if (content.isEmpty) return;
@@ -35,72 +32,52 @@ class SearchArea extends HookConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      padding: const EdgeInsets.only(left: 16, right: 8, top: 4, bottom: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(30),
         color: Colors.white,
-        border: Border.all(color: colorScheme.primary, width: 0.4),
+        border:
+            Border.all(color: colorScheme.primary.withOpacity(0.3), width: 0.4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
             offset: const Offset(0, 4),
-            spreadRadius: 0,
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          // 第一行：输入框 + 放大/缩小图标
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: TextField(
-                  minLines: lineCount.value,
-                  maxLines: lineCount.value,
-                  controller: contentController,
-                  decoration: const InputDecoration(
-                    hintText: '想说什么尽管说...',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 8),
-                    alignLabelWithHint: true,
-                  ),
-                  onChanged: notifier.setSearchKeyword,
-                  onSubmitted: (_) => doSend(),
-                ),
+          Expanded(
+            child: TextField(
+              controller: contentController,
+              maxLines: 1,
+              style: const TextStyle(fontSize: 14),
+              decoration: const InputDecoration(
+                hintText: '想说什么尽管说...',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
-              IconButton(
-                icon: Icon(
-                  lineCount.value > _minLines
-                      ? Icons.close_fullscreen
-                      : Icons.open_in_full,
-                  size: 18,
-                  color: const Color.fromARGB(255, 189, 189, 189),
-                ),
-                tooltip: lineCount.value > _minLines ? '缩小' : '放大',
-                onPressed: () {
-                  lineCount.value =
-                      lineCount.value > _minLines ? _minLines : _maxLines;
-                },
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(36, 36),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-            ],
+              onChanged: notifier.setSearchKeyword,
+              onSubmitted: (_) => doSend(),
+              textInputAction: TextInputAction.send,
+            ),
           ),
-          // 第二行：发送按钮居右
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: doSend,
-              child: Text('发送', style: TextStyle(color: colorScheme.primary)),
+          TextButton(
+            onPressed: doSend,
+            style: TextButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              '发送',
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

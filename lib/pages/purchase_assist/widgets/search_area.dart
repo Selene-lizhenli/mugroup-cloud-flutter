@@ -84,8 +84,8 @@ class SearchArea extends HookConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: Colors.white ,
-        border: Border.all(color: colorScheme.primary,width: 0.4),
+        color: Colors.white,
+        border: Border.all(color: colorScheme.primary, width: 0.4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
@@ -100,28 +100,15 @@ class SearchArea extends HookConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (state.hasSearched == false) ...[
-            Row(children: [getTnputArea()]),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Spacer(),
-                getcaremaBtn(),
-                getPicBtn(),
-              ],
-            )
-          ] else ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                getTnputArea(),
-                getcaremaBtn(),
-                getPicBtn(),
-              ],
-            ),
-          ]
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              getTnputArea(),
+              getcaremaBtn(),
+              getPicBtn(),
+            ],
+          ),
         ],
       ),
     );
