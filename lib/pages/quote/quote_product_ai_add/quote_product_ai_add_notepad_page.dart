@@ -209,7 +209,11 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
             continue;
           }
           if (!line.startsWith('data:')) continue;
-          String content = line.replaceFirst('data:', '').trim();
+          String content = line.substring(5);
+
+          if (content.startsWith(' ')) {
+            content = content.substring(1);
+          }
 
           if (content.contains("[DONE]")) {
             _finalizeGroup(taskId, sub);
