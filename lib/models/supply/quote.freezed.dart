@@ -43,6 +43,8 @@ mixin _$Quote {
   bool? get canBill => throw _privateConstructorUsedError;
   @JsonKey(name: 'tax_rate')
   String? get taxRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'product_weight')
+  String? get productWeight => throw _privateConstructorUsedError;
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost => throw _privateConstructorUsedError;
   @JsonKey(name: 'currency')
@@ -87,6 +89,7 @@ abstract class $QuoteCopyWith<$Res> {
       @JsonKey(name: 'record_user') String? recordUser,
       @JsonKey(name: 'can_bill') bool? canBill,
       @JsonKey(name: 'tax_rate') String? taxRate,
+      @JsonKey(name: 'product_weight') String? productWeight,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'currency') String? currency,
       @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
@@ -127,6 +130,7 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
     Object? recordUser = freezed,
     Object? canBill = freezed,
     Object? taxRate = freezed,
+    Object? productWeight = freezed,
     Object? purchaseCost = freezed,
     Object? currency = freezed,
     Object? supplierProductNo = freezed,
@@ -193,6 +197,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       taxRate: freezed == taxRate
           ? _value.taxRate
           : taxRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productWeight: freezed == productWeight
+          ? _value.productWeight
+          : productWeight // ignore: cast_nullable_to_non_nullable
               as String?,
       purchaseCost: freezed == purchaseCost
           ? _value.purchaseCost
@@ -268,6 +276,7 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       @JsonKey(name: 'record_user') String? recordUser,
       @JsonKey(name: 'can_bill') bool? canBill,
       @JsonKey(name: 'tax_rate') String? taxRate,
+      @JsonKey(name: 'product_weight') String? productWeight,
       @JsonKey(name: 'purchase_cost') String? purchaseCost,
       @JsonKey(name: 'currency') String? currency,
       @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
@@ -307,6 +316,7 @@ class __$$QuoteImplCopyWithImpl<$Res>
     Object? recordUser = freezed,
     Object? canBill = freezed,
     Object? taxRate = freezed,
+    Object? productWeight = freezed,
     Object? purchaseCost = freezed,
     Object? currency = freezed,
     Object? supplierProductNo = freezed,
@@ -374,6 +384,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
           ? _value.taxRate
           : taxRate // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == productWeight
+          ? _value.productWeight
+          : productWeight // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == purchaseCost
           ? _value.purchaseCost
           : purchaseCost // ignore: cast_nullable_to_non_nullable
@@ -432,6 +446,7 @@ class _$QuoteImpl implements _Quote {
       @JsonKey(name: 'record_user') this.recordUser,
       @JsonKey(name: 'can_bill') this.canBill,
       @JsonKey(name: 'tax_rate') this.taxRate,
+      @JsonKey(name: 'product_weight') this.productWeight,
       @JsonKey(name: 'purchase_cost') this.purchaseCost,
       @JsonKey(name: 'currency') this.currency,
       @JsonKey(name: 'supplier_product_no') this.supplierProductNo,
@@ -483,6 +498,9 @@ class _$QuoteImpl implements _Quote {
   @JsonKey(name: 'tax_rate')
   final String? taxRate;
   @override
+  @JsonKey(name: 'product_weight')
+  final String? productWeight;
+  @override
   @JsonKey(name: 'purchase_cost')
   final String? purchaseCost;
   @override
@@ -512,7 +530,7 @@ class _$QuoteImpl implements _Quote {
 
   @override
   String toString() {
-    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, supplierPrice: $supplierPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
+    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, productWeight: $productWeight, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, supplierPrice: $supplierPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
   }
 
   @override
@@ -543,6 +561,8 @@ class _$QuoteImpl implements _Quote {
                 other.recordUser == recordUser) &&
             (identical(other.canBill, canBill) || other.canBill == canBill) &&
             (identical(other.taxRate, taxRate) || other.taxRate == taxRate) &&
+            (identical(other.productWeight, productWeight) ||
+                other.productWeight == productWeight) &&
             (identical(other.purchaseCost, purchaseCost) ||
                 other.purchaseCost == purchaseCost) &&
             (identical(other.currency, currency) ||
@@ -581,6 +601,7 @@ class _$QuoteImpl implements _Quote {
         recordUser,
         canBill,
         taxRate,
+        productWeight,
         purchaseCost,
         currency,
         supplierProductNo,
@@ -622,6 +643,7 @@ abstract class _Quote implements Quote {
       @JsonKey(name: 'record_user') final String? recordUser,
       @JsonKey(name: 'can_bill') final bool? canBill,
       @JsonKey(name: 'tax_rate') final String? taxRate,
+      @JsonKey(name: 'product_weight') final String? productWeight,
       @JsonKey(name: 'purchase_cost') final String? purchaseCost,
       @JsonKey(name: 'currency') final String? currency,
       @JsonKey(name: 'supplier_product_no') final String? supplierProductNo,
@@ -671,6 +693,9 @@ abstract class _Quote implements Quote {
   @override
   @JsonKey(name: 'tax_rate')
   String? get taxRate;
+  @override
+  @JsonKey(name: 'product_weight')
+  String? get productWeight;
   @override
   @JsonKey(name: 'purchase_cost')
   String? get purchaseCost;

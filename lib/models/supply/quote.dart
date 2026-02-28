@@ -21,6 +21,7 @@ class Quote with _$Quote {
     @JsonKey(name: 'record_user') String? recordUser,
     @JsonKey(name: 'can_bill') bool? canBill,
     @JsonKey(name: 'tax_rate') String? taxRate,
+    @JsonKey(name: 'product_weight') String? productWeight,
     @JsonKey(name: 'purchase_cost') String? purchaseCost,
     @JsonKey(name: 'currency') String? currency,
     @JsonKey(name: 'supplier_product_no') String? supplierProductNo,
