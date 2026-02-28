@@ -1,14 +1,14 @@
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
+import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class QuoteCard extends StatelessWidget {
+class QuoteCard extends HookConsumerWidget {
   final QuotationList item;
   final VoidCallback? onTap;
   final int? tabIndex;
-
-  // 【新增】接收外部传入的选中ID
   final int? selectedSupplierId;
   final void Function(int? supplierId)? onSupplierSelected;
 
@@ -18,7 +18,7 @@ class QuoteCard extends StatelessWidget {
     this.onTap,
     this.tabIndex,
     this.onSupplierSelected,
-    this.selectedSupplierId, // 接收外部传入的 ID
+    this.selectedSupplierId,
   });
 
   List<Map<String, dynamic>> _getProcessedSuppliers() {
@@ -35,16 +35,14 @@ class QuoteCard extends StatelessWidget {
         }
       }
     }
-
     return supplierMap.values.toList().reversed.toList();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final processedSuppliers = _getProcessedSuppliers();
 
-    // 计算显示数量，但使用传入的 selectedSupplierId
     int displayCount = item.productCount ?? 0;
     if (selectedSupplierId != null) {
       try {
@@ -72,7 +70,7 @@ class QuoteCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-            child: _buildHeader(context, colorScheme, displayCount),
+            child: _buildHeader(context, ref, colorScheme, displayCount),
           ),
           _buildSupplierHorizontalList(
               context, processedSuppliers, colorScheme),
@@ -82,8 +80,8 @@ class QuoteCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context, ColorScheme colorScheme, int displayCount) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref,
+      ColorScheme colorScheme, int displayCount) {
     final customerName = item.company?.name ?? item.user?.name ?? '未知客户';
     final creatorName = item.creator?.name ?? '系统';
     final isFiltered = selectedSupplierId != null;
@@ -93,6 +91,7 @@ class QuoteCard extends StatelessWidget {
     final collabText = hasCollaborators
         ? collaborators.map((e) => e.name ?? '').join('、')
         : '暂无';
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -137,7 +136,7 @@ class QuoteCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        _buildCollaborateButton(context, colorScheme),
+        _buildCollaborateButton(context, ref, colorScheme),
       ],
     );
   }
@@ -285,13 +284,18 @@ class QuoteCard extends StatelessWidget {
   }
 
   Widget _buildCollaborateButton(
-      BuildContext context, ColorScheme colorScheme) {
+      BuildContext context, WidgetRef ref, ColorScheme colorScheme) {
     return GestureDetector(
-      onTap: () => showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
-      ),
+      onTap: () async {
+        await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
+        );
+
+        // 5. 协作完成后，通过 ref 触发刷新请求
+        ref.read(quotePageRefreshTrigger.notifier).update((state) => state + 1);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
