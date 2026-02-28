@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'widgets/show_advice_edit_sheet.dart';
 
 @RoutePage()
 class AdviceCollectPage extends HookConsumerWidget {
@@ -157,82 +158,6 @@ class _CommentGroup extends ConsumerWidget {
   final AdviceCollectBook book;
   const _CommentGroup({required this.book});
 
-  // 弹出回复框的方法
-  void _showReplyBottomSheet(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final replyController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // 关键：允许弹窗随键盘推起
-      backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                      color: colorScheme.outlineVariant,
-                      borderRadius: BorderRadius.circular(2))),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Text('回复 ', style: TextStyle(color: colorScheme.outline)),
-                  Text('@${book.user?.name ?? "匿名"}',
-                      style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: replyController,
-                autofocus: true,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: '写下你的想法...',
-                  filled: true,
-                  fillColor: colorScheme.surface.withOpacity(0.3),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // 这里执行发送逻辑
-                    print("发送给 ${book.id}: ${replyController.text}");
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: const Text('发布留言'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -246,7 +171,20 @@ class _CommentGroup extends ConsumerWidget {
           userName: book.user?.name ?? '匿名',
           content: book.content ?? '',
           isReply: false,
-          onTap: () => _showReplyBottomSheet(context, ref),
+          onTap: () {
+            showAdviceEditSheet(
+              context: context,
+              replyToName: book.user?.name ?? '匿名',
+              onSend: (content, images) {
+                // 调用 notifier 发送回复
+                ref.read(adviceCollectProvider.notifier).sendMyAdvice({
+                  'parent_id': book.id,
+                  'content': content,
+                  // 'images': images, // 如果后端支持
+                });
+              },
+            );
+          },
         ),
         // 管理员回复
         if (hasReply)
@@ -267,7 +205,6 @@ class _CommentGroup extends ConsumerWidget {
               ),
             ),
           ),
-        // const SizedBox(height: 20),
       ],
     );
   }
