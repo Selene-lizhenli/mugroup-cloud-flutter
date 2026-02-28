@@ -2,24 +2,17 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
-import 'package:cloud/helper/helper.dart';
-import 'package:cloud/http/api.dart';
-import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/login/shared.dart';
-import 'package:cloud/pages/login/widgets/long_way.dart';
+import 'package:cloud/pages/login/widgets/login_way.dart';
+import 'package:cloud/pages/login/widgets/login_content.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:dio/dio.dart';
 import 'package:flant/flant.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_wxwork/flutter_wxwork.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:flutter_wxwork/flutter_wxwork.dart';
 
 @RoutePage()
 class LoginPage extends HookConsumerWidget {
@@ -30,7 +23,8 @@ class LoginPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginWay = useState<String?>(null);
-    final restEnableLoginWays = useState<List<String>>([]);
+    // 是否安装了企业微信
+    final isWxworkInstalled = useState<bool?>(null);
     final appleIdentityToken = useState<String?>(null);
     final cloud = ref.watch(coreProvider).value!;
     final core = ref.read(coreProvider.notifier);
@@ -56,44 +50,43 @@ class LoginPage extends HookConsumerWidget {
           .toList();
     }, [tenant]);
 
+    // 检查是否安装企业微信，并缓存到 state 中
+    useEffect(() {
+      Future.microtask(() async {
+        if (!enableLoginWays.contains("wxwork") ||
+            tenant?.wxwork?.schema == null) {
+          isWxworkInstalled.value = false;
+          return;
+        }
+
+        final wxwork = FlutterWxwork();
+        final installed = await wxwork.isAppInstalled();
+        isWxworkInstalled.value = installed;
+      });
+      return null;
+    }, [enableLoginWays, tenant]);
+
     final quickLoginWay = useMemoized(() async {
       final result = <String>[];
 
       if (enableLoginWays.contains("wxwork") &&
           tenant?.wxwork?.schema != null) {
-        // 判断是否安装
-        final wxwork = FlutterWxwork();
-        final isInstall = await wxwork.isAppInstalled();
-        if (isInstall) {
-          result.add("wxwork");
-        }
+        result.add("wxwork"); //租户里面有企微登录方式，则添加企微登录方式
       }
 
       if (Platform.isIOS && tenant?.loginWays?.contains.call("apple") == true) {
-        result.add("apple");
+        result.add("apple"); //租户里面有苹果方式，且是苹果的平台，才添加企微登录方式
       }
       return result;
     }, [enableLoginWays, tenant]);
 
     useEffect(() {
+      // 如果当前选择的登录方式不在可用列表中，则清空；否则保持用户选择
       if (loginWay.value != null && enableLoginWays.contains(loginWay.value)) {
         return;
       }
 
-      loginWay.value = enableLoginWays.elementAtOrNull(0);
-
-      return null;
-    }, [enableLoginWays, loginWay.value]);
-
-    useEffect(() {
-      logger.d("loginWay.value${loginWay.value ?? ""}");
-      if (loginWay.value == null) {
-        restEnableLoginWays.value = [];
-      }
-
-      final rest = [...enableLoginWays];
-      rest.remove(loginWay.value);
-      restEnableLoginWays.value = rest;
+      loginWay.value = null;
 
       return null;
     }, [enableLoginWays, loginWay.value]);
@@ -171,282 +164,55 @@ class LoginPage extends HookConsumerWidget {
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                if (loginWay.value != null)
-                                  LoginWay(
-                                    loginWay: loginWay.value!,
-                                    appleIdentityToken:
-                                        appleIdentityToken.value,
-                                    onLogined: () async {
-                                      await app.fetchUser();
-                                      afterLogin();
-                                    },
+                                LoginContent(
+                                  loginWay: loginWay.value,
+                                  isWxworkInstalled: isWxworkInstalled.value,
+                                  appleIdentityToken: appleIdentityToken.value,
+                                  onLogined: () async {
+                                    await app.fetchUser();
+                                    afterLogin();
+                                  },
+                                ),
+                                Container(
+                                  margin:
+                                      const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
-                                if (restEnableLoginWays.value.isNotEmpty) ...[
-                                  Container(
-                                    margin:
-                                        const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15), 
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: SizedBox(
-                                            height: 60,
-                                            child: FlanDivider(
-                                              child: Text(
-                                                style: TextStyle(fontSize: 15),
-                                                "其他登录方式",
-                                              ),
+                                  child: Column(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: SizedBox(
+                                          height: 60,
+                                          child: FlanDivider(
+                                            child: Text(
+                                              style: TextStyle(fontSize: 15),
+                                              "登录方式",
                                             ),
                                           ),
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            for (var (index, item)
-                                                in restEnableLoginWays
-                                                    .value.indexed) ...[
-                                              if (index != 0)
-                                                Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10),
-                                                  color: colorScheme.outline,
-                                                  height: 20,
-                                                  width: 1,
-                                                ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  loginWay.value = item;
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 5,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                    color: primaryColorPink
-                                                        .withOpacity(0.025),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      style: const TextStyle(
-                                                        fontSize: 13,
-                                                        color: primaryColorPink,
-                                                      ),
-                                                      getLableByLoginWay(item),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            ]
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                      ),
+                                      FastLoginSection(
+                                        enableLoginWays: enableLoginWays,
+                                        quickLoginWay: quickLoginWay,
+                                        wxworkSchema: tenant.wxwork?.schema,
+                                        wxworkCorpId: tenant.wxwork?.corpId,
+                                        wxworkAgentId: tenant.wxwork?.agentId,
+                                        loginWay: loginWay,
+                                        appleIdentityToken: appleIdentityToken,
+                                        onAfterLogin: () async {
+                                          await app.fetchUser();
+                                          afterLogin();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 const Spacer(),
-                                // 第三方快捷登录
-                                FutureBuilder(
-                                  future: quickLoginWay,
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    final quickLoginWays = snapshot.data!;
-
-                                    if (quickLoginWays.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 60,
-                                            child: FlanDivider(
-                                              child: Text(
-                                                '快捷登录方式',
-                                                style: TextStyle(
-                                                  color: Colors.black
-                                                      .withOpacity(0.8),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              if (quickLoginWays
-                                                  .contains("wxwork"))
-                                                GestureDetector(
-                                                  onTap: () async {
-                                                    try {
-                                                      final wxwork =
-                                                          FlutterWxwork();
-
-                                                      await wxwork.register(
-                                                        scheme: tenant
-                                                            .wxwork!.schema!,
-                                                        corpId: tenant
-                                                            .wxwork!.corpId!,
-                                                        agentId: tenant
-                                                            .wxwork!.agentId!,
-                                                      );
-
-                                                      final result =
-                                                          await wxwork.auth();
-                                                      if (result.errCode !=
-                                                          '0') {
-                                                        throw Exception(
-                                                            '请授权登录');
-                                                      }
-
-                                                      final code = result.code!;
-
-                                                      await silentApi.post(
-                                                          'api/tenant/wechat/login',
-                                                          data: {"code": code});
-
-                                                      await app.fetchUser();
-                                                      afterLogin();
-                                                    } catch (e) {
-                                                      var message =
-                                                          e.toString();
-                                                      if (e is DioException) {
-                                                        message = e.response
-                                                                    ?.data[
-                                                                'message'] ??
-                                                            message;
-                                                      }
-
-                                                      EasyLoading.showError(
-                                                          message);
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 5),
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white
-                                                          .withOpacity(0.4),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: SvgPicture.asset(
-                                                      width: 20,
-                                                      height: 20,
-                                                      'assets/icons/wxwork.svg',
-                                                    ),
-                                                  ),
-                                                ),
-                                              if (quickLoginWays
-                                                  .contains("apple"))
-                                                GestureDetector(
-                                                  onTap: () async {
-                                                    try {
-                                                      final credential =
-                                                          await SignInWithApple
-                                                              .getAppleIDCredential(
-                                                        scopes: [],
-                                                      );
-
-                                                      EasyLoading.show();
-
-                                                      await api.get(
-                                                          "api/csrf-cookie");
-
-                                                      final loginResult =
-                                                          await api.post(
-                                                        "api/tenant/apple/login",
-                                                        data: {
-                                                          "identityToken":
-                                                              credential
-                                                                  .identityToken
-                                                        },
-                                                      );
-
-                                                      final user = loginResult
-                                                              .data is Map
-                                                          ? User.fromJson(
-                                                              loginResult.data)
-                                                          : null;
-
-                                                      if (user == null) {
-                                                        appleIdentityToken
-                                                                .value =
-                                                            credential
-                                                                .identityToken;
-                                                        loginWay.value =
-                                                            "account";
-                                                        return;
-                                                      }
-
-                                                      await app.fetchUser();
-                                                      afterLogin();
-                                                    } catch (e) {
-                                                      if (e
-                                                          is SignInWithAppleAuthorizationException) {
-                                                        if (e.code ==
-                                                            AuthorizationErrorCode
-                                                                .canceled) {
-                                                          return;
-                                                        }
-                                                      }
-                                                      EasyLoading.showError(
-                                                          e.toString());
-                                                    } finally {
-                                                      EasyLoading.dismiss();
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 5),
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.white
-                                                          .withOpacity(0.4),
-                                                    ),
-                                                    child: const Icon(
-                                                      FontAwesomeIcons.apple,
-                                                      size: 25,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
                                 DefaultTextStyle(
                                   style: TextStyle(
                                     color: colorScheme.onSurface,

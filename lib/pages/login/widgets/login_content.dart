@@ -6,23 +6,27 @@ import 'package:cloud/http/api.dart';
 import 'package:cloud/models/qrcode.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/pages/login/widgets/wxwork_icon.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/pages/login/widgets/wxwork.dart';
 import 'package:cloud/providers/core_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class LoginWay extends HookConsumerWidget {
-  final String loginWay;
+class LoginContent extends HookConsumerWidget {
+  final String? loginWay;
   final String? appleIdentityToken;
   final void Function()? onLogined;
+  final bool? isWxworkInstalled;
 
-  const LoginWay({
+  const LoginContent({
     super.key,
     required this.loginWay,
     this.onLogined,
     this.appleIdentityToken,
+    this.isWxworkInstalled,
   });
 
   @override
@@ -161,6 +165,41 @@ class LoginWay extends HookConsumerWidget {
               style: TextStyle(color: colorScheme.onSurface, fontSize: 12),
             ),
           ],
+          // 初始状态：只显示企微快捷登录按钮
+          if (loginWay == null && tenant.wxwork != null) ...[
+            Center(
+              child: Column(
+                children: [
+                  const WxworkIcon(size: 150),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(top: 25),
+                    child: isWxworkInstalled == true
+                        ? ElevatedButton(
+                            onPressed: () async {
+                              await wxworkQuickLogin(
+                                schema: tenant.wxwork!.schema!,
+                                corpId: tenant.wxwork!.corpId!,
+                                agentId: tenant.wxwork!.agentId!,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColorBlue,
+                              shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
+                            ),
+                            child: Text(
+                                style: TextStyle(color: colorScheme.onPrimary),
+                                '唤起企业微信登录'),
+                          )
+                        : Text(
+                            style: TextStyle(color: colorScheme.onPrimary),
+                            '请先安装企业微信'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // 账号密码
           if (loginWay == "account") ...[
             if (appleIdentityToken != null)
@@ -230,8 +269,8 @@ class LoginWay extends HookConsumerWidget {
                 children: [
                   if (qrcodeLoading.value)
                     const SizedBox(
-                      width: 200,
-                      height: 200,
+                      width: 180,
+                      height: 180,
                       child: Center(
                         child: SizedBox(
                           width: 50,
@@ -242,8 +281,8 @@ class LoginWay extends HookConsumerWidget {
                     )
                   else if (qrcode.value?.userId != null)
                     SizedBox(
-                      width: 200,
-                      height: 200,
+                      width: 180,
+                      height: 180,
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -275,8 +314,8 @@ class LoginWay extends HookConsumerWidget {
                     Column(
                       children: [
                         SizedBox(
-                          width: 200,
-                          height: 200,
+                          width: 180,
+                          height: 180,
                           child: QrImageView(
                             data:
                                 '${tenant.baseUrl}login/qrcode/${qrcode.value!.id}',
@@ -287,7 +326,7 @@ class LoginWay extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "请使用企业微信扫码登录",
+                          "企业微信扫码登录仅限PDA使用",
                           style: TextStyle(
                               color: colorScheme.outline, fontSize: 14),
                         )
