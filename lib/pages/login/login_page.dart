@@ -188,9 +188,7 @@ class LoginPage extends HookConsumerWidget {
                                     padding:
                                         const EdgeInsets.fromLTRB(0, 0, 0, 10),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      color:
-                                          colorScheme.surface.withOpacity(0.5),
+                                      borderRadius: BorderRadius.circular(15), 
                                     ),
                                     child: Column(
                                       children: [
@@ -279,10 +277,16 @@ class LoginPage extends HookConsumerWidget {
                                       ),
                                       child: Column(
                                         children: [
-                                          const SizedBox(
+                                          SizedBox(
                                             height: 60,
                                             child: FlanDivider(
-                                              child: Text('快捷登录方式'),
+                                              child: Text(
+                                                '快捷登录方式',
+                                                style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.8),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Row(
@@ -344,12 +348,9 @@ class LoginPage extends HookConsumerWidget {
                                                         horizontal: 5),
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
+                                                      color: Colors.white
+                                                          .withOpacity(0.4),
                                                       shape: BoxShape.circle,
-                                                      border: Border.all(
-                                                        color: const Color(
-                                                            0xFFEBEDF0),
-                                                        width: 1,
-                                                      ),
                                                     ),
                                                     child: SvgPicture.asset(
                                                       width: 20,
@@ -426,16 +427,13 @@ class LoginPage extends HookConsumerWidget {
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
-                                                      color: Colors.black,
-                                                      border: Border.all(
-                                                        color: Colors.black,
-                                                        width: 1,
-                                                      ),
+                                                      color: Colors.white
+                                                          .withOpacity(0.4),
                                                     ),
                                                     child: const Icon(
                                                       FontAwesomeIcons.apple,
                                                       size: 25,
-                                                      color: Colors.white,
+                                                      color: Colors.black,
                                                     ),
                                                   ),
                                                 ),
