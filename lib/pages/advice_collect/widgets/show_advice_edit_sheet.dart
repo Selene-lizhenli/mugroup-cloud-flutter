@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:cloud/models/sample/media.dart';
+import 'package:cloud/services/media.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -6,7 +9,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 void showAdviceEditSheet({
   required BuildContext context,
   String? replyToName,
-  required Function(String content, List<File> images) onSend,
+  required Function(String content, List<TemporaryMedia> medias) onSend,
 }) {
   showModalBottomSheet(
     context: context,
@@ -21,9 +24,9 @@ void showAdviceEditSheet({
 
 class _AdviceEditSheet extends StatefulWidget {
   final String? replyToName;
-  final Function(String content, List<File> images) onSend;
+  final Function(String content, List<TemporaryMedia> medias) onSend;
 
-  const _AdviceEditSheet({this.replyToName, required this.onSend});
+  const _AdviceEditSheet({super.key, this.replyToName, required this.onSend});
 
   @override
   State<_AdviceEditSheet> createState() => _AdviceEditSheetState();
@@ -31,15 +34,16 @@ class _AdviceEditSheet extends StatefulWidget {
 
 class _AdviceEditSheetState extends State<_AdviceEditSheet> {
   final TextEditingController _controller = TextEditingController();
-  final List<File> _images = [];
+
+  final List<TemporaryMedia> _uploadedMedias = [];
   static const int _maxImageCount = 9;
 
-  bool get _canSend => _controller.text.trim().isNotEmpty || _images.isNotEmpty;
+  bool get _canSend =>
+      _controller.text.trim().isNotEmpty || _uploadedMedias.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-
     _controller.addListener(() => setState(() {}));
   }
 
@@ -50,7 +54,7 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
   }
 
   Future<void> _handlePickAssets() async {
-    final int remainingQuota = _maxImageCount - _images.length;
+    final int remainingQuota = _maxImageCount - _uploadedMedias.length;
 
     if (remainingQuota <= 0) {
       EasyLoading.showToast('最多只能上传$_maxImageCount张图片');
@@ -67,16 +71,19 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
     );
 
     if (result != null && result.isNotEmpty) {
-      EasyLoading.show(status: '加载中...');
+      EasyLoading.show(status: '上传中...');
       try {
-        final List<File> newFiles = [];
         for (final entity in result) {
-          final f = await entity.file;
-          if (f != null) newFiles.add(f);
+          final File? f = await entity.file;
+          if (f != null) {
+            final TemporaryMedia temporaryMedia = await upload(file: f);
+            setState(() {
+              _uploadedMedias.add(temporaryMedia);
+            });
+          }
         }
-        setState(() {
-          _images.addAll(newFiles);
-        });
+      } catch (e) {
+        EasyLoading.showError('图片上传失败');
       } finally {
         EasyLoading.dismiss();
       }
@@ -97,13 +104,8 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 1. 输入区域：灰色圆角矩形
           _buildInputArea(),
-
-          // 2. 图片预览回显区
-          if (_images.isNotEmpty) _buildImageGallery(),
-
-          // 3. 底部操作栏：图片图标 + 发送按钮
+          if (_uploadedMedias.isNotEmpty) _buildImageGallery(),
           _buildBottomToolbar(colorScheme),
         ],
       ),
@@ -143,12 +145,11 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        // 如果图片未满，末尾显示一个追加按钮
-        itemCount: _images.length < _maxImageCount
-            ? _images.length + 1
-            : _images.length,
+        itemCount: _uploadedMedias.length < _maxImageCount
+            ? _uploadedMedias.length + 1
+            : _uploadedMedias.length,
         itemBuilder: (context, index) {
-          if (index < _images.length) {
+          if (index < _uploadedMedias.length) {
             return _buildImagePreviewItem(index);
           } else {
             return _buildAppendButton();
@@ -159,21 +160,46 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
   }
 
   Widget _buildImagePreviewItem(int index) {
+    final media = _uploadedMedias[index];
     return Stack(
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 8, top: 8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.file(_images[index],
-                width: 70, height: 70, fit: BoxFit.cover),
+          child: GestureDetector(
+            onTap: () {
+              showFlanImagePreview(
+                context,
+                images: _uploadedMedias.map((item) => item.url).toList(),
+                startPosition: index,
+                loop: false,
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                media.url,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey[200],
+                    child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2)),
+                  );
+                },
+              ),
+            ),
           ),
         ),
         Positioned(
           right: 0,
           top: 0,
           child: GestureDetector(
-            onTap: () => setState(() => _images.removeAt(index)),
+            onTap: () => setState(() => _uploadedMedias.removeAt(index)),
             child: const CircleAvatar(
               radius: 10,
               backgroundColor: Colors.black54,
@@ -216,12 +242,11 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
           ElevatedButton(
             onPressed: _canSend
                 ? () {
-                    widget.onSend(_controller.text, _images);
+                    widget.onSend(_controller.text, _uploadedMedias);
                     Navigator.pop(context);
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              // 关键：根据状态切换深浅色
               backgroundColor: _canSend
                   ? colorScheme.primary
                   : colorScheme.primary.withOpacity(0.3),
