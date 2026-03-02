@@ -514,6 +514,310 @@ abstract class _AdviceCollectBookUser implements AdviceCollectBookUser {
       get copyWith => throw _privateConstructorUsedError;
 }
 
+AdviceCollectBookComment _$AdviceCollectBookCommentFromJson(
+    Map<String, dynamic> json) {
+  return _AdviceCollectBookComment.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AdviceCollectBookComment {
+  int? get id => throw _privateConstructorUsedError;
+  String? get comment => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_approved')
+  bool? get isApproved => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+  AdviceCollectBookUser? get user => throw _privateConstructorUsedError;
+  List<Media>? get attachments => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $AdviceCollectBookCommentCopyWith<AdviceCollectBookComment> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AdviceCollectBookCommentCopyWith<$Res> {
+  factory $AdviceCollectBookCommentCopyWith(AdviceCollectBookComment value,
+          $Res Function(AdviceCollectBookComment) then) =
+      _$AdviceCollectBookCommentCopyWithImpl<$Res, AdviceCollectBookComment>;
+  @useResult
+  $Res call(
+      {int? id,
+      String? comment,
+      @JsonKey(name: 'is_approved') bool? isApproved,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      AdviceCollectBookUser? user,
+      List<Media>? attachments});
+
+  $AdviceCollectBookUserCopyWith<$Res>? get user;
+}
+
+/// @nodoc
+class _$AdviceCollectBookCommentCopyWithImpl<$Res,
+        $Val extends AdviceCollectBookComment>
+    implements $AdviceCollectBookCommentCopyWith<$Res> {
+  _$AdviceCollectBookCommentCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? comment = freezed,
+    Object? isApproved = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? user = freezed,
+    Object? attachments = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      comment: freezed == comment
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isApproved: freezed == isApproved
+          ? _value.isApproved
+          : isApproved // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as AdviceCollectBookUser?,
+      attachments: freezed == attachments
+          ? _value.attachments
+          : attachments // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $AdviceCollectBookUserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $AdviceCollectBookUserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$AdviceCollectBookCommentImplCopyWith<$Res>
+    implements $AdviceCollectBookCommentCopyWith<$Res> {
+  factory _$$AdviceCollectBookCommentImplCopyWith(
+          _$AdviceCollectBookCommentImpl value,
+          $Res Function(_$AdviceCollectBookCommentImpl) then) =
+      __$$AdviceCollectBookCommentImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int? id,
+      String? comment,
+      @JsonKey(name: 'is_approved') bool? isApproved,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      AdviceCollectBookUser? user,
+      List<Media>? attachments});
+
+  @override
+  $AdviceCollectBookUserCopyWith<$Res>? get user;
+}
+
+/// @nodoc
+class __$$AdviceCollectBookCommentImplCopyWithImpl<$Res>
+    extends _$AdviceCollectBookCommentCopyWithImpl<$Res,
+        _$AdviceCollectBookCommentImpl>
+    implements _$$AdviceCollectBookCommentImplCopyWith<$Res> {
+  __$$AdviceCollectBookCommentImplCopyWithImpl(
+      _$AdviceCollectBookCommentImpl _value,
+      $Res Function(_$AdviceCollectBookCommentImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? comment = freezed,
+    Object? isApproved = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? user = freezed,
+    Object? attachments = freezed,
+  }) {
+    return _then(_$AdviceCollectBookCommentImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      comment: freezed == comment
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isApproved: freezed == isApproved
+          ? _value.isApproved
+          : isApproved // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as AdviceCollectBookUser?,
+      attachments: freezed == attachments
+          ? _value._attachments
+          : attachments // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable(createToJson: false)
+class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
+  const _$AdviceCollectBookCommentImpl(
+      {this.id,
+      this.comment,
+      @JsonKey(name: 'is_approved') this.isApproved,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      this.user,
+      final List<Media>? attachments})
+      : _attachments = attachments;
+
+  factory _$AdviceCollectBookCommentImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AdviceCollectBookCommentImplFromJson(json);
+
+  @override
+  final int? id;
+  @override
+  final String? comment;
+  @override
+  @JsonKey(name: 'is_approved')
+  final bool? isApproved;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+  @override
+  final AdviceCollectBookUser? user;
+  final List<Media>? _attachments;
+  @override
+  List<Media>? get attachments {
+    final value = _attachments;
+    if (value == null) return null;
+    if (_attachments is EqualUnmodifiableListView) return _attachments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  String toString() {
+    return 'AdviceCollectBookComment(id: $id, comment: $comment, isApproved: $isApproved, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, attachments: $attachments)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AdviceCollectBookCommentImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.comment, comment) || other.comment == comment) &&
+            (identical(other.isApproved, isApproved) ||
+                other.isApproved == isApproved) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.user, user) || other.user == user) &&
+            const DeepCollectionEquality()
+                .equals(other._attachments, _attachments));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      comment,
+      isApproved,
+      createdAt,
+      updatedAt,
+      user,
+      const DeepCollectionEquality().hash(_attachments));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AdviceCollectBookCommentImplCopyWith<_$AdviceCollectBookCommentImpl>
+      get copyWith => __$$AdviceCollectBookCommentImplCopyWithImpl<
+          _$AdviceCollectBookCommentImpl>(this, _$identity);
+}
+
+abstract class _AdviceCollectBookComment implements AdviceCollectBookComment {
+  const factory _AdviceCollectBookComment(
+      {final int? id,
+      final String? comment,
+      @JsonKey(name: 'is_approved') final bool? isApproved,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt,
+      final AdviceCollectBookUser? user,
+      final List<Media>? attachments}) = _$AdviceCollectBookCommentImpl;
+
+  factory _AdviceCollectBookComment.fromJson(Map<String, dynamic> json) =
+      _$AdviceCollectBookCommentImpl.fromJson;
+
+  @override
+  int? get id;
+  @override
+  String? get comment;
+  @override
+  @JsonKey(name: 'is_approved')
+  bool? get isApproved;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+  @override
+  AdviceCollectBookUser? get user;
+  @override
+  List<Media>? get attachments;
+  @override
+  @JsonKey(ignore: true)
+  _$$AdviceCollectBookCommentImplCopyWith<_$AdviceCollectBookCommentImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
 AdviceCollectBook _$AdviceCollectBookFromJson(Map<String, dynamic> json) {
   return _AdviceCollectBook.fromJson(json);
 }
@@ -532,6 +836,8 @@ mixin _$AdviceCollectBook {
   String? get updatedAt => throw _privateConstructorUsedError;
   AdviceCollectBookUser? get user => throw _privateConstructorUsedError;
   AdviceCollectBookUser? get handler => throw _privateConstructorUsedError;
+  List<AdviceCollectBookComment>? get comments =>
+      throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $AdviceCollectBookCopyWith<AdviceCollectBook> get copyWith =>
@@ -553,7 +859,8 @@ abstract class $AdviceCollectBookCopyWith<$Res> {
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
-      AdviceCollectBookUser? handler});
+      AdviceCollectBookUser? handler,
+      List<AdviceCollectBookComment>? comments});
 
   $AdviceCollectBookUserCopyWith<$Res>? get user;
   $AdviceCollectBookUserCopyWith<$Res>? get handler;
@@ -581,6 +888,7 @@ class _$AdviceCollectBookCopyWithImpl<$Res, $Val extends AdviceCollectBook>
     Object? updatedAt = freezed,
     Object? user = freezed,
     Object? handler = freezed,
+    Object? comments = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -619,6 +927,10 @@ class _$AdviceCollectBookCopyWithImpl<$Res, $Val extends AdviceCollectBook>
           ? _value.handler
           : handler // ignore: cast_nullable_to_non_nullable
               as AdviceCollectBookUser?,
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as List<AdviceCollectBookComment>?,
     ) as $Val);
   }
 
@@ -664,7 +976,8 @@ abstract class _$$AdviceCollectBookImplCopyWith<$Res>
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
-      AdviceCollectBookUser? handler});
+      AdviceCollectBookUser? handler,
+      List<AdviceCollectBookComment>? comments});
 
   @override
   $AdviceCollectBookUserCopyWith<$Res>? get user;
@@ -692,6 +1005,7 @@ class __$$AdviceCollectBookImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? user = freezed,
     Object? handler = freezed,
+    Object? comments = freezed,
   }) {
     return _then(_$AdviceCollectBookImpl(
       id: freezed == id
@@ -730,6 +1044,10 @@ class __$$AdviceCollectBookImplCopyWithImpl<$Res>
           ? _value.handler
           : handler // ignore: cast_nullable_to_non_nullable
               as AdviceCollectBookUser?,
+      comments: freezed == comments
+          ? _value._comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as List<AdviceCollectBookComment>?,
     ));
   }
 }
@@ -746,7 +1064,9 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       this.user,
-      this.handler});
+      this.handler,
+      final List<AdviceCollectBookComment>? comments})
+      : _comments = comments;
 
   factory _$AdviceCollectBookImpl.fromJson(Map<String, dynamic> json) =>
       _$$AdviceCollectBookImplFromJson(json);
@@ -772,10 +1092,19 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
   final AdviceCollectBookUser? user;
   @override
   final AdviceCollectBookUser? handler;
+  final List<AdviceCollectBookComment>? _comments;
+  @override
+  List<AdviceCollectBookComment>? get comments {
+    final value = _comments;
+    if (value == null) return null;
+    if (_comments is EqualUnmodifiableListView) return _comments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'AdviceCollectBook(id: $id, content: $content, status: $status, message: $message, handledAt: $handledAt, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, handler: $handler)';
+    return 'AdviceCollectBook(id: $id, content: $content, status: $status, message: $message, handledAt: $handledAt, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, handler: $handler, comments: $comments)';
   }
 
   @override
@@ -794,13 +1123,24 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.user, user) || other.user == user) &&
-            (identical(other.handler, handler) || other.handler == handler));
+            (identical(other.handler, handler) || other.handler == handler) &&
+            const DeepCollectionEquality().equals(other._comments, _comments));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, content, status, message,
-      handledAt, createdAt, updatedAt, user, handler);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      content,
+      status,
+      message,
+      handledAt,
+      createdAt,
+      updatedAt,
+      user,
+      handler,
+      const DeepCollectionEquality().hash(_comments));
 
   @JsonKey(ignore: true)
   @override
@@ -812,15 +1152,17 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
 
 abstract class _AdviceCollectBook implements AdviceCollectBook {
   const factory _AdviceCollectBook(
-      {final int? id,
-      final String? content,
-      final String? status,
-      final String? message,
-      @JsonKey(name: 'handled_at') final String? handledAt,
-      @JsonKey(name: 'created_at') final String? createdAt,
-      @JsonKey(name: 'updated_at') final String? updatedAt,
-      final AdviceCollectBookUser? user,
-      final AdviceCollectBookUser? handler}) = _$AdviceCollectBookImpl;
+          {final int? id,
+          final String? content,
+          final String? status,
+          final String? message,
+          @JsonKey(name: 'handled_at') final String? handledAt,
+          @JsonKey(name: 'created_at') final String? createdAt,
+          @JsonKey(name: 'updated_at') final String? updatedAt,
+          final AdviceCollectBookUser? user,
+          final AdviceCollectBookUser? handler,
+          final List<AdviceCollectBookComment>? comments}) =
+      _$AdviceCollectBookImpl;
 
   factory _AdviceCollectBook.fromJson(Map<String, dynamic> json) =
       _$AdviceCollectBookImpl.fromJson;
@@ -846,6 +1188,8 @@ abstract class _AdviceCollectBook implements AdviceCollectBook {
   AdviceCollectBookUser? get user;
   @override
   AdviceCollectBookUser? get handler;
+  @override
+  List<AdviceCollectBookComment>? get comments;
   @override
   @JsonKey(ignore: true)
   _$$AdviceCollectBookImplCopyWith<_$AdviceCollectBookImpl> get copyWith =>

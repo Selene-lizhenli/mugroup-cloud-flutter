@@ -110,4 +110,25 @@ class AdviceCollect extends _$AdviceCollect {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
+
+  Future<void> sendMyComments(int id, Map<String, dynamic> params) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final resp = await sendAdviceComments(id, params);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+
+  Future<void> sendMyCommentsComment(int id, Map<String, dynamic> params) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final resp = await sendCommentsComment(id, params);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
 }

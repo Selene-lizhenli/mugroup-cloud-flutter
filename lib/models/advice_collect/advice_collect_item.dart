@@ -1,3 +1,4 @@
+import 'package:cloud/models/media.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'advice_collect_item.freezed.dart';
@@ -29,6 +30,22 @@ class AdviceCollectBookUser with _$AdviceCollectBookUser {
       _$AdviceCollectBookUserFromJson(json);
 }
 
+@Freezed(toJson: false)
+class AdviceCollectBookComment with _$AdviceCollectBookComment {
+  const factory AdviceCollectBookComment({
+    int? id,
+    String? comment,
+    @JsonKey(name: 'is_approved') bool? isApproved,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+    AdviceCollectBookUser? user,
+    List<Media>? attachments,
+  }) = _AdviceCollectBookComment;
+
+  factory AdviceCollectBookComment.fromJson(Map<String, dynamic> json) =>
+      _$AdviceCollectBookCommentFromJson(json);
+}
+
 /// 建议收集列表项（接口 api/tenant/feedback/books 单项）
 @Freezed(toJson: false)
 class AdviceCollectBook with _$AdviceCollectBook {
@@ -42,6 +59,7 @@ class AdviceCollectBook with _$AdviceCollectBook {
     @JsonKey(name: 'updated_at') String? updatedAt,
     AdviceCollectBookUser? user,
     AdviceCollectBookUser? handler,
+    List<AdviceCollectBookComment>? comments,
   }) = _AdviceCollectBook;
 
   factory AdviceCollectBook.fromJson(Map<String, dynamic> json) =>

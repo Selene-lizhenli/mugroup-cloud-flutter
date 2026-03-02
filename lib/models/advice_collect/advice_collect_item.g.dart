@@ -27,6 +27,23 @@ _$AdviceCollectBookUserImpl _$$AdviceCollectBookUserImplFromJson(
       employStatus: (json['employ_status'] as num?)?.toInt(),
     );
 
+_$AdviceCollectBookCommentImpl _$$AdviceCollectBookCommentImplFromJson(
+        Map<String, dynamic> json) =>
+    _$AdviceCollectBookCommentImpl(
+      id: (json['id'] as num?)?.toInt(),
+      comment: json['comment'] as String?,
+      isApproved: json['is_approved'] as bool?,
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
+      user: json['user'] == null
+          ? null
+          : AdviceCollectBookUser.fromJson(
+              json['user'] as Map<String, dynamic>),
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
 _$AdviceCollectBookImpl _$$AdviceCollectBookImplFromJson(
         Map<String, dynamic> json) =>
     _$AdviceCollectBookImpl(
@@ -45,4 +62,8 @@ _$AdviceCollectBookImpl _$$AdviceCollectBookImplFromJson(
           ? null
           : AdviceCollectBookUser.fromJson(
               json['handler'] as Map<String, dynamic>),
+      comments: (json['comments'] as List<dynamic>?)
+          ?.map((e) =>
+              AdviceCollectBookComment.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );

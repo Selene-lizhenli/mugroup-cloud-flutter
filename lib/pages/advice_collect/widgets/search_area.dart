@@ -19,6 +19,8 @@ class SearchArea extends HookConsumerWidget {
             'content': content,
             // 'images': images, // 如果有上传图片需求
           });
+
+          ref.read(adviceCollectProvider.notifier).loadBooks();
         },
       ),
       child: Container(

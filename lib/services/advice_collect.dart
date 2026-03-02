@@ -47,11 +47,47 @@ Future<ApiResponse> sendAdvice(
         (res) => ApiResponse.fromJson(
           res.data,
           (data) {
-            if(res.data['code'] == 200) {
+            if (res.data['code'] == 200) {
               return true;
             } else {
               return false;
-            } 
+            }
+          },
+        ),
+      );
+}
+
+Future<ApiResponse> sendAdviceComments(
+  int id,
+  Map<String, dynamic>? params,
+) async {
+  return api.post('api/tenant/feedback/books/$id/comment', data: params).then(
+        (res) => ApiResponse.fromJson(
+          res.data,
+          (data) {
+            if (res.data['code'] == 200) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+        ),
+      );
+}
+
+Future<ApiResponse> sendCommentsComment(
+  int id,
+  Map<String, dynamic>? params,
+) async {
+  return api.post('api/tenant/comments/$id/comment', data: params).then(
+        (res) => ApiResponse.fromJson(
+          res.data,
+          (data) {
+            if (res.data['code'] == 200) {
+              return true;
+            } else {
+              return false;
+            }
           },
         ),
       );
