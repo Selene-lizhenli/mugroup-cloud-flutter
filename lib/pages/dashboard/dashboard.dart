@@ -80,14 +80,15 @@ class DashboardPage extends HookConsumerWidget {
                       ]
                     : [
                         Color.lerp(
-                            colorScheme.primary, colorScheme.surface, 0.6)!,
+                            colorScheme.primary, colorScheme.surface, 0.4)!,
+                        // colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                       ],
                 stops: isSpringFestival
                     ? const [0.0, 0.2, 0.6, 1.0]
-                    : const [0.0, 0.1, 0.6, 1.0],
+                    : const [0.0, 0.3, 0.6, 1.0],
               ),
             ),
           ),
