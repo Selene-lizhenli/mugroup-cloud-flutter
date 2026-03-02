@@ -14,11 +14,8 @@ class SearchArea extends HookConsumerWidget {
       onTap: () => showAdviceEditSheet(
         context: context,
         onSend: (content, images) {
-          notifier.sendMyAdvice({
-            'anonymous': false,
-            'content': content,
-            // 'images': images, // 如果有上传图片需求
-          });
+          notifier.sendMyAdvice(
+              {'anonymous': false, 'content': content, 'attachments': images});
 
           ref.read(adviceCollectProvider.notifier).loadBooks();
         },

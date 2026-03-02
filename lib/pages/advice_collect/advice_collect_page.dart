@@ -183,11 +183,8 @@ class _CommentGroup extends HookConsumerWidget {
               context: context,
               replyToName: book.user?.name ?? '匿名',
               onSend: (content, images) {
-                ref
-                    .read(adviceCollectProvider.notifier)
-                    .sendMyComments(book.id!, {
-                  'comment': content,
-                });
+                ref.read(adviceCollectProvider.notifier).sendMyComments(
+                    book.id!, {'comment': content, 'attachments': images});
 
                 ref.read(adviceCollectProvider.notifier).loadBooks();
               },
@@ -228,9 +225,8 @@ class _CommentGroup extends HookConsumerWidget {
                       onSend: (content, images) {
                         ref
                             .read(adviceCollectProvider.notifier)
-                            .sendMyCommentsComment(comment.id!, {
-                          'comment': content,
-                        });
+                            .sendMyCommentsComment(comment.id!,
+                                {'comment': content, 'attachments': images});
 
                         ref.read(adviceCollectProvider.notifier).loadBooks();
                       },
@@ -419,12 +415,14 @@ class _ImageGrid extends StatelessWidget {
     final int displayCount = totalCount > 3 ? 3 : totalCount;
     final int remaining = totalCount - 3;
     final List<String> imageUrls = attachments.map((e) => e.url ?? '').toList();
+    final List<String> imageThumbUrls =
+        attachments.map((e) => e.thumbUrl ?? '').toList();
 
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 2), // 调整图片上下间距
       child: LayoutBuilder(builder: (context, constraints) {
-        const double spacing = 4.0;
-        final double itemSize = (constraints.maxWidth - (spacing * 2)) / 3;
+        const double spacing = 6.0;
+        final double itemSize = (constraints.maxWidth - (spacing * 2)) / 4;
 
         return Row(
           children: List.generate(displayCount, (index) {
@@ -450,7 +448,7 @@ class _ImageGrid extends StatelessWidget {
                     fit: StackFit.expand,
                     children: [
                       Image.network(
-                        imageUrls[index],
+                        imageThumbUrls[index],
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             Container(color: Colors.grey[200]),
