@@ -863,6 +863,7 @@ mixin _$AdviceCollectBook {
   AdviceCollectBookUser? get handler => throw _privateConstructorUsedError;
   List<AdviceCollectBookComment>? get comments =>
       throw _privateConstructorUsedError;
+  List<Media>? get attachments => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $AdviceCollectBookCopyWith<AdviceCollectBook> get copyWith =>
@@ -885,7 +886,8 @@ abstract class $AdviceCollectBookCopyWith<$Res> {
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
       AdviceCollectBookUser? handler,
-      List<AdviceCollectBookComment>? comments});
+      List<AdviceCollectBookComment>? comments,
+      List<Media>? attachments});
 
   $AdviceCollectBookUserCopyWith<$Res>? get user;
   $AdviceCollectBookUserCopyWith<$Res>? get handler;
@@ -914,6 +916,7 @@ class _$AdviceCollectBookCopyWithImpl<$Res, $Val extends AdviceCollectBook>
     Object? user = freezed,
     Object? handler = freezed,
     Object? comments = freezed,
+    Object? attachments = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -956,6 +959,10 @@ class _$AdviceCollectBookCopyWithImpl<$Res, $Val extends AdviceCollectBook>
           ? _value.comments
           : comments // ignore: cast_nullable_to_non_nullable
               as List<AdviceCollectBookComment>?,
+      attachments: freezed == attachments
+          ? _value.attachments
+          : attachments // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ) as $Val);
   }
 
@@ -1002,7 +1009,8 @@ abstract class _$$AdviceCollectBookImplCopyWith<$Res>
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
       AdviceCollectBookUser? handler,
-      List<AdviceCollectBookComment>? comments});
+      List<AdviceCollectBookComment>? comments,
+      List<Media>? attachments});
 
   @override
   $AdviceCollectBookUserCopyWith<$Res>? get user;
@@ -1031,6 +1039,7 @@ class __$$AdviceCollectBookImplCopyWithImpl<$Res>
     Object? user = freezed,
     Object? handler = freezed,
     Object? comments = freezed,
+    Object? attachments = freezed,
   }) {
     return _then(_$AdviceCollectBookImpl(
       id: freezed == id
@@ -1073,6 +1082,10 @@ class __$$AdviceCollectBookImplCopyWithImpl<$Res>
           ? _value._comments
           : comments // ignore: cast_nullable_to_non_nullable
               as List<AdviceCollectBookComment>?,
+      attachments: freezed == attachments
+          ? _value._attachments
+          : attachments // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ));
   }
 }
@@ -1090,8 +1103,10 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
       @JsonKey(name: 'updated_at') this.updatedAt,
       this.user,
       this.handler,
-      final List<AdviceCollectBookComment>? comments})
-      : _comments = comments;
+      final List<AdviceCollectBookComment>? comments,
+      final List<Media>? attachments})
+      : _comments = comments,
+        _attachments = attachments;
 
   factory _$AdviceCollectBookImpl.fromJson(Map<String, dynamic> json) =>
       _$$AdviceCollectBookImplFromJson(json);
@@ -1127,9 +1142,19 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<Media>? _attachments;
+  @override
+  List<Media>? get attachments {
+    final value = _attachments;
+    if (value == null) return null;
+    if (_attachments is EqualUnmodifiableListView) return _attachments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'AdviceCollectBook(id: $id, content: $content, status: $status, message: $message, handledAt: $handledAt, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, handler: $handler, comments: $comments)';
+    return 'AdviceCollectBook(id: $id, content: $content, status: $status, message: $message, handledAt: $handledAt, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, handler: $handler, comments: $comments, attachments: $attachments)';
   }
 
   @override
@@ -1149,7 +1174,9 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
                 other.updatedAt == updatedAt) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.handler, handler) || other.handler == handler) &&
-            const DeepCollectionEquality().equals(other._comments, _comments));
+            const DeepCollectionEquality().equals(other._comments, _comments) &&
+            const DeepCollectionEquality()
+                .equals(other._attachments, _attachments));
   }
 
   @JsonKey(ignore: true)
@@ -1165,7 +1192,8 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
       updatedAt,
       user,
       handler,
-      const DeepCollectionEquality().hash(_comments));
+      const DeepCollectionEquality().hash(_comments),
+      const DeepCollectionEquality().hash(_attachments));
 
   @JsonKey(ignore: true)
   @override
@@ -1177,17 +1205,17 @@ class _$AdviceCollectBookImpl implements _AdviceCollectBook {
 
 abstract class _AdviceCollectBook implements AdviceCollectBook {
   const factory _AdviceCollectBook(
-          {final int? id,
-          final String? content,
-          final String? status,
-          final String? message,
-          @JsonKey(name: 'handled_at') final String? handledAt,
-          @JsonKey(name: 'created_at') final String? createdAt,
-          @JsonKey(name: 'updated_at') final String? updatedAt,
-          final AdviceCollectBookUser? user,
-          final AdviceCollectBookUser? handler,
-          final List<AdviceCollectBookComment>? comments}) =
-      _$AdviceCollectBookImpl;
+      {final int? id,
+      final String? content,
+      final String? status,
+      final String? message,
+      @JsonKey(name: 'handled_at') final String? handledAt,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt,
+      final AdviceCollectBookUser? user,
+      final AdviceCollectBookUser? handler,
+      final List<AdviceCollectBookComment>? comments,
+      final List<Media>? attachments}) = _$AdviceCollectBookImpl;
 
   factory _AdviceCollectBook.fromJson(Map<String, dynamic> json) =
       _$AdviceCollectBookImpl.fromJson;
@@ -1215,6 +1243,8 @@ abstract class _AdviceCollectBook implements AdviceCollectBook {
   AdviceCollectBookUser? get handler;
   @override
   List<AdviceCollectBookComment>? get comments;
+  @override
+  List<Media>? get attachments;
   @override
   @JsonKey(ignore: true)
   _$$AdviceCollectBookImplCopyWith<_$AdviceCollectBookImpl> get copyWith =>

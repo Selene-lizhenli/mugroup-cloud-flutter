@@ -177,6 +177,7 @@ class _CommentGroup extends HookConsumerWidget {
           userName: book.user?.name ?? '匿名',
           content: book.content ?? '',
           isReply: false,
+          attachments: book.attachments,
           createdAt: book.createdAt,
           onTap: () {
             showAdviceEditSheet(

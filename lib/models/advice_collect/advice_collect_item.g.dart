@@ -67,4 +67,7 @@ _$AdviceCollectBookImpl _$$AdviceCollectBookImplFromJson(
           ?.map((e) =>
               AdviceCollectBookComment.fromJson(e as Map<String, dynamic>))
           .toList(),
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );

@@ -61,6 +61,7 @@ class AdviceCollectBook with _$AdviceCollectBook {
     AdviceCollectBookUser? user,
     AdviceCollectBookUser? handler,
     List<AdviceCollectBookComment>? comments,
+    List<Media>? attachments,
   }) = _AdviceCollectBook;
 
   factory AdviceCollectBook.fromJson(Map<String, dynamic> json) =>
