@@ -47,10 +47,10 @@ class SelectCurrencySheet extends HookConsumerWidget {
     // 获取汇率字符串：exchangeRate 表示 100 单位该货币 = 多少人民币，需要除以 100
     String getRateValue(ExchangeRate rate) {
       final rateStr = rate.exchangeRate ?? '0';
-      final rateValue = double.tryParse(rateStr) ?? 0.0;
+      final rateValue = (double.tryParse(rateStr) ?? 0.0) / 100;
       if (rateValue == 0.0) {
         return '0';
-      } 
+      }
       return rateValue.toStringAsFixed(4);
     }
 

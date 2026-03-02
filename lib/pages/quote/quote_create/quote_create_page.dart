@@ -42,9 +42,12 @@ class QuoteCreatePage extends HookConsumerWidget {
           if (data.contact != null) notifier.setSelectedContact(data.contact!);
 
           notifier.setCurrency(data.curreny ?? 'USD');
-          notifier.setRate(data.exchange ?? '1.0');
-          final String? langCode = data.language;
 
+          final double rawExchange =
+              double.tryParse(data.exchange ?? '') ?? 0.0;
+          notifier.setRate((rawExchange / 100).toString());
+
+          final String? langCode = data.language;
           final languageItem =
               getLanguageByCode(langCode ?? 'EN') ?? getLanguageByCode('EN');
 
