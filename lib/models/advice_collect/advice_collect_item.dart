@@ -36,6 +36,7 @@ class AdviceCollectBookComment with _$AdviceCollectBookComment {
     int? id,
     String? comment,
     @JsonKey(name: 'is_approved') bool? isApproved,
+    @JsonKey(name: 'parent_id') int? parentId,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     AdviceCollectBookUser? user,

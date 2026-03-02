@@ -33,6 +33,7 @@ _$AdviceCollectBookCommentImpl _$$AdviceCollectBookCommentImplFromJson(
       id: (json['id'] as num?)?.toInt(),
       comment: json['comment'] as String?,
       isApproved: json['is_approved'] as bool?,
+      parentId: (json['parent_id'] as num?)?.toInt(),
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       user: json['user'] == null

@@ -525,6 +525,8 @@ mixin _$AdviceCollectBookComment {
   String? get comment => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_approved')
   bool? get isApproved => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id')
+  int? get parentId => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -547,6 +549,7 @@ abstract class $AdviceCollectBookCommentCopyWith<$Res> {
       {int? id,
       String? comment,
       @JsonKey(name: 'is_approved') bool? isApproved,
+      @JsonKey(name: 'parent_id') int? parentId,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
@@ -572,6 +575,7 @@ class _$AdviceCollectBookCommentCopyWithImpl<$Res,
     Object? id = freezed,
     Object? comment = freezed,
     Object? isApproved = freezed,
+    Object? parentId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? user = freezed,
@@ -590,6 +594,10 @@ class _$AdviceCollectBookCommentCopyWithImpl<$Res,
           ? _value.isApproved
           : isApproved // ignore: cast_nullable_to_non_nullable
               as bool?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -635,6 +643,7 @@ abstract class _$$AdviceCollectBookCommentImplCopyWith<$Res>
       {int? id,
       String? comment,
       @JsonKey(name: 'is_approved') bool? isApproved,
+      @JsonKey(name: 'parent_id') int? parentId,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       AdviceCollectBookUser? user,
@@ -660,6 +669,7 @@ class __$$AdviceCollectBookCommentImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? comment = freezed,
     Object? isApproved = freezed,
+    Object? parentId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? user = freezed,
@@ -678,6 +688,10 @@ class __$$AdviceCollectBookCommentImplCopyWithImpl<$Res>
           ? _value.isApproved
           : isApproved // ignore: cast_nullable_to_non_nullable
               as bool?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -705,6 +719,7 @@ class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
       {this.id,
       this.comment,
       @JsonKey(name: 'is_approved') this.isApproved,
+      @JsonKey(name: 'parent_id') this.parentId,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       this.user,
@@ -721,6 +736,9 @@ class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
   @override
   @JsonKey(name: 'is_approved')
   final bool? isApproved;
+  @override
+  @JsonKey(name: 'parent_id')
+  final int? parentId;
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -741,7 +759,7 @@ class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
 
   @override
   String toString() {
-    return 'AdviceCollectBookComment(id: $id, comment: $comment, isApproved: $isApproved, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, attachments: $attachments)';
+    return 'AdviceCollectBookComment(id: $id, comment: $comment, isApproved: $isApproved, parentId: $parentId, createdAt: $createdAt, updatedAt: $updatedAt, user: $user, attachments: $attachments)';
   }
 
   @override
@@ -753,6 +771,8 @@ class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
             (identical(other.comment, comment) || other.comment == comment) &&
             (identical(other.isApproved, isApproved) ||
                 other.isApproved == isApproved) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -769,6 +789,7 @@ class _$AdviceCollectBookCommentImpl implements _AdviceCollectBookComment {
       id,
       comment,
       isApproved,
+      parentId,
       createdAt,
       updatedAt,
       user,
@@ -787,6 +808,7 @@ abstract class _AdviceCollectBookComment implements AdviceCollectBookComment {
       {final int? id,
       final String? comment,
       @JsonKey(name: 'is_approved') final bool? isApproved,
+      @JsonKey(name: 'parent_id') final int? parentId,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       final AdviceCollectBookUser? user,
@@ -802,6 +824,9 @@ abstract class _AdviceCollectBookComment implements AdviceCollectBookComment {
   @override
   @JsonKey(name: 'is_approved')
   bool? get isApproved;
+  @override
+  @JsonKey(name: 'parent_id')
+  int? get parentId;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;

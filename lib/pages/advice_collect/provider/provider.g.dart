@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adviceCollectHash() => r'0cfb0e177b5500e21972697ed69ae3f8c4a36c8d';
+String _$adviceCollectHash() => r'ab93b4548bdac9ce294cfbb8b9fd9a15638ea39b';
 
 /// See also [AdviceCollect].
 @ProviderFor(AdviceCollect)

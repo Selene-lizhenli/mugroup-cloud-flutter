@@ -142,9 +142,10 @@ class _CommentGroup extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isExpanded = useState(false);
     final comments = book.comments ?? [];
+
+    final allComments = book.comments ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,9 +181,19 @@ class _CommentGroup extends HookConsumerWidget {
             itemCount: isExpanded.value ? comments.length : 1,
             itemBuilder: (context, index) {
               final comment = comments[index];
+
+              String? replyTo;
+              if (comment.parentId != null) {
+                replyTo = allComments
+                    .where((c) => c.id == comment.parentId)
+                    .firstOrNull
+                    ?.user
+                    ?.name;
+              }
               return _ReplyWrapper(
                 child: _CommentItem(
                   userName: comment.user?.name ?? '用户',
+                  replyToName: replyTo,
                   content: comment.comment ?? '',
                   attachments: comment.attachments,
                   isReply: true,
@@ -245,6 +256,7 @@ class _CommentGroup extends HookConsumerWidget {
 
 class _CommentItem extends StatelessWidget {
   final String userName;
+  final String? replyToName;
   final String content;
   final List<Media>? attachments;
   final bool isReply;
@@ -252,6 +264,7 @@ class _CommentItem extends StatelessWidget {
 
   const _CommentItem({
     required this.userName,
+    this.replyToName,
     required this.content,
     this.attachments,
     required this.isReply,
@@ -285,13 +298,31 @@ class _CommentItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    userName,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      if (replyToName != null) ...[
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            '回复',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black),
+                          ),
+                        ),
+                        Text(
+                          replyToName!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 1), // 缩小用户名和气泡间的距离
                   // 气泡重新加入，但大幅压缩边距
