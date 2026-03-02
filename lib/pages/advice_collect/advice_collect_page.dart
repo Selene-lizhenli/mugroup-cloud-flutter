@@ -11,6 +11,28 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flant/flant.dart';
 import 'widgets/show_advice_edit_sheet.dart';
 
+String formatXHSStyleTime(String? createdAt) {
+  if (createdAt == null) return "";
+  final date = DateTime.tryParse(createdAt)?.toLocal();
+  if (date == null) return "";
+
+  final now = DateTime.now();
+  final difference = now.difference(date);
+
+  if (difference.inSeconds < 60) {
+    return "刚刚";
+  } else if (difference.inMinutes < 60) {
+    return "${difference.inMinutes}分钟前";
+  } else if (difference.inHours < 24) {
+    return "${difference.inHours}小时前";
+  } else if (difference.inDays <= 7) {
+    return "${difference.inDays}天前";
+  } else {
+    // 超过7天显示年月日
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+}
+
 @RoutePage()
 class AdviceCollectPage extends HookConsumerWidget {
   const AdviceCollectPage({super.key});
@@ -155,6 +177,7 @@ class _CommentGroup extends HookConsumerWidget {
           userName: book.user?.name ?? '匿名',
           content: book.content ?? '',
           isReply: false,
+          createdAt: book.createdAt,
           onTap: () {
             showAdviceEditSheet(
               context: context,
@@ -197,6 +220,7 @@ class _CommentGroup extends HookConsumerWidget {
                   content: comment.comment ?? '',
                   attachments: comment.attachments,
                   isReply: true,
+                  createdAt: comment.createdAt,
                   onTap: () {
                     showAdviceEditSheet(
                       context: context,
@@ -230,7 +254,7 @@ class _CommentGroup extends HookConsumerWidget {
                     Text(
                       isExpanded.value
                           ? '收起回复'
-                          : '展开更多 ${comments.length - 1} 条回复',
+                          : '展开 ${comments.length - 1} 条回复',
                       style: const TextStyle(
                           fontSize: 13,
                           color: Color(0xFFE91E63),
@@ -260,6 +284,7 @@ class _CommentItem extends StatelessWidget {
   final String content;
   final List<Media>? attachments;
   final bool isReply;
+  final String? createdAt;
   final VoidCallback onTap;
 
   const _CommentItem({
@@ -268,12 +293,15 @@ class _CommentItem extends StatelessWidget {
     required this.content,
     this.attachments,
     required this.isReply,
+    this.createdAt,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final timeStr = formatXHSStyleTime(createdAt);
 
     return InkWell(
       onTap: onTap,
@@ -349,6 +377,26 @@ class _CommentItem extends StatelessWidget {
                   // 图片展示
                   if (attachments != null && attachments!.isNotEmpty)
                     _ImageGrid(attachments: attachments!),
+
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4, left: 2),
+                    child: Row(
+                      children: [
+                        Text(timeStr,
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.grey)),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: onTap,
+                          child: const Text('回复',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey)),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
