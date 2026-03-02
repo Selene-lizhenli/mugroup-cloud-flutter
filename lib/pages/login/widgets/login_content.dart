@@ -10,7 +10,7 @@ import 'package:cloud/pages/login/widgets/wxwork_icon.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/login/widgets/wxwork.dart';
 import 'package:cloud/providers/core_provider.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -18,13 +18,13 @@ import 'package:qr_flutter/qr_flutter.dart';
 class LoginContent extends HookConsumerWidget {
   final String? loginWay;
   final String? appleIdentityToken;
-  final void Function()? onLogined;
+  final void Function()? onAfterLogin;
   final bool? isWxworkInstalled;
 
   const LoginContent({
     super.key,
     required this.loginWay,
-    this.onLogined,
+    this.onAfterLogin,
     this.appleIdentityToken,
     this.isWxworkInstalled,
   });
@@ -87,7 +87,7 @@ class LoginContent extends HookConsumerWidget {
         qrcode.value = result;
         if (result.usedAt != null) {
           logger.d("登录成功");
-          onLogined?.call();
+          onAfterLogin?.call();
         }
 
         final expirationTime = DateTime.tryParse(result.expiredAt!)?.toLocal();
@@ -120,7 +120,7 @@ class LoginContent extends HookConsumerWidget {
 
       await api.post("api/login", data: data);
 
-      onLogined?.call();
+      onAfterLogin?.call();
     }, [appleIdentityToken]);
 
     useEffect(() {
@@ -165,8 +165,8 @@ class LoginContent extends HookConsumerWidget {
               style: TextStyle(color: colorScheme.onSurface, fontSize: 12),
             ),
           ],
-          // 初始状态：只显示企微快捷登录按钮
-          if (loginWay == null && tenant.wxwork != null) ...[
+          //   企微本地app快捷登录按钮
+          if (loginWay == "wxwork_local_app") ...[
             Center(
               child: Column(
                 children: [
@@ -177,11 +177,12 @@ class LoginContent extends HookConsumerWidget {
                     child: isWxworkInstalled == true
                         ? ElevatedButton(
                             onPressed: () async {
-                              await wxworkQuickLogin(
+                              await handleWxworkQuickLogin(
                                 schema: tenant.wxwork!.schema!,
                                 corpId: tenant.wxwork!.corpId!,
                                 agentId: tenant.wxwork!.agentId!,
                               );
+                              onAfterLogin?.call();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColorBlue,
@@ -191,17 +192,24 @@ class LoginContent extends HookConsumerWidget {
                                 style: TextStyle(color: colorScheme.onPrimary),
                                 '唤起企业微信登录'),
                           )
-                        : Text(
-                            style: TextStyle(color: colorScheme.onPrimary),
-                            '请先安装企业微信'),
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error, color: colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                  style: TextStyle(color: colorScheme.primary),
+                                  '请先安装企业微信'),
+                            ],
+                          ),
                   ),
                 ],
               ),
             ),
-          ],
-
+          ]
           // 账号密码
-          if (loginWay == "account") ...[
+          else if (loginWay == "account") ...[
             if (appleIdentityToken != null)
               const Padding(
                 padding: EdgeInsets.only(top: 8.0),
@@ -213,9 +221,7 @@ class LoginContent extends HookConsumerWidget {
                   ),
                 ),
               ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             TextField(
               controller: accountController,
               style: TextStyle(
@@ -260,10 +266,22 @@ class LoginContent extends HookConsumerWidget {
                 ),
               ),
             ),
-          ],
-
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 25),
+              child: ElevatedButton(
+                onPressed: handleAccountLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColorBlue,
+                  shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
+                ),
+                child: Text(
+                    style: TextStyle(color: colorScheme.onPrimary), '立即登录'),
+              ),
+            ),
+          ]
           // 企业扫码登录
-          if (loginWay == "wxwork") ...[
+          else if (loginWay == "wxwork") ...[
             Center(
               child: Column(
                 children: [
@@ -336,21 +354,6 @@ class LoginContent extends HookConsumerWidget {
               ),
             ),
           ],
-
-          if (['account'].contains(loginWay))
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 25),
-              child: ElevatedButton(
-                onPressed: handleAccountLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColorBlue,
-                  shape: const StadiumBorder(), // 胶囊形，圆角为高度一半
-                ),
-                child: Text(
-                    style: TextStyle(color: colorScheme.onPrimary), '立即登录'),
-              ),
-            ),
         ],
       ),
     );

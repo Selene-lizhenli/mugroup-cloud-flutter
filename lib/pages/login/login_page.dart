@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/login_way.dart';
 import 'package:cloud/pages/login/widgets/login_content.dart';
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/pages/login/widgets/wxwork.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flant/flant.dart';
@@ -85,8 +87,20 @@ class LoginPage extends HookConsumerWidget {
       if (loginWay.value != null && enableLoginWays.contains(loginWay.value)) {
         return;
       }
-
-      loginWay.value = null;
+      //初始化登录方式
+      if (enableLoginWays.contains('wxwork') &&
+          tenant?.wxwork?.schema != null &&
+          tenant?.wxwork?.corpId != null &&
+          tenant?.wxwork?.agentId != null) {
+        loginWay.value = 'wxwork_local_app';
+      } else if (enableLoginWays.contains('wxwork') &&
+          (tenant?.wxwork?.schema == null ||
+              tenant?.wxwork?.corpId == null ||
+              tenant?.wxwork?.agentId == null)) {
+        loginWay.value = 'wxwork';
+      } else {
+        loginWay.value = enableLoginWays.isNotEmpty ? enableLoginWays[0] : null;
+      }
 
       return null;
     }, [enableLoginWays, loginWay.value]);
@@ -116,6 +130,7 @@ class LoginPage extends HookConsumerWidget {
                       name: tenant.title ?? "未命名租户(${tenant.id})",
                       callback: (action) async {
                         core.setCurrentTenantId(tenant.id);
+                        loginWay.value = null;
                         appleIdentityToken.value = null;
                       },
                     ),
@@ -168,7 +183,7 @@ class LoginPage extends HookConsumerWidget {
                                   loginWay: loginWay.value,
                                   isWxworkInstalled: isWxworkInstalled.value,
                                   appleIdentityToken: appleIdentityToken.value,
-                                  onLogined: () async {
+                                  onAfterLogin: () async {
                                     await app.fetchUser();
                                     afterLogin();
                                   },
@@ -183,31 +198,66 @@ class LoginPage extends HookConsumerWidget {
                                   ),
                                   child: Column(
                                     children: [
-                                      const Padding(
-                                        padding: EdgeInsets.symmetric(
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 10),
                                         child: SizedBox(
                                           height: 60,
                                           child: FlanDivider(
-                                            child: Text(
+                                            style: FlanDividerStyle(
+                                              color: colorScheme.outline,
+                                              borderColor: colorScheme.outline
+                                                  .withOpacity(0.3),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5),
+                                            ),
+                                            child: const Text(
                                               style: TextStyle(fontSize: 15),
                                               "登录方式",
                                             ),
                                           ),
                                         ),
                                       ),
-                                      FastLoginSection(
-                                        enableLoginWays: enableLoginWays,
-                                        quickLoginWay: quickLoginWay,
-                                        wxworkSchema: tenant.wxwork?.schema,
-                                        wxworkCorpId: tenant.wxwork?.corpId,
-                                        wxworkAgentId: tenant.wxwork?.agentId,
-                                        loginWay: loginWay,
-                                        appleIdentityToken: appleIdentityToken,
-                                        onAfterLogin: () async {
-                                          await app.fetchUser();
-                                          afterLogin();
-                                        },
+                                      // 登录方式
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          ApiEnableLoginWays(
+                                            enableLoginWays: enableLoginWays,
+                                            loginWay: loginWay,
+                                            onAfterLogin: () async {
+                                              await app.fetchUser();
+                                              afterLogin();
+                                            },
+                                          ),
+                                          //本地企微app 登录方式
+                                          if (tenant.wxwork?.schema != null &&
+                                              tenant.wxwork?.corpId != null &&
+                                              tenant.wxwork?.agentId != null)
+                                            WxworkFastLoginBtn(
+                                              schema: tenant.wxwork?.schema,
+                                              corpId: tenant.wxwork?.corpId!,
+                                              agentId: tenant.wxwork?.agentId!,
+                                              loginWay: loginWay,
+                                              onAfterLogin: () async {
+                                                await app.fetchUser();
+                                                afterLogin();
+                                              },
+                                            ),
+                                          //apple 登录方式
+                                          AppleFastLoginBtn(
+                                            quickLoginWay: quickLoginWay,
+                                            loginWay: loginWay,
+                                            appleIdentityToken:
+                                                appleIdentityToken,
+                                            onAfterLogin: () async {
+                                              await app.fetchUser();
+                                              afterLogin();
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -222,16 +272,12 @@ class LoginPage extends HookConsumerWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text("网页版: https://cloud.mugroup.com"),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
+                                      SizedBox(width: 10),
                                       Text("客服: 669082"),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                const SizedBox(height: 10),
                               ],
                             ),
                           ),

@@ -10,14 +10,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'wxwork_icon.dart';
 
 /// 通用的企微快捷登录方法，可在任意位置复用
-Future<void> wxworkQuickLogin({
+Future<void> handleWxworkQuickLogin({
   required String schema,
   required String corpId,
   required String agentId,
 }) async {
   try {
     final wxwork = FlutterWxwork();
-
     await wxwork.register(
       scheme: schema,
       corpId: corpId,
@@ -36,7 +35,7 @@ Future<void> wxworkQuickLogin({
       data: {'code': code},
     );
 
-    await app.fetchUser();
+    // await app.fetchUser();
   } catch (e) {
     var message = e.toString();
     if (e is DioException) {
@@ -47,18 +46,20 @@ Future<void> wxworkQuickLogin({
 }
 
 /// 企微快捷登录按钮（用于登录页）
-class WxworkQuickLoginButton extends HookConsumerWidget {
-  final String schema;
-  final String corpId;
-  final String agentId;
+class WxworkFastLoginBtn extends HookConsumerWidget {
+  final String? schema;
+  final String? corpId;
+  final String? agentId;
   final Future<void> Function() onAfterLogin;
   final double? size;
+  final ValueNotifier<String?> loginWay;
 
-  const WxworkQuickLoginButton({
+  const WxworkFastLoginBtn({
     super.key,
     required this.schema,
     required this.corpId,
     required this.agentId,
+    required this.loginWay,
     required this.onAfterLogin,
     this.size,
   });
@@ -69,11 +70,15 @@ class WxworkQuickLoginButton extends HookConsumerWidget {
 
     return GestureDetector(
         onTap: () async {
-          await wxworkQuickLogin(
-            schema: schema,
-            corpId: corpId,
-            agentId: agentId,
-          );
+          loginWay.value = 'wxwork_local_app';
+          if (schema != null && corpId != null && agentId != null) {
+            await handleWxworkQuickLogin(
+              schema: schema!,
+              corpId: corpId!,
+              agentId: agentId!,
+            );
+            onAfterLogin?.call();
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(
@@ -81,7 +86,7 @@ class WxworkQuickLoginButton extends HookConsumerWidget {
             vertical: 5,
           ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
+            shape: BoxShape.circle,
             color: primaryColorPink.withOpacity(0.025),
           ),
           child: Column(
