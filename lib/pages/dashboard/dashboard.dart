@@ -8,7 +8,7 @@ import 'package:cloud/pages/dashboard/widgets/home_user_header.dart';
 import 'package:cloud/pages/dashboard/widgets/selected_modules_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart'; 
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
 class DashboardPage extends HookConsumerWidget {
@@ -71,40 +71,32 @@ class DashboardPage extends HookConsumerWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: isSpringFestival
+                colors: isSpringFestival || isYuanxiaoFestival
                     ? [
-                        Color.fromARGB(235, 139, 15, 6),
-                        Color.fromARGB(235, 155, 32, 23), 
+                        const Color.fromARGB(235, 168, 20, 9),
+                        const Color.fromARGB(235, 176, 38, 28),
                         colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                       ]
-                    : [
-                        Color.lerp(
-                            colorScheme.primary, colorScheme.surface, 0.4)!,
-                        // colorScheme.surfaceTint,
-                        colorScheme.surfaceTint,
-                        colorScheme.surfaceTint,
-                        colorScheme.surfaceTint,
-                      ],
-                stops: isSpringFestival
+                    : [],
+                stops: isSpringFestival || isYuanxiaoFestival
                     ? const [0.0, 0.2, 0.6, 1.0]
-                    : const [0.0, 0.3, 0.6, 1.0],
+                    : const [],
               ),
             ),
           ),
         ),
-        // 最底层背景图：顶部对齐（春节期间展示焰火图，否则用主题主色块）
-        if (isSpringFestival)
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            child: Image.asset(
-              'assets/photo/yanhua.png',
-              fit: BoxFit.fitWidth,
-              alignment: Alignment.topCenter,
-            ),
+        // 最底层背景图：顶部对齐 
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: Image.asset(
+            getBackgroundPic,
+            fit: BoxFit.fitWidth,
+            alignment: Alignment.topCenter,
           ),
+        ),
         SafeArea(
           bottom: false,
           child: RefreshIndicator(
@@ -120,7 +112,7 @@ class DashboardPage extends HookConsumerWidget {
                   child: HomeUserHeader(),
                 ),
                 Container(
-                  height: 50,
+                  height: 60,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: Colors.transparent,
@@ -135,11 +127,11 @@ class DashboardPage extends HookConsumerWidget {
                   child: Column(
                     children: [
                       Transform.translate(
-                        offset: const Offset(0, -40),
+                        offset: const Offset(0, -50),
                         child: const EntryGridModule(),
                       ),
                       Transform.translate(
-                        offset: const Offset(0, -30),
+                        offset: const Offset(0, -40),
                         child: SelectedModulesWidget(key: selectedModulesKey),
                       ),
                     ],
