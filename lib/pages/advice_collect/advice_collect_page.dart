@@ -327,6 +327,14 @@ class _CommentItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
+                      Text(
+                        userName,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
                       if (replyToName != null) ...[
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
