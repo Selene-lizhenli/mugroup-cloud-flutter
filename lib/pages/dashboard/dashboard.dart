@@ -111,31 +111,24 @@ class DashboardPage extends HookConsumerWidget {
                       EdgeInsets.symmetric(horizontal: pageHorizontalPadding),
                   child: HomeUserHeader(),
                 ),
-                Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.transparent,
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceTint,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: pageHorizontalPadding),
-                  child: Column(
-                    children: [
-                      Transform.translate(
-                        offset: const Offset(0, -50),
-                        child: const EntryGridModule(),
+                Stack(
+                  children: [
+                    Positioned.fill(
+                      top: 60,
+                      child: Container(color: colorScheme.surfaceTint),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: pageHorizontalPadding),
+                      child: Column(
+                        children: [
+                          const EntryGridModule(),
+                          const SizedBox(height: 16),
+                          SelectedModulesWidget(key: selectedModulesKey),
+                        ],
                       ),
-                      Transform.translate(
-                        offset: const Offset(0, -40),
-                        child: SelectedModulesWidget(key: selectedModulesKey),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
