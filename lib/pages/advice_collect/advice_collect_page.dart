@@ -144,14 +144,26 @@ class _SearchResultBody extends ConsumerWidget {
         const SearchArea(),
         const SizedBox(height: 12),
         Expanded(
-          child: state.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 100),
-                  itemCount: state.bookList.length,
-                  itemBuilder: (context, index) =>
-                      _CommentGroup(book: state.bookList[index]),
+          child: Stack(
+            children: [
+              ListView.builder(
+                key: const PageStorageKey('advice_collect_list'),
+                padding: const EdgeInsets.only(bottom: 100),
+                itemCount: state.bookList.length,
+                itemBuilder: (context, index) =>
+                    _CommentGroup(book: state.bookList[index]),
+              ),
+              if (state.isLoading && state.bookList.isEmpty)
+                const Center(child: CircularProgressIndicator())
+              else if (state.isLoading)
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  child: LinearProgressIndicator(minHeight: 2),
                 ),
+            ],
+          ),
         ),
       ],
     );
@@ -166,6 +178,7 @@ class _CommentGroup extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isExpanded = useState(false);
     final comments = book.comments ?? [];
+    final colorScheme = Theme.of(context).colorScheme;
 
     final allComments = book.comments ?? [];
 
@@ -252,17 +265,15 @@ class _CommentGroup extends HookConsumerWidget {
                       isExpanded.value
                           ? '收起回复'
                           : '展开 ${comments.length - 1} 条回复',
-                      style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFFE91E63),
-                          fontWeight: FontWeight.w500),
+                      style:   TextStyle(
+                          fontSize: 13, color: colorScheme.outline),
                     ),
                     Icon(
                       isExpanded.value
                           ? Icons.keyboard_arrow_up
                           : Icons.keyboard_arrow_down,
                       size: 18,
-                      color: const Color(0xFFE91E63),
+                      color: colorScheme.outline,
                     ),
                   ],
                 ),
