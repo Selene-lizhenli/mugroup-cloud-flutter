@@ -188,6 +188,7 @@ class SupplierAddSheet extends HookConsumerWidget {
         final data = <String, dynamic>{
           'name': supplierName.value.trim(),
           'collection_name': "bussiness_card",
+          'item_type': "market"
         };
 
         // 处理档口位置

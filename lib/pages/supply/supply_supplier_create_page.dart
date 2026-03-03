@@ -28,7 +28,7 @@ class SupplySupplierCreatePage extends HookConsumerWidget {
               return item;
             }).toList();
           }
-          await storeSupplySupplier(data);
+          await storeSupplySupplier({...data, 'item_type': "market"});
           EasyLoading.showSuccess("创建成功");
           if (context.mounted) {
             Navigator.of(context).pop();

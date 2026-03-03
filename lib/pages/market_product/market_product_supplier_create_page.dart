@@ -63,6 +63,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
             'images': values['images'],
             'name': values['name'],
             'stall_address': '$area$stall',
+            'item_type': "market"
           };
 
           if (data['images'] != null && data['images'] is List) {

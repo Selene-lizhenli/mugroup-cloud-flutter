@@ -132,6 +132,7 @@ class AddSupplierSheet extends HookConsumerWidget {
           'name': supplierName.value.trim(),
           'collection_name': "bussiness_card",
           'stall_address': shopNumber.value.trim(),
+          'item_type': "market"
         };
 
         if (businessCard.value.isNotEmpty) {
