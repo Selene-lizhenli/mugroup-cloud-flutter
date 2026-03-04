@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
@@ -7,6 +8,7 @@ import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/pages/samples/widgets/product_card_detailed.dart';
 import 'package:cloud/pages/samples/widgets/product_dropdown_menu.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -184,6 +186,26 @@ class ProductView extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         final sample = home.samples[index];
+
+                        void navToDetail() {
+                          final allIds =
+                              home.samples.map((e) => e.id as int).toList();
+
+                          context.router.push(ShowroomSampleViewerRoute(
+                              initialIds: allIds,
+                              initialIndex: index,
+                              onLoadMore: (page) async {
+                                final resp = await homeNotifier.fetchSamples(
+                                  searchText: home.search,
+                                  searchMedia: home.currentMedia,
+                                  init: false,
+                                );
+                                return resp.data
+                                    .map((e) => e.id as int)
+                                    .toList();
+                              }));
+                        }
+
                         final cartItem = cartState.items.firstWhereOrNull(
                             (element) => element.sample.id == sample.id);
 
@@ -192,6 +214,7 @@ class ProductView extends HookConsumerWidget {
                             key: ValueKey(sample.id),
                             sample: sample,
                             cartCount: cartItem?.count,
+                            onTap: navToDetail,
                             onTapAddSample: () {
                               cart.addSample(sample, 1);
                             },
@@ -201,6 +224,7 @@ class ProductView extends HookConsumerWidget {
                             key: ValueKey(sample.id),
                             sample: sample,
                             cartCount: cartItem?.count,
+                            onTap: navToDetail,
                             onTapAddSample: () {
                               cart.addSample(sample, 1);
                             },

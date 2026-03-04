@@ -1,13 +1,11 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart'; 
-import 'package:cloud/models/sample/sample.dart'; 
-import 'package:cloud/router/router.gr.dart'; 
-import 'package:flutter/material.dart'; 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/models/sample/sample.dart';
+import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class ProductCardDetailed extends StatelessWidget {
   final Sample sample;
-
+  final GestureTapCallback? onTap;
   final GestureTapCallback? onTapAddSample;
 
   final int? cartCount;
@@ -15,6 +13,7 @@ class ProductCardDetailed extends StatelessWidget {
   const ProductCardDetailed({
     super.key,
     required this.sample,
+    this.onTap,
     this.onTapAddSample,
     this.cartCount,
   });
@@ -27,13 +26,7 @@ class ProductCardDetailed extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: GestureDetector(
-        onTap: () {
-          if (context.mounted) {
-            context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
-
-            return;
-          }
-        },
+        onTap: onTap,
         child: Container(
           color: colorScheme.surface,
           child: Column(
@@ -301,7 +294,10 @@ class ProductCardDetailed extends StatelessWidget {
       return null;
     }
 
-    final colorMap = {"japan": Colors.yellow[800], "market_product": Colors.red};
+    final colorMap = {
+      "japan": Colors.yellow[800],
+      "market_product": Colors.red
+    };
     final labelMap = {"japan": "日本产品", "market_product": "内部"};
 
     final label = labelMap[itemType];
@@ -340,4 +336,3 @@ class ProductCardDetailed extends StatelessWidget {
     );
   }
 }
- 
