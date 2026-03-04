@@ -385,8 +385,17 @@ class QuotePage extends HookConsumerWidget {
                 return GestureDetector(
                   onTap: () {
                     if (sample?.id != null) {
-                      context.router
-                          .push(ShowroomSampleDetailRoute(id: sample!.id!));
+                      final allSampleIds = products
+                          .map((p) => p.showroomSample?.id)
+                          .whereType<int>()
+                          .toList();
+
+                      final initialIndex = allSampleIds.indexOf(sample!.id!);
+
+                      context.router.push(ShowroomSampleViewerRoute(
+                        initialIds: allSampleIds,
+                        initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                      ));
                     }
                   },
                   child: Container(
