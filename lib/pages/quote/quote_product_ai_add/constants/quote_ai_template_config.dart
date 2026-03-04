@@ -13,12 +13,16 @@ class AppColumns {
       ColumnConfig('inner_capacity', '内装箱量', width: 70);
   static const spec = ColumnConfig('spec', '产品规格', width: 90);
   static const weight = ColumnConfig('product_weight', '重量(g)', width: 60);
-  static const packaging = ColumnConfig('packing', '包装方式', width: 70);
+  static const packing = ColumnConfig('packing', '包装方式', width: 70);
   static const unit = ColumnConfig('unit', '单位', width: 50);
   static const volume = ColumnConfig('outer_volume', '体积', width: 60);
   static const moq = ColumnConfig('moq', '起订量', width: 60);
   static const description = ColumnConfig('description_cn', '描述', width: 120);
   static const remark = ColumnConfig('remark', '备注', width: 120);
+  static const customerPrice =
+      ColumnConfig('customer_price', '客户报价', width: 120);
+  static const material = ColumnConfig('material', '产品材质', width: 120);
+  static const color = ColumnConfig('color', '产品颜色', width: 120);
 
   static const List<ColumnConfig> all = [
     productNo,
@@ -27,11 +31,14 @@ class AppColumns {
     innerCapacity,
     spec,
     weight,
-    packaging,
+    packing,
     unit,
     volume,
     moq,
-    description
+    description,
+    customerPrice,
+    material,
+    color
   ];
 }
 
@@ -54,32 +61,23 @@ class TemplateOption {
 const List<TemplateOption> kQuoteAiTemplates = [
   TemplateOption(
     id: '001',
-    name: '模板1',
+    name: '通用模板',
     previewImageUrl: 'assets/aiTemplets/floor_001.jpg',
     columns: [
       AppColumns.productNo,
       AppColumns.purchaseCost,
       AppColumns.outCapacity,
-      AppColumns.volume,
       AppColumns.innerCapacity,
-      AppColumns.packaging,
-      AppColumns.description,
-    ],
-  ),
-  TemplateOption(
-    id: '002',
-    name: '模板2',
-    previewImageUrl: 'assets/aiTemplets/floor_002.jpg',
-    columns: [
-      AppColumns.productNo,
-      AppColumns.purchaseCost,
-      AppColumns.outCapacity,
       AppColumns.spec,
+      AppColumns.packing,
       AppColumns.unit,
-      AppColumns.weight,
       AppColumns.volume,
-      AppColumns.packaging,
+      AppColumns.moq,
       AppColumns.description,
+      AppColumns.weight,
+      AppColumns.customerPrice,
+      AppColumns.material,
+      AppColumns.color,
       AppColumns.remark,
     ],
   ),
@@ -88,7 +86,7 @@ const List<TemplateOption> kQuoteAiTemplates = [
 const List<TemplateOption> kQuoteAiNotePadTemplates = [
   TemplateOption(
     id: '001',
-    name: '模板1',
+    name: '通用模板',
     previewImageUrl: 'assets/aiTemplets/notepad_001.jpg',
     columns: [
       AppColumns.productNo,
@@ -98,7 +96,7 @@ const List<TemplateOption> kQuoteAiNotePadTemplates = [
       AppColumns.unit,
       AppColumns.weight,
       AppColumns.volume,
-      AppColumns.packaging,
+      AppColumns.packing,
       AppColumns.description,
       AppColumns.remark,
     ],
