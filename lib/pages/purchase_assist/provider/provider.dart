@@ -229,7 +229,7 @@ class PurchaseAssist extends _$PurchaseAssist {
       priceMax: '',
     );
     loadProducts(refresh: true, params: {
-      "sortOrder": 'fdefault',
+      "sortOrder": 'default',
       "priceMin": '',
       "priceMax": '',
     });

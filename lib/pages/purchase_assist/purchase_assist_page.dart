@@ -327,9 +327,7 @@ class _SearchResultBody extends HookConsumerWidget {
                   notifier
                       .loadProducts(refresh: true, params: {"platform": value});
                 },
-                backgroundColor: state.hasSearched
-                    ? colorScheme.surface.withOpacity(0.3)
-                    : null,
+                backgroundColor: colorScheme.surface.withOpacity(0.3),
                 spacing: 8,
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
                 fontSize: 12,
