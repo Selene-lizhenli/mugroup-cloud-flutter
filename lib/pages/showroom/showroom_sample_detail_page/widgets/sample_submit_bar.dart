@@ -16,9 +16,6 @@ class SampleSubmitBar extends HookConsumerWidget {
   final Sample? sample;
   const SampleSubmitBar({super.key, this.sample});
 
-  static final GlobalKey cartIconKey = GlobalKey();
-  static final GlobalKey updateButtonKey = GlobalKey();
-
   void _handleSupplierTap(BuildContext context) {
     final quotes = sample?.supplyQuotes ?? [];
 
@@ -148,12 +145,13 @@ class SampleSubmitBar extends HookConsumerWidget {
     );
   }
 
-  Future<void> _playAddToCartAnimation(BuildContext context) async {
+  Future<void> _playAddToCartAnimation(
+      BuildContext context, GlobalKey startKey, GlobalKey endKey) async {
     final RenderBox? startRenderBox =
-        updateButtonKey.currentContext?.findRenderObject() as RenderBox?;
+        startKey.currentContext?.findRenderObject() as RenderBox?;
 
     final RenderBox? endRenderBox =
-        cartIconKey.currentContext?.findRenderObject() as RenderBox?;
+        endKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (startRenderBox == null || endRenderBox == null) return;
 
@@ -235,6 +233,9 @@ class SampleSubmitBar extends HookConsumerWidget {
     final cartState = ref.watch(cartProvider);
     final user = ref.watch(userProvider).user;
 
+    final cartIconKey = useMemoized(() => GlobalKey(), [sample?.id]);
+    final updateButtonKey = useMemoized(() => GlobalKey(), [sample?.id]);
+
     // 购物车数量逻辑
     final badgeCount = cartState.items.length.toString();
     final showBadge = cartState.items.isNotEmpty;
@@ -290,7 +291,8 @@ class SampleSubmitBar extends HookConsumerWidget {
               onClick: () async {
                 final currentSample = sample;
                 if (currentSample != null) {
-                  await _playAddToCartAnimation(context);
+                  await _playAddToCartAnimation(
+                      context, updateButtonKey, cartIconKey);
                   cart.addSample(currentSample, 1);
                 }
               },

@@ -1,12 +1,10 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
-import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
   final Sample sample;
-
+  final GestureTapCallback? onTap;
   final GestureTapCallback? onTapAddSample;
 
   final int? cartCount;
@@ -14,6 +12,7 @@ class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
     required this.sample,
+    this.onTap,
     this.onTapAddSample,
     this.cartCount,
   });
@@ -25,17 +24,12 @@ class ProductCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: GestureDetector(
-        onTap: () {
-          if (context.mounted) {
-            context.router.push(ShowroomSampleDetailRoute(id: sample.id!));
-            return;
-          }
-        },
+        onTap: onTap,
         child: Container(
           color: colorScheme.surface,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [ 
+            children: [
               sample.cover == null
                   ? Image.asset(
                       'assets/icons/no_image.png',
