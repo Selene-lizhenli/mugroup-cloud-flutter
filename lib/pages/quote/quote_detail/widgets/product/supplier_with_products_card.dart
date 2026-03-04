@@ -203,8 +203,19 @@ class _SupplierWithProductsCardState
           }
           if (sampleId == null) return;
           if (!context.mounted) return;
+
+          final List<int> allSampleIds = widget.products
+              .map((p) => p.showroomSample?.id)
+              .whereType<int>()
+              .toList();
+
+          final int initialIndex = allSampleIds.indexOf(sampleId);
+
           context.router.push(
-            ShowroomSampleDetailRoute(id: sampleId),
+            ShowroomSampleViewerRoute(
+              initialIds: allSampleIds,
+              initialIndex: initialIndex >= 0 ? initialIndex : 0,
+            ),
           );
         },
         child: Stack(
