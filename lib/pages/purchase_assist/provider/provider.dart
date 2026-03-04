@@ -113,34 +113,44 @@ class PurchaseAssistState implements MuListState {
 const String kSortPriceDesc = 'price_desc';
 const String kSortPriceAsc = 'price_asc';
 
+double _parseCleanPrice(String? priceStr) {
+  if (priceStr == null || priceStr.isEmpty) return 0.0;
+
+  try {
+    String singlePrice = priceStr.split('-').first.trim();
+
+    String cleanStr = singlePrice.replaceAll(RegExp(r'[^\d.]'), '');
+
+    return double.tryParse(cleanStr) ?? 0.0;
+  } catch (e) {
+    return 0.0;
+  }
+}
+
 /// 按价格前端排序；默认（null/空）不排序，保持接口返回顺序
 List<PurchaseAssistSearchProduct> _sortProductsByPrice(
   List<PurchaseAssistSearchProduct> list,
   String? sortOrder,
 ) {
   if (sortOrder == 'default' || sortOrder == null || sortOrder.isEmpty) {
-    return list; // 默认：不排序
+    return list;
   }
+
   final sorted = List<PurchaseAssistSearchProduct>.from(list);
-  double parsePrice(String? s) {
-    if (s == null || s.trim().isEmpty) return double.infinity;
-    return double.tryParse(s.trim()) ?? double.infinity;
-  }
 
   if (sortOrder == kSortPriceDesc) {
     sorted.sort((a, b) {
-      final pa = parsePrice(a.price);
-      final pb = parsePrice(b.price);
-      // 无效价格用 negativeInfinity 排到末尾（降序时小值在末尾）
-      final va = pa.isFinite ? pa : double.negativeInfinity;
-      final vb = pb.isFinite ? pb : double.negativeInfinity;
+      final va = _parseCleanPrice(a.price);
+      final vb = _parseCleanPrice(b.price);
+      // 降序：大的在前
       return vb.compareTo(va);
     });
   } else if (sortOrder == kSortPriceAsc) {
     sorted.sort((a, b) {
-      final pa = parsePrice(a.price);
-      final pb = parsePrice(b.price);
-      return pa.compareTo(pb);
+      final va = _parseCleanPrice(a.price);
+      final vb = _parseCleanPrice(b.price);
+      // 升序：小的在前
+      return va.compareTo(vb);
     });
   }
   return sorted;
@@ -235,6 +245,27 @@ class PurchaseAssist extends _$PurchaseAssist {
     });
   }
 
+  List<PurchaseAssistSearchProduct> _filterProductsByPrice(
+      List<PurchaseAssistSearchProduct> list) {
+    if ((state.priceMin == null || state.priceMin!.isEmpty) &&
+        (state.priceMax == null || state.priceMax!.isEmpty)) {
+      return list;
+    }
+
+    final double min = double.tryParse(state.priceMin ?? '') ?? 0.0;
+
+    final double max = (state.priceMax == null || state.priceMax!.isEmpty)
+        ? double.infinity
+        : (double.tryParse(state.priceMax!) ?? double.infinity);
+
+    return list.where((item) {
+      final double itemPrice = _parseCleanPrice(item.price);
+      final bool match = itemPrice >= min && itemPrice <= max;
+
+      return match;
+    }).toList();
+  }
+
   /// 加载商品列表（接口占位，后续替换为真实 API）
   Future<void> loadProducts(
       {bool refresh = true, Map<String, dynamic>? params}) async {
@@ -264,6 +295,12 @@ class PurchaseAssist extends _$PurchaseAssist {
       }
       final resp = await getMultiPlatformSearch(data);
       var result = resp as List<PurchaseAssistSearchProduct>;
+
+      final currentPlatform = params?['platform'] ?? state.selectedPlatform;
+      if (currentPlatform != 'cloud') {
+        result = _filterProductsByPrice(result);
+      }
+
       // 前端按价格排序
       result =
           _sortProductsByPrice(result, params?['sortOrder'] ?? state.sortOrder);
