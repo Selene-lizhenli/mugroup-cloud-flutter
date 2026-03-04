@@ -78,22 +78,26 @@ class DashboardPage extends HookConsumerWidget {
                         colorScheme.surfaceTint,
                         colorScheme.surfaceTint,
                       ]
-                    : [],
+                    : [
+                        colorScheme.surfaceTint,
+                        colorScheme.surfaceTint,
+                      ],
                 stops: isSpringFestival || isYuanxiaoFestival
                     ? const [0.0, 0.2, 0.6, 1.0]
-                    : const [],
+                    : const [0.0, 1],
               ),
             ),
           ),
         ),
-        // 最底层背景图：顶部对齐 
+        // 最底层背景图：顶部对齐
         Positioned(
           left: 0,
           right: 0,
           top: 0,
+          bottom: 0,
           child: Image.asset(
-            getBackgroundPic,
-            fit: BoxFit.fitWidth,
+            getBackgroundPic, 
+            fit: BoxFit.cover,
             alignment: Alignment.topCenter,
           ),
         ),
@@ -113,10 +117,11 @@ class DashboardPage extends HookConsumerWidget {
                 ),
                 Stack(
                   children: [
-                    Positioned.fill(
-                      top: 60,
-                      child: Container(color: colorScheme.surfaceTint),
-                    ),
+                    if (notNeedTopPosition) ...[const SizedBox(height: 1)] else
+                      Positioned.fill(
+                        top: 70,
+                        child: Container(color: colorScheme.surfaceTint),
+                      ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: pageHorizontalPadding),

@@ -42,7 +42,7 @@ final is38Festival = () {
 }();
 // 获取当前的背景图
 final getBackgroundPic = () {
-  var urlString = 'assets/festival/background.png';
+  var urlString = 'assets/festival/yanhua.png';
   if (isYuanxiaoFestival || isSpringFestival) {
     //元宵
     urlString = 'assets/festival/yanhua.png';
@@ -55,4 +55,8 @@ final getBackgroundPic = () {
     urlString = 'assets/festival/background.png'; //日常背景图
   }
   return urlString;
+}();
+
+final notNeedTopPosition = () {
+  return is38Festival || isQingmingFestival;
 }();
