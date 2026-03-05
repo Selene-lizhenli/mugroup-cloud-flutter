@@ -351,43 +351,44 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                               ),
                             const SliverToBoxAdapter(
                                 child: SizedBox(height: 12)),
-                            // 工厂报价
-                            Container(
-                              color: Colors.white,
-                              key: elevatorFloors.value
-                                  .firstWhereOrNull(
-                                      (floor) => floor.id == "supplyQuote")
-                                  ?.key,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // 瀑布流
-                                  MasonryGridView.count(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 5,
-                                    crossAxisSpacing: 5,
-                                    itemCount:
-                                        sample.value?.supplyQuotes?.length ?? 0,
-                                    padding: const EdgeInsets.all(4),
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      final quote =
-                                          sample.value?.supplyQuotes?[index];
-                                      if (quote == null) {
-                                        return const SizedBox.shrink();
-                                      }
+                            if (sample.value?.supplyQuotes?.isNotEmpty ?? false)
+                              // 工厂报价
+                              Container(
+                                color: Colors.white,
+                                key: elevatorFloors.value
+                                    .firstWhereOrNull(
+                                        (floor) => floor.id == "supplyQuote")
+                                    ?.key,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 瀑布流
+                                    MasonryGridView.count(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 5,
+                                      crossAxisSpacing: 5,
+                                      itemCount:
+                                          sample.value?.supplyQuotes?.length ??
+                                              0,
+                                      padding: const EdgeInsets.all(4),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final quote =
+                                            sample.value?.supplyQuotes?[index];
+                                        if (quote == null) {
+                                          return const SizedBox.shrink();
+                                        }
 
-                                      return SupplyQuoteCard(quote: quote);
-                                    },
-                                  ),
-                                ],
+                                        return SupplyQuoteCard(quote: quote);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 12),
 
                             // 相似产品
                             Container(
