@@ -48,32 +48,35 @@ class MarketProductListPage extends HookConsumerWidget {
             const SizedBox(
               height: 8,
             ),
-            HomeAppBar(
-              controller: home.searchTextController,
-              onSearchText: (search) {
-                homeNotifier.setSearch(search);
-                home.bus.dispatch(
-                    SearchEvent(search: search, media: home.currentMedia));
-              },
-              onSearchMedia: (temporaryMedia) {
-                homeNotifier.addMedia(temporaryMedia);
-                if (temporaryMedia.id == home.currentMediaId) {
-                  return;
-                }
-                home.bus.dispatch(
-                    SearchEvent(search: home.search, media: temporaryMedia));
-              },
-              onDeleteMedia: (temporaryMedia) {
-                final nextState = homeNotifier.deleteMedia(temporaryMedia);
-                if (nextState.currentMediaId == home.currentMediaId) {
-                  return;
-                }
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+              child: HomeAppBar(
+                controller: home.searchTextController,
+                onSearchText: (search) {
+                  homeNotifier.setSearch(search);
+                  home.bus.dispatch(
+                      SearchEvent(search: search, media: home.currentMedia));
+                },
+                onSearchMedia: (temporaryMedia) {
+                  homeNotifier.addMedia(temporaryMedia);
+                  if (temporaryMedia.id == home.currentMediaId) {
+                    return;
+                  }
+                  home.bus.dispatch(
+                      SearchEvent(search: home.search, media: temporaryMedia));
+                },
+                onDeleteMedia: (temporaryMedia) {
+                  final nextState = homeNotifier.deleteMedia(temporaryMedia);
+                  if (nextState.currentMediaId == home.currentMediaId) {
+                    return;
+                  }
 
-                home.bus.dispatch(SearchEvent(
-                  media: nextState.currentMedia,
-                  search: nextState.search,
-                ));
-              },
+                  home.bus.dispatch(SearchEvent(
+                    media: nextState.currentMedia,
+                    search: nextState.search,
+                  ));
+                },
+              ),
             ),
             Expanded(
               child: PageView(
