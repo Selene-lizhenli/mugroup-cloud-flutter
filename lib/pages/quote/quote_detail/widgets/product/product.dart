@@ -69,6 +69,11 @@ class ProductSection extends HookConsumerWidget {
                             context: context,
                             isScrollControlled: true,
                             useSafeArea: true,
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context)
+                                  .size
+                                  .width, // 底部抽屉宽度占满屏幕
+                            ),
                             builder: (context) =>
                                 AddSupplierSheet(quotationId: quoteId),
                           );
@@ -123,6 +128,11 @@ class ProductSection extends HookConsumerWidget {
                               context: context,
                               isScrollControlled: true,
                               useSafeArea: true,
+                              constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context)
+                                    .size
+                                    .width, // 底部抽屉宽度占满屏幕
+                              ),
                               builder: (context) =>
                                   AddSupplierSheet(quotationId: quoteId),
                             );

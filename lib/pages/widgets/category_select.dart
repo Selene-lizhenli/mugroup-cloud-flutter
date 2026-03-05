@@ -118,6 +118,9 @@ class CategorySelectPopup extends HookWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+      ),
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.85,
         child: CategorySelectPopup(

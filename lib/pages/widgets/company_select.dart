@@ -111,6 +111,9 @@ class CompanySelect extends HookConsumerWidget {
               context: context,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+              ),
               builder: (_) => _CompanySelectSheet(
                 label: label,
                 value: value,

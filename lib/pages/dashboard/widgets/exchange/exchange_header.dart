@@ -2,7 +2,6 @@ import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
 import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// 汇率图表头部组件（包含标题、汇率计算器和维度选择器）
 class ExchangeChartHeader extends StatelessWidget {
@@ -26,10 +25,14 @@ class ExchangeChartHeader extends StatelessWidget {
   void _showExchangeCalculator(
     BuildContext context,
   ) {
+    final screenWidth = MediaQuery.of(context).size.width; 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent, 
+      constraints: BoxConstraints(
+        maxWidth: screenWidth, // 底部抽屉宽度占满屏幕
+      ),
       builder: (BuildContext sheetContext) {
         return ExchangeCalculatorDialog(
             selectedDimension: selectedDimension, list: currencyList);
@@ -38,12 +41,15 @@ class ExchangeChartHeader extends StatelessWidget {
   }
 
   void _openDimensionBottomSheet(BuildContext context) async {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme; 
 
     await showModalBottomSheet<ExchangeRate>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+      ),
       builder: (sheetContext) {
         final maxHeight = MediaQuery.of(sheetContext).size.height * 0.7;
         return Container(
@@ -160,6 +166,8 @@ class ExchangeChartHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 4, left: 4),
       child: Row(

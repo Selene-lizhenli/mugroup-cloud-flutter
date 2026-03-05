@@ -48,6 +48,9 @@ class HomeUserHeader extends HookConsumerWidget {
         context: context,
         showDragHandle: true,
         isScrollControlled: true,
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+        ),
         builder: (_) => Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
@@ -76,9 +79,9 @@ class HomeUserHeader extends HookConsumerWidget {
                     '  • 新增《独立站》模块，帮助您管理独立站和询盘数据',
                     '  • 新增《留言板》模块，帮助您进行留言反馈',
                     '  • 新增《客户》模块，帮助您管理客户信息',
-                    '  • 新增《供应商》模块，帮助您管理供应商信息', 
-                    '  • 新增系统主題切换功能',  
-                    '🔧 功能改进', 
+                    '  • 新增《供应商》模块，帮助您管理供应商信息',
+                    '  • 新增系统主題切换功能',
+                    '🔧 功能改进',
                     '  • 商品列表展示优化，提供简洁模式和详细模式',
                     '  • 首页布局优化， 展示数据统计模块和应用入口',
                   ],

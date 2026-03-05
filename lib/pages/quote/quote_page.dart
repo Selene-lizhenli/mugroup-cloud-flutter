@@ -654,6 +654,9 @@ Future<void> _showPreSelectionSheet(
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+    ),
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       final colorScheme = Theme.of(context).colorScheme;
       final currentQuote = useValueListenable(selectedQuote);
@@ -694,6 +697,9 @@ Future<void> _showPreSelectionSheet(
                   isScrollControlled: true,
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                  ),
                   builder: (ctx) {
                     return Padding(
                       padding: EdgeInsets.only(
@@ -724,6 +730,9 @@ Future<void> _showPreSelectionSheet(
                   isScrollControlled: true,
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                  ),
                   builder: (ctx) {
                     return Padding(
                       padding: EdgeInsets.only(

@@ -62,6 +62,9 @@ class SupplierCertSelect extends HookConsumerWidget {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+        ),
         builder: (context) {
           return SafeArea(
             child: Column(

@@ -12,8 +12,7 @@ ExchangeRate get _cnyRate => const ExchangeRate(
       reverseExchangeRate: '1',
     );
 
-bool _isCny(ExchangeRate r) =>
-    r.shortName == 'CNY' || r.name == '人民币';
+bool _isCny(ExchangeRate r) => r.shortName == 'CNY' || r.name == '人民币';
 
 double _getReverse(ExchangeRate r) =>
     double.tryParse(r.reverseExchangeRate ?? '0') ?? 0.0;
@@ -232,6 +231,9 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+        ),
         builder: (ctx2) => DraggableScrollableSheet(
           initialChildSize: 0.7,
           minChildSize: 0.5,
@@ -252,25 +254,27 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       );
     }
 
-    void showSelectorForFrom() => showCurrencySelector(context, choiceList,
-        selectedValue: from, onSelect: (r) {
-      selectedFrom.value = r;
-      if (fromAmountController.text.isNotEmpty) {
-        calculateFromLeft();
-      } else {
-        toAmountController.clear();
-      }
-    });
+    void showSelectorForFrom() =>
+        showCurrencySelector(context, choiceList, selectedValue: from,
+            onSelect: (r) {
+          selectedFrom.value = r;
+          if (fromAmountController.text.isNotEmpty) {
+            calculateFromLeft();
+          } else {
+            toAmountController.clear();
+          }
+        });
 
-    void showSelectorForTo() => showCurrencySelector(context, choiceList,
-        selectedValue: to, onSelect: (r) {
-      selectedTo.value = r;
-      if (toAmountController.text.isNotEmpty) {
-        calculateFromRight();
-      } else {
-        fromAmountController.clear();
-      }
-    });
+    void showSelectorForTo() =>
+        showCurrencySelector(context, choiceList, selectedValue: to,
+            onSelect: (r) {
+          selectedTo.value = r;
+          if (toAmountController.text.isNotEmpty) {
+            calculateFromRight();
+          } else {
+            fromAmountController.clear();
+          }
+        });
 
     Widget buildInputRow({
       required ExchangeRate currency,
@@ -525,7 +529,8 @@ class _CurrencySearchList extends HookWidget {
                       height: 1, indent: 16, color: Color(0xFFEEEEEE)),
                   itemBuilder: (context, index) {
                     final item = filteredList[index];
-                    final isSelected = selectedValue?.shortName == item.shortName;
+                    final isSelected =
+                        selectedValue?.shortName == item.shortName;
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(

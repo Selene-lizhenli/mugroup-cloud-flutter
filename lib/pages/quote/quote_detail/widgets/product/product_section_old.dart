@@ -4,10 +4,8 @@ import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/quote/quote_detail/models/quote_detail_state.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product/product_pagination.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/product/supplier_with_products_card.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
-import 'package:cloud/pages/quote/widgets/sample_detail_card.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart'; 
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -65,6 +63,11 @@ class ProductSection extends HookConsumerWidget {
                             // }
                             showModalBottomSheet(
                               context: context,
+                              constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context)
+                                    .size
+                                    .width, // 底部抽屉宽度占满屏幕
+                              ),
                               builder: (context) =>
                                   AddSupplierSheet(quotationId: quoteId),
                             );

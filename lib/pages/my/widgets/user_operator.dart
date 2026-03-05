@@ -28,7 +28,7 @@ class UserOperatorSection extends HookConsumerWidget {
           maxWidth: MediaQuery.of(context).size.width,
           minHeight: 200,
           maxHeight: 320,
-        ),
+        ), 
         builder: (_) => Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),

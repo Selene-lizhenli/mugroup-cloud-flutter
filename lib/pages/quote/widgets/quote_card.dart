@@ -277,6 +277,9 @@ class QuoteCard extends HookConsumerWidget {
                 onTap: () => showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                    ),
                     builder: (context) =>
                         AddSupplierSheet(quotationId: item.id)),
                 child: const Center(
@@ -290,6 +293,9 @@ class QuoteCard extends HookConsumerWidget {
         await showModalBottomSheet(
           context: context,
           isScrollControlled: true,
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+          ),
           builder: (context) => CollaborationBottomSheet(quoteId: item.id!),
         );
 

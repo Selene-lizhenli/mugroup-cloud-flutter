@@ -112,6 +112,11 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context)
+                            .size
+                            .width, // 底部抽屉宽度占满屏幕
+                      ),
                       builder: (_) => const SelectCustomerSheet(),
                     ),
                   ),
@@ -123,6 +128,11 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context)
+                            .size
+                            .width, // 底部抽屉宽度占满屏幕
+                      ),
                       builder: (_) => SelectContactSheet(
                         companyId: state.selectedCustomers?.id,
                       ),
@@ -140,6 +150,11 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                               context: context,
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
+                              constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context)
+                                    .size
+                                    .width, // 底部抽屉宽度占满屏幕
+                              ),
                               builder: (_) => const SelectLanguageSheet(),
                             ),
                           },
@@ -158,6 +173,11 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                             context: context,
                             isScrollControlled: true,
                             backgroundColor: Colors.transparent,
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context)
+                                  .size
+                                  .width, // 底部抽屉宽度占满屏幕
+                            ),
                             builder: (_) => const SelectCurrencySheet(),
                           ),
                         ),

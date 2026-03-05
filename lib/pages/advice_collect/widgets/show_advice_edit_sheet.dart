@@ -11,10 +11,14 @@ void showAdviceEditSheet({
   String? replyToName,
   required Function(String content, List<TemporaryMedia> medias) onSend,
 }) {
+  final screenWidth = MediaQuery.of(context).size.width; 
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    constraints: BoxConstraints(
+      maxWidth: screenWidth, // 底部抽屉宽度占满屏幕
+    ),
     builder: (context) => _AdviceEditSheet(
       replyToName: replyToName,
       onSend: onSend,

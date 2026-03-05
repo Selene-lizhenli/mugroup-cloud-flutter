@@ -526,6 +526,9 @@ void showImageUploadSheet(BuildContext context, ProductDraftItem item,
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+    ),
     builder: (context) {
       return HookConsumer(builder: (context, ref, child) {
         final tempImages = useState<List<TemporaryMedia>?>(null);
@@ -658,6 +661,9 @@ Future<void> _showPreSelectionSheet(
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+    ),
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       // 【核心】：在弹窗内部维护临时选中的状态，不直接改外部
       final tempQuote = useState<Map<String, dynamic>?>(externalQuote.value);
@@ -694,6 +700,11 @@ Future<void> _showPreSelectionSheet(
                   isScrollControlled: true,
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context)
+                        .size
+                        .width, // 底部抽屉宽度占满屏幕
+                  ),
                   builder: (ctx) {
                     return Padding(
                       padding: EdgeInsets.only(
@@ -723,6 +734,11 @@ Future<void> _showPreSelectionSheet(
                   isScrollControlled: true,
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context)
+                        .size
+                        .width, // 底部抽屉宽度占满屏幕
+                  ),
                   builder: (ctx) {
                     return Padding(
                       padding: EdgeInsets.only(
