@@ -20,7 +20,7 @@ class SampleSubmitBar extends HookConsumerWidget {
     final quotes = sample?.supplyQuotes ?? [];
 
     if (quotes.isEmpty) {
-      EasyLoading.showError("暂无供应商信息");
+      EasyLoading.showInfo("暂无供应商信息");
       return;
     }
 
