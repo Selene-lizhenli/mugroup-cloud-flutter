@@ -2,9 +2,7 @@ import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/warehous_item_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
-import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,24 +13,12 @@ class SamplesPageView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
-    final homeNotifier = ref.read(homeProvider.notifier);
+
     final warehouses = home.warehouses;
     final pageScreenHeight = MediaQuery.of(context)
         .size
         .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
-  final pageScreenWidth = MediaQuery.of(context)
-        .size
-        .width; 
-
-    final cloud = ref.watch(coreProvider).value!;
-    final currentTenant = cloud.currentTenant; //当前租户
-
-    useEffect(() {
-      Future.microtask(() async {
-        await homeNotifier.fetchWarehouses(currentTenant);
-      });
-      return null;
-    }, []);
+    final pageScreenWidth = MediaQuery.of(context).size.width;
 
     if (home.isLoadingWarehouses) {
       return const Center(
@@ -59,9 +45,9 @@ class SamplesPageView extends HookConsumerWidget {
             padding:
                 EdgeInsets.only(bottom: index == warehouses.length - 1 ? 0 : 8),
             child: WarehouseShowCard(
-              warehouse: warehouse, 
+              warehouse: warehouse,
               pageScreenHeight: pageScreenHeight,
-              pageScreenWidth: pageScreenWidth, 
+              pageScreenWidth: pageScreenWidth,
             ),
           ),
         );

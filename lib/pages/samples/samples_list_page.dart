@@ -1,9 +1,11 @@
-import 'package:auto_route/auto_route.dart'; 
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/views/product_view.dart';
 import 'package:cloud/pages/samples/views/showroom_view.dart';
 import 'package:cloud/pages/samples/widgets/home_app_bar.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -21,6 +23,30 @@ class SamplesListPage extends HookConsumerWidget {
     final currentPageIndex = useState<int>(home.currentPage);
     final colorScheme = Theme.of(context).colorScheme;
     final currentWarehouse = home.currentSelectedWarehouse;
+    final cloud = ref.watch(coreProvider).value;
+    final currentTenant = cloud?.currentTenant;
+
+    useEffect(() {
+      if (currentTenant != null) {
+        Future.microtask(() => homeNotifier.fetchWarehouses(currentTenant));
+      }
+      return null;
+    }, [currentTenant]);
+
+    final bool showShowroom =
+        home.isLoadingWarehouses || home.warehouses.isNotEmpty;
+
+    logger.d(showShowroom);
+
+    // 2. 动态生成页面列表
+    final List<Widget> pages = [
+      if (showShowroom) const SamplesPageView(),
+      const ProductView(),
+    ];
+
+    // 3. 计算当前的逻辑索引
+    // 如果没有样品间页，ProductView 就是第 0 页；如果有，它是第 1 页
+    final int productViewIndex = showShowroom ? 1 : 0;
 
     return Scaffold(
         backgroundColor: colorScheme.surfaceTint,
@@ -47,7 +73,7 @@ class SamplesListPage extends HookConsumerWidget {
                 },
               ),
             ),
-            if (currentPageIndex.value == 1) ...[
+            if (currentPageIndex.value == productViewIndex) ...[
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
                 offset: const Offset(-8, 38),
@@ -146,12 +172,12 @@ class SamplesListPage extends HookConsumerWidget {
                   onPageChanged: (page) {
                     homeNotifier.switchToPage(page);
                     currentPageIndex.value = page;
-                    if (page == 0) {
+                    if (showShowroom && page == 0) {
                       homeNotifier.setCurrentSelectedWarehouse(null);
                     }
                   },
                   allowImplicitScrolling: false,
-                  children: const [SamplesPageView(), ProductView()],
+                  children: pages,
                 ),
               ),
             ],
