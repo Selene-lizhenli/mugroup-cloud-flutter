@@ -190,7 +190,7 @@ class LoginContent extends HookConsumerWidget {
                             ),
                             child: Text(
                                 style: TextStyle(color: colorScheme.onPrimary),
-                                '唤起企业微信登录'),
+                                '企业微信登录认证'),
                           )
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
