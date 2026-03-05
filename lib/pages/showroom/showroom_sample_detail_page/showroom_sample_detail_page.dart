@@ -544,15 +544,23 @@ class SupplyQuoteCard extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    (quote.supplier?.shortName ?? quote.supplier?.name) ??
-                        "未知工厂",
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: slate800),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: GestureDetector(
+                    onTap: () {
+                      final supplierId = quote.supplier?.id;
+                      if (supplierId == null) return;
+                      context.router
+                          .push(SupplySupplierDetailRoute(id: supplierId));
+                    },
+                    child: Text(
+                      (quote.supplier?.shortName ?? quote.supplier?.name) ??
+                          "未知工厂",
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: slate800),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 if (quote.recordUser != null)
