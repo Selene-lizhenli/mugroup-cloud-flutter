@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/app/app.dart';
 import 'package:cloud/constants/app_feature_constants.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
@@ -102,6 +104,9 @@ class EntryGridModule extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final core = app.container.read(coreProvider).value;
+    final tenant = core?.currentTenant;
+    logger.d(tenant);
     final colorScheme = Theme.of(context).colorScheme;
     const int crossAxisCount = 5;
     const double spacing = 6.0;
@@ -114,8 +119,11 @@ class EntryGridModule extends ConsumerWidget {
     // 只保留当前有权限的入口
     final visibleEntries =
         allEntries.where((e) => permissionBools[e.id] ?? false).toList();
-    // 追加强制开放的入口（不受权限控制）
-    visibleEntries.addAll(openedEntry);
+
+    // 留言板模块 自由云链才有
+    if (tenant?.id == 6) {
+      visibleEntries.addAll(openedEntry);
+    }
 
     if (visibleEntries.isEmpty) {
       return Container(
@@ -157,22 +165,25 @@ class EntryGridModule extends ConsumerWidget {
                       crossAxisCount)
                   .floorToDouble();
 
-          return Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            alignment: WrapAlignment.start,
-            children: visibleEntries
-                .map(
-                  (config) => _EntryItem(
-                    width: itemWidth,
-                    iconSize: config.iconSize,
-                    icon: config.iconAsset,
-                    label: config.label,
-                    route: config.route,
-                    color: colorScheme.primary,
-                  ),
-                )
-                .toList(),
+          return SizedBox(
+            width: constraints.maxWidth,
+            child: Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              alignment: WrapAlignment.start,
+              children: visibleEntries
+                  .map(
+                    (config) => _EntryItem(
+                      width: itemWidth,
+                      iconSize: config.iconSize,
+                      icon: config.iconAsset,
+                      label: config.label,
+                      route: config.route,
+                      color: colorScheme.primary,
+                    ),
+                  )
+                  .toList(),
+            ),
           );
         },
       ),
