@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
- 
 
 // 展示样品间页面
 class SamplesPageView extends HookConsumerWidget {
@@ -18,17 +17,19 @@ class SamplesPageView extends HookConsumerWidget {
     final home = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
     final warehouses = home.warehouses;
-    final screenHeight = MediaQuery.of(context)
+    final pageScreenHeight = MediaQuery.of(context)
         .size
         .height; // 使用 ListView.builder 构建可滚动列表，避免使用 ListView.separated
-    final isPad = MediaQuery.of(context).size.width > 600;
-    final imageHeight = screenHeight * (isPad ? 0.26 : 0.19);
+  final pageScreenWidth = MediaQuery.of(context)
+        .size
+        .width; 
+
     final cloud = ref.watch(coreProvider).value!;
-    final currentTenant = cloud.currentTenant;  //当前租户
+    final currentTenant = cloud.currentTenant; //当前租户
 
     useEffect(() {
       Future.microtask(() async {
-        await homeNotifier.fetchWarehouses( currentTenant);
+        await homeNotifier.fetchWarehouses(currentTenant);
       });
       return null;
     }, []);
@@ -58,9 +59,9 @@ class SamplesPageView extends HookConsumerWidget {
             padding:
                 EdgeInsets.only(bottom: index == warehouses.length - 1 ? 0 : 8),
             child: WarehouseShowCard(
-              warehouse: warehouse,
-              isPad: isPad,
-              imageHeight: imageHeight,
+              warehouse: warehouse, 
+              pageScreenHeight: pageScreenHeight,
+              pageScreenWidth: pageScreenWidth, 
             ),
           ),
         );

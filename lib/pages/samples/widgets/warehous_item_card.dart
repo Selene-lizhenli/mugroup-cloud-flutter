@@ -1,4 +1,3 @@
-
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
@@ -9,15 +8,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // 每个样品间 名称及图片
 class WarehouseShowCard extends ConsumerWidget {
-  final Warehouse warehouse;
-  final bool? isPad;
-  final double imageHeight;
+  final Warehouse warehouse; 
+  final double pageScreenHeight;
+  final double pageScreenWidth;
 
   const WarehouseShowCard({
     super.key,
-    required this.warehouse,
-    required this.imageHeight,
-    this.isPad,
+    required this.warehouse, 
+    required this.pageScreenHeight,
+    required this.pageScreenWidth,
   });
   //大图查看图片
   void showImagePreview(BuildContext context, List<WarehouseImage> images,
@@ -280,6 +279,19 @@ class WarehouseShowCard extends ConsumerWidget {
     final homeNotifier = ref.read(homeProvider.notifier);
     final orderedImages = orderImages(warehouse);
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    const padding = 8.0;
+
+    final middleMedia = pageScreenWidth > 600 && pageScreenWidth < 1024;
+    final largeMedia = pageScreenWidth > 1024;
+
+    // 左右 padding 各 8，3 张图之间 2 个间隔各 8 => 8*4=32
+    final itemWidth = middleMedia == true
+        ? (screenWidth - padding * 9) / 4
+        : largeMedia
+            ? (screenWidth - padding * 10) / 5
+            : (screenWidth - padding * 8) / 3;
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.transparent,
@@ -314,7 +326,7 @@ class WarehouseShowCard extends ConsumerWidget {
           ),
           // 图片区域（左右滑动，单张高度占屏幕 20%），点击预览大图
           SizedBox(
-            height: imageHeight,
+            height: itemWidth,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(0),
@@ -324,7 +336,8 @@ class WarehouseShowCard extends ConsumerWidget {
                 images: orderedImages,
                 warehouseName: warehouse.name ?? '-',
                 onImageTap: onTrumbImageTap,
-                isPad: isPad,
+                middleMedia: middleMedia,
+                itemWidth: itemWidth,
               ),
             ),
           ),
@@ -341,13 +354,14 @@ class _ImageGallery extends StatelessWidget {
   final String warehouseName;
 
   final Function(BuildContext, List<WarehouseImage>, int, String) onImageTap;
-  final bool? isPad;
-
+  final bool? middleMedia;
+  final double itemWidth;
   const _ImageGallery({
     required this.images,
     required this.warehouseName,
     required this.onImageTap,
-    this.isPad,
+    this.middleMedia,
+    required this.itemWidth,
   });
 
   @override
@@ -358,13 +372,7 @@ class _ImageGallery extends StatelessWidget {
         child: const Icon(Icons.warehouse, color: Colors.grey, size: 48),
       );
     }
-
-    final screenWidth = MediaQuery.of(context).size.width;
     const padding = 8.0;
-    // 左右 padding 各 8，3 张图之间 2 个间隔各 8 => 8*4=32
-    final itemWidth = isPad == true
-        ? (screenWidth - padding * 10) / 5
-        : (screenWidth - padding * 8) / 3;
     final imageSize = itemWidth.round();
 
     return Container(
@@ -385,7 +393,7 @@ class _ImageGallery extends StatelessWidget {
               ),
               child: SizedBox(
                 width: itemWidth,
-                // height: itemWidth,
+                // height: 20,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
