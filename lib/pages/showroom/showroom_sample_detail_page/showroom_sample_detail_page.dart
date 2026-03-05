@@ -450,6 +450,13 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                           return ProductCard(
                                             key: ValueKey(sample.id),
                                             sample: sample,
+                                            onTap: () {
+                                              context.router.push(
+                                                ShowroomSampleDetailRoute(
+                                                  id: sample.id!,
+                                                ),
+                                              );
+                                            },
                                           );
                                         },
                                       );
