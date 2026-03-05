@@ -177,12 +177,14 @@ class LoginContent extends HookConsumerWidget {
                     child: isWxworkInstalled == true
                         ? ElevatedButton(
                             onPressed: () async {
-                              await handleWxworkQuickLogin(
+                              final isSuccess = await handleWxworkQuickLogin(
                                 schema: tenant.wxwork!.schema!,
                                 corpId: tenant.wxwork!.corpId!,
                                 agentId: tenant.wxwork!.agentId!,
                               );
-                              onAfterLogin?.call();
+                              if (isSuccess) {
+                                onAfterLogin?.call();
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColorBlue,

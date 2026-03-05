@@ -1,4 +1,3 @@
-import 'package:cloud/app/app.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/http/api.dart';
 import 'package:dio/dio.dart';
@@ -10,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'wxwork_icon.dart';
 
 /// 通用的企微快捷登录方法，可在任意位置复用
-Future<void> handleWxworkQuickLogin({
+Future<bool> handleWxworkQuickLogin({
   required String schema,
   required String corpId,
   required String agentId,
@@ -24,8 +23,9 @@ Future<void> handleWxworkQuickLogin({
     );
 
     final result = await wxwork.auth();
+
     if (result.errCode != '0') {
-      throw Exception('请授权登录');
+      return false;
     }
 
     final code = result.code!;
@@ -35,13 +35,14 @@ Future<void> handleWxworkQuickLogin({
       data: {'code': code},
     );
 
-    // await app.fetchUser();
+    return true;
   } catch (e) {
     var message = e.toString();
     if (e is DioException) {
       message = e.response?.data['message'] ?? message;
     }
     EasyLoading.showError(message);
+    return false;
   }
 }
 
@@ -72,12 +73,15 @@ class WxworkFastLoginBtn extends HookConsumerWidget {
         onTap: () async {
           loginWay.value = 'wxwork_local_app';
           if (schema != null && corpId != null && agentId != null) {
-            await handleWxworkQuickLogin(
+            final isSuccess = await handleWxworkQuickLogin(
               schema: schema!,
               corpId: corpId!,
               agentId: agentId!,
             );
-            onAfterLogin?.call();
+
+            if (isSuccess) {
+              onAfterLogin?.call();
+            }
           }
         },
         child: Container(
