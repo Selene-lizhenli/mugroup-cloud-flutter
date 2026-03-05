@@ -495,6 +495,8 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
   final List<XFile?> _capturedImages = [];
 
+  Offset? _focusPoint;
+
   int? _replaceIndex;
 
   final ScrollController _scrollController = ScrollController();
@@ -531,6 +533,9 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
     try {
       await _controller.initialize();
+
+      await _controller.setFocusMode(FocusMode.auto);
+      await _controller.setExposureMode(ExposureMode.auto);
 
       await _controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
       if (!mounted) return;
@@ -710,11 +715,74 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     const Color primaryColor = Color(0xFF007AFF);
     const Color warningColor = Color(0xFFFF9500);
 
+    Future<void> onTapFocus(TapDownDetails details) async {
+      if (!_controller.value.isInitialized) return;
+
+      final RenderBox box = context.findRenderObject() as RenderBox;
+      final Offset localPosition = box.globalToLocal(details.globalPosition);
+
+      setState(() {
+        _focusPoint = localPosition;
+      });
+
+      HapticFeedback.selectionClick();
+
+      final double dx = localPosition.dx / box.size.width;
+      final double dy = localPosition.dy / box.size.height;
+
+      try {
+        await _controller.setFocusPoint(Offset(dx, dy));
+        await _controller.setExposurePoint(Offset(dx, dy));
+        await _controller.setFocusMode(FocusMode.auto);
+      } catch (e) {
+        debugPrint("对焦失败: $e");
+      }
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && _focusPoint == localPosition) {
+          setState(() {
+            _focusPoint = null;
+          });
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          SizedBox.expand(child: CameraPreview(_controller)),
+          GestureDetector(
+            onTapDown: onTapFocus,
+            child: SizedBox.expand(
+              child: CameraPreview(_controller),
+            ),
+          ),
+          if (_focusPoint != null)
+            Positioned(
+              left: _focusPoint!.dx - 40,
+              top: _focusPoint!.dy - 40,
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 1.0),
+                    ),
+                  ),
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Positioned(
             top: 0,
             left: 0,
