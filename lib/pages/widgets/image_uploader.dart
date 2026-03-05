@@ -522,7 +522,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
     _controller = CameraController(
       widget.cameras[0],
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.jpeg
