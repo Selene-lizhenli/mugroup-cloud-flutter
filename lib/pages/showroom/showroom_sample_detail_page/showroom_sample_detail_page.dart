@@ -53,11 +53,28 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
       ];
     }
 
+    final fetchSimilars = useCallback(() async {
+      final resp = await getSampleSimilars(
+        id: id,
+        queryParameters: {
+          "page": similarPage.value,
+        },
+      );
+
+      sampleSimilars.value = [...sampleSimilars.value, ...resp.data];
+
+      if (resp.meta?.pagination != null) {
+        similarPage.value = similarPage.value + 1;
+      }
+
+      return resp;
+    }, [id]);
+
     useEffect(() {
-      // 等页面真正挂载后再加载数据
-      Future.delayed(Duration.zero, () {
+      Future.delayed(Duration.zero, () async {
         hasMounted.value = true;
-        loadSample(id);
+        await loadSample(id);
+        await fetchSimilars();
       });
       return () {};
     }, [id]);
@@ -81,25 +98,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                   },
                   scrollController: scrollController,
                   onLoad: () async {
-                    final resp = await getSampleSimilars(
-                      id: id,
-                      queryParameters: {
-                        "page": similarPage.value,
-                      },
-                    );
+                    final resp = await fetchSimilars();
 
-                    sampleSimilars.value = [
-                      ...sampleSimilars.value,
-                      ...resp.data
-                    ];
-
-                    if (similarPage.value >=
-                        resp.meta!.pagination!.totalPages) {
+                    if (similarPage.value > resp.meta!.pagination!.totalPages) {
                       return IndicatorResult.noMore;
                     }
-
-                    similarPage.value = similarPage.value + 1;
-
                     return IndicatorResult.success;
                   },
                   childBuilder: (context, physics) {
@@ -364,28 +367,34 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // 瀑布流
-                                    MasonryGridView.count(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      crossAxisCount: 2,
-                                      mainAxisSpacing: 5,
-                                      crossAxisSpacing: 5,
-                                      itemCount:
-                                          sample.value?.supplyQuotes?.length ??
-                                              0,
-                                      padding: const EdgeInsets.all(4),
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        final quote =
-                                            sample.value?.supplyQuotes?[index];
-                                        if (quote == null) {
-                                          return const SizedBox.shrink();
-                                        }
+                                    if (sampleSimilars.value.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    else
+                                      // 瀑布流
+                                      MasonryGridView.count(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        crossAxisCount: 2,
+                                        mainAxisSpacing: 5,
+                                        crossAxisSpacing: 5,
+                                        itemCount: sample
+                                                .value?.supplyQuotes?.length ??
+                                            0,
+                                        padding: const EdgeInsets.all(4),
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          final quote = sample
+                                              .value?.supplyQuotes?[index];
+                                          if (quote == null) {
+                                            return const SizedBox.shrink();
+                                          }
 
-                                        return SupplyQuoteCard(quote: quote);
-                                      },
-                                    ),
+                                          return SupplyQuoteCard(quote: quote);
+                                        },
+                                      ),
                                   ],
                                 ),
                               ),
