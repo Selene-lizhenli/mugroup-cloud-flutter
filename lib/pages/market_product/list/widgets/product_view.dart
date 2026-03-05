@@ -115,7 +115,7 @@ class MarketProductView extends HookConsumerWidget {
     return Container(
         padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceTint,
+          color: colorScheme.surface,
           borderRadius: home.currentMediaId != null
               ? null
               : const BorderRadius.only(
@@ -152,20 +152,17 @@ class MarketProductView extends HookConsumerWidget {
           child: CustomScrollView(
             slivers: [
               MultiSliver(
-                children: [
-                  Container(
-                    height: 0,
-                  ),
-                  SliverPinnedHeader(
-                    child: ProductDropdownMenu(
-                      facetCounts: facetCounts.value,
-                      value: query.value,
-                      onChange: (menuQuery) {
-                        query.value = menuQuery;
-                        refreshController.callRefresh(force: true);
-                      },
-                    ),
-                  ),
+                children: [ 
+                  // SliverPinnedHeader(
+                  //   child: ProductDropdownMenu(
+                  //     facetCounts: facetCounts.value,
+                  //     value: query.value,
+                  //     onChange: (menuQuery) {
+                  //       query.value = menuQuery;
+                  //       refreshController.callRefresh(force: true);
+                  //     },
+                  //   ),
+                  // ),
                   if (samples.value.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,

@@ -121,94 +121,168 @@ class HomeAppBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          height: 38,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: colorScheme.primary,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextField(
-                  autofocus: false,
-                  controller: controller,
-                  textAlignVertical: TextAlignVertical.center,
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  focusNode: focusNode,
-                  decoration: InputDecoration(
-                    hintText: '',
-                    filled: true,
-                    fillColor: fillColor ?? Colors.transparent,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 10,
-                    ),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 38,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: colorScheme.primary,
+                    width: 1,
                   ),
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (value) {
-                    onSearchText?.call(value);
-                  },
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-              if (enableImageSearch)
-                SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: IconButton(
-                    icon: const Icon(
-                      CupertinoIcons.camera,
-                      size: 28,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        autofocus: false,
+                        controller: controller,
+                        textAlignVertical: TextAlignVertical.center,
+                        onTapOutside: (event) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          hintText: '',
+                          filled: true,
+                          fillColor: fillColor ?? Colors.transparent,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 10,
+                          ),
+                        ),
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (value) {
+                          onSearchText?.call(value);
+                        },
+                      ),
+                    ),
+                    if (enableImageSearch)
+                      SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: IconButton(
+                          icon: const Icon(
+                            CupertinoIcons.camera,
+                            size: 28,
+                            color: Colors.grey,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: handleUploadMedia,
+                        ),
+                      ),
+                    Container(
                       color: Colors.grey,
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      width: 0,
+                      height: 0,
                     ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: handleUploadMedia,
-                  ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                          top: 0, bottom: 0, left: 0, right: 0),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        onPressed: () {
+                          onSearchText?.call(controller.text);
+                        },
+                        child: Text(
+                          "搜索",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              Container(
-                color: Colors.grey,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                width: 0,
-                height: 0,
               ),
-              Container(
-                margin:
-                    const EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  onPressed: () {
-                    onSearchText?.call(controller.text);
-                  },
-                  child: Text(
-                    "搜索",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
+            ),
+       
+            // IconButton(
+            //   icon: Stack(
+            //     clipBehavior: Clip.none,
+            //     children: [
+            //       const MuThemeIcon(
+            //         iconType: 'filter',
+            //         iconSize: 24,
+            //       ),
+            //       // if (hasActiveFilters)
+            //       Positioned(
+            //         right: -1,
+            //         top: -1,
+            //         child: Container(
+            //           width: 8,
+            //           height: 8,
+            //           decoration: BoxDecoration(
+            //             color: Colors.red,
+            //             shape: BoxShape.circle,
+            //             border: Border.all(color: Colors.white, width: 1),
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            //   tooltip: '筛选',
+            //   padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+            //   constraints: const BoxConstraints(),
+            //   style: IconButton.styleFrom(
+            //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //   ),
+            //   onPressed: () {
+            //     // showModalBottomSheet(
+            //     //   context: context,
+            //     //   isScrollControlled: true,
+            //     //   backgroundColor: Colors.transparent,
+            //     //   constraints: BoxConstraints(
+            //     //     maxWidth:
+            //     //         MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+            //     //   ),
+            //     //   builder: (sheetContext) => GestureDetector(
+            //     //     behavior: HitTestBehavior.opaque,
+            //     //     onTap: () => Navigator.of(context).pop(),
+            //     //     child: Padding(
+            //     //       padding: EdgeInsets.only(
+            //     //         bottom: math.max(
+            //     //           MediaQuery.of(sheetContext).viewInsets.bottom,
+            //     //           0,
+            //     //         ),
+            //     //       ),
+            //     //       child: DraggableScrollableSheet(
+            //     //         initialChildSize: 0.6,
+            //     //         minChildSize: 0.6,
+            //     //         maxChildSize: 0.85,
+            //     //         builder: (context, scrollController) => Container(
+            //     //           decoration: BoxDecoration(
+            //     //             color: Theme.of(context).colorScheme.surface,
+            //     //             borderRadius:
+            //     //                 const BorderRadius.vertical(top: Radius.circular(12)),
+            //     //           ),
+            //     //           child: FilterContent(scrollController: scrollController),
+            //     //         ),
+            //     //       ),
+            //     //     ),
+            //     //   ),
+            //     // );
+            //   },
+            // ),
+       
+          ],
         ),
         if (home.currentMediaId != null)
           HomeMedia(

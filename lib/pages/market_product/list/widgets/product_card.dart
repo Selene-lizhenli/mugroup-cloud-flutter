@@ -88,6 +88,8 @@ class ProductCard extends StatelessWidget {
                         children: [
                           if (sample.productNo != null) ...[
                             Text(sample.productNo!),
+                          ],
+                          if (sample.barcode != null) ...[
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 5,
@@ -98,9 +100,7 @@ class ProductCard extends StatelessWidget {
                                 width: 0.5,
                                 color: colorScheme.outline,
                               ),
-                            )
-                          ],
-                          if (sample.barcode != null)
+                            ),
                             Flexible(
                               child: Text(
                                 sample.barcode!,
@@ -108,6 +108,7 @@ class ProductCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             )
+                          ]
                         ],
                       ),
                     ),
@@ -133,9 +134,7 @@ class ProductCard extends StatelessWidget {
                                 color: colorScheme.surfaceContainerHighest,
                               ),
                             ),
-                            const SizedBox(
-                              width: 4,
-                            ),
+                            const SizedBox(width: 4),
                             TDTag(
                               sample.tradeCountry!,
                               isLight: true,
@@ -144,9 +143,7 @@ class ProductCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     // 价格
                     Row(
                       children: [

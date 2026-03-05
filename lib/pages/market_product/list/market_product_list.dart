@@ -22,10 +22,11 @@ class MarketProductListPage extends HookConsumerWidget {
     final currentPageIndex = useState<int>(0);
 
     return Scaffold(
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: const Text('产品管理'),
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: colorScheme.surface,
           foregroundColor: Colors.black,
           actions: [
             TextButton(
@@ -45,9 +46,7 @@ class MarketProductListPage extends HookConsumerWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
               child: HomeAppBar(
