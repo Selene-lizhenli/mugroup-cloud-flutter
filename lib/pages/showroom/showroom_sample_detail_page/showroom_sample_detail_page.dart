@@ -312,7 +312,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '规格: ${sample.value!.spec}',
+                                      '规格: ${sample.value!.spec ?? "未知"}',
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
