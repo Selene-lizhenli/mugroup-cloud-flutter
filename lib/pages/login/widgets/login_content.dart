@@ -346,7 +346,7 @@ class LoginContent extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "企业微信扫码登录仅限PDA使用",
+                          "请使用企业微信扫码登录",
                           style: TextStyle(
                               color: colorScheme.outline, fontSize: 14),
                         )
