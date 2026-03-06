@@ -1,5 +1,6 @@
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
+import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 import 'package:cloud/pages/widgets/theme_icon.dart';
 import 'package:flutter/material.dart';
 
@@ -25,14 +26,10 @@ class ExchangeChartHeader extends StatelessWidget {
   void _showExchangeCalculator(
     BuildContext context,
   ) {
-    final screenWidth = MediaQuery.of(context).size.width; 
-    showModalBottomSheet(
+    muShowModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent, 
-      constraints: BoxConstraints(
-        maxWidth: screenWidth, // 底部抽屉宽度占满屏幕
-      ),
+      backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         return ExchangeCalculatorDialog(
             selectedDimension: selectedDimension, list: currencyList);
@@ -41,74 +38,53 @@ class ExchangeChartHeader extends StatelessWidget {
   }
 
   void _openDimensionBottomSheet(BuildContext context) async {
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
 
-    await showModalBottomSheet<ExchangeRate>(
+    await muShowModalBottomSheet<ExchangeRate>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-      ),
+      maxHeightRatio: 0.7,
       builder: (sheetContext) {
         final maxHeight = MediaQuery.of(sheetContext).size.height * 0.7;
         return Container(
           constraints: BoxConstraints(maxHeight: maxHeight),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          decoration: const BoxDecoration(
+            color: Colors.transparent, 
           ),
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Stack(
-                children: [
-                  // 顶部渐变背景（不影响下面的列表区域）
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
-                        ),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            colorScheme.primary.withOpacity(0.18),
-                            colorScheme.surface.withOpacity(0.0),
-                          ],
-                        ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  bottom: 0,
+                  left: 12,
+                  right: 12,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '选择维度',
+                        style: Theme.of(sheetContext)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.primary),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                    IconButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                      icon: Icon(
+                        Icons.close,
+                        color: colorScheme.outline,
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '选择维度',
-                            style: Theme.of(sheetContext)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.of(sheetContext).pop(),
-                          icon: Icon(
-                            Icons.close,
-                            color: colorScheme.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Divider(height: 1, color: colorScheme.outlineVariant),
               if (currencyList != null && currencyList!.isNotEmpty)

@@ -6,6 +6,7 @@ import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_lis
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -648,15 +649,10 @@ Future<void> _showPreSelectionSheet(
     return '';
   }
 
-  await showModalBottomSheet(
+  await muShowModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-    ),
+    backgroundColor: Colors.white, 
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       final colorScheme = Theme.of(context).colorScheme;
       final currentQuote = useValueListenable(selectedQuote);

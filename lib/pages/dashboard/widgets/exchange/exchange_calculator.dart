@@ -287,7 +287,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: colorScheme.surface,
           borderRadius: containerRadius,
         ),
         child: Row(
@@ -367,7 +367,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(

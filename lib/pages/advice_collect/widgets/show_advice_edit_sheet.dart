@@ -5,20 +5,17 @@ import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 
 void showAdviceEditSheet({
   required BuildContext context,
   String? replyToName,
   required Function(String content, List<TemporaryMedia> medias) onSend,
-}) {
-  final screenWidth = MediaQuery.of(context).size.width; 
-  showModalBottomSheet(
+}) { 
+  muShowModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    constraints: BoxConstraints(
-      maxWidth: screenWidth, // 底部抽屉宽度占满屏幕
-    ),
     builder: (context) => _AdviceEditSheet(
       replyToName: replyToName,
       onSend: onSend,
@@ -102,7 +99,7 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -121,7 +118,7 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: TextField(

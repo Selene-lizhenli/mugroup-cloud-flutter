@@ -181,8 +181,8 @@ flutter:
     - assets/element/empty.png 
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
-    - assets/aiTemplets/notepad_001.jpg
-    - assets/element/empty.png 
+    - assets/aiTemplets/notepad_001.jpg 
+    - assets/element/awning.png
     - assets/photo/benben_c.png
     - assets/photo/benben_s.png 
     - assets/photo/christmastree.png 

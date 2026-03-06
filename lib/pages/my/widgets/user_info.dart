@@ -44,7 +44,7 @@ class UserInfoHeader extends StatelessWidget {
                   "${user?.name}",
                   style: TextStyle(
                     fontSize: 23,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

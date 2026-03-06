@@ -9,6 +9,7 @@ import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_templa
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -655,15 +656,10 @@ Future<void> _showPreSelectionSheet(
     return '';
   }
 
-  await showModalBottomSheet(
+  await muShowModalBottomSheet(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-    ),
+    isScrollControlled: true, 
+    noBorder: true,
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       // 【核心】：在弹窗内部维护临时选中的状态，不直接改外部
       final tempQuote = useState<Map<String, dynamic>?>(externalQuote.value);
@@ -701,9 +697,7 @@ Future<void> _showPreSelectionSheet(
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context)
-                        .size
-                        .width, // 底部抽屉宽度占满屏幕
+                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
                   ),
                   builder: (ctx) {
                     return Padding(
@@ -735,9 +729,7 @@ Future<void> _showPreSelectionSheet(
                   useRootNavigator: true,
                   backgroundColor: Colors.transparent,
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context)
-                        .size
-                        .width, // 底部抽屉宽度占满屏幕
+                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
                   ),
                   builder: (ctx) {
                     return Padding(
