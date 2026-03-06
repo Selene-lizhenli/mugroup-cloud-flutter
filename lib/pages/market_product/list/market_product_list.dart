@@ -24,7 +24,7 @@ class MarketProductListPage extends HookConsumerWidget {
     return Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          title: const Text('产品管理'),
+          title: const Text('市场产品'),
           elevation: 0,
           backgroundColor: colorScheme.surface,
           foregroundColor: Colors.black,

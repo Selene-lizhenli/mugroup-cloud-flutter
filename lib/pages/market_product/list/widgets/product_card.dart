@@ -112,39 +112,16 @@ class ProductCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (sample.category != null)
-                      TDTag(
-                        sample.category!.name!,
-                        isLight: true,
-                        theme: TDTagTheme.warning,
-                        size: TDTagSize.medium,
-                      ),
 
-                    // 贸易国别
-                    if (sample.tradeCountry != null)
-                      Container(
-                        padding: const EdgeInsets.only(top: 3),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "贸易国别",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: colorScheme.surfaceContainerHighest,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            TDTag(
-                              sample.tradeCountry!,
-                              isLight: true,
-                              size: TDTagSize.small,
-                            ),
-                          ],
+                    if (sample.spec != null)
+                      Text(
+                        sample.spec!,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: colorScheme.surfaceContainerHighest,
                         ),
                       ),
                     const SizedBox(height: 5),
-                    // 价格
                     Row(
                       children: [
                         if (sample.purchaseCost != null)
