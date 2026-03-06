@@ -9,6 +9,7 @@ abstract class WarehouseImage with _$WarehouseImage {
     int? id,
     String? name,
     String? url,
+    int? categoryId,
     @JsonKey(name: 'white_url') String? whiteUrl,
     @JsonKey(name: 'thumb_url') String? thumbUrl,
     String? type,

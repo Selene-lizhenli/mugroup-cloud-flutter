@@ -13,11 +13,11 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 const String warehousesIdField = "warehouse_id";
 
 class ProductDropdownMenu extends HookConsumerWidget {
-  final List<FacetCount> facetCounts;  
+  final List<FacetCount> facetCounts;
 
   const ProductDropdownMenu({
-    super.key, 
-    required this.facetCounts, 
+    super.key,
+    required this.facetCounts,
   });
 
   @override
@@ -74,7 +74,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
             // 单选时，value  是数组，需要取第一个元素
             final selectedValue =
                 value is List ? (value.isNotEmpty ? value.first : null) : value;
-            if (selectedValue == null) { 
+            if (selectedValue == null) {
               homeNotifier.setCurrentSelectedWarehouse(null);
               return;
             }
@@ -82,11 +82,11 @@ class ProductDropdownMenu extends HookConsumerWidget {
             final selectedWarehouse = warehouses.firstWhereOrNull(
               (w) => w.id.toString() == selectedValue.toString(),
             );
-            homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse); 
+            homeNotifier.setCurrentSelectedWarehouse(selectedWarehouse);
           },
           onConfirm: (value) {},
           onReset: () {
-            homeNotifier.setCurrentSelectedWarehouse(null); 
+            homeNotifier.setCurrentSelectedWarehouse(null);
           },
         );
 
@@ -101,7 +101,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
         isMounted.value = false;
       };
     }, []);
-
 
     final fetchSuppliers = useCallback((List<String> ids) async {
       final resp = await getSupplySuppliers(queryParameters: {
@@ -169,75 +168,68 @@ class ProductDropdownMenu extends HookConsumerWidget {
     final menus = <TDDropdownItem>[];
     //添加样品间筛选项
     handleWarehouseDropdown(menus);
+
+    useEffect(() {
+      if (categories.value.isEmpty) fetchCategories();
+      return null;
+    }, []);
+
     //添加供应商等筛选项
     for (var facetCount in facetCounts) {
       final field = facetCount.fieldName;
-      if (!supportFacet.containsKey(field)) {
+      if (!supportFacet.containsKey(field)) continue;
+
+      final isCategory = field == "category_id";
+
+      // 如果不是分类且数量少于等于1，则跳过
+      if (!isCategory && facetCount.counts.length <= 1) {
         continue;
       }
-      if (facetCount.counts.length <= 1) {
-        continue;
-      }
-      TDDropdownItem? item;
+
       final option = menuOptions[field];
-      final options = <TDDropdownItemOption>[];
       final selectValues = query[field];
 
-      for (var count in facetCount.counts) {
-        var label = count.value;
-        var selected = false;
-        if (selectValues is List) {
-          selected = selectValues.contains(count.value);
-        }
+      final options =
+          (isCategory ? categories.value : facetCount.counts).map((item) {
+        final String val = isCategory
+            ? (item as Category).id.toString()
+            : (item as FacetCountCount).value;
+        String label = isCategory ? (item as Category).name ?? val : val;
+
         if (field == "supplier_ids") {
-          final supplier = suppliers.value
-              .firstWhereOrNull((item) => item.id.toString() == count.value);
-          if (supplier == null) {
-            continue;
-          }
-
-          label = supplier.name ?? label;
-        } else if (field == "category_id") {
-          final category = categories.value
-              .firstWhereOrNull((item) => item.id.toString() == count.value);
-
-          label = category?.name ?? label;
+          final supplier =
+              suppliers.value.firstWhereOrNull((s) => s.id.toString() == val);
+          label = supplier?.name ?? label;
         }
 
-        options.add(TDDropdownItemOption(
+        return TDDropdownItemOption(
           label: label,
-          value: count.value,
-          selected: selected,
-        ));
-      }
+          value: val,
+          selected: selectValues is List &&
+              selectValues.map((e) => e.toString()).contains(val),
+        );
+      }).toList();
 
-      item = TDDropdownItem(
+      menus.add(TDDropdownItem(
         label: supportFacet[field],
         multiple: option?.multiple,
         optionsColumns: option?.optionsColumns,
         options: options,
-        onChange: (value) {
-          homeNotifier.setQuery({
-            ...query,
-            field: value,
-          });
-        },
         onConfirm: (value) {
-          if (value is List && value.isEmpty) {
-            homeNotifier.setQuery({...query}..remove(field));
-            return;
+          final newQuery = Map<String, dynamic>.from(query);
+          if (value == null || (value is List && value.isEmpty)) {
+            newQuery.remove(field);
+          } else {
+            newQuery[field] = value;
           }
-          homeNotifier.setQuery({
-            ...query,
-            field: value,
-          });
+          homeNotifier.setQuery(newQuery);
         },
         onReset: () {
-          homeNotifier.setQuery({...query}..remove(field));
+          final newQuery = Map<String, dynamic>.from(query);
+          newQuery.remove(field);
+          homeNotifier.setQuery(newQuery);
         },
-      );
-
-      menus.add(item);
+      ));
     }
 
     if (menus.isEmpty) return const SizedBox.shrink();

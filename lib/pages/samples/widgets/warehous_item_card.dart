@@ -8,13 +8,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // 每个样品间 名称及图片
 class WarehouseShowCard extends ConsumerWidget {
-  final Warehouse warehouse; 
+  final Warehouse warehouse;
   final double pageScreenHeight;
   final double pageScreenWidth;
 
   const WarehouseShowCard({
     super.key,
-    required this.warehouse, 
+    required this.warehouse,
     required this.pageScreenHeight,
     required this.pageScreenWidth,
   });
@@ -232,13 +232,20 @@ class WarehouseShowCard extends ConsumerWidget {
     );
   }
 
-  void onTrumbImageTap(context, images, index, warehouseName) {
+  void onTrumbImageTap(context, homeNotifier, images, index, warehouseName) {
+    final tappedImage = images[index];
     if (warehouse.id == null) {
       // 如果warehouse.id没有，显示弹窗提示
       showNotOpenDialog(context);
     } else {
-      // 正常显示图片预览
-      showImagePreview(context, images, index, warehouseName);
+      if (tappedImage.categoryId != null) {
+        // 调用新封装的跳转逻辑
+        homeNotifier.jumpToProductWithCategory(
+            warehouse, tappedImage.categoryId!);
+      } else {
+        // 原有的预览逻辑...
+        showImagePreview(context, images, index, warehouseName);
+      }
     }
   }
 
@@ -249,8 +256,7 @@ class WarehouseShowCard extends ConsumerWidget {
       showNotOpenDialog(context);
       return;
     }
-    homeNotifier.setCurrentSelectedWarehouse(warehouse);
-    homeNotifier.switchToProductView();
+    homeNotifier.switchToWarehouseFullView(warehouse);
   }
 
   List<WarehouseImage> orderImages(Warehouse warehouse) {
@@ -334,7 +340,8 @@ class WarehouseShowCard extends ConsumerWidget {
               ),
               child: _ImageGallery(
                 images: orderedImages,
-                warehouseName: warehouse.name ?? '-',
+                warehouse: warehouse,
+                homeNotifier: homeNotifier,
                 onImageTap: onTrumbImageTap,
                 middleMedia: middleMedia,
                 itemWidth: itemWidth,
@@ -351,14 +358,17 @@ class WarehouseShowCard extends ConsumerWidget {
 /// 每屏最多显示 3 张图片，其余需左右滑动查看
 class _ImageGallery extends StatelessWidget {
   final List<WarehouseImage> images;
-  final String warehouseName;
+  final Warehouse warehouse;
+  final dynamic homeNotifier;
 
-  final Function(BuildContext, List<WarehouseImage>, int, String) onImageTap;
+  final Function(BuildContext, Home, List<WarehouseImage>, int, String)
+      onImageTap;
   final bool? middleMedia;
   final double itemWidth;
   const _ImageGallery({
     required this.images,
-    required this.warehouseName,
+    required this.warehouse,
+    required this.homeNotifier,
     required this.onImageTap,
     this.middleMedia,
     required this.itemWidth,
@@ -374,6 +384,7 @@ class _ImageGallery extends StatelessWidget {
     }
     const padding = 8.0;
     final imageSize = itemWidth.round();
+    final warehouseName = warehouse.name ?? '样品间';
 
     return Container(
       color: Colors.transparent,
@@ -400,8 +411,10 @@ class _ImageGallery extends StatelessWidget {
                     color: Colors.grey.shade300,
                     child: imageUrl != null && imageUrl.isNotEmpty
                         ? GestureDetector(
-                            onTap: () => onImageTap(
-                                context, images, index, warehouseName),
+                            onTap: () {
+                              onImageTap(context, homeNotifier, images, index,
+                                  warehouseName);
+                            },
                             child: ImageShow(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,

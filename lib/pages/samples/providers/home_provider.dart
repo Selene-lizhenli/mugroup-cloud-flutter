@@ -112,6 +112,35 @@ class Home extends _$Home {
   //   state = state.copyWith(categories: [...state.categories, ...list]);
   // }
 
+  /// 从样品间图片点击跳转到产品列表，并带入分类 ID
+  void jumpToProductWithCategory(Warehouse warehouse, int categoryId) {
+    state = state.copyWith(
+      currentSelectedWarehouse: warehouse,
+      isDetailedMode: true,
+    );
+
+    final newQuery = {
+      ...state.query,
+      'category_id': [categoryId.toString()],
+    };
+
+    state = state.copyWith(
+      query: newQuery,
+    );
+
+    switchToProductView();
+  }
+
+  /// 切换到样品间全库视图（清空分类等筛选）
+  void switchToWarehouseFullView(Warehouse warehouse) {
+    state = state.copyWith(
+      currentSelectedWarehouse: warehouse,
+      query: {},
+      isDetailedMode: true,
+    );
+    switchToProductView();
+  }
+
   HomeState deleteMedia(TemporaryMedia media) {
     final nextMedia = List.of(state.media);
     var nextCurrentMediaId = state.currentMediaId;

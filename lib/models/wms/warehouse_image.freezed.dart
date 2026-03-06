@@ -23,6 +23,7 @@ mixin _$WarehouseImage {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get url => throw _privateConstructorUsedError;
+  int? get categoryId => throw _privateConstructorUsedError;
   @JsonKey(name: 'white_url')
   String? get whiteUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumb_url')
@@ -51,6 +52,7 @@ abstract class $WarehouseImageCopyWith<$Res> {
       {int? id,
       String? name,
       String? url,
+      int? categoryId,
       @JsonKey(name: 'white_url') String? whiteUrl,
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       String? type,
@@ -76,6 +78,7 @@ class _$WarehouseImageCopyWithImpl<$Res, $Val extends WarehouseImage>
     Object? id = freezed,
     Object? name = freezed,
     Object? url = freezed,
+    Object? categoryId = freezed,
     Object? whiteUrl = freezed,
     Object? thumbUrl = freezed,
     Object? type = freezed,
@@ -97,6 +100,10 @@ class _$WarehouseImageCopyWithImpl<$Res, $Val extends WarehouseImage>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
+      categoryId: freezed == categoryId
+          ? _value.categoryId
+          : categoryId // ignore: cast_nullable_to_non_nullable
+              as int?,
       whiteUrl: freezed == whiteUrl
           ? _value.whiteUrl
           : whiteUrl // ignore: cast_nullable_to_non_nullable
@@ -141,6 +148,7 @@ abstract class _$$WarehouseImageImplCopyWith<$Res>
       {int? id,
       String? name,
       String? url,
+      int? categoryId,
       @JsonKey(name: 'white_url') String? whiteUrl,
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       String? type,
@@ -164,6 +172,7 @@ class __$$WarehouseImageImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? url = freezed,
+    Object? categoryId = freezed,
     Object? whiteUrl = freezed,
     Object? thumbUrl = freezed,
     Object? type = freezed,
@@ -185,6 +194,10 @@ class __$$WarehouseImageImplCopyWithImpl<$Res>
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
+      categoryId: freezed == categoryId
+          ? _value.categoryId
+          : categoryId // ignore: cast_nullable_to_non_nullable
+              as int?,
       whiteUrl: freezed == whiteUrl
           ? _value.whiteUrl
           : whiteUrl // ignore: cast_nullable_to_non_nullable
@@ -224,6 +237,7 @@ class _$WarehouseImageImpl implements _WarehouseImage {
       {this.id,
       this.name,
       this.url,
+      this.categoryId,
       @JsonKey(name: 'white_url') this.whiteUrl,
       @JsonKey(name: 'thumb_url') this.thumbUrl,
       this.type,
@@ -241,6 +255,8 @@ class _$WarehouseImageImpl implements _WarehouseImage {
   final String? name;
   @override
   final String? url;
+  @override
+  final int? categoryId;
   @override
   @JsonKey(name: 'white_url')
   final String? whiteUrl;
@@ -262,7 +278,7 @@ class _$WarehouseImageImpl implements _WarehouseImage {
 
   @override
   String toString() {
-    return 'WarehouseImage(id: $id, name: $name, url: $url, whiteUrl: $whiteUrl, thumbUrl: $thumbUrl, type: $type, filename: $filename, address: $address, shotAt: $shotAt, collectionName: $collectionName)';
+    return 'WarehouseImage(id: $id, name: $name, url: $url, categoryId: $categoryId, whiteUrl: $whiteUrl, thumbUrl: $thumbUrl, type: $type, filename: $filename, address: $address, shotAt: $shotAt, collectionName: $collectionName)';
   }
 
   @override
@@ -273,6 +289,8 @@ class _$WarehouseImageImpl implements _WarehouseImage {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.url, url) || other.url == url) &&
+            (identical(other.categoryId, categoryId) ||
+                other.categoryId == categoryId) &&
             (identical(other.whiteUrl, whiteUrl) ||
                 other.whiteUrl == whiteUrl) &&
             (identical(other.thumbUrl, thumbUrl) ||
@@ -288,8 +306,8 @@ class _$WarehouseImageImpl implements _WarehouseImage {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, url, whiteUrl,
-      thumbUrl, type, filename, address, shotAt, collectionName);
+  int get hashCode => Object.hash(runtimeType, id, name, url, categoryId,
+      whiteUrl, thumbUrl, type, filename, address, shotAt, collectionName);
 
   @JsonKey(ignore: true)
   @override
@@ -311,6 +329,7 @@ abstract class _WarehouseImage implements WarehouseImage {
           {final int? id,
           final String? name,
           final String? url,
+          final int? categoryId,
           @JsonKey(name: 'white_url') final String? whiteUrl,
           @JsonKey(name: 'thumb_url') final String? thumbUrl,
           final String? type,
@@ -329,6 +348,8 @@ abstract class _WarehouseImage implements WarehouseImage {
   String? get name;
   @override
   String? get url;
+  @override
+  int? get categoryId;
   @override
   @JsonKey(name: 'white_url')
   String? get whiteUrl;
