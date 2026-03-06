@@ -103,9 +103,12 @@ class QuoteCard extends HookConsumerWidget {
                 child: GestureDetector(
                   onTap: onTap,
                   child: Text(
-                    customerName,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold),
+                    '$customerName  ',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
