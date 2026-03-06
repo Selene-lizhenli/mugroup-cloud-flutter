@@ -396,7 +396,8 @@ class _ImageGallery extends StatelessWidget {
         itemCount: images.length,
         itemBuilder: (context, index) {
           final image = images[index];
-          final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
+          final imageUrl = image.thumbUrl;
+
           return RepaintBoundary(
             child: Padding(
               padding: EdgeInsets.only(
@@ -418,10 +419,6 @@ class _ImageGallery extends StatelessWidget {
                             child: ImageShow(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              memCacheWidth:
-                                  image.thumbUrl == null ? imageSize : null,
-                              memCacheHeight:
-                                  image.thumbUrl == null ? imageSize : null,
                               enablePreview: false,
                             ),
                           )
