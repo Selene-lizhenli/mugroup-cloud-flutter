@@ -8,13 +8,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // 每个样品间 名称及图片
 class WarehouseShowCard extends ConsumerWidget {
-  final Warehouse warehouse;
+  final Warehouse warehouse; 
   final double pageScreenHeight;
   final double pageScreenWidth;
 
   const WarehouseShowCard({
     super.key,
-    required this.warehouse,
+    required this.warehouse, 
     required this.pageScreenHeight,
     required this.pageScreenWidth,
   });
@@ -375,46 +375,52 @@ class _ImageGallery extends StatelessWidget {
     const padding = 8.0;
     final imageSize = itemWidth.round();
 
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding:
-          const EdgeInsets.symmetric(horizontal: padding, vertical: padding),
-      cacheExtent: 0,
-      itemCount: images.length,
-      addAutomaticKeepAlives: false,
-      addRepaintBoundaries: true,
-      itemBuilder: (context, index) {
-        final image = images[index];
-        final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
-
-        return Padding(
-          padding: EdgeInsets.only(
-            right: index == images.length - 1 ? 0 : padding,
-          ),
-          child: SizedBox(
-            width: itemWidth,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: Colors.grey.shade200,
-                child: imageUrl != null && imageUrl.isNotEmpty
-                    ? GestureDetector(
-                        onTap: () =>
-                            onImageTap(context, images, index, warehouseName),
-                        child: ImageShow(
-                          imageUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          memCacheWidth: imageSize,
-                          enablePreview: false,
-                        ),
-                      )
-                    : const Icon(Icons.image_not_supported,
-                        color: Colors.grey, size: 24),
+    return Container(
+      color: Colors.transparent,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding:
+            const EdgeInsets.symmetric(horizontal: padding, vertical: padding),
+        cacheExtent: 200,
+        itemCount: images.length,
+        itemBuilder: (context, index) {
+          final image = images[index];
+          final imageUrl = image.thumbUrl ?? image.url ?? image.whiteUrl;
+          return RepaintBoundary(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: index == images.length - 1 ? 0 : padding,
+              ),
+              child: SizedBox(
+                width: itemWidth,
+                // height: 20,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    color: Colors.grey.shade300,
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () => onImageTap(
+                                context, images, index, warehouseName),
+                            child: ImageShow(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              memCacheWidth:
+                                  image.thumbUrl == null ? imageSize : null,
+                              memCacheHeight:
+                                  image.thumbUrl == null ? imageSize : null,
+                              enablePreview: false,
+                            ),
+                          )
+                        : const Icon(Icons.image_not_supported,
+                            color: Colors.grey, size: 48),
+                  ),
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
