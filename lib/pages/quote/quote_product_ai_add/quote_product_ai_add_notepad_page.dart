@@ -837,16 +837,44 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       int? productId,
       int? supplyQuoteId,
     }) async {
-      const showroomFields = {'product_no', 'spec', 'description_cn'};
+      const showroomFields = {
+        'product_no',
+        'packing',
+        'unit',
+        'spec',
+        'purchase_cost',
+        'description_cn',
+        'remark',
+      };
+      const supplyQuoteFields = {
+        'product_no',
+        'purchase_cost',
+        'unit',
+        'moq',
+        'packing',
+        'inner_capacity',
+        'outer_capacity',
+        'outer_volume',
+        'material',
+        'remark',
+        'customer_price',
+        'product_weight',
+        'color',
+      };
+      bool isUpdated = false;
+
       try {
-        if (showroomFields.contains(fieldKey)) {
-          if (productId == null) return false;
+        if (showroomFields.contains(fieldKey) && productId != null) {
           await updateShowroomSample(productId, {fieldKey: value});
-        } else {
-          if (supplyQuoteId == null) return false;
-          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
         }
-        return true;
+
+        if (supplyQuoteFields.contains(fieldKey) && supplyQuoteId != null) {
+          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
+        }
+
+        return isUpdated;
       } catch (e) {
         return false;
       }
