@@ -50,11 +50,13 @@ class ProductAiAddState {
   final bool isGlobalLoading;
   final bool isSubmitting;
   final String currentTemplateId;
+  final bool isUploading; // 新增：是否正在执行文件上传
 
   ProductAiAddState({
     this.items = const [],
     this.isGlobalLoading = false,
     this.isSubmitting = false,
+    this.isUploading = false,
     String? currentTemplateId,
   }) : currentTemplateId = currentTemplateId ?? kDefaultTemplateId;
 
@@ -62,12 +64,14 @@ class ProductAiAddState {
     List<ProductDraftItem>? items,
     bool? isGlobalLoading,
     bool? isSubmitting,
+    bool? isUploading,
     String? currentTemplateId,
   }) {
     return ProductAiAddState(
       items: items ?? this.items,
       isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      isUploading: isUploading ?? this.isUploading,
       currentTemplateId: currentTemplateId ?? this.currentTemplateId,
     );
   }
@@ -94,9 +98,13 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   Future<void> uploadAndRecognize(
       File file, WidgetRef ref, int? quoteId, String? supplierId) async {
     try {
+      state = state.copyWith(isUploading: true);
       EasyLoading.show(status: '上传中...');
       final media = await upload(file: file);
       EasyLoading.dismiss();
+
+      state = state.copyWith(isUploading: false);
+
       final initialPath = media.thumbUrl ?? ''; // 记录初始路径作为 ID
 
       final newItem = ProductDraftItem(
@@ -107,6 +115,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       state = state.copyWith(items: [newItem, ...state.items]);
       _startIndividualSse(initialPath, media, quoteId, supplierId);
     } finally {
+      state = state.copyWith(isUploading: false);
       EasyLoading.dismiss();
     }
   }
@@ -269,7 +278,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   }
 }
 
-final productAiAddProvider =
+final productAiAddProviderFloor =
     NotifierProvider.autoDispose<ProductAiAddController, ProductAiAddState>(
   ProductAiAddController.new,
 );
@@ -284,8 +293,8 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final providerState = ref.watch(productAiAddProvider);
-    final controller = ref.read(productAiAddProvider.notifier);
+    final providerState = ref.watch(productAiAddProviderFloor);
+    final controller = ref.read(productAiAddProviderFloor.notifier);
 
     final isTemplateExpanded = useState(true);
     final currentTemplate = getTemplateById(providerState.currentTemplateId);
