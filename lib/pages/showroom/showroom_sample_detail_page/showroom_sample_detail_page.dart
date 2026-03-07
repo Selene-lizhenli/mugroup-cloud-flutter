@@ -526,23 +526,33 @@ class SupplyQuoteCard extends HookConsumerWidget {
     final hasLocation = province.isNotEmpty || city.isNotEmpty;
 
     final specItems = [
+      if (quote.customerPrice != null)
+        _buildRowItem(Icons.payments_outlined, "客户报价", quote.customerPrice!),
       if (quote.material != null)
-        _buildRowItem(Icons.category_outlined, "材质", quote.material!),
+        _buildRowItem(Icons.layers_outlined, "材质", quote.material!),
       if (quote.packing != null)
-        _buildRowItem(Icons.all_inbox_outlined, "包装", quote.packing!),
+        _buildRowItem(Icons.inventory_2_outlined, "包装", quote.packing!),
       if (quote.moq != null)
-        _buildRowItem(Icons.shopping_cart_outlined, "MOQ", "${quote.moq}"),
+        _buildRowItem(
+            Icons.shopping_cart_checkout_outlined, "MOQ", "${quote.moq}"),
       if (quote.outerCapacity != null)
-        _buildRowItem(Icons.inventory_2_outlined, "装箱", quote.outerCapacity!),
+        _buildRowItem(Icons.widgets_outlined, "内箱装箱", quote.outerCapacity!),
+      if (quote.innerCapacity != null)
+        _buildRowItem(Icons.grid_view_rounded, "外箱装箱", quote.innerCapacity!),
       if (quote.outerVolume != null)
-        _buildRowItem(Icons.straighten_outlined, "体积", quote.outerVolume!),
+        _buildRowItem(Icons.aspect_ratio_outlined, "体积", quote.outerVolume!),
       if (quote.outerGrossWeight != null)
-        _buildRowItem(Icons.scale_outlined, "毛重", quote.outerGrossWeight!),
+        _buildRowItem(
+            Icons.monitor_weight_outlined, "毛重", quote.outerGrossWeight!),
+      if (quote.productWeight != null)
+        _buildRowItem(Icons.scale_outlined, "产品重量(g)", quote.productWeight!),
       if (quote.shippingQty != null)
         _buildRowItem(
             Icons.local_shipping_outlined, "出货", "${quote.shippingQty}"),
       if (quote.sampleLocation != null)
-        _buildRowItem(Icons.place_outlined, "样品位", quote.sampleLocation!),
+        _buildRowItem(Icons.fmd_good_outlined, "样品位", quote.sampleLocation!),
+      if (quote.remark != null)
+        _buildRowItem(Icons.sticky_note_2_outlined, "备注", quote.remark!),
     ];
 
     return GestureDetector(
