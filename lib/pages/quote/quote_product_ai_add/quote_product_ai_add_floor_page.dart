@@ -590,8 +590,28 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
     //样品的字段
     const Set<String> showroomFields = {
       'product_no',
+      'packing',
+      'unit',
       'spec',
+      'purchase_cost',
       'description_cn',
+      'remark',
+    };
+
+    const Set<String> supplyQuoteFields = {
+      'product_no',
+      'purchase_cost',
+      'unit',
+      'moq',
+      'packing',
+      'inner_capacity',
+      'outer_capacity',
+      'outer_volume',
+      'material',
+      'remark',
+      'customer_price',
+      'product_weight',
+      'color',
     };
 
     Future<bool> updateRemoteField({
@@ -601,23 +621,23 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       final int? productId = parseId(item.getValue('product_id'));
       final int? supplyQuoteId = parseId(item.getValue('supply_quote_id'));
 
+      bool isUpdated = false;
+
       try {
-        if (showroomFields.contains(fieldKey)) {
-          if (productId == null) return false;
-
-          await updateShowroomSample(productId, {
-            fieldKey: value,
-          });
-          return true;
-        } else {
-          if (supplyQuoteId == null) return false;
-
-          await updateSupplyQuote(supplyQuoteId, {
-            fieldKey: value,
-          });
-          return true;
+        if (showroomFields.contains(fieldKey) && productId != null) {
+          await updateShowroomSample(productId, {fieldKey: value});
+          isUpdated = true;
         }
-      } finally {}
+
+        if (supplyQuoteFields.contains(fieldKey) && supplyQuoteId != null) {
+          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
+        }
+
+        return isUpdated;
+      } catch (e) {
+        return false;
+      }
     }
 
     return Stack(
