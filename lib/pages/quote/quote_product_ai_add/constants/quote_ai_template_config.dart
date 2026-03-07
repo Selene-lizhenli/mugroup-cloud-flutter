@@ -36,6 +36,7 @@ class AppColumns {
     volume,
     moq,
     description,
+    remark,
     customerPrice,
     material,
     color
