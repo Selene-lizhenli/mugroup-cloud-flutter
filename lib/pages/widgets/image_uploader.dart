@@ -738,13 +738,20 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
       HapticFeedback.selectionClick();
 
-      final double dx = localPosition.dx / box.size.width;
-      final double dy = localPosition.dy / box.size.height;
+      double fullWidth = box.size.width;
+      double fullHeight = box.size.height;
+
+      double x = localPosition.dy / fullHeight;
+      double y = 1.0 - (localPosition.dx / fullWidth);
+      Offset focusOffset = Offset(x, y);
 
       try {
-        await _controller.setFocusPoint(Offset(dx, dy));
-        await _controller.setExposurePoint(Offset(dx, dy));
-        await _controller.setFocusMode(FocusMode.auto);
+        if (_controller.value.focusMode != FocusMode.auto) {
+          await _controller.setFocusMode(FocusMode.auto);
+        }
+
+        await _controller.setFocusPoint(focusOffset);
+        await _controller.setExposurePoint(focusOffset);
       } catch (e) {
         debugPrint("对焦失败: $e");
       }
@@ -764,8 +771,13 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
         children: [
           GestureDetector(
             onTapDown: onTapFocus,
-            child: SizedBox.expand(
-              child: CameraPreview(_controller),
+            child: Center(
+              child: CameraPreview(
+                _controller,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return const SizedBox.expand();
+                }),
+              ),
             ),
           ),
           if (_focusPoint != null)
