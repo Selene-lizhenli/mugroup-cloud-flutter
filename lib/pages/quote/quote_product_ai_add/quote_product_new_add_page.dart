@@ -4,7 +4,9 @@ import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_p
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_floor_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/quote_product_ai_add_notepad_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_list_page.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -30,6 +32,50 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final tabController =
         useTabController(initialLength: 3, initialIndex: initialTabIndex);
+
+    final isFloorProcessing =
+        ref.watch(productAiAddProviderFloor.select((s) => s.isUploading));
+
+    final isNotepadProcessing =
+        ref.watch(productAiAddProviderNotepad.select((s) => s.isUploading));
+
+    final isProcessing = isFloorProcessing || isNotepadProcessing;
+
+    // 抽取刷新逻辑
+    void triggerRefresh() {
+      ref.read(quotePageRefreshTrigger.notifier).update((state) => state + 1);
+      ref.read(quotePageProductRefresh.notifier).update((state) => state + 1);
+    }
+
+    Future<void> handlePop(bool didPop) async {
+      if (didPop) {
+        triggerRefresh();
+        return;
+      }
+
+      if (EasyLoading.isShow) {
+        EasyLoading.dismiss();
+      }
+
+      final shouldExit = await ConfirmDialog.show(
+        context,
+        title: '操作尚未完成',
+        content: '图片正在上传中，退出将中断上传。确定离开吗？',
+        cancelText: '取消',
+        confirmText: '确定',
+      );
+
+      if (shouldExit == true) {
+        triggerRefresh();
+        if (context.mounted) {
+          Navigator.pop(context, false);
+        }
+      } else {
+        if (isProcessing) {
+          EasyLoading.show(status: '上传中...');
+        }
+      }
+    }
 
     final tabBar = TabBar(
       controller: tabController,
@@ -89,17 +135,9 @@ class QuoteProductNewAddPage extends HookConsumerWidget {
           bottom: tabBar,
         ),
         body: PopScope(
+          canPop: !isProcessing,
           onPopInvoked: (didPop) {
-            if (didPop) {
-              // 当用户通过侧滑手势或系统返回键退出时，也发送刷新信号
-              ref
-                  .read(quotePageRefreshTrigger.notifier)
-                  .update((state) => state + 1);
-
-              ref
-                  .read(quotePageProductRefresh.notifier)
-                  .update((state) => state + 1);
-            }
+            handlePop(didPop);
           },
           child: tabBarView,
         ),

@@ -728,30 +728,30 @@ class ExportInspectionDialog extends HookWidget {
                       child: const Text('导出xlsx'),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: isDownloading.value
-                          ? null
-                          : () {
-                              // final email = emailController.text;
-                              showEmailNotSupportedTip();
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                      child: Text(
-                        '邮件发送',
-                        style: TextStyle(color: colorScheme.onSecondary),
-                      ),
-                    ),
-                  ),
+                  // const SizedBox(width: 12),
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: isDownloading.value
+                  //         ? null
+                  //         : () {
+                  //             // final email = emailController.text;
+                  //             showEmailNotSupportedTip();
+                  //           },
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: primaryColor,
+                  //       foregroundColor: Colors.white,
+                  //       elevation: 0,
+                  //       padding: const EdgeInsets.symmetric(vertical: 12),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(6),
+                  //       ),
+                  //     ),
+                  //     child: Text(
+                  //       '邮件发送',
+                  //       style: TextStyle(color: colorScheme.onSecondary),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ],

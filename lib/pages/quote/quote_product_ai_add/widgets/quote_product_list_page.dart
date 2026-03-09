@@ -21,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:cloud/helper/helper.dart';
 
 final quotePageProductRefresh = StateProvider.autoDispose<int>((ref) => 0);
 
@@ -99,6 +98,7 @@ class QuoteProductListPage extends HookConsumerWidget {
         final List<ProductDraftItem> mappedItems =
             dataList.map<ProductDraftItem>((e) {
           final item = e is QuotationSample ? e : QuotationSample.fromJson(e);
+
           final sample = item.showroomSample;
           final quote = item.supplyQuote;
 
@@ -110,8 +110,14 @@ class QuoteProductListPage extends HookConsumerWidget {
               'purchase_cost':
                   item.price ?? quote?.purchaseCost ?? sample?.purchaseCost,
               'outer_capacity': quote?.outerCapacity,
+              'inner_capacity': quote?.innerCapacity,
               'description_cn': sample?.descriptionCn,
               'spec': sample?.spec,
+              'moq': quote?.moq,
+              'customer_price': quote?.customerPrice,
+              'material': quote?.material,
+              'color': quote?.color,
+              'remark': sample?.remark ?? quote?.remark,
               'unit': sample?.unit,
               'product_weight': quote?.productWeight,
               'packing': sample?.packing,
@@ -135,7 +141,6 @@ class QuoteProductListPage extends HookConsumerWidget {
         products.value = mappedItems;
         hasMore.value = false;
       } catch (e) {
-        logger.e("加载列表失败: $e");
         if (context.mounted) EasyLoading.showError("数据加载失败");
       } finally {
         if (context.mounted) isLoading.value = false;
@@ -331,23 +336,51 @@ class QuoteProductListPage extends HookConsumerWidget {
       return int.tryParse(s);
     }
 
-    const Set<String> showroomFields = {'product_no', 'spec', 'description_cn'};
+    const Set<String> showroomFields = {
+      'product_no',
+      'packing',
+      'unit',
+      'spec',
+      'purchase_cost',
+      'description_cn',
+      'remark',
+    };
+
+    const Set<String> supplyQuoteFields = {
+      'product_no',
+      'purchase_cost',
+      'unit',
+      'moq',
+      'packing',
+      'inner_capacity',
+      'outer_capacity',
+      'outer_volume',
+      'material',
+      'remark',
+      'customer_price',
+      'product_weight',
+      'color',
+    };
 
     Future<bool> updateRemoteField(
         {required String fieldKey, required dynamic value}) async {
       final int? productId = parseId(item.getValue('product_id'));
       final int? supplyQuoteId = parseId(item.getValue('supply_quote_id'));
+      bool isUpdated = false;
+
       try {
-        if (showroomFields.contains(fieldKey)) {
-          if (productId == null) return false;
+        if (showroomFields.contains(fieldKey) && productId != null) {
           await updateShowroomSample(productId, {fieldKey: value});
-          return true;
-        } else {
-          if (supplyQuoteId == null) return false;
-          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
-          return true;
+          isUpdated = true;
         }
-      } catch (_) {
+
+        if (supplyQuoteFields.contains(fieldKey) && supplyQuoteId != null) {
+          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
+        }
+
+        return isUpdated;
+      } catch (e) {
         return false;
       }
     }
@@ -658,7 +691,7 @@ Future<void> _showPreSelectionSheet(
 
   await muShowModalBottomSheet(
     context: context,
-    isScrollControlled: true, 
+    isScrollControlled: true,
     noBorder: true,
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       // 【核心】：在弹窗内部维护临时选中的状态，不直接改外部

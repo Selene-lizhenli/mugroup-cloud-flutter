@@ -1,7 +1,9 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
+import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -199,8 +201,10 @@ class QuoteCard extends HookConsumerWidget {
                   child: GestureDetector(
                     onTap: () {
                       final newId = isSelected ? null : id;
-                      // 【核心变化】直接调用外部回调，不在此维护 state
                       onSupplierSelected?.call(newId);
+                    },
+                    onLongPress: () {
+                      context.router.push(SupplySupplierDetailRoute(id: id));
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -210,39 +214,78 @@ class QuoteCard extends HookConsumerWidget {
                         border: Border.all(
                           color: isSelected
                               ? colorScheme.primary
-                              : Colors.transparent,
+                              : Colors.black.withOpacity(0.05),
                           width: 2,
                         ),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: imageUrl != null
-                            ? Image.network(imageUrl, fit: BoxFit.cover)
-                            : Center(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
                                 child: Text(
                                   supplier?.name ?? '',
-                                  style: const TextStyle(fontSize: 9),
+                                  style: const TextStyle(
+                                      fontSize: 11, color: Colors.grey),
                                   textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                            ),
+                            if (imageUrl != null)
+                              Positioned.fill(
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const SizedBox(),
+                                ),
+                              ),
+                            if (imageUrl != null)
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2),
+                                  color: Colors.black.withOpacity(0.3),
+                                  child: Text(
+                                    supplier?.name ?? '',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 10),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-                if (imageUrl != null && isSelected)
-                  Align(
-                    alignment: Alignment.center,
+                if (imageUrl != null)
+                  Positioned(
+                    top: 4,
+                    right: 4,
                     child: GestureDetector(
                       onTap: () => _showImagePreview(context, imageUrl),
                       child: Container(
-                        width: 30,
-                        height: 30,
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withOpacity(0.4),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.fullscreen_rounded,
-                            color: Colors.white, size: 20),
+                        child: const Icon(
+                          Icons.fullscreen_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),

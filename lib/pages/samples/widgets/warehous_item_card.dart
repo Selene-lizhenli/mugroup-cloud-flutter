@@ -19,8 +19,8 @@ class WarehouseShowCard extends ConsumerWidget {
     required this.pageScreenWidth,
   });
   //大图查看图片
-  void showImagePreview(BuildContext context, List<WarehouseImage> images,
-      int initialIndex, String warehouseName) {
+  static void showImagePreview(BuildContext context,
+      List<WarehouseImage> images, int initialIndex, String warehouseName) {
     int currentIndex = initialIndex;
     final pageController = PageController(initialPage: initialIndex);
 
@@ -415,6 +415,10 @@ class _ImageGallery extends StatelessWidget {
                             onTap: () {
                               onImageTap(context, homeNotifier, images, index,
                                   warehouseName);
+                            },
+                            onLongPress: () {
+                              WarehouseShowCard.showImagePreview(
+                                  context, images, index, warehouseName);
                             },
                             child: ImageShow(
                               imageUrl: imageUrl,

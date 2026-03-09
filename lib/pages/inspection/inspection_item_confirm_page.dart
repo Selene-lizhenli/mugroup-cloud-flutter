@@ -582,6 +582,7 @@ class _PhotoCard extends HookConsumerWidget {
                       // directCamera: isDirectCamera.value,
                       // directGallery: !isDirectCamera.value,
                       enableContinuous: true,
+                      showContinuousOption: true,
                       onContinuousCapture: handleAutoDistribute,
                       onChanged: (list) => onMediaChanged('details', list),
                       // 内部去处理 80x80 的方块拖拽
@@ -677,6 +678,7 @@ class _PhotoCard extends HookConsumerWidget {
                 maxCount: 1,
                 customIcon: Icons.camera_alt,
                 value: currentImages,
+                showContinuousOption: true,
                 enableContinuous: enableContinuous,
                 onChanged: (list) => onMediaChanged(apiKey, list),
                 onContinuousCapture: onContinuousCapture,

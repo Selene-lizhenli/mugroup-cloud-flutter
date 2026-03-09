@@ -25,10 +25,14 @@ mixin _$Quote {
   Supplier? get supplier => throw _privateConstructorUsedError;
   String? get packing => throw _privateConstructorUsedError;
   String? get material => throw _privateConstructorUsedError;
+  String? get color => throw _privateConstructorUsedError;
+  String? get remark => throw _privateConstructorUsedError;
   @JsonKey(name: 'supplier_id')
   int? get supplierId => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_capacity')
   String? get outerCapacity => throw _privateConstructorUsedError;
+  @JsonKey(name: 'inner_capacity')
+  String? get innerCapacity => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_volume')
   String? get outerVolume => throw _privateConstructorUsedError;
   @JsonKey(name: 'outer_gross_weight')
@@ -80,8 +84,11 @@ abstract class $QuoteCopyWith<$Res> {
       Supplier? supplier,
       String? packing,
       String? material,
+      String? color,
+      String? remark,
       @JsonKey(name: 'supplier_id') int? supplierId,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
+      @JsonKey(name: 'inner_capacity') String? innerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
@@ -121,8 +128,11 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
     Object? supplier = freezed,
     Object? packing = freezed,
     Object? material = freezed,
+    Object? color = freezed,
+    Object? remark = freezed,
     Object? supplierId = freezed,
     Object? outerCapacity = freezed,
+    Object? innerCapacity = freezed,
     Object? outerVolume = freezed,
     Object? outerGrossWeight = freezed,
     Object? chuhuoAt = freezed,
@@ -162,6 +172,14 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
           ? _value.material
           : material // ignore: cast_nullable_to_non_nullable
               as String?,
+      color: freezed == color
+          ? _value.color
+          : color // ignore: cast_nullable_to_non_nullable
+              as String?,
+      remark: freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
       supplierId: freezed == supplierId
           ? _value.supplierId
           : supplierId // ignore: cast_nullable_to_non_nullable
@@ -169,6 +187,10 @@ class _$QuoteCopyWithImpl<$Res, $Val extends Quote>
       outerCapacity: freezed == outerCapacity
           ? _value.outerCapacity
           : outerCapacity // ignore: cast_nullable_to_non_nullable
+              as String?,
+      innerCapacity: freezed == innerCapacity
+          ? _value.innerCapacity
+          : innerCapacity // ignore: cast_nullable_to_non_nullable
               as String?,
       outerVolume: freezed == outerVolume
           ? _value.outerVolume
@@ -267,8 +289,11 @@ abstract class _$$QuoteImplCopyWith<$Res> implements $QuoteCopyWith<$Res> {
       Supplier? supplier,
       String? packing,
       String? material,
+      String? color,
+      String? remark,
       @JsonKey(name: 'supplier_id') int? supplierId,
       @JsonKey(name: 'outer_capacity') String? outerCapacity,
+      @JsonKey(name: 'inner_capacity') String? innerCapacity,
       @JsonKey(name: 'outer_volume') String? outerVolume,
       @JsonKey(name: 'outer_gross_weight') String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') DateTime? chuhuoAt,
@@ -307,8 +332,11 @@ class __$$QuoteImplCopyWithImpl<$Res>
     Object? supplier = freezed,
     Object? packing = freezed,
     Object? material = freezed,
+    Object? color = freezed,
+    Object? remark = freezed,
     Object? supplierId = freezed,
     Object? outerCapacity = freezed,
+    Object? innerCapacity = freezed,
     Object? outerVolume = freezed,
     Object? outerGrossWeight = freezed,
     Object? chuhuoAt = freezed,
@@ -348,6 +376,14 @@ class __$$QuoteImplCopyWithImpl<$Res>
           ? _value.material
           : material // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == color
+          ? _value.color
+          : color // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == remark
+          ? _value.remark
+          : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == supplierId
           ? _value.supplierId
           : supplierId // ignore: cast_nullable_to_non_nullable
@@ -355,6 +391,10 @@ class __$$QuoteImplCopyWithImpl<$Res>
       freezed == outerCapacity
           ? _value.outerCapacity
           : outerCapacity // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == innerCapacity
+          ? _value.innerCapacity
+          : innerCapacity // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == outerVolume
           ? _value.outerVolume
@@ -437,8 +477,11 @@ class _$QuoteImpl implements _Quote {
       this.supplier,
       this.packing,
       this.material,
+      this.color,
+      this.remark,
       @JsonKey(name: 'supplier_id') this.supplierId,
       @JsonKey(name: 'outer_capacity') this.outerCapacity,
+      @JsonKey(name: 'inner_capacity') this.innerCapacity,
       @JsonKey(name: 'outer_volume') this.outerVolume,
       @JsonKey(name: 'outer_gross_weight') this.outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') this.chuhuoAt,
@@ -471,11 +514,18 @@ class _$QuoteImpl implements _Quote {
   @override
   final String? material;
   @override
+  final String? color;
+  @override
+  final String? remark;
+  @override
   @JsonKey(name: 'supplier_id')
   final int? supplierId;
   @override
   @JsonKey(name: 'outer_capacity')
   final String? outerCapacity;
+  @override
+  @JsonKey(name: 'inner_capacity')
+  final String? innerCapacity;
   @override
   @JsonKey(name: 'outer_volume')
   final String? outerVolume;
@@ -530,7 +580,7 @@ class _$QuoteImpl implements _Quote {
 
   @override
   String toString() {
-    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, supplierId: $supplierId, outerCapacity: $outerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, productWeight: $productWeight, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, supplierPrice: $supplierPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
+    return 'Quote(id: $id, moq: $moq, supplier: $supplier, packing: $packing, material: $material, color: $color, remark: $remark, supplierId: $supplierId, outerCapacity: $outerCapacity, innerCapacity: $innerCapacity, outerVolume: $outerVolume, outerGrossWeight: $outerGrossWeight, chuhuoAt: $chuhuoAt, sampleLocation: $sampleLocation, recordUser: $recordUser, canBill: $canBill, taxRate: $taxRate, productWeight: $productWeight, purchaseCost: $purchaseCost, currency: $currency, supplierProductNo: $supplierProductNo, shippingQty: $shippingQty, customerPrice: $customerPrice, supplierPrice: $supplierPrice, internalSku: $internalSku, supplierSku: $supplierSku, customerSku: $customerSku)';
   }
 
   @override
@@ -545,10 +595,14 @@ class _$QuoteImpl implements _Quote {
             (identical(other.packing, packing) || other.packing == packing) &&
             (identical(other.material, material) ||
                 other.material == material) &&
+            (identical(other.color, color) || other.color == color) &&
+            (identical(other.remark, remark) || other.remark == remark) &&
             (identical(other.supplierId, supplierId) ||
                 other.supplierId == supplierId) &&
             (identical(other.outerCapacity, outerCapacity) ||
                 other.outerCapacity == outerCapacity) &&
+            (identical(other.innerCapacity, innerCapacity) ||
+                other.innerCapacity == innerCapacity) &&
             (identical(other.outerVolume, outerVolume) ||
                 other.outerVolume == outerVolume) &&
             (identical(other.outerGrossWeight, outerGrossWeight) ||
@@ -592,8 +646,11 @@ class _$QuoteImpl implements _Quote {
         supplier,
         packing,
         material,
+        color,
+        remark,
         supplierId,
         outerCapacity,
+        innerCapacity,
         outerVolume,
         outerGrossWeight,
         chuhuoAt,
@@ -634,8 +691,11 @@ abstract class _Quote implements Quote {
       final Supplier? supplier,
       final String? packing,
       final String? material,
+      final String? color,
+      final String? remark,
       @JsonKey(name: 'supplier_id') final int? supplierId,
       @JsonKey(name: 'outer_capacity') final String? outerCapacity,
+      @JsonKey(name: 'inner_capacity') final String? innerCapacity,
       @JsonKey(name: 'outer_volume') final String? outerVolume,
       @JsonKey(name: 'outer_gross_weight') final String? outerGrossWeight,
       @JsonKey(name: 'chuhuo_at') final DateTime? chuhuoAt,
@@ -667,11 +727,18 @@ abstract class _Quote implements Quote {
   @override
   String? get material;
   @override
+  String? get color;
+  @override
+  String? get remark;
+  @override
   @JsonKey(name: 'supplier_id')
   int? get supplierId;
   @override
   @JsonKey(name: 'outer_capacity')
   String? get outerCapacity;
+  @override
+  @JsonKey(name: 'inner_capacity')
+  String? get innerCapacity;
   @override
   @JsonKey(name: 'outer_volume')
   String? get outerVolume;

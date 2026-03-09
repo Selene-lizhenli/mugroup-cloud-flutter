@@ -97,11 +97,13 @@ class ProductAiAddState {
   final bool isGlobalLoading;
   final bool isSubmitting;
   final String currentTemplateId;
+  final bool isUploading; // 新增：是否正在执行文件上传
 
   ProductAiAddState({
     this.groups = const [],
     this.isGlobalLoading = false,
     this.isSubmitting = false,
+    this.isUploading = false,
     String? currentTemplateId,
   }) : currentTemplateId = currentTemplateId ?? kDefaultNotePadTemplateId;
 
@@ -109,12 +111,14 @@ class ProductAiAddState {
     List<ImageProductGroup>? groups,
     bool? isGlobalLoading,
     bool? isSubmitting,
+    bool? isUploading,
     String? currentTemplateId,
   }) {
     return ProductAiAddState(
       groups: groups ?? this.groups,
       isGlobalLoading: isGlobalLoading ?? this.isGlobalLoading,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      isUploading: isUploading ?? this.isUploading,
       currentTemplateId: currentTemplateId ?? this.currentTemplateId,
     );
   }
@@ -408,7 +412,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
   }
 }
 
-final productAiAddProvider =
+final productAiAddProviderNotepad =
     NotifierProvider.autoDispose<ProductAiAddController, ProductAiAddState>(
         ProductAiAddController.new);
 
@@ -422,8 +426,8 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final providerState = ref.watch(productAiAddProvider);
-    final controller = ref.read(productAiAddProvider.notifier);
+    final providerState = ref.watch(productAiAddProviderNotepad);
+    final controller = ref.read(productAiAddProviderNotepad.notifier);
     final isTemplateExpanded = useState(true);
     final currentMediaList = providerState.groups.map((e) => e.media).toList();
     final currentTemplate = kQuoteAiNotePadTemplates.firstWhere(
@@ -837,16 +841,44 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
       int? productId,
       int? supplyQuoteId,
     }) async {
-      const showroomFields = {'product_no', 'spec', 'description_cn'};
+      const showroomFields = {
+        'product_no',
+        'packing',
+        'unit',
+        'spec',
+        'purchase_cost',
+        'description_cn',
+        'remark',
+      };
+      const supplyQuoteFields = {
+        'product_no',
+        'purchase_cost',
+        'unit',
+        'moq',
+        'packing',
+        'inner_capacity',
+        'outer_capacity',
+        'outer_volume',
+        'material',
+        'remark',
+        'customer_price',
+        'product_weight',
+        'color',
+      };
+      bool isUpdated = false;
+
       try {
-        if (showroomFields.contains(fieldKey)) {
-          if (productId == null) return false;
+        if (showroomFields.contains(fieldKey) && productId != null) {
           await updateShowroomSample(productId, {fieldKey: value});
-        } else {
-          if (supplyQuoteId == null) return false;
-          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
         }
-        return true;
+
+        if (supplyQuoteFields.contains(fieldKey) && supplyQuoteId != null) {
+          await updateSupplyQuote(supplyQuoteId, {fieldKey: value});
+          isUpdated = true;
+        }
+
+        return isUpdated;
       } catch (e) {
         return false;
       }

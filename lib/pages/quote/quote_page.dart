@@ -212,6 +212,8 @@ class QuotePage extends HookConsumerWidget {
                     onPressed: () => context.router.push(QuoteCreateRoute())),
                 content: _buildRecentRecordsContent(
                   context,
+                  currentQuote,
+                  selectedSupplier,
                   isLoading.value,
                   list.value,
                   recordsDisplayCount,
@@ -250,6 +252,8 @@ class QuotePage extends HookConsumerWidget {
   // 客户列表内容渲染
   Widget _buildRecentRecordsContent(
       BuildContext context,
+      ValueNotifier<Map<String, dynamic>?> currentQuote,
+      ValueNotifier<Map<String, dynamic>?> selectedSupplier,
       bool isLoading,
       List<QuotationList> data,
       ValueNotifier<int> displayCount,
@@ -293,7 +297,16 @@ class QuotePage extends HookConsumerWidget {
                   } else {
                     activeQuoteId.value = item.id;
                     selectedSupplierId.value = supplierId;
-                    // 点击后立即执行异步刷新
+
+                    currentQuote.value = item.toJson();
+
+                    final matchedSupply = item.supplyQuotes
+                        ?.firstWhere((s) => s.supplier?.id == supplierId);
+                    if (matchedSupply?.supplier != null) {
+                      selectedSupplier.value =
+                          matchedSupply!.supplier!.toJson();
+                    }
+
                     await fetchActiveProducts();
                   }
                 },
@@ -652,7 +665,7 @@ Future<void> _showPreSelectionSheet(
   await muShowModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white, 
+    backgroundColor: Colors.white,
     builder: (context) => HookConsumer(builder: (context, ref, child) {
       final colorScheme = Theme.of(context).colorScheme;
       final currentQuote = useValueListenable(selectedQuote);

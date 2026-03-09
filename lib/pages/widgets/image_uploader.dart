@@ -51,6 +51,8 @@ class ImageUploader extends HookConsumerWidget {
   /// false => 长按无效果
   final bool enableContinuous;
 
+  final bool showContinuousOption;
+
   final IconData? customIcon;
 
   final String? uploaderKey;
@@ -74,6 +76,7 @@ class ImageUploader extends HookConsumerWidget {
     // 默认设置：保留弹窗，关闭连拍
     this.directCamera = false,
     this.directGallery = false,
+    this.showContinuousOption = false,
     this.enableContinuous = false,
     this.onContinuousCapture,
     this.customIcon,
@@ -197,6 +200,14 @@ class ImageUploader extends HookConsumerWidget {
                 await openStandardCamera();
               },
             ),
+            if (showContinuousOption)
+              FlanActionSheetAction(
+                name: "连拍模式",
+                callback: (action) async {
+                  Navigator.pop(context);
+                  await openContinuousCamera();
+                },
+              ),
             FlanActionSheetAction(
               name: "从手机相册选择",
               callback: (action) async {
@@ -727,13 +738,20 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
       HapticFeedback.selectionClick();
 
-      final double dx = localPosition.dx / box.size.width;
-      final double dy = localPosition.dy / box.size.height;
+      double fullWidth = box.size.width;
+      double fullHeight = box.size.height;
+
+      double x = localPosition.dy / fullHeight;
+      double y = 1.0 - (localPosition.dx / fullWidth);
+      Offset focusOffset = Offset(x, y);
 
       try {
-        await _controller.setFocusPoint(Offset(dx, dy));
-        await _controller.setExposurePoint(Offset(dx, dy));
-        await _controller.setFocusMode(FocusMode.auto);
+        if (_controller.value.focusMode != FocusMode.auto) {
+          await _controller.setFocusMode(FocusMode.auto);
+        }
+
+        await _controller.setFocusPoint(focusOffset);
+        await _controller.setExposurePoint(focusOffset);
       } catch (e) {
         debugPrint("对焦失败: $e");
       }
@@ -753,8 +771,13 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
         children: [
           GestureDetector(
             onTapDown: onTapFocus,
-            child: SizedBox.expand(
-              child: CameraPreview(_controller),
+            child: Center(
+              child: CameraPreview(
+                _controller,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return const SizedBox.expand();
+                }),
+              ),
             ),
           ),
           if (_focusPoint != null)
