@@ -51,6 +51,8 @@ class ImageUploader extends HookConsumerWidget {
   /// false => 长按无效果
   final bool enableContinuous;
 
+  final bool showContinuousOption;
+
   final IconData? customIcon;
 
   final String? uploaderKey;
@@ -74,6 +76,7 @@ class ImageUploader extends HookConsumerWidget {
     // 默认设置：保留弹窗，关闭连拍
     this.directCamera = false,
     this.directGallery = false,
+    this.showContinuousOption = false,
     this.enableContinuous = false,
     this.onContinuousCapture,
     this.customIcon,
@@ -197,6 +200,14 @@ class ImageUploader extends HookConsumerWidget {
                 await openStandardCamera();
               },
             ),
+            if (showContinuousOption)
+              FlanActionSheetAction(
+                name: "连拍模式",
+                callback: (action) async {
+                  Navigator.pop(context);
+                  await openContinuousCamera();
+                },
+              ),
             FlanActionSheetAction(
               name: "从手机相册选择",
               callback: (action) async {
