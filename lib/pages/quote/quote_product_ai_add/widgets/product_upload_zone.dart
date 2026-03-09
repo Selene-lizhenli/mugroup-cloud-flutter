@@ -69,7 +69,7 @@ class ProductUploadZone extends HookConsumerWidget {
             final result = await AssetPicker.pickAssets(
               context,
               pickerConfig: const AssetPickerConfig(
-                  maxAssets: 20, requestType: RequestType.image),
+                  maxAssets: 50, requestType: RequestType.image),
             );
             if (result != null) {
               for (var e in result) {
