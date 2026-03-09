@@ -1200,34 +1200,22 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
                                   formDataNotifier.clearFormData();
 
-                                  final isContinue = await ConfirmDialog.show(
-                                    context,
-                                    title: '创建成功',
-                                    content: '',
-                                    cancelText: '返回',
-                                    confirmText: '继续创建',
-                                    confirmColor: colorScheme.primary,
-                                  );
+                                  final currentSupplier =
+                                      formState.value['supplier'];
+                                  formState.reset();
+                                  formDataNotifier.clearFormData();
 
-                                  if (isContinue == true) {
-                                    final currentSupplier =
-                                        formState.value['supplier'];
-                                    formState.reset();
-                                    formDataNotifier.clearFormData();
+                                  if (currentSupplier != null) {
+                                    formKey.currentState?.patchValue({
+                                      'supplier': currentSupplier,
+                                    });
+                                  }
 
-                                    if (currentSupplier != null) {
-                                      formKey.currentState?.patchValue({
-                                        'supplier': currentSupplier,
-                                      });
-                                    }
-                                  } else {
-                                    if (context.mounted) {
-                                      ref
-                                          .read(
-                                              quotePageRefreshTrigger.notifier)
-                                          .update((state) => state + 1);
-                                      Navigator.of(context).pop(true);
-                                    }
+                                  if (context.mounted) {
+                                    ref
+                                        .read(quotePageRefreshTrigger.notifier)
+                                        .update((state) => state + 1);
+                                    Navigator.of(context).pop(true);
                                   }
                                 } finally {
                                   // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
@@ -1251,7 +1239,141 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                               ),
                             )
                           : const Text(
-                              '提交',
+                              '完成',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.secondary,
+                        disabledBackgroundColor:
+                            colorScheme.secondary.withOpacity(0.6),
+                      ),
+                      onPressed: isSubmitting.value
+                          ? null
+                          : () async {
+                              final formState = formKey.currentState;
+                              if (formState?.saveAndValidate() ?? false) {
+                                isSubmitting.value = true;
+                                EasyLoading.show(
+                                  status: '正在提交...',
+                                  maskType: EasyLoadingMaskType.clear,
+                                );
+
+                                try {
+                                  final Map<String, dynamic> submitValues =
+                                      Map.from(formState!.value);
+
+                                  final supplier = initialSupplier;
+
+                                  submitValues['supply_quotes'] = [
+                                    {
+                                      "supplier_id": supplier?['id'],
+                                      'supplier': supplier,
+                                      "product_no": submitValues["product_no"],
+                                      'product_brand':
+                                          submitValues["product_brand"],
+                                      'supplier_sku':
+                                          submitValues["supplier_sku"],
+                                      "customer_sku":
+                                          submitValues["customer_sku"],
+                                      'purchase_cost':
+                                          submitValues["purchase_cost"],
+                                      "deliver_day":
+                                          submitValues["deliver_day"],
+                                      "moq": submitValues["moq"],
+                                      "customer_price":
+                                          submitValues["customer_price"],
+                                      "customer_qty":
+                                          submitValues["customer_qty"],
+                                      "unit": submitValues["unit"],
+                                      "material": submitValues["material"],
+                                      "inner_capacity":
+                                          submitValues["inner_capacity"],
+                                      "weight": submitValues["weight"],
+                                      "packing": submitValues["packing"],
+                                      "outer_capacity":
+                                          submitValues["outer_capacity"],
+                                      "outer_volume":
+                                          submitValues["outer_volume"],
+                                    }
+                                  ];
+
+                                  final length =
+                                      submitValues['length']?.toString() ?? '';
+                                  final width =
+                                      submitValues['width']?.toString() ?? '';
+                                  final height =
+                                      submitValues['heigth']?.toString() ?? '';
+
+                                  final spec =
+                                      [length, width, height].join('x');
+                                  submitValues['spec'] = spec;
+
+                                  // 2. 发起网络请求
+                                  await storeShowroomSample({
+                                    ...submitValues,
+                                    "supplier_id": supplier?['id'],
+                                    if (quoteId != null)
+                                      "quotation_id": quoteId,
+                                    'item_type': 'market_product'
+                                  });
+
+                                  isSubmitting.value = false;
+
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  const storageKey = 'last_quote_product_add';
+                                  await prefs.setString(
+                                      storageKey, jsonEncode(submitValues));
+
+                                  EasyLoading.dismiss();
+
+                                  if (!context.mounted) return;
+
+                                  formDataNotifier.clearFormData();
+
+                                  final currentSupplier =
+                                      formState.value['supplier'];
+                                  formState.reset();
+                                  formDataNotifier.clearFormData();
+
+                                  if (currentSupplier != null) {
+                                    formKey.currentState?.patchValue({
+                                      'supplier': currentSupplier,
+                                    });
+                                  }
+
+                                  handleCopyLastItem();
+                                } finally {
+                                  // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
+                                  isSubmitting.value = false;
+                                  if (EasyLoading.isShow) EasyLoading.dismiss();
+                                }
+                              } else {
+                                autoValidateMode.value =
+                                    AutovalidateMode.onUserInteraction;
+                              }
+                            },
+                      child: isSubmitting.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              '存并复录',
                               style: TextStyle(color: Colors.white),
                             ),
                     ),

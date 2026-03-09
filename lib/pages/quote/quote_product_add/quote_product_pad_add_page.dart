@@ -524,7 +524,51 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
       }
     }
 
-    Future<void> handleSubmit() async {
+    Future<void> handleCopyLastItem() async {
+      try {
+        EasyLoading.show(status: '加载中...');
+        final prefs = await SharedPreferences.getInstance();
+
+        const storageKey = 'last_quote_product_add';
+        final jsonStr = prefs.getString(storageKey);
+
+        if (jsonStr != null) {
+          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+
+          data.remove('id');
+          data.remove('image');
+          data.remove('images');
+
+          data['supplier_sku'] = '';
+          data['customer_sku'] = '';
+
+          if (data['spec'] != null && data['spec'].toString().isNotEmpty) {
+            final parts = data['spec'].toString().split('x');
+            if (parts.isNotEmpty) {
+              data['length'] = parts[0];
+            }
+            if (parts.length > 1) {
+              data['width'] = parts[1];
+            }
+            if (parts.length > 2) {
+              data['heigth'] = parts[2];
+            }
+          }
+
+          // 3. 填充表单
+          formKey.currentState?.patchValue(data);
+          EasyLoading.showSuccess('已复制上一条数据');
+        } else {
+          EasyLoading.showInfo('暂无历史数据');
+        }
+      } catch (e) {
+        EasyLoading.showError('加载失败');
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }
+
+    Future<void> handleSubmit(bool isCopy) async {
       final formState = formKey.currentState;
       if (formState?.saveAndValidate() ?? false) {
         isSubmitting.value = true;
@@ -587,31 +631,27 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
 
           formDataNotifier.clearFormData();
 
-          final isContinue = await ConfirmDialog.show(
-            context,
-            title: '创建成功',
-            content: '',
-            cancelText: '返回',
-            confirmText: '继续创建',
-            confirmColor: colorScheme.primary,
-          );
-          if (isContinue == true) {
-            final currentSupplier = formState.value['supplier'];
-            formState.reset();
-            formDataNotifier.clearFormData();
+          final currentSupplier = formState.value['supplier'];
+          formState.reset();
+          formDataNotifier.clearFormData();
 
-            if (currentSupplier != null) {
-              formKey.currentState?.patchValue({
-                'supplier': currentSupplier,
-              });
-            }
-          } else {
+          if (currentSupplier != null) {
+            formKey.currentState?.patchValue({
+              'supplier': currentSupplier,
+            });
+          }
+
+          if (!isCopy) {
             if (context.mounted) {
               ref
                   .read(quotePageRefreshTrigger.notifier)
                   .update((state) => state + 1);
               Navigator.of(context).pop(true);
             }
+          }
+
+          if (isCopy) {
+            handleCopyLastItem();
           }
         } finally {
           // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
@@ -620,50 +660,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
         }
       } else {
         autoValidateMode.value = AutovalidateMode.onUserInteraction;
-      }
-    }
-
-    Future<void> handleCopyLastItem() async {
-      try {
-        EasyLoading.show(status: '加载中...');
-        final prefs = await SharedPreferences.getInstance();
-
-        const storageKey = 'last_quote_product_add';
-        final jsonStr = prefs.getString(storageKey);
-
-        if (jsonStr != null) {
-          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-
-          data.remove('id');
-          data.remove('image');
-          data.remove('images');
-
-          data['supplier_sku'] = '';
-          data['customer_sku'] = '';
-
-          if (data['spec'] != null && data['spec'].toString().isNotEmpty) {
-            final parts = data['spec'].toString().split('x');
-            if (parts.isNotEmpty) {
-              data['length'] = parts[0];
-            }
-            if (parts.length > 1) {
-              data['width'] = parts[1];
-            }
-            if (parts.length > 2) {
-              data['heigth'] = parts[2];
-            }
-          }
-
-          // 3. 填充表单
-          formKey.currentState?.patchValue(data);
-          EasyLoading.showSuccess('已复制上一条数据');
-        } else {
-          EasyLoading.showInfo('暂无历史数据');
-        }
-      } catch (e) {
-        EasyLoading.showError('加载失败');
-      } finally {
-        EasyLoading.dismiss();
       }
     }
 
@@ -980,7 +976,9 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                         isScrollControlled: true,
                                         backgroundColor: Colors.transparent,
                                         constraints: BoxConstraints(
-                                          maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                                          maxWidth: MediaQuery.of(context)
+                                              .size
+                                              .width, // 底部抽屉宽度占满屏幕
                                         ),
                                         builder: (ctx) => FieldSelector(
                                           fields: fieldConfigs,
@@ -1303,33 +1301,78 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                           border:
                               Border(top: BorderSide(color: Color(0xFFEEEEEE))),
                         ),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF53F85),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: isSubmitting.value ? null : handleSubmit,
-                            child: isSubmitting.value
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.white),
+                        child: SafeArea(
+                          top: false,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: SizedBox(
+                                width: double.infinity,
+                                height: 56,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: colorScheme.primary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  )
-                                : const Text(
-                                    '提交',
-                                    style: TextStyle(color: Colors.white),
                                   ),
+                                  onPressed: isSubmitting.value
+                                      ? null
+                                      : () => handleSubmit(false),
+                                  child: isSubmitting.value
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : const Text(
+                                          '完成',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                ),
+                              )),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                  child: SizedBox(
+                                width: double.infinity,
+                                height: 56,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: colorScheme.secondary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: isSubmitting.value
+                                      ? null
+                                      : () => handleSubmit(true),
+                                  child: isSubmitting.value
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : const Text(
+                                          '存并复录',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                ),
+                              ))
+                            ],
                           ),
                         ),
                       ),
