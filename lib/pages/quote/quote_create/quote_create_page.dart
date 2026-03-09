@@ -45,7 +45,11 @@ class QuoteCreatePage extends HookConsumerWidget {
 
           final double rawExchange =
               double.tryParse(data.exchange ?? '') ?? 0.0;
-          notifier.setRate((rawExchange / 100).toString());
+          if (data.curreny == 'CNY') {
+            notifier.setRate("1.0000");
+          } else {
+            notifier.setRate((rawExchange / 100).toString());
+          }
 
           final String? langCode = data.language;
           final languageItem =

@@ -92,7 +92,15 @@ class SelectCurrencySheet extends HookConsumerWidget {
             // ================= Content =================
             Flexible(
               child: exchangeAsync.when(
-                data: (exchangeRates) {
+                data: (rates) {
+                  final List<ExchangeRate> exchangeRates = [
+                    const ExchangeRate(
+                      name: '人民币',
+                      shortName: 'CNY',
+                      exchangeRate: '100.0000',
+                    ),
+                    ...rates,
+                  ];
                   if (exchangeRates.isEmpty) {
                     return const Center(
                       child: Text(
