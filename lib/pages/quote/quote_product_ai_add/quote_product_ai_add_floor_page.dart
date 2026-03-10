@@ -130,6 +130,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       final response = await api.post<ResponseBody>(
         'api/open/agents/sample/store-market-product',
         data: {
+          'version': "v1",
           "images": [media],
           if (quoteId != null) "quotation_id": quoteId,
           "supplier_id": supplierId,
@@ -143,7 +144,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           .map((d) => utf8.decode(d))
           .transform(const LineSplitter())
           .listen((line) {
-        // logger.d(line);
+        logger.d(line);
         if (line.startsWith('event:')) {
           eventType = line.replaceFirst('event:', '').trim();
           return;
@@ -164,15 +165,17 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           try {
             final Map<String, dynamic> raw = jsonDecode(content);
 
-            logger.d(raw);
+            // logger.d(raw);
             _updateItemData(taskId, raw, isCreated: true);
           } catch (_) {
             // 如果解析失败，说明 created 也是分片的
             buffer += content;
           }
         } else {
-          // message 识别信息通常是流式的
-          buffer += content;
+          final Map<String, dynamic> dataJson = jsonDecode(content);
+          final String data = dataJson['content'] ?? "";
+
+          buffer += data;
         }
 
         logger.d(buffer);

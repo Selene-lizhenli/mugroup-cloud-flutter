@@ -196,6 +196,7 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
       final response = await api.post<ResponseBody>(
         'api/open/agents/sample/store-market-note-product',
         data: {
+          'version': 'v1',
           'item_type': 'market_product',
           'template_id': state.currentTemplateId,
           "images": [media],
@@ -205,8 +206,12 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         options: Options(responseType: ResponseType.stream),
       );
 
-      sub = response.data?.stream.map((d) => utf8.decode(d)).listen((chunk) {
+      sub = response.data?.stream
+          .map((d) => utf8.decode(d))
+          .transform(const LineSplitter())
+          .listen((chunk) {
         final lines = chunk.split('\n');
+
         for (var line in lines) {
           if (line.startsWith('event:')) {
             eventType = line.replaceFirst('event:', '').trim();
@@ -226,20 +231,23 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
           if (eventType == 'created') {
             // ✅ 处理 ID 绑定
-
-            logger.d(content);
-            _bindIdsToItems(taskId, content);
+            final Map<String, dynamic> dataJson = jsonDecode(content);
+            final String actualContent = dataJson['content'] ?? content;
+            // logger.d(content);
+            _bindIdsToItems(taskId, actualContent);
           } else {
-            // ✅ 处理实时打字机渲染
-            buffer += content;
-
-            logger.d(buffer);
-            _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
+            final Map<String, dynamic> dataMap = jsonDecode(content);
+            final String data = dataMap['content'] ?? "";
+            if (content.isNotEmpty) {
+              buffer += data;
+              // logger.d("Current Buffer: $buffer");
+              _updateGroupItemsFromBuffer(taskId, buffer, currentTemplate);
+            }
           }
         }
       },
-          onDone: () => _finalizeGroup(taskId, sub),
-          onError: (_) => _finalizeGroup(taskId, sub));
+              onDone: () => _finalizeGroup(taskId, sub),
+              onError: (_) => _finalizeGroup(taskId, sub));
     } catch (e) {
       _finalizeGroup(taskId, sub);
     }
