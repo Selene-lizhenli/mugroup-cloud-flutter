@@ -143,7 +143,7 @@ class EntryGridModule extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: colorScheme.surface.withOpacity(0.93),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),

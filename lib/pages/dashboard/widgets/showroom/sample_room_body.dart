@@ -43,7 +43,7 @@ class SampleRoomBody extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: colorScheme.surface,
+        color: colorScheme.surface.withOpacity(0.93),
            boxShadow: const [
             BoxShadow(
               color: pageShadowColor,

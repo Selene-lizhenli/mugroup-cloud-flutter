@@ -70,7 +70,7 @@ class DashboardPage extends HookConsumerWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                end: Alignment.bottomCenter, 
                 colors: isSpringFestival || isYuanxiaoFestival
                     ? [
                         const Color.fromARGB(235, 168, 20, 9),
@@ -96,9 +96,9 @@ class DashboardPage extends HookConsumerWidget {
           top: 0,
           bottom: 0,
           child: Image.asset(
-            getBackgroundPic, 
+            getBackgroundPic,
             fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topRight,
           ),
         ),
         SafeArea(
@@ -129,7 +129,7 @@ class DashboardPage extends HookConsumerWidget {
                         children: [
                           const SizedBox(height: 6),
                           const EntryGridModule(),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 5),
                           SelectedModulesWidget(key: selectedModulesKey),
                         ],
                       ),

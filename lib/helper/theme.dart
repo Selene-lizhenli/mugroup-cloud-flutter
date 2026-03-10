@@ -48,7 +48,7 @@ final getBackgroundPic = () {
     urlString = 'assets/festival/yanhua.png';
   } else if (isQingmingFestival) {
     //清明
-    urlString = 'assets/festival/qinging.png';
+    urlString = 'assets/festival/qingming.png';
   } else if (is38Festival) {
     urlString = 'assets/festival/38.png';
   } else {

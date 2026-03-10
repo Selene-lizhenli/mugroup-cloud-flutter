@@ -148,7 +148,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: colorScheme.surface,
+          color: colorScheme.surface.withOpacity(0.93), 
           boxShadow: const [
             BoxShadow(
               color: pageShadowColor,
