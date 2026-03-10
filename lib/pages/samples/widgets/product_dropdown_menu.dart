@@ -215,6 +215,21 @@ class ProductDropdownMenu extends HookConsumerWidget {
         multiple: option?.multiple,
         optionsColumns: option?.optionsColumns,
         options: options,
+        onChange: (value) {
+          if (option?.multiple == false) {
+            final newQuery = Map<String, dynamic>.from(query);
+
+            final val =
+                (value is List && value.isNotEmpty) ? value.first : value;
+
+            if (val == null || (val is List && val.isEmpty)) {
+              newQuery.remove(field);
+            } else {
+              newQuery[field] = [val];
+            }
+            homeNotifier.setQuery(newQuery);
+          }
+        },
         onConfirm: (value) {
           final newQuery = Map<String, dynamic>.from(query);
           if (value == null || (value is List && value.isEmpty)) {
