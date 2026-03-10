@@ -184,7 +184,7 @@ class InspectionAddSku extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(_radius)),
             ),
             child: isLoading
-                ? MuProgressIndicator()
+                ? const MuProgressIndicator()
                 : Text(
                     isUploadMode ? '上传并解析' : '确认添加',
                     style: const TextStyle(
