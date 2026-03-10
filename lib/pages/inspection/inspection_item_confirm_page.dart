@@ -652,7 +652,11 @@ class _PhotoCard extends HookConsumerWidget {
     required void Function(MediaDragData source, MediaDragData target) onSwap,
     void Function(List<File>)? onContinuousCapture,
   }) {
-    final currentImages = mediaMap[apiKey] ?? [];
+    List<TemporaryMedia> currentImages = mediaMap[apiKey] ?? [];
+
+    if (apiKey != 'details' && currentImages.length > 1) {
+      currentImages = [currentImages.last];
+    }
 
     return SizedBox(
       key: key,
