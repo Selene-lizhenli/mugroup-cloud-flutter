@@ -105,7 +105,7 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildInputArea(),
+          _buildInputArea(colorScheme),
           if (_uploadedMedias.isNotEmpty) _buildImageGallery(),
           _buildBottomToolbar(colorScheme),
         ],
@@ -113,12 +113,12 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
     );
   }
 
-  Widget _buildInputArea() {
+  Widget _buildInputArea(colorScheme) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TextField(

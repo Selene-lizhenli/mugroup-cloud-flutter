@@ -44,13 +44,13 @@ class ExchangeChartHeader extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      maxHeightRatio: 0.7,
+      maxHeightRatio: 0.56,
       builder: (sheetContext) {
         final maxHeight = MediaQuery.of(sheetContext).size.height * 0.7;
         return Container(
           constraints: BoxConstraints(maxHeight: maxHeight),
           decoration: const BoxDecoration(
-            color: Colors.transparent, 
+            color: Colors.transparent,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Column(
@@ -73,7 +73,7 @@ class ExchangeChartHeader extends StatelessWidget {
                             .titleMedium
                             ?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: colorScheme.primary),
+                                color: colorScheme.onSurface),
                       ),
                     ),
                     IconButton(
@@ -86,36 +86,27 @@ class ExchangeChartHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider(height: 1, color: colorScheme.outlineVariant),
+              Divider(height: 1, color: colorScheme.primary.withOpacity(0.1)),
               if (currencyList != null && currencyList!.isNotEmpty)
                 Flexible(
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     itemCount: currencyList!.length,
-                    separatorBuilder: (_, __) =>
-                        Divider(height: 1, color: colorScheme.outlineVariant),
+                    separatorBuilder: (_, __) => Divider(
+                        height: 1, color: colorScheme.primary.withOpacity(0.1)),
                     itemBuilder: (ctx, index) {
                       final dimension = currencyList![index];
                       final isSelected =
                           selectedDimension?.shortName == dimension.shortName;
 
                       return ListTile(
-                        dense: true,
-                        leading: Icon(
-                          isSelected
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                          size: 18,
-                          color: isSelected
-                              ? colorScheme.primary
-                              : colorScheme.outline,
-                        ),
+                        dense: true, 
                         title: Text(
-                          '${dimension.name} ${dimension.shortName}',
+                          '${dimension.name} ${dimension.shortName} ${isSelected ? '（当前选中）' : ''}',
                           style: TextStyle(
                             color: isSelected
                                 ? colorScheme.primary
-                                : colorScheme.onSurface,
+                                : colorScheme.onSurface, 
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,

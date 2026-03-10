@@ -131,6 +131,7 @@ class DashboardPage extends HookConsumerWidget {
                           const EntryGridModule(),
                           const SizedBox(height: 5),
                           SelectedModulesWidget(key: selectedModulesKey),
+                          const SizedBox(height: 20), 
                         ],
                       ),
                     ),

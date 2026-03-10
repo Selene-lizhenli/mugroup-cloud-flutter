@@ -289,6 +289,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: containerRadius,
+          border: Border.all(color: colorScheme.primary.withOpacity(0.45), width: 0.5),
         ),
         child: Row(
           children: [
@@ -394,11 +395,10 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close, size: 20, color: Colors.grey),
+                  child: const Icon(Icons.close, size: 22, color: Colors.grey),
                 ),
               ),
             ],
