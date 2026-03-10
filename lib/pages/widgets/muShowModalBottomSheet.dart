@@ -67,7 +67,7 @@ class _MuSheetWithAwningState extends State<_MuSheetWithAwning> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surface, 
+            color: colorScheme.surface,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -84,9 +84,8 @@ class _MuSheetWithAwningState extends State<_MuSheetWithAwning> {
                           color: Colors.transparent, width: 10),
                       left: const BorderSide(
                           color: Colors.transparent, width: 10),
-                    ), 
-            color: const Color(0xFFF8F2E7),
-
+                    ),
+              color: const Color.fromARGB(255, 253, 250, 243),
             ),
             child: content,
           ),
