@@ -221,20 +221,54 @@ class SkuSettingsDialog extends HookWidget {
                               if (generationType.value == 2)
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 40, right: 10, bottom: 10),
-                                  child: TextField(
-                                    controller: customPrefixController,
-                                    decoration: const InputDecoration(
-                                      hintText: '输入前缀 (如ABC)',
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 8),
-                                      border: OutlineInputBorder(),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                    ),
+                                      left: 46, right: 10, bottom: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '格式：自定义 + 4位随机数字',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: TextField(
+                                          controller: customPrefixController,
+                                          style: const TextStyle(fontSize: 14),
+                                          decoration: InputDecoration(
+                                            hintText: '例如: ABC',
+                                            hintStyle: TextStyle(
+                                                color: Colors.grey[400],
+                                                fontSize: 13),
+                                            isDense: true,
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 12),
+                                            filled: true,
+                                            fillColor: Colors.grey[50],
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey[300]!),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              borderSide: BorderSide(
+                                                  color: colorScheme.primary,
+                                                  width: 1.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
+                                ),
                             ],
                           ),
                         ),
