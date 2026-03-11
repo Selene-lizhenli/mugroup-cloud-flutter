@@ -8,6 +8,7 @@ import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/product_upload_zone.dart';
+import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/services/media.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/supply.dart';
@@ -799,6 +800,33 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   ),
                 ),
               ),
+              Material(
+                color: Colors.blue.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+                child: InkWell(
+                  onTap: () => showImageUploadSheet(context, item, onUpdate),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    width: 48,
+                    height: 56,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_photo_alternate_rounded,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(height: 2),
+                        Text('更多',
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blue[700])),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -819,6 +847,120 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
       ],
     );
   }
+}
+
+void showImageUploadSheet(BuildContext context, ProductDraftItem item,
+    Function(String, String) onUpdate) {
+  // 辅助函数：解析 ID
+  int? parseId(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    return int.tryParse(v.toString());
+  }
+
+  final int? productId = parseId(item.data['product_id']);
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+    ),
+    builder: (context) {
+      return HookConsumer(builder: (context, ref, child) {
+        final tempImages = useState<List<TemporaryMedia>?>(null);
+        final isSubmitting = useState<bool>(false);
+
+        bool hasImages =
+            tempImages.value != null && tempImages.value!.isNotEmpty;
+
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            left: 20,
+            right: 20,
+            top: 12,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2)),
+              ),
+              const Text('上传细节图片',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                child: ImageUploader(
+                  customIcon: Icons.camera_alt,
+                  value: tempImages.value,
+                  onChanged: (value) {
+                    tempImages.value = value;
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: (isSubmitting.value || !hasImages)
+                    ? null
+                    : () async {
+                        if (productId == null) {
+                          EasyLoading.showError("产品ID无效");
+                          return;
+                        }
+
+                        isSubmitting.value = true;
+
+                        try {
+                          await updateShowroomSample(
+                              productId, {'image': tempImages.value});
+
+                          EasyLoading.showSuccess('更新成功');
+
+                          if (context.mounted) Navigator.pop(context);
+                        } catch (e) {
+                          EasyLoading.showError('更新失败: $e');
+                        } finally {
+                          isSubmitting.value = false;
+                        }
+                      },
+                child: isSubmitting.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : const Text('确定更新',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      });
+    },
+  );
 }
 
 void _showPreviewDialog(BuildContext context, String imageUrl) {
