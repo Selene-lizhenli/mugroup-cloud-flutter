@@ -84,65 +84,147 @@ class QuoteCard extends HookConsumerWidget {
 
   Widget _buildHeader(BuildContext context, WidgetRef ref,
       ColorScheme colorScheme, int displayCount) {
+    // 1. 客户名称
     final customerName = item.company?.name ?? item.user?.name ?? '未知客户';
     final creatorName = item.creator?.name ?? '系统';
-    final isFiltered = selectedSupplierId != null;
 
+    // 2. 协作信息
     final collaborators = item.collaborators;
     final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
     final collabText = hasCollaborators
         ? collaborators.map((e) => e.name ?? '').join('、')
         : '暂无';
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Flexible(
-                flex: 5,
-                child: GestureDetector(
-                  onTap: onTap,
+    // 3. 创建时间格式化 (到年月)
+    final createdAt = item.createdAt;
+    final timeString = createdAt != null
+        ? '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}'
+        : '未知';
+
+    bool isExpanded = false;
+
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: 5,
+                        child: GestureDetector(
+                          onTap: onTap,
+                          child: Text(
+                            '$customerName  ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        flex: 10,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: Text(
+                                  '协作: $collabText',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: hasCollaborators
+                                        ? Colors.green[600]
+                                        : Colors.grey[400],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Icon(
+                                  isExpanded
+                                      ? Icons.keyboard_arrow_up
+                                      : Icons.keyboard_arrow_down,
+                                  color: Colors.grey,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
-                    '$customerName  ',
+                    timeString,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
+                      fontSize: 11,
+                      color: Colors.grey[400],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '创建人: $creatorName',
-                style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 3,
-                child: Text(
-                  '协作: $collabText',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color:
-                        hasCollaborators ? Colors.green[600] : Colors.grey[400],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: _buildCollaborateButton(context, ref, colorScheme),
+                ),
+              ],
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '协作: $collabText',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      '创建人: $creatorName',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              _buildCountTag(displayCount, isFiltered),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        _buildCollaborateButton(context, ref, colorScheme),
-      ],
+          ],
+        );
+      },
     );
   }
 
