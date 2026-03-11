@@ -231,10 +231,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
 
           if (eventType == 'created') {
             // ✅ 处理 ID 绑定
-            final Map<String, dynamic> dataJson = jsonDecode(content);
-            final String actualContent = dataJson['content'] ?? content;
             // logger.d(content);
-            _bindIdsToItems(taskId, actualContent);
+            _bindIdsToItems(taskId, content);
           } else {
             final Map<String, dynamic> dataMap = jsonDecode(content);
             final String data = dataMap['content'] ?? "";
