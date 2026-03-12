@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
+import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -402,14 +402,36 @@ class QuoteCard extends HookConsumerWidget {
             color: const Color(0xFFF5F5F5),
             borderRadius: BorderRadius.circular(12),
             child: InkWell(
-                onTap: () => showModalBottomSheet(
+                onTap: () async {
+                  final result =
+                      await showModalBottomSheet<Map<String, dynamic>>(
                     context: context,
                     isScrollControlled: true,
+                    useRootNavigator: true,
+                    backgroundColor: Colors.transparent,
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                      maxWidth: MediaQuery.of(context).size.width,
                     ),
-                    builder: (context) =>
-                        AddSupplierSheet(quotationId: item.id)),
+                    builder: (ctx) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                        ),
+                        child: const SupplierSelect(),
+                      );
+                    },
+                  );
+                  if (!context.mounted) return;
+
+                  if (result != null && result['id'] != null) {
+                    final String selectedSupplierId = result['id'].toString();
+
+                    await context.router.push(QuoteProductNewAddRoute(
+                      quoteId: item.id,
+                      supplierId: selectedSupplierId,
+                    ));
+                  }
+                },
                 child: const Center(
                     child: Icon(Icons.add_rounded, color: Colors.grey)))));
   }
