@@ -9,6 +9,7 @@ import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:gal/gal.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -585,6 +586,8 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
     try {
       final file = await _controller.takePicture();
+
+      await Gal.putImage(file.path);
 
       setState(() {
         if (_replaceIndex != null) {
