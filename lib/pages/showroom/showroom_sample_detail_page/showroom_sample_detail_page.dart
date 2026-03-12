@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
+import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
@@ -26,6 +27,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final home = ref.watch(homeProvider);
     final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
     final sample = useState<Sample?>(null);
@@ -224,14 +226,15 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '¥${(double.tryParse(sample.value?.purchaseCost?.toString() ?? '0.0') ?? 0.0).toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.secondary,
+                                  if (home.isDetailedMode)
+                                    Text(
+                                      '¥${(double.tryParse(sample.value?.purchaseCost?.toString() ?? '0.0') ?? 0.0).toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.secondary,
+                                      ),
                                     ),
-                                  ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 4),
@@ -523,6 +526,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
 
     final province = quote.supplier?.province ?? '';
     final city = quote.supplier?.city ?? '';
+    final home = ref.watch(homeProvider);
     final hasLocation = province.isNotEmpty || city.isNotEmpty;
 
     final specItems = [
@@ -660,7 +664,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildMainPrice(quote, orange600),
+                if (home.isDetailedMode) _buildMainPrice(quote, orange600),
                 if (quote.chuhuoAt != null)
                   Text(
                     "交期:${quote.chuhuoAt!.month}/${quote.chuhuoAt!.day}",
