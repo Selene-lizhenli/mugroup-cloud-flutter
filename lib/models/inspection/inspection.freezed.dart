@@ -23,6 +23,7 @@ mixin _$Inspection {
   int? get id => throw _privateConstructorUsedError;
   int? get type => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
   List<User>? get collaborators => throw _privateConstructorUsedError;
   List<InspectionItem>? get items => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
@@ -44,9 +45,12 @@ abstract class $InspectionCopyWith<$Res> {
       {int? id,
       int? type,
       String? name,
+      User? user,
       List<User>? collaborators,
       List<InspectionItem>? items,
       @JsonKey(name: 'created_at') String? createdAt});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -65,6 +69,7 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
     Object? id = freezed,
     Object? type = freezed,
     Object? name = freezed,
+    Object? user = freezed,
     Object? collaborators = freezed,
     Object? items = freezed,
     Object? createdAt = freezed,
@@ -82,6 +87,10 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       collaborators: freezed == collaborators
           ? _value.collaborators
           : collaborators // ignore: cast_nullable_to_non_nullable
@@ -95,6 +104,18 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -110,9 +131,13 @@ abstract class _$$InspectionImplCopyWith<$Res>
       {int? id,
       int? type,
       String? name,
+      User? user,
       List<User>? collaborators,
       List<InspectionItem>? items,
       @JsonKey(name: 'created_at') String? createdAt});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -129,6 +154,7 @@ class __$$InspectionImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? type = freezed,
     Object? name = freezed,
+    Object? user = freezed,
     Object? collaborators = freezed,
     Object? items = freezed,
     Object? createdAt = freezed,
@@ -146,6 +172,10 @@ class __$$InspectionImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       freezed == collaborators
           ? _value._collaborators
           : collaborators // ignore: cast_nullable_to_non_nullable
@@ -169,6 +199,7 @@ class _$InspectionImpl implements _Inspection {
       this.id,
       this.type,
       this.name,
+      this.user,
       final List<User>? collaborators,
       final List<InspectionItem>? items,
       @JsonKey(name: 'created_at') this.createdAt)
@@ -184,6 +215,8 @@ class _$InspectionImpl implements _Inspection {
   final int? type;
   @override
   final String? name;
+  @override
+  final User? user;
   final List<User>? _collaborators;
   @override
   List<User>? get collaborators {
@@ -210,7 +243,7 @@ class _$InspectionImpl implements _Inspection {
 
   @override
   String toString() {
-    return 'Inspection(id: $id, type: $type, name: $name, collaborators: $collaborators, items: $items, createdAt: $createdAt)';
+    return 'Inspection(id: $id, type: $type, name: $name, user: $user, collaborators: $collaborators, items: $items, createdAt: $createdAt)';
   }
 
   @override
@@ -221,6 +254,7 @@ class _$InspectionImpl implements _Inspection {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.user, user) || other.user == user) &&
             const DeepCollectionEquality()
                 .equals(other._collaborators, _collaborators) &&
             const DeepCollectionEquality().equals(other._items, _items) &&
@@ -235,6 +269,7 @@ class _$InspectionImpl implements _Inspection {
       id,
       type,
       name,
+      user,
       const DeepCollectionEquality().hash(_collaborators),
       const DeepCollectionEquality().hash(_items),
       createdAt);
@@ -258,6 +293,7 @@ abstract class _Inspection implements Inspection {
       final int? id,
       final int? type,
       final String? name,
+      final User? user,
       final List<User>? collaborators,
       final List<InspectionItem>? items,
       @JsonKey(name: 'created_at') final String? createdAt) = _$InspectionImpl;
@@ -271,6 +307,8 @@ abstract class _Inspection implements Inspection {
   int? get type;
   @override
   String? get name;
+  @override
+  User? get user;
   @override
   List<User>? get collaborators;
   @override

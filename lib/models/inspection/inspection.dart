@@ -11,6 +11,7 @@ class Inspection with _$Inspection {
     int? id,
     int? type,
     String? name,
+    User? user,
     List<User>? collaborators,
     List<InspectionItem>? items,
     @JsonKey(name: 'created_at') String? createdAt,

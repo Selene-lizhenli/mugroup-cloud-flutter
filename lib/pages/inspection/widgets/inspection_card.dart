@@ -85,7 +85,7 @@ class InspectionCard extends HookConsumerWidget {
                   Icon(Icons.person_outline,
                       size: 16, color: colorScheme.outline),
                   const SizedBox(width: 4),
-                  Text('${user?.name}', style: greyTextStyle),
+                  Text('${inspection.user?.name}', style: greyTextStyle),
                   const SizedBox(width: 6),
                   Text(
                     '#${inspection.id}',
