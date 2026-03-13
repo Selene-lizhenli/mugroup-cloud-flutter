@@ -5,6 +5,7 @@ import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/widgets/collaboration_dialog.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class QuoteCard extends HookConsumerWidget {
@@ -82,136 +83,136 @@ class QuoteCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref,
-      ColorScheme colorScheme, int displayCount) {
-    // 1. 客户名称
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref,
+    ColorScheme colorScheme,
+    int displayCount,
+  ) {
     final customerName = item.company?.name ?? item.user?.name ?? '未知客户';
     final creatorName = item.creator?.name ?? '系统';
 
-    // 2. 协作信息
     final collaborators = item.collaborators;
     final hasCollaborators = collaborators != null && collaborators.isNotEmpty;
+
     final collabText = hasCollaborators
         ? collaborators.map((e) => e.name ?? '').join('、')
         : '暂无';
 
-    // 3. 创建时间格式化 (到年月)
     final createdAt = item.createdAt;
+
     final timeString = createdAt != null
         ? '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}'
         : '未知';
 
-    bool isExpanded = false;
+    final isExpanded = useState(false);
 
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
+    final nameStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: colorScheme.primary,
+    );
+
+    final collabStyle = TextStyle(
+      fontSize: 11,
+      color: hasCollaborators ? Colors.green[600] : Colors.grey[400],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        /// 计算客户名称宽度
+        final namePainter = TextPainter(
+          text: TextSpan(text: customerName, style: nameStyle),
+          maxLines: 1,
+          textDirection: TextDirection.ltr,
+        )..layout();
+
+        /// 计算协作文本宽度
+        final collabPainter = TextPainter(
+          text: TextSpan(text: '协作人: $collabText', style: collabStyle),
+          maxLines: 1,
+          textDirection: TextDirection.ltr,
+        )..layout();
+
+        const reservedWidth = 80;
+
+        final remainWidth =
+            constraints.maxWidth - namePainter.width - reservedWidth;
+
+        final showCollab = remainWidth > collabPainter.width;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        flex: 5,
+                      Expanded(
                         child: GestureDetector(
                           onTap: onTap,
                           child: Text(
-                            '$customerName  ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.primary,
-                            ),
+                            customerName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: nameStyle,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        flex: 10,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 2.0),
-                                child: Text(
-                                  '协作: $collabText',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: hasCollaborators
-                                        ? Colors.green[600]
-                                        : Colors.grey[400],
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () {
-                                setState(() {
-                                  isExpanded = !isExpanded;
-                                });
-                              },
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Icon(
-                                  isExpanded
-                                      ? Icons.keyboard_arrow_up
-                                      : Icons.keyboard_arrow_down,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ],
+                      if (showCollab) ...[
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            '协作人: $collabText',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: collabStyle,
+                          ),
+                        ),
+                      ],
+                      GestureDetector(
+                        onTap: () {
+                          isExpanded.value = !isExpanded.value;
+                        },
+                        child: Icon(
+                          isExpanded.value
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: 20,
+                          color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    timeString,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[400],
-                    ),
+                const SizedBox(width: 8),
+                Text(
+                  timeString,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[400],
                   ),
                 ),
                 const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.only(top: 2.0),
-                  child: _buildCollaborateButton(context, ref, colorScheme),
-                ),
+                _buildCollaborateButton(context, ref, colorScheme),
               ],
             ),
-            if (isExpanded)
+            if (isExpanded.value)
               Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                padding: const EdgeInsets.only(top: 8),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
-                        '协作: $collabText',
+                        '协作人: $collabText',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[600],
+                          color: Colors.green[600],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Text(
                       '创建人: $creatorName',
                       style: TextStyle(
