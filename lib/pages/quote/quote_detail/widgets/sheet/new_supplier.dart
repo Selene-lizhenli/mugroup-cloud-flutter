@@ -3,7 +3,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
-import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -142,9 +141,10 @@ class AddSupplierSheet extends HookConsumerWidget {
         }
 
         final supplier = await storeSupplySupplier(data);
+
         if (supplier != null && context.mounted) {
-          Navigator.pop(context);
-          if (supplier.id != null) {
+          Navigator.of(context).pop(supplier.toJson());
+          if (supplier.id != null || quotationId != null) {
             await context.router.push(QuoteProductNewAddRoute(
               quoteId: quotationId,
               supplierId: supplier.id.toString(),

@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
@@ -11,7 +12,6 @@ import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
-import 'package:cloud/pages/widgets/supplier_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
@@ -757,22 +757,12 @@ Future<void> _showPreSelectionSheet(
             GestureDetector(
               onTap: () async {
                 final result = await showModalBottomSheet<Map<String, dynamic>>(
-                  context: context,
-                  isScrollControlled: true,
-                  useRootNavigator: true,
-                  backgroundColor: Colors.transparent,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-                  ),
-                  builder: (ctx) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(ctx).viewInsets.bottom,
-                      ),
-                      child: const SupplierSelect(),
-                    );
-                  },
-                );
+                    context: context,
+                    isScrollControlled: true,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+                    ),
+                    builder: (context) => const AddSupplierSheet());
 
                 if (result != null && context.mounted) {
                   tempSupplier.value = result; // 仅修改弹窗内预览
