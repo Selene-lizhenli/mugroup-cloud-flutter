@@ -536,7 +536,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
     _controller = CameraController(
       widget.cameras[0],
-      ResolutionPreset.medium,
+      ResolutionPreset.veryHigh,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.jpeg
@@ -587,7 +587,9 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     try {
       final file = await _controller.takePicture();
 
-      await Gal.putImage(file.path);
+      Gal.putImage(file.path).catchError((e) {
+        debugPrint("后台保存相册失败: $e");
+      });
 
       setState(() {
         if (_replaceIndex != null) {
@@ -742,11 +744,16 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
       HapticFeedback.selectionClick();
 
       double fullWidth = box.size.width;
-      double fullHeight = box.size.height;
 
-      double x = localPosition.dy / fullHeight;
-      double y = 1.0 - (localPosition.dx / fullWidth);
-      Offset focusOffset = Offset(x, y);
+      double cameraHeight = fullWidth * _controller.value.aspectRatio;
+
+      double xp = localPosition.dx / fullWidth;
+      double yp = localPosition.dy / cameraHeight;
+
+      xp = xp.clamp(0.0, 1.0);
+      yp = yp.clamp(0.0, 1.0);
+
+      Offset focusOffset = Offset(xp, yp);
 
       try {
         if (_controller.value.focusMode != FocusMode.auto) {
