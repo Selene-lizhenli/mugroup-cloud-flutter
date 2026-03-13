@@ -206,12 +206,11 @@ class AddSupplierSheet extends HookConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ImageUploader(
-                    directCamera: true,
                     maxCount: 1,
                     customIcon: Icons.camera_alt,
                     recognizeAtBottom: true,
                     enableContinuous: true,
-                    showRecognizeButton: true,
+                    autoRecognize: true,
                     recognizeApi: identifySupplierShopCard,
                     onRecognizeResult: (data) {
                       if (data != null && data is Map<String, dynamic>) {

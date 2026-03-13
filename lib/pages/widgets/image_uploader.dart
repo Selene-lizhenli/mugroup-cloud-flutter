@@ -56,6 +56,8 @@ class ImageUploader extends HookConsumerWidget {
 
   final IconData? customIcon;
 
+  final bool autoRecognize;
+
   final String? uploaderKey;
   final void Function(MediaDragData source, MediaDragData target)? onSwap;
 
@@ -69,6 +71,7 @@ class ImageUploader extends HookConsumerWidget {
     this.maxCount,
     this.value,
     this.onChanged,
+    this.autoRecognize = false,
     this.showRecognizeButton = false,
     this.recognizeApi,
     this.onRecognizeResult,
@@ -95,6 +98,24 @@ class ImageUploader extends HookConsumerWidget {
     final bool hasError =
         (errorText?.isNotEmpty ?? false) && currentImages.isEmpty;
 
+    Future<void> executeRecognition(List<TemporaryMedia> medias) async {
+      if (recognizeApi == null) return;
+      try {
+        await EasyLoading.show(
+            status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
+        final result = await recognizeApi!({'image': medias});
+        if (result != null && onRecognizeResult != null) {
+          EasyLoading.showSuccess("识别成功");
+          onRecognizeResult!(result);
+        } else {
+          EasyLoading.dismiss();
+        }
+      } catch (e) {
+        debugPrint('自动识别异常: $e');
+        EasyLoading.dismiss();
+      }
+    }
+
     // --- 内部方法：上传文件 (用于连拍/普通拍摄) ---
     Future<void> uploadFiles(List<File> files) async {
       final List<TemporaryMedia> uploadedMedias = [];
@@ -109,7 +130,15 @@ class ImageUploader extends HookConsumerWidget {
       }
 
       if (uploadedMedias.isNotEmpty) {
-        onChanged?.call([...currentImages, ...uploadedMedias]);
+        final List<TemporaryMedia> newList = [
+          ...currentImages,
+          ...uploadedMedias
+        ];
+        onChanged?.call(newList);
+
+        if (autoRecognize && recognizeApi != null) {
+          await executeRecognition(newList);
+        }
       }
     }
 
