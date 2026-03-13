@@ -4,6 +4,7 @@ import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:cloud/constants/version_log.dart';
 
 /// 首页顶部用户信息模块
 
@@ -16,7 +17,7 @@ class HomeUserHeader extends HookConsumerWidget {
   const HomeUserHeader({super.key});
 
   Widget _buildUpdateItem(BuildContext context, ThemeData theme,
-      ColorScheme colorScheme, String version, List<String> items) {
+      ColorScheme colorScheme, List<String> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -49,44 +50,34 @@ class HomeUserHeader extends HookConsumerWidget {
         showDragHandle: true,
         isScrollControlled: true,
         constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.68,
           maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
         ),
         builder: (_) => Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '版本更新日志：',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
+                for (final log in kVersionLogs) ...[
+                  Text(
+                    log.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                _buildUpdateItem(
-                  context,
-                  theme,
-                  colorScheme,
-                  '2.0最新升级内容',
-                  [
-                    '✨ 新增功能',
-                    '  • 新增《验货》模块，记录商品验货数据',
-                    '  • 新增《采购助手》模块，帮助您采购寻源',
-                    '  • 新增《独立站》模块，帮助您管理独立站和询盘数据',
-                    '  • 新增《留言板》模块，帮助您进行留言反馈',
-                    '  • 新增《客户》模块，帮助您管理客户信息',
-                    '  • 新增《供应商》模块，帮助您管理供应商信息',
-                    '  • 新增系统主題切换功能',
-                    '🔧 功能改进',
-                    '  • 商品列表展示优化，提供简洁模式和详细模式',
-                    '  • 首页布局优化， 展示数据统计模块和应用入口',
-                  ],
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  _buildUpdateItem(
+                    context,
+                    theme,
+                    colorScheme,
+                    log.items,
+                  ),
+                  const SizedBox(height: 10),
+                ], 
               ],
             ),
           ),
