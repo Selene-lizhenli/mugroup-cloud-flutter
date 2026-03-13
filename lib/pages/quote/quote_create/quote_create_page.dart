@@ -77,7 +77,7 @@ class QuoteCreatePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditMode ? '编辑报价单' : '新增报价单'),
+        title: Text(isEditMode ? '编辑带客详情' : '新增带客记录'),
         backgroundColor: colorScheme.surface,
       ),
       body: isLoading.value

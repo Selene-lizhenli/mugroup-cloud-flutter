@@ -39,7 +39,7 @@ class QuoteDetailPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('报价单详情'),
+        title: const Text('带客详情'),
         backgroundColor: Theme.of(context).colorScheme.surfaceTint, 
         actions: [
           IconButton(
