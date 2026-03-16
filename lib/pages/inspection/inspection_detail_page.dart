@@ -779,7 +779,6 @@ class _InspectionListItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isExpanded = useState(false);
-    final isVerified = item.status == 1;
 
     final colorScheme = Theme.of(context).colorScheme;
     final Color errorColor = colorScheme.error;
@@ -795,7 +794,6 @@ class _InspectionListItem extends HookWidget {
 
     // 4. 生成动态检查项数据
     final checkPoints = [
-      {'label': '验货', 'checked': isVerified},
       {'label': '重量', 'checked': hasMedia('weight_proof')},
       {'label': '条码', 'checked': hasMedia('barcode_label')},
       {'label': '开箱', 'checked': hasMedia('unboxing')},
@@ -840,7 +838,7 @@ class _InspectionListItem extends HookWidget {
                     ),
                   ),
                 ),
-                _buildStatusTag(isVerified),
+                _buildStatusTag(item.status),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () async {
@@ -928,20 +926,35 @@ class _InspectionListItem extends HookWidget {
     );
   }
 
-  Widget _buildStatusTag(bool isVerified) {
+  Widget _buildStatusTag(int? status) {
+    final label = {1: '合格', 2: '微瑕', 3: '不合格'}[status] ?? '未验货';
+
+    final color = {1: Colors.green, 2: Colors.orange, 3: Colors.red}[status] ??
+        Colors.grey;
+
+    final icon = {
+          1: Icons.check_circle,
+          2: Icons.info,
+          3: Icons.cancel
+        }[status] ??
+        Icons.radio_button_unchecked;
+
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          isVerified ? Icons.check_circle : Icons.check_circle_outline,
+          icon,
           size: 16,
-          color: isVerified ? const Color(0xFF52C41A) : Colors.grey[400],
+          color: color,
         ),
         const SizedBox(width: 4),
         Text(
-          isVerified ? '已验货' : '未验货',
+          label,
           style: TextStyle(
-            color: isVerified ? const Color(0xFF52C41A) : Colors.grey[500],
+            color: color,
             fontSize: 14,
+            fontWeight:
+                (status ?? 0) != 0 ? FontWeight.w500 : FontWeight.normal,
           ),
         ),
       ],

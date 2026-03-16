@@ -32,6 +32,8 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
     final isLoading = useState(true);
     final isSubmitting = useState(false);
 
+    final submittingStatus = useState<int>(0);
+
     final mediaMap = useState<Map<String, List<TemporaryMedia>>>({});
     void updateMedia(String key, List<TemporaryMedia> medias) {
       final newMap = Map<String, List<TemporaryMedia>>.from(mediaMap.value);
@@ -83,8 +85,15 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
       return null;
     }, []);
 
-    Future<void> handleSubmit() async {
+    Future<void> handleSubmit(int targetStatus) async {
       if (isSubmitting.value) return;
+
+      if ((targetStatus == 2 || targetStatus == 3) &&
+          remarkController.text.trim().isEmpty) {
+        EasyLoading.showInfo('微瑕或不合格必须填写验货备注');
+        return;
+      }
+
       final bool hasImages =
           mediaMap.value.values.any((medias) => medias.isNotEmpty);
 
@@ -92,6 +101,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         EasyLoading.showInfo('请至少上传一张验货图片');
         return;
       }
+      submittingStatus.value = targetStatus;
       isSubmitting.value = true;
       try {
         final Map<String, dynamic> submitData = {};
@@ -110,7 +120,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         });
 
         submitData['remark'] = remarkController.text;
-        submitData['status'] = 1;
+        submitData['status'] = targetStatus;
 
         await updateInspectionItem(id, submitData);
 
@@ -163,8 +173,8 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
           ),
           _buildBottomBtn(
             onPressed: handleSubmit,
-            primaryColor: primaryColor,
             isSubmitting: isSubmitting.value,
+            submittingStatus: submittingStatus.value,
           ),
         ],
       ),
@@ -172,50 +182,95 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
   }
 
   Widget _buildBottomBtn({
-    VoidCallback? onPressed,
-    required Color primaryColor,
+    required Function(int) onPressed,
     required bool isSubmitting,
-  }) =>
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: Colors.white,
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: isSubmitting ? null : onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              minimumSize: const Size(double.infinity, 44),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)),
+    required int submittingStatus,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: Colors.white,
+      child: SafeArea(
+        child: Row(
+          children: [
+            _buildActionBtn(
+              label: '微瑕',
+              color: Colors.orange,
+              status: 2,
+              isSubmitting: isSubmitting,
+              submittingStatus: submittingStatus,
+              onPressed: () => onPressed(2),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (isSubmitting == true) ...[
-                  const SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                Text(
-                  isSubmitting == true ? '正在提交' : '完成验货',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                )
-              ],
+            const SizedBox(width: 12),
+            _buildActionBtn(
+              label: '不合格',
+              color: Colors.red,
+              status: 3,
+              isSubmitting: isSubmitting,
+              submittingStatus: submittingStatus,
+              onPressed: () => onPressed(3),
             ),
-          ),
+            const SizedBox(width: 12),
+            _buildActionBtn(
+              label: '合格',
+              color: Colors.green,
+              status: 1,
+              isSubmitting: isSubmitting,
+              submittingStatus: submittingStatus,
+              onPressed: () => onPressed(1),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
+
+  Widget _buildActionBtn({
+    required String label,
+    required Color color,
+    required int status,
+    required bool isSubmitting,
+    required int submittingStatus,
+    required VoidCallback onPressed,
+  }) {
+    final bool isThisSubmitting = isSubmitting && submittingStatus == status;
+
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: isSubmitting ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          disabledBackgroundColor: color.withOpacity(0.5),
+          padding: EdgeInsets.zero,
+          minimumSize: const Size(0, 44),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isThisSubmitting) ...[
+              const SizedBox(
+                height: 14,
+                width: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              isThisSubmitting ? '提交中' : label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _InfoCard extends StatelessWidget {
@@ -225,6 +280,31 @@ class _InfoCard extends StatelessWidget {
   const _InfoCard(
       {required this.blue, required this.text, this.inspectionItem});
 
+  Widget _buildStatusTag(int? status) {
+    final label = {1: '合格', 2: '微瑕', 3: '不合格'}[status] ?? '未验货';
+
+    final color = {1: Colors.green, 2: Colors.orange, 3: Colors.red}[status] ??
+        Colors.grey;
+
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: color,
+          fontWeight: FontWeight.w600,
+          height: 1.1,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return _BaseCard(
@@ -233,11 +313,17 @@ class _InfoCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _TitleRow(
-                  icon: Icons.store_mall_directory_outlined,
-                  title: '产品验货',
-                  color: blue,
-                  textColor: text),
+              Row(
+                children: [
+                  _TitleRow(
+                    icon: Icons.store_mall_directory_outlined,
+                    title: '产品验货',
+                    color: blue,
+                    textColor: text,
+                  ),
+                  _buildStatusTag(inspectionItem?.status),
+                ],
+              ),
               Text('SKU: ${inspectionItem?.itemNo}',
                   style: TextStyle(color: blue, fontWeight: FontWeight.w500)),
             ],
