@@ -370,34 +370,28 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (sampleSimilars.value.isEmpty)
-                                      const Padding(
-                                        padding: EdgeInsets.all(20.0),
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    else
-                                      // 瀑布流
-                                      MasonryGridView.count(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        crossAxisCount: 2,
-                                        mainAxisSpacing: 5,
-                                        crossAxisSpacing: 5,
-                                        itemCount: sample
-                                                .value?.supplyQuotes?.length ??
-                                            0,
-                                        padding: const EdgeInsets.all(4),
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          final quote = sample
-                                              .value?.supplyQuotes?[index];
-                                          if (quote == null) {
-                                            return const SizedBox.shrink();
-                                          }
+                                    // 瀑布流
+                                    MasonryGridView.count(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 5,
+                                      crossAxisSpacing: 5,
+                                      itemCount:
+                                          sample.value?.supplyQuotes?.length ??
+                                              0,
+                                      padding: const EdgeInsets.all(4),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final quote =
+                                            sample.value?.supplyQuotes?[index];
+                                        if (quote == null) {
+                                          return const SizedBox.shrink();
+                                        }
 
-                                          return SupplyQuoteCard(quote: quote);
-                                        },
-                                      ),
+                                        return SupplyQuoteCard(quote: quote);
+                                      },
+                                    ),
                                   ],
                                 ),
                               ),
