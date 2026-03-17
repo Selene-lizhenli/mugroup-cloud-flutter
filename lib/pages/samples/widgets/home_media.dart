@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/media.dart';
+import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -34,11 +35,21 @@ class HomeMeidaItem extends StatelessWidget {
                         ),
                   width: 2),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: CachedNetworkImage(
-                fit: BoxFit.cover,
-                imageUrl: media.url,
+            child: GestureDetector(
+              onTap: () {
+                showFlanImagePreview(
+                  context,
+                  images: [media.url],
+                  startPosition: 0,
+                  loop: false,
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  imageUrl: media.url,
+                ),
               ),
             ),
           ),
