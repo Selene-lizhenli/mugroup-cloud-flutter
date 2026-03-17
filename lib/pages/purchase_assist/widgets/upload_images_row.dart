@@ -1,10 +1,9 @@
- 
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
-import 'package:cloud/pages/purchase_assist/purchase_assist_page.dart'; 
-import 'package:flutter/material.dart'; 
-import 'package:hooks_riverpod/hooks_riverpod.dart';  
-import 'package:cached_network_image/cached_network_image.dart'; 
- 
+import 'package:cloud/pages/purchase_assist/purchase_assist_page.dart';
+import 'package:flant/components/image_preview.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 /// 已上传的搜索图片横向列表（首项为加号，点击执行 openGallery）
 class UploadedImagesRow extends ConsumerWidget {
@@ -102,13 +101,23 @@ class UploadedImagesRow extends ConsumerWidget {
                                   ]
                                 : null,
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              width: 72,
-                              height: 72,
-                              fit: BoxFit.cover,
+                          child: GestureDetector(
+                            onTap: () {
+                              showFlanImagePreview(
+                                context,
+                                images: [media.url],
+                                startPosition: 0,
+                                loop: false,
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
