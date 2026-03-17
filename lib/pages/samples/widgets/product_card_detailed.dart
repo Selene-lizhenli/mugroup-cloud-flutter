@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-class ProductCardDetailed extends StatelessWidget {
+class ProductCardDetailed extends HookConsumerWidget {
   final Sample sample;
   final GestureTapCallback? onTap;
   final GestureTapCallback? onTapAddSample;
@@ -19,9 +21,38 @@ class ProductCardDetailed extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final itemTypeSpan = _buildItemTypeSpan(context);
+
+    final quotationInfo =
+        ref.watch(cartProvider.select((state) => state.quotationInfo));
+
+    final showPrice = quotationInfo?.showPrice ?? false;
+    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
+    final exchange = quotationInfo?.exchange ?? 1.0;
+    final commissionRate = quotationInfo?.commissionRate ?? 0.0;
+    final currency = quotationInfo?.curreny ?? "CNY";
+
+    final double rawCost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
+    final double taxRate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
+
+    double baseCost = rawCost;
+    if (!showTaxRatePrice) {
+      baseCost = rawCost / (1 + taxRate * 0.01);
+    }
+
+    double finalPriceValue =
+        (baseCost / exchange) * (1 + commissionRate * 0.01);
+
+    Map<String, String> symbols = {
+      "CNY": "¥",
+      "USD": "\$",
+      "EUR": "€",
+      "GBP": "£"
+    };
+    String symbol = symbols[currency] ?? "¥";
+    String displayPrice = finalPriceValue.toStringAsFixed(2);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
@@ -145,19 +176,19 @@ class ProductCardDetailed extends StatelessWidget {
                     // 价格
                     Row(
                       children: [
-                        if (sample.purchaseCost != null)
+                        if (sample.purchaseCost != null && showPrice)
                           RichText(
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text: '¥',
+                                  text: symbol,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: colorScheme.secondary,
                                   ),
                                 ),
                                 TextSpan(
-                                  text: sample.purchaseCost,
+                                  text: displayPrice,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -171,7 +202,9 @@ class ProductCardDetailed extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 5),
                                       child: Text(
-                                        '(含税率 ${sample.taxRate!})',
+                                        showTaxRatePrice
+                                            ? '(含税率 ${sample.taxRate!}%)'
+                                            : '(已扣除税率 ${sample.taxRate!}%)',
                                         style: TextStyle(
                                           color: colorScheme
                                               .surfaceContainerHighest,

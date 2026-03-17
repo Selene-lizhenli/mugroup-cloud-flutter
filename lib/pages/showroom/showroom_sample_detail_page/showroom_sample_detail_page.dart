@@ -3,6 +3,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
+import 'package:cloud/pages/cart/models/state.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/product_card.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
@@ -28,6 +30,8 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+    final quotationInfo =
+        ref.watch(cartProvider.select((s) => s.quotationInfo));
     final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
     final sample = useState<Sample?>(null);
@@ -38,6 +42,25 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
     final isLoading = useState<bool>(true);
     final hasMounted = useState(false);
+
+    // --- 价格计算逻辑 ---
+    final showPrice = quotationInfo?.showPrice ?? false;
+    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
+    final symbol = (quotationInfo?.curreny == 'USD' ? '\$' : '¥');
+
+    double getFinalPrice() {
+      final cost = double.tryParse(sample.value?.purchaseCost ?? '') ?? 0.0;
+      final rate = double.tryParse(sample.value?.taxRate ?? '') ?? 0.0;
+
+      // 基础价处理
+      double base = showTaxRatePrice ? cost : (cost / (1 + rate * 0.01));
+      // 汇率与佣金换算
+      return base /
+          (quotationInfo?.exchange ?? 1) *
+          (1 + (quotationInfo?.commissionRate ?? 0) * 0.01);
+    }
+
+    final displayPrice = getFinalPrice().toStringAsFixed(2);
 
     loadSample(int id) async {
       try {
@@ -226,13 +249,34 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  if (home.isDetailedMode)
-                                    Text(
-                                      '¥${(double.tryParse(sample.value?.purchaseCost?.toString() ?? '0.0') ?? 0.0).toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.bold,
-                                        color: colorScheme.secondary,
+                                  if (home.isDetailedMode && showPrice)
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: symbol,
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: colorScheme.secondary,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text: displayPrice,
+                                            style: TextStyle(
+                                                fontSize: 26,
+                                                fontWeight: FontWeight.bold,
+                                                color: colorScheme.secondary),
+                                          ),
+                                          if (sample.value?.hasTaxRate == true)
+                                            TextSpan(
+                                              text: showTaxRatePrice
+                                                  ? ' (含税${sample.value!.taxRate}%)'
+                                                  : ' (扣税${sample.value!.taxRate}%)',
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                   Container(
@@ -523,6 +567,10 @@ class SupplyQuoteCard extends HookConsumerWidget {
     final home = ref.watch(homeProvider);
     final hasLocation = province.isNotEmpty || city.isNotEmpty;
 
+    final quotationInfo =
+        ref.watch(cartProvider.select((s) => s.quotationInfo));
+    final showPrice = quotationInfo?.showPrice ?? false;
+
     final specItems = [
       if (quote.customerPrice != null)
         _buildRowItem(Icons.payments_outlined, "客户报价", quote.customerPrice!),
@@ -658,7 +706,8 @@ class SupplyQuoteCard extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (home.isDetailedMode) _buildMainPrice(quote, orange600),
+                if (home.isDetailedMode && showPrice)
+                  _buildMainPrice(quote, orange600, quotationInfo),
                 if (quote.chuhuoAt != null)
                   Text(
                     "交期:${quote.chuhuoAt!.month}/${quote.chuhuoAt!.day}",
@@ -712,18 +761,21 @@ class SupplyQuoteCard extends HookConsumerWidget {
         style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)));
   }
 
-  Widget _buildMainPrice(Quote quote, Color activeColor) {
-    // 修复点 3: 极致安全的价格分割逻辑
-    final rawPrice = quote.purchaseCost ?? '0.00';
-    final parts = rawPrice.split('.');
+  Widget _buildMainPrice(Quote quote, Color activeColor, QuotationInfo? info) {
+    final isTax = quote.canBill ?? false;
 
-    // 确保 parts 至少有一个元素，即使 rawPrice 为空字符串
-    final String intPart =
-        parts.isNotEmpty ? (parts[0].isEmpty ? '0' : parts[0]) : '0';
+    final exchange = info?.exchange ?? 1.0;
+    final commission = info?.commissionRate ?? 0.0;
+
+    // 工厂价格换算：(工厂原始成本 / 汇率) * (1 + 佣金)
+    final double rawCost = double.tryParse(quote.purchaseCost ?? '0') ?? 0.0;
+    final double finalValue = (rawCost / exchange) * (1 + commission * 0.01);
+
+    final parts = finalValue.toStringAsFixed(2).split('.');
+    final String intPart = parts[0];
     final String decPart = parts.length > 1 ? parts[1] : '00';
 
-    final currency = quote.currency == 'USD' ? '\$' : '¥';
-    final isTax = quote.canBill ?? false;
+    final currency = info?.curreny == 'USD' ? '\$' : '¥';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
