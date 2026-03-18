@@ -3,6 +3,7 @@ import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:video_compress_plus/video_compress_plus.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 import 'package:video_player/video_player.dart';
@@ -34,17 +35,32 @@ class VideoUploader extends StatelessWidget {
         FlanActionSheetAction(
           name: "拍摄视频",
           callback: (action) async {
+            Navigator.pop(context);
             await _handleCamera(context);
           },
         ),
         FlanActionSheetAction(
           name: "从手机相册选择",
           callback: (action) async {
+            Navigator.pop(context);
             await _handlePickVideo(context);
           },
         ),
       ],
     );
+  }
+
+  bool _isFileSizeValid(File file) {
+    const int maxSizeBytes = 77 * 1024 * 1024;
+    final int fileSize = file.lengthSync();
+
+    if (fileSize > maxSizeBytes) {
+      final double sizeInMb = fileSize / (1024 * 1024);
+      EasyLoading.showError(
+          '视频文件过大 (${sizeInMb.toStringAsFixed(1)}MB)，请限制在 77MB 以内');
+      return false;
+    }
+    return true;
   }
 
   Future<void> _handlePickVideo(BuildContext context) async {
@@ -60,6 +76,7 @@ class VideoUploader extends StatelessWidget {
     final File? file = await assets.first.originFile;
     if (file == null) return;
 
+    if (!_isFileSizeValid(file)) return;
     _uploadFile(file);
   }
 
@@ -77,21 +94,52 @@ class VideoUploader extends StatelessWidget {
     final File? file = await asset.originFile;
     if (file == null) return;
 
+    if (!_isFileSizeValid(file)) return;
     _uploadFile(file);
   }
 
   Future<void> _uploadFile(File file) async {
     try {
+      EasyLoading.show(status: '正在压缩视频...');
+
+      await VideoCompress.cancelCompression();
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      MediaInfo? info = await VideoCompress.compressVideo(
+        file.path,
+        quality: VideoQuality.DefaultQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+
+      File fileToUpload =
+          (info != null && info.file != null) ? info.file! : file;
+
       EasyLoading.show(status: '正在上传视频...');
-      final media = await upload(file: file);
+      final media = await upload(file: fileToUpload);
 
       final newList = List<TemporaryMedia>.from(value);
       newList.add(media);
       onChanged(newList);
 
       EasyLoading.showSuccess('上传完成');
-    } catch (e) {
-      EasyLoading.showError('上传失败');
+
+      // 清理缓存
+      await VideoCompress.deleteAllCache();
+    } catch (e, stack) {
+      debugPrint('视频压缩错误详情: $e');
+      debugPrint('堆栈信息: $stack');
+
+      try {
+        debugPrint('压缩失败，尝试直接上传原文件...');
+        final media = await upload(file: file);
+        final newList = List<TemporaryMedia>.from(value);
+        newList.add(media);
+        onChanged(newList);
+        EasyLoading.showSuccess('上传完成(未压缩)');
+      } catch (uploadError) {
+        EasyLoading.showError('上传失败');
+      }
     } finally {
       EasyLoading.dismiss();
     }
