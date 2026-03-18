@@ -6,6 +6,7 @@ import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
+import 'package:cloud/pages/widgets/video_uploader.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:cloud/constants/form_definitions.dart';
@@ -401,6 +402,8 @@ class _PhotoCard extends HookConsumerWidget {
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
     final colorScheme = Theme.of(context).colorScheme;
 
+    const String videoKey = 'inspection_video';
+
     // 状态：是否直接拍照 (默认为 true)
     final isDirectCamera = useState(true);
 
@@ -677,7 +680,35 @@ class _PhotoCard extends HookConsumerWidget {
                     ),
                   ),
                 ],
-              )
+              ),
+
+              const SizedBox(height: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _TitleRow(
+                        icon: Icons.video_camera_back_outlined,
+                        title: '验货视频',
+                        color: blue,
+                        textColor: text,
+                      ),
+                      Text('${mediaMap[videoKey]?.length ?? 0}/1个',
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  VideoUploader(
+                    label: null,
+                    maxCount: 1,
+                    value: mediaMap[videoKey] ?? [],
+                    onChanged: (newList) => onMediaChanged(videoKey, newList),
+                  ),
+                ],
+              ),
             ],
           );
         },
