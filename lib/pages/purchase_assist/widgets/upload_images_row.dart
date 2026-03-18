@@ -103,12 +103,18 @@ class UploadedImagesRow extends ConsumerWidget {
                           ),
                           child: GestureDetector(
                             onTap: () {
-                              showFlanImagePreview(
-                                context,
-                                images: [media.url],
-                                startPosition: 0,
-                                loop: false,
-                              );
+                              if (isSelected) {
+                                showFlanImagePreview(
+                                  context,
+                                  images: [media.url],
+                                  startPosition: 0,
+                                  loop: false,
+                                );
+                              } else {
+                                notifier.setSearchMedia(media);
+                                notifier.loadProducts(
+                                    params: {"media_id": media.id});
+                              }
                             },
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
