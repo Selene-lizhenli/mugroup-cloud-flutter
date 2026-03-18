@@ -51,13 +51,13 @@ class VideoUploader extends StatelessWidget {
   }
 
   bool _isFileSizeValid(File file) {
-    const int maxSizeBytes = 77 * 1024 * 1024;
+    const int maxSizeBytes = 50 * 1024 * 1024;
     final int fileSize = file.lengthSync();
 
     if (fileSize > maxSizeBytes) {
       final double sizeInMb = fileSize / (1024 * 1024);
       EasyLoading.showError(
-          '视频文件过大 (${sizeInMb.toStringAsFixed(1)}MB)，请限制在 77MB 以内');
+          '视频文件过大 (${sizeInMb.toStringAsFixed(1)}MB)，请限制在 50MB 以内');
       return false;
     }
     return true;
