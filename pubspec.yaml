@@ -102,6 +102,7 @@ dependencies:
   device_info_plus: ^11.3.0
   gal: 2.1.1
   video_player: ^2.9.5
+  video_compress_plus: ^1.0.0
     # path: ../flant
 
 dev_dependencies:
