@@ -180,23 +180,47 @@ class ProductDropdownMenu extends HookConsumerWidget {
       if (!supportFacet.containsKey(field)) continue;
 
       final isCategory = field == "category_id";
+      final isSupplier = field == "supplier_ids";
 
-      // 如果不是分类且数量少于等于1，则跳过
-      if (!isCategory && facetCount.counts.length <= 1) {
+      final currentQueryValues = query[field] as List? ?? [];
+      if (!isCategory &&
+          facetCount.counts.length <= 1 &&
+          currentQueryValues.isEmpty) {
         continue;
       }
 
       final option = menuOptions[field];
-      final selectValues = query[field];
 
-      final options =
-          (isCategory ? categories.value : facetCount.counts).map((item) {
+      final Set<String> selectStringValues =
+          currentQueryValues.map((e) => e.toString()).toSet();
+
+      final rawData = isCategory ? categories.value : facetCount.counts;
+      final List<dynamic> sortedData = List.from(rawData);
+
+      sortedData.sort((a, b) {
+        final String valA = isCategory
+            ? (a as Category).id.toString()
+            : (a as FacetCountCount).value;
+        final String valB = isCategory
+            ? (b as Category).id.toString()
+            : (b as FacetCountCount).value;
+
+        final bool aSelected = selectStringValues.contains(valA);
+        final bool bSelected = selectStringValues.contains(valB);
+
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+        return 0;
+      });
+
+      final options = sortedData.map((item) {
         final String val = isCategory
             ? (item as Category).id.toString()
             : (item as FacetCountCount).value;
+
         String label = isCategory ? (item as Category).name ?? val : val;
 
-        if (field == "supplier_ids") {
+        if (isSupplier) {
           final supplier =
               suppliers.value.firstWhereOrNull((s) => s.id.toString() == val);
           label = supplier?.name ?? label;
@@ -205,20 +229,23 @@ class ProductDropdownMenu extends HookConsumerWidget {
         return TDDropdownItemOption(
           label: label,
           value: val,
-          selected: selectValues is List &&
-              selectValues.map((e) => e.toString()).contains(val),
+          selected: selectStringValues.contains(val),
         );
       }).toList();
 
+      final baseLabel = supportFacet[field] ?? "";
+      final displayLabel = selectStringValues.isNotEmpty
+          ? "$baseLabel(${selectStringValues.length})"
+          : baseLabel;
+
       menus.add(TDDropdownItem(
-        label: supportFacet[field],
-        multiple: option?.multiple,
-        optionsColumns: option?.optionsColumns,
+        label: displayLabel,
+        multiple: option?.multiple ?? false,
+        optionsColumns: option?.optionsColumns ?? 1,
         options: options,
         onChange: (value) {
           if (option?.multiple == false) {
             final newQuery = Map<String, dynamic>.from(query);
-
             final val =
                 (value is List && value.isNotEmpty) ? value.first : value;
 
@@ -235,7 +262,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
           if (value == null || (value is List && value.isEmpty)) {
             newQuery.remove(field);
           } else {
-            newQuery[field] = value;
+            newQuery[field] = value is List ? value : [value];
           }
           homeNotifier.setQuery(newQuery);
         },
