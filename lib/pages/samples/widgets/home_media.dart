@@ -7,11 +7,13 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 class HomeMeidaItem extends StatelessWidget {
   final TemporaryMedia media;
   final GestureTapCallback? onTapDelete;
+  final VoidCallback? onTap;
   final bool active;
   const HomeMeidaItem({
     super.key,
     required this.media,
     required this.active,
+    this.onTap,
     this.onTapDelete,
   });
 
@@ -37,12 +39,17 @@ class HomeMeidaItem extends StatelessWidget {
             ),
             child: GestureDetector(
               onTap: () {
-                showFlanImagePreview(
-                  context,
-                  images: [media.url],
-                  startPosition: 0,
-                  loop: false,
-                );
+                if (active) {
+                  showFlanImagePreview(
+                    context,
+                    images: [media.url],
+                    startPosition: 0,
+                    loop: false,
+                  );
+                } else {
+                  // 如果未选中，点击执行【切换】
+                  onTap?.call();
+                }
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
@@ -116,13 +123,11 @@ class HomeMedia extends StatelessWidget {
                 child: Row(
                   children: [
                     for (var item in media) ...[
-                      GestureDetector(
+                      HomeMeidaItem(
+                        media: item,
                         onTap: () => onTapMedia?.call(item),
-                        child: HomeMeidaItem(
-                          media: item,
-                          onTapDelete: () => onDeleteMedia?.call(item),
-                          active: currentMediaId == item.id,
-                        ),
+                        onTapDelete: () => onDeleteMedia?.call(item),
+                        active: currentMediaId == item.id,
                       ),
                       const SizedBox(
                         width: 10,
