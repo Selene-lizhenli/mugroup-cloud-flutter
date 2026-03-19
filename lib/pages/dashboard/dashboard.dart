@@ -117,11 +117,11 @@ class DashboardPage extends HookConsumerWidget {
                 ),
                 Stack(
                   children: [
-                    if (notNeedTopPosition) ...[const SizedBox(height: 1)] else
-                      Positioned.fill(
-                        top: 70,
-                        child: Container(color: colorScheme.surfaceTint),
-                      ),
+                    // if (notNeedTopPosition) ...[const SizedBox(height: 1)] else
+                    //   Positioned.fill(
+                    //     top: 70,
+                    //     child: Container(color: colorScheme.surfaceTint),
+                    //   ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: pageHorizontalPadding),

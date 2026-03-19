@@ -41,7 +41,7 @@ class MyPage extends HookConsumerWidget {
             margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.03),
+              color: colorScheme.primary.withOpacity(0.06),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(

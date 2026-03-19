@@ -30,7 +30,7 @@ class UserInfoHeader extends StatelessWidget {
           children: [
             const SizedBox(height: 8),
             Image.asset(
-              'assets/photo/benben_s.png',
+              'assets/element/benben_ava.png',
               width: 45,
               fit: BoxFit.contain,
             ),

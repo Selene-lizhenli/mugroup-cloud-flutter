@@ -30,7 +30,7 @@ final isYuanxiaoFestival = () {
 
 // 判断是否是清明时段
 final isQingmingFestival = () {
-  final is2026Qingming = inRange(DateTime(2026, 4, 3), DateTime(2026, 4, 5));
+  final is2026Qingming = inRange(DateTime(2026, 4, 2), DateTime(2026, 4, 5));
   return is2026Qingming;
 }();
 

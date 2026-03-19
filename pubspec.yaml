@@ -186,8 +186,7 @@ flutter:
     - assets/aiTemplets/floor_002.jpg
     - assets/aiTemplets/notepad_001.jpg 
     - assets/element/awning.png
-    - assets/photo/benben_c.png
-    - assets/photo/benben_s.png 
+    - assets/element/benben_ava.png  
     - assets/photo/christmastree.png 
     - assets/photo/login.png 
     - assets/festival/yanhua.png

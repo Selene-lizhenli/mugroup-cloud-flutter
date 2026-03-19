@@ -77,7 +77,7 @@ class HomeUserHeader extends HookConsumerWidget {
                     log.items,
                   ),
                   const SizedBox(height: 10),
-                ], 
+                ],
               ],
             ),
           ),
@@ -100,7 +100,7 @@ class HomeUserHeader extends HookConsumerWidget {
             isSpringFestival
                 ? 'assets/element/logonoicon.png'
                 : 'assets/logo.webp',
-            width: isSpringFestival ? 85 : 116,
+            width: isSpringFestival ? 85 : 108,
             fit: BoxFit.contain,
           ),
           const Spacer(),
@@ -114,9 +114,13 @@ class HomeUserHeader extends HookConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.person,
-                      size: 24, color: colorScheme.onSurface.withOpacity(0.72)),
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [ 
+                  Image.asset(
+                    'assets/element/benben_ava.png',
+                    width: 19,
+                    fit: BoxFit.contain,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     user?.name ?? "",
