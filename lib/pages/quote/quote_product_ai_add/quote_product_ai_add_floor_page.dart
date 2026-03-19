@@ -84,75 +84,6 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     return ProductAiAddState();
   }
 
-  Future<void> uploadSingleProductContinuous(
-      List<File> files, WidgetRef ref, int? quoteId, String? supplierId) async {
-    if (files.isEmpty) return;
-
-    try {
-      state = state.copyWith(isUploading: true);
-      EasyLoading.show(status: '正在处理首图...');
-
-      final media = await upload(file: files.first);
-      final taskId = media.thumbUrl ?? '';
-
-      final newItem = ProductDraftItem(
-        data: {'old_thumb': taskId},
-        media: media,
-        isRecognizing: true,
-      );
-      state = state.copyWith(items: [newItem, ...state.items]);
-
-      _startIndividualSse(taskId, media, quoteId, supplierId);
-
-      EasyLoading.dismiss();
-
-      _backgroundListenAndAppend(taskId, files.sublist(1), ref);
-    } catch (e) {
-      debugPrint('连拍初始上传失败: $e');
-      EasyLoading.showError('上传失败');
-    } finally {
-      state = state.copyWith(isUploading: false);
-    }
-  }
-
-  void _backgroundListenAndAppend(
-      String taskId, List<File> remainingFiles, WidgetRef ref) {
-    if (remainingFiles.isEmpty) return;
-
-    late ProviderSubscription sub;
-    sub = ref.listenManual(productAiAddProviderFloor, (previous, next) {
-      final matches = next.items.where((e) => e.data['old_thumb'] == taskId);
-
-      if (matches.isEmpty) return;
-
-      final item = matches.first;
-
-      final String? pid = item.data['product_id'];
-
-      if (pid != null && pid.isNotEmpty) {
-        sub.close();
-
-        _appendRemainingImages(pid, remainingFiles);
-      }
-    });
-  }
-
-  Future<void> _appendRemainingImages(
-      String productId, List<File> files) async {
-    for (int i = 0; i < files.length; i++) {
-      try {
-        EasyLoading.showToast('正在关联细节图 ${i + 1}/${files.length}');
-        final media = await upload(file: files[i]);
-        await updateShowroomSample(int.parse(productId), {
-          'image': [media]
-        });
-      } catch (e) {
-        debugPrint("追加图片失败: $e");
-      }
-    }
-    EasyLoading.showSuccess('产品图片追加完成');
-  }
-
   void changeTemplate(String templateId) {
     if (state.currentTemplateId == templateId) return;
     state = state.copyWith(currentTemplateId: templateId);
@@ -610,11 +541,6 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                     onFileSelected: (File file) {
                       controller.uploadAndRecognize(
                           file, ref, quoteId, supplierId);
-                    },
-                    onContinuousSelected: (files) async {
-                      controller.uploadSingleProductContinuous(
-                          files, ref, quoteId, supplierId);
-                      return null;
                     },
                   ),
                 ),
