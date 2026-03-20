@@ -273,7 +273,7 @@ class LoginPage extends HookConsumerWidget {
                                     children: [
                                       Text("网页版: https://cloud.mugroup.com"),
                                       SizedBox(width: 10),
-                                      Text("客服: 669082"),
+                                      Text("客服: $customerPhoneNumber"),
                                     ],
                                   ),
                                 ),

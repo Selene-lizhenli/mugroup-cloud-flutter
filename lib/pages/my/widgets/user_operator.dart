@@ -1,4 +1,5 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserOperatorSection extends HookConsumerWidget {
   const UserOperatorSection({super.key});
@@ -15,8 +17,7 @@ class UserOperatorSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final cart = ref.read(cartProvider.notifier);
-    final user = ref.watch(userProvider).user;
+    final cart = ref.read(cartProvider.notifier); 
     final theme = Theme.of(context);
 
     void showThemeSelector() {
@@ -28,7 +29,7 @@ class UserOperatorSection extends HookConsumerWidget {
           maxWidth: MediaQuery.of(context).size.width,
           minHeight: 200,
           maxHeight: 320,
-        ), 
+        ),
         builder: (_) => Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -56,7 +57,7 @@ class UserOperatorSection extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: currentTheme == ThemeType.pink
-                          ? const Color(0xFFFA338A)
+                          ? primaryColorPink
                           : colorScheme.outlineVariant,
                       width: currentTheme == ThemeType.pink ? 2 : 1,
                     ),
@@ -67,7 +68,7 @@ class UserOperatorSection extends HookConsumerWidget {
                         width: 35,
                         height: 35,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFA338A),
+                          color: primaryColorPink,
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -105,7 +106,7 @@ class UserOperatorSection extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: currentTheme == ThemeType.blue
-                          ? const Color(0xFF355EBF)
+                          ? primaryColorBlue
                           : colorScheme.outlineVariant,
                       width: currentTheme == ThemeType.blue ? 2 : 1,
                     ),
@@ -116,7 +117,7 @@ class UserOperatorSection extends HookConsumerWidget {
                         width: 35,
                         height: 35,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF355EBF),
+                          color: primaryColorBlue,
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -228,6 +229,58 @@ class UserOperatorSection extends HookConsumerWidget {
             CupertinoIcons.info,
             color: colorScheme.tertiary,
           ),
+        ),
+        Divider(
+          indent: 10,
+          endIndent: 10,
+          height: 1,
+          color: colorScheme.primary.withOpacity(0.05),
+        ),
+        ListTile(
+          tileColor: colorScheme.surface,
+          trailing: Icon(
+            Icons.chevron_right,
+            color: colorScheme.onSurface,
+          ),
+          title: Row(children: [
+            Text(
+              '联系技术人员',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+              ),
+            ), 
+          ]),
+          leading: const Icon(
+            Icons.phone,
+            color: Color(0xFF08D9D6),
+          ),
+          onTap: () async {
+            showFlanActionSheet(
+              context,
+              cancelText: "取消",
+              actions: [
+                FlanActionSheetAction(
+                  name: '拨打短号($customerPhoneNumber)',
+                  callback: (action) async {
+                    final phoneNumber = customerPhoneNumber.toString().trim();
+                    if (phoneNumber.isEmpty) {
+                      EasyLoading.showError('短号为空');
+                      return;
+                    }
+                    try {
+                      final uri = Uri(scheme: 'tel', path: phoneNumber);
+                      await launchUrl(uri);
+                    } catch (e) {
+                      EasyLoading.showError('${'拨号失败'}：${e.toString()}');
+                    }
+                  },
+                ),
+              ],
+              closeable: false,
+              safeAreaInsetBottom: true,
+              closeOnClickAction: true,
+            );
+          },
         ),
         Divider(
           indent: 10,
