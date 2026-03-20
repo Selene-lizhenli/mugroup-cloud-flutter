@@ -23,6 +23,10 @@ class AppRouter extends RootStackRouter {
         ],
       ),
       AutoRoute(
+        page: SampleRankListRoute.page,
+        path: '/dashboard/rank',
+      ),
+      AutoRoute(
         page: CartRoute.page,
         path: '/samples/cart',
       ),

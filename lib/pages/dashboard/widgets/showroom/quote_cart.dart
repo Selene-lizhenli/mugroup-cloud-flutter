@@ -3,6 +3,7 @@ import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
+import 'package:cloud/pages/dashboard/widgets/product_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,8 @@ import 'package:cloud/pages/widgets/image_show.dart';
 class QuoteTopChartContent extends StatefulWidget {
   final List<QuoteTopStats> data;
   final DateRange selectedRange;
-  final void Function(DateRange range, Map<String, String> params)? onRangeChanged;
+  final void Function(DateRange range, Map<String, String> params)?
+      onRangeChanged;
   final bool? isLoading;
   final void Function(GlobalKey)? handleExpandScroll;
 
@@ -50,11 +52,12 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
     // 只取前9条数据
     final displayData = widget.data.take(9).toList();
     final isLoading = widget.isLoading;
-    final dimenLabel = sampleDimensionConfigs[1]['label'] as String; //当前选中的维度的标签名字
+    final dimenLabel =
+        sampleDimensionConfigs[1]['label'] as String; //当前选中的维度的标签名字
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +120,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isExpanded ? '收起' : '更多',
+                        _isExpanded ? '收起' : '展开',
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.primary,
@@ -144,145 +147,25 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
           Column(
             key: _expandedContentKey,
             children: [
-              ...displayData.asMap().entries.expand<Widget>((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isTopThree = index < 3;
-                final medalColor = index == 0
-                    ? const Color(0xFFFFD700) // 金
-                    : index == 1
-                        ? const Color(0xFFC0C0C0) // 银
-                        : const Color(0xFFCD7F32); // 铜
-
-                return [
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface,
-                        ),
-                        child: InkWell(
-                          onTap: item.id != null
-                              ? () {
-                                  if (context.mounted) {
-                                    context.router.push(
-                                      ShowroomSampleDetailRoute(id: item.id!),
-                                    );
-                                  }
-                                }
-                              : null,
-                          borderRadius: BorderRadius.circular(8),
-                          child: Row(
-                            children: [
-                              // 缩略图
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(2),
-                                child: SizedBox(
-                                  width: 55,
-                                  height: 55,
-                                  child: ImageShow(
-                                    imageUrl: item.thumbUrl ?? '',
-                                    fit: BoxFit.contain,
-                                    enablePreview: false,
-                                    showErrorText: true,
-                                    errorIconSize: 18,
-                                    errorTextSize: 7,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              // 内容
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.sampleName ?? ' ',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '样品编号: ${item.sampleNo ?? ' '}',
-                                          style: TextStyle(
-                                              color: colorScheme.onSurface
-                                                  .withOpacity(0.72),
-                                              fontSize: 10),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          '报价次数：${item.count ?? ' '}',
-                                          style: TextStyle(
-                                              color: colorScheme.onSurface
-                                                  .withOpacity(0.72),
-                                              fontSize: 10),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              // 箭头图标（可点击）
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Icon(Icons.arrow_forward_ios,
-                                  color: colorScheme.outline, size: 14),
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (isTopThree)
-                        Positioned(
-                          left: 2,
-                          top: 2,
-                          child: Container(
-                            width: 22,
-                            height: 22,
-                            decoration: BoxDecoration(
-                              color: medalColor,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 2,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.emoji_events,
-                                  size: 14,
-                                  color: index == 1
-                                      ? Colors.grey.shade800
-                                      : Colors.white,
-                                ),
-                                // Text(index.toString()),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  // 添加水平分割线（最后一条数据后不添加）
-                  if (index < displayData.length - 1)
-                    Divider(
-                      height: 1,
-                      color: colorScheme.outline.withOpacity(0.15),
-                    ),
-                ];
-              }),
+              TopRankItemCard(displayData: displayData, type: 'quote'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    highlightColor: colorScheme.tertiary,
+                    splashColor: colorScheme.tertiary,
+                    focusColor: colorScheme.tertiary,
+                    child: Text('更多',
+                        style: TextStyle(
+                            color: colorScheme.outline, fontSize: 12)),
+                    onTap: () {
+                      context.router.push(SampleRankListRoute(
+                          data: widget.data, label: dimenLabel));
+                    },
+                  )
+                ],
+              )
             ],
           ),
       ],
@@ -394,7 +277,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                       barRods: [
                         BarChartRodData(
                           y: count.toDouble(),
-                          colors: [colorScheme.secondary],
+                          colors: [colorScheme.primary],
                           width: 24,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(4),
