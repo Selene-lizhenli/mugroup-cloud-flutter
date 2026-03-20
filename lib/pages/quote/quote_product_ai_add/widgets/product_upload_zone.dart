@@ -9,12 +9,16 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class ProductUploadZone extends HookConsumerWidget {
   final Function(File file) onFileSelected;
+  final Function(List<Map<String, dynamic>> groups)? onProductGroupSelected;
+  final String type;
   final double width;
   final double height;
 
   const ProductUploadZone({
     super.key,
     required this.onFileSelected,
+    this.onProductGroupSelected,
+    required this.type,
     this.width = 90,
     this.height = 90,
   });
@@ -62,6 +66,14 @@ class ProductUploadZone extends HookConsumerWidget {
             _handleContinuous(context);
           },
         ),
+        if (type == 'floor')
+          FlanActionSheetAction(
+            name: "产品连拍(主图/细节图)",
+            callback: (_) async {
+              Navigator.pop(context);
+              _handleProductContinuous(context);
+            },
+          ),
         FlanActionSheetAction(
           name: "从相册选择",
           callback: (_) async {
@@ -89,7 +101,6 @@ class ProductUploadZone extends HookConsumerWidget {
     if (cameras.isEmpty) return;
 
     final List<XFile>? result = await Navigator.push(
-      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
           builder: (context) => ContinuousCameraPage(cameras: cameras)),
@@ -99,6 +110,24 @@ class ProductUploadZone extends HookConsumerWidget {
       for (var xFile in result) {
         onFileSelected(File(xFile.path));
       }
+    }
+  }
+
+  Future<void> _handleProductContinuous(BuildContext context) async {
+    final cameras = await availableCameras();
+    if (cameras.isEmpty) return;
+
+    final dynamic result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              ContinuousCameraPage(cameras: cameras, isMain: true)),
+    );
+
+    if (result != null && result is List) {
+      final List<Map<String, dynamic>> groups =
+          List<Map<String, dynamic>>.from(result);
+      onProductGroupSelected?.call(groups);
     }
   }
 }

@@ -523,8 +523,13 @@ class ImageUploader extends HookConsumerWidget {
 
 class ContinuousCameraPage extends StatefulWidget {
   final List<CameraDescription> cameras;
+  final bool isMain;
 
-  const ContinuousCameraPage({super.key, required this.cameras});
+  const ContinuousCameraPage({
+    super.key,
+    required this.cameras,
+    this.isMain = false,
+  });
 
   @override
   State<ContinuousCameraPage> createState() => _ContinuousCameraPageState();
@@ -546,9 +551,13 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
   late AnimationController _shutterAnimController;
   late Animation<double> _shutterScaleAnim;
 
+  bool _isMainImage = false; // 标记主图的开关，默认关闭
+  final Map<int, bool> _mainImageFlags = {}; // 记录索引对应的图片是否为主图
+
   @override
   void initState() {
     super.initState();
+    _isMainImage = widget.isMain;
     WidgetsBinding.instance.addObserver(this);
 
     _shutterAnimController = AnimationController(
@@ -621,12 +630,15 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
       });
 
       setState(() {
+        int targetIndex;
         if (_replaceIndex != null) {
+          targetIndex = _replaceIndex!;
           if (_replaceIndex! < _capturedImages.length) {
             _capturedImages[_replaceIndex!] = file;
           }
           _replaceIndex = null;
         } else {
+          targetIndex = _capturedImages.length;
           _capturedImages.add(file);
 
           Future.delayed(const Duration(milliseconds: 100), () {
@@ -638,6 +650,10 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
               );
             }
           });
+        }
+        if (widget.isMain) {
+          _mainImageFlags[targetIndex] = _isMainImage;
+          if (_isMainImage) _isMainImage = false;
         }
       });
     } catch (e) {
@@ -663,83 +679,143 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
       barrierColor: Colors.black,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (ctx, anim1, anim2) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Stack(
-            children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(ctx),
-                  child: InteractiveViewer(
-                    child: Image.file(File(file.path), fit: BoxFit.contain),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded,
-                              color: Colors.white, size: 28),
-                          onPressed: () => Navigator.pop(ctx),
-                        ),
-                        Text("${index + 1}/${_capturedImages.length}",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600)),
-                        const SizedBox(width: 48),
-                      ],
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter dialogSetState) {
+            // 获取当前图片是否为主图
+            final bool isMain = _mainImageFlags[index] ?? false;
+
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Stack(
+                children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(ctx),
+                      child: InteractiveViewer(
+                        child: Image.file(File(file.path), fit: BoxFit.contain),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                bottom: 40,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _deleteAndRetake(index);
-                      },
-                      child: Container(
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2C2C2C),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.refresh_rounded,
-                                color: Colors.amber, size: 20),
-                            SizedBox(width: 8),
-                            Text("重拍此页",
-                                style: TextStyle(
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded,
+                                  color: Colors.white, size: 28),
+                              onPressed: () => Navigator.pop(ctx),
+                            ),
+                            Text("${index + 1}/${_capturedImages.length}",
+                                style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500)),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600)),
+                            const SizedBox(width: 48),
                           ],
                         ),
                       ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    bottom: 40,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (widget.isMain) ...[
+                            GestureDetector(
+                              onTap: () {
+                                dialogSetState(() {
+                                  _mainImageFlags[index] = !isMain;
+                                });
+                                setState(() {});
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: isMain
+                                      ? Colors.amber.withOpacity(0.2)
+                                      : const Color(0xFF2C2C2C),
+                                  border: Border.all(
+                                      color: isMain
+                                          ? Colors.amber
+                                          : Colors.transparent),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isMain
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      color:
+                                          isMain ? Colors.amber : Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      isMain ? "取消主图" : "设为主图",
+                                      style: TextStyle(
+                                        color: isMain
+                                            ? Colors.amber
+                                            : Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                          ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              _deleteAndRetake(index);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2C2C2C),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.refresh_rounded,
+                                      color: Colors.white, size: 20),
+                                  SizedBox(width: 8),
+                                  Text("重拍",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -945,8 +1021,43 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        if (widget.isMain)
+                          SizedBox(
+                            width: 60,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isMainImage = !_isMainImage;
+                                });
+                                HapticFeedback.mediumImpact();
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _isMainImage
+                                        ? Icons.star_rounded
+                                        : Icons.star_outline_rounded,
+                                    color: _isMainImage
+                                        ? Colors.amber
+                                        : Colors.white54,
+                                    size: 28,
+                                  ),
+                                  Text(
+                                    "设为主图",
+                                    style: TextStyle(
+                                      color: _isMainImage
+                                          ? Colors.amber
+                                          : Colors.white54,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         SizedBox(
-                            width: 80,
+                            width: 40,
                             child: Center(
                               child: Text("已拍 $validCount",
                                   style: const TextStyle(
@@ -981,9 +1092,59 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
                           child: Center(
                             child: GestureDetector(
                               onTap: () {
-                                final result =
-                                    _capturedImages.whereType<XFile>().toList();
-                                Navigator.pop(context, result);
+                                if (_capturedImages.isEmpty) {
+                                  if (widget.isMain) {
+                                    Navigator.pop(
+                                        context, <Map<String, dynamic>>[]);
+                                  } else {
+                                    Navigator.pop(context, <XFile>[]);
+                                  }
+                                  return;
+                                }
+
+                                if (!widget.isMain) {
+                                  final result = _capturedImages
+                                      .whereType<XFile>()
+                                      .toList();
+                                  Navigator.pop(context, result);
+                                  return;
+                                }
+
+                                List<Map<String, dynamic>> groupedResults = [];
+                                Map<String, dynamic>? currentGroup;
+
+                                for (int i = 0;
+                                    i < _capturedImages.length;
+                                    i++) {
+                                  final file = _capturedImages[i];
+                                  if (file == null) continue; // 跳过空位
+
+                                  bool isMain = _mainImageFlags[i] == true;
+
+                                  if (isMain) {
+                                    // 遇到主图，创建新组
+                                    currentGroup = {
+                                      'main': file,
+                                      'details': <XFile>[],
+                                    };
+                                    groupedResults.add(currentGroup);
+                                  } else {
+                                    // 遇到细节图
+                                    if (currentGroup == null) {
+                                      // 容错：没拍主图直接拍细节图
+                                      currentGroup = {
+                                        'main': null,
+                                        'details': <XFile>[file],
+                                      };
+                                      groupedResults.add(currentGroup);
+                                    } else {
+                                      (currentGroup['details'] as List<XFile>)
+                                          .add(file);
+                                    }
+                                  }
+                                }
+
+                                Navigator.pop(context, groupedResults);
                               },
                               child: AnimatedOpacity(
                                 duration: const Duration(milliseconds: 200),
@@ -1021,6 +1182,20 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
     final XFile? file = _capturedImages[index];
     final bool isTarget = _replaceIndex == index;
 
+    final bool isMain = widget.isMain && (_mainImageFlags[index] ?? false);
+
+    Border? currentBorder;
+    if (isTarget) {
+      currentBorder =
+          Border.all(color: const Color(0xFFFF9500), width: 2); // 补拍状态（橙色优先）
+    } else if (isMain) {
+      currentBorder =
+          Border.all(color: Colors.amber, width: 2); // 主图状态（显眼的琥珀色/金色）
+    } else {
+      currentBorder =
+          Border.all(color: Colors.white.withOpacity(0.2), width: 1); // 默认状态
+    }
+
     return GestureDetector(
       onTap: () {
         if (file == null) {
@@ -1035,9 +1210,7 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
         height: 76,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
-          border: isTarget
-              ? Border.all(color: const Color(0xFFFF9500), width: 2)
-              : Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          border: currentBorder,
           color: Colors.white.withOpacity(0.1),
         ),
         child: ClipRRect(
@@ -1056,6 +1229,29 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
                 ),
               if (isGlobalRetakeMode && !isTarget)
                 Container(color: Colors.black54),
+              if (isMain)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: const BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(4),
+                      ),
+                    ),
+                    child: const Text(
+                      "主图",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 bottom: 0,
                 right: 0,

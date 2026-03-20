@@ -669,6 +669,7 @@ class QuoteProductAiAddNotepadPage extends HookConsumerWidget {
                         child: ProductUploadZone(
                           width: 90,
                           height: 90,
+                          type: 'notepad',
                           onFileSelected: (File file) {
                             controller.uploadAndRecognize(
                                 file, ref, quoteId, supplierId);

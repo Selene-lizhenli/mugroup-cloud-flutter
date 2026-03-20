@@ -19,6 +19,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_repair_flutter/json_repair_flutter.dart';
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class ProductDraftItem {
   final Map<String, String> data;
@@ -96,12 +97,19 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     state = state.copyWith(items: newList);
   }
 
-  Future<void> uploadAndRecognize(
-      File file, WidgetRef ref, int? quoteId, String? supplierId) async {
+  Future<void> uploadAndRecognize(File file, List<File> detailFiles,
+      WidgetRef ref, int? quoteId, String? supplierId) async {
     try {
       state = state.copyWith(isUploading: true);
       EasyLoading.show(status: '上传中...');
       final media = await upload(file: file);
+
+      List<TemporaryMedia> detailMedias = [];
+      if (detailFiles.isNotEmpty) {
+        final futures = detailFiles.map((f) => upload(file: f));
+        detailMedias = await Future.wait(futures);
+      }
+
       EasyLoading.dismiss();
 
       state = state.copyWith(isUploading: false);
@@ -114,14 +122,19 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           isRecognizing: true);
 
       state = state.copyWith(items: [newItem, ...state.items]);
-      _startIndividualSse(initialPath, media, quoteId, supplierId);
+      _startIndividualSse(
+          initialPath, media, detailMedias, quoteId, supplierId);
     } finally {
       state = state.copyWith(isUploading: false);
       EasyLoading.dismiss();
     }
   }
 
-  void _startIndividualSse(String taskId, TemporaryMedia media, int? quoteId,
+  void _startIndividualSse(
+      String taskId,
+      TemporaryMedia media,
+      List<TemporaryMedia> detailMedias,
+      int? quoteId,
       String? supplierId) async {
     String buffer = "";
     String eventType = "message"; // 默认事件类型
@@ -158,7 +171,9 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
           content = content.substring(1);
         }
 
-        if (content.contains("[DONE]")) return _finalize(taskId, sub);
+        if (content.contains("[DONE]")) {
+          return _finalize(taskId, sub, detailMedias);
+        }
 
         // --- 关键改进：针对不同 event 重置 buffer 或 增量处理 ---
         if (eventType == 'created') {
@@ -183,12 +198,12 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         // 统一尝试从当前 buffer 修复并更新 OCR 文本
         _processBufferToUI(taskId, buffer);
       },
-              onDone: () => _finalize(taskId, sub),
-              onError: (_) => _finalize(taskId, sub));
+              onDone: () => _finalize(taskId, sub, detailMedias),
+              onError: (_) => _finalize(taskId, sub, detailMedias));
 
       ref.onDispose(() => sub?.cancel());
     } catch (e) {
-      _finalize(taskId, sub);
+      _finalize(taskId, sub, detailMedias);
     }
   }
 
@@ -255,7 +270,8 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
     );
   }
 
-  void _finalize(String taskId, StreamSubscription? sub) {
+  void _finalize(String taskId, StreamSubscription? sub,
+      List<TemporaryMedia> detailMedias) async {
     sub?.cancel();
     state = state.copyWith(
       items: state.items.map((item) {
@@ -265,6 +281,26 @@ class ProductAiAddController extends AutoDisposeNotifier<ProductAiAddState> {
         return item;
       }).toList(),
     );
+
+    if (detailMedias.isNotEmpty) {
+      try {
+        final item =
+            state.items.firstWhere((e) => e.data['old_thumb'] == taskId);
+        final productIdStr = item.data['product_id'];
+
+        if (productIdStr != null && productIdStr.isNotEmpty) {
+          final int productId = int.parse(productIdStr);
+
+          // 细节图
+          List<TemporaryMedia> allImages = [...detailMedias];
+
+          await updateShowroomSample(
+              productId, {'image': allImages.map((e) => e.toJson()).toList()});
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   void updateCell(int index, String key, String value) {
@@ -538,9 +574,26 @@ class QuoteProductAiAddFloorPage extends HookConsumerWidget {
                   child: ProductUploadZone(
                     width: 90,
                     height: 90,
+                    type: 'floor',
                     onFileSelected: (File file) {
                       controller.uploadAndRecognize(
-                          file, ref, quoteId, supplierId);
+                          file, [], ref, quoteId, supplierId);
+                    },
+                    onProductGroupSelected:
+                        (List<Map<String, dynamic>> groups) {
+                      for (int i = 0; i < groups.length; i++) {
+                        var group = groups[i];
+                        XFile? mainFile = group['main'];
+                        List<XFile> detailFiles = group['details'];
+
+                        if (mainFile != null) {
+                          List<File> dFiles =
+                              detailFiles.map((e) => File(e.path)).toList();
+
+                          controller.uploadAndRecognize(File(mainFile.path),
+                              dFiles, ref, quoteId, supplierId);
+                        }
+                      }
                     },
                   ),
                 ),
