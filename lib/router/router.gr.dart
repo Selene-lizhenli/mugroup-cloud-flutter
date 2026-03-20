@@ -1419,6 +1419,7 @@ class SampleRankListRoute extends _i70.PageRouteInfo<SampleRankListRouteArgs> {
     _i73.Key? key,
     required List<dynamic> data,
     String? label,
+    String? type,
     List<_i70.PageRouteInfo>? children,
   }) : super(
           SampleRankListRoute.name,
@@ -1426,6 +1427,7 @@ class SampleRankListRoute extends _i70.PageRouteInfo<SampleRankListRouteArgs> {
             key: key,
             data: data,
             label: label,
+            type: type,
           ),
           initialChildren: children,
         );
@@ -1440,6 +1442,7 @@ class SampleRankListRoute extends _i70.PageRouteInfo<SampleRankListRouteArgs> {
         key: args.key,
         data: args.data,
         label: args.label,
+        type: args.type,
       );
     },
   );
@@ -1450,6 +1453,7 @@ class SampleRankListRouteArgs {
     this.key,
     required this.data,
     this.label,
+    this.type,
   });
 
   final _i73.Key? key;
@@ -1458,9 +1462,11 @@ class SampleRankListRouteArgs {
 
   final String? label;
 
+  final String? type;
+
   @override
   String toString() {
-    return 'SampleRankListRouteArgs{key: $key, data: $data, label: $label}';
+    return 'SampleRankListRouteArgs{key: $key, data: $data, label: $label, type: $type}';
   }
 }
 

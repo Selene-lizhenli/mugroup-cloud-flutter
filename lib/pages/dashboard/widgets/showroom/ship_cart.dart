@@ -184,6 +184,7 @@ class _TopChartContentState extends State<ShipTopChartContent> {
                         context.router.push(SampleRankListRoute(
                           data: widget.data,
                           label: dimenLabel,
+                          type: 'ship',
                         ));
                       },
                     ),

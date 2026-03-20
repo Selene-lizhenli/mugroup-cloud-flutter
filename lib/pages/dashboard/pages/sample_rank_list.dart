@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 class SampleRankListPage extends StatelessWidget {
   final List<dynamic> data;
   final String? label;
+  final String? type;
 
   const SampleRankListPage({
     super.key,
     required this.data,
     this.label,
+    this.type,
   });
 
   @override
@@ -56,6 +58,7 @@ class SampleRankListPage extends StatelessWidget {
                   TopRankItemCard(
                     displayData: displayData,
                     showInpage: true,
+                    type: type,
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 5, 16, 12),

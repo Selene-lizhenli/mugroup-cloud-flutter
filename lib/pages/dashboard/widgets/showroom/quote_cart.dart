@@ -152,20 +152,35 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  InkWell(
-                    highlightColor: colorScheme.tertiary,
-                    splashColor: colorScheme.tertiary,
-                    focusColor: colorScheme.tertiary,
-                    child: Text('更多',
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiary.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: InkWell(
+                      highlightColor: colorScheme.tertiary,
+                      splashColor: colorScheme.tertiary,
+                      focusColor: colorScheme.tertiary,
+                      child: Text(
+                        '更多',
                         style: TextStyle(
-                            color: colorScheme.outline, fontSize: 12)),
-                    onTap: () {
-                      context.router.push(SampleRankListRoute(
-                          data: widget.data, label: dimenLabel));
-                    },
-                  )
+                            color: colorScheme.onSurface.withOpacity(0.7),
+                            fontSize: 11),
+                      ),
+                      onTap: () {
+                        context.router.push(SampleRankListRoute(
+                          data: widget.data,
+                          label: dimenLabel,
+                          type: 'quote',
+                        ));
+                      },
+                    ),
+                  ),
                 ],
-              )
+              ),
+              const SizedBox(height: 10)
             ],
           ),
       ],
