@@ -8,8 +8,7 @@ import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
-import 'package:cloud/pages/widgets/build_form_card.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
+import 'package:cloud/pages/widgets/build_form_card.dart'; 
 import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -455,7 +454,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
       final images = formKey.currentState?.value['image'];
-      final user = ref.read(userProvider).user;
 
       if (images == null || (images is List && images.isEmpty)) {
         EasyLoading.showInfo("请先上传图片");
@@ -466,60 +464,15 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
 
       try {
-        final result = await identifyOcr('ExtractQtnBasic', {
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": images[0].thumbUrl,
-        });
+        final result = await identifySample({'image': images});
 
-        if (result != null &&
-            result is Map<String, dynamic> &&
-            result['success'] == true) {
-          // 1. 获取内部的数据列表
-          final List? dataList = result['data'];
-
-          if (dataList != null && dataList.isNotEmpty) {
-            // 2. 取出第一个条目作为处理对象
-            final Map<String, dynamic> rawItem =
-                Map<String, dynamic>.from(dataList.first);
-            final Map<String, dynamic> processedData = {};
-
-            final Map<String, String> fieldMapping = {
-              'item_no': 'product_no',
-              'price': 'purchase_cost',
-              'out_carton': 'outer_capacity',
-              'inner_pack': 'inner_capacity',
-              'size': 'spec',
-              'weight': 'weight',
-              'packaging_type': 'packing',
-              'unit': 'unit',
-              'volume': 'outer_volume',
-              'moq': 'moq',
-              'description': 'description_cn',
-            };
-
-            // 3. 执行映射转换（遍历 mapping 而不是遍历结果，更安全）
-            fieldMapping.forEach((oldKey, newKey) {
-              if (rawItem.containsKey(oldKey)) {
-                // 转换值为 String，因为 Input 组件通常接收 String
-                processedData[newKey] = rawItem[oldKey].toString();
-              }
-            });
-
-            EasyLoading.showSuccess("识别成功");
-
-            // 4. 打印转换后的扁平化数据
-            logger.d(processedData);
-
-            // 5. 填充表单
-            formKey.currentState?.patchValue(processedData);
-          } else {
-            EasyLoading.showInfo("未识别到有效内容");
-          }
+        if (result != null && result is Map<String, dynamic>) {
+          EasyLoading.showSuccess("识别成功");
+          formKey.currentState?.patchValue(result);
+        } else {
+          EasyLoading.dismiss();
         }
       } catch (e) {
-        logger.d(e);
         EasyLoading.showError('识别失败');
       }
     }
@@ -597,7 +550,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             "unit": submitValues["unit"],
             "material": submitValues["material"],
             "inner_capacity": submitValues["inner_capacity"],
-            "weight": submitValues["weight"],
+            "product_weight": submitValues["weight"],
             "packing": submitValues["packing"],
             "outer_capacity": submitValues["outer_capacity"],
             "outer_volume": submitValues["outer_volume"],

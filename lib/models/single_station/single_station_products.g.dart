@@ -8,13 +8,13 @@ part of 'single_station_products.dart';
 
 _$StationSampleImpl _$$StationSampleImplFromJson(Map<String, dynamic> json) =>
     _$StationSampleImpl(
-      id: (json['id'] as num?)?.toInt(),
-      qty: (json['qty'] as num?)?.toInt(),
-      price: (json['price'] as num?)?.toInt(),
+      id: intFromJson(json['id']),
+      qty: intFromJson(json['qty']),
+      price: stringFromJson(json['price']),
       active: json['active'] as bool?,
-      stationId: (json['station_id'] as num?)?.toInt(),
-      sampleId: (json['sample_id'] as num?)?.toInt(),
-      quoteId: (json['quote_id'] as num?)?.toInt(),
+      stationId: intFromJson(json['station_id']),
+      sampleId: intFromJson(json['sample_id']),
+      quoteId: intFromJson(json['quote_id']),
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       showroomSample: json['showroomSample'] == null

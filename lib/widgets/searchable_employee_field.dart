@@ -1,6 +1,5 @@
 import 'package:cloud/models/user.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart'; 
 import 'package:cloud/services/tenant.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';

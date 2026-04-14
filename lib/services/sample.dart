@@ -1,9 +1,10 @@
 import 'package:cloud/http/api.dart';
+import 'package:cloud/models/quote/export_template.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/category.dart';
-import 'package:cloud/models/sample/quotation.dart';
-import 'package:cloud/models/quote/quotation_list.dart';
+import 'package:cloud/models/sample/quotation.dart'; 
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/single_station/single_station_products.dart';
 
 Future<Sample?> updateShowroomSample(int id, Map<String, dynamic>? data) async {
   return api.post("api/tenant/showroom/samples/$id", data: data).then(
@@ -125,19 +126,53 @@ Future updateShowroomQuotation(String id, Map<String, dynamic>? data) async {
   );
 }
 
-Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
+
+//获取样品间的报价单的详情
+Future<ApiResponse<List<SingleStationSample>>> getShowroomQuotationDetail(
     Map<String, dynamic>? data) async {
-  return api.get("api/tenant/showroom/quotations", data: data).then(
-        (res) => ApiResponse<List<QuotationList>>.fromJson(
+  return api.get("api/tenant/showroom/quotationSamples", data: data).then(
+        (res) => ApiResponse<List<SingleStationSample>>.fromJson(
           res.data,
           (data) {
             var list = (data as List).cast<Map<String, dynamic>>();
-            return list.map(QuotationList.fromJson).toList();
+            return list.map(SingleStationSample.fromJson).toList();
           },
         ),
       );
 }
 
+// 获取接口返回的报价单模版
+// api/tenant/showroom/quotations/export_template/available
+Future<ApiResponse<List<ExportTemplate>>>
+    getShowroomQuotationExportTemplate() async {
+  return api
+      .get(
+        "api/tenant/showroom/quotations/export_template/available",
+      )
+      .then(
+        (res) {
+          final data = res.data;
+
+          // Some endpoints return raw `List` instead of `{ data: ..., meta: ... }`.
+          if (data is List) {
+            final list = data.cast<Map<String, dynamic>>();
+            return ApiResponse<List<ExportTemplate>>.data(
+              list.map(ExportTemplate.fromJson).toList(),
+              null,
+            );
+          }
+
+          return ApiResponse<List<ExportTemplate>>.fromJson(
+            data as Map<String, dynamic>,
+            (data) {
+              final list = (data as List).cast<Map<String, dynamic>>();
+              return list.map(ExportTemplate.fromJson).toList();
+            },
+          );
+        },
+      );
+}
+ 
 Future<Quotation?> getShowroomQuotationByQuoteNo(String quoteNo) async {
   return api.get("api/tenant/showroom/quotations/quote_no/$quoteNo").then(
     (res) {

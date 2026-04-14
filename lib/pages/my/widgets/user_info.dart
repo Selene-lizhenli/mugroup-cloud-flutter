@@ -16,9 +16,11 @@ class UserInfoHeader extends StatelessWidget {
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.fromLTRB(8, 5, 8, 10),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: colorScheme.surface.withOpacity(0.49),
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(8),
             topRight: Radius.circular(8),
           ),
@@ -43,24 +45,24 @@ class UserInfoHeader extends StatelessWidget {
                 Text(
                   "${user?.name}",
                   style: TextStyle(
-                    fontSize: 23,
-                    color: colorScheme.primary,
+                    fontSize: 22,
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   '工号: ${user?.jobNumber}',
                   style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.surfaceContainerHighest,
+                    fontSize: 15,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (user?.department != null)
                   Text(
                     '部门: ${user?.department?.name}',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: colorScheme.surfaceContainerHighest,
+                      fontSize: 15,
+                      color: colorScheme.onSurface,
                     ),
                   ),
               ],

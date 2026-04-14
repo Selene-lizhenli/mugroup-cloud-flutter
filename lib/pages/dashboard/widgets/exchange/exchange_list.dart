@@ -4,16 +4,17 @@ import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/pages/widgets/show_Error.dart';
 import 'package:flutter/material.dart';
 
-///展示汇率列表表格（ 未选择维度时）
 class ExchangeRatesValueList extends StatelessWidget {
   final List<ExchangeRate>? list;
   final bool? loading;
   final String? errorMessage;
   final VoidCallback? onRetry;
+  final void Function(ExchangeRate item)? onCurrencyTap;
 
   const ExchangeRatesValueList({
     super.key,
     this.loading = false,
+    this.onCurrencyTap,
     this.errorMessage,
     this.onRetry,
     this.list,
@@ -47,72 +48,183 @@ class ExchangeRatesValueList extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // 最少 2 列，最多 4 列；根据可用宽度自适应
-            final width = constraints.maxWidth;
-            final columns = (width / 180).floor().clamp(2, 4);
+    const double nameW = 70;
+    const double priceW = 75;
+    const double dateW = 85;
+    const double contentWidth = nameW + (priceW * 5) + dateW;
 
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: list?.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                crossAxisSpacing: 2,
-                mainAxisSpacing: 2,
-                childAspectRatio: 5.8,
-              ),
-              itemBuilder: (context, index) {
-                final item = list?[index];
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    // color: colorScheme.primary.withOpacity(0.03),
-                    borderRadius: BorderRadius.circular(2),
-                    // border: Border.all(
-                    //   color: colorScheme.primary,
-                    //   width: 0.1,
-                    // ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double tableWidth =
+            contentWidth > constraints.maxWidth ? contentWidth : constraints.maxWidth;
+        const int columnCount = 7;
+        final double extraPerCell =
+            tableWidth > contentWidth ? (tableWidth - contentWidth) / columnCount : 0;
+        final double nameCellW = nameW + extraPerCell;
+        final double priceCellW = priceW + extraPerCell;
+        final double dateCellW = dateW + extraPerCell;
+
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 260),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: tableWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: tableWidth,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withOpacity(0.06),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(4)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _buildCell('货币名称',
+                            width: nameCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme,
+                            alignment: Alignment.centerLeft),
+                        _buildCell('现汇买入价',
+                            width: priceCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme),
+                        _buildCell('现钞买入价',
+                            width: priceCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme),
+                        _buildCell('现汇卖出价',
+                            width: priceCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme),
+                        _buildCell('现钞卖出价',
+                            width: priceCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme),
+                        _buildCell('中行折算价',
+                            width: priceCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme),
+                        _buildCell('发布日期',
+                            width: dateCellW,
+                            isHeader: true,
+                            colorScheme: colorScheme,
+                            alignment: Alignment.centerRight),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${item?.name} ${item?.shortName}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            height: 1,
-                            color: colorScheme.onSurface,
-                          ),
+                  Expanded(
+                    child: Container(
+                      width: tableWidth,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                              color: colorScheme.outlineVariant, width: 0.5),
                         ),
                       ),
-                      Text(
-                        item?.exchangeRate ?? '-',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: list!.length,
+                        separatorBuilder: (context, index) => Divider(
                           height: 1,
-                          color: colorScheme.primary,
+                          thickness: 0.5,
+                          color: colorScheme.outlineVariant.withOpacity(0.5),
                         ),
+                        itemBuilder: (context, index) {
+                          final item = list![index];
+
+                          String dateStr = item.pushedAt ?? '-';
+                          if (dateStr.length > 10) {
+                            dateStr = dateStr.substring(5, 16);
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    if (onCurrencyTap != null) {
+                                      onCurrencyTap!(item);
+                                    }
+                                  },
+                                  child: _buildCell(
+                                    '${item.name ?? ''}\n${item.shortName ?? ''}',
+                                    width: nameCellW,
+                                    colorScheme: colorScheme,
+                                    alignment: Alignment.centerLeft,
+                                    isName: true,
+                                  ),
+                                ),
+                                _buildCell(item.xhBuyRate,
+                                    width: priceCellW, colorScheme: colorScheme),
+                                _buildCell(item.xzBuyRate,
+                                    width: priceCellW, colorScheme: colorScheme),
+                                _buildCell(item.xhSellRate,
+                                    width: priceCellW, colorScheme: colorScheme),
+                                _buildCell(item.xzSellRate,
+                                    width: priceCellW, colorScheme: colorScheme),
+                                _buildCell(item.midRate,
+                                    width: priceCellW, colorScheme: colorScheme),
+                                _buildCell(dateStr,
+                                    width: dateCellW,
+                                    colorScheme: colorScheme,
+                                    alignment: Alignment.centerRight),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            );
-          },
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCell(
+    String? text, {
+    required double width,
+    bool isHeader = false,
+    bool isName = false,
+    required ColorScheme colorScheme,
+    Alignment alignment = Alignment.center,
+  }) {
+    return Container(
+      width: width,
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Text(
+        text ?? '-',
+        maxLines: isName ? 2 : 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: alignment == Alignment.centerRight
+            ? TextAlign.right
+            : (alignment == Alignment.centerLeft
+                ? TextAlign.left
+                : TextAlign.center),
+        style: TextStyle(
+          fontSize: isHeader ? 11 : 10.5,
+          fontWeight: isHeader
+              ? FontWeight.w600
+              : (isName ? FontWeight.w500 : FontWeight.normal),
+          color: isHeader
+              ? colorScheme.primary
+              : (isName ? colorScheme.onSurface : colorScheme.onSurfaceVariant),
+          height: 1.0,
         ),
-      ],
+      ),
     );
   }
 }

@@ -249,7 +249,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  if (home.isDetailedMode && showPrice)
+                                  if (showPrice)
                                     RichText(
                                       text: TextSpan(
                                         children: [

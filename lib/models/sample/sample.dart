@@ -34,6 +34,7 @@ abstract class Sample with _$Sample {
     String? spec,
     SampleCategory? category,
     List<Media>? image,
+    List<Media>? audios,
   }) = _Sample;
 
   factory Sample.fromJson(Map<String, Object?> json) => _$SampleFromJson(json);

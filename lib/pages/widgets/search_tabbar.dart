@@ -7,17 +7,21 @@ final searchTextProvider = StateProvider<String>((ref) => '');
 class SearchAppTabbar extends HookConsumerWidget {
   final VoidCallback? onSearch;
   final Color? themeColor;
+  /// 为 true 时进入页面后自动聚焦搜索框并弹出软键盘（适合独立搜索页）。
+  final bool autofocus;
 
   const SearchAppTabbar({
     super.key,
     this.onSearch,
     this.themeColor, //搜索bar 默认是蓝色
+    this.autofocus = true,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textController = useTextEditingController();
+    final focusNode = useFocusNode();
     final themeColorValue = themeColor ?? colorScheme.primary;
 
     useEffect(() {
@@ -26,6 +30,14 @@ class SearchAppTabbar extends HookConsumerWidget {
       });
       return null;
     }, [textController]);
+
+    useEffect(() {
+      if (!autofocus) return null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        focusNode.requestFocus();
+      });
+      return null;
+    }, [autofocus, focusNode]);
 
     void handleSearch() {
       FocusScope.of(context).unfocus();
@@ -52,6 +64,8 @@ class SearchAppTabbar extends HookConsumerWidget {
               children: [
                 Expanded(
                   child: TextField(
+                    focusNode: focusNode,
+                    autofocus: autofocus,
                     cursorColor: themeColorValue,
                     controller: textController,
                     style: const TextStyle(

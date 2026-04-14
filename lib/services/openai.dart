@@ -60,26 +60,3 @@ Future identifySupplierShopCard(Map<String, dynamic>? data) async {
     },
   );
 }
-
-Future identifyOcr(String type, Map<String, dynamic>? data) async {
-  const url = "https://yw-host.964062.xyz:63019/mucloud/ai/ocr";
-
-  return api
-      .post(
-    url,
-    data: data,
-    options: Options(
-      headers: {
-        "x-access-token": "VEpPnatr9Ewv4RhmjKpcgqhChxwnzAmNmdanULPmoxm",
-        "x-action": type,
-        "Content-Type": "application/json",
-      },
-    ),
-  )
-      .then((res) {
-    if (res.data == null) {
-      return null;
-    }
-    return Map<String, dynamic>.from(res.data);
-  });
-}

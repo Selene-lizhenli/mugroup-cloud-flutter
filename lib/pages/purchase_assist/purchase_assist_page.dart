@@ -100,7 +100,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('比价助手'),
+          title: const Text('采购助手'),
           elevation: 0,
           foregroundColor: Colors.black,
           actions: [
@@ -225,6 +225,11 @@ class _SearchResultBody extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final selectedPlatform = state.selectedPlatform;
 
+    const List<SearchPlatformItem> amazonCountries = [
+      SearchPlatformItem(label: '加拿大', value: 'CA'),
+      SearchPlatformItem(label: '墨西哥', value: 'MX'),
+    ];
+
     useEffect(() {
       if (state.searchKeyword != searchController.text) {
         searchController.text = state.searchKeyword;
@@ -274,8 +279,7 @@ class _SearchResultBody extends HookConsumerWidget {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             constraints: BoxConstraints(
-              maxWidth:
-                  MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+              maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
             ),
             builder: (sheetContext) => GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -328,6 +332,12 @@ class _SearchResultBody extends HookConsumerWidget {
                     );
                     return;
                   }
+                  if (state.searchMediaList.isEmpty && value == 'amazon') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('亚马逊不支持关键字搜索')),
+                    );
+                    return;
+                  }
                   notifier.setSelectedPlatform(value);
                   notifier
                       .loadProducts(refresh: true, params: {"platform": value});
@@ -344,6 +354,39 @@ class _SearchResultBody extends HookConsumerWidget {
             const SizedBox(width: 4),
           ],
         ),
+        if (selectedPlatform == 'amazon')
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+            child: Row(
+              children: [
+                Text("国家站点：",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black.withOpacity(0.6),
+                        fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: MuTagList(
+                    items: amazonCountries,
+                    selectedValue: state.selectedCountry ?? 'CA',
+                    onSelected: (countryValue) {
+                      notifier.setSelectedCountry(countryValue);
+                      notifier.loadProducts(
+                        refresh: true,
+                        params: {
+                          "platform": 'amazon',
+                          "country": countryValue,
+                        },
+                      );
+                    },
+                    fontSize: 11,
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
+                    chipPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  ),
+                ),
+              ],
+            ),
+          ),
         // 顶部收缩的搜索框
         const SearchArea(),
 

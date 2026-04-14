@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// 时间范围枚举（所有时间、最近一年、最近半年、最近一个月）
 enum DateRange {
   allTime,
+  lastTwoYear,
   lastYear,
   lastHalfYear,
-  lastMonth,
 }
 
 /// 将时间范围转为 API 所需的 start/end 参数（YYYY-MM-DD）
@@ -14,14 +14,14 @@ Map<String, String> trnasDateRangeToParams(DateRange range) {
   final end = DateTime(now.year, now.month, now.day);
   late DateTime start;
   switch (range) {
+    case DateRange.lastTwoYear:
+      start = DateTime(now.year - 2, now.month, now.day);
+      break;
     case DateRange.lastYear:
       start = DateTime(now.year - 1, now.month, now.day);
       break;
     case DateRange.lastHalfYear:
       start = DateTime(now.year, now.month - 6, now.day);
-      break;
-    case DateRange.lastMonth:
-      start = DateTime(now.year, now.month - 1, now.day);
       break;
     case DateRange.allTime:
       return {'start': '', 'end': ''};
@@ -43,7 +43,7 @@ class TimeRangeSelect extends StatefulWidget {
 
   const TimeRangeSelect({
     super.key,
-    this.initialRange = DateRange.allTime,
+    this.initialRange = DateRange.lastTwoYear,
     this.onRangeChanged,
     this.padding,
     this.useAllTime = true,
@@ -84,6 +84,11 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
               onTap: () => _selectRange(DateRange.allTime),
             ),
           _RangeChip(
+            label: '最近两年',
+            isSelected: _selectedRange == DateRange.lastTwoYear,
+            onTap: () => _selectRange(DateRange.lastTwoYear),
+          ),
+          _RangeChip(
             label: '最近一年',
             isSelected: _selectedRange == DateRange.lastYear,
             onTap: () => _selectRange(DateRange.lastYear),
@@ -92,11 +97,6 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
             label: '最近半年',
             isSelected: _selectedRange == DateRange.lastHalfYear,
             onTap: () => _selectRange(DateRange.lastHalfYear),
-          ),
-          _RangeChip(
-            label: '最近一个月',
-            isSelected: _selectedRange == DateRange.lastMonth,
-            onTap: () => _selectRange(DateRange.lastMonth),
           ),
         ],
       ),
@@ -135,7 +135,7 @@ class _RangeChip extends StatelessWidget {
               height: 1,
               color: isSelected
                   ? colorScheme.onSurface.withOpacity(0.6)
-                  : colorScheme.outline ,
+                  : colorScheme.outline,
             ),
           ),
         ),

@@ -6,6 +6,13 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'contact.freezed.dart';
 part 'contact.g.dart';
 
+List<String>? _stringOrStringListToList(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return [value];
+  if (value is List) return value.map((e) => e.toString()).toList();
+  return null;
+}
+
 @freezed
 class Contact with _$Contact {
   factory Contact(
@@ -17,10 +24,10 @@ class Contact with _$Contact {
     @JsonKey(name: 'tel_number') String? telNumber,
     @JsonKey(name: 'company_id') int? companyId,
     Company? company,
-    List<String>? whatsapp,
-    List<String>? email,
-    List<String>? linkedin,
-    List<String>? facebook,
+    @JsonKey(fromJson: _stringOrStringListToList) List<String>? whatsapp,
+    @JsonKey(fromJson: _stringOrStringListToList) List<String>? email,
+    @JsonKey(fromJson: _stringOrStringListToList) List<String>? linkedin,
+    @JsonKey(fromJson: _stringOrStringListToList) List<String>? facebook,
     User? head,
     String? mobile,
     List<Log>? logs,

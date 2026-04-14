@@ -1,20 +1,21 @@
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud/helper/helper.dart';
 
 part 'single_station_products.freezed.dart';
 part 'single_station_products.g.dart';
 
 @freezed
 class SingleStationSample with _$SingleStationSample {
-  factory SingleStationSample({
-    int? id, 
-    int? qty,
-    int? price, 
+  factory SingleStationSample({ 
+    @JsonKey(fromJson: intFromJson) int? id,
+    @JsonKey(fromJson: intFromJson) int? qty,
+    @JsonKey(fromJson: stringFromJson) String? price,
     bool? active,
-    @JsonKey(name: 'station_id') int? stationId,
-    @JsonKey(name: 'sample_id') int? sampleId,
-    @JsonKey(name: 'quote_id') int? quoteId,
+    @JsonKey(name: 'station_id', fromJson: intFromJson) int? stationId,
+    @JsonKey(name: 'sample_id', fromJson: intFromJson) int? sampleId,
+    @JsonKey(name: 'quote_id', fromJson: intFromJson) int? quoteId,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'showroomSample') Sample? showroomSample,

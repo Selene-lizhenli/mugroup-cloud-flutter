@@ -18,10 +18,10 @@ _$ContactImpl _$$ContactImplFromJson(Map<String, dynamic> json) =>
       json['company'] == null
           ? null
           : Company.fromJson(json['company'] as Map<String, dynamic>),
-      (json['whatsapp'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['email'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['linkedin'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['facebook'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      _stringOrStringListToList(json['whatsapp']),
+      _stringOrStringListToList(json['email']),
+      _stringOrStringListToList(json['linkedin']),
+      _stringOrStringListToList(json['facebook']),
       json['head'] == null
           ? null
           : User.fromJson(json['head'] as Map<String, dynamic>),

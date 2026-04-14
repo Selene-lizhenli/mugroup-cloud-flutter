@@ -1,9 +1,9 @@
 import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
-import 'package:cloud/models/dashboard/quote_top_stats.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
-import 'package:cloud/pages/dashboard/widgets/date_select.dart' show DateRange;
+import 'package:cloud/models/dashboard/quote_top_stats.dart'; 
+import 'package:cloud/pages/dashboard/widgets/date_select.dart'
+    show DateRange, trnasDateRangeToParams;
 import 'package:cloud/services/dashboard.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_header.dart';
 import 'package:cloud/pages/dashboard/widgets/showroom/sample_room_body.dart';
@@ -47,8 +47,8 @@ class SampleRoomChart extends ConsumerStatefulWidget {
 class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
   List<QuoteTopStats> _quoteTopDimensionData = []; //  数据 报价排行
   List<ShipTopStats> _shipTopDimensionData = []; //  数据 出货排行
-  final DateRange _shipDateRange = DateRange.allTime; // 出货排行时间范围 初始值
-  final DateRange _quoteDateRange = DateRange.allTime; // 报价次数排行时间范围 初始值
+  final DateRange _shipDateRange = DateRange.lastTwoYear; // 出货排行时间范围 初始值
+  final DateRange _quoteDateRange = DateRange.lastTwoYear; // 报价次数排行时间范围 初始值
 
   bool _isLoading = false; // 数据加载状态
 
@@ -111,17 +111,18 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     }
   }
 
-  /// 根据维度加载数据
+  /// 页面加载初始化 或者 切换维度时后的初始化  时间段，根据维度加载数据
   Future<void> _loadDimensionData(String dimension) async {
     setState(() {
       _isLoading = true;
     });
     try {
       if (dimension == sampleDimensionConfigs[1]['value']) {
-        handleQuoteRankData(null); // 默认是所有时间DateRange.allTime，所以这里传入null
-      } else if (dimension == sampleDimensionConfigs[0]['value'] ||
-          dimension == sampleDimensionConfigs[2]['value']) {
-        handleShipRankData(null); // 默认是所有时间DateRange.allTime，所以这里传入null
+        handleQuoteRankData(trnasDateRangeToParams(
+            _shipDateRange)); //c  
+      } else if (dimension == sampleDimensionConfigs[0]['value']) {
+        handleShipRankData(trnasDateRangeToParams(
+            _quoteDateRange)); //  
       } else {
         if (mounted) {
           setState(() {

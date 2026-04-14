@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends HookConsumerWidget {
   final Sample sample;
 
   final GestureTapCallback? onTapAddSample;
@@ -20,8 +22,40 @@ class ProductCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final quotationInfo =
+        ref.watch(cartProvider.select((state) => state.quotationInfo));
+
+    final showPrice = quotationInfo?.showPrice ?? false;
+    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
+    final exchange = quotationInfo?.exchange ?? 1.0;
+    final commissionRate = quotationInfo?.commissionRate ?? 0.0;
+    final currency = quotationInfo?.curreny ?? "CNY";
+
+    final double rawCost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
+    final double taxRate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
+
+    double baseCost = rawCost;
+    if (!showTaxRatePrice) {
+      baseCost = rawCost / (1 + taxRate * 0.01);
+    }
+
+    double finalPriceValue =
+        (baseCost / exchange) * (1 + commissionRate * 0.01);
+
+    Map<String, String> symbols = {
+      "CNY": "¥",
+      "USD": "\$",
+      "EUR": "€",
+      "GBP": "£"
+    };
+    String symbol = symbols[currency] ?? "¥";
+    String displayPrice = finalPriceValue.toStringAsFixed(2);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
@@ -128,21 +162,23 @@ class ProductCard extends StatelessWidget {
                           RichText(
                             text: TextSpan(
                               children: [
-                                TextSpan(
-                                  text: '¥',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: colorScheme.secondary,
+                                if (showPrice) ...[
+                                  TextSpan(
+                                    text: symbol,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: colorScheme.secondary,
+                                    ),
                                   ),
-                                ),
-                                TextSpan(
-                                  text: sample.purchaseCost,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.secondary,
+                                  TextSpan(
+                                    text: displayPrice,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.secondary,
+                                    ),
                                   ),
-                                ),
+                                ],
                                 if (sample.hasTaxRate == true)
                                   WidgetSpan(
                                     alignment: PlaceholderAlignment.baseline,

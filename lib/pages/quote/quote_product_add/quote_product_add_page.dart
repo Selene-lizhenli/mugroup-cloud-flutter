@@ -5,11 +5,10 @@ import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/pages/quote/quote_page.dart';
 import 'package:cloud/pages/quote/quote_product_add/providers/quote_product_add_form_provider.dart';
 import 'package:cloud/pages/quote/quote_product_add/widgets/sku_setting_dialog.dart';
+import 'package:cloud/pages/quote/quote_product_add/widgets/voice_record_button.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
@@ -55,6 +54,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
           storageKey: 'quote_product_add_form_v1',
           defaultFields: quoteSampleDefaultFields,
         ));
+
+    final currentAudios = useState<List<dynamic>>([]);
 
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
@@ -456,7 +457,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     Future<void> handleSmartRecognize() async {
       formKey.currentState?.save();
       final images = formKey.currentState?.value['image'];
-      final user = ref.read(userProvider).user;
 
       if (images == null || (images is List && images.isEmpty)) {
         EasyLoading.showInfo("请先上传图片");
@@ -467,60 +467,16 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
           status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
 
       try {
-        final result = await identifyOcr('ExtractQtnBasic', {
-          "department": user?.department?.name,
-          "employee_name": user?.name,
-          "employee_number": user?.jobNumber,
-          "image": images[0].thumbUrl,
-        });
+        final result = await identifySample({'image': images});
 
-        if (result != null &&
-            result is Map<String, dynamic> &&
-            result['success'] == true) {
-          // 1. 获取内部的数据列表
-          final List? dataList = result['data'];
+        if (result != null && result is Map<String, dynamic>) {
+          EasyLoading.showSuccess("识别成功");
 
-          if (dataList != null && dataList.isNotEmpty) {
-            // 2. 取出第一个条目作为处理对象
-            final Map<String, dynamic> rawItem =
-                Map<String, dynamic>.from(dataList.first);
-            final Map<String, dynamic> processedData = {};
-
-            final Map<String, String> fieldMapping = {
-              'item_no': 'product_no',
-              'price': 'purchase_cost',
-              'out_carton': 'outer_capacity',
-              'inner_pack': 'inner_capacity',
-              'size': 'spec',
-              'weight': 'weight',
-              'packaging_type': 'packing',
-              'unit': 'unit',
-              'volume': 'outer_volume',
-              'moq': 'moq',
-              'description': 'description_cn',
-            };
-
-            // 3. 执行映射转换（遍历 mapping 而不是遍历结果，更安全）
-            fieldMapping.forEach((oldKey, newKey) {
-              if (rawItem.containsKey(oldKey)) {
-                // 转换值为 String，因为 Input 组件通常接收 String
-                processedData[newKey] = rawItem[oldKey].toString();
-              }
-            });
-
-            EasyLoading.showSuccess("识别成功");
-
-            // 4. 打印转换后的扁平化数据
-            logger.d(processedData);
-
-            // 5. 填充表单
-            formKey.currentState?.patchValue(processedData);
-          } else {
-            EasyLoading.showInfo("未识别到有效内容");
-          }
+          formKey.currentState?.patchValue(result);
+        } else {
+          EasyLoading.dismiss();
         }
       } catch (e) {
-        logger.d(e);
         EasyLoading.showError('识别失败');
       }
     }
@@ -638,6 +594,97 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       return null;
     }, []);
 
+    Future<void> handleSubmit(bool isCopy) async {
+      final formState = formKey.currentState;
+      if (formState?.saveAndValidate() ?? false) {
+        isSubmitting.value = true;
+        EasyLoading.show(
+          status: '正在提交...',
+          maskType: EasyLoadingMaskType.clear,
+        );
+
+        try {
+          final Map<String, dynamic> submitValues = Map.from(formState!.value);
+
+          final supplier = initialSupplier;
+
+          submitValues['supply_quotes'] = [
+            {
+              "supplier_id": supplier?['id'],
+              'supplier': supplier,
+              "product_no": submitValues["product_no"],
+              'product_brand': submitValues["product_brand"],
+              'supplier_sku': submitValues["supplier_sku"],
+              "customer_sku": submitValues["customer_sku"],
+              'purchase_cost': submitValues["purchase_cost"],
+              "deliver_day": submitValues["deliver_day"],
+              "moq": submitValues["moq"],
+              "customer_price": submitValues["customer_price"],
+              "customer_qty": submitValues["customer_qty"],
+              "unit": submitValues["unit"],
+              "material": submitValues["material"],
+              "inner_capacity": submitValues["inner_capacity"],
+              "product_weight": submitValues["weight"],
+              "packing": submitValues["packing"],
+              "outer_capacity": submitValues["outer_capacity"],
+              "outer_volume": submitValues["outer_volume"],
+            }
+          ];
+
+          final length = submitValues['length']?.toString() ?? '';
+          final width = submitValues['width']?.toString() ?? '';
+          final height = submitValues['heigth']?.toString() ?? '';
+
+          final spec = [length, width, height].join('x');
+          submitValues['spec'] = spec;
+
+          if (currentAudios.value.isNotEmpty) {
+            submitValues['audios'] = currentAudios.value;
+          }
+
+          // 2. 发起网络请求
+          await storeShowroomSample({
+            ...submitValues,
+            "supplier_id": supplier?['id'],
+            if (quoteId != null) "quotation_id": quoteId,
+            'item_type': 'market_product'
+          });
+
+          isSubmitting.value = false;
+
+          final prefs = await SharedPreferences.getInstance();
+          const storageKey = 'last_quote_product_add';
+          await prefs.setString(storageKey, jsonEncode(submitValues));
+
+          EasyLoading.dismiss();
+
+          if (!context.mounted) return;
+
+          formDataNotifier.clearFormData();
+
+          final currentSupplier = formState.value['supplier'];
+          formState.reset();
+          formDataNotifier.clearFormData();
+
+          if (currentSupplier != null) {
+            formKey.currentState?.patchValue({
+              'supplier': currentSupplier,
+            });
+          }
+          if (isCopy == true) {
+            handleCopyLastItem();
+          }
+        } finally {
+          currentAudios.value = [];
+          // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
+          isSubmitting.value = false;
+          if (EasyLoading.isShow) EasyLoading.dismiss();
+        }
+      } else {
+        autoValidateMode.value = AutovalidateMode.onUserInteraction;
+      }
+    }
+
     return Scaffold(
       body: Column(
         children: [
@@ -685,24 +732,58 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                             ),
                           ],
                         ),
-                        action: GestureDetector(
-                          onTap: handleSmartRecognize,
-                          child: Row(
-                            children: [
-                              Icon(Icons.center_focus_weak,
-                                  size: 16,
-                                  color: Theme.of(context).primaryColor),
-                              const SizedBox(width: 4),
-                              Text(
-                                "智能识别",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                        action: Row(
+                          children: [
+                            // 智能识别按钮
+                            GestureDetector(
+                              onTap: handleSmartRecognize,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.center_focus_weak,
+                                      size: 16,
+                                      color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "智能识别",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 16),
+                            // 语音辅录按钮
+                            VoiceRecordButton(
+                              onProcessing: (isUploading) {
+                                if (isUploading) {
+                                  EasyLoading.show(status: '语音识别中...');
+                                } else {
+                                  EasyLoading.dismiss();
+                                }
+                              },
+                              onMediaUploaded: (media) {
+                                currentAudios.value = [
+                                  ...currentAudios.value,
+                                  media
+                                ];
+                              },
+                              onSuccess: (data) {
+                                Map<String, dynamic> patchData = {};
+                                data.forEach((key, value) {
+                                  if (value != null) {
+                                    patchData[key] = value.toString();
+                                  }
+                                });
+
+                                // 执行回显
+                                formKey.currentState?.patchValue(patchData);
+                                EasyLoading.showSuccess("识别并回显成功");
+                              },
+                            ),
+                          ],
                         ),
                         children: [
                           FormBuilderField<List<dynamic>>(
@@ -1116,117 +1197,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                             colorScheme.primary.withOpacity(0.6),
                       ),
 
-                      onPressed: isSubmitting.value
-                          ? null
-                          : () async {
-                              final formState = formKey.currentState;
-                              if (formState?.saveAndValidate() ?? false) {
-                                isSubmitting.value = true;
-                                EasyLoading.show(
-                                  status: '正在提交...',
-                                  maskType: EasyLoadingMaskType.clear,
-                                );
-
-                                try {
-                                  final Map<String, dynamic> submitValues =
-                                      Map.from(formState!.value);
-
-                                  final supplier = initialSupplier;
-
-                                  submitValues['supply_quotes'] = [
-                                    {
-                                      "supplier_id": supplier?['id'],
-                                      'supplier': supplier,
-                                      "product_no": submitValues["product_no"],
-                                      'product_brand':
-                                          submitValues["product_brand"],
-                                      'supplier_sku':
-                                          submitValues["supplier_sku"],
-                                      "customer_sku":
-                                          submitValues["customer_sku"],
-                                      'purchase_cost':
-                                          submitValues["purchase_cost"],
-                                      "deliver_day":
-                                          submitValues["deliver_day"],
-                                      "moq": submitValues["moq"],
-                                      "customer_price":
-                                          submitValues["customer_price"],
-                                      "customer_qty":
-                                          submitValues["customer_qty"],
-                                      "unit": submitValues["unit"],
-                                      "material": submitValues["material"],
-                                      "inner_capacity":
-                                          submitValues["inner_capacity"],
-                                      "weight": submitValues["weight"],
-                                      "packing": submitValues["packing"],
-                                      "outer_capacity":
-                                          submitValues["outer_capacity"],
-                                      "outer_volume":
-                                          submitValues["outer_volume"],
-                                    }
-                                  ];
-
-                                  final length =
-                                      submitValues['length']?.toString() ?? '';
-                                  final width =
-                                      submitValues['width']?.toString() ?? '';
-                                  final height =
-                                      submitValues['heigth']?.toString() ?? '';
-
-                                  final spec =
-                                      [length, width, height].join('x');
-                                  submitValues['spec'] = spec;
-
-                                  // 2. 发起网络请求
-                                  await storeShowroomSample({
-                                    ...submitValues,
-                                    "supplier_id": supplier?['id'],
-                                    if (quoteId != null)
-                                      "quotation_id": quoteId,
-                                    'item_type': 'market_product'
-                                  });
-
-                                  isSubmitting.value = false;
-
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  const storageKey = 'last_quote_product_add';
-                                  await prefs.setString(
-                                      storageKey, jsonEncode(submitValues));
-
-                                  EasyLoading.dismiss();
-
-                                  if (!context.mounted) return;
-
-                                  formDataNotifier.clearFormData();
-
-                                  final currentSupplier =
-                                      formState.value['supplier'];
-                                  formState.reset();
-                                  formDataNotifier.clearFormData();
-
-                                  if (currentSupplier != null) {
-                                    formKey.currentState?.patchValue({
-                                      'supplier': currentSupplier,
-                                    });
-                                  }
-
-                                  if (context.mounted) {
-                                    ref
-                                        .read(quotePageRefreshTrigger.notifier)
-                                        .update((state) => state + 1);
-                                    Navigator.of(context).pop(true);
-                                  }
-                                } finally {
-                                  // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
-                                  isSubmitting.value = false;
-                                  if (EasyLoading.isShow) EasyLoading.dismiss();
-                                }
-                              } else {
-                                autoValidateMode.value =
-                                    AutovalidateMode.onUserInteraction;
-                              }
-                            },
+                      onPressed:
+                          isSubmitting.value ? null : () => handleSubmit(false),
                       // 根据状态切换按钮内部显示
                       child: isSubmitting.value
                           ? const SizedBox(
@@ -1256,112 +1228,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         disabledBackgroundColor:
                             colorScheme.secondary.withOpacity(0.6),
                       ),
-                      onPressed: isSubmitting.value
-                          ? null
-                          : () async {
-                              final formState = formKey.currentState;
-                              if (formState?.saveAndValidate() ?? false) {
-                                isSubmitting.value = true;
-                                EasyLoading.show(
-                                  status: '正在提交...',
-                                  maskType: EasyLoadingMaskType.clear,
-                                );
-
-                                try {
-                                  final Map<String, dynamic> submitValues =
-                                      Map.from(formState!.value);
-
-                                  final supplier = initialSupplier;
-
-                                  submitValues['supply_quotes'] = [
-                                    {
-                                      "supplier_id": supplier?['id'],
-                                      'supplier': supplier,
-                                      "product_no": submitValues["product_no"],
-                                      'product_brand':
-                                          submitValues["product_brand"],
-                                      'supplier_sku':
-                                          submitValues["supplier_sku"],
-                                      "customer_sku":
-                                          submitValues["customer_sku"],
-                                      'purchase_cost':
-                                          submitValues["purchase_cost"],
-                                      "deliver_day":
-                                          submitValues["deliver_day"],
-                                      "moq": submitValues["moq"],
-                                      "customer_price":
-                                          submitValues["customer_price"],
-                                      "customer_qty":
-                                          submitValues["customer_qty"],
-                                      "unit": submitValues["unit"],
-                                      "material": submitValues["material"],
-                                      "inner_capacity":
-                                          submitValues["inner_capacity"],
-                                      "weight": submitValues["weight"],
-                                      "packing": submitValues["packing"],
-                                      "outer_capacity":
-                                          submitValues["outer_capacity"],
-                                      "outer_volume":
-                                          submitValues["outer_volume"],
-                                    }
-                                  ];
-
-                                  final length =
-                                      submitValues['length']?.toString() ?? '';
-                                  final width =
-                                      submitValues['width']?.toString() ?? '';
-                                  final height =
-                                      submitValues['heigth']?.toString() ?? '';
-
-                                  final spec =
-                                      [length, width, height].join('x');
-                                  submitValues['spec'] = spec;
-
-                                  // 2. 发起网络请求
-                                  await storeShowroomSample({
-                                    ...submitValues,
-                                    "supplier_id": supplier?['id'],
-                                    if (quoteId != null)
-                                      "quotation_id": quoteId,
-                                    'item_type': 'market_product'
-                                  });
-
-                                  isSubmitting.value = false;
-
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  const storageKey = 'last_quote_product_add';
-                                  await prefs.setString(
-                                      storageKey, jsonEncode(submitValues));
-
-                                  EasyLoading.dismiss();
-
-                                  if (!context.mounted) return;
-
-                                  formDataNotifier.clearFormData();
-
-                                  final currentSupplier =
-                                      formState.value['supplier'];
-                                  formState.reset();
-                                  formDataNotifier.clearFormData();
-
-                                  if (currentSupplier != null) {
-                                    formKey.currentState?.patchValue({
-                                      'supplier': currentSupplier,
-                                    });
-                                  }
-
-                                  handleCopyLastItem();
-                                } finally {
-                                  // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
-                                  isSubmitting.value = false;
-                                  if (EasyLoading.isShow) EasyLoading.dismiss();
-                                }
-                              } else {
-                                autoValidateMode.value =
-                                    AutovalidateMode.onUserInteraction;
-                              }
-                            },
+                      onPressed:
+                          isSubmitting.value ? null : () => handleSubmit(true),
                       child: isSubmitting.value
                           ? const SizedBox(
                               width: 20,

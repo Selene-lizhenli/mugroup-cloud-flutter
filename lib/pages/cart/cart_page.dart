@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/cart.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
@@ -6,7 +7,10 @@ import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/operate_bar.dart';
+import 'package:cloud/pages/sample_quotation/widgets/share_drawer.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -18,6 +22,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'package:cloud/widgets/quotation_info_dialog.dart';
 import 'widgets/sample_item.dart';
 
 @RoutePage()
@@ -29,6 +34,7 @@ class CartPage extends HookConsumerWidget {
     final state = ref.watch(cartProvider);
     final cart = ref.read(cartProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
+    final permissions = ref.watch(userProvider).permissions ?? const <String>[];
     final barcodeTextController = useTextEditingController();
 
     final items = state.items;
@@ -45,49 +51,7 @@ class CartPage extends HookConsumerWidget {
     const warningColor = Color(0xFFFFD75E);
     final user = useState<User?>(null);
 
-    final borrowReasons = [
-      const FlanActionSheetAction(name: "客户会议用"),
-      const FlanActionSheetAction(name: "客户选中，核价报价用"),
-      const FlanActionSheetAction(name: "展会使用"),
-      const FlanActionSheetAction(name: "本组出货样"),
-      const FlanActionSheetAction(name: "其他")
-    ];
-
-    final currencies = [
-      const FlanActionSheetAction(name: "CNY"),
-      const FlanActionSheetAction(name: "USD"),
-      const FlanActionSheetAction(name: "EUR"),
-      const FlanActionSheetAction(name: "GBP")
-    ];
-
-    final stockInOptions = [
-      {'stockInName': '交样入库', 'type': 'submission_in'},
-      {'stockInName': '采购入库', 'type': 'purchase'},
-      {'stockInName': '移除入库', 'type': 'remove'},
-      {'stockInName': '退货入库', 'type': 'return'},
-      {'stockInName': '其他入库', 'type': 'other'},
-      {'stockInName': '客户取消订单', 'type': 'cancel'},
-      {'stockInName': '调拨入库', 'type': 'transfer_in'},
-      {'stockInName': '还样入库', 'type': 'borrow_in'},
-      {'stockInName': '盘点入库', 'type': 'inventory_in'},
-    ];
-
-    final exchangeFieldKey = GlobalKey();
-    final commissionRateFieldKey = GlobalKey();
-
-    void scrollToField(GlobalKey key) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        final context = key.currentContext;
-        if (context != null) {
-          Scrollable.ensureVisible(
-            context,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            alignment: 0.8, // 越小越靠上
-          );
-        }
-      });
-    }
+    // quotationInfo 设置弹窗已抽成可复用组件，见 `QuotationInfoDialog`
 
     String getStockInOptionText(String? stockInOption) {
       if (stockInOption == null) {
@@ -505,10 +469,153 @@ class CartPage extends HookConsumerWidget {
       reasonController.dispose();
     }
 
-    void quotationDialog(BuildContext context) {
+    void showQuotationCreatedActionsDialog(
+      BuildContext pageContext,
+      int quotationId,
+    ) {
+      final router = pageContext.router;
+      showDialog<void>(
+        context: pageContext,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('创建报价单成功'),
+            content: const Text('你可以继续进行以下操作：'),
+            actions: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                        router.push(
+                          SampleQuoteDetailRoute(id: quotationId),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        backgroundColor: colorScheme.secondary,
+                      ),
+                      child: Text(
+                        '查看详情',
+                        style: TextStyle(color: colorScheme.onSecondary),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        backgroundColor: colorScheme.primary,
+                      ),
+                      onPressed: () async {
+                        Navigator.of(dialogContext).pop();
+                        try {
+                          EasyLoading.show(status: '正在加载数据，请稍后...');
+                          final detail = await getQuotationListById(quotationId);
+                          final templatesResp =
+                              await getShowroomQuotationExportTemplate();
+                          final dynamicTemplates = templatesResp.data;
+                          if (!pageContext.mounted) return;
+                          EasyLoading.dismiss();
+                          showQuotationDownloadSheet(
+                            context: pageContext,
+                            item: detail,
+                            dynamicTemplates: dynamicTemplates,
+                            permissions: permissions,
+                          );
+                        } catch (e) {
+                          EasyLoading.dismiss();
+                          EasyLoading.showError('获取导出数据失败,$e');
+                        }
+                      },
+                      child: Text(
+                        '立即导出',
+                        style: TextStyle(color: colorScheme.onPrimary),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                      child: const Text(
+                        '取消',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    Future<void> submitQuotationFromDialog(
+      BuildContext pageContext,
+      BuildContext dialogContext,
+    ) async {
+      if (user.value == null) {
+        EasyLoading.showInfo("请先选择用户!");
+        return;
+      }
+      try {
+        EasyLoading.show(status: '加载中...');
+        final data = {
+          "sample_items": items
+              .map((item) => {
+                    "sample_id": item.sample.id,
+                    "price": item.price,
+                    "qty": item.count
+                  })
+              .toList(),
+          "user_id": user.value?.id,
+          "curreny": quotationInfo?.curreny,
+          "exchange": quotationInfo?.exchange,
+          "commission_rate": quotationInfo?.commissionRate,
+          "is_tax_inclusive": quotationInfo?.showTaxRatePrice
+        };
+        final res = await storeShowroomQuotation(data);
+        cart.clear();
+        user.value = null;
+        EasyLoading.dismiss();
+        if (pageContext.mounted) {
+          final quotationId = res?.id;
+          Navigator.of(dialogContext).pop();
+          if (quotationId != null) {
+            showQuotationCreatedActionsDialog(
+              pageContext,
+              quotationId,
+            );
+          }
+        }
+      } catch (e) {
+        EasyLoading.showError('创建报价单失败,$e');
+      } finally {}
+    }
+
+    void quotationDialog(BuildContext pageContext) {
       showDialog(
-        context: context,
-        builder: (context) {
+        context: pageContext,
+        builder: (dialogContext) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
@@ -528,7 +635,7 @@ class CartPage extends HookConsumerWidget {
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () async {
-                    final selectedUser = await context.router
+                    final selectedUser = await pageContext.router
                         .push<User>(const SelectUserRoute());
                     user.value = selectedUser;
                   },
@@ -565,45 +672,15 @@ class CartPage extends HookConsumerWidget {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text(
                   "取消",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  if (user.value == null) {
-                    EasyLoading.showInfo("请先选择用户!");
-                    return;
-                  }
-                  try {
-                    EasyLoading.show(status: '加载中...');
-                    final data = {
-                      "sample_items": items
-                          .map((item) => {
-                                "sample_id": item.sample.id,
-                                "price": item.price,
-                                "qty": item.count
-                              })
-                          .toList(),
-                      "user_id": user.value?.id,
-                      "curreny": quotationInfo?.curreny,
-                      "exchange": quotationInfo?.exchange,
-                      "commission_rate": quotationInfo?.commissionRate,
-                      "is_tax_inclusive": quotationInfo?.showTaxRatePrice
-                    };
-                    await storeShowroomQuotation(data);
-                    EasyLoading.showSuccess('创建报价单成功!'); 
-                    cart.clear();
-                    user.value = null;
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  } catch (e) {
-                    EasyLoading.showError('创建报价单失败,$e');
-                  } finally {}
-                },
+                onPressed: () =>
+                    submitQuotationFromDialog(pageContext, dialogContext),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
@@ -621,400 +698,14 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
-    void quotationInfoDialog(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          bool? showPrice = quotationInfo?.showPrice;
-          bool? showTaxRatePrice = quotationInfo?.showTaxRatePrice;
-          String? currency = quotationInfo?.curreny;
-          final exchangeController = TextEditingController();
-          final commissionRateController = TextEditingController();
-
-          exchangeController.text = quotationInfo?.exchange?.toString() ?? "";
-          commissionRateController.text =
-              quotationInfo?.commissionRate?.toString() ?? "";
-
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return Dialog(
-                backgroundColor: colorScheme.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                insetPadding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "报价单设置",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "以下设置将对选样车中的所有样品生效",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color:
-                                        colorScheme.onSurface.withOpacity(0.6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Text(
-                                  "是否显示价格",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                Radio<bool>(
-                                  value: true,
-                                  groupValue: showPrice,
-                                  fillColor: MaterialStateProperty.all(
-                                    colorScheme.secondary,
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showPrice = value;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  '是',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(width: 24),
-                                Radio<bool>(
-                                  value: false,
-                                  groupValue: showPrice,
-                                  fillColor: MaterialStateProperty.all(
-                                    colorScheme.secondary,
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showPrice = value;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  '否',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  '采购价是否含税',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                Radio<bool>(
-                                  value: true,
-                                  groupValue: showTaxRatePrice,
-                                  fillColor: MaterialStateProperty.all(
-                                    colorScheme.secondary,
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showTaxRatePrice = value;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  '是',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(width: 24),
-                                Radio<bool>(
-                                  value: false,
-                                  groupValue: showTaxRatePrice,
-                                  fillColor: MaterialStateProperty.all(
-                                    colorScheme.secondary,
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      showTaxRatePrice = value;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  '否',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              "报价币种",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () {
-                                showFlanActionSheet(
-                                  context,
-                                  description: "请选择报价币种",
-                                  cancelText: "我再想想",
-                                  actions: currencies,
-                                  closeOnClickAction: true,
-                                  onSelect: (action, index) {
-                                    currency = currencies[index].name;
-                                    setState(() {});
-                                  },
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color:
-                                        colorScheme.outline.withOpacity(0.30),
-                                    width: 0.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: colorScheme.surfaceContainer,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        currency ?? "请选择报价币种",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: currency == null
-                                              ? colorScheme.onSurface
-                                                  .withOpacity(0.5)
-                                              : colorScheme.onSurface,
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.keyboard_arrow_right,
-                                      color: colorScheme.onSurface
-                                          .withOpacity(0.5),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              "汇率",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              key: exchangeFieldKey,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: colorScheme.outline.withOpacity(0.3),
-                                  width: 0.5,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                                color: colorScheme.surfaceContainer,
-                              ),
-                              child: TextField(
-                                controller: exchangeController,
-                                cursorColor: colorScheme.secondary,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}'),
-                                  ),
-                                ],
-                                style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontSize: 14,
-                                ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "请输入汇率",
-                                  hintStyle: TextStyle(
-                                    color:
-                                        colorScheme.onSurface.withOpacity(0.5),
-                                  ),
-                                ),
-                                onTap: () {
-                                  scrollToField(exchangeFieldKey);
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              "佣金比率(%)",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              key: commissionRateFieldKey,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: colorScheme.outline.withOpacity(0.3),
-                                  width: 0.5,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                                color: colorScheme.surfaceContainer,
-                              ),
-                              child: TextField(
-                                controller: commissionRateController,
-                                cursorColor: colorScheme.secondary,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}'),
-                                  ),
-                                ],
-                                style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontSize: 14,
-                                ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "请输入佣金比率",
-                                  hintStyle: TextStyle(
-                                    color:
-                                        colorScheme.onSurface.withOpacity(0.5),
-                                  ),
-                                ),
-                                onTap: () {
-                                  scrollToField(commissionRateFieldKey);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    /// 固定底部按钮区域
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                            ),
-                            child: Text(
-                              "取消",
-                              style: TextStyle(
-                                color: colorScheme.onSurface.withOpacity(0.7),
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: () {
-                              cart.quotationInfo = null;
-                              double? exchange =
-                                  double.tryParse(exchangeController.text);
-                              double? commissionRate = double.tryParse(
-                                  commissionRateController.text);
-                              cart.quotationInfo = QuotationInfo(
-                                  showPrice,
-                                  showTaxRatePrice,
-                                  currency,
-                                  exchange,
-                                  commissionRate);
-                              Navigator.of(context).pop();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.secondary,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              "提交",
-                              style: TextStyle(
-                                color: colorScheme.onSecondary,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-          );
-        },
+    Future<void> quotationInfoDialog(BuildContext context) async {
+      final next = await QuotationInfoDialog.show(
+        context,
+        initialValue: quotationInfo,
+        currencies: currencies.map((e) => e.name).toList(growable: false),
       );
+      if (next == null) return;
+      cart.quotationInfo = next;
     }
 
     void setPriceDialog(BuildContext context, CartItem item) {

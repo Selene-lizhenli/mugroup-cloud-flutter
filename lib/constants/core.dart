@@ -16,6 +16,7 @@ class SearchPlatformItem {
 const List<SearchPlatformItem> searchPlatform = [
   SearchPlatformItem(label: '云链', value: 'cloud'),
   SearchPlatformItem(label: '1688', value: '1688'),
+  SearchPlatformItem(label: '亚马逊', value: 'amazon'),
   SearchPlatformItem(label: '国际站', value: 'alibabaglobal'),
   SearchPlatformItem(label: '义乌市场', value: 'yiwugo'),
   SearchPlatformItem(label: '小商品城', value: 'chinagoods'),

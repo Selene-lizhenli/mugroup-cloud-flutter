@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
@@ -9,6 +10,7 @@ import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 import 'package:cloud/pages/widgets/quote_select.dart';
+import 'package:cloud/providers/theme_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,7 +31,8 @@ class QuotePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     useAutomaticKeepAlive(wantKeepAlive: true);
-
+    final theme = Theme.of(context);
+    final isPinkTheme = ref.watch(appThemeProvider) == ThemeType.pink;
     // --- 基础数据状态 ---
     final isLoading = useState(true);
     final list = useState<List<QuotationList>>([]);
@@ -40,6 +43,7 @@ class QuotePage extends HookConsumerWidget {
     final activeProducts =
         useState<List<QuotationSample>>([]); // 存储卡片内点击请求回来的详细产品
     final isProductLoading = useState(false); // 预览产品的加载状态
+    final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
 
     // --- 添加产品板块的独立状态 ---
     final currentQuote = useState<Map<String, dynamic>?>(null);
@@ -161,9 +165,6 @@ class QuotePage extends HookConsumerWidget {
 
     ref.listen(quotePageRefreshTrigger, (previous, next) async {
       if (next > 0) {
-        // 这里模拟“重新进入”：清空旧数据或直接重新请求
-        debugPrint("模拟重新进入页面...");
-
         // 1. 执行主列表刷新
         await fetchData();
 
@@ -175,76 +176,119 @@ class QuotePage extends HookConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text("带客记录",
-            style: TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
-                fontSize: 18)),
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          // 1. 刷新主列表
-          await fetchData();
-          // 2. 如果当前有展开项，同步刷新明细产品
-          if (activeQuoteId.value != null && selectedSupplierId.value != null) {
-            await fetchActiveProducts();
-          }
-        },
-        child: SingleChildScrollView(
-          controller: scrollController,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            children: [
-              QuoteSearchBar(controller: searchController),
-              _buildSectionCard(
-                context,
-                title: "客户列表",
-                icon: Icons.access_time_filled_rounded,
-                iconColor: Colors.blueAccent,
-                action: IconButton(
-                    icon: const Icon(Icons.add_circle_outline,
-                        color: Colors.blueAccent),
-                    onPressed: () => context.router.push(QuoteCreateRoute())),
-                content: _buildRecentRecordsContent(
-                  context,
-                  currentQuote,
-                  selectedSupplier,
-                  isLoading.value,
-                  list.value,
-                  recordsDisplayCount,
-                  scrollController,
-                  activeProducts,
-                  activeQuoteId,
-                  selectedSupplierId,
-                  isProductLoading,
-                  fetchActiveProducts,
-                  () async {
-                    await fetchData();
-                    if (activeQuoteId.value != null &&
-                        selectedSupplierId.value != null) {
-                      await fetchActiveProducts();
-                    }
-                  },
+      backgroundColor: colorScheme.surfaceTint,
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: paddingTop,
+            child:
+                Container(color: isPinkTheme ? colorScheme.surface : lightBlue),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: paddingTop),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await fetchData(); // 1. 刷新主列表
+                // 2. 如果当前有展开项，同步刷新明细产品
+                if (activeQuoteId.value != null &&
+                    selectedSupplierId.value != null) {
+                  await fetchActiveProducts();
+                }
+              },
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 0),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          color: isPinkTheme ? colorScheme.surface : lightBlue,
+                          boxShadow: [
+                            BoxShadow(
+                                color: colorScheme.onSurface.withOpacity(0.06),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4))
+                          ]),
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Column(
+                        children: [
+                          Align(
+                            child: Text(
+                              '市场带客',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          QuoteSearchBar(controller: searchController),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 2),
+                      child: _buildSectionCard(
+                        context,
+                        title: "带客记录",
+                        icon: Icons.access_time_filled_rounded,
+                        iconColor: colorScheme.secondary,
+                        iconSize: 26,
+                        action: IconButton(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          icon: Icon(Icons.add_circle_outline,
+                              size: 26, color: colorScheme.secondary),
+                          onPressed: () =>
+                              context.router.push(QuoteCreateRoute()),
+                        ),
+                        backgroundColor: colorScheme.primary,
+                        colorScheme: colorScheme,
+                        content: _buildRecentRecordsContent(
+                          context,
+                          currentQuote,
+                          selectedSupplier,
+                          isLoading.value,
+                          list.value,
+                          recordsDisplayCount,
+                          scrollController,
+                          activeProducts,
+                          activeQuoteId,
+                          selectedSupplierId,
+                          isProductLoading,
+                          fetchActiveProducts,
+                          () async {
+                            await fetchData();
+                            if (activeQuoteId.value != null &&
+                                selectedSupplierId.value != null) {
+                              await fetchActiveProducts();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+                      child: _buildSectionCard(
+                        context,
+                        title: "添加产品",
+                        icon: Icons.grid_view_rounded,
+                        iconColor: Colors.purpleAccent,
+                        iconSize: 24.0,
+                        backgroundColor: colorScheme.secondary,
+                        colorScheme: colorScheme,
+                        content: _buildProductAddSection(context, currentQuote,
+                            selectedSupplier, colorScheme),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                context,
-                title: "添加产品",
-                icon: Icons.grid_view_rounded,
-                iconColor: Colors.purpleAccent,
-                content: _buildProductAddSection(
-                    context, currentQuote, selectedSupplier, colorScheme),
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -275,6 +319,7 @@ class QuotePage extends HookConsumerWidget {
     final displayList = data.take(displayCount.value).toList();
     final hasMore = data.length > displayCount.value;
     final canCollapse = displayCount.value > 2;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       children: [
@@ -332,10 +377,14 @@ class QuotePage extends HookConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (hasMore)
-              _buildTextBtn("加载更多", Icons.keyboard_arrow_down,
-                  () => displayCount.value += 5),
+              _buildTextBtn(
+                "加载更多",
+                colorScheme,
+                Icons.keyboard_arrow_down,
+                () => displayCount.value += 5,
+              ),
             if (canCollapse)
-              _buildTextBtn("收起", Icons.keyboard_arrow_up, () {
+              _buildTextBtn("收起", colorScheme, Icons.keyboard_arrow_up, () {
                 displayCount.value = 2;
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (scrollController.hasClients) {
@@ -391,9 +440,9 @@ class QuotePage extends HookConsumerWidget {
                 }
 
                 final sample = products[index - 1].showroomSample;
-                final imgUrl =
+                final thubImgUrl =
                     (sample?.image != null && sample!.image!.isNotEmpty)
-                        ? sample.image![0].url
+                        ? sample.image![0].thumbUrl
                         : null;
 
                 return GestureDetector(
@@ -423,8 +472,8 @@ class QuotePage extends HookConsumerWidget {
                             Border.all(color: Colors.black.withOpacity(0.05))),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(7),
-                      child: imgUrl != null
-                          ? Image.network(imgUrl, fit: BoxFit.cover)
+                      child: thubImgUrl != null
+                          ? Image.network(thubImgUrl, fit: BoxFit.cover)
                           : Image.asset(
                               'assets/icons/no_image.png',
                               fit: BoxFit.contain,
@@ -576,36 +625,49 @@ class QuotePage extends HookConsumerWidget {
       {required dynamic title,
       required IconData icon,
       required Color iconColor,
+      double? iconSize,
       required Widget content,
+      required Color backgroundColor,
+      required colorScheme,
       Widget? action}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.black.withOpacity(0.08)),
+          border: Border.all(color: Colors.white, width: 1.52),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: colorScheme.onSurface.withOpacity(0.09),
                 blurRadius: 10,
                 offset: const Offset(0, 4))
           ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
+          Container(
+            height: 62,
+            decoration: BoxDecoration(
+              color: backgroundColor.withOpacity(0.06),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
             padding: const EdgeInsets.fromLTRB(16, 12, 12, 10),
-            child: Row(children: [
-              Icon(icon, size: 18, color: iconColor),
-              const SizedBox(width: 8),
-              title is Widget
-                  ? title
-                  : Text(title.toString(),
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              if (action != null) action,
-            ]),
+            child: Row(
+              children: [
+                Icon(icon, size: iconSize ?? 20, color: iconColor),
+                const SizedBox(width: 8),
+                title is Widget
+                    ? title
+                    : Text(title.toString(),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                const Spacer(),
+                if (action != null) action,
+              ],
+            ),
           ),
           const Divider(height: 1),
           content,
@@ -614,7 +676,8 @@ class QuotePage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildTextBtn(String label, IconData icon, VoidCallback onTap,
+  Widget _buildTextBtn(
+      String label, colorScheme, IconData icon, VoidCallback onTap,
       {bool isGrey = false}) {
     return InkWell(
       onTap: onTap,
@@ -625,11 +688,14 @@ class QuotePage extends HookConsumerWidget {
           children: [
             Text(label,
                 style: TextStyle(
-                    color: isGrey ? Colors.grey : Colors.blueAccent,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold)),
-            Icon(icon,
-                size: 18, color: isGrey ? Colors.grey : Colors.blueAccent),
+                  color: isGrey ? Colors.grey : colorScheme.onSurface,
+                  fontSize: 13,
+                )),
+            Icon(
+              icon,
+              size: 18,
+              color: isGrey ? Colors.grey : colorScheme.onSurface,
+            ),
           ],
         ),
       ),

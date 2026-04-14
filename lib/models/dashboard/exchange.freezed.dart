@@ -29,6 +29,18 @@ mixin _$ExchangeRate {
   String? get date => throw _privateConstructorUsedError;
   @JsonKey(name: 'short_name')
   String? get shortName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'xh_buy_rate')
+  String? get xhBuyRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'xz_buy_rate')
+  String? get xzBuyRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'xh_sell_rate')
+  String? get xhSellRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'xz_sell_rate')
+  String? get xzSellRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'mid_rate')
+  String? get midRate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'pushed_at')
+  String? get pushedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,7 +59,13 @@ abstract class $ExchangeRateCopyWith<$Res> {
       @JsonKey(name: 'exchange_rate') String? exchangeRate,
       @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
       @JsonKey(name: 'date') String? date,
-      @JsonKey(name: 'short_name') String? shortName});
+      @JsonKey(name: 'short_name') String? shortName,
+      @JsonKey(name: 'xh_buy_rate') String? xhBuyRate,
+      @JsonKey(name: 'xz_buy_rate') String? xzBuyRate,
+      @JsonKey(name: 'xh_sell_rate') String? xhSellRate,
+      @JsonKey(name: 'xz_sell_rate') String? xzSellRate,
+      @JsonKey(name: 'mid_rate') String? midRate,
+      @JsonKey(name: 'pushed_at') String? pushedAt});
 }
 
 /// @nodoc
@@ -68,6 +86,12 @@ class _$ExchangeRateCopyWithImpl<$Res, $Val extends ExchangeRate>
     Object? reverseExchangeRate = freezed,
     Object? date = freezed,
     Object? shortName = freezed,
+    Object? xhBuyRate = freezed,
+    Object? xzBuyRate = freezed,
+    Object? xhSellRate = freezed,
+    Object? xzSellRate = freezed,
+    Object? midRate = freezed,
+    Object? pushedAt = freezed,
   }) {
     return _then(_value.copyWith(
       name: freezed == name
@@ -90,6 +114,30 @@ class _$ExchangeRateCopyWithImpl<$Res, $Val extends ExchangeRate>
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
+      xhBuyRate: freezed == xhBuyRate
+          ? _value.xhBuyRate
+          : xhBuyRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xzBuyRate: freezed == xzBuyRate
+          ? _value.xzBuyRate
+          : xzBuyRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xhSellRate: freezed == xhSellRate
+          ? _value.xhSellRate
+          : xhSellRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xzSellRate: freezed == xzSellRate
+          ? _value.xzSellRate
+          : xzSellRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      midRate: freezed == midRate
+          ? _value.midRate
+          : midRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pushedAt: freezed == pushedAt
+          ? _value.pushedAt
+          : pushedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -107,7 +155,13 @@ abstract class _$$ExchangeRateImplCopyWith<$Res>
       @JsonKey(name: 'exchange_rate') String? exchangeRate,
       @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
       @JsonKey(name: 'date') String? date,
-      @JsonKey(name: 'short_name') String? shortName});
+      @JsonKey(name: 'short_name') String? shortName,
+      @JsonKey(name: 'xh_buy_rate') String? xhBuyRate,
+      @JsonKey(name: 'xz_buy_rate') String? xzBuyRate,
+      @JsonKey(name: 'xh_sell_rate') String? xhSellRate,
+      @JsonKey(name: 'xz_sell_rate') String? xzSellRate,
+      @JsonKey(name: 'mid_rate') String? midRate,
+      @JsonKey(name: 'pushed_at') String? pushedAt});
 }
 
 /// @nodoc
@@ -126,6 +180,12 @@ class __$$ExchangeRateImplCopyWithImpl<$Res>
     Object? reverseExchangeRate = freezed,
     Object? date = freezed,
     Object? shortName = freezed,
+    Object? xhBuyRate = freezed,
+    Object? xzBuyRate = freezed,
+    Object? xhSellRate = freezed,
+    Object? xzSellRate = freezed,
+    Object? midRate = freezed,
+    Object? pushedAt = freezed,
   }) {
     return _then(_$ExchangeRateImpl(
       name: freezed == name
@@ -148,6 +208,30 @@ class __$$ExchangeRateImplCopyWithImpl<$Res>
           ? _value.shortName
           : shortName // ignore: cast_nullable_to_non_nullable
               as String?,
+      xhBuyRate: freezed == xhBuyRate
+          ? _value.xhBuyRate
+          : xhBuyRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xzBuyRate: freezed == xzBuyRate
+          ? _value.xzBuyRate
+          : xzBuyRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xhSellRate: freezed == xhSellRate
+          ? _value.xhSellRate
+          : xhSellRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      xzSellRate: freezed == xzSellRate
+          ? _value.xzSellRate
+          : xzSellRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      midRate: freezed == midRate
+          ? _value.midRate
+          : midRate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pushedAt: freezed == pushedAt
+          ? _value.pushedAt
+          : pushedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -160,7 +244,13 @@ class _$ExchangeRateImpl implements _ExchangeRate {
       @JsonKey(name: 'exchange_rate') this.exchangeRate,
       @JsonKey(name: 'reverse_exchange_rate') this.reverseExchangeRate,
       @JsonKey(name: 'date') this.date,
-      @JsonKey(name: 'short_name') this.shortName});
+      @JsonKey(name: 'short_name') this.shortName,
+      @JsonKey(name: 'xh_buy_rate') this.xhBuyRate,
+      @JsonKey(name: 'xz_buy_rate') this.xzBuyRate,
+      @JsonKey(name: 'xh_sell_rate') this.xhSellRate,
+      @JsonKey(name: 'xz_sell_rate') this.xzSellRate,
+      @JsonKey(name: 'mid_rate') this.midRate,
+      @JsonKey(name: 'pushed_at') this.pushedAt});
 
   factory _$ExchangeRateImpl.fromJson(Map<String, dynamic> json) =>
       _$$ExchangeRateImplFromJson(json);
@@ -179,10 +269,28 @@ class _$ExchangeRateImpl implements _ExchangeRate {
   @override
   @JsonKey(name: 'short_name')
   final String? shortName;
+  @override
+  @JsonKey(name: 'xh_buy_rate')
+  final String? xhBuyRate;
+  @override
+  @JsonKey(name: 'xz_buy_rate')
+  final String? xzBuyRate;
+  @override
+  @JsonKey(name: 'xh_sell_rate')
+  final String? xhSellRate;
+  @override
+  @JsonKey(name: 'xz_sell_rate')
+  final String? xzSellRate;
+  @override
+  @JsonKey(name: 'mid_rate')
+  final String? midRate;
+  @override
+  @JsonKey(name: 'pushed_at')
+  final String? pushedAt;
 
   @override
   String toString() {
-    return 'ExchangeRate(name: $name, exchangeRate: $exchangeRate, reverseExchangeRate: $reverseExchangeRate, date: $date, shortName: $shortName)';
+    return 'ExchangeRate(name: $name, exchangeRate: $exchangeRate, reverseExchangeRate: $reverseExchangeRate, date: $date, shortName: $shortName, xhBuyRate: $xhBuyRate, xzBuyRate: $xzBuyRate, xhSellRate: $xhSellRate, xzSellRate: $xzSellRate, midRate: $midRate, pushedAt: $pushedAt)';
   }
 
   @override
@@ -197,13 +305,35 @@ class _$ExchangeRateImpl implements _ExchangeRate {
                 other.reverseExchangeRate == reverseExchangeRate) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.shortName, shortName) ||
-                other.shortName == shortName));
+                other.shortName == shortName) &&
+            (identical(other.xhBuyRate, xhBuyRate) ||
+                other.xhBuyRate == xhBuyRate) &&
+            (identical(other.xzBuyRate, xzBuyRate) ||
+                other.xzBuyRate == xzBuyRate) &&
+            (identical(other.xhSellRate, xhSellRate) ||
+                other.xhSellRate == xhSellRate) &&
+            (identical(other.xzSellRate, xzSellRate) ||
+                other.xzSellRate == xzSellRate) &&
+            (identical(other.midRate, midRate) || other.midRate == midRate) &&
+            (identical(other.pushedAt, pushedAt) ||
+                other.pushedAt == pushedAt));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, name, exchangeRate, reverseExchangeRate, date, shortName);
+      runtimeType,
+      name,
+      exchangeRate,
+      reverseExchangeRate,
+      date,
+      shortName,
+      xhBuyRate,
+      xzBuyRate,
+      xhSellRate,
+      xzSellRate,
+      midRate,
+      pushedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -225,8 +355,13 @@ abstract class _ExchangeRate implements ExchangeRate {
       @JsonKey(name: 'exchange_rate') final String? exchangeRate,
       @JsonKey(name: 'reverse_exchange_rate') final String? reverseExchangeRate,
       @JsonKey(name: 'date') final String? date,
-      @JsonKey(name: 'short_name')
-      final String? shortName}) = _$ExchangeRateImpl;
+      @JsonKey(name: 'short_name') final String? shortName,
+      @JsonKey(name: 'xh_buy_rate') final String? xhBuyRate,
+      @JsonKey(name: 'xz_buy_rate') final String? xzBuyRate,
+      @JsonKey(name: 'xh_sell_rate') final String? xhSellRate,
+      @JsonKey(name: 'xz_sell_rate') final String? xzSellRate,
+      @JsonKey(name: 'mid_rate') final String? midRate,
+      @JsonKey(name: 'pushed_at') final String? pushedAt}) = _$ExchangeRateImpl;
 
   factory _ExchangeRate.fromJson(Map<String, dynamic> json) =
       _$ExchangeRateImpl.fromJson;
@@ -245,6 +380,24 @@ abstract class _ExchangeRate implements ExchangeRate {
   @override
   @JsonKey(name: 'short_name')
   String? get shortName;
+  @override
+  @JsonKey(name: 'xh_buy_rate')
+  String? get xhBuyRate;
+  @override
+  @JsonKey(name: 'xz_buy_rate')
+  String? get xzBuyRate;
+  @override
+  @JsonKey(name: 'xh_sell_rate')
+  String? get xhSellRate;
+  @override
+  @JsonKey(name: 'xz_sell_rate')
+  String? get xzSellRate;
+  @override
+  @JsonKey(name: 'mid_rate')
+  String? get midRate;
+  @override
+  @JsonKey(name: 'pushed_at')
+  String? get pushedAt;
   @override
   @JsonKey(ignore: true)
   _$$ExchangeRateImplCopyWith<_$ExchangeRateImpl> get copyWith =>

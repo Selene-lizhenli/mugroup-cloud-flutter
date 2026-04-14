@@ -14,21 +14,42 @@ class QuoteSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      height: 57,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+        textAlign: TextAlign.left,
         decoration: InputDecoration(
           hintText: '搜索带客记录',
-          suffixIcon: const Icon(Icons.search),
+          hintStyle: TextStyle(
+              fontSize: 14, color: colorScheme.onSurface.withOpacity(0.6)),
+          suffixIcon: const Icon(Icons.search, size: 20),
+         
           filled: true,
-          fillColor: Colors.white,
+          focusColor: colorScheme.surface.withOpacity(0.99),
+          fillColor: colorScheme.surface,
           contentPadding:
-              const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              const EdgeInsets.symmetric(vertical: 6, horizontal: 15),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: colorScheme.outline, // 标准紫色
+              width: 0.8,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: colorScheme.primary, // 主色边框（你也可以自定义颜色）
+              width: 1, // 边框粗细
+            ),
           ),
         ),
       ),

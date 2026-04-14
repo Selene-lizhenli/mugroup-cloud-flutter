@@ -14,6 +14,7 @@ class InspectionItem with _$InspectionItem {
     int? ctns,
     int? qty,
     String? remark,
+    String? barcode,
     List<Media>? media,
     @JsonKey(name: 'task_id') int? taskId,
     @JsonKey(name: 'user_id') int? userId,

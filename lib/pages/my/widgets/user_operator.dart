@@ -17,7 +17,9 @@ class UserOperatorSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final cart = ref.read(cartProvider.notifier); 
+ 
+    final cart = ref.read(cartProvider.notifier);
+ 
     final theme = Theme.of(context);
 
     void showThemeSelector() {
@@ -75,7 +77,7 @@ class UserOperatorSection extends HookConsumerWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          '玫粉色',
+                          'MU · 粉',
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: currentTheme == ThemeType.pink
                                 ? FontWeight.w600
@@ -124,7 +126,7 @@ class UserOperatorSection extends HookConsumerWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          '蓝色',
+                          'MU · 蓝',
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: currentTheme == ThemeType.blue
                                 ? FontWeight.w600
@@ -148,176 +150,180 @@ class UserOperatorSection extends HookConsumerWidget {
       );
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ListTile(
-          tileColor: colorScheme.surface,
-          title: Text(
-            '我的主题',
-            style: TextStyle(
-              color: colorScheme.onSurface,
-            ),
-          ),
-          trailing: Icon(
-            Icons.chevron_right,
-            color: colorScheme.onSurface,
-          ),
-          leading: Icon(
-            Icons.palette,
-            color: colorScheme.primary,
-          ),
-          onTap: showThemeSelector,
-        ),
-        Divider(
-          indent: 10,
-          endIndent: 10,
-          height: 1,
-          color: colorScheme.primary.withOpacity(0.05),
-        ),
-        ListTile(
-          tileColor: colorScheme.surface,
-          title: Text(
-            '清空缓存',
-            style: TextStyle(
-              color: colorScheme.onSurface,
-            ),
-          ),
-          trailing: Icon(
-            Icons.chevron_right,
-            color: colorScheme.onSurface,
-          ),
-          leading: Icon(
-            Icons.cleaning_services,
-            color: colorScheme.secondary,
-          ),
-          onTap: () {
-            showFlanActionSheet(
-              context,
-              cancelText: "取消",
-              actions: [
-                FlanActionSheetAction(
-                  name: '清空选样车缓存',
-                  callback: (action) async {
-                    cart.clear();
-                    EasyLoading.showSuccess("清理成功");
-                  },
-                ),
-              ],
-              closeable: false,
-              safeAreaInsetBottom: true,
-              closeOnClickAction: true,
-            );
-          },
-        ),
-        Divider(
-          indent: 10,
-          endIndent: 10,
-          height: 1,
-          color: colorScheme.primary.withOpacity(0.05),
-        ),
-        ListTile(
-          tileColor: colorScheme.surface,
-          title: Text(
-            '版本信息(${app.fullVersion})',
-            style: TextStyle(
-              color: colorScheme.onSurface,
-            ),
-          ),
-          leading: Icon(
-            CupertinoIcons.info,
-            color: colorScheme.tertiary,
-          ),
-        ),
-        Divider(
-          indent: 10,
-          endIndent: 10,
-          height: 1,
-          color: colorScheme.primary.withOpacity(0.05),
-        ),
-        ListTile(
-          tileColor: colorScheme.surface,
-          trailing: Icon(
-            Icons.chevron_right,
-            color: colorScheme.onSurface,
-          ),
-          title: Row(children: [
-            Text(
-              '联系技术人员',
+    return Container(
+      decoration: BoxDecoration(color: colorScheme.surface.withOpacity(0.49)),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            tileColor: colorScheme.surface.withOpacity(0.9),
+            title: Text(
+              '我的主题',
               style: TextStyle(
                 color: colorScheme.onSurface,
               ),
-            ), 
-          ]),
-          leading: const Icon(
-            Icons.phone,
-            color: Color(0xFF08D9D6),
-          ),
-          onTap: () async {
-            showFlanActionSheet(
-              context,
-              cancelText: "取消",
-              actions: [
-                FlanActionSheetAction(
-                  name: '拨打短号($customerPhoneNumber)',
-                  callback: (action) async {
-                    final phoneNumber = customerPhoneNumber.toString().trim();
-                    if (phoneNumber.isEmpty) {
-                      EasyLoading.showError('短号为空');
-                      return;
-                    }
-                    try {
-                      final uri = Uri(scheme: 'tel', path: phoneNumber);
-                      await launchUrl(uri);
-                    } catch (e) {
-                      EasyLoading.showError('${'拨号失败'}：${e.toString()}');
-                    }
-                  },
-                ),
-              ],
-              closeable: false,
-              safeAreaInsetBottom: true,
-              closeOnClickAction: true,
-            );
-          },
-        ),
-        Divider(
-          indent: 10,
-          endIndent: 10,
-          height: 1,
-          color: colorScheme.primary.withOpacity(0.05),
-        ),
-        ListTile(
-          tileColor: colorScheme.surface,
-          title: Text(
-            '退出登录',
-            style: TextStyle(
+            ),
+            trailing: Icon(
+              Icons.chevron_right,
               color: colorScheme.onSurface,
             ),
+            leading: Icon(
+              Icons.palette,
+              color: colorScheme.primary,
+            ),
+            onTap: showThemeSelector,
           ),
-          leading: Icon(
-            Icons.logout,
-            color: colorScheme.primary,
+          Divider(
+            indent: 10,
+            endIndent: 10,
+            height: 1,
+            color: colorScheme.primary.withOpacity(0.05),
           ),
-          onTap: () {
-            showFlanActionSheet(
-              context,
-              cancelText: "取消",
-              actions: [
-                FlanActionSheetAction(
-                  name: '退出登录',
-                  callback: (action) async {
-                    await api.post("api/logout");
-                    authNotifier.logout();
-                  },
+          ListTile(
+            tileColor: colorScheme.surface.withOpacity(0.9),
+            title: Text(
+              '清空缓存',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+              ),
+            ),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: colorScheme.onSurface,
+            ),
+            leading: Icon(
+              Icons.cleaning_services,
+              color: colorScheme.secondary,
+            ),
+            onTap: () {
+              showFlanActionSheet(
+                context,
+                cancelText: "取消",
+                actions: [
+                  FlanActionSheetAction(
+                    name: '清空选样车缓存',
+                    callback: (action) async {
+                      cart.clear();
+                      EasyLoading.showSuccess("清理成功");
+                    },
+                  ),
+                ],
+                closeable: false,
+                safeAreaInsetBottom: true,
+                closeOnClickAction: true,
+              );
+            },
+          ),
+          Divider(
+            indent: 10,
+            endIndent: 10,
+            height: 1,
+            color: colorScheme.primary.withOpacity(0.05),
+          ),
+          ListTile(
+            tileColor: colorScheme.surface,
+            trailing: Icon(
+              Icons.chevron_right,
+              color: colorScheme.onSurface,
+            ),
+            title: Row(children: [
+              Text(
+                '联系技术人员',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
                 ),
-              ],
-              closeOnClickAction: true,
-            );
-          },
-        ),
-      ],
+              ),
+            ]),
+            leading: const Icon(
+              Icons.phone,
+              color: Color(0xFF08D9D6),
+            ),
+            onTap: () async {
+              showFlanActionSheet(
+                context,
+                cancelText: "取消",
+                actions: [
+                  FlanActionSheetAction(
+                    name: '拨打短号($customerPhoneNumber)',
+                    callback: (action) async {
+                      final phoneNumber = customerPhoneNumber.toString().trim();
+                      if (phoneNumber.isEmpty) {
+                        EasyLoading.showError('短号为空');
+                        return;
+                      }
+                      try {
+                        final uri = Uri(scheme: 'tel', path: phoneNumber);
+                        await launchUrl(uri);
+                      } catch (e) {
+                        EasyLoading.showError('${'拨号失败'}：${e.toString()}');
+                      }
+                    },
+                  ),
+                ],
+                closeable: false,
+                safeAreaInsetBottom: true,
+                closeOnClickAction: true,
+              );
+            },
+          ),
+          Divider(
+            indent: 10,
+            endIndent: 10,
+            height: 1,
+            color: colorScheme.primary.withOpacity(0.05),
+          ),
+          ListTile(
+            tileColor: colorScheme.surface,
+            title: Text(
+              '版本信息(${app.fullVersion})',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+              ),
+            ),
+            leading: Icon(
+              CupertinoIcons.info,
+              color: colorScheme.tertiary,
+            ),
+          ),
+          Divider(
+            indent: 10,
+            endIndent: 10,
+            height: 1,
+            color: colorScheme.primary.withOpacity(0.05),
+          ),
+          ListTile(
+            tileColor: colorScheme.surface,
+            title: Text(
+              '退出登录',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+              ),
+            ),
+            leading: Icon(
+              Icons.logout,
+              color: colorScheme.primary,
+            ),
+            onTap: () {
+              showFlanActionSheet(
+                context,
+                cancelText: "取消",
+                actions: [
+                  FlanActionSheetAction(
+                    name: '退出登录',
+                    callback: (action) async {
+                      await api.post("api/logout");
+                      authNotifier.logout();
+                    },
+                  ),
+                ],
+                closeOnClickAction: true,
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

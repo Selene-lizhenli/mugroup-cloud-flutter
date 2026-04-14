@@ -411,98 +411,12 @@ class ExportInspectionDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color textDark = Color(0xFF333333);
-    final borderColor = Colors.grey[300]!;
-    final colorScheme = Theme.of(context).colorScheme;
-    final Color primaryColor = colorScheme.primary;
-    final emailController = useTextEditingController();
+    const Color textDark = Color(0xFF333333); 
+    final colorScheme = Theme.of(context).colorScheme; 
 
     final isDownloading = useState(false);
 
-    void showEmailNotSupportedTip() {
-      showDialog(
-        context: context,
-        builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.white,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            constraints: const BoxConstraints(maxWidth: 320),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 图标容器
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFFF3E0),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.lightbulb_outline,
-                    color: Color(0xFFFF9800),
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // 标题
-                const Text(
-                  '暂不支持邮箱格式哦~',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF1A1A1A),
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // 内容描述
-                const Text(
-                  'Comming Soon，敬请期待！',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Color(0xFF666666),
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 28),
-                // 按钮
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                    ),
-                    child: const Text(
-                      '我知道了',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
+ 
     return PopScope(
       canPop: !isDownloading.value,
       onPopInvoked: (didPop) {
@@ -927,7 +841,7 @@ class _InspectionListItem extends HookWidget {
   }
 
   Widget _buildStatusTag(int? status) {
-    final label = {1: '合格', 2: '微瑕', 3: '不合格'}[status] ?? '未验货';
+    final label = {1: '合格', 2: '微瑕合格', 3: '不合格'}[status] ?? '未验货';
 
     final color = {1: Colors.green, 2: Colors.orange, 3: Colors.red}[status] ??
         Colors.grey;

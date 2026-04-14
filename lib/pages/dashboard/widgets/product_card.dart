@@ -56,14 +56,16 @@ class TopRankItemCard<T> extends StatelessWidget {
     }
 
     Widget buildInfo(item) {
-      try { 
+      try {
         final data = item;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               data.sampleName ?? ' ',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(),
+              style: showInpage == true
+                  ? Theme.of(context).textTheme.bodyMedium?.copyWith()
+                  : Theme.of(context).textTheme.bodySmall?.copyWith(),
             ),
             const SizedBox(height: 4),
             Text(
@@ -88,7 +90,8 @@ class TopRankItemCard<T> extends StatelessWidget {
                     formatCurrencyAmount(data.shippingAmount),
                     style: TextStyle(
                       color: colorScheme.primary,
-                      fontSize: 10,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const Text(
@@ -104,7 +107,17 @@ class TopRankItemCard<T> extends StatelessWidget {
                   ),
                   Text(
                     ' ${item.count ?? ' '}',
-                    style: TextStyle(color: colorScheme.primary, fontSize: 10),
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    ' 次',
+                    style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.72),
+                        fontSize: 10),
                   ),
                 ] else
                   ...[],

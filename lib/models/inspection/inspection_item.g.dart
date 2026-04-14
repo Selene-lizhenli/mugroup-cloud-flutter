@@ -15,6 +15,7 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
       (json['ctns'] as num?)?.toInt(),
       (json['qty'] as num?)?.toInt(),
       json['remark'] as String?,
+      json['barcode'] as String?,
       (json['media'] as List<dynamic>?)
           ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -36,6 +37,7 @@ Map<String, dynamic> _$$InspectionItemImplToJson(
       'ctns': instance.ctns,
       'qty': instance.qty,
       'remark': instance.remark,
+      'barcode': instance.barcode,
       'media': instance.media,
       'task_id': instance.taskId,
       'user_id': instance.userId,

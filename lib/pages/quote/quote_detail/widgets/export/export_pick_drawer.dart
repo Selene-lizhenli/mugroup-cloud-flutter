@@ -1,127 +1,124 @@
+import 'dart:math' as math;
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/user.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
-import 'package:cloud/pages/widgets/input.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum ExportTemplateType {
-  normal, // 出货清单
-  encrypt, // 出货清单（含加密信息）
-  quote, // 报价单
+  normal(
+    title: '出货清单',
+    templateKey: 'chqd',
+    permissionKey: 'showroom.quotation.export.chuhuoExcel',
+  ),
+  encrypt(
+    title: '出货清单（含加密信息）',
+    templateKey: 'chqd_secret',
+    permissionKey: 'showroom.quotation.export.admin.chuhuoExcel',
+  ),
+  quote(
+    title: '报价单',
+    templateKey: 'bjd',
+    permissionKey: 'showroom.quotation.export.baojiaExcel',
+  );
+
+  final String title;
+  final String templateKey;
+  final String permissionKey;
+
+  const ExportTemplateType({
+    required this.title,
+    required this.templateKey,
+    required this.permissionKey,
+  });
 }
 
 enum ExportChannel {
-  email, // 邮箱
   wework, // 企微
 }
 
-class EmailExportSheet extends StatefulWidget {
+class EmployeePickerSheet extends StatelessWidget {
   final int? quoteId;
-  const EmailExportSheet(this.quoteId);
+  const EmployeePickerSheet(this.quoteId, {super.key});
 
-  @override
-  State<EmailExportSheet> createState() => _EmailExportSheetState();
-}
-
-class _EmailExportSheetState extends State<EmailExportSheet> {
   @override
   Widget build(BuildContext context) {
     return ExportShareSheet(
-      quoteId: widget.quoteId,
-      channel: ExportChannel.email,
-    );
-  }
-}
-
-class EmployeePickerSheet extends StatefulWidget {
-  final int? quoteId;
-  const EmployeePickerSheet(this.quoteId);
-
-  @override
-  State<EmployeePickerSheet> createState() => _EmployeePickerSheetState();
-}
-
-class _EmployeePickerSheetState extends State<EmployeePickerSheet> {
-  @override
-  Widget build(BuildContext context) {
-    return ExportShareSheet(
-      quoteId: widget.quoteId,
+      quoteId: quoteId,
       channel: ExportChannel.wework,
     );
   }
 }
 
-class ExportShareSheet extends StatefulWidget {
+class ExportShareSheet extends HookConsumerWidget {
   final int? quoteId;
   final ExportChannel channel;
   const ExportShareSheet({
+    super.key,
     required this.quoteId,
     required this.channel,
   });
 
-  @override
-  State<ExportShareSheet> createState() => _ExportShareSheetState();
-}
+ 
 
-class _ExportShareSheetState extends State<ExportShareSheet> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _ccController = TextEditingController();
-  User? _selected;
-  ExportTemplateType _templateType = ExportTemplateType.normal;
-  late ExportChannel _channel;
-  bool _submitting = false;
+  bool _canUseTemplate(ExportTemplateType type, List<String> permissions) {
+    return permissions.contains(type.permissionKey);
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _channel = widget.channel;
+  List<ExportTemplateType> _availableTemplates(List<String> permissions) {
+    return ExportTemplateType.values
+        .where((e) => _canUseTemplate(e, permissions))
+        .toList();
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _ccController.dispose();
-    super.dispose();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;
+    final permissions = user?.permissions ?? const <String>[]; 
+    final selected = useState<User?>(null);
+    final templateType = useState(ExportTemplateType.quote);
+    final channel = useState(this.channel);
+    final submitting = useState(false);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isWework = channel.value == ExportChannel.wework;
+    final availableTemplates = _availableTemplates(permissions);
+    final canExportNormal =
+        availableTemplates.contains(ExportTemplateType.normal);
+    final canExportEncrypt =
+        availableTemplates.contains(ExportTemplateType.encrypt);
+    final canExportQuote =
+        availableTemplates.contains(ExportTemplateType.quote);
 
-  bool _isValidEmail(String email) {
-    if (email.isEmpty) return false;
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email);
-  }
+    useEffect(() {
+      if (availableTemplates.isNotEmpty &&
+          !availableTemplates.contains(templateType.value)) {
+        templateType.value = availableTemplates.first;
+      }
+      return null;
+    }, [availableTemplates, templateType.value]);
 
-  Future<void> _handleConfirm() async {
-    // 邮箱渠道验证
-    if (_channel == ExportChannel.email) {
-      final email = _emailController.text.trim();
-
-      if (email.isEmpty) {
+    Future<void> handleConfirm() async {
+      if (availableTemplates.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('请输入邮箱地址'),
+            content: Text('暂无可用模板，请联系管理员',
+                style: TextStyle(color: colorScheme.onError)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
         return;
       }
 
-      if (!_isValidEmail(email)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('请输入有效的邮箱地址'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-        return;
+      if (!availableTemplates.contains(templateType.value)) {
+        templateType.value = availableTemplates.first;
       }
-    }
 
-    // 企微渠道验证
-    if (_channel == ExportChannel.wework) {
-      if (_selected == null) {
+      if (channel.value == ExportChannel.wework && selected.value == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('请选择用户'),
@@ -130,97 +127,100 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
         );
         return;
       }
-    }
 
-    setState(() {
-      _submitting = true;
-    });
+      submitting.value = true;
+      try {
+        final params = <String, dynamic>{
+          "channel": "wework",
+          "template": templateType.value.templateKey,
+        };
 
-    try {
-      final params = <String, dynamic>{
-        "channel": _channel == ExportChannel.email ? "email" : "wework",
-        "template": _getTemplateString(_templateType),
-      };
-
-      if (_channel == ExportChannel.email) {
-        params["email"] = _emailController.text.trim();
-        if (_ccController.text.trim().isNotEmpty) {
-          params["cc"] = _ccController.text.trim();
+        if (channel.value == ExportChannel.wework) {
+          params["user_id"] = selected.value?.id;
         }
-      } else {
-        params["user_id"] = _selected?.id;
-      }
+        final result = await exportQuotationFile(quoteId ?? 0, params);
+        if (!context.mounted) return;
 
-      final result = await exportQuotationFile(
-        widget.quoteId ?? 0,
-        params,
-      );
-
-      if (!context.mounted) return;
-
-      if (result.success) {
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(channel.value == ExportChannel.wework
+                  ? '导出成功，请到企微查看！'
+                  : '导出成功！'),
+              backgroundColor: Colors.green.shade600,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.message ?? '导出失败'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      } catch (e, s) {
+        if (!context.mounted) return;
+        debugPrint('导出失败: $e\n$s');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_channel == ExportChannel.email
-                ? '导出成功，邮件已发送！'
-                : '导出成功，请到企微查看！'),
-            backgroundColor: Colors.green.shade600,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message ?? '导出失败'),
+            content: const Text('导出失败，请稍后重试'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
-      }
-    } catch (e, s) {
-      if (!context.mounted) return;
-      debugPrint('导出失败: $e\n$s');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('导出失败，请稍后重试'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _submitting = false;
-        });
+      } finally {
+        submitting.value = false;
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isEmail = _channel == ExportChannel.email;
-    final isWework = _channel == ExportChannel.wework;
 
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.7,
           maxWidth: 500,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: colorScheme.primary, width: 6),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // ===== 标题 =====
-            const Padding(
-              padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: Text(
-                '分享',
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: colorScheme.primary, width: 6),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+                color: colorScheme.primary,
+              ),
+              padding: const EdgeInsets.fromLTRB(12, 5, 12, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '分享',
+                    textAlign: TextAlign.left,
+                    style:
+                        TextStyle(fontSize: 18, color: colorScheme.onPrimary),
+                  ),
+                  const SizedBox(width: 5),
+                  Transform.rotate(
+                    angle: -math.pi / 4,
+                    child: Icon(
+                      Icons.send,
+                      size: 20,
+                      color: colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
               ),
             ),
             // ===== 表单内容 =====
@@ -234,148 +234,135 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          '渠道',
+                          '渠道:',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         _ChannelOption(
                           label: '企微',
                           assetPath: 'assets/icons/wxwork.svg',
                           selected: isWework,
                           iconColor: colorScheme.outline,
                           onTap: () {
-                            setState(() {
-                              _channel = ExportChannel.wework;
-                            });
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                        _ChannelOption(
-                          label: '邮箱',
-                          assetPath: 'assets/icons/email.svg',
-                          selected: isEmail,
-                          iconColor: colorScheme.outline,
-                          onTap: () {
-                            setState(() {
-                              _channel = ExportChannel.email;
-                            });
+                            channel.value = ExportChannel.wework;
                           },
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
                     // ===== 模板选择 =====
-                    Text(
-                      '模板',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 6),
-                    Column(
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _RadioItem(
-                          title: '出货清单',
-                          value: ExportTemplateType.normal,
-                          groupValue: _templateType,
-                          onChanged: (v) {
-                            setState(() => _templateType = v);
-                          },
+                        Text(
+                          '模板:',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(width: 12),
-                        _RadioItem(
-                          title: '出货清单（含加密信息）',
-                          value: ExportTemplateType.encrypt,
-                          groupValue: _templateType,
-                          onChanged: (v) {
-                            setState(() => _templateType = v);
-                          },
-                        ),
-                        const SizedBox(height: 4),
-                        _RadioItem(
-                          title: '报价单',
-                          value: ExportTemplateType.quote,
-                          groupValue: _templateType,
-                          onChanged: (v) {
-                            setState(() => _templateType = v);
-                          },
-                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (canExportQuote) ...[
+                                _RadioItem(
+                                  title: ExportTemplateType.quote.title,
+                                  value: ExportTemplateType.quote,
+                                  groupValue: templateType.value,
+                                  onChanged: (v) {
+                                    templateType.value = v;
+                                  },
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                              if (canExportNormal) ...[
+                                _RadioItem(
+                                  title: ExportTemplateType.normal.title,
+                                  value: ExportTemplateType.normal,
+                                  groupValue: templateType.value,
+                                  onChanged: (v) {
+                                    templateType.value = v;
+                                  },
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                              if (canExportEncrypt) ...[
+                                _RadioItem(
+                                  title: ExportTemplateType.encrypt.title,
+                                  value: ExportTemplateType.encrypt,
+                                  groupValue: templateType.value,
+                                  onChanged: (v) {
+                                    templateType.value = v;
+                                  },
+                                ),
+                              ],
+                              if (availableTemplates.isEmpty)
+                                Text(
+                                  '  暂无可用模板，请联系管理员',
+                                  style: TextStyle(color: colorScheme.outline),
+                                ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
 
-                    // ===== 根据渠道显示不同的表单 =====
                     const SizedBox(height: 8),
-                    if (isEmail) ...[
-                      // ===== 邮箱输入框 =====
 
-                      Input(
-                        label: '邮箱',
-                        value: _emailController.text,
-                        hintText: '请输入邮箱地址',
-                        onChanged: (value) {
-                          setState(() {
-                            _emailController.text = value;
-                          });
-                        },
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      // ===== 抄送输入框 =====
-                      const SizedBox(height: 8),
-                      Input(
-                        label: '抄送',
-                        hintText: '抄送地址',
-                        value: _ccController.text,
-                        onChanged: (value) {
-                          setState(() {
-                            _ccController.text = value;
-                          });
-                        },
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                    ] else ...[
-                      // ===== 员工搜索选择 =====
-                      const Text("用户"),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () async {
-                          final selectedUser = await context.router
-                              .push<User>(const SelectUserRoute());
-                          if (selectedUser != null && mounted) {
-                            setState(() {
-                              _selected = selectedUser;
-                            });
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colorScheme.surfaceTint,
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  _selected == null
-                                      ? "请选择用户"
-                                      : "${_selected!.name} (${_selected!.department?.name ?? '暂无部门'})",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: _selected == null
-                                        ? Colors.grey.shade600
-                                        : Colors.black87,
-                                  ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("用户:"),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                final selectedUser = await context.router
+                                    .push<User>(const SelectUserRoute());
+                                if (selectedUser != null && context.mounted) {
+                                  selected.value = selectedUser;
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 11,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: colorScheme.surfaceTint,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: selected.value == null
+                                          ? Text(
+                                              "请选择用户",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                            )
+                                          : Text(
+                                              "${selected.value!.name} (${selected.value!.department?.name ?? '暂无部门'})",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: colorScheme.primary,
+                                              ),
+                                            ),
+                                    ),
+                                    const Icon(Icons.keyboard_arrow_right,
+                                        color: Colors.grey),
+                                  ],
                                 ),
                               ),
-                              const Icon(Icons.keyboard_arrow_right,
-                                  color: Colors.grey),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                            ),
+                          )
+                        ]),
+
+                    // ===== 员工搜索选择 =====
                   ],
                 ),
               ),
@@ -392,7 +379,9 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                     borderRadius: BorderRadius.circular(8),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: _submitting ? null : () => Navigator.pop(context),
+                      onTap: submitting.value
+                          ? null
+                          : () => Navigator.pop(context),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 28,
@@ -417,29 +406,25 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
                   ),
                   const SizedBox(width: 12),
                   Material(
-                    color: colorScheme.primary,
+                    color: submitting.value
+                        ? colorScheme.primary.withOpacity(0.3)
+                        : colorScheme.primary,
                     borderRadius: BorderRadius.circular(8),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: _submitting ? null : _handleConfirm,
+                      onTap: submitting.value ? null : handleConfirm,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 28,
                           vertical: 10,
                         ),
-                        child: _submitting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: MuProgressIndicator(),
-                              )
-                            : Text(
-                                '确认',
-                                style: TextStyle(
-                                  color: colorScheme.onPrimary,
-                                  fontSize: 14,
-                                ),
-                              ),
+                        child: Text(
+                          submitting.value ? '发送中...' : '确认',
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -450,18 +435,6 @@ class _ExportShareSheetState extends State<ExportShareSheet> {
         ),
       ),
     );
-  }
-}
-
-/// 将模板类型转换为字符串
-String _getTemplateString(ExportTemplateType type) {
-  switch (type) {
-    case ExportTemplateType.normal:
-      return "chqd";
-    case ExportTemplateType.encrypt:
-      return "chqd_secret";
-    case ExportTemplateType.quote:
-      return "bjd";
   }
 }
 
@@ -556,10 +529,10 @@ class _ChannelOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          // borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12),
           // border: Border.all(color: borderColor, width: 1),
           color: selected
-              ? colorScheme.primary.withOpacity(0.06)
+              ? colorScheme.primary.withOpacity(0.2)
               : colorScheme.surface,
         ),
         child: Row(
@@ -568,8 +541,7 @@ class _ChannelOption extends StatelessWidget {
             SvgPicture.asset(assetPath,
                 width: 20,
                 height: 20,
-                colorFilter:
-                    ColorFilter.mode(iconColor ?? fgColor, BlendMode.srcIn)),
+                colorFilter: ColorFilter.mode(fgColor, BlendMode.srcIn)),
             const SizedBox(width: 8),
             Text(
               label,

@@ -1,3 +1,4 @@
+import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
@@ -166,41 +167,60 @@ class WarehouseShowCard extends ConsumerWidget {
               Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF3E0),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.lightbulb_outline,
-                  color: Color(0xFFFF9800),
+                  color: colorScheme.primary,
                   size: 32,
                 ),
               ),
               const SizedBox(height: 20),
               // 标题
-              const Text(
-                '独立样品间暂未开放',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1A1A1A),
-                  height: 1.2,
-                ),
+              Text(
+                '独立样品间待开放',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF1A1A1A),
+                      height: 1.2,
+                    ),
               ),
-              //  文案换成：有独立样品间的部门请联系数字发展中心进行适配
               const SizedBox(height: 12),
-              // 内容描述
-              const Text(
-                '敬请期待！',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFF666666),
-                  height: 1.5,
-                ),
+              Text(
+                '如有独立样品间数字展厅部署需求，欢迎联系数字发展中心！',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 15,
+                      color: colorScheme.error,
+                      height: 1.5,
+                    ),
                 textAlign: TextAlign.center,
               ),
-
-              const SizedBox(height: 28),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.phone,
+                    color: Color(0xFF08D9D6),
+                    size: 21,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    '$customerPhoneNumber',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontSize: 16,
+                          color: colorScheme.onSurface,
+                          height: 1.5,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               // 按钮
               SizedBox(
                 width: double.infinity,

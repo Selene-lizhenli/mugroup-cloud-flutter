@@ -55,6 +55,7 @@ mixin _$Sample {
   String? get spec => throw _privateConstructorUsedError;
   SampleCategory? get category => throw _privateConstructorUsedError;
   List<Media>? get image => throw _privateConstructorUsedError;
+  List<Media>? get audios => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -89,7 +90,8 @@ abstract class $SampleCopyWith<$Res> {
       List<Quote>? supplyQuotes,
       String? spec,
       SampleCategory? category,
-      List<Media>? image});
+      List<Media>? image,
+      List<Media>? audios});
 
   $SampleCategoryCopyWith<$Res>? get category;
 }
@@ -130,6 +132,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
     Object? spec = freezed,
     Object? category = freezed,
     Object? image = freezed,
+    Object? audios = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -224,6 +227,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as List<Media>?,
+      audios: freezed == audios
+          ? _value.audios
+          : audios // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ) as $Val);
   }
 
@@ -270,7 +277,8 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
       List<Quote>? supplyQuotes,
       String? spec,
       SampleCategory? category,
-      List<Media>? image});
+      List<Media>? image,
+      List<Media>? audios});
 
   @override
   $SampleCategoryCopyWith<$Res>? get category;
@@ -310,6 +318,7 @@ class __$$SampleImplCopyWithImpl<$Res>
     Object? spec = freezed,
     Object? category = freezed,
     Object? image = freezed,
+    Object? audios = freezed,
   }) {
     return _then(_$SampleImpl(
       id: freezed == id
@@ -404,6 +413,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value._image
           : image // ignore: cast_nullable_to_non_nullable
               as List<Media>?,
+      audios: freezed == audios
+          ? _value._audios
+          : audios // ignore: cast_nullable_to_non_nullable
+              as List<Media>?,
     ));
   }
 }
@@ -434,9 +447,11 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       final List<Quote>? supplyQuotes,
       this.spec,
       this.category,
-      final List<Media>? image})
+      final List<Media>? image,
+      final List<Media>? audios})
       : _supplyQuotes = supplyQuotes,
         _image = image,
+        _audios = audios,
         super._();
 
   factory _$SampleImpl.fromJson(Map<String, dynamic> json) =>
@@ -516,9 +531,19 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<Media>? _audios;
+  @override
+  List<Media>? get audios {
+    final value = _audios;
+    if (value == null) return null;
+    if (_audios is EqualUnmodifiableListView) return _audios;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, itemType: $itemType, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image)';
+    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, itemType: $itemType, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image, audios: $audios)';
   }
 
   @override
@@ -548,7 +573,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('supplyQuotes', supplyQuotes))
       ..add(DiagnosticsProperty('spec', spec))
       ..add(DiagnosticsProperty('category', category))
-      ..add(DiagnosticsProperty('image', image));
+      ..add(DiagnosticsProperty('image', image))
+      ..add(DiagnosticsProperty('audios', audios));
   }
 
   @override
@@ -589,7 +615,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
             (identical(other.spec, spec) || other.spec == spec) &&
             (identical(other.category, category) ||
                 other.category == category) &&
-            const DeepCollectionEquality().equals(other._image, _image));
+            const DeepCollectionEquality().equals(other._image, _image) &&
+            const DeepCollectionEquality().equals(other._audios, _audios));
   }
 
   @JsonKey(ignore: true)
@@ -618,7 +645,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
         const DeepCollectionEquality().hash(_supplyQuotes),
         spec,
         category,
-        const DeepCollectionEquality().hash(_image)
+        const DeepCollectionEquality().hash(_image),
+        const DeepCollectionEquality().hash(_audios)
       ]);
 
   @JsonKey(ignore: true)
@@ -659,7 +687,8 @@ abstract class _Sample extends Sample {
       final List<Quote>? supplyQuotes,
       final String? spec,
       final SampleCategory? category,
-      final List<Media>? image}) = _$SampleImpl;
+      final List<Media>? image,
+      final List<Media>? audios}) = _$SampleImpl;
   const _Sample._() : super._();
 
   factory _Sample.fromJson(Map<String, dynamic> json) = _$SampleImpl.fromJson;
@@ -722,6 +751,8 @@ abstract class _Sample extends Sample {
   SampleCategory? get category;
   @override
   List<Media>? get image;
+  @override
+  List<Media>? get audios;
   @override
   @JsonKey(ignore: true)
   _$$SampleImplCopyWith<_$SampleImpl> get copyWith =>

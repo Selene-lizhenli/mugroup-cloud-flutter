@@ -53,15 +53,17 @@ class CrmCompanyCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              company.name ?? "未命名客户",
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1F2937),
+                            Expanded(
+                              child: Text(
+                                company.name ?? "未命名客户",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1F2937),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             if (onEdit != null)
@@ -91,7 +93,7 @@ class CrmCompanyCard extends StatelessWidget {
                             children: [
                               const SizedBox(height: 2),
                               Icon(Icons.location_on_outlined,
-                                  size: 14, color: colorScheme.outline), 
+                                  size: 14, color: colorScheme.outline),
                               Expanded(
                                 child: Text(
                                   company.address ?? '',

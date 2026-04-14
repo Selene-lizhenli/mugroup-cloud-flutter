@@ -303,7 +303,7 @@ class ExchangeTrend extends StatelessWidget {
         TimeRangeSelect(
           initialRange: selectedRange,
           onRangeChanged: onRangeChanged,
-          useAllTime:false
+          useAllTime:false,
         ),
         const SizedBox(height: 4),
       ],

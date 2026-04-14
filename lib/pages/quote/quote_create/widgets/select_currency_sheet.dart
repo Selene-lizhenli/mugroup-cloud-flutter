@@ -5,6 +5,16 @@ import 'package:cloud/providers/exchange.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+// 获取汇率字符串：exchangeRate 表示 100 单位该货币 = 多少人民币，需要除以 100
+String getRateValue(ExchangeRate rate) {
+  final rateStr = rate.exchangeRate ?? '0';
+  final rateValue = (double.tryParse(rateStr) ?? 0.0) / 100;
+  if (rateValue == 0.0) {
+    return '0';
+  }
+  return rateValue.toStringAsFixed(4);
+}
+
 class SelectCurrencySheet extends HookConsumerWidget {
   const SelectCurrencySheet({super.key});
 
@@ -42,16 +52,6 @@ class SelectCurrencySheet extends HookConsumerWidget {
     // 获取存储值：优先使用 shortName，如果没有则使用显示文本
     String getStorageValue(ExchangeRate rate) {
       return rate.shortName ?? buildDisplayText(rate);
-    }
-
-    // 获取汇率字符串：exchangeRate 表示 100 单位该货币 = 多少人民币，需要除以 100
-    String getRateValue(ExchangeRate rate) {
-      final rateStr = rate.exchangeRate ?? '0';
-      final rateValue = (double.tryParse(rateStr) ?? 0.0) / 100;
-      if (rateValue == 0.0) {
-        return '0';
-      }
-      return rateValue.toStringAsFixed(4);
     }
 
     return Container(
@@ -109,7 +109,7 @@ class SelectCurrencySheet extends HookConsumerWidget {
                       ),
                     );
                   }
-                  
+
                   return ListView.separated(
                     shrinkWrap: true,
                     itemCount: exchangeRates.length,
@@ -117,37 +117,38 @@ class SelectCurrencySheet extends HookConsumerWidget {
                         const Divider(height: 1, indent: 10),
                     itemBuilder: (context, index) {
                       final rate = exchangeRates[index];
-                    final displayText = buildDisplayText(rate);
-                    final selected = isSelected(rate);
-                    final rateValue = getRateValue(rate);
+                      final displayText = buildDisplayText(rate);
+                      final selected = isSelected(rate);
+                      final rateValue = getRateValue(rate);
 
-                    return ListTile(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16),
-                      title: Row(
-                        children: [
-                          Text(displayText),
-                        const SizedBox(width: 8),
-                          Text(
-                            rateValue,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
+                      return ListTile(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
+                        title: Row(
+                          children: [
+                            Text(displayText),
+                            const SizedBox(width: 8),
+                            Text(
+                              rateValue,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      trailing: selected
-                          ? const Icon(Icons.check, color: Colors.blue)
-                          : null,
-                      onTap: () {
-                        final currencyValue = getStorageValue(rate);
-                        notifier.setCurrencyWithRate(currencyValue, rateValue);
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                );
+                          ],
+                        ),
+                        trailing: selected
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                        onTap: () {
+                          final currencyValue = getStorageValue(rate);
+                          notifier.setCurrencyWithRate(
+                              currencyValue, rateValue);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
                 },
                 loading: () => const Center(
                   child: MuProgressIndicator(),

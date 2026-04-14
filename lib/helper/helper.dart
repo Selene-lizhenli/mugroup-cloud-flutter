@@ -183,3 +183,22 @@ Map<String, dynamic> parseUaDeviceType(String? ua) {
     };
   }
 }
+
+
+/// 兼容后端返回类型：可能是 `int` 或 `string`（也可能是 `double/num`）
+
+String? stringFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  if (value is int || value is double) return value.toString();
+  return null;
+}
+
+/// 兼容后端返回类型：可能是 `int` 或 `string`（也可能是 `double/num`）
+int? intFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}

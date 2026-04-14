@@ -36,6 +36,9 @@ _$SampleImpl _$$SampleImplFromJson(Map<String, dynamic> json) => _$SampleImpl(
       image: (json['image'] as List<dynamic>?)
           ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
           .toList(),
+      audios: (json['audios'] as List<dynamic>?)
+          ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$SampleImplToJson(_$SampleImpl instance) =>
@@ -63,6 +66,7 @@ Map<String, dynamic> _$$SampleImplToJson(_$SampleImpl instance) =>
       'spec': instance.spec,
       'category': instance.category,
       'image': instance.image,
+      'audios': instance.audios,
     };
 
 _$SampleCategoryImpl _$$SampleCategoryImplFromJson(Map<String, dynamic> json) =>

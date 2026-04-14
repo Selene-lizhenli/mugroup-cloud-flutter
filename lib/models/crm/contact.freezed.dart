@@ -30,9 +30,13 @@ mixin _$Contact {
   @JsonKey(name: 'company_id')
   int? get companyId => throw _privateConstructorUsedError;
   Company? get company => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get whatsapp => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get email => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get linkedin => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get facebook => throw _privateConstructorUsedError;
   User? get head => throw _privateConstructorUsedError;
   String? get mobile => throw _privateConstructorUsedError;
@@ -57,10 +61,10 @@ abstract class $ContactCopyWith<$Res> {
       @JsonKey(name: 'tel_number') String? telNumber,
       @JsonKey(name: 'company_id') int? companyId,
       Company? company,
-      List<String>? whatsapp,
-      List<String>? email,
-      List<String>? linkedin,
-      List<String>? facebook,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? whatsapp,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? linkedin,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? facebook,
       User? head,
       String? mobile,
       List<Log>? logs});
@@ -203,10 +207,10 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
       @JsonKey(name: 'tel_number') String? telNumber,
       @JsonKey(name: 'company_id') int? companyId,
       Company? company,
-      List<String>? whatsapp,
-      List<String>? email,
-      List<String>? linkedin,
-      List<String>? facebook,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? whatsapp,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? linkedin,
+      @JsonKey(fromJson: _stringOrStringListToList) List<String>? facebook,
       User? head,
       String? mobile,
       List<Log>? logs});
@@ -321,9 +325,12 @@ class _$ContactImpl implements _Contact {
       @JsonKey(name: 'tel_number') this.telNumber,
       @JsonKey(name: 'company_id') this.companyId,
       this.company,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? whatsapp,
-      final List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList) final List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? linkedin,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? facebook,
       this.head,
       this.mobile,
@@ -357,6 +364,7 @@ class _$ContactImpl implements _Contact {
   final Company? company;
   final List<String>? _whatsapp;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get whatsapp {
     final value = _whatsapp;
     if (value == null) return null;
@@ -367,6 +375,7 @@ class _$ContactImpl implements _Contact {
 
   final List<String>? _email;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get email {
     final value = _email;
     if (value == null) return null;
@@ -377,6 +386,7 @@ class _$ContactImpl implements _Contact {
 
   final List<String>? _linkedin;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get linkedin {
     final value = _linkedin;
     if (value == null) return null;
@@ -387,6 +397,7 @@ class _$ContactImpl implements _Contact {
 
   final List<String>? _facebook;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get facebook {
     final value = _facebook;
     if (value == null) return null;
@@ -485,9 +496,12 @@ abstract class _Contact implements Contact {
       @JsonKey(name: 'tel_number') final String? telNumber,
       @JsonKey(name: 'company_id') final int? companyId,
       final Company? company,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? whatsapp,
-      final List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList) final List<String>? email,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? linkedin,
+      @JsonKey(fromJson: _stringOrStringListToList)
       final List<String>? facebook,
       final User? head,
       final String? mobile,
@@ -514,12 +528,16 @@ abstract class _Contact implements Contact {
   @override
   Company? get company;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get whatsapp;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get email;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get linkedin;
   @override
+  @JsonKey(fromJson: _stringOrStringListToList)
   List<String>? get facebook;
   @override
   User? get head;

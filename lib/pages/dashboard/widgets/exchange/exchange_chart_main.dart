@@ -23,7 +23,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
   bool _isLoading = false;
   String? _errorMessage;
   bool _isListLoading = false;
-  DateRange selectedRange = DateRange.lastYear; // 选中的时间范围
+  DateRange selectedRange = DateRange.lastTwoYear; // 选中的时间范围
   // 存储当前货币的历史数据
   ExchangeRateHistory? _exchangeData; //波动图的数据
   List<ExchangeRate>? _currencyList; //列表的数据
@@ -146,9 +146,10 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
       ),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: colorScheme.surface.withOpacity(0.93), 
+          color: colorScheme.surface.withOpacity(0.93),
           boxShadow: const [
             BoxShadow(
               color: pageShadowColor,
@@ -180,6 +181,14 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
               ExchangeRatesValueList(
                 list: _currencyList,
                 loading: _isListLoading,
+                onCurrencyTap: (ExchangeRate item) {
+                  setState(() {
+                    _selectedDimension = item;
+                    _showTrendView = true;
+                    _exchangeData = null;
+                  });
+                  _loadExchangeData();
+                },
               )
           ],
         ),

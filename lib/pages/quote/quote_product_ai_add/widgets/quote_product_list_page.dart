@@ -8,6 +8,7 @@ import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
+import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
@@ -82,6 +83,8 @@ class QuoteProductListPage extends HookConsumerWidget {
         return;
       }
 
+      print(quoteId);
+
       if (isLoading.value && !isRefresh) return;
       isLoading.value = true;
 
@@ -141,7 +144,24 @@ class QuoteProductListPage extends HookConsumerWidget {
         products.value = mappedItems;
         hasMore.value = false;
       } catch (e) {
-        if (context.mounted) EasyLoading.showError("数据加载失败");
+        if (!context.mounted) return;
+
+        bool isNotFound = false;
+
+        if (e.toString().contains('404')) {
+          isNotFound = true;
+        }
+
+        if (isNotFound) {
+          EasyLoading.showInfo("该报价单已失效或不存在");
+          products.value = [];
+          selectedSupplier.value = null;
+          selectedQuote.value = null;
+          onChanged?.call(null, null);
+        } else {
+          debugPrint("加载产品列表异常: $e");
+          EasyLoading.showError("数据加载失败，请检查网络或重试");
+        }
       } finally {
         if (context.mounted) isLoading.value = false;
       }
@@ -240,21 +260,16 @@ class QuoteProductListPage extends HookConsumerWidget {
                     if (index < products.value.length) {
                       final item = products.value[index];
                       return _buildDataRow(
-                        context,
-                        index,
-                        item,
-                        currentTemplate.value,
-                        (key, val) {
-                          final newList = [...products.value];
-                          newList[index].data[key] = val;
-                          products.value = newList;
-                        },
-                        () {
-                          final newList = [...products.value];
-                          newList.removeAt(index);
-                          products.value = newList;
-                        },
-                      );
+                          context, index, item, currentTemplate.value,
+                          (key, val) {
+                        final newList = [...products.value];
+                        newList[index].data[key] = val;
+                        products.value = newList;
+                      }, () {
+                        final newList = [...products.value];
+                        newList.removeAt(index);
+                        products.value = newList;
+                      }, selectedQuote);
                     } else {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -321,12 +336,14 @@ class QuoteProductListPage extends HookConsumerWidget {
   }
 
   Widget _buildDataRow(
-      BuildContext context,
-      int index,
-      ProductDraftItem item,
-      TemplateOption template,
-      Function(String key, String val) onUpdate,
-      VoidCallback onDelete) {
+    BuildContext context,
+    int index,
+    ProductDraftItem item,
+    TemplateOption template,
+    Function(String key, String val) onUpdate,
+    VoidCallback onDelete,
+    ValueNotifier<Map<String, dynamic>?> selectedQuote,
+  ) {
     const double rowHeight = 72.0;
 
     int? parseId(dynamic v) {
@@ -538,6 +555,52 @@ class QuoteProductListPage extends HookConsumerWidget {
                 ),
               ),
             ],
+          ),
+        ),
+        Positioned(
+          top: -5,
+          left: -5,
+          child: GestureDetector(
+            onTap: () async {
+              final isConfirmed = await ConfirmDialog.show(
+                context,
+                cancelText: '移除产品',
+                confirmText: '删除产品',
+                content: '确定你要进行的操作！',
+              );
+
+              if (isConfirmed == null) return;
+
+              try {
+                EasyLoading.show(status: '正在处理...');
+
+                final quoteId = selectedQuote.value?['id'];
+                final int? productId = parseId(item.getValue('product_id'));
+
+                await removeItemQuotationSamples(
+                  quoteId,
+                  {'sample_id': productId, 'offline': isConfirmed},
+                );
+
+                if (isConfirmed) {
+                  EasyLoading.showSuccess('删除成功');
+                } else {
+                  EasyLoading.showSuccess('移除成功');
+                }
+
+                onDelete();
+              } catch (e) {
+                // EasyLoading.showError('操作失败: ${e.toString()}');
+              } finally {
+                EasyLoading.dismiss();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                  color: Colors.red, shape: BoxShape.circle),
+              child: const Icon(Icons.close, size: 12, color: Colors.white),
+            ),
           ),
         ),
       ],

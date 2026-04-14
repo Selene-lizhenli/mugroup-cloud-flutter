@@ -1,29 +1,25 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart'; 
+import 'package:auto_route/auto_route.dart'; 
 import 'package:cloud/pages/quote/quote_detail/providers/quote_detail_provider.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/export/export_pick_drawer.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/quote_detail_body.dart'; 
+import 'package:cloud/pages/quote/quote_detail/widgets/quote_detail_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-  
 
 @RoutePage()
-class QuoteDetailPage extends HookConsumerWidget { 
+class QuoteDetailPage extends HookConsumerWidget {
   final int id;
 
   const QuoteDetailPage({
-    super.key, 
+    super.key,
     @pathParam required this.id,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {  
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final quoteDetailState = ref.watch(quoteDetailProvider);
     final quoteDetailNotifier = ref.read(quoteDetailProvider.notifier);
- 
- 
+
     useEffect(() {
       if (id > 0) {
         Future.microtask(() {
@@ -35,12 +31,11 @@ class QuoteDetailPage extends HookConsumerWidget {
         // quoteDetailNotifier.clear();
       };
     }, [id]);
- 
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('带客详情'),
-        backgroundColor: Theme.of(context).colorScheme.surfaceTint, 
+        backgroundColor: Theme.of(context).colorScheme.surfaceTint,
         actions: [
           IconButton(
             onPressed: () {
@@ -53,16 +48,21 @@ class QuoteDetailPage extends HookConsumerWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.share_outlined, size: 21),
+            icon: Image.asset(
+              "assets/icons/share.png",
+              width: 19,
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topRight,
+            ),
           ),
           IconButton(
-            onPressed: () { 
+            onPressed: () {
               final quoteId = quoteDetailState.baseInfo?.id ?? id;
               if (quoteId > 0) {
                 quoteDetailNotifier.fetchQuoteDetail(quoteId);
               }
             },
-            icon: const Icon(Icons.refresh, size: 20),
+            icon: const Icon(Icons.refresh, size: 22),
           ),
         ],
       ),

@@ -1,9 +1,12 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/list/widgets/product_view.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/market_product/list/widgets/home_app_bar.dart';
 import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/widgets/quotation_info_dialog.dart';
+import 'package:flant/components/action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,6 +23,26 @@ class MarketProductListPage extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
+    final state = ref.watch(cartProvider);
+    final cart = ref.read(cartProvider.notifier);
+    final quotationInfo = state.quotationInfo;
+
+    final currencies = [
+      const FlanActionSheetAction(name: "CNY"),
+      const FlanActionSheetAction(name: "USD"),
+      const FlanActionSheetAction(name: "EUR"),
+      const FlanActionSheetAction(name: "GBP")
+    ];
+
+    Future<void> quotationInfoDialog(BuildContext context) async {
+      final next = await QuotationInfoDialog.show(
+        context,
+        initialValue: quotationInfo,
+        currencies: currencies.map((e) => e.name).toList(growable: false),
+      );
+      if (next == null) return;
+      cart.quotationInfo = next;
+    }
 
     return Scaffold(
         backgroundColor: colorScheme.surface,
@@ -29,6 +52,11 @@ class MarketProductListPage extends HookConsumerWidget {
           backgroundColor: colorScheme.surface,
           foregroundColor: Colors.black,
           actions: [
+            IconButton(
+                onPressed: () {
+                  quotationInfoDialog(context);
+                },
+                icon: const Icon(Icons.settings_outlined)),
             TextButton(
               onPressed: () async {
                 context.router.push(QuoteProductNewAddRoute());

@@ -32,6 +32,7 @@ class PurchaseAssistState implements MuListState {
     this.searchMedia,
     this.searchMediaList = const [],
     this.selectedPlatform = 'cloud',
+    this.selectedCountry = 'CA',
     this.sortOrder,
     this.priceMin,
     this.priceMax,
@@ -54,6 +55,7 @@ class PurchaseAssistState implements MuListState {
   final TemporaryMedia? searchMedia;
   final List<TemporaryMedia> searchMediaList;
   final String selectedPlatform;
+  final String? selectedCountry;
 
   /// 排序：'price_desc' 价格降序，'price_asc' 价格升序
   final String? sortOrder;
@@ -77,6 +79,7 @@ class PurchaseAssistState implements MuListState {
     TemporaryMedia? searchMedia,
     List<TemporaryMedia>? searchMediaList,
     String? selectedPlatform,
+    String? selectedCountry,
     Object? sortOrder = _unset,
     Object? priceMin = _unset,
     Object? priceMax = _unset,
@@ -98,6 +101,7 @@ class PurchaseAssistState implements MuListState {
       searchMedia: searchMedia ?? this.searchMedia,
       searchMediaList: searchMediaList ?? this.searchMediaList,
       selectedPlatform: selectedPlatform ?? this.selectedPlatform,
+      selectedCountry: selectedCountry ?? this.selectedCountry,
       sortOrder:
           identical(sortOrder, _unset) ? this.sortOrder : sortOrder as String?,
       priceMin:
@@ -211,6 +215,10 @@ class PurchaseAssist extends _$PurchaseAssist {
     state = state.copyWith(priceMin: min, priceMax: max);
   }
 
+  void setSelectedCountry(String country) {
+    state = state.copyWith(selectedCountry: country);
+  }
+
   void clearSearch() {
     state = state.copyWith(
       hasSearched: false,
@@ -285,8 +293,15 @@ class PurchaseAssist extends _$PurchaseAssist {
       };
       // 只有当关键字有值且非空时才追加 keywords 字段
       final keyword = state.searchKeyword.trim();
-      if ((params?['platform'] ?? state.selectedPlatform) != 'alibabaglobal') {
+      final platform = params?['platform'] ?? state.selectedPlatform;
+
+      // 如果平台既不是 alibabaglobal 也不是 amazon，则赋值关键词
+      if (platform != 'alibabaglobal' && platform != 'amazon') {
         data['keywords'] = keyword;
+      }
+
+      if (platform == 'amazon') {
+        data['country'] = params?['country'] ?? state.selectedCountry ?? 'CA';
       }
 
       if (state.priceMax != null && state.priceMax!.isNotEmpty ||

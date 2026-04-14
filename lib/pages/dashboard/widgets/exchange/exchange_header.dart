@@ -100,13 +100,13 @@ class ExchangeChartHeader extends StatelessWidget {
                           selectedDimension?.shortName == dimension.shortName;
 
                       return ListTile(
-                        dense: true, 
+                        dense: true,
                         title: Text(
                           '${dimension.name} ${dimension.shortName} ${isSelected ? '（当前选中）' : ''}',
                           style: TextStyle(
                             color: isSelected
                                 ? colorScheme.primary
-                                : colorScheme.onSurface, 
+                                : colorScheme.onSurface,
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -141,11 +141,26 @@ class ExchangeChartHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 模块标题
-          Text(
-            '汇率',
-            style:
-                Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '汇率',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontSize: 16),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '数据来自中行',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,

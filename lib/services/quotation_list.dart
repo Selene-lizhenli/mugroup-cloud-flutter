@@ -40,7 +40,7 @@ Future<ApiResponse<List<QuotationSample>>> getQuotationProductListByProductId(
             return list.map(QuotationSample.fromJson).toList();
           },
         ),
-      ); 
+      );
 }
 
 Future<QuotationList> getQuotationListById(int id) async {
@@ -67,6 +67,7 @@ Future<List<QuoteSupplierGroup>> getQuotationSupplierListById(int id) async {
   return dataRes;
 }
 
+// 获取报价单列表
 Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
     Map<String, dynamic>? data) async {
   return api.get("api/tenant/showroom/quotations", data: data).then(
@@ -81,9 +82,7 @@ Future<ApiResponse<List<QuotationList>>> getShowroomQuotation(
 }
 
 Future<void> deleteQuotation(int id) async {
-  
   await api.delete("api/tenant/showroom/quotations/$id");
-  
 }
 
 // 移除样品明细中的商品
@@ -153,6 +152,20 @@ Future updateShowroomQuotationSample(int id, Map<String, dynamic>? data) async {
         return false;
       }
       return true;
+    },
+  );
+}
+
+// 移除报价单明细中的商品
+Future removeItemQuotationSamples(int id, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/showroom/quotations/$id/removeItem", data: data)
+      .then(
+    (res) {
+      if (res.data == null) {
+        return null;
+      }
+      return res;
     },
   );
 }

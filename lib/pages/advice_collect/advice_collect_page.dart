@@ -196,7 +196,7 @@ class _CommentGroup extends HookConsumerWidget {
             showAdviceEditSheet(
               context: context,
               replyToName: book.user?.name ?? '匿名',
-              onSend: (content, images) {
+              onSend: (content, images, isAnonymous) {
                 ref.read(adviceCollectProvider.notifier).sendMyComments(
                     book.id!, {'comment': content, 'attachments': images});
 
@@ -236,7 +236,7 @@ class _CommentGroup extends HookConsumerWidget {
                     showAdviceEditSheet(
                       context: context,
                       replyToName: comment.user?.name ?? '匿名',
-                      onSend: (content, images) {
+                      onSend: (content, images, isAnonymous) {
                         ref
                             .read(adviceCollectProvider.notifier)
                             .sendMyCommentsComment(comment.id!,
@@ -265,8 +265,8 @@ class _CommentGroup extends HookConsumerWidget {
                       isExpanded.value
                           ? '收起回复'
                           : '展开 ${comments.length - 1} 条回复',
-                      style:   TextStyle(
-                          fontSize: 13, color: colorScheme.outline),
+                      style:
+                          TextStyle(fontSize: 13, color: colorScheme.outline),
                     ),
                     Icon(
                       isExpanded.value

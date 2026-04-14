@@ -913,6 +913,11 @@ void showImageUploadSheet(BuildContext context, ProductDraftItem item,
 
   final int? productId = parseId(item.data['product_id']);
 
+  if (productId == null) {
+    EasyLoading.showInfo("后台样品还未创建完成，请稍作等待");
+    return;
+  }
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

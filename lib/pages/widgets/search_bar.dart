@@ -10,6 +10,8 @@ class MuSearchBar extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final Color? themeColor;
   final Color? fillColor;
+  final double? left;
+  final double? right;
 
   const MuSearchBar({
     super.key,
@@ -20,6 +22,8 @@ class MuSearchBar extends StatelessWidget {
     this.padding,
     this.themeColor,
     this.fillColor,
+    this.left = 12,
+    this.right = 12,
   });
 
   @override
@@ -32,17 +36,17 @@ class MuSearchBar extends StatelessWidget {
     final onThemeColor = _getContrastColor(effectiveThemeColor);
 
     return Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
+      padding: padding ?? EdgeInsets.fromLTRB(left ?? 12.0, 0, right ?? 12, 0),
       child: Row(
         children: [
           Expanded(
-            child: SizedBox( 
+            child: SizedBox(
               child: TextField(
                 controller: controller,
                 textInputAction: TextInputAction.search,
                 // 回车搜索时透出当前文本
                 onSubmitted: onSearch,
-                cursorColor: effectiveThemeColor, 
+                cursorColor: effectiveThemeColor,
                 style: const TextStyle(fontSize: 14, height: 1),
                 decoration: InputDecoration(
                   hintText: hintText,

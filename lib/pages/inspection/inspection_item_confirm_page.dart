@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:flutter/services.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 @RoutePage()
 class InspectionItemConfirmPage extends HookConsumerWidget {
@@ -32,7 +33,6 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
     final inspectionItem = useState<InspectionItem?>(null);
     final isLoading = useState(true);
     final isSubmitting = useState(false);
-
     final submittingStatus = useState<int>(0);
 
     final mediaMap = useState<Map<String, List<TemporaryMedia>>>({});
@@ -55,23 +55,16 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 
         if (data?.media != null && data!.media!.isNotEmpty) {
           final Map<String, List<TemporaryMedia>> initMap = {};
-
           for (var item in data.media!) {
-            if (item.id == null || item.url == null) {
-              continue;
-            }
+            if (item.id == null || item.url == null) continue;
             final String key = item.collectionName ?? 'details';
-
             final tempMedia = TemporaryMedia(
               id: item.id!,
               url: item.url!,
               thumbUrl: item.thumbUrl ?? item.url,
               uuid: null,
             );
-
-            if (!initMap.containsKey(key)) {
-              initMap[key] = [];
-            }
+            if (!initMap.containsKey(key)) initMap[key] = [];
             initMap[key]!.add(tempMedia);
           }
           mediaMap.value = initMap;
@@ -102,6 +95,7 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         EasyLoading.showInfo('请至少上传一张验货图片');
         return;
       }
+
       submittingStatus.value = targetStatus;
       isSubmitting.value = true;
       try {
@@ -122,6 +116,10 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
 
         submitData['remark'] = remarkController.text;
         submitData['status'] = targetStatus;
+
+        if (inspectionItem.value?.barcode != null) {
+          submitData['barcode'] = inspectionItem.value!.barcode;
+        }
 
         await updateInspectionItem(id, submitData);
 
@@ -145,40 +143,52 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         centerTitle: true,
         leading: const BackButton(color: Colors.black),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
+      body: isLoading.value
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                _InfoCard(
-                  blue: primaryColor,
-                  text: _cText,
-                  inspectionItem: inspectionItem.value,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(12),
+                    children: [
+                      _InfoCard(
+                        blue: primaryColor,
+                        text: _cText,
+                        inspectionItem: inspectionItem.value,
+                        // 回调更新状态
+                        onBarcodeScanned: (code) {
+                          HapticFeedback.mediumImpact();
+                          if (inspectionItem.value != null) {
+                            inspectionItem.value =
+                                inspectionItem.value!.copyWith(
+                              barcode: code,
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _PhotoCard(
+                        blue: primaryColor,
+                        text: _cText,
+                        mediaMap: mediaMap.value,
+                        onMediaChanged: updateMedia,
+                      ),
+                      const SizedBox(height: 12),
+                      _NoteCard(
+                        blue: primaryColor,
+                        text: _cText,
+                        controller: remarkController,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                _PhotoCard(
-                  blue: primaryColor,
-                  text: _cText,
-                  mediaMap: mediaMap.value,
-                  onMediaChanged: updateMedia,
-                ),
-                const SizedBox(height: 12),
-                _NoteCard(
-                  blue: primaryColor,
-                  text: _cText,
-                  controller: remarkController,
+                _buildBottomBtn(
+                  onPressed: handleSubmit,
+                  isSubmitting: isSubmitting.value,
+                  submittingStatus: submittingStatus.value,
                 ),
               ],
             ),
-          ),
-          _buildBottomBtn(
-            onPressed: handleSubmit,
-            isSubmitting: isSubmitting.value,
-            submittingStatus: submittingStatus.value,
-          ),
-        ],
-      ),
     );
   }
 
@@ -194,21 +204,21 @@ class InspectionItemConfirmPage extends HookConsumerWidget {
         child: Row(
           children: [
             _buildActionBtn(
-              label: '微瑕',
-              color: Colors.orange,
-              status: 2,
-              isSubmitting: isSubmitting,
-              submittingStatus: submittingStatus,
-              onPressed: () => onPressed(2),
-            ),
-            const SizedBox(width: 12),
-            _buildActionBtn(
               label: '不合格',
               color: Colors.red,
               status: 3,
               isSubmitting: isSubmitting,
               submittingStatus: submittingStatus,
               onPressed: () => onPressed(3),
+            ),
+            const SizedBox(width: 12),
+            _buildActionBtn(
+              label: '微瑕合格',
+              color: Colors.orange,
+              status: 2,
+              isSubmitting: isSubmitting,
+              submittingStatus: submittingStatus,
+              onPressed: () => onPressed(2),
             ),
             const SizedBox(width: 12),
             _buildActionBtn(
@@ -278,12 +288,81 @@ class _InfoCard extends StatelessWidget {
   final InspectionItem? inspectionItem;
   final Color blue;
   final Color text;
-  const _InfoCard(
-      {required this.blue, required this.text, this.inspectionItem});
+  final Function(String) onBarcodeScanned;
+
+  const _InfoCard({
+    required this.blue,
+    required this.text,
+    this.inspectionItem,
+    required this.onBarcodeScanned,
+  });
+
+  // 内部扫描逻辑
+  void _openScanner(BuildContext context) async {
+    final String? result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.85,
+        child: Stack(
+          children: [
+            MobileScanner(
+              controller: MobileScannerController(
+                detectionSpeed: DetectionSpeed.noDuplicates,
+                facing: CameraFacing.back,
+              ),
+              onDetect: (capture) {
+                final barcode = capture.barcodes.first;
+                if (barcode.rawValue != null) {
+                  Navigator.pop(context, barcode.rawValue);
+                }
+              },
+            ),
+            // 扫描界面 UI 装饰
+            Positioned.fill(
+              child: Container(
+                decoration: const ShapeDecoration(
+                  shape: ScannerOverlayShape(
+                    borderColor: Colors.white,
+                    borderRadius: 10,
+                    borderLength: 30,
+                    borderWidth: 5,
+                    cutOutSize: 250,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              left: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            const Positioned(
+              bottom: 100,
+              left: 0,
+              right: 0,
+              child: Text(
+                '请将条形码置于框内',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null) {
+      onBarcodeScanned(result);
+    }
+  }
 
   Widget _buildStatusTag(int? status) {
-    final label = {1: '合格', 2: '微瑕', 3: '不合格'}[status] ?? '未验货';
-
+    final label = {1: '合格', 2: '微瑕合格', 3: '不合格'}[status] ?? '未验货';
     final color = {1: Colors.green, 2: Colors.orange, 3: Colors.red}[status] ??
         Colors.grey;
 
@@ -310,6 +389,7 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _BaseCard(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -329,6 +409,57 @@ class _InfoCard extends StatelessWidget {
                   style: TextStyle(color: blue, fontWeight: FontWeight.w500)),
             ],
           ),
+
+          const SizedBox(height: 16),
+
+          // --- 条码识别展示区 ---
+          GestureDetector(
+            onTap: () => _openScanner(context),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F7FA),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                    color: inspectionItem?.barcode != null
+                        ? blue
+                        : Colors.transparent,
+                    width: 1),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.qr_code_scanner, color: blue, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      inspectionItem?.barcode ?? '点击识别产品条码',
+                      style: TextStyle(
+                        color: inspectionItem?.barcode != null
+                            ? text
+                            : Colors.grey[400],
+                        fontSize: 14,
+                        fontWeight: inspectionItem?.barcode != null
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  if (inspectionItem?.barcode != null) ...[
+                    const Text(
+                      '已识别',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const Icon(Icons.check_circle,
+                        color: Colors.green, size: 18),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
           const SizedBox(height: 16),
           Row(
             children: [
@@ -367,6 +498,85 @@ class _InfoCard extends StatelessWidget {
           ),
         ),
       );
+}
+
+// 扫描框自定义形状组件
+class ScannerOverlayShape extends ShapeBorder {
+  final Color borderColor;
+  final double borderWidth;
+  final double borderLength;
+  final double borderRadius;
+  final double cutOutSize;
+
+  const ScannerOverlayShape({
+    this.borderColor = Colors.white,
+    this.borderWidth = 10,
+    this.borderLength = 40,
+    this.borderRadius = 0,
+    this.cutOutSize = 250,
+  });
+
+  @override
+  EdgeInsetsGeometry get dimensions => const EdgeInsets.all(10);
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => Path();
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    Path background = Path()..addRect(rect);
+    Path cutOut = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromCenter(
+            center: rect.center, width: cutOutSize, height: cutOutSize),
+        Radius.circular(borderRadius),
+      ));
+    return Path.combine(PathOperation.difference, background, cutOut);
+  }
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
+    final paint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth;
+
+    final center = rect.center;
+    final halfSize = cutOutSize / 2;
+
+    // 绘制四个角的边框 (简化逻辑)
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx - halfSize, center.dy - halfSize + borderLength)
+        ..lineTo(center.dx - halfSize, center.dy - halfSize)
+        ..lineTo(center.dx - halfSize + borderLength, center.dy - halfSize),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx + halfSize, center.dy - halfSize + borderLength)
+        ..lineTo(center.dx + halfSize, center.dy - halfSize)
+        ..lineTo(center.dx + halfSize - borderLength, center.dy - halfSize),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx - halfSize, center.dy + halfSize - borderLength)
+        ..lineTo(center.dx - halfSize, center.dy + halfSize)
+        ..lineTo(center.dx - halfSize + borderLength, center.dy + halfSize),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx + halfSize, center.dy + halfSize - borderLength)
+        ..lineTo(center.dx + halfSize, center.dy + halfSize)
+        ..lineTo(center.dx + halfSize - borderLength, center.dy + halfSize),
+      paint,
+    );
+  }
+
+  @override
+  ShapeBorder scale(double t) => this;
 }
 
 class _PhotoCard extends HookConsumerWidget {

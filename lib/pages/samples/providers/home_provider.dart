@@ -180,8 +180,8 @@ class Home extends _$Home {
           name: '独立(部门)样品间',
           image: [
             WarehouseImage(
-              url: 'assets/building2d.png',
-              thumbUrl: 'assets/building2d.png',
+              url: 'assets/bs_self.jpg',
+              thumbUrl: 'assets/bs_self.jpg',
             ),
           ],
         ),

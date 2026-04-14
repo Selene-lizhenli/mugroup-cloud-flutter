@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:cloud/providers/theme_provider.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class _MeasureSize extends SingleChildRenderObjectWidget {
   final ValueChanged<Size> onChange;
@@ -34,7 +37,7 @@ class _RenderMeasureSize extends RenderProxyBox {
   }
 }
 
-class _MuSheetWithAwning extends StatefulWidget {
+class _MuSheetWithAwning extends HookConsumerWidget {
   final ColorScheme colorScheme;
   final Widget content;
   final double sheetMaxHeight;
@@ -46,28 +49,28 @@ class _MuSheetWithAwning extends StatefulWidget {
     required this.sheetMaxHeight,
     this.noBorder = false,
   });
-  @override
-  State<_MuSheetWithAwning> createState() => _MuSheetWithAwningState();
-}
-
-class _MuSheetWithAwningState extends State<_MuSheetWithAwning> {
-  double? _awningHeight;
 
   @override
-  Widget build(BuildContext context) {
-    final noBorder = widget.noBorder;
-    final colorScheme = Theme.of(context).colorScheme;
-    final sheetMaxHeight = widget.sheetMaxHeight;
-    final content = widget.content;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noBorder = this.noBorder;
+    final sheetMaxHeight = this.sheetMaxHeight;
+    final content = this.content;
+    final awningHeight = useState<double?>(null);
 
-    final dy = _awningHeight == null
-        ? -40.0
-        : -(_awningHeight! - 5).clamp(0.0, double.infinity).toDouble();
+    final themeType = ref.watch(appThemeProvider);
+    final backgrundTopImage = themeType == ThemeType.pink
+        ? 'assets/theme/awning_pink.png'
+        : 'assets/theme/awning_blue.png';
+
+    final dy = awningHeight.value == null
+        ? -53.0
+        : -(awningHeight.value! - 5).clamp(0.0, double.infinity).toDouble();
+
     return Stack(
       children: [
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -79,13 +82,20 @@ class _MuSheetWithAwningState extends State<_MuSheetWithAwning> {
               border: noBorder == true
                   ? const Border()
                   : Border(
-                      bottom: BorderSide(color: colorScheme.primary, width: 10),
-                      right: const BorderSide(
-                          color: Colors.transparent, width: 10),
-                      left: const BorderSide(
-                          color: Colors.transparent, width: 10),
+                      bottom: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 10,
+                      ),
+                      right: BorderSide(
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 10),
+                      left: BorderSide(
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 10),
                     ),
-              color: const Color.fromARGB(255, 253, 250, 243),
+              color: themeType == ThemeType.blue
+                  ? colorScheme.surface
+                  : const Color.fromARGB(255, 253, 250, 243),
             ),
             child: content,
           ),
@@ -98,12 +108,12 @@ class _MuSheetWithAwningState extends State<_MuSheetWithAwning> {
             offset: Offset(0, dy),
             child: _MeasureSize(
               onChange: (size) {
-                if (!mounted) return;
-                if (_awningHeight == size.height) return;
-                setState(() => _awningHeight = size.height);
+                if (!context.mounted) return;
+                if (awningHeight.value == size.height) return;
+                awningHeight.value = size.height;
               },
               child: Image.asset(
-                'assets/element/awning.png',
+                backgrundTopImage,
                 width: double.infinity,
                 fit: BoxFit.fitWidth,
               ),

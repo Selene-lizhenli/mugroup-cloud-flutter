@@ -10,24 +10,31 @@ import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
 void showAdviceEditSheet({
   required BuildContext context,
   String? replyToName,
-  required Function(String content, List<TemporaryMedia> medias) onSend,
-}) { 
+  bool isReply = false,
+  required Function(
+          String content, List<TemporaryMedia> medias, bool isAnonymous)
+      onSend,
+}) {
   muShowModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) => _AdviceEditSheet(
       replyToName: replyToName,
+      isReply: isReply,
       onSend: onSend,
     ),
   );
 }
 
 class _AdviceEditSheet extends StatefulWidget {
+  final bool isReply;
   final String? replyToName;
-  final Function(String content, List<TemporaryMedia> medias) onSend;
+  final Function(String content, List<TemporaryMedia> medias, bool isAnonymous)
+      onSend;
 
-  const _AdviceEditSheet({super.key, this.replyToName, required this.onSend});
+  const _AdviceEditSheet(
+      {this.replyToName, this.isReply = false, required this.onSend});
 
   @override
   State<_AdviceEditSheet> createState() => _AdviceEditSheetState();
@@ -38,6 +45,8 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
 
   final List<TemporaryMedia> _uploadedMedias = [];
   static const int _maxImageCount = 9;
+
+  bool _isAnonymous = false;
 
   bool get _canSend =>
       _controller.text.trim().isNotEmpty || _uploadedMedias.isNotEmpty;
@@ -99,7 +108,7 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: Colors.transparent,
+        color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -239,11 +248,31 @@ class _AdviceEditSheetState extends State<_AdviceEditSheet> {
             icon: const Icon(Icons.image_outlined,
                 color: Colors.black54, size: 28),
           ),
+          if (widget.isReply)
+            GestureDetector(
+              onTap: () => setState(() => _isAnonymous = !_isAnonymous),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    value: _isAnonymous,
+                    activeColor: colorScheme.primary,
+                    visualDensity: VisualDensity.compact,
+                    onChanged: (val) {
+                      setState(() => _isAnonymous = val ?? false);
+                    },
+                  ),
+                  const Text('匿名',
+                      style: TextStyle(color: Colors.black54, fontSize: 14)),
+                ],
+              ),
+            ),
           const Spacer(),
           ElevatedButton(
             onPressed: _canSend
                 ? () {
-                    widget.onSend(_controller.text, _uploadedMedias);
+                    widget.onSend(
+                        _controller.text, _uploadedMedias, _isAnonymous);
                     Navigator.pop(context);
                   }
                 : null,

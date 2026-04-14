@@ -48,7 +48,7 @@ class QuoteCreatePage extends HookConsumerWidget {
           if (data.curreny == 'CNY') {
             notifier.setRate("1.0000");
           } else {
-            notifier.setRate((rawExchange / 100).toString());
+            notifier.setRate(rawExchange.toString());
           }
 
           final String? langCode = data.language;
@@ -72,7 +72,9 @@ class QuoteCreatePage extends HookConsumerWidget {
 
       WidgetsBinding.instance.addPostFrameCallback((_) => loadInitialData());
 
-      return () => notifier.reset();
+      return () {
+        Future<void>(notifier.reset);
+      };
     }, [quoteId]);
 
     return Scaffold(
@@ -140,7 +142,6 @@ class QuoteCreateBottomBar extends ConsumerWidget {
                       "company": state.selectedCustomers,
                       "type": "market",
                     };
-
                     try {
                       if (quoteId != null) {
                         final success = await updateShowroomQuotation(
@@ -171,14 +172,8 @@ class QuoteCreateBottomBar extends ConsumerWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: state.submitting
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: MuProgressIndicator(barWidth: 2))
-                : Text('保存',
-                    style:
-                        TextStyle(fontSize: 16, color: colorScheme.onPrimary)),
+            child: Text(state.submitting ? '保存中...' : '保存',
+                style: TextStyle(fontSize: 16, color: colorScheme.onPrimary)),
           ),
         ),
       ),

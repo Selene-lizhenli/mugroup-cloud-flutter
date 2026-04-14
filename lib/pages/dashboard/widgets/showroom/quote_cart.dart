@@ -7,8 +7,7 @@ import 'package:cloud/pages/dashboard/widgets/product_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:cloud/pages/widgets/image_show.dart';
+import 'package:fl_chart/fl_chart.dart'; 
 
 /// 样品间---统计排行图表&列表组件
 class QuoteTopChartContent extends StatefulWidget {
@@ -22,7 +21,7 @@ class QuoteTopChartContent extends StatefulWidget {
   const QuoteTopChartContent({
     super.key,
     required this.data,
-    this.selectedRange = DateRange.lastYear,
+    this.selectedRange = DateRange.lastTwoYear,
     this.onRangeChanged,
     this.isLoading,
     this.handleExpandScroll,
@@ -32,7 +31,7 @@ class QuoteTopChartContent extends StatefulWidget {
 }
 
 class _TopChartContentState extends State<QuoteTopChartContent> {
-  bool _isExpanded = false;
+  bool _isExpanded = true;
   static const double chartContainerHeight = 200;
   final GlobalKey _expandedContentKey = GlobalKey();
 
@@ -91,6 +90,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
         TimeRangeSelect(
           initialRange: widget.selectedRange,
           onRangeChanged: widget.onRangeChanged,
+          useAllTime:false,
         ),
         const SizedBox(height: 16),
         Container(
@@ -147,40 +147,44 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
           Column(
             key: _expandedContentKey,
             children: [
-              TopRankItemCard(displayData: displayData, type: 'quote'),
+              TopRankItemCard(
+                displayData: displayData.take(3).toList(),
+                type: 'quote',
+              ),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 30, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiary.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: InkWell(
-                      highlightColor: colorScheme.tertiary,
-                      splashColor: colorScheme.tertiary,
-                      focusColor: colorScheme.tertiary,
+                  InkWell(
+                    highlightColor: colorScheme.tertiary,
+                    splashColor: colorScheme.tertiary,
+                    focusColor: colorScheme.tertiary,
+                    onTap: () {
+                      context.router.push(SampleRankListRoute(
+                        data: widget.data,
+                        label: dimenLabel,
+                        type: 'quote',
+                      ));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colorScheme.tertiary.withOpacity(0.33),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                       child: Text(
-                        '更多',
+                        ' 查看完整榜单 ',
                         style: TextStyle(
                             color: colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 11),
                       ),
-                      onTap: () {
-                        context.router.push(SampleRankListRoute(
-                          data: widget.data,
-                          label: dimenLabel,
-                          type: 'quote',
-                        ));
-                      },
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10)
+              const SizedBox(height: 8)
             ],
           ),
       ],

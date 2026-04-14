@@ -170,9 +170,7 @@ class ProductCardDetailed extends HookConsumerWidget {
                           ],
                         ),
                       ),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     // 价格
                     Row(
                       children: [

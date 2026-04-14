@@ -5,6 +5,7 @@ import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/pages/showroom/widgets/audio_playable_item.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/field_selector.dart';
@@ -436,6 +437,77 @@ class ShowroomSampleForm extends HookConsumerWidget {
                           },
                         ),
                       ],
+                    ),
+                    FormBuilderField<List<dynamic>>(
+                      name: "audios",
+                      builder: (field) {
+                        List<TemporaryMedia> displayValue = [];
+
+                        if (field.value != null) {
+                          displayValue = field.value!
+                              .map((e) {
+                                if (e is Media) {
+                                  return TemporaryMedia(
+                                    id: e.id!,
+                                    url: e.url!,
+                                    thumbUrl: e.thumbUrl,
+                                  );
+                                } else if (e is TemporaryMedia) {
+                                  return e;
+                                }
+                                return null;
+                              })
+                              .whereType<TemporaryMedia>()
+                              .toList();
+                        }
+
+                        if (displayValue.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return BuildFormCard(
+                          title: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                '辅录音频',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                            ],
+                          ),
+                          children: [
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: displayValue.map((media) {
+                                return AudioPlayableItem(
+                                  url: media.url,
+                                  onDelete: () {
+                                    final newValue =
+                                        List.from(field.value ?? [])
+                                          ..removeWhere((e) {
+                                            if (e is Media) {
+                                              return e.id == media.id;
+                                            }
+                                            if (e is TemporaryMedia) {
+                                              return e.id == media.id;
+                                            }
+                                            return false;
+                                          });
+
+                                    field.didChange(newValue);
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     BuildFormCard(
                       title: '基本信息',

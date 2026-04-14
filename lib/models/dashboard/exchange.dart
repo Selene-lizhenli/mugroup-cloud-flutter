@@ -12,6 +12,12 @@ class ExchangeRate with _$ExchangeRate {
     @JsonKey(name: 'reverse_exchange_rate') String? reverseExchangeRate,
     @JsonKey(name: 'date') String? date,
     @JsonKey(name: 'short_name') String? shortName,
+    @JsonKey(name: 'xh_buy_rate') String? xhBuyRate,
+    @JsonKey(name: 'xz_buy_rate') String? xzBuyRate,
+    @JsonKey(name: 'xh_sell_rate') String? xhSellRate,
+    @JsonKey(name: 'xz_sell_rate') String? xzSellRate,
+    @JsonKey(name: 'mid_rate') String? midRate,
+    @JsonKey(name: 'pushed_at') String? pushedAt,
   }) = _ExchangeRate;
 
   factory ExchangeRate.fromJson(Map<String, dynamic> json) =>

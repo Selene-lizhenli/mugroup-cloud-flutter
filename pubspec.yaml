@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.1.7+35
+version: 2.1.11+39
 
 environment:
   sdk: ">=3.4.4 <4.0.0"
@@ -101,8 +101,12 @@ dependencies:
   json_repair_flutter: ^2.0.0
   device_info_plus: ^11.3.0
   gal: 2.1.1
+  image: ^4.5.4
   video_player: ^2.9.5
   video_compress_plus: ^1.0.0
+  record: ^4.4.4
+  permission_handler: ^11.3.1
+  audioplayers: 5.2.1
     # path: ../flant
 
 dev_dependencies:
@@ -171,6 +175,7 @@ flutter:
   assets:
     - assets/coming.png 
     - assets/building2d.png 
+    - assets/bs_self.jpg
     - assets/icon.png
     - assets/element/logonoicon.png
     - assets/logo.webp
@@ -181,18 +186,26 @@ flutter:
     - assets/icons/checklist.png 
     - assets/icons/fluctuation.png
     - assets/icons/no_image.png
-    - assets/element/empty.png 
+    - assets/icons/share.png
+    - assets/element/empty.png  
     - assets/aiTemplets/floor_001.jpg
     - assets/aiTemplets/floor_002.jpg
     - assets/aiTemplets/notepad_001.jpg 
-    - assets/element/awning.png
+    - assets/element/awning.png 
     - assets/element/benben_ava.png  
     - assets/photo/christmastree.png 
     - assets/photo/login.png 
+    - assets/photo/quote_back_blue.png
+    - assets/photo/quote_back_pink.png 
+    - assets/photo/quote_back_pink.jpg 
     - assets/festival/yanhua.png
     - assets/festival/38.png 
     - assets/festival/background.png  
-    - assets/festival/qingming.png 
+    - assets/festival/qingming.png  
+    - assets/theme/awning_blue.png
+    - assets/theme/awning_pink.png
+    - assets/theme/column_chart_blue.png
+    - assets/theme/column_chart_pink.png
     - assets/theme/kaiyueren_yuqiuyu_pink.png
     - assets/theme/kaiyueren_yuqiuyu_blue.png  
     - assets/theme/factory_blue.png

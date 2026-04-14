@@ -27,6 +27,7 @@ mixin _$InspectionItem {
   int? get ctns => throw _privateConstructorUsedError;
   int? get qty => throw _privateConstructorUsedError;
   String? get remark => throw _privateConstructorUsedError;
+  String? get barcode => throw _privateConstructorUsedError;
   List<Media>? get media => throw _privateConstructorUsedError;
   @JsonKey(name: 'task_id')
   int? get taskId => throw _privateConstructorUsedError;
@@ -61,6 +62,7 @@ abstract class $InspectionItemCopyWith<$Res> {
       int? ctns,
       int? qty,
       String? remark,
+      String? barcode,
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
@@ -90,6 +92,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? ctns = freezed,
     Object? qty = freezed,
     Object? remark = freezed,
+    Object? barcode = freezed,
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
@@ -126,6 +129,10 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
       remark: freezed == remark
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
+      barcode: freezed == barcode
+          ? _value.barcode
+          : barcode // ignore: cast_nullable_to_non_nullable
               as String?,
       media: freezed == media
           ? _value.media
@@ -175,6 +182,7 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       int? ctns,
       int? qty,
       String? remark,
+      String? barcode,
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
@@ -202,6 +210,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? ctns = freezed,
     Object? qty = freezed,
     Object? remark = freezed,
+    Object? barcode = freezed,
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
@@ -238,6 +247,10 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
       freezed == remark
           ? _value.remark
           : remark // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == barcode
+          ? _value.barcode
+          : barcode // ignore: cast_nullable_to_non_nullable
               as String?,
       freezed == media
           ? _value._media
@@ -282,6 +295,7 @@ class _$InspectionItemImpl implements _InspectionItem {
       this.ctns,
       this.qty,
       this.remark,
+      this.barcode,
       final List<Media>? media,
       @JsonKey(name: 'task_id') this.taskId,
       @JsonKey(name: 'user_id') this.userId,
@@ -308,6 +322,8 @@ class _$InspectionItemImpl implements _InspectionItem {
   final int? qty;
   @override
   final String? remark;
+  @override
+  final String? barcode;
   final List<Media>? _media;
   @override
   List<Media>? get media {
@@ -339,7 +355,7 @@ class _$InspectionItemImpl implements _InspectionItem {
 
   @override
   String toString() {
-    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
+    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, barcode: $barcode, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
   }
 
   @override
@@ -354,6 +370,7 @@ class _$InspectionItemImpl implements _InspectionItem {
             (identical(other.ctns, ctns) || other.ctns == ctns) &&
             (identical(other.qty, qty) || other.qty == qty) &&
             (identical(other.remark, remark) || other.remark == remark) &&
+            (identical(other.barcode, barcode) || other.barcode == barcode) &&
             const DeepCollectionEquality().equals(other._media, _media) &&
             (identical(other.taskId, taskId) || other.taskId == taskId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
@@ -377,6 +394,7 @@ class _$InspectionItemImpl implements _InspectionItem {
       ctns,
       qty,
       remark,
+      barcode,
       const DeepCollectionEquality().hash(_media),
       taskId,
       userId,
@@ -409,6 +427,7 @@ abstract class _InspectionItem implements InspectionItem {
           final int? ctns,
           final int? qty,
           final String? remark,
+          final String? barcode,
           final List<Media>? media,
           @JsonKey(name: 'task_id') final int? taskId,
           @JsonKey(name: 'user_id') final int? userId,
@@ -435,6 +454,8 @@ abstract class _InspectionItem implements InspectionItem {
   int? get qty;
   @override
   String? get remark;
+  @override
+  String? get barcode;
   @override
   List<Media>? get media;
   @override

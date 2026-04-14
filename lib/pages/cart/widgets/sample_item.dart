@@ -70,7 +70,8 @@ class SampleItem extends HookWidget {
         (1 + ((quotationInfo?.commissionRate ?? 0) * 0.01));
 
     // 设置展示价格
-    if (cartType == CartType.quotation) {
+    if (cartType == null || cartType == CartType.quotation) {
+      // 类型是1.报价选样车 2.没有选择选样车；时 购物车都显示调整后价格
       displayPrice = sample.purchaseCost != null
           ? price ?? finalPrice.toStringAsFixed(2)
           : "";

@@ -37,8 +37,9 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
           }
         }
       }
-      final usdExchangeRate = usdRate?.exchangeRate ?? '';
-      notifier.setCurrencyWithRate('USD', usdExchangeRate);
+      if (usdRate != null) {
+        notifier.setCurrencyWithRate('USD', getRateValue(usdRate));
+      }
       notifier.setLanguage(const LanguageItem(name: '英语', code: 'EN'));
       return;
     }
@@ -52,9 +53,10 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
 
     if (rate != null) {
       notifier.setCurrencyWithRate(
-        rate.shortName ?? '',
-        rate.exchangeRate ?? '',
-      );
+          rate.shortName ?? '',
+          (double.tryParse(rate.exchangeRate ?? '') != null)
+              ? ((double.tryParse(rate.exchangeRate!) ?? 0) / 100).toString()
+              : '');
     }
 
     if (language != null) {
@@ -82,11 +84,14 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
         return;
       }
 
-      _applyAutoSettings(
-        ref: ref,
-        state: next,
-        exchangeAsync: exchangeAsync,
-      );
+      // Avoid mutating provider state during build lifecycle.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _applyAutoSettings(
+          ref: ref,
+          state: next,
+          exchangeAsync: exchangeAsync,
+        );
+      });
     });
 
     return SingleChildScrollView(
@@ -113,14 +118,12 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context)
-                            .size
-                            .width, // 底部抽屉宽度占满屏幕
+                        maxWidth:
+                            MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
                       ),
                       builder: (_) => const SelectCustomerSheet(),
                     ),
                   ),
-                  // TODO 添加外销员 字段: user_id
                   FormSelectField(
                     label: '选择联系人',
                     value: state.selectedContact?.name ?? '请选择联系人',
@@ -129,9 +132,8 @@ class QuoteBaseInfoStep extends HookConsumerWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context)
-                            .size
-                            .width, // 底部抽屉宽度占满屏幕
+                        maxWidth:
+                            MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
                       ),
                       builder: (_) => SelectContactSheet(
                         companyId: state.selectedCustomers?.id,

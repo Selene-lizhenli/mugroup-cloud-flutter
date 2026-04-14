@@ -122,6 +122,7 @@ class LoginContent extends HookConsumerWidget {
 
       onAfterLogin?.call();
     }, [appleIdentityToken]);
+    
 
     useEffect(() {
       if (loginWay == "wxwork") {
@@ -137,8 +138,12 @@ class LoginContent extends HookConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    final screenWidth = MediaQuery.sizeOf(context).width; 
+    final containerWidth =
+        screenWidth >=  largeScreenWidth ? screenWidth * 0.88 : double.infinity;
+
     return Container(
-      width: double.infinity,
+      width: containerWidth,
       padding: const EdgeInsets.fromLTRB(14, 25, 14, 30),
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(

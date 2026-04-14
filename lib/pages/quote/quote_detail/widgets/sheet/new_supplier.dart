@@ -52,16 +52,7 @@ class AddSupplierSheet extends HookConsumerWidget {
       searchResults.value = [];
       FocusScope.of(context).unfocus();
     }
-
-    // 处理选中逻辑（原生 Map）
-    void handleSelect(Map<String, dynamic> result) {
-      selectedSupplierId.value = result['id']?.toString();
-      supplierName.value = result['name']?.toString() ?? '';
-      shopNumber.value = result['stall_address']?.toString() ?? '';
-      searchResults.value = [];
-      FocusScope.of(context).unfocus();
-    }
-
+ 
     // 防抖搜索逻辑
     useEffect(() {
       Timer? debounce;
@@ -206,6 +197,10 @@ class AddSupplierSheet extends HookConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ImageUploader(
+                    extraContent: const Text(
+                      '  可识别店面门头、名片',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     maxCount: 1,
                     customIcon: Icons.camera_alt,
                     recognizeAtBottom: true,

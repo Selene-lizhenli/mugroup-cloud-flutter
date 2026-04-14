@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/my/widgets/user_info.dart';
 import 'package:cloud/pages/my/widgets/user_operator.dart';
 import 'package:cloud/providers/app_provider.dart';
-import 'package:cloud/providers/theme_provider.dart';
+import 'package:cloud/providers/theme_provider.dart'; 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,10 +19,15 @@ class MyPage extends HookConsumerWidget {
         ? 'assets/theme/kaiyueren_yuqiuyu_pink.png'
         : 'assets/theme/kaiyueren_yuqiuyu_blue.png';
 
+    final backgrundBottomImage = themeType == ThemeType.pink
+        ? 'assets/theme/column_chart_blue.png'
+        : 'assets/theme/column_chart_pink.png';
+
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: colorScheme.primary.withOpacity(0.9),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: Image.asset(
           kaiyuerenImage,
@@ -33,27 +38,43 @@ class MyPage extends HookConsumerWidget {
             onPressed: () {
               context.router.maybePop();
             },
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 21)),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 20,
+              color: colorScheme.tertiary,
+            )),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                UserInfoHeader(user: user, colorScheme: colorScheme),
-                const UserOperatorSection(),
-              ],
+ 
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            backgrundBottomImage,
+            fit: BoxFit.fitWidth,
+            width: 100,
+            alignment: Alignment.bottomRight,
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    UserInfoHeader(user: user, colorScheme: colorScheme),
+                    const UserOperatorSection(),
+                  ],
+                ),
+              ), 
             ),
           ),
-        ),
+        ],
       ),
     );
   }

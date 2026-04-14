@@ -68,20 +68,54 @@ class ProductUploadZone extends HookConsumerWidget {
         ),
         if (type == 'floor')
           FlanActionSheetAction(
-            name: "产品连拍(主图/细节图)",
+            name: "多产品连拍(主图+细节图)",
             callback: (_) async {
               Navigator.pop(context);
               _handleProductContinuous(context);
             },
           ),
         FlanActionSheetAction(
-          name: "从相册选择",
+          name: "从相册选择(50张)",
           callback: (_) async {
             Navigator.pop(context);
             final result = await AssetPicker.pickAssets(
               context,
               pickerConfig: const AssetPickerConfig(
                   maxAssets: 50, requestType: RequestType.image),
+            );
+            if (result != null) {
+              for (var e in result) {
+                final f = await e.file;
+                if (f != null) onFileSelected(f);
+              }
+            }
+          },
+        ),
+        FlanActionSheetAction(
+          name: "从相册选择(100张)",
+          callback: (_) async {
+            Navigator.pop(context);
+            final result = await AssetPicker.pickAssets(
+              context,
+              pickerConfig: const AssetPickerConfig(
+                  maxAssets: 100, requestType: RequestType.image),
+            );
+            if (result != null) {
+              for (var e in result) {
+                final f = await e.file;
+                if (f != null) onFileSelected(f);
+              }
+            }
+          },
+        ),
+        FlanActionSheetAction(
+          name: "从相册选择(200张)",
+          callback: (_) async {
+            Navigator.pop(context);
+            final result = await AssetPicker.pickAssets(
+              context,
+              pickerConfig: const AssetPickerConfig(
+                  maxAssets: 200, requestType: RequestType.image),
             );
             if (result != null) {
               for (var e in result) {

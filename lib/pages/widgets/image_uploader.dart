@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:gal/gal.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image/image.dart' as img;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
@@ -18,6 +19,45 @@ class MediaDragData {
   final String key;
   final int index;
   MediaDragData({required this.key, required this.index});
+}
+
+Future<File> _normalizeCameraImageToPortrait(File file) async {
+  try {
+    final bytes = await file.readAsBytes();
+    final decoded = img.decodeImage(bytes);
+    if (decoded == null) return file;
+
+    // 先处理 EXIF 朝向，兼容 iOS 常见方向元数据。
+    final baked = img.bakeOrientation(decoded);
+    final portraitImage =
+        baked.width > baked.height ? img.copyRotate(baked, angle: 90) : baked;
+
+    // 已经是竖图且无需旋转时直接返回原文件。
+    if (portraitImage.width == decoded.width &&
+        portraitImage.height == decoded.height) {
+      return file;
+    }
+
+    final lowerPath = file.path.toLowerCase();
+    if (lowerPath.endsWith('.png') || lowerPath.endsWith('.webp')) {
+      await file.writeAsBytes(img.encodePng(portraitImage), flush: true);
+      return file;
+    }
+
+    // iOS 可能是 .heic/.heif，写入 jpg 内容时统一输出为 .jpg 文件。
+    final targetPath = (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg'))
+        ? file.path
+        : '${file.path}.jpg';
+    final targetFile = targetPath == file.path ? file : File(targetPath);
+    await targetFile.writeAsBytes(
+      img.encodeJpg(portraitImage, quality: 95),
+      flush: true,
+    );
+    return targetFile;
+  } catch (e) {
+    debugPrint('自动旋转竖图失败: $e');
+    return file;
+  }
 }
 
 class ImageUploader extends HookConsumerWidget {
@@ -62,6 +102,7 @@ class ImageUploader extends HookConsumerWidget {
   final void Function(MediaDragData source, MediaDragData target)? onSwap;
 
   final void Function(List<File> files)? onContinuousCapture;
+  final Widget? extraContent;
 
   const ImageUploader({
     super.key,
@@ -86,6 +127,7 @@ class ImageUploader extends HookConsumerWidget {
     this.customIcon,
     this.uploaderKey,
     this.onSwap,
+    this.extraContent,
   });
 
   @override
@@ -158,7 +200,10 @@ class ImageUploader extends HookConsumerWidget {
       if (entity != null) {
         // CameraPicker 返回的是 AssetEntity，转换一下
         final f = await entity.file;
-        if (f != null) await uploadFiles([f]);
+        if (f != null) {
+          final normalized = await _normalizeCameraImageToPortrait(f);
+          await uploadFiles([normalized]);
+        }
       }
     }
 
@@ -362,6 +407,9 @@ class ImageUploader extends HookConsumerWidget {
                   ),
               ],
             ),
+            if (extraContent != null) ...[
+              extraContent!,
+            ],
             if (showBottomRecognize)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 12),
@@ -624,8 +672,11 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
 
     try {
       final file = await _controller.takePicture();
+      final normalizedFile =
+          await _normalizeCameraImageToPortrait(File(file.path));
+      final xFile = XFile(normalizedFile.path);
 
-      Gal.putImage(file.path).catchError((e) {
+      Gal.putImage(xFile.path).catchError((e) {
         debugPrint("后台保存相册失败: $e");
       });
 
@@ -634,12 +685,12 @@ class _ContinuousCameraPageState extends State<ContinuousCameraPage>
         if (_replaceIndex != null) {
           targetIndex = _replaceIndex!;
           if (_replaceIndex! < _capturedImages.length) {
-            _capturedImages[_replaceIndex!] = file;
+            _capturedImages[_replaceIndex!] = xFile;
           }
           _replaceIndex = null;
         } else {
           targetIndex = _capturedImages.length;
-          _capturedImages.add(file);
+          _capturedImages.add(xFile);
 
           Future.delayed(const Duration(milliseconds: 100), () {
             if (_scrollController.hasClients) {

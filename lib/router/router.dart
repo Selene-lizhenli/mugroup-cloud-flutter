@@ -23,6 +23,14 @@ class AppRouter extends RootStackRouter {
         ],
       ),
       AutoRoute(
+        page: SampleQuoteDetailRoute.page,
+        path: '/samples/quote_detail',
+      ),
+      AutoRoute(
+        page: SampleQuoteListRoute.page,
+        path: '/samples/quote',
+      ),
+      AutoRoute(
         page: SampleRankListRoute.page,
         path: '/dashboard/rank',
       ),

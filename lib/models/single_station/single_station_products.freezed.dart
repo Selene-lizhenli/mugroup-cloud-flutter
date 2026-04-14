@@ -20,15 +20,18 @@ SingleStationSample _$SingleStationSampleFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SingleStationSample {
+  @JsonKey(fromJson: intFromJson)
   int? get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: intFromJson)
   int? get qty => throw _privateConstructorUsedError;
-  int? get price => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: stringFromJson)
+  String? get price => throw _privateConstructorUsedError;
   bool? get active => throw _privateConstructorUsedError;
-  @JsonKey(name: 'station_id')
+  @JsonKey(name: 'station_id', fromJson: intFromJson)
   int? get stationId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sample_id')
+  @JsonKey(name: 'sample_id', fromJson: intFromJson)
   int? get sampleId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'quote_id')
+  @JsonKey(name: 'quote_id', fromJson: intFromJson)
   int? get quoteId => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
@@ -51,13 +54,13 @@ abstract class $SingleStationSampleCopyWith<$Res> {
       _$SingleStationSampleCopyWithImpl<$Res, SingleStationSample>;
   @useResult
   $Res call(
-      {int? id,
-      int? qty,
-      int? price,
+      {@JsonKey(fromJson: intFromJson) int? id,
+      @JsonKey(fromJson: intFromJson) int? qty,
+      @JsonKey(fromJson: stringFromJson) String? price,
       bool? active,
-      @JsonKey(name: 'station_id') int? stationId,
-      @JsonKey(name: 'sample_id') int? sampleId,
-      @JsonKey(name: 'quote_id') int? quoteId,
+      @JsonKey(name: 'station_id', fromJson: intFromJson) int? stationId,
+      @JsonKey(name: 'sample_id', fromJson: intFromJson) int? sampleId,
+      @JsonKey(name: 'quote_id', fromJson: intFromJson) int? quoteId,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'showroomSample') Sample? showroomSample,
@@ -104,7 +107,7 @@ class _$SingleStationSampleCopyWithImpl<$Res, $Val extends SingleStationSample>
       price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
@@ -174,13 +177,13 @@ abstract class _$$StationSampleImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int? id,
-      int? qty,
-      int? price,
+      {@JsonKey(fromJson: intFromJson) int? id,
+      @JsonKey(fromJson: intFromJson) int? qty,
+      @JsonKey(fromJson: stringFromJson) String? price,
       bool? active,
-      @JsonKey(name: 'station_id') int? stationId,
-      @JsonKey(name: 'sample_id') int? sampleId,
-      @JsonKey(name: 'quote_id') int? quoteId,
+      @JsonKey(name: 'station_id', fromJson: intFromJson) int? stationId,
+      @JsonKey(name: 'sample_id', fromJson: intFromJson) int? sampleId,
+      @JsonKey(name: 'quote_id', fromJson: intFromJson) int? quoteId,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'showroomSample') Sample? showroomSample,
@@ -227,7 +230,7 @@ class __$$StationSampleImplCopyWithImpl<$Res>
       price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
@@ -268,13 +271,13 @@ class __$$StationSampleImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$StationSampleImpl implements _StationSample {
   _$StationSampleImpl(
-      {this.id,
-      this.qty,
-      this.price,
+      {@JsonKey(fromJson: intFromJson) this.id,
+      @JsonKey(fromJson: intFromJson) this.qty,
+      @JsonKey(fromJson: stringFromJson) this.price,
       this.active,
-      @JsonKey(name: 'station_id') this.stationId,
-      @JsonKey(name: 'sample_id') this.sampleId,
-      @JsonKey(name: 'quote_id') this.quoteId,
+      @JsonKey(name: 'station_id', fromJson: intFromJson) this.stationId,
+      @JsonKey(name: 'sample_id', fromJson: intFromJson) this.sampleId,
+      @JsonKey(name: 'quote_id', fromJson: intFromJson) this.quoteId,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       @JsonKey(name: 'showroomSample') this.showroomSample,
@@ -284,21 +287,24 @@ class _$StationSampleImpl implements _StationSample {
       _$$StationSampleImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: intFromJson)
   final int? id;
   @override
+  @JsonKey(fromJson: intFromJson)
   final int? qty;
   @override
-  final int? price;
+  @JsonKey(fromJson: stringFromJson)
+  final String? price;
   @override
   final bool? active;
   @override
-  @JsonKey(name: 'station_id')
+  @JsonKey(name: 'station_id', fromJson: intFromJson)
   final int? stationId;
   @override
-  @JsonKey(name: 'sample_id')
+  @JsonKey(name: 'sample_id', fromJson: intFromJson)
   final int? sampleId;
   @override
-  @JsonKey(name: 'quote_id')
+  @JsonKey(name: 'quote_id', fromJson: intFromJson)
   final int? quoteId;
   @override
   @JsonKey(name: 'created_at')
@@ -373,13 +379,13 @@ class _$StationSampleImpl implements _StationSample {
 
 abstract class _StationSample implements SingleStationSample {
   factory _StationSample(
-      {final int? id,
-      final int? qty,
-      final int? price,
+      {@JsonKey(fromJson: intFromJson) final int? id,
+      @JsonKey(fromJson: intFromJson) final int? qty,
+      @JsonKey(fromJson: stringFromJson) final String? price,
       final bool? active,
-      @JsonKey(name: 'station_id') final int? stationId,
-      @JsonKey(name: 'sample_id') final int? sampleId,
-      @JsonKey(name: 'quote_id') final int? quoteId,
+      @JsonKey(name: 'station_id', fromJson: intFromJson) final int? stationId,
+      @JsonKey(name: 'sample_id', fromJson: intFromJson) final int? sampleId,
+      @JsonKey(name: 'quote_id', fromJson: intFromJson) final int? quoteId,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       @JsonKey(name: 'showroomSample') final Sample? showroomSample,
@@ -389,21 +395,24 @@ abstract class _StationSample implements SingleStationSample {
       _$StationSampleImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: intFromJson)
   int? get id;
   @override
+  @JsonKey(fromJson: intFromJson)
   int? get qty;
   @override
-  int? get price;
+  @JsonKey(fromJson: stringFromJson)
+  String? get price;
   @override
   bool? get active;
   @override
-  @JsonKey(name: 'station_id')
+  @JsonKey(name: 'station_id', fromJson: intFromJson)
   int? get stationId;
   @override
-  @JsonKey(name: 'sample_id')
+  @JsonKey(name: 'sample_id', fromJson: intFromJson)
   int? get sampleId;
   @override
-  @JsonKey(name: 'quote_id')
+  @JsonKey(name: 'quote_id', fromJson: intFromJson)
   int? get quoteId;
   @override
   @JsonKey(name: 'created_at')

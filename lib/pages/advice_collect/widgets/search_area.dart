@@ -13,9 +13,13 @@ class SearchArea extends HookConsumerWidget {
     return GestureDetector(
       onTap: () => showAdviceEditSheet(
         context: context,
-        onSend: (content, images) {
-          notifier.sendMyAdvice(
-              {'anonymous': false, 'content': content, 'attachments': images});
+        isReply: true,
+        onSend: (content, images, isAnonymous) {
+          notifier.sendMyAdvice({
+            'anonymous': isAnonymous,
+            'content': content,
+            'attachments': images
+          });
 
           ref.read(adviceCollectProvider.notifier).loadBooks();
         },
