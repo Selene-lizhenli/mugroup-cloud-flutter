@@ -14,12 +14,12 @@ class VersionLog {
 const List<VersionLog> kVersionLogs = [
  
   VersionLog(
-    title: '2.3.3 版本更新日志：',
+    title: '2.3.5 版本更新日志：',
     items: [
       '🔧 功能优化',
       '  •  验货-可按需导出',
       '  •  验货-多张上传展示进度',
-      '  •  验货-相机增加自动旋转调节',
+      '  •  验货-相机增加自动旋转调节', 
       '  •  验货-其他已知问题修复',
     ],
   ),
