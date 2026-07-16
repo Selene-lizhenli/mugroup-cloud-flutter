@@ -86,6 +86,7 @@ class VideoUploader extends StatelessWidget {
       pickerConfig: const CameraPickerConfig(
         enableRecording: true,
         onlyEnableRecording: true,
+        enableAudio: true,
         maximumRecordingDuration: Duration(seconds: 30),
       ),
     );

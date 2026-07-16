@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -2440,9 +2440,9 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         },
         pickerConfig: CameraPickerConfig(
           enableRecording: false,
+          enableAudio: false,
           // 预览始终竖屏；成片横/竖由顶部陀螺仪开关控制。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
-          resolutionPreset: camera.ResolutionPreset.max,
           preferredFlashMode: camera.FlashMode.off,
           onXFileCaptured: (file, _) {
             unawaited(handleIosWechatCapture(file));
@@ -3477,9 +3477,9 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
         },
         pickerConfig: CameraPickerConfig(
           enableRecording: false,
+          enableAudio: false,
           // 预览始终竖屏铺满；成片横/竖由顶部开关 + 加速度计控制。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
-          resolutionPreset: camera.ResolutionPreset.max,
           preferredFlashMode: camera.FlashMode.off,
           // 拍照由 lockFrameThenCapture 自行控制：先锁画面再出片。
         ),
