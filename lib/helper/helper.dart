@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:logger/logger.dart';
 
 final logger = Logger();
@@ -201,4 +203,18 @@ int? intFromJson(dynamic value) {
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
   return null;
+}
+
+ 
+
+/// 生成 数字+大小写字母 随机字符串
+/// [length] 字符串长度
+String generateRandomString(int length) {
+  // 包含：数字 + 大写字母 + 小写字母
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
+  final random = Random();
+  return List.generate(length, (index) {
+    return chars[random.nextInt(chars.length)];
+  }).join();
 }

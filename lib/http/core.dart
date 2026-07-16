@@ -1,4 +1,5 @@
 import 'package:cloud/config/config.dart';
+import 'package:cloud/http/locale_header.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -10,7 +11,13 @@ final silentCoreApi = Dio(
       Headers.acceptHeader: 'application/json',
     },
   ),
-);
+)
+  ..interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) async {
+      applyAcceptLanguageHeader(options);
+      handler.next(options);
+    },
+  ));
 
 final coreApi = silentCoreApi
   ..interceptors.add(InterceptorsWrapper(

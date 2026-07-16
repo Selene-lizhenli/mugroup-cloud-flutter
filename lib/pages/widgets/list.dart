@@ -1,4 +1,5 @@
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -40,6 +41,7 @@ class MuListView<T> extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final refreshController = useEasyRefreshController(
       controlFinishLoad: true,
       controlFinishRefresh: true,
@@ -59,8 +61,8 @@ class MuListView<T> extends HookWidget {
     }
 
     if (state.isLoading && list.isEmpty) {
-      return const Center(
-        child: MuProgressIndicator(text: '加载中...', showText: true),
+      return Center(
+        child: MuProgressIndicator(text: '${l10n.loading}...', showText: true),
       );
     }
 
@@ -75,19 +77,19 @@ class MuListView<T> extends HookWidget {
     }
 
     if (list.isEmpty) {
-      return const Center(
+      return Center(
         child: Empty(
-          text: '暂无数据',
+          text: l10n.noData,
         ),
       );
-    } 
+    }
     return Container(
       margin: EdgeInsets.fromLTRB(hPadding ?? 0, 2, hPadding ?? 0, 0),
       decoration: const BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
+          topLeft: Radius.circular(4),
+          topRight: Radius.circular(4),
         ),
       ),
       clipBehavior: Clip.hardEdge,

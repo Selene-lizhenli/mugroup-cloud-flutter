@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 
 /// 自定义跳动柱状图加载动画
 /// UI：primary和secondary两种颜色的长条柱子，一共5根
@@ -109,7 +110,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
     final showText = widget.showText;
     final textColor = widget.textColor;
     final fontSize = widget.fontSize;
-
+    final l10n = context.l10n;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -156,7 +157,7 @@ class _MuProgressIndicatorState extends State<MuProgressIndicator>
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-              text ?? '加载中...',
+              text ?? context.l10n.loading,
               style: TextStyle(
                   fontSize: fontSize ?? 12.0,
                   color: textColor ?? colorScheme.onSurface),

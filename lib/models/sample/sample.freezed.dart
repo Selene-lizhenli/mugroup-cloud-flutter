@@ -21,6 +21,8 @@ Sample _$SampleFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Sample {
   int? get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+  String? get xTenantId => throw _privateConstructorUsedError;
   String? get barcode => throw _privateConstructorUsedError;
   String? get packing => throw _privateConstructorUsedError;
   String? get construction => throw _privateConstructorUsedError;
@@ -69,6 +71,8 @@ abstract class $SampleCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+      String? xTenantId,
       String? barcode,
       String? packing,
       String? construction,
@@ -110,6 +114,7 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
   @override
   $Res call({
     Object? id = freezed,
+    Object? xTenantId = freezed,
     Object? barcode = freezed,
     Object? packing = freezed,
     Object? construction = freezed,
@@ -139,6 +144,10 @@ class _$SampleCopyWithImpl<$Res, $Val extends Sample>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      xTenantId: freezed == xTenantId
+          ? _value.xTenantId
+          : xTenantId // ignore: cast_nullable_to_non_nullable
+              as String?,
       barcode: freezed == barcode
           ? _value.barcode
           : barcode // ignore: cast_nullable_to_non_nullable
@@ -256,6 +265,8 @@ abstract class _$$SampleImplCopyWith<$Res> implements $SampleCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+      String? xTenantId,
       String? barcode,
       String? packing,
       String? construction,
@@ -296,6 +307,7 @@ class __$$SampleImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? xTenantId = freezed,
     Object? barcode = freezed,
     Object? packing = freezed,
     Object? construction = freezed,
@@ -325,6 +337,10 @@ class __$$SampleImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      xTenantId: freezed == xTenantId
+          ? _value.xTenantId
+          : xTenantId // ignore: cast_nullable_to_non_nullable
+              as String?,
       barcode: freezed == barcode
           ? _value.barcode
           : barcode // ignore: cast_nullable_to_non_nullable
@@ -426,6 +442,8 @@ class __$$SampleImplCopyWithImpl<$Res>
 class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   const _$SampleImpl(
       {this.id,
+      @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+      this.xTenantId,
       this.barcode,
       this.packing,
       this.construction,
@@ -459,6 +477,9 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   final int? id;
+  @override
+  @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+  final String? xTenantId;
   @override
   final String? barcode;
   @override
@@ -543,7 +564,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Sample(id: $id, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, itemType: $itemType, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image, audios: $audios)';
+    return 'Sample(id: $id, xTenantId: $xTenantId, barcode: $barcode, packing: $packing, construction: $construction, remark: $remark, series: $series, unit: $unit, categoryId: $categoryId, nameCn: $nameCn, nameEn: $nameEn, productNo: $productNo, taxRate: $taxRate, purchaseCost: $purchaseCost, pageNo: $pageNo, tradeCountry: $tradeCountry, developedAt: $developedAt, descriptionCn: $descriptionCn, descriptionEn: $descriptionEn, itemType: $itemType, supplyQuotes: $supplyQuotes, spec: $spec, category: $category, image: $image, audios: $audios)';
   }
 
   @override
@@ -552,6 +573,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
     properties
       ..add(DiagnosticsProperty('type', 'Sample'))
       ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('xTenantId', xTenantId))
       ..add(DiagnosticsProperty('barcode', barcode))
       ..add(DiagnosticsProperty('packing', packing))
       ..add(DiagnosticsProperty('construction', construction))
@@ -583,6 +605,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
         (other.runtimeType == runtimeType &&
             other is _$SampleImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.xTenantId, xTenantId) ||
+                other.xTenantId == xTenantId) &&
             (identical(other.barcode, barcode) || other.barcode == barcode) &&
             (identical(other.packing, packing) || other.packing == packing) &&
             (identical(other.construction, construction) ||
@@ -624,6 +648,7 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
   int get hashCode => Object.hashAll([
         runtimeType,
         id,
+        xTenantId,
         barcode,
         packing,
         construction,
@@ -666,6 +691,8 @@ class _$SampleImpl extends _Sample with DiagnosticableTreeMixin {
 abstract class _Sample extends Sample {
   const factory _Sample(
       {final int? id,
+      @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+      final String? xTenantId,
       final String? barcode,
       final String? packing,
       final String? construction,
@@ -695,6 +722,9 @@ abstract class _Sample extends Sample {
 
   @override
   int? get id;
+  @override
+  @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+  String? get xTenantId;
   @override
   String? get barcode;
   @override

@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/single_station/inquiry/inquiries_list.dart';
-import 'package:cloud/pages/single_station/provider/provider.dart'; 
-import 'package:cloud/pages/widgets/search_bar.dart'; 
+import 'package:cloud/pages/single_station/provider/provider.dart';
+import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,6 +16,7 @@ class InquiryMessagePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
 
+    final l10n = context.l10n;
     final searchController = useTextEditingController();
     final stationNotifier = ref.read(singleStationProvider.notifier);
     final refreshController = useMemoized(
@@ -39,7 +41,7 @@ class InquiryMessagePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('询盘'),
+        title: Text(l10n.inquiryTitle),
         elevation: 0,
       ),
       body: Column(
@@ -48,8 +50,8 @@ class InquiryMessagePage extends HookConsumerWidget {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: MuSearchBar(
               controller: searchController,
-              hintText: '请输入客户名称进行搜索',
-              buttonText: '搜索',
+              hintText: l10n.inquirySearchHint,
+              buttonText: l10n.search,
               onSearch: (search) {
                 final keyword = search ?? searchController.text;
                 stationNotifier.setStationSearchKeyword(keyword);

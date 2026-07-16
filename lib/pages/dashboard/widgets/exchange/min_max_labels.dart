@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +31,7 @@ class MinMaxLabels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     if (spots.isEmpty || spots.length == 1) return const SizedBox.shrink();
 
@@ -51,8 +53,10 @@ class MinMaxLabels extends StatelessWidget {
         chartAreaHeight - ((minSpot.y - minY) / yRange) * chartAreaHeight;
 
     // 标签文本
-    final maxText = '最高: ${maxValue.toStringAsFixed(4)}';
-    final minText = '最低: ${minValue.toStringAsFixed(4)}';
+    final maxText =
+        l10n.dashboardMaxLabel(maxValue.toStringAsFixed(4));
+    final minText =
+        l10n.dashboardMinLabel(minValue.toStringAsFixed(4));
 
     // 使用 TextPainter 精确测量文本尺寸
     const textStyle = TextStyle(

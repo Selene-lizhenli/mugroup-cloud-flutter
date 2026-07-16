@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/crm/company.dart';
 import 'package:cloud/models/crm/contact.dart';
 import 'package:cloud/pages/quote/quote_create/provider/quote_create_provider.dart';
@@ -14,7 +15,7 @@ class SelectCustomerSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quoteCreateProvider);
     final notifier = ref.read(quoteCreateProvider.notifier);
-
+    final l10n = context.l10n;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     useEffect(() {
@@ -53,7 +54,7 @@ class SelectCustomerSheet extends HookConsumerWidget {
               notifier.loadCustomers();
             },
             decoration: InputDecoration(
-              hintText: '请输入关键字搜索',
+              hintText: '${l10n.enterTheKeyword}...',
               prefixIcon: const Icon(Icons.search),
               isDense: true,
               filled: true,

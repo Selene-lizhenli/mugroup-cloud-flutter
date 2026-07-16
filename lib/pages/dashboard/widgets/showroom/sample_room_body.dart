@@ -1,9 +1,10 @@
 import 'package:cloud/constants/dashboard_configs.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
-import 'package:cloud/models/dashboard/ship_top_stats.dart'; 
-import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart';
-import 'package:cloud/pages/dashboard/widgets/showroom/ship_cart.dart';
+import 'package:cloud/models/dashboard/ship_top_stats.dart';
+import 'package:cloud/pages/dashboard/widgets/date_select.dart'; 
+import 'package:cloud/pages/dashboard/widgets/showroom/quote_cart.dart'; 
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
@@ -58,16 +59,6 @@ class SampleRoomBody extends ConsumerWidget {
         children: [
           // 根据数据状态显示内容
           if (currentDimension == sampleDimensionConfigs[0]['value'])
-            ShipTopChartContent(
-              isLoading: isLoading,
-              handleExpandScroll: handleExpandScroll,
-              data: shipTopDimensionData,
-              selectedRange: shipDateRange,
-              onRangeChanged: (DateRange range, Map<String, String> params) {
-                handleShipRankData(params);
-              },
-            )
-          else if (currentDimension == sampleDimensionConfigs[1]['value'])
             QuoteTopChartContent(
               handleExpandScroll: handleExpandScroll,
               isLoading: isLoading,
@@ -85,10 +76,10 @@ class SampleRoomBody extends ConsumerWidget {
                       child: MuProgressIndicator(),
                     ),
                   )
-                : const Center(
+                : Center(
                     child: Padding(
-                      padding: EdgeInsets.all(40.0),
-                      child: Text("暂无数据"),
+                      padding: const EdgeInsets.all(40.0),
+                      child: Text(context.l10n.noData),
                     ),
                   )
         ],

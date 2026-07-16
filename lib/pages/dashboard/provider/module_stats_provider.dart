@@ -12,7 +12,7 @@ String _formatMonthLabel(String monthKey) {
     final parts = monthKey.split('-');
     if (parts.length >= 2) {
       final month = int.parse(parts[1]);
-      return '${month}月';
+      return '$month';
     }
     return monthKey;
   } catch (e) {

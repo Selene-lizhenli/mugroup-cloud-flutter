@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/advice_collect/provider/provider.dart';
 import 'package:cloud/pages/advice_collect/widgets/show_advice_edit_sheet.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class SearchArea extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(adviceCollectProvider.notifier);
+    final l10n = context.l10n;
 
     return GestureDetector(
       onTap: () => showAdviceEditSheet(
@@ -37,12 +39,12 @@ class SearchArea extends HookConsumerWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Text('想说什么尽管说...',
-                style: TextStyle(color: Colors.grey, fontSize: 14)),
-            Spacer(),
-            Icon(Icons.image_outlined, color: Colors.grey, size: 20),
+            Text('${l10n.sayAnything}...',
+                style: const TextStyle(color: Colors.grey, fontSize: 14)),
+            const Spacer(),
+            const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
           ],
         ),
       ),

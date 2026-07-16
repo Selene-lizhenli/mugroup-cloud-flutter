@@ -1,10 +1,8 @@
-import 'package:city_pickers/city_pickers.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/widgets/build_form_card.dart';
 import 'package:cloud/pages/widgets/check_box_input.dart';
 import 'package:cloud/pages/widgets/date_picker_input.dart';
-import 'package:cloud/pages/widgets/dynamic_city_pickers.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
 import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/multi_select.dart';
@@ -32,8 +30,6 @@ class SupplySupplierForm extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-
-    final provinceId = useState<String?>(null);
 
     // 解析 stall_address 为区域和店铺号
     Map<String, dynamic> getInitialValues() {
@@ -161,42 +157,6 @@ class SupplySupplierForm extends HookConsumerWidget {
                           children: [
                             Expanded(
                               child: FormBuilderField<String>(
-                                name: "supplier_no",
-                                builder: (field) {
-                                  return Input(
-                                    label: '厂商编号',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "usci_code",
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return '该项不能为空';
-                                  }
-                                  return null;
-                                },
-                                builder: (field) {
-                                  return Input(
-                                    label: '税号代码',
-                                    value: field.value ?? '',
-                                    onChanged: field.didChange,
-                                    errorText: field.errorText,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: FormBuilderField<String>(
                                 name: "short_name",
                                 builder: (field) {
                                   return Input(
@@ -229,37 +189,53 @@ class SupplySupplierForm extends HookConsumerWidget {
                             ),
                           ],
                         ),
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: FormBuilderField<String>(
+                        //         name: "province",
+                        //         builder: (field) {
+                        //           return DynamicCityPickers(
+                        //             label: '省份',
+                        //             showType: ShowType.p,
+                        //             value: field.value ?? '',
+                        //             onChanged: (value) {
+                        //               field.didChange(value?.provinceName);
+                        //               provinceId.value = value?.provinceId;
+                        //             },
+                        //           );
+                        //         },
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 16),
+                        //     Expanded(
+                        //       child: FormBuilderField<String>(
+                        //         name: "city",
+                        //         builder: (field) {
+                        //           return DynamicCityPickers(
+                        //             label: '城市',
+                        //             showType: ShowType.c,
+                        //             locationCode: provinceId.value,
+                        //             value: field.value ?? '',
+                        //             onChanged: (value) {
+                        //               field.didChange(value?.cityName);
+                        //             },
+                        //           );
+                        //         },
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                         Row(
                           children: [
                             Expanded(
                               child: FormBuilderField<String>(
-                                name: "province",
+                                name: "address",
                                 builder: (field) {
-                                  return DynamicCityPickers(
-                                    label: '省份',
-                                    showType: ShowType.p,
+                                  return Input(
+                                    label: '厂商地址',
                                     value: field.value ?? '',
-                                    onChanged: (value) {
-                                      field.didChange(value?.provinceName);
-                                      provinceId.value = value?.provinceId;
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: FormBuilderField<String>(
-                                name: "city",
-                                builder: (field) {
-                                  return DynamicCityPickers(
-                                    label: '城市',
-                                    showType: ShowType.c,
-                                    locationCode: provinceId.value,
-                                    value: field.value ?? '',
-                                    onChanged: (value) {
-                                      field.didChange(value?.cityName);
-                                    },
+                                    onChanged: field.didChange,
                                   );
                                 },
                               ),
@@ -267,21 +243,12 @@ class SupplySupplierForm extends HookConsumerWidget {
                           ],
                         ),
                         FormBuilderField<String>(
-                          name: "address",
-                          builder: (field) {
-                            return Input(
-                              label: '厂商地址',
-                              value: field.value ?? '',
-                              onChanged: field.didChange,
-                            );
-                          },
-                        ),
-                        FormBuilderField<String>(
                           name: "business_scope",
                           builder: (field) {
                             return TextArea(
                               label: '营业范围',
                               value: field.value,
+                              maxLines: 1,
                               onChanged: field.didChange,
                             );
                           },

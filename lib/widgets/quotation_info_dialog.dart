@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/cart/models/state.dart' as cart_state;
 import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -34,6 +35,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final initial = initialValue;
     final showPrice = useState<bool?>(initial?.showPrice);
     final showTaxRatePrice = useState<bool?>(initial?.showTaxRatePrice);
@@ -73,8 +75,8 @@ class QuotationInfoDialog extends HookConsumerWidget {
     void pickCurrency() {
       showFlanActionSheet(
         context,
-        description: "请选择报价币种",
-        cancelText: "我再想想",
+        description: l10n.quotationSelectCurrency,
+        cancelText: l10n.quotationThinkAgain,
         actions: currencyActions,
         closeOnClickAction: true,
         onSelect: (action, index) {
@@ -91,34 +93,71 @@ class QuotationInfoDialog extends HookConsumerWidget {
     );
 
     final fixedSettingLabelWidth = (TextPainter(
-          text: TextSpan(text: "佣金比率(%)：", style: settingLabelStyle),
+          text: TextSpan(
+            text: l10n.quotationCommissionRateLabel,
+            style: settingLabelStyle,
+          ),
           textDirection: Directionality.of(context),
         )..layout())
             .width +
         5;
 
+    // 价格设置弹窗
     return Dialog(
-      backgroundColor: colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 24,
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // 标题
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            decoration: BoxDecoration(color: colorScheme.primary),
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
+            ),
             child: Text(
-              "价格设置",
+              l10n.quotationPriceSettings,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onPrimary,
+              ),
+            ),
+          ),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            decoration: BoxDecoration(
+              color: colorScheme.tertiary.withOpacity(0.3),
+              border: Border(
+                top: BorderSide(
+                  color: colorScheme.tertiary.withOpacity(0.5),
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: colorScheme.tertiary.withOpacity(0.5),
+                  width: 1,
+                ),
+                left: BorderSide(
+                  color: colorScheme.tertiary.withOpacity(0.5),
+                  width: 1,
+                ),
+                right: BorderSide(
+                  color: colorScheme.tertiary.withOpacity(0.5),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Text(
+              l10n.quotationSettingsApplyToAll,
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.outline,
               ),
             ),
           ),
@@ -131,8 +170,9 @@ class QuotationInfoDialog extends HookConsumerWidget {
                   const SizedBox(height: 10),
                   Row(
                     children: [
+                      // 是否显示价格
                       Text(
-                        "是否显示价格",
+                        l10n.quotationShowPrice,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -150,7 +190,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         },
                       ),
                       Text(
-                        '是',
+                        l10n.yes,
                         style: TextStyle(
                           fontSize: 14,
                           color: colorScheme.onSurface,
@@ -168,7 +208,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         },
                       ),
                       Text(
-                        '否',
+                        l10n.no,
                         style: TextStyle(
                           fontSize: 14,
                           color: colorScheme.onSurface,
@@ -181,7 +221,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                     Row(
                       children: [
                         Text(
-                          '采购价是否含税',
+                          l10n.quotationPurchasePriceIncludesTax,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -199,7 +239,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                           },
                         ),
                         Text(
-                          '是',
+                          l10n.yes,
                           style: TextStyle(
                             fontSize: 14,
                             color: colorScheme.onSurface,
@@ -217,7 +257,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                           },
                         ),
                         Text(
-                          '否',
+                          l10n.no,
                           style: TextStyle(
                             fontSize: 14,
                             color: colorScheme.onSurface,
@@ -232,7 +272,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         SizedBox(
                           width: fixedSettingLabelWidth,
                           child: Text(
-                            "报价币种：",
+                            l10n.quotationCurrencyLabel,
                             textAlign: TextAlign.right,
                             style: settingLabelStyle,
                           ),
@@ -254,7 +294,8 @@ class QuotationInfoDialog extends HookConsumerWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      currency.value ?? "请选择报价币种",
+                                      currency.value ??
+                                          l10n.quotationSelectCurrency,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: currency.value == null
@@ -282,7 +323,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         SizedBox(
                           width: fixedSettingLabelWidth,
                           child: Text(
-                            "汇率：",
+                            l10n.quotationExchangeLabel,
                             textAlign: TextAlign.right,
                             style: settingLabelStyle,
                           ),
@@ -314,7 +355,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "请输入汇率",
+                                hintText: l10n.quotationExchangeHint,
                                 hintStyle: TextStyle(
                                   color: colorScheme.onSurface.withOpacity(0.5),
                                 ),
@@ -331,7 +372,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         SizedBox(
                           width: fixedSettingLabelWidth,
                           child: Text(
-                            "佣金比率(%)：",
+                            l10n.quotationCommissionRateLabel,
                             textAlign: TextAlign.right,
                             style: settingLabelStyle,
                           ),
@@ -363,7 +404,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "请输入佣金比率",
+                                hintText: l10n.quotationCommissionRateHint,
                                 hintStyle: TextStyle(
                                   color: colorScheme.onSurface.withOpacity(0.5),
                                 ),
@@ -375,45 +416,14 @@ class QuotationInfoDialog extends HookConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 14),
                   ],
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-            margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            decoration: BoxDecoration(
-              color: colorScheme.tertiary.withOpacity(0.3),
-              border: Border(
-                top: BorderSide(
-                  color: colorScheme.tertiary.withOpacity(0.5),
-                  width: 1,
-                ),
-                bottom: BorderSide(
-                  color: colorScheme.tertiary.withOpacity(0.5),
-                  width: 1,
-                ),
-                left: BorderSide(
-                  color: colorScheme.tertiary.withOpacity(0.5),
-                  width: 1,
-                ),
-                right: BorderSide(
-                  color: colorScheme.tertiary.withOpacity(0.5),
-                  width: 1,
-                ),
-              ),
-            ),
-            child: Text(
-              "⚠️以上设置将对所有样品生效!",
-              style: TextStyle(
-                fontSize: 13,
-                color: colorScheme.outline,
-              ),
-            ),
-          ),
+
+          // 取消 确定按钮组
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 5, 24, 24),
             child: Row(
@@ -428,7 +438,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    "取消",
+                    l10n.cancel,
                     style: TextStyle(
                       color: colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 16,
@@ -465,7 +475,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    "提交",
+                    l10n.submit,
                     style: TextStyle(
                       color: colorScheme.onSecondary,
                       fontSize: 16,

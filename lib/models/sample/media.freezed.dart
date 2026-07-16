@@ -20,7 +20,8 @@ TemporaryMedia _$TemporaryMediaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TemporaryMedia {
-  int get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+  Object get id => throw _privateConstructorUsedError;
   String? get uuid => throw _privateConstructorUsedError;
   @JsonKey(name: 'thumb_url')
   String? get thumbUrl => throw _privateConstructorUsedError;
@@ -39,7 +40,9 @@ abstract class $TemporaryMediaCopyWith<$Res> {
       _$TemporaryMediaCopyWithImpl<$Res, TemporaryMedia>;
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(
+          fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+      Object id,
       String? uuid,
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       String url});
@@ -64,10 +67,7 @@ class _$TemporaryMediaCopyWithImpl<$Res, $Val extends TemporaryMedia>
     Object? url = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
+      id: null == id ? _value.id : id,
       uuid: freezed == uuid
           ? _value.uuid
           : uuid // ignore: cast_nullable_to_non_nullable
@@ -93,7 +93,9 @@ abstract class _$$TemporaryMediaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(
+          fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+      Object id,
       String? uuid,
       @JsonKey(name: 'thumb_url') String? thumbUrl,
       String url});
@@ -116,10 +118,7 @@ class __$$TemporaryMediaImplCopyWithImpl<$Res>
     Object? url = null,
   }) {
     return _then(_$TemporaryMediaImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
+      id: null == id ? _value.id : id,
       uuid: freezed == uuid
           ? _value.uuid
           : uuid // ignore: cast_nullable_to_non_nullable
@@ -138,18 +137,22 @@ class __$$TemporaryMediaImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$TemporaryMediaImpl implements _TemporaryMedia {
+class _$TemporaryMediaImpl extends _TemporaryMedia {
   const _$TemporaryMediaImpl(
-      {required this.id,
+      {@JsonKey(
+          fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+      required this.id,
       this.uuid,
       @JsonKey(name: 'thumb_url') this.thumbUrl,
-      required this.url});
+      required this.url})
+      : super._();
 
   factory _$TemporaryMediaImpl.fromJson(Map<String, dynamic> json) =>
       _$$TemporaryMediaImplFromJson(json);
 
   @override
-  final int id;
+  @JsonKey(fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+  final Object id;
   @override
   final String? uuid;
   @override
@@ -168,7 +171,7 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TemporaryMediaImpl &&
-            (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             (identical(other.uuid, uuid) || other.uuid == uuid) &&
             (identical(other.thumbUrl, thumbUrl) ||
                 other.thumbUrl == thumbUrl) &&
@@ -177,7 +180,8 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, uuid, thumbUrl, url);
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(id), uuid, thumbUrl, url);
 
   @JsonKey(ignore: true)
   @override
@@ -194,18 +198,22 @@ class _$TemporaryMediaImpl implements _TemporaryMedia {
   }
 }
 
-abstract class _TemporaryMedia implements TemporaryMedia {
+abstract class _TemporaryMedia extends TemporaryMedia {
   const factory _TemporaryMedia(
-      {required final int id,
+      {@JsonKey(
+          fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+      required final Object id,
       final String? uuid,
       @JsonKey(name: 'thumb_url') final String? thumbUrl,
       required final String url}) = _$TemporaryMediaImpl;
+  const _TemporaryMedia._() : super._();
 
   factory _TemporaryMedia.fromJson(Map<String, dynamic> json) =
       _$TemporaryMediaImpl.fromJson;
 
   @override
-  int get id;
+  @JsonKey(fromJson: temporaryMediaIdFromJson, toJson: temporaryMediaIdToJson)
+  Object get id;
   @override
   String? get uuid;
   @override

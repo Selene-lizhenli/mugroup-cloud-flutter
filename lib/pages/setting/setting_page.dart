@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/app_stat_module.dart';
+import 'package:cloud/constants/entry_feature_l10n_helper.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/setting/widgets/setting_modlue_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/providers/app_provider.dart';
@@ -59,10 +61,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('模块配置已保存'),
+      SnackBar(
+          content: Text(context.l10n.settingModuleConfigSaved),
           backgroundColor: Colors.green,
-          padding: EdgeInsets.all(20)),
+          padding: const EdgeInsets.all(20)),
     );
   }
 
@@ -164,6 +166,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final notifier = ref.read(coreProvider.notifier);
     if (_loading) {
@@ -186,7 +189,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('模块管理'),
+        title: Text(l10n.settingModuleManagement),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -209,14 +212,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
           /// =======================
           /// 已选中的模块
           /// =======================
-          const _SectionTitle(title: '已选中的模块'),
+          _SectionTitle(title: l10n.settingSelectedModules),
           const SizedBox(height: 12),
 
           // 如果有选中的模块，显示模块列表
           if (selectedDataOverview.isNotEmpty || selectedApp.isNotEmpty) ...[
             /// 数据统计组（已选中）
             if (selectedDataOverview.isNotEmpty) ...[
-              const _GroupTitle(title: '数据统计'),
+              _GroupTitle(title: l10n.settingGroupDataStatistics),
               const SizedBox(height: 10),
               _ReorderableModuleList(
                 modules: selectedDataOverview,
@@ -234,7 +237,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
             /// 应用组（已选中）
             if (selectedApp.isNotEmpty) ...[
-              const _GroupTitle(title: '应用'),
+              _GroupTitle(title: l10n.settingGroupApplications),
               const SizedBox(height: 10),
               _ReorderableModuleList(
                 modules: selectedApp,
@@ -262,12 +265,12 @@ class _SettingPageState extends ConsumerState<SettingPage> {
           /// =======================
           if (unselectedDataOverview.isNotEmpty ||
               unselectedApp.isNotEmpty) ...[
-            const _SectionTitle(title: '更多模块'),
+            _SectionTitle(title: l10n.settingMoreModules),
             const SizedBox(height: 12),
 
             /// 数据统计组（未选中）
             if (unselectedDataOverview.isNotEmpty) ...[
-              const _GroupTitle(title: '数据统计'),
+              _GroupTitle(title: l10n.settingGroupDataStatistics),
               const SizedBox(height: 10),
               _ReorderableModuleList(
                 modules: unselectedDataOverview,
@@ -285,7 +288,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
             /// 应用组（未选中）
             if (unselectedApp.isNotEmpty) ...[
-              const _GroupTitle(title: '应用'),
+              _GroupTitle(title: l10n.settingGroupApplications),
               const SizedBox(height: 10),
               _ReorderableModuleList(
                 modules: unselectedApp,
@@ -331,7 +334,8 @@ class _ReorderableModuleList extends StatelessWidget {
       final module = modules[0];
       return SettingModuleCard(
         key: ValueKey(module.id),
-        title: module.title,
+        moduleId: module.id,
+        title: entryFeatureLocalizedTitle(context, module.id),
         selected: selected,
         onAction: () => onToggle(module),
         dragIndex: null, // 单个模块不需要拖拽
@@ -366,7 +370,8 @@ class _ReorderableModuleList extends StatelessWidget {
         final module = modules[index];
         return SettingModuleCard(
           key: ValueKey(module.id),
-          title: module.title,
+          moduleId: module.id,
+          title: entryFeatureLocalizedTitle(context, module.id),
           selected: selected,
           onAction: () => onToggle(module),
           dragIndex: index, // 传递索引用于拖拽
@@ -445,7 +450,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '暂无选中的模块',
+            context.l10n.settingNoSelectedModules,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey.shade500,
                   fontSize: 14,

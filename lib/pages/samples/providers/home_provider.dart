@@ -1,8 +1,10 @@
 import 'package:cloud/app/app.dart';
 import 'package:cloud/constants/core.dart';
+import 'package:cloud/constants/samples.dart';
 import 'package:cloud/core/rx_bus.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/core.dart';
+import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/models/response.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -43,6 +45,7 @@ class Home extends _$Home {
       productCurrentPage: 1,
       productNoMore: false,
       productListLoading: false,
+      privateWarehouseList: [], //查询到的有权限的保密的样品间展厅
     );
 
     return homeState;
@@ -80,7 +83,7 @@ class Home extends _$Home {
 
     state = state.copyWith(
       media: list,
-      currentMediaId: media.id,
+      currentMediaId: media.idAsInt,
     );
   }
 
@@ -147,8 +150,8 @@ class Home extends _$Home {
 
     nextMedia.remove(media);
 
-    if (media.id == nextCurrentMediaId) {
-      nextCurrentMediaId = nextMedia.firstOrNull?.id;
+    if (media.idEquals(nextCurrentMediaId)) {
+      nextCurrentMediaId = nextMedia.firstOrNull?.idAsInt;
     }
 
     state = state.copyWith(
@@ -169,32 +172,47 @@ class Home extends _$Home {
   Future<void> fetchWarehouses(Tenant? currentTenant) async {
     state = state.copyWith(isLoadingWarehouses: true);
 
-    final resp = await getWarehouses();
-    final warehouses = resp.data ?? [];
-    var independentWarehouse = <Warehouse>[];
-    // 若当前租户为 id==6，新增一项独立(部门)样品间
-    if (currentTenant != null &&
-        (currentTenant.id == TenantConstants.warehouseMainTenantId)) {
-      independentWarehouse = [
-        const Warehouse(
-          name: '独立(部门)样品间',
-          image: [
-            WarehouseImage(
-              url: 'assets/bs_self.jpg',
-              thumbUrl: 'assets/bs_self.jpg',
-            ),
-          ],
-        ),
-      ];
-    }
-    // 过滤掉废弃的样品间
-    final filteredWarehouses =
-        warehouses.where((warehouse) => warehouse.abandoned != true).toList();
+    try {
+      final responses = await Future.wait<ApiResponse<List<Warehouse>>>([
+        getWarehousesPublic(),
+        getWarehousesPrivate(),
+      ]);
 
-    state = state.copyWith(
-      warehouses: [...filteredWarehouses, ...independentWarehouse],
-      isLoadingWarehouses: false,
-    );
+      final respPublic = responses[0];
+      final respPrivate = responses[1];
+      final warehouses = [...respPublic.data, ...respPrivate.data];
+      var independentWarehouse = <Warehouse>[];
+
+      // 过滤掉废弃的样品间
+      final filteredWarehouses =
+          warehouses.where((warehouse) => warehouse.abandoned != true).toList();
+
+      // 若当前租户为 id==6，且没有私有样品间展厅，追加新增一项独立(部门)样品间
+      if (currentTenant != null &&
+          (currentTenant.id == TenantConstants.warehouseMainTenantId)) {
+        if (respPrivate.data.isEmpty) {
+          independentWarehouse = [
+            const Warehouse(
+              name: '独立(部门)样品间', 
+              // name_en: 'INDEPENDENT (DEPARTMENT) SHOWROOM',
+              image: [
+                WarehouseImage(
+                  url: 'assets/bs_self.jpg',
+                  thumbUrl: 'assets/bs_self.jpg',
+                ),
+              ],
+            ),
+          ];
+        }
+      }
+
+      state = state.copyWith(
+        warehouses: [...filteredWarehouses, ...independentWarehouse],
+        privateWarehouseList: respPrivate.data,
+      );
+    } finally {
+      state = state.copyWith(isLoadingWarehouses: false);
+    }
   }
 
   void setCurrentSelectedWarehouse(Warehouse? warehouse) {
@@ -222,32 +240,106 @@ class Home extends _$Home {
     if (init == true) {
       state = state.copyWith(productListLoading: true, productCurrentPage: 1);
     }
+    final hasPrivateWarehouse = state.privateWarehouseList.isNotEmpty;
+    final currentSelectedWarehouse = state.currentSelectedWarehouse;
+    final search = state.search;
+    final isDetailedMode = state.isDetailedMode;
+    final query = state.query;
+    final productCurrentPage = state.productCurrentPage;
+    final privateWarehouseList = state.privateWarehouseList;
+
     try {
       // 准备查询参数（使用当前状态）
-      final currentPage = init == true ? 1 : state.productCurrentPage;
+      final currentPage = init == true ? 1 : productCurrentPage;
       final core = app.container.read(coreProvider).value;
       final tenant = core?.currentTenant;
       final queryParameters = {
-        "search": searchText ?? state.search,
+        "search": searchText ?? search,
         if (searchMedia != null) "image": searchMedia.id,
         "item_type": "sample", // 样品间数据
         "page": currentPage,
         "pageSize": 20,
         "includes": 'supplyQuotes.supplier',
-        if (state.isDetailedMode == true) ...state.query,
+        if (isDetailedMode == true) ...query,
         if (tenant?.id == TenantConstants.warehouseMainTenantId &&
-            state.currentSelectedWarehouse != null)
-          'warehouse_id': state.currentSelectedWarehouse!.id.toString(),
+            currentSelectedWarehouse != null &&
+            PublicWarehouseId.ids.contains(currentSelectedWarehouse
+                .id)) // 当前租户是云链，当前选中的样品间展厅有值，且值是集团公共样品展厅中的一个
+          'warehouse_id': currentSelectedWarehouse!.id.toString(),
       };
+
+      //在云链的租户上，有保密展厅，当前选中的展厅为空
+      final shouldSearchOnPublicAndPrivate =
+          tenant?.id == TenantConstants.warehouseMainTenantId &&
+              hasPrivateWarehouse &&
+              currentSelectedWarehouse == null;
+
+      //在云链的租户上，有保密展厅，当前选中的展厅不是公开展厅时走私有搜索
+      final searchOnPrivate =
+          tenant?.id == TenantConstants.warehouseMainTenantId &&
+              hasPrivateWarehouse &&
+              currentSelectedWarehouse != null &&
+              !PublicWarehouseId.ids.contains(currentSelectedWarehouse.id);
+
+      /// 保密展厅列表里出现的租户 id（去重，顺序与列表中首次出现一致）。
+      final distinctPrivateTenantIds = <int>{
+        for (final w in privateWarehouseList)
+          if (w.tenantId != null) w.tenantId!,
+      }.toList();
+
+      late ApiResponse<List<Sample>> resp;
+      //如果应该在公共、私有样品间同时搜索
+      if (shouldSearchOnPublicAndPrivate) {
+        if (distinctPrivateTenantIds.isEmpty) {
+          resp = await getSamples(queryParameters: queryParameters);
+        } else {
+          final responses = await Future.wait<ApiResponse<List<Sample>>>([
+            getSamples(queryParameters: queryParameters),
+            ...distinctPrivateTenantIds.map(
+              (tid) => getSamples(
+                queryParameters: queryParameters,
+                extraHeaders: <String, dynamic>{'X-Tenant-ID': tid},
+              ),
+            ),
+          ]);
+
+          final respPublic = responses.first;
+          final mergedPrivate =
+              responses.skip(1).expand((r) => r.data).toList();
+
+          resp = ApiResponse<List<Sample>>.data(
+            [...mergedPrivate, ...respPublic.data],
+            respPublic.meta ?? responses.last.meta,
+          );
+        }
+        //如果应该在某个独立样品间独立搜索
+      } else if (searchOnPrivate) {
+        final responses = await Future.wait<ApiResponse<List<Sample>>>(
+          distinctPrivateTenantIds.map(
+            (tid) => getSamples(
+              queryParameters: queryParameters,
+              extraHeaders: <String, dynamic>{'X-Tenant-ID': tid},
+            ),
+          ),
+        );
+        resp = ApiResponse<List<Sample>>.data(
+          responses.expand((r) => r.data).toList(),
+          responses.last.meta ?? responses.first.meta,
+        );
+      } else {
+        resp = await getSamples(
+          queryParameters: queryParameters,
+        );
+      }
+
       logger.d('样品列表查询参数$queryParameters');
-      final resp = await getSamples(queryParameters: queryParameters);
 
       // 使用 addPostFrameCallback 延迟状态更新，避免在构建过程中修改状态
 
       var updatedState = state.copyWith(
         search: searchText,
         // media: searchMedia != null ? [searchMedia] : state.media,
-        currentMediaId: searchMedia?.id,
+        currentMediaId: searchMedia?.idAsInt,
         productListLoading: false,
         samples: (init == true || currentPage == 1)
             ? resp.data

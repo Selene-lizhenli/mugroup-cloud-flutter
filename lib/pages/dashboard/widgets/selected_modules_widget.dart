@@ -59,8 +59,6 @@ class _SelectedModulesWidgetState extends ConsumerState<SelectedModulesWidget> {
       permissionBools,
       isSelected: true,
     );
-    logger.d(
-        'dashboard页面选中的modules: ${modules.map((e) => '${e.id} ${e.visible} ${e.selected}')}');
     if (mounted) {
       setState(() {
         _selectedModules = modules;

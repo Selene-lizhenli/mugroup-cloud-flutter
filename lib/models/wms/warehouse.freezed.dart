@@ -23,14 +23,18 @@ mixin _$Warehouse {
   int? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
+  String? get type => throw _privateConstructorUsedError;
+  String? get permission => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'tenant_id')
+  int? get tenantId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+  String? get orderColumn => throw _privateConstructorUsedError;
   List<WarehouseImage>? get image => throw _privateConstructorUsedError;
   bool? get abandoned => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sample_count')
-  int? get sampleCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,11 +51,15 @@ abstract class $WarehouseCopyWith<$Res> {
       {int? id,
       String? name,
       String? address,
+      String? type,
+      String? permission,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'tenant_id') int? tenantId,
+      @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+      String? orderColumn,
       List<WarehouseImage>? image,
-      bool? abandoned,
-      @JsonKey(name: 'sample_count') int? sampleCount});
+      bool? abandoned});
 }
 
 /// @nodoc
@@ -70,11 +78,14 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
     Object? id = freezed,
     Object? name = freezed,
     Object? address = freezed,
+    Object? type = freezed,
+    Object? permission = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? tenantId = freezed,
+    Object? orderColumn = freezed,
     Object? image = freezed,
     Object? abandoned = freezed,
-    Object? sampleCount = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -89,6 +100,14 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String?,
+      permission: freezed == permission
+          ? _value.permission
+          : permission // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -96,6 +115,14 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
       updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      tenantId: freezed == tenantId
+          ? _value.tenantId
+          : tenantId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      orderColumn: freezed == orderColumn
+          ? _value.orderColumn
+          : orderColumn // ignore: cast_nullable_to_non_nullable
               as String?,
       image: freezed == image
           ? _value.image
@@ -105,10 +132,6 @@ class _$WarehouseCopyWithImpl<$Res, $Val extends Warehouse>
           ? _value.abandoned
           : abandoned // ignore: cast_nullable_to_non_nullable
               as bool?,
-      sampleCount: freezed == sampleCount
-          ? _value.sampleCount
-          : sampleCount // ignore: cast_nullable_to_non_nullable
-              as int?,
     ) as $Val);
   }
 }
@@ -125,11 +148,15 @@ abstract class _$$WarehouseImplCopyWith<$Res>
       {int? id,
       String? name,
       String? address,
+      String? type,
+      String? permission,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'tenant_id') int? tenantId,
+      @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+      String? orderColumn,
       List<WarehouseImage>? image,
-      bool? abandoned,
-      @JsonKey(name: 'sample_count') int? sampleCount});
+      bool? abandoned});
 }
 
 /// @nodoc
@@ -146,11 +173,14 @@ class __$$WarehouseImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? address = freezed,
+    Object? type = freezed,
+    Object? permission = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? tenantId = freezed,
+    Object? orderColumn = freezed,
     Object? image = freezed,
     Object? abandoned = freezed,
-    Object? sampleCount = freezed,
   }) {
     return _then(_$WarehouseImpl(
       id: freezed == id
@@ -165,6 +195,14 @@ class __$$WarehouseImplCopyWithImpl<$Res>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String?,
+      permission: freezed == permission
+          ? _value.permission
+          : permission // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -172,6 +210,14 @@ class __$$WarehouseImplCopyWithImpl<$Res>
       updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      tenantId: freezed == tenantId
+          ? _value.tenantId
+          : tenantId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      orderColumn: freezed == orderColumn
+          ? _value.orderColumn
+          : orderColumn // ignore: cast_nullable_to_non_nullable
               as String?,
       image: freezed == image
           ? _value._image
@@ -181,10 +227,6 @@ class __$$WarehouseImplCopyWithImpl<$Res>
           ? _value.abandoned
           : abandoned // ignore: cast_nullable_to_non_nullable
               as bool?,
-      sampleCount: freezed == sampleCount
-          ? _value.sampleCount
-          : sampleCount // ignore: cast_nullable_to_non_nullable
-              as int?,
     ));
   }
 }
@@ -196,11 +238,14 @@ class _$WarehouseImpl implements _Warehouse {
       {this.id,
       this.name,
       this.address,
+      this.type,
+      this.permission,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'tenant_id') this.tenantId,
+      @JsonKey(name: 'order_column', fromJson: _stringFromAny) this.orderColumn,
       final List<WarehouseImage>? image = const [],
-      this.abandoned,
-      @JsonKey(name: 'sample_count') this.sampleCount})
+      this.abandoned})
       : _image = image;
 
   factory _$WarehouseImpl.fromJson(Map<String, dynamic> json) =>
@@ -213,11 +258,21 @@ class _$WarehouseImpl implements _Warehouse {
   @override
   final String? address;
   @override
+  final String? type;
+  @override
+  final String? permission;
+  @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
+  @override
+  @JsonKey(name: 'tenant_id')
+  final int? tenantId;
+  @override
+  @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+  final String? orderColumn;
   final List<WarehouseImage>? _image;
   @override
   @JsonKey()
@@ -231,13 +286,10 @@ class _$WarehouseImpl implements _Warehouse {
 
   @override
   final bool? abandoned;
-  @override
-  @JsonKey(name: 'sample_count')
-  final int? sampleCount;
 
   @override
   String toString() {
-    return 'Warehouse(id: $id, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt, image: $image, abandoned: $abandoned, sampleCount: $sampleCount)';
+    return 'Warehouse(id: $id, name: $name, address: $address, type: $type, permission: $permission, createdAt: $createdAt, updatedAt: $updatedAt, tenantId: $tenantId, orderColumn: $orderColumn, image: $image, abandoned: $abandoned)';
   }
 
   @override
@@ -248,15 +300,20 @@ class _$WarehouseImpl implements _Warehouse {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.address, address) || other.address == address) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.permission, permission) ||
+                other.permission == permission) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.tenantId, tenantId) ||
+                other.tenantId == tenantId) &&
+            (identical(other.orderColumn, orderColumn) ||
+                other.orderColumn == orderColumn) &&
             const DeepCollectionEquality().equals(other._image, _image) &&
             (identical(other.abandoned, abandoned) ||
-                other.abandoned == abandoned) &&
-            (identical(other.sampleCount, sampleCount) ||
-                other.sampleCount == sampleCount));
+                other.abandoned == abandoned));
   }
 
   @JsonKey(ignore: true)
@@ -266,11 +323,14 @@ class _$WarehouseImpl implements _Warehouse {
       id,
       name,
       address,
+      type,
+      permission,
       createdAt,
       updatedAt,
+      tenantId,
+      orderColumn,
       const DeepCollectionEquality().hash(_image),
-      abandoned,
-      sampleCount);
+      abandoned);
 
   @JsonKey(ignore: true)
   @override
@@ -291,11 +351,15 @@ abstract class _Warehouse implements Warehouse {
       {final int? id,
       final String? name,
       final String? address,
+      final String? type,
+      final String? permission,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
+      @JsonKey(name: 'tenant_id') final int? tenantId,
+      @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+      final String? orderColumn,
       final List<WarehouseImage>? image,
-      final bool? abandoned,
-      @JsonKey(name: 'sample_count') final int? sampleCount}) = _$WarehouseImpl;
+      final bool? abandoned}) = _$WarehouseImpl;
 
   factory _Warehouse.fromJson(Map<String, dynamic> json) =
       _$WarehouseImpl.fromJson;
@@ -307,18 +371,25 @@ abstract class _Warehouse implements Warehouse {
   @override
   String? get address;
   @override
+  String? get type;
+  @override
+  String? get permission;
+  @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
   @override
+  @JsonKey(name: 'tenant_id')
+  int? get tenantId;
+  @override
+  @JsonKey(name: 'order_column', fromJson: _stringFromAny)
+  String? get orderColumn;
+  @override
   List<WarehouseImage>? get image;
   @override
   bool? get abandoned;
-  @override
-  @JsonKey(name: 'sample_count')
-  int? get sampleCount;
   @override
   @JsonKey(ignore: true)
   _$$WarehouseImplCopyWith<_$WarehouseImpl> get copyWith =>

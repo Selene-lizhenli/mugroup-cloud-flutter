@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
@@ -31,6 +32,7 @@ class ExchangeTrend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final data = exchangeData?.data ?? [];
     final spots = <FlSpot>[];
@@ -66,12 +68,12 @@ class ExchangeTrend extends StatelessWidget {
         Column(
           children: [
             if (isLoading)
-              const SizedBox(
+              SizedBox(
                 height: 150,
                 child: Center(
                   child: MuProgressIndicator(
                     showText: true,
-                    text: '加载中...',
+                    text: l10n.loading,
                   ),
                 ),
               )
@@ -248,16 +250,23 @@ class ExchangeTrend extends StatelessWidget {
                                       try {
                                         final parts = dateDisplay.split('-');
                                         if (parts.length >= 3) {
-                                          dateDisplay =
-                                              '${parts[0]}年${int.parse(parts[1])}月${int.parse(parts[2])}日';
+                                          dateDisplay = l10n.dashboardDateLabel(
+                                            int.parse(parts[0]),
+                                            int.parse(parts[1]),
+                                            int.parse(parts[2]),
+                                          );
                                         }
                                       } catch (e) {}
 
                                       String label = dateDisplay;
-                                      label +=
-                                          '\n汇率: ${rates[index].toStringAsFixed(4)}';
-                                      if (isMax) label += '\n 最高点';
-                                      if (isMin) label += '\n 最低点';
+                                      label += '\n${l10n.dashboardRateValue(
+                                          rates[index].toStringAsFixed(4))}';
+                                      if (isMax) {
+                                        label += '\n ${l10n.dashboardHighestPoint}';
+                                      }
+                                      if (isMin) {
+                                        label += '\n ${l10n.dashboardLowestPoint}';
+                                      }
 
                                       return LineTooltipItem(
                                         label,

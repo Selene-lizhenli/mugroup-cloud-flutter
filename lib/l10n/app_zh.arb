@@ -1,0 +1,871 @@
+{
+  "@@locale": "zh",
+  "jobNumberLabel": "工号: {number}",
+  "@jobNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "departmentLabel": "部门: {name}",
+  "@departmentLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "myTheme": "我的主题",
+  "myLanguage": "语言",
+  "selectTheme": "请选择主题",
+  "themePinkLabel": "MU · 粉",
+  "themeBlueLabel": "MU · 蓝",
+  "themeSwitchedPink": "已切换为玫粉色主题",
+  "themeSwitchedBlue": "已切换为蓝色主题",
+  "selectLanguage": "请选择语言",
+  "languageChinese": "中文",
+  "languageEnglish": "English",
+  "languageSwitchedChinese": "已切换为中文",
+  "languageSwitchedEnglish": "已切换为英文",
+  "clearCache": "清空缓存",
+  "cancel": "取消",
+  "clearCartCache": "清空选样车缓存",
+  "clearSuccess": "清理成功",
+  "contactSupport": "联系技术人员",
+  "callShortNumber": "拨打短号({phone})",
+  "@callShortNumber": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "shortNumberEmpty": "短号为空",
+  "callFailed": "拨号失败",
+  "callFailedWithError": "{message}：{error}",
+  "@callFailedWithError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settings": "设置",
+  "photoBackupToGalleryQuestion": "拍摄图片备份至手机相册？",
+  "photoBackupEnabled": "已开启图片备份至手机相册",
+  "photoBackupDisabled": "已关闭图片备份至手机相册",
+  "yes": "是",
+  "no": "否",
+  "photoBackupYesHint": " (连拍时会自动备份)",  
+  "reportPerSkuDisabled": "已关闭按 SKU 生成单个验货报告", 
+  "reportPerSkuNoHint": " (多 SKU 时合并为 zip)",
+  "switchLanguageQuestion": "切换语言？",
+  "aboutApp": "关于App ({tenant}{version})",
+  "@aboutApp": {
+    "placeholders": {
+      "tenant": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "logout": "退出登录",
+  "samplesShowroom": "样品间",
+  "samplesCart": "选样车",
+  "samplesQuotation": "报价单",
+  "samplesSettingsSuccess": "设置成功！",
+  "samplesQuickBrowseMode": "快速浏览模式",
+  "samplesCardDetailMode": "卡片详细模式",
+  "samplesWarehouseNotOpenTitle": "独立样品间待开放",
+  "samplesWarehouseNotOpenMessage": "如有独立样品间数字展厅部署需求，欢迎联系数字发展中心！",
+  "samplesGotIt": "我知道了",
+  "loading": "加载中...",
+  "samplesFilterSupplier": "供应商",
+  "samplesFilterCategory": "产品分类",
+  "samplesFilterTradeCountry": "贸易国别",
+  "noData": "暂无数据",
+  "search": "搜索",
+  "samplesCapture": "拍摄",
+  "samplesPickFromGallery": "从手机相册选择",
+  "samplesCameraOpenFailed": "无法打开相机: {error}",
+  "@samplesCameraOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardNoModulesAvailable": "暂无可用模块",
+  "dashboardTopRank": "Top榜单",
+  "dashboardSampleQuoteRank": "样品间选中排名",
+  "dashboardRanking": "排名",
+  "dashboardNoMore": "没有更多了...",
+  "dashboardCollapse": "收起",
+  "dashboardExpand": "展开",
+  "dashboardViewFullRank": "查看完整榜单",
+  "dashboardDimensionData": "{label}数据",
+  "@dashboardDimensionData": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardSampleNoLabel": "样品编号: {number}",
+  "@dashboardSampleNoLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardShippingAmountCny": "出货金额(CNY)：",
+  "dashboardTenThousandRmb": "万人民币",
+  "dashboardQuoteCount": "报价次数：",
+  "dashboardTimes": "次",
+  "dashboardUnknown": "未知",
+  "dashboardBarTooltip": "编号: {sampleNo}\n数量: {count}",
+  "@dashboardBarTooltip": {
+    "placeholders": {
+      "sampleNo": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardLast6Months": "最近半年",
+  "dashboardLast12Months": "最近一年",
+  "dashboardAllTime": "所有时间",
+  "dashboardLastTwoYears": "最近两年",
+  "dashboardMonthLabel": "{month}月",
+  "@dashboardMonthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardCustomer": "客户",
+  "dashboardSupplier": "供应商",
+  "dashboardInspection": "验货",
+  "dashboardMarketPurchase": "市场带客",
+  "dashboardProductCount": "产品数量",
+  "dashboardCustomerCount": "客户数量",
+  "dashboardServiceProviderCount": "服务商数量",
+  "dashboardUpdateLog": "版本更新日志",
+  "dashboardLayoutSettings": "设置页面布局",
+  "dashboardExchangeRate": "汇率",
+  "dashboardExchangeCalculator": "汇率换算",
+  "dashboardExchangeRateDefaultHint": "汇率默认实时中国银行中行价折算",
+  "dashboardNoExchangeData": "暂无汇率数据",
+  "dashboardSearchCurrency": "搜索货币名称",
+  "dashboardCurrencyNotFound": "未找到相关货币",
+  "dashboardSelectDimension": "选择维度",
+  "dashboardCurrentlySelected": "（当前选中）",
+  "current": "当前",
+  "dashboardDataFromBoc": "数据来自中行",
+  "dashboardInvalidCurrency": "无效的货币维度",
+  "dashboardExchangeLoadFailed": "汇率数据加载失败! {error}",
+  "@dashboardExchangeLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardDataLoadFailed": "数据加载失败! {error}",
+  "@dashboardDataLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardCny": "人民币",
+  "dashboardCurrencyName": "货币名称",
+  "dashboardCashBuyRate": "现汇买入价",
+  "dashboardNotesBuyRate": "现钞买入价",
+  "dashboardCashSellRate": "现汇卖出价",
+  "dashboardNotesSellRate": "现钞卖出价",
+  "dashboardBocConversionRate": "中行折算价",
+  "dashboardPublishDate": "发布日期",
+  "dashboardRateValue": "汇率: {rate}",
+  "@dashboardRateValue": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardHighestPoint": "最高点",
+  "dashboardLowestPoint": "最低点",
+  "dashboardMaxLabel": "最高: {value}",
+  "@dashboardMaxLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardMinLabel": "最低: {value}",
+  "@dashboardMinLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "featurePurchaseAssist": "采购助手",
+  "featureIndependentWebsite": "独立站",
+  "featureAdviceCollect": "留言板",
+  "featureWarehouseManagement": "仓库管理",
+  "featureWarehouseReceipts": "仓库收货",
+  "featureTodayExchangeRate": "今日汇率",
+  "quotationPriceSettings": "价格设置",
+  "quotationShowPrice": "是否显示价格",
+  "quotationPurchasePriceIncludesTax": "采购价是否含税",
+  "quotationCurrencyLabel": "报价币种：",
+  "quotationSelectCurrency": "请选择报价币种",
+  "quotationThinkAgain": "我再想想",
+  "quotationExchangeLabel": "汇率：",
+  "quotationExchangeHint": "请输入汇率",
+  "quotationCommissionRateLabel": "佣金比率(%)：",
+  "quotationCommissionRateHint": "请输入佣金比率",
+  "quotationSettingsApplyToAll": "⚠️ 以下设置将对所有样品生效!",
+  "submit": "提交",
+  "cartSelectStockInType": "请选择入库类型",
+  "cartStockInTypeNotSet": "未设置入库类型",
+  "cartSelectWarehouse": "请选择仓库",
+  "cartWarehouseNameNotSet": "未设置仓库名称",
+  "cartSelectBorrower": "请选择借样人",
+  "cartScanTransferQr": "请扫描调拨单二维码",
+  "cartTransferOrderNotSet": "未设置调拨单号",
+  "cartScanDeliveryQr": "请扫描出货单二维码",
+  "cartDeliveryOrderNotSet": "未设置出货单号",
+  "cartSelectSampleCart": "请选择一辆选样车",
+  "cartSelectSampleCartTitle": "请选择选样车",
+  "cartConfirmBorrow": "确认借样",
+  "cartBorrower": "借样人",
+  "cartSelectUser": "请选择用户",
+  "cartNoDepartment": "暂无部门",
+  "cartBorrowReason": "借样原因",
+  "cartSelectBorrowReason": "请选择借样原因",
+  "cartBorrowReasonHint": "请输入借样理由",
+  "cartExpectedReturnTime": "预计归还时间",
+  "cartSelectDate": "请选择日期",
+  "cartSelectUserFirst": "请先选择用户!",
+  "cartSelectBorrowReasonFirst": "请先选择借样原因!",
+  "cartInputBorrowReasonFirst": "请先输入借样原因!",
+  "cartSelectReturnTimeFirst": "请先选择预计归还时间!",
+  "cartBorrowSuccess": "借样成功!",
+  "cartQuotationCreatedTitle": "创建报价单成功",
+  "cartQuotationCreatedContent": "你可以继续进行以下操作：",
+  "cartViewDetail": "查看详情",
+  "cartConfirmQuotation": "确认报价单",
+  "cartExporterLabel": "外销员 *",
+  "cartRemark": "备注",
+  "cartQuotationRemarkHint": "选填，报价单备注信息",
+  "cartSaveAndApprove": "保存并审批",
+  "cartSaveOnly": "仅保存",
+  "cartAdjustPrice": "调价",
+  "cartPrice": "价格",
+  "cartFillProductBarcode": "填写产品条码",
+  "cartProductBarcode": "产品条码",
+  "cartProductBarcodeHint": "请输入产品条码",
+  "cartProductBarcodeRequired": "请输入产品条码!",
+  "cartTransferIn": "调入",
+  "cartTransferOut": "调出",
+  "cartConfirmAction": "确认{action}",
+  "@cartConfirmAction": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "cartConfirm": "确认",
+  "cartDeliveryOut": "出货",
+  "cartUnknown": "未知",
+  "cartStockIn": "入库",
+  "cartStockInType": "入库类型",
+  "cartRemarkHint": "请输入备注信息",
+  "cartTransferOutSuccess": "调拨出库成功!",
+  "cartTransferInSuccess": "调拨入库成功!",
+  "cartDeliverySuccess": "出货成功!",
+  "cartStockInSuccess": "入库成功!",
+  "cartSelectWarehouseFirst": "请先选择仓库!",
+  "cartScanTransferFirst": "请先扫描调拨单号!",
+  "cartScanDeliveryFirst": "请先扫描出货单号!",
+  "cartSelectBorrowerFirst": "请先选择借样人!",
+  "cartReturnSuccess": "还样成功!",
+  "cartEmptyHint": "这里是空的，快去添加吧~",
+  "cartRemove": "移除",
+  "cartPriceChangedBadge": "改",
+  "cartSelectSampleCartFirst": "请先选择您需要的选样车",
+  "cartUnsupportedBarcode": "不支持该条码!",
+  "cartScan": "扫一扫",
+  "cartManualBarcode": "手填条码",
+  "cartSubmittingApproval": "提交审批中...",
+  "cartSubmitSuccess": "提交成功!",
+  "cartQuotationNoIdForApproval": "创建报价单成功但未返回单据编号，无法提交审批",
+  "cartSaveOrSubmitFailed": "保存或提交审批失败,{error}",
+  "@cartSaveOrSubmitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cartCreateQuotationFailed": "创建报价单失败,{error}",
+  "@cartCreateQuotationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cartBorrowReasonCustomerMeeting": "客户会议用",
+  "cartBorrowReasonPricingQuote": "客户选中，核价报价用",
+  "cartBorrowReasonExhibition": "展会使用",
+  "cartBorrowReasonGroupShipment": "本组出货样",
+  "cartBorrowReasonOther": "其他",
+  "cartStockInSubmission": "交样入库",
+  "cartStockInPurchase": "采购入库",
+  "cartStockInRemove": "移除入库",
+  "cartStockInReturn": "退货入库",
+  "cartStockInOther": "其他入库",
+  "cartStockInCancel": "客户取消订单",
+  "cartStockInTransfer": "调拨入库",
+  "cartStockInBorrow": "还样入库",
+  "cartStockInInventory": "盘点入库",
+  "cartTypeStockIn": "入库选样车",
+  "cartTypeBorrowOut": "借样选样车",
+  "cartTypeBorrowIn": "还样选样车",
+  "cartTypeTransferOut": "调拨出库选样车",
+  "cartTypeTransferIn": "调拨入库选样车",
+  "cartTypeInout": "手动盘点选样车",
+  "cartTypeQuotation": "报价单选样车",
+  "cartTypeDeliveryOut": "出货选样车",
+  "cartTypeDefault": "选样车",
+  "cartOperateBorrow": "借样",
+  "cartOperateReturn": "还样",
+  "cartOperateQuotation": "报价",
+  "cartOperateInventory": "盘点",
+  "cartSelectedCount": "已选: {count} 件",
+  "@cartSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectUserLoadFailed": "加载失败",
+  "selectUserSearchPrompt": "请输入姓名或工号搜索",
+  "selectUserSearchBarHint": "输入姓名/工号搜索",
+  "selectUserNotFound": "未找到相关用户",
+  "dashboardDateLabel": "{year}年{month}月{day}日",
+  "@dashboardDateLabel": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteBasicInfo": "基本信息",
+  "quoteSampleDetailsTab": "样品明细 ({count})",
+  "@quoteSampleDetailsTab": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteSearchHint": "根据员工姓名、单号搜索报价单",
+  "quoteCopiedToClipboard": "已复制{label}到剪贴板",
+  "@quoteCopiedToClipboard": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteNoIdForSubmit": "无报价单id，暂时无法提交",
+  "quoteSubmitApprovalFailed": "提交审批失败,{error}",
+  "@quoteSubmitApprovalFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteSubmitApproval": "提交审批",
+  "quoteDate": "报价日期",
+  "quoteCreator": "创建人",
+  "quoteExporter": "外销员",
+  "quoteTradeCountry": "贸易国别",
+  "quoteExchangeRate": "汇率",
+  "quoteCommissionRate": "佣金比率",
+  "quoteCurrency": "报价币种",
+  "quoteRemark": "备注",
+  "quoteApprovalStatus": "审批状态",
+  "quoteNone": "无",
+  "quoteCreatorLabel": "创建人：",
+  "quoteExporterLabel": "外销员：",
+  "quoteOrderNoLabel": "单号：",
+  "quoteUnitCount": "个",
+  "quoteSelectDownloadMethod": "请选择下载方式",
+  "quoteExportBySupplier": "按供应商",
+  "quoteExportByTime": "按时间",
+  "quoteMissingIdForSupplier": "缺少报价单ID，无法选择供应商",
+  "quoteEndBeforeStart": "结束时间不能早于开始时间",
+  "quoteTypeLabel": "类型",
+  "quoteSupplierLabel": "供应商",
+  "quoteSelectSupplier": "请选择供应商",
+  "quoteStartDate": "开始日期",
+  "quoteSelectStartDate": "请选择开始日期",
+  "quoteEndDate": "结束日期",
+  "quoteSelectEndDate": "请选择结束日期",
+  "quoteTemplateLabel": "模板",
+  "quoteQrCode": "报价单二维码",
+  "quoteProductImagesSku": "产品图片(以SKU为文件)",
+  "quoteProductImagesFlat": "产品图片(无文件夹)",
+  "quoteJyExcel": "极越报价单(xlsx)",
+  "quoteYrExcel": "义荣报价单(xlsx)",
+  "quoteTxExcel": "通西报价单(xlsx)",
+  "quoteQuotationExcel": "报价单(xlsx)",
+  "quoteShipmentListExcel": "出货清单(xlsx)",
+  "quoteMmQuotation": "MM报价单",
+  "quoteProductDetailExcel": "产品明细(xlsx)",
+  "quoteShipmentListAdminExcel": "出货清单-含保密信息(xlsx)",
+  "quoteMarketRecordExcel": "市场记录报价单(xlsx)",
+  "quoteUnknownSupplier": "未知供应商",
+  "quoteSuppliersCount": "{name}等{count}家",
+  "@quoteSuppliersCount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteSelectSupplierTitle": "选择供应商",
+  "quoteConfirm": "确定",
+  "quoteConfirmSelected": "确定（已选{count}）",
+  "@quoteConfirmSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteInvalidTimeRange": "时间范围不合法",
+  "quoteMissingQuoteNoForQr": "缺少报价单号，无法生成二维码",
+  "quoteScanWithPda": "请使用PDA扫码",
+  "quoteClose": "关闭",
+  "quoteMissingIdForDownload": "缺少报价单ID，无法下载文件",
+  "quoteDownloading": "正在下载中,请稍后....",
+  "quoteDownloadedTo": "已下载到本地：{path}",
+  "@quoteDownloadedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteShareFileText": "这是报价单 {no} 的文件",
+  "@quoteShareFileText": {
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteDownloadFailed": "下载失败{statusPart}：{error}",
+  "@quoteDownloadFailed": {
+    "placeholders": {
+      "statusPart": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteDownloadFailedSimple": "下载失败：{error}",
+  "@quoteDownloadFailedSimple": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteApprovalDraft": "待提交",
+  "quoteApprovalPending": "审批中",
+  "quoteApprovalApproved": "已通过",
+  "quoteApprovalRejected": "已拒绝",
+  "stationProductCatalogLabel": "目录",
+  "stationProductPurchaseUnitPrice": "采购单价",
+  "samplesItemTypeJapan": "日本产品",
+  "samplesItemTypeInternal": "内部",
+  "samplesTaxRateIncluded": "(含税率 {rate}%)",
+  "@samplesTaxRateIncluded": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "samplesTaxRateExcluded": "(已扣除税率 {rate}%)",
+  "@samplesTaxRateExcluded": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomAudioPlaying": "播放中...",
+  "showroomAudioClip": "语音片段",
+  "showroomNoSupplierInfo": "暂无供应商信息",
+  "showroomNoValidSupplier": "未找到有效供应商",
+  "showroomSupplier": "供应商",
+  "showroomEditSample": "编辑样品",
+  "showroomAddToCart": "加入选样车",
+  "showroomProductNo": "产品货号",
+  "showroomPrice": "价格",
+  "showroomUnit": "单位",
+  "showroomNameCn": "中文名称",
+  "showroomNameEn": "英文名称",
+  "showroomSeries": "系列",
+  "showroomPacking": "包装方式",
+  "showroomLength": "长",
+  "showroomWidth": "宽",
+  "showroomHeight": "高",
+  "showroomUploadImageFirst": "请先上传图片",
+  "showroomSmartRecognizing": "智能识别中...",
+  "showroomRecognizeSuccess": "识别成功",
+  "showroomRecognizeFailed": "识别失败",
+  "showroomImages": "图片",
+  "showroomImageAutoRecognize": "图片自动识别",
+  "showroomSmartRecognize": "智能识别",
+  "showroomAuxAudio": "辅录音频",
+  "showroomCopyLast": "复制上一条",
+  "showroomFieldSettings": "字段设置",
+  "showroomFactoryQuotes": "工厂报价",
+  "showroomSupplierExists": "该供应商已在列表中",
+  "showroomAdd": "添加",
+  "showroomNoFactoryQuotes": "暂无工厂报价",
+  "showroomRemoveFactoryQuoteConfirm": "确定要移除这个工厂报价吗？",
+  "showroomDeleting": "删除中...",
+  "showroomDeleteSuccess": "删除成功",
+  "showroomSupplierProductNo": "供应商货号",
+  "showroomSupplierPrice": "供应商价格",
+  "showroomMoq": "最小起订量",
+  "showroomMaterial": "材质",
+  "showroomProductSpec": "产品规格",
+  "showroomDescription": "描述",
+  "showroomDescriptionCn": "中文描述",
+  "showroomDescriptionEn": "英文描述",
+  "showroomConfirmExitTitle": "确认退出",
+  "showroomConfirmExitContent": "确定要退出吗？未保存的内容将会丢失。",
+  "showroomConfirmExit": "确定退出",
+  "showroomMarketProductCreate": "市场产品创建",
+  "showroomCreating": "创建中...",
+  "showroomCreateSuccess": "创建成功",
+  "showroomCreateSuccessContent": "样品已成功创建，您希望接下来做什么？",
+  "showroomDoneAndBack": "完成并返回",
+  "showroomContinueCreate": "继续创建",
+  "showroomSampleEdit": "样品编辑",
+  "showroomEditSuccess": "编辑成功",
+  "showroomFloorDetail": "详情",
+  "showroomFloorRecommend": "推荐",
+  "showroomTaxIncludedParen": " (含税{rate}%)",
+  "@showroomTaxIncludedParen": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomTaxDeductedParen": " (扣税{rate}%)",
+  "@showroomTaxDeductedParen": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomProductNoWithValue": "产品编号: {no}",
+  "@showroomProductNoWithValue": {
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomLabelSpec": "规格:",
+  "showroomLabelCategory": "分类:",
+  "showroomLabelBarcode": "条形码:",
+  "showroomLabelTaxRate": "税率:",
+  "showroomRecommendedForYou": "为你推荐",
+  "showroomCustomerQuote": "客户报价",
+  "showroomPackingShort": "包装",
+  "showroomInnerBoxCapacity": "内箱装箱",
+  "showroomOuterBoxCapacity": "外箱装箱",
+  "showroomVolume": "体积",
+  "showroomGrossWeight": "毛重",
+  "showroomProductWeight": "产品重量(g)",
+  "showroomShipping": "出货",
+  "showroomSampleLocation": "样品位",
+  "showroomUnknownFactory": "未知工厂",
+  "showroomTagInternal": "内部:{sku}",
+  "@showroomTagInternal": {
+    "placeholders": {
+      "sku": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomTagFactory": "工厂:{sku}",
+  "@showroomTagFactory": {
+    "placeholders": {
+      "sku": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomTagCustomer": "客户:{sku}",
+  "@showroomTagCustomer": {
+    "placeholders": {
+      "sku": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomCustomerPriceLabel": "客户价:",
+  "showroomQuotePriceLabel": "报价:",
+  "showroomDeliveryDate": "交期:{month}/{day}",
+  "@showroomDeliveryDate": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "showroomTaxIncludedBadge": "含税{rate}",
+  "@showroomTaxIncludedBadge": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "showroomTaxExcludedBadge": "不含税",
+  "cartSamplePageNo": "样本页码: {pageNo}",
+  "@cartSamplePageNo": {
+    "placeholders": {
+      "pageNo": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteRegion": "地区: {value}",
+  "@cartQuoteRegion": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteShippingDate": "出货日期: {date}",
+  "@cartQuoteShippingDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuotePurchasePrice": "采购价: {value}",
+  "@cartQuotePurchasePrice": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuotePurchaseCurrency": "采购币种: {value}",
+  "@cartQuotePurchaseCurrency": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteCanBill": "是否开票: {value}",
+  "@cartQuoteCanBill": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteTaxRate": "税率: {value}",
+  "@cartQuoteTaxRate": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteVolume": "体积: {value}",
+  "@cartQuoteVolume": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteOuterCapacity": "装箱量: {value}",
+  "@cartQuoteOuterCapacity": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuoteRecordUser": "记录人员: {value}",
+  "@cartQuoteRecordUser": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cartQuotePacking": "包装: {value}",
+  "@cartQuotePacking": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "stationDetailTitle": "独立站详情",
+  "stationDetailSamplesTab": "样品明细",
+  "stationDetailMissingInfo": "缺少站点信息",
+  "stationDetailTitleLabel": "标题",
+  "stationDetailEnglishTitle": "英文标题",
+  "stationDetailTheme": "主题",
+  "stationDetailExpireTime": "有效期",
+  "stationDetailContactPerson": "联系人",
+  "stationDetailEmail": "邮箱",
+  "stationDetailAddress": "地址",
+  "stationDetailShareLink": "分享链接",
+  "stationThemeMeimeiImage": "玫玫印象",
+  "stationThemeChristmas": "圣诞恋歌",
+  "stationThemeDefault": "默认",
+  "stationInquiryMessages": "询盘消息",
+  "stationSearchHint": "请输入标题进行搜索",
+  "stationThemeWithValue": "主题：{theme}",
+  "@stationThemeWithValue": {
+    "placeholders": {
+      "theme": {
+        "type": "String"
+      }
+    }
+  },
+  "stationExpireTimeWithValue": "过期时间：{date}",
+  "@stationExpireTimeWithValue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationSiteUrlLabel": "站点网址：",
+  "inquiryTitle": "询盘",
+  "inquiryDetailTitle": "询盘详情",
+  "inquiryBasicInfoTab": "询盘信息",
+  "inquirySearchHint": "请输入客户名称进行搜索",
+  "inquiryMissingInfo": "缺少询盘信息",
+  "inquiryCustomerName": "客户名称",
+  "inquiryPhone": "电话",
+  "inquiryCreatedAt": "创建时间",
+  "inquiryStationName": "站点名称",
+  "inquiryIpAddress": "IP 地址",
+  "inquirySource": "来源",
+  "inquiryMessageContent": "消息内容",
+  "inquiryDeviceUnknown": "未知设备",
+  "inquiryDeviceIosPhone": "苹果手机",
+  "inquiryDeviceIosPad": "苹果平板",
+  "inquiryDeviceMacOs": "苹果电脑",
+  "inquiryDeviceWindows": "Windows 设备",
+  "inquiryDeviceLinux": "Linux 设备",
+  "inquiryDeviceAndroidPhone": "Android 手机",
+  "inquiryDeviceAndroidPad": "Android 平板",
+  "inquirySourceWithWework": "{source}；企微",
+  "@inquirySourceWithWework": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshPullDown": "下拉刷新",
+  "refreshPullUp": "上拉加载",
+  "refreshRelease": "释放开始",
+  "refreshProcessing": "刷新中...",
+  "loadProcessing": "加载中...",
+  "refreshSucceeded": "成功了",
+  "refreshNoMore": "没有更多了",
+  "refreshFailed": "失败了",
+  "refreshLastUpdatedAt": "最后更新于 %T",
+  "settingModuleManagement": "模块管理",
+  "settingModuleConfigSaved": "模块配置已保存",
+  "settingSelectedModules": "已选中的模块",
+  "settingMoreModules": "更多模块",
+  "settingNoSelectedModules": "暂无选中的模块",
+  "settingModuleSelected": "已选中",
+  "settingModuleUnselected": "未选中",
+  "settingGroupDataStatistics": "数据统计",
+  "settingGroupApplications": "应用",
+  "tasks": "任务",
+  "newlyAdded": "新增",
+  "searchPlatformCloud": "云链",
+  "searchPlatform1688": "1688",
+  "searchPlatformAmazon": "亚马逊",
+  "searchPlatformAlibabaglobal": "国际站",
+  "searchPlatformYiwugo": "义乌市场",
+  "searchPlatformChinagoods": "小商品城",
+  "sayAnything": "想说什么尽管说",
+  "enterTheKeyword": "请输入关键字",
+  "notSupportKeywordSearch": "不支持关键字搜索",
+  "filter": "筛选",
+  "reset": "重置",
+  "purchaseAssistFilterSort": "排序",
+  "purchaseAssistFilterPriceRange": "价格区间",
+  "purchaseAssistSortDefault": "默认",
+  "purchaseAssistSortPriceDesc": "按价格降序",
+  "purchaseAssistSortPriceAsc": "按价格升序",
+  "purchaseAssistMinPrice": "最低价",
+  "purchaseAssistMaxPrice": "最高价",
+  "purchaseAssistEnterMinPrice": "请输入最小值",
+  "purchaseAssistEnterMaxPrice": "请输入最大值"
+}

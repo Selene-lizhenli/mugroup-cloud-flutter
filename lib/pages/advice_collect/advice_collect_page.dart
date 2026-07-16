@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/advice_collect/provider/provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/models/advice_collect/advice_collect_item.dart';
@@ -45,6 +46,7 @@ class AdviceCollectPage extends HookConsumerWidget {
     final paddingTop = MediaQuery.of(context).padding.top;
     final notifier = ref.read(adviceCollectProvider.notifier);
     final bookListMyself = state.bookListMyself ?? [];
+    final l10n = context.l10n;
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,7 +60,7 @@ class AdviceCollectPage extends HookConsumerWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('留言板'),
+        title: Text(l10n.featureAdviceCollect),
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [

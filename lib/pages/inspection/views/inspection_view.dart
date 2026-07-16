@@ -1,9 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/hooks/useEasyRefreshController/hook.dart';
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/pages/inspection/const.dart';
+import 'package:cloud/pages/inspection/providers/inspection_detail_provider.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_card.dart';
-import 'package:cloud/pages/widgets/confirm_dialog.dart';
-import 'package:cloud/pages/widgets/search_bar.dart';
+import 'package:cloud/pages/inspection/widgets/select_template_dialog.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/pages/widgets/search_bar_white.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -26,17 +29,20 @@ class InspectionView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final notifier = ref.read(inspectionDetailProvider.notifier);
     final refreshController = useEasyRefreshController(
       controlFinishLoad: true,
       controlFinishRefresh: true,
     );
-
+    final templateKeys = ref.watch(
+      inspectionDetailProvider.select((s) => s.templateKeys),
+    );
     final searchController = useTextEditingController();
     final search = useState<String?>(null);
     final filterDate = useState<DateTime?>(null);
-
     final page = useRef(1);
-    final inspections = useState<List<Inspection>>([]);
+    final inspectionsList = useState<List<Inspection>>([]);
+    final isLoading = useState<bool>(false);
 
     String? getCreatedMonth() {
       final date = filterDate.value;
@@ -55,38 +61,44 @@ class InspectionView extends HookConsumerWidget {
 
     Future<void> fetchPage({required bool init}) async {
       if (init) {
+        isLoading.value = true;
         page.value = 1;
-        inspections.value = [];
+        inspectionsList.value = [];
       }
-
-      final resp = await getInspections(
-        queryParameters: {
-          'search': search.value,
-          'page': page.value,
-          'pageSize': pageSize,
-          'created_month': getCreatedMonth(),
-        },
-      );
-
-      if (init) {
-        inspections.value = resp.data;
-      } else {
-        inspections.value = [...inspections.value, ...resp.data];
-      }
-
-      if (resp.data.isNotEmpty) {
-        page.value++;
-      }
-
-      if (init) {
-        refreshController.finishRefresh();
-        refreshController.resetFooter();
-      } else {
-        refreshController.finishLoad(
-          resp.data.length >= pageSize
-              ? IndicatorResult.success
-              : IndicatorResult.noMore,
+      try {
+        final resp = await getInspections(
+          queryParameters: {
+            'search': search.value,
+            'page': page.value,
+            'pageSize': pageSize,
+            'created_month': getCreatedMonth(),
+          },
         );
+
+        if (init) {
+          inspectionsList.value = resp.data;
+        } else {
+          inspectionsList.value = [...inspectionsList.value, ...resp.data];
+        }
+
+        if (resp.data.isNotEmpty) {
+          page.value++;
+        }
+
+        if (init) {
+          refreshController.finishRefresh();
+          refreshController.resetFooter();
+        } else {
+          refreshController.finishLoad(
+            resp.data.length >= pageSize
+                ? IndicatorResult.success
+                : IndicatorResult.noMore,
+          );
+        }
+      } catch (e) {
+        refreshController.finishLoad(IndicatorResult.fail);
+      } finally {
+        isLoading.value = false;
       }
     }
 
@@ -124,11 +136,95 @@ class InspectionView extends HookConsumerWidget {
     }
 
     useEffect(() {
-      setRefreshFn?.call(() async {
-        await refreshController.callRefresh();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        notifier.loadTemplateKeys();
       });
+
       return null;
     }, []);
+
+    useEffect(() {
+      setRefreshFn?.call(() async {
+        await fetchPage(init: true);
+      });
+      Future.microtask(() => fetchPage(init: true));
+      return null;
+    }, []);
+
+    // 点击某个验货列表的事件
+    handleInspectionCardTap(inspection) async {
+      final inspectionId = inspection.id;
+      if (inspectionId == null) return;
+
+      final shouldShowTemplateDialog =
+          inspection.inspectionDynamicTemplateId == null;
+
+      // --------------------------
+      // 情况1：已经有模板 → 直接跳转
+      // --------------------------
+      if (!shouldShowTemplateDialog) {
+        if (context.mounted) {
+          await context.router.push(
+            InspectionDetailRoute(id: inspectionId),
+          );
+          if (context.mounted) {
+            await fetchPage(init: true);
+          }
+        }
+        return;
+      }
+
+      if (context.mounted) {
+        final Map<String, dynamic>? templateData;
+        if (templateKeys.isEmpty) {
+          // --------------------------
+          // 情况2：未选模板 → 动态模板空  必须先选，选完才跳转
+          // --------------------------
+          templateData =
+              Map<String, dynamic>.from(inspectionGroupBasicTemplate);
+        } else {
+          // --------------------------
+          // 情况3：未选模板 → 动态模板不为空 必须先选，选完才跳转
+          // --------------------------
+
+          templateData = await showDialog<Map<String, dynamic>>(
+            context: context,
+            barrierDismissible: true,
+            builder: (dialogContext) {
+              return const SelectTemplateDialog();
+            },
+          );
+        }
+
+        // --------------------------
+        // 关键：只有选中模板，才跳转详情页
+        // --------------------------
+        if (templateData != null) {
+          final templateValue = templateData['value'];
+          try {
+            await updateInspectionTask(
+              inspectionId,
+              {
+                'inspection_dynamic_template_id': templateValue is int
+                    ? templateValue
+                    : int.tryParse(templateValue?.toString() ?? '') ??
+                        templateValue,
+              },
+            );
+            if (!context.mounted) return;
+            await context.router.push(
+              InspectionDetailRoute(id: inspectionId),
+            );
+            if (context.mounted) {
+              await fetchPage(init: true);
+            }
+          } catch (e) {
+            EasyLoading.showError('绑定验货任务失败');
+          }
+        }
+      }
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -137,7 +233,7 @@ class InspectionView extends HookConsumerWidget {
       clipBehavior: Clip.hardEdge,
       child: EasyRefresh(
         controller: refreshController,
-        refreshOnStart: true,
+        refreshOnStart: false,
         onRefresh: () async {
           try {
             await fetchPage(init: true);
@@ -159,10 +255,13 @@ class InspectionView extends HookConsumerWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: MuSearchBar(
+                        child: MuSearchBarWhite(
                           controller: searchController,
                           hintText: '搜索产品编码/名称',
+                          hintTextColor: colorScheme.outline,
                           buttonText: '搜索',
+                          fillColor: colorScheme.surface.withOpacity(0.8),
+                          showButton: false,
                           onSearch: (value) async {
                             search.value = value;
                             await fetchPage(init: true);
@@ -237,9 +336,16 @@ class InspectionView extends HookConsumerWidget {
                     ],
                   ),
                 ),
-
-                // const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                if (inspections.value.isEmpty)
+                if (isLoading.value == true)
+                  const SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: MuProgressIndicator(
+                        showText: true,
+                      ),
+                    ),
+                  )
+                else if (inspectionsList.value.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
@@ -258,34 +364,12 @@ class InspectionView extends HookConsumerWidget {
                     sliver: SliverMasonryGrid.count(
                       crossAxisCount: 1,
                       mainAxisSpacing: 0,
-                      childCount: inspections.value.length,
+                      childCount: inspectionsList.value.length,
                       itemBuilder: (context, index) {
-                        final inspection = inspections.value[index];
+                        final inspection = inspectionsList.value[index];
                         return InspectionCard(
                           inspection: inspection,
-                          onTap: () {
-                            context.router.push(
-                              InspectionDetailRoute(id: inspection.id!),
-                            );
-                          },
-                          onDelete: () async {
-                            if (inspection.items!.isNotEmpty) {
-                              await ConfirmDialog.show(
-                                context,
-                                content: '该记录下有验货任务，禁止删除!',
-                              );
-                              return;
-                            }
-                            final bool isConfirmed = await ConfirmDialog.show(
-                              context,
-                              content: '确定要删除验货任务${inspection.name}？',
-                            );
-                            if (isConfirmed) {
-                              await deleteInspection(inspection.id!);
-                              EasyLoading.showSuccess('删除成功');
-                              await refreshController.callRefresh();
-                            }
-                          },
+                          onTap: () => handleInspectionCardTap(inspection),
                           onRefresh: () async {
                             await refreshController.callRefresh();
                           },

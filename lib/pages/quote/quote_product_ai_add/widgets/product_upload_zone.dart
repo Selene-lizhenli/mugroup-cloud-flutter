@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProductUploadZone extends HookConsumerWidget {
   final Function(File file) onFileSelected;
@@ -54,9 +55,17 @@ class ProductUploadZone extends HookConsumerWidget {
           name: "拍摄照片",
           callback: (_) async {
             Navigator.pop(context);
-            final entity = await CameraPicker.pickFromCamera(context);
-            final file = await entity?.file;
-            if (file != null) onFileSelected(file);
+
+            final picker = ImagePicker(); 
+            final XFile? photo = await picker.pickImage(
+              source: ImageSource.camera,
+              imageQuality: 100, // 避免系统插件再压缩
+              preferredCameraDevice: CameraDevice.rear,
+            );
+
+            if (photo != null) {
+              onFileSelected(File(photo.path));
+            }
           },
         ),
         FlanActionSheetAction(
@@ -131,13 +140,10 @@ class ProductUploadZone extends HookConsumerWidget {
 
   /// 连拍跳转逻辑
   Future<void> _handleContinuous(BuildContext context) async {
-    final cameras = await availableCameras();
-    if (cameras.isEmpty) return;
-
     final List<XFile>? result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ContinuousCameraPage(cameras: cameras)),
+          builder: (context) => const ContinuousCameraPage()),
     );
 
     if (result != null) {
@@ -148,14 +154,10 @@ class ProductUploadZone extends HookConsumerWidget {
   }
 
   Future<void> _handleProductContinuous(BuildContext context) async {
-    final cameras = await availableCameras();
-    if (cameras.isEmpty) return;
-
     final dynamic result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              ContinuousCameraPage(cameras: cameras, isMain: true)),
+          builder: (context) => const ContinuousCameraPage(isMain: true)),
     );
 
     if (result != null && result is List) {

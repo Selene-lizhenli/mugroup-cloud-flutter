@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/single_station/single_station_products.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -17,13 +18,26 @@ class StationProductCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final isZh = Localizations.localeOf(context).languageCode.startsWith('zh');
 
     final Sample? sample = item.showroomSample;
     final int? sampleId = sample?.id ?? item.sampleId;
 
-    final nameCn = useMemoized(
-      () => sample?.nameCn ?? sample?.nameEn ?? '—',
-      [sample?.nameCn, sample?.nameEn],
+    final displayName = useMemoized(
+      () {
+        final cn = sample?.nameCn?.trim();
+        final en = sample?.nameEn?.trim();
+        if (isZh) {
+          if (cn != null && cn.isNotEmpty) return cn;
+          if (en != null && en.isNotEmpty) return en;
+        } else {
+          if (en != null && en.isNotEmpty) return en;
+          if (cn != null && cn.isNotEmpty) return cn;
+        }
+        return '—';
+      },
+      [sample?.nameCn, sample?.nameEn, isZh],
     );
 
     final catalog = useMemoized(
@@ -107,7 +121,7 @@ class StationProductCard extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      nameCn,
+                      displayName,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -118,13 +132,13 @@ class StationProductCard extends HookWidget {
                     ),
                     const SizedBox(height: 6),
                     _MetaLine(
-                      label: '目录',
+                      label: l10n.stationProductCatalogLabel,
                       value: catalog,
                       colorScheme: colorScheme,
                     ),
                     const SizedBox(height: 4),
                     _MetaLine(
-                      label: '采购单价',
+                      label: l10n.stationProductPurchaseUnitPrice,
                       value: purchaseCost,
                       colorScheme: colorScheme,
                     ),

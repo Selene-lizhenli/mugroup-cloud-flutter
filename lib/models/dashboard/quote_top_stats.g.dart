@@ -12,6 +12,7 @@ _$QuoteTopStatsImpl _$$QuoteTopStatsImplFromJson(Map<String, dynamic> json) =>
       sampleId: (json['sample_id'] as num?)?.toInt(),
       count: (json['count'] as num?)?.toInt(),
       sampleName: json['sample_name'] as String?,
+      sampleNameEn: json['sample_name_en'] as String?,
       id: (json['id'] as num?)?.toInt(),
       thumbUrl: json['thumb_url'] as String?,
     );
@@ -22,6 +23,7 @@ Map<String, dynamic> _$$QuoteTopStatsImplToJson(_$QuoteTopStatsImpl instance) =>
       'sample_id': instance.sampleId,
       'count': instance.count,
       'sample_name': instance.sampleName,
+      'sample_name_en': instance.sampleNameEn,
       'id': instance.id,
       'thumb_url': instance.thumbUrl,
     };

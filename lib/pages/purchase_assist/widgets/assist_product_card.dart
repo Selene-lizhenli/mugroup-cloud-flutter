@@ -1,26 +1,34 @@
- 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud/models/purchase_assist/purchase_assist.dart'; 
-import 'package:flutter/material.dart'; 
+import 'package:cloud/models/purchase_assist/purchase_assist.dart';
+import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AssistProductCard extends StatelessWidget {
+class AssistProductCard extends HookConsumerWidget {
   final PurchaseAssistSearchProduct sample;
 
   final GestureTapCallback? onTap;
 
   final int? cartCount;
+  final String platformType;
 
   const AssistProductCard({
     super.key,
     required this.sample,
+    required this.platformType,
     this.onTap,
     this.cartCount,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
- 
+    final quotationInfo =
+        ref.watch(cartProvider.select((state) => state.quotationInfo));
+    final showPrice = quotationInfo?.showPrice ?? false;
+    final shouldShowPrice =
+        sample.price != null && (platformType != 'cloud' || showPrice);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: GestureDetector(
@@ -73,12 +81,12 @@ class AssistProductCard extends StatelessWidget {
                     // 价格
                     Row(
                       children: [
-                        if (sample.price != null)
+                        if (shouldShowPrice)
                           RichText(
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text: '¥',
+                                  text: "¥",
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: colorScheme.secondary,

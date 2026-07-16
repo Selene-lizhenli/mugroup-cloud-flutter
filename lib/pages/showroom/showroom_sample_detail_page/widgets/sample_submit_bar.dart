@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
@@ -14,13 +15,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SampleSubmitBar extends HookConsumerWidget {
   final Sample? sample;
-  const SampleSubmitBar({super.key, this.sample});
+  final String? xTenantId;
+  const SampleSubmitBar({super.key, this.sample, this.xTenantId});
 
   void _handleSupplierTap(BuildContext context) {
+    final l10n = context.l10n;
     final quotes = sample?.supplyQuotes ?? [];
 
     if (quotes.isEmpty) {
-      EasyLoading.showInfo("暂无供应商信息");
+      EasyLoading.showInfo(l10n.showroomNoSupplierInfo);
       return;
     }
 
@@ -36,7 +39,7 @@ class SampleSubmitBar extends HookConsumerWidget {
     final uniqueSuppliers = uniqueSuppliersMap.values.toList();
 
     if (uniqueSuppliers.isEmpty) {
-      EasyLoading.showError("未找到有效供应商");
+      EasyLoading.showError(l10n.showroomNoValidSupplier);
     } else if (uniqueSuppliers.length == 1) {
       _navigateToSupplier(context, uniqueSuppliers.first);
     } else {
@@ -65,7 +68,8 @@ class SampleSubmitBar extends HookConsumerWidget {
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
       ),
-      builder: (context) {
+      builder: (sheetContext) {
+        final l10n = sheetContext.l10n;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -82,10 +86,10 @@ class SampleSubmitBar extends HookConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const SizedBox(width: 24),
-                    const Text(
-                      '请选择供应商',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Text(
+                      l10n.quoteSelectSupplier,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.grey),
@@ -125,7 +129,7 @@ class SampleSubmitBar extends HookConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 16.0),
                             child: Text(
-                              supplier.name ?? "未知供应商",
+                              supplier.name ?? l10n.quoteUnknownSupplier,
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
@@ -231,6 +235,7 @@ class SampleSubmitBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final cart = ref.read(cartProvider.notifier);
     final cartState = ref.watch(cartProvider);
@@ -248,7 +253,9 @@ class SampleSubmitBar extends HookConsumerWidget {
     final itemType = sample?.itemType;
 
     if (itemType == 'sample') {
-      canEdit = permissions.contains('showroom.sample.update');
+      //xTenantId是前端自定义的字段，如果有值表示是保密样品件的样品
+      canEdit =
+          permissions.contains('showroom.sample.update') && xTenantId == null;
     } else if (itemType == 'market_product') {
       canEdit = permissions.contains('showroom.market_product.update');
     }
@@ -262,13 +269,13 @@ class SampleSubmitBar extends HookConsumerWidget {
           children: [
             FlanActionBarIcon(
               iconName: FlanIcons.shop_o,
-              text: '供应商',
+              text: l10n.showroomSupplier,
               onClick: () => _handleSupplierTap(context),
             ),
             FlanActionBarIcon(
               key: cartIconKey,
               iconName: FlanIcons.cart_o,
-              text: '选样车',
+              text: l10n.samplesCart,
               badge: showBadge ? badgeCount : '',
               onClick: () {
                 context.router.push(const CartRoute());
@@ -277,7 +284,7 @@ class SampleSubmitBar extends HookConsumerWidget {
             if (canEdit)
               FlanActionBarButton(
                 type: FlanButtonType.danger,
-                text: '编辑样品',
+                text: l10n.showroomEditSample,
                 color: colorScheme.secondary,
                 onClick: () {
                   if (sample?.id != null) {
@@ -289,7 +296,7 @@ class SampleSubmitBar extends HookConsumerWidget {
             FlanActionBarButton(
               key: updateButtonKey,
               type: FlanButtonType.warning,
-              text: '加入选样车',
+              text: l10n.showroomAddToCart,
               color: colorScheme.primary,
               onClick: () async {
                 final currentSample = sample;

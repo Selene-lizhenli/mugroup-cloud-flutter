@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/hooks/hooks.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/samples/events/search_event.dart';
@@ -125,8 +125,7 @@ class ProductView extends HookConsumerWidget {
               refreshController.resetFooter();
             }
           },
-          onLoad: () async {
-            logger.d('xialajiazaigengduo0');
+          onLoad: () async { 
             try {
               final resp = await homeNotifier.fetchSamples(
                 searchText: home.search,
@@ -148,7 +147,7 @@ class ProductView extends HookConsumerWidget {
                   Container(
                     height: 0,
                   ),
-                  if (home.facetCounts.isNotEmpty && home.isDetailedMode)
+                  if (home.facetCounts.isNotEmpty)
                     SliverPinnedHeader(
                       child: ProductDropdownMenu(
                         facetCounts: home.facetCounts,
@@ -166,7 +165,7 @@ class ProductView extends HookConsumerWidget {
                       hasScrollBody: false,
                       child: Center(
                         child: Text(
-                          '暂无数据',
+                          context.l10n.noData,
                           style: TextStyle(
                             color: colorScheme.surfaceContainerHighest,
                             fontSize: 16,
@@ -194,6 +193,7 @@ class ProductView extends HookConsumerWidget {
                           context.router.push(ShowroomSampleViewerRoute(
                               initialIds: allIds,
                               initialIndex: index,
+                              xTenantId: sample.xTenantId,
                               onLoadMore: (page) async {
                                 final resp = await homeNotifier.fetchSamples(
                                   searchText: home.search,

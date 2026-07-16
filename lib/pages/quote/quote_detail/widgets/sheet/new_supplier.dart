@@ -26,8 +26,15 @@ class AddSupplierSheet extends HookConsumerWidget {
     // 状态定义
     final supplierName = useState('');
     final shopNumber = useState('');
+    final contact = useState('');
+    final contactPhone = useState('');
+    final contactPhoneField = useState('phone');
+    final contactEmail = useState('');
     final businessCard = useState<List<TemporaryMedia>>([]);
     final selectedSupplierId = useState<String?>(null);
+
+    final recognizedSupplierData =
+        useState<Map<String, dynamic>?>(null); // 保存识别接口返回的完整数据
 
     // 联想搜索状态
     final searchResults = useState<List<dynamic>>([]);
@@ -36,7 +43,17 @@ class AddSupplierSheet extends HookConsumerWidget {
     // 焦点与滚动控制
     final supplierNameFocus = useFocusNode();
     final shopNumberFocus = useFocusNode();
+    final contactFocus = useFocusNode();
+    final contactPhoneFocus = useFocusNode();
+    final contactEmailFocus = useFocusNode();
     final mainScrollController = useScrollController();
+
+    // 为每个输入框创建 GlobalKey
+    final supplierNameKey = useMemoized(() => GlobalKey());
+    final shopNumberKey = useMemoized(() => GlobalKey());
+    final contactKey = useMemoized(() => GlobalKey());
+    final contactPhoneKey = useMemoized(() => GlobalKey());
+    final contactEmailKey = useMemoized(() => GlobalKey());
 
     // 环境信息
     final mediaQuery = MediaQuery.of(context);
@@ -44,15 +61,142 @@ class AddSupplierSheet extends HookConsumerWidget {
     final keyboardHeight = mediaQuery.viewInsets.bottom;
     final isKeyboardOpen = keyboardHeight > 0;
 
+    // 智能滚动到指定输入框
+    void scrollToWidget(GlobalKey widgetKey) {
+      if (!mainScrollController.hasClients) return;
+
+      Future.delayed(const Duration(milliseconds: 50), () {
+        try {
+          final RenderBox? renderBox =
+              widgetKey.currentContext?.findRenderObject() as RenderBox?;
+          if (renderBox == null) return;
+
+          // 获取输入框在屏幕中的位置
+          final position = renderBox.localToGlobal(Offset.zero);
+          final boxHeight = renderBox.size.height;
+
+          // 计算可见区域高度（屏幕高度 - 键盘高度 - 安全区域）
+          final visibleHeight = screenHeight - keyboardHeight - 20;
+
+          // 如果输入框底部超出可见区域，需要滚动
+          if (position.dy + boxHeight > visibleHeight) {
+            // 计算需要滚动的偏移量
+            final offset = position.dy + boxHeight - visibleHeight + 80;
+
+            // 获取当前滚动位置
+            final currentOffset = mainScrollController.offset;
+            final maxOffset = mainScrollController.position.maxScrollExtent;
+
+            // 计算目标滚动位置
+            var targetOffset = currentOffset + offset;
+            // 确保不超出最大滚动范围
+            if (targetOffset > maxOffset) {
+              targetOffset = maxOffset;
+            }
+
+            mainScrollController.animateTo(
+              targetOffset,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOut,
+            );
+          }
+        } catch (e) {
+          // 如果获取位置失败，回退到滚动到底部
+          mainScrollController.animateTo(
+            mainScrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
+
+    // 获取当前焦点的输入框 Key
+    GlobalKey? getCurrentFocusKey() {
+      if (supplierNameFocus.hasFocus) return supplierNameKey;
+      if (shopNumberFocus.hasFocus) return shopNumberKey;
+      if (contactFocus.hasFocus) return contactKey;
+      if (contactPhoneFocus.hasFocus) return contactPhoneKey;
+      if (contactEmailFocus.hasFocus) return contactEmailKey;
+      return null;
+    }
+
+    // 监听焦点变化，智能滚动
+    useEffect(() {
+      void listener() {
+        final focusKey = getCurrentFocusKey();
+        if (focusKey != null) {
+          scrollToWidget(focusKey);
+        }
+      }
+
+      final focusNodes = [
+        supplierNameFocus,
+        shopNumberFocus,
+        contactFocus,
+        contactPhoneFocus,
+        contactEmailFocus,
+      ];
+
+      for (final node in focusNodes) {
+        node.addListener(listener);
+      }
+
+      return () {
+        for (final node in focusNodes) {
+          node.removeListener(listener);
+        }
+      };
+    }, [
+      supplierNameFocus,
+      shopNumberFocus,
+      contactFocus,
+      contactPhoneFocus,
+      contactEmailFocus,
+    ]);
+
+    // 监听键盘弹出，智能滚动到当前焦点输入框
+    useEffect(() {
+      if (isKeyboardOpen) {
+        final focusKey = getCurrentFocusKey();
+        if (focusKey != null) {
+          scrollToWidget(focusKey);
+        }
+      }
+      return null;
+    }, [keyboardHeight]);
+
     // 处理选中逻辑（模型对象转 Map）
     void handleSelectFromModel(dynamic model) {
       selectedSupplierId.value = model.id?.toString();
       supplierName.value = model.name ?? '';
       shopNumber.value = model.stallAddress ?? '';
+
+      final contacts = model.contacts;
+      if (contacts is List && contacts.isNotEmpty) {
+        final firstContact = contacts.first;
+        if (firstContact is Map) {
+          contact.value = firstContact['name']?.toString() ?? '';
+          contactPhone.value = firstContact['phone']?.toString() ?? '';
+          contactPhoneField.value = 'phone';
+          contactEmail.value = firstContact['email']?.toString() ?? '';
+        } else if (firstContact != null) {
+          contact.value = firstContact.name?.toString() ?? '';
+          contactPhone.value = firstContact.phone?.toString() ?? '';
+          contactPhoneField.value = 'phone';
+          contactEmail.value = firstContact.email?.toString() ?? '';
+        }
+      } else {
+        contact.value = '';
+        contactPhone.value = '';
+        contactPhoneField.value = 'phone';
+        contactEmail.value = '';
+      }
+
       searchResults.value = [];
       FocusScope.of(context).unfocus();
     }
- 
+
     // 防抖搜索逻辑
     useEffect(() {
       Timer? debounce;
@@ -82,27 +226,6 @@ class AddSupplierSheet extends HookConsumerWidget {
       return () => debounce?.cancel();
     }, [supplierName.value]);
 
-    void forceScrollToBottom() {
-      Future.delayed(const Duration(milliseconds: 350), () {
-        if (mainScrollController.hasClients) {
-          mainScrollController.animateTo(
-            mainScrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-    }
-
-    useEffect(() {
-      void listener() {
-        if (shopNumberFocus.hasFocus) forceScrollToBottom();
-      }
-
-      shopNumberFocus.addListener(listener);
-      return () => shopNumberFocus.removeListener(listener);
-    }, [shopNumberFocus]);
-
     void onSubmit() async {
       if (supplierName.value.trim().isEmpty) {
         supplierNameFocus.requestFocus();
@@ -122,8 +245,48 @@ class AddSupplierSheet extends HookConsumerWidget {
           'name': supplierName.value.trim(),
           'collection_name': "bussiness_card",
           'stall_address': shopNumber.value.trim(),
-          'item_type': "market"
+          'item_type': "market",
         };
+
+        // 将识别到的供应商其余字段（排除页面展示的名称和档口地址）传给服务器
+        final recognized = recognizedSupplierData.value;
+        final contactInfo = <String, dynamic>{
+          'name': contact.value.trim().isNotEmpty
+              ? contact.value.trim()
+              : recognized?['contact_name']?.toString().trim() ?? '',
+          'email': contactEmail.value.trim().isNotEmpty
+              ? contactEmail.value.trim()
+              : recognized?['email']?.toString().trim() ?? '',
+          if (recognized != null) ...{
+            'fax': recognized['fax']?.toString().trim() ?? '',
+            'myt': recognized['myt']?.toString().trim() ?? '',
+            'qq': recognized['qq']?.toString().trim() ?? '',
+            'wechat': recognized['wechat']?.toString().trim() ?? '',
+          },
+        }..removeWhere((_, value) => value.toString().isEmpty);
+
+        if (contactPhone.value.trim().isNotEmpty) {
+          contactInfo[contactPhoneField.value] = contactPhone.value.trim();
+        }
+        if (contactPhoneField.value == 'phone') {
+          final mobile = recognized?['mobile']?.toString().trim() ?? '';
+          if (mobile.isNotEmpty) {
+            contactInfo['mobile'] = mobile;
+          }
+        }
+
+        if (contactInfo.isNotEmpty) {
+          data['contacts'] = [contactInfo];
+        }
+
+        if (recognized != null) {
+          if (recognized['address'] != null) {
+            data['address'] = recognized['address'].toString().trim();
+          }
+          if (recognized['short_name'] != null) {
+            data['short_name'] = recognized['short_name'].toString().trim();
+          }
+        }
 
         if (businessCard.value.isNotEmpty) {
           data['images'] = businessCard.value
@@ -209,12 +372,32 @@ class AddSupplierSheet extends HookConsumerWidget {
                     recognizeApi: identifySupplierShopCard,
                     onRecognizeResult: (data) {
                       if (data != null && data is Map<String, dynamic>) {
+                        recognizedSupplierData.value =
+                            Map<String, dynamic>.from(data);
                         selectedSupplierId.value = null;
                         if (data['supplier_name'] != null) {
                           supplierName.value = data['supplier_name'].toString();
                         }
                         if (data['stall_address'] != null) {
                           shopNumber.value = data['stall_address'].toString();
+                        }
+                        if (data['contact_name'] != null) {
+                          contact.value = data['contact_name'].toString();
+                        }
+                        final phone = data['phone']?.toString().trim() ?? '';
+                        final mobile = data['mobile']?.toString().trim() ?? '';
+                        if (phone.isNotEmpty) {
+                          contactPhone.value = phone;
+                          contactPhoneField.value = 'phone';
+                        } else if (mobile.isNotEmpty) {
+                          contactPhone.value = mobile;
+                          contactPhoneField.value = 'mobile';
+                        } else {
+                          contactPhone.value = '';
+                          contactPhoneField.value = 'phone';
+                        }
+                        if (data['email'] != null) {
+                          contactEmail.value = data['email'].toString();
                         }
                       }
                     },
@@ -405,14 +588,52 @@ class AddSupplierSheet extends HookConsumerWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  Input(
-                    label: '店铺号',
-                    value: shopNumber.value,
-                    onChanged: (value) => shopNumber.value = value,
-                    focusNode: shopNumberFocus,
-                    hintText: '请输入店铺号',
+                  Container(
+                    key: shopNumberKey,
+                    child: Input(
+                      label: '店铺号',
+                      value: shopNumber.value,
+                      onChanged: (value) => shopNumber.value = value,
+                      focusNode: shopNumberFocus,
+                      hintText: '请输入店铺号',
+                    ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  Container(
+                    key: contactKey,
+                    child: Input(
+                      label: '联系人',
+                      value: contact.value,
+                      onChanged: (value) => contact.value = value,
+                      focusNode: contactFocus,
+                      hintText: '请输入联系人',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    key: contactPhoneKey,
+                    child: Input(
+                      label: '手机号',
+                      value: contactPhone.value,
+                      onChanged: (value) => contactPhone.value = value,
+                      focusNode: contactPhoneFocus,
+                      hintText: '请输入手机号',
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    key: contactEmailKey,
+                    child: Input(
+                      label: 'Email',
+                      value: contactEmail.value,
+                      onChanged: (value) => contactEmail.value = value,
+                      focusNode: contactEmailFocus,
+                      hintText: '请输入邮箱',
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
                   // 操作按钮
                   Row(

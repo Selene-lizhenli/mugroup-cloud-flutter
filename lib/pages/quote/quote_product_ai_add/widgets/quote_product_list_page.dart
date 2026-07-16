@@ -4,15 +4,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_add/quote_product_add_adaptive_page.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/constants/quote_ai_template_config.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/edit_dialog.dart';
+import 'package:cloud/pages/quote/widgets/customerAndSupplier.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/pages/widgets/image_uploader.dart';
-import 'package:cloud/pages/widgets/input.dart';
-import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
-import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
@@ -96,7 +93,7 @@ class QuoteProductListPage extends HookConsumerWidget {
 
         if (!context.mounted) return;
 
-        final List<dynamic> dataList = resp.data ?? [];
+        final List<dynamic> dataList = resp.data;
 
         final List<ProductDraftItem> mappedItems =
             dataList.map<ProductDraftItem>((e) {
@@ -192,15 +189,19 @@ class QuoteProductListPage extends HookConsumerWidget {
       final currentTabIndex = tabController.index;
 
       if (selectedSupplier.value == null) {
-        await _showPreSelectionSheet(
-          context,
-          selectedQuote,
-          selectedSupplier,
-          currentTabIndex: currentTabIndex,
-          onChanged: (quote, supplier) {
+        await showCustomerAndSupplierSheet(
+          context: context,
+          initialQuote: selectedQuote.value,
+          initialSupplier: selectedSupplier.value,
+          onConfirm: (quote, supplier) {
+            selectedQuote.value = quote;
+            selectedSupplier.value = supplier;
             onChanged?.call(quote, supplier);
           },
+          autoPushQuoteProductRoute: true,
+          initialTabIndex: currentTabIndex,
         );
+        return;
       }
       if (!context.mounted) return;
       if (selectedSupplier.value != null) {
@@ -345,6 +346,9 @@ class QuoteProductListPage extends HookConsumerWidget {
     ValueNotifier<Map<String, dynamic>?> selectedQuote,
   ) {
     const double rowHeight = 72.0;
+    
+    final imageUrl = item.media.url?.toString();
+    final thumbUrl = item.media.thumbUrl?.toString();
 
     int? parseId(dynamic v) {
       if (v == null) return null;
@@ -402,6 +406,36 @@ class QuoteProductListPage extends HookConsumerWidget {
       }
     }
 
+    Widget buildThumbImage(String? rawUrl) {
+      final thumbUrl = rawUrl?.toString();
+      final thumbUri = thumbUrl == null ? null : Uri.tryParse(thumbUrl);
+      final canLoad = thumbUri != null &&
+          (thumbUri.scheme == 'http' || thumbUri.scheme == 'https') &&
+          thumbUri.host.isNotEmpty;
+      if (!canLoad) {
+        return Image.asset(
+          'assets/icons/no_image.png',
+          fit: BoxFit.cover,
+        );
+      }
+      return Image.network(
+        thumbUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (c, e, s) => const Icon(
+          Icons.broken_image,
+          color: Colors.grey,
+        ),
+      );
+    }
+
+    bool canPreviewImage(String? rawUrl) {
+      final previewUrl = rawUrl?.toString();
+      final previewUri = previewUrl == null ? null : Uri.tryParse(previewUrl);
+      return previewUri != null &&
+          (previewUri.scheme == 'http' || previewUri.scheme == 'https') &&
+          previewUri.host.isNotEmpty;
+    }
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -420,8 +454,10 @@ class QuoteProductListPage extends HookConsumerWidget {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () =>
-                    showFlanImagePreview(context, images: [item.media.url]),
+                onTap: () {
+                  if (!canPreviewImage(imageUrl)) return;
+                  showFlanImagePreview(context, images: [imageUrl!]);
+                },
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: Container(
@@ -436,11 +472,7 @@ class QuoteProductListPage extends HookConsumerWidget {
                                 height: 16,
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2)))
-                        : Image.network(item.media.thumbUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (c, e, s) => const Icon(
-                                Icons.broken_image,
-                                color: Colors.grey)),
+                        : buildThumbImage(thumbUrl),
                   ),
                 ),
               ),
@@ -719,158 +751,6 @@ void showImageUploadSheet(BuildContext context, ProductDraftItem item,
         );
       });
     },
-  );
-}
-
-Future<void> _showPreSelectionSheet(
-    BuildContext context,
-    ValueNotifier<Map<String, dynamic>?> externalQuote,
-    ValueNotifier<Map<String, dynamic>?> externalSupplier,
-    {required int currentTabIndex,
-    required Function(
-            Map<String, dynamic>? quote, Map<String, dynamic>? supplier)
-        onChanged}) async {
-  String getSafeName(dynamic data, List<String> keys) {
-    if (data == null) return '';
-    if (data is Map) {
-      for (var key in keys) {
-        if (data[key] != null) return data[key].toString();
-      }
-    }
-    try {
-      final mapData = data.toJson();
-      for (var key in keys) {
-        if (mapData[key] != null) return mapData[key].toString();
-      }
-    } catch (e) {
-      if (keys.contains('name')) {
-        try {
-          return data.name.toString();
-        } catch (_) {}
-      }
-    }
-    return '';
-  }
-
-  await muShowModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    noBorder: true,
-    builder: (context) => HookConsumer(builder: (context, ref, child) {
-      // 【核心】：在弹窗内部维护临时选中的状态，不直接改外部
-      final tempQuote = useState<Map<String, dynamic>?>(externalQuote.value);
-      final tempSupplier =
-          useState<Map<String, dynamic>?>(externalSupplier.value);
-
-      final companyName = getSafeName(tempQuote.value?['company'], ['name']);
-      final supplierName =
-          getSafeName(tempSupplier.value, ['short_name', 'name']);
-
-      return Padding(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            top: 20,
-            left: 20,
-            right: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2))),
-            const Text("录入信息确认",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
-            GestureDetector(
-              onTap: () async {
-                final result = await showModalBottomSheet<Map<String, dynamic>>(
-                  context: context,
-                  isScrollControlled: true,
-                  useRootNavigator: true,
-                  backgroundColor: Colors.transparent,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-                  ),
-                  builder: (ctx) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(ctx).viewInsets.bottom,
-                      ),
-                      child: const QuoteSelect(),
-                    );
-                  },
-                );
-
-                if (result != null && context.mounted) {
-                  tempQuote.value = result; // 仅修改弹窗内预览
-                }
-              },
-              child: AbsorbPointer(
-                  child: Input(
-                      label: '对应客户',
-                      value: companyName,
-                      hintText: '请选择客户',
-                      showClearButton: false)),
-            ),
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () async {
-                final result = await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context,
-                    isScrollControlled: true,
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-                    ),
-                    builder: (context) => const AddSupplierSheet());
-
-                if (result != null && context.mounted) {
-                  tempSupplier.value = result; // 仅修改弹窗内预览
-                }
-              },
-              child: AbsorbPointer(
-                  child: Input(
-                      label: '所属供应商',
-                      isRequired: true,
-                      value: supplierName,
-                      hintText: '请选择供应商',
-                      showClearButton: false)),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12))),
-              onPressed: () {
-                if (tempSupplier.value != null) {
-                  onChanged(tempQuote.value, tempSupplier.value);
-
-                  if (tempSupplier.value != null) {
-                    final sId = tempSupplier.value?['id']?.toString();
-                    final qId = tempQuote.value?['id'];
-                    context.router.push(
-                        QuoteProductNewAddRoute(quoteId: qId, supplierId: sId));
-                  }
-                  Navigator.pop(context);
-                } else {
-                  EasyLoading.showInfo("请先选择供应商");
-                }
-              },
-              child: const Text("确定",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      );
-    }),
   );
 }
 

@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/theme_config.dart';
-import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/sample_quotation/providers/provider.dart';
 import 'package:cloud/pages/sample_quotation/widgets/basic_info_tab.dart';
 import 'package:cloud/pages/sample_quotation/widgets/share_drawer.dart';
 import 'package:cloud/pages/sample_quotation/widgets/station_samples_tab.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -52,29 +52,32 @@ class SampleQuoteDetailPage extends HookConsumerWidget {
     }, [effectiveId, id]);
 
     final data = id != null ? state.baseInfo : item;
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('报价单'),
+        title: Text(l10n.samplesQuotation),
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Image.asset(
-              "assets/icons/share.png",
-              width: 19,
-              fit: BoxFit.fitWidth,
-              alignment: Alignment.topRight,
-            ),
-            padding: EdgeInsets.zero,
-            onPressed: () => showQuotationDownloadSheet(
-              context: context,
-              item: data!,
-              dynamicTemplates: dynamicTemplates,
-              permissions: permissions,
-            ),
-          ),
-        ],
+        actions: data?.status == 'approved'
+            ? [
+                IconButton(
+                  icon: Image.asset(
+                    "assets/icons/download.png",
+                    width: 19,
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.topRight,
+                  ),
+                  padding: EdgeInsets.zero,
+                  onPressed: () => showQuotationDownloadSheet(
+                    context: context,
+                    item: data!,
+                    dynamicTemplates: dynamicTemplates,
+                    permissions: permissions,
+                  ),
+                )
+              ]
+            : [],
         backgroundColor: Colors.transparent,
       ),
       body: Stack(clipBehavior: Clip.none, children: [
@@ -103,8 +106,12 @@ class SampleQuoteDetailPage extends HookConsumerWidget {
                 child: TabBar(
                   controller: tabController,
                   tabs: [
-                    const Tab(text: '基本信息'),
-                    Tab(text: '样品明细 (${state.productsList.length})'),
+                    Tab(text: l10n.quoteBasicInfo),
+                    Tab(
+                      text: l10n.quoteSampleDetailsTab(
+                        data?.sumQty?.toString() ?? '',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -115,7 +122,7 @@ class SampleQuoteDetailPage extends HookConsumerWidget {
                     controller: tabController,
                     children: [
                       BasicInfoTab(item: data),
-                      const StationSamplesTab(),
+                      StationSamplesTab(quotationId: data?.id ?? effectiveId),
                     ],
                   ),
                 ),

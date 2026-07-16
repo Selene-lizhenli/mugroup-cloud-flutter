@@ -1,21 +1,18 @@
 import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/models/sample/quotation_sample.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/quote/quote_product_ai_add/widgets/quote_product_list_page.dart';
+import 'package:cloud/pages/quote/widgets/customerAndSupplier.dart';
 import 'package:cloud/pages/quote/widgets/quote_card.dart';
 import 'package:cloud/pages/quote/widgets/quote_search_bar.dart';
-import 'package:cloud/pages/widgets/input.dart';
-import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
-import 'package:cloud/pages/widgets/quote_select.dart';
 import 'package:cloud/providers/theme_provider.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:cloud/services/quotation_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +28,6 @@ class QuotePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     useAutomaticKeepAlive(wantKeepAlive: true);
-    final theme = Theme.of(context);
     final isPinkTheme = ref.watch(appThemeProvider) == ThemeType.pink;
     // --- 基础数据状态 ---
     final isLoading = useState(true);
@@ -53,11 +49,10 @@ class QuotePage extends HookConsumerWidget {
     final recordsDisplayCount = useState(2);
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
-    final lastSearch = useRef('');
 
     const String quoteCacheKey = 'cache_current_quote';
     const String supplierCacheKey = 'cache_selected_supplier';
-
+    final l10n = context.l10n;
 // 1. 初始化加载：从本地恢复数据
     useEffect(() {
       Future<void> restoreData() async {
@@ -139,7 +134,14 @@ class QuotePage extends HookConsumerWidget {
         final filtered = (resp.data)
             .where(
                 (s) => s.supplyQuote?.supplier?.id == selectedSupplierId.value)
-            .toList();
+            .toList()
+          ..sort((a, b) {
+            final aTime =
+                DateTime.tryParse(a.createdAt ?? '') ?? DateTime(1970);
+            final bTime =
+                DateTime.tryParse(b.createdAt ?? '') ?? DateTime(1970);
+            return bTime.compareTo(aTime);
+          });
 
         activeProducts.value = filtered;
       } catch (e) {
@@ -149,18 +151,9 @@ class QuotePage extends HookConsumerWidget {
       }
     }
 
-    // 搜索监听
     useEffect(() {
       fetchData();
-      void onSearchChanged() {
-        final current = searchController.text.trim();
-        if (current == lastSearch.value) return;
-        lastSearch.value = current;
-        fetchData();
-      }
-
-      searchController.addListener(onSearchChanged);
-      return () => searchController.removeListener(onSearchChanged);
+      return null;
     }, []);
 
     ref.listen(quotePageRefreshTrigger, (previous, next) async {
@@ -176,17 +169,31 @@ class QuotePage extends HookConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceTint,
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Positioned(
+          Positioned.fill(
+            top: 0,
             left: 0,
             right: 0,
-            top: 0,
-            height: paddingTop,
-            child:
-                Container(color: isPinkTheme ? colorScheme.surface : lightBlue),
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    isPinkTheme ? lightPink : lightBlue,
+                    const Color.fromARGB(255, 241, 241, 241),
+                    const Color.fromARGB(255, 241, 241, 241),
+                    const Color.fromARGB(255, 241, 241, 241),
+                    const Color.fromARGB(255, 241, 241, 241),
+                    const Color.fromARGB(255, 241, 241, 241),
+                  ],
+                ),
+              ),
+            ),
           ),
           Padding(
             padding: EdgeInsets.only(top: paddingTop),
@@ -205,31 +212,50 @@ class QuotePage extends HookConsumerWidget {
                 child: Column(
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                          color: isPinkTheme ? colorScheme.surface : lightBlue,
-                          boxShadow: [
-                            BoxShadow(
-                                color: colorScheme.onSurface.withOpacity(0.06),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4))
-                          ]),
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      padding: const EdgeInsets.fromLTRB(0, 6, 0, 7),
                       child: Column(
                         children: [
-                          Align(
-                            child: Text(
-                              '市场带客',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onSurface,
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(width: 18),
+                              SizedBox(
+                                width: 20,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () => context.router.maybePop(),
+                                  child: Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    size: 21,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const Spacer(),
+                              Text(
+                                l10n.dashboardMarketPurchase,
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const Spacer(),
+                              const SizedBox(width: 20),
+                            ],
                           ),
-                          QuoteSearchBar(controller: searchController),
+                          const SizedBox(height: 8),
+                          QuoteSearchBar(
+                            controller: searchController,
+                            onSearch: (_) => fetchData(),
+                          ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 2),
+                      padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
                       child: _buildSectionCard(
                         context,
                         title: "带客记录",
@@ -243,7 +269,8 @@ class QuotePage extends HookConsumerWidget {
                           onPressed: () =>
                               context.router.push(QuoteCreateRoute()),
                         ),
-                        backgroundColor: colorScheme.primary,
+                        backgroundColor:
+                            const Color.fromARGB(255, 188, 186, 166),
                         colorScheme: colorScheme,
                         content: _buildRecentRecordsContent(
                           context,
@@ -276,7 +303,8 @@ class QuotePage extends HookConsumerWidget {
                         icon: Icons.grid_view_rounded,
                         iconColor: Colors.purpleAccent,
                         iconSize: 24.0,
-                        backgroundColor: colorScheme.secondary,
+                        backgroundColor:
+                            const Color.fromARGB(255, 135, 135, 135),
                         colorScheme: colorScheme,
                         content: _buildProductAddSection(context, currentQuote,
                             selectedSupplier, colorScheme),
@@ -396,6 +424,7 @@ class QuotePage extends HookConsumerWidget {
               }, isGrey: true),
           ],
         ),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -630,48 +659,53 @@ class QuotePage extends HookConsumerWidget {
       required Color backgroundColor,
       required colorScheme,
       Widget? action}) {
+    const borderRadius = 16.0;
+    const borderWidth = 1.52;
+    const innerRadius = borderRadius - borderWidth;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.16)),
+      ),
+      padding: const EdgeInsets.all(borderWidth),
+      child: Container(
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white, width: 1.52),
-          boxShadow: [
-            BoxShadow(
-                color: colorScheme.onSurface.withOpacity(0.09),
-                blurRadius: 10,
-                offset: const Offset(0, 4))
-          ]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 62,
-            decoration: BoxDecoration(
-              color: backgroundColor.withOpacity(0.06),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+          borderRadius: BorderRadius.circular(innerRadius),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 62,
+              decoration: BoxDecoration(
+                color: backgroundColor.withOpacity(0.06),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(innerRadius),
+                  topRight: Radius.circular(innerRadius),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 12, 12, 10),
+              child: Row(
+                children: [
+                  Icon(icon, size: iconSize ?? 20, color: iconColor),
+                  const SizedBox(width: 8),
+                  title is Widget
+                      ? title
+                      : Text(title.toString(),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  if (action != null) action,
+                ],
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(16, 12, 12, 10),
-            child: Row(
-              children: [
-                Icon(icon, size: iconSize ?? 20, color: iconColor),
-                const SizedBox(width: 8),
-                title is Widget
-                    ? title
-                    : Text(title.toString(),
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                const Spacer(),
-                if (action != null) action,
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          content,
-        ],
+            const Divider(height: 1),
+            content,
+          ],
+        ),
       ),
     );
   }
@@ -682,19 +716,19 @@ class QuotePage extends HookConsumerWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(label,
                 style: TextStyle(
-                  color: isGrey ? Colors.grey : colorScheme.onSurface,
+                  color: isGrey ? Colors.grey : colorScheme.outline,
                   fontSize: 13,
                 )),
             Icon(
               icon,
               size: 18,
-              color: isGrey ? Colors.grey : colorScheme.onSurface,
+              color: isGrey ? Colors.grey : colorScheme.outline,
             ),
           ],
         ),
@@ -713,139 +747,13 @@ Future<void> _showPreSelectionSheet(
     BuildContext context,
     ValueNotifier<Map<String, dynamic>?> selectedQuote,
     ValueNotifier<Map<String, dynamic>?> selectedSupplier) async {
-  // 内部工具函数：安全解析名称，兼容 Map 和 Model 对象
-  String getSafeName(dynamic data, List<String> keys) {
-    if (data == null) return '';
-    if (data is Map) {
-      for (var key in keys) {
-        if (data[key] != null) return data[key].toString();
-      }
-    }
-    try {
-      if (keys.contains('name')) return data.name ?? '';
-      if (keys.contains('short_name')) return data.shortName ?? data.name ?? '';
-    } catch (_) {}
-    return '';
-  }
-
-  await muShowModalBottomSheet(
+  await showCustomerAndSupplierSheet(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    builder: (context) => HookConsumer(builder: (context, ref, child) {
-      final colorScheme = Theme.of(context).colorScheme;
-      final currentQuote = useValueListenable(selectedQuote);
-      final currentSupplier = useValueListenable(selectedSupplier);
-
-      // 提取解析后的显示值
-      final companyName = getSafeName(currentQuote?['company'], ['name']);
-      final supplierName = getSafeName(currentSupplier, ['short_name', 'name']);
-
-      return Padding(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            top: 20,
-            left: 20,
-            right: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 顶部横条指示器
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const Text("录入信息确认",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
-
-            // 客户选择
-            GestureDetector(
-              onTap: () async {
-                final result = await showModalBottomSheet<Map<String, dynamic>>(
-                  context: context,
-                  isScrollControlled: true,
-                  useRootNavigator: true,
-                  backgroundColor: Colors.transparent,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-                  ),
-                  builder: (ctx) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(ctx).viewInsets.bottom,
-                      ),
-                      child: const QuoteSelect(),
-                    );
-                  },
-                );
-
-                if (result != null) selectedQuote.value = result;
-              },
-              child: AbsorbPointer(
-                  child: Input(
-                label: '对应客户',
-                value: companyName,
-                hintText: '请选择客户',
-                showClearButton: false,
-              )),
-            ),
-            const SizedBox(height: 16),
-
-            // 供应商选择
-            GestureDetector(
-              onTap: () async {
-                final result = await showModalBottomSheet<Map<String, dynamic>>(
-                    context: context,
-                    isScrollControlled: true,
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
-                    ),
-                    builder: (context) => const AddSupplierSheet());
-
-                if (result != null) selectedSupplier.value = result;
-              },
-              child: AbsorbPointer(
-                  child: Input(
-                label: '所属供应商',
-                isRequired: true,
-                value: supplierName,
-                hintText: '请选择供应商',
-                showClearButton: false,
-              )),
-            ),
-            const SizedBox(height: 32),
-
-            // 确定按钮
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  backgroundColor: colorScheme.primary,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12))),
-              onPressed: () {
-                // 只有供应商是必填项，满足即可关闭
-                if (selectedSupplier.value != null) {
-                  Navigator.pop(context);
-                } else {
-                  EasyLoading.showInfo("请先选择供应商");
-                }
-              },
-              child: const Text("确定",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      );
-    }),
+    initialQuote: selectedQuote.value,
+    initialSupplier: selectedSupplier.value,
+    onConfirm: (quote, supplier) {
+      selectedQuote.value = quote;
+      selectedSupplier.value = supplier;
+    },
   );
 }

@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/dashboard_configs.dart';
+import 'package:cloud/pages/dashboard/dashboard_l10n_helper.dart';
 import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/chart_dimen_tips.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
@@ -51,22 +52,24 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     // 只取前9条数据
     final displayData = widget.data.take(9).toList();
     final isLoading = widget.isLoading;
-    final dimenLabel =
-        sampleDimensionConfigs[1]['label'] as String; //当前选中的维度的标签名字
+    final dimenLabel = context.dashboardSampleDimensionLabel(
+      sampleDimensionConfigs[0]['value'] as String,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 柱状图
         if (isLoading == true)
-          const SizedBox(
+          SizedBox(
             height: chartContainerHeight,
             child: Center(
-              child: MuProgressIndicator(showText: true, text: '加载中...'),
+              child: MuProgressIndicator(showText: true, text: l10n.loading),
             ),
           )
         else if (displayData.isEmpty)
@@ -74,7 +77,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             height: chartContainerHeight,
             child: Center(
               child: Text(
-                '暂无数据',
+                l10n.noData,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: colorScheme.outline,
                     ),
@@ -103,7 +106,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
             children: [
               Expanded(
                 child: Text(
-                  '$dimenLabel数据',
+                  l10n.dashboardDimensionData(dimenLabel),
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -120,7 +123,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isExpanded ? '收起' : '展开',
+                        _isExpanded ? l10n.dashboardCollapse : l10n.dashboardExpand,
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.primary,
@@ -175,7 +178,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Text(
-                        ' 查看完整榜单 ',
+                        l10n.dashboardViewFullRank,
                         style: TextStyle(
                             color: colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 11),
@@ -194,6 +197,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
   /// 构建柱状图
   Widget buildBarChart(BuildContext context, List<QuoteTopStats> displayData,
       String dimenLabel) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
 
     // 计算最大数量，用于设置纵轴最大值
@@ -215,7 +219,7 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
           return Stack(
             children: [
               ChartDimenTips(
-                label: '$dimenLabel',
+                label: dimenLabel,
               ),
               const SizedBox(height: 10),
               BarChart(
@@ -234,8 +238,10 @@ class _TopChartContentState extends State<QuoteTopChartContent> {
                         final item = displayData[groupIndex];
                         return BarTooltipItem(
                           '${item.sampleName ?? ''}\n'
-                          '编号: ${item.sampleNo ?? '未知'}\n'
-                          '数量: ${item.count ?? 0}',
+                          '${l10n.dashboardBarTooltip(
+                            item.sampleNo ?? l10n.dashboardUnknown,
+                            '${item.count ?? 0}',
+                          )}',
                           TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 10,

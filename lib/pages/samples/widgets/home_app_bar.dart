@@ -1,45 +1,11 @@
-
 import 'package:cloud/models/sample/media.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
-import 'package:cloud/pages/samples/widgets/home_media.dart'; 
-import 'package:cloud/services/media.dart';
-import 'package:flant/components/action_sheet.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'; 
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:cloud/pages/samples/widgets/home_media.dart';
+import 'package:cloud/widgets/common_home_app_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
-class HomeAppBarItem extends StatelessWidget {
-  final GestureTapCallback onTap;
-  final String text;
-  final bool active;
-
-  const HomeAppBarItem({
-    super.key,
-    required this.onTap,
-    required this.text,
-    required this.active,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: DefaultTextStyle(
-        style: active
-            ? const TextStyle(fontSize: 18, color: Colors.white)
-            : const TextStyle(fontSize: 16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(text),
-        ),
-      ),
-    );
-  }
-}
-
+ 
 class HomeAppBar extends HookConsumerWidget {
   final TextEditingController controller;
   final void Function(String search)? onSearchText;
@@ -56,185 +22,25 @@ class HomeAppBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
-    final focusNode = useFocusNode();
-    final colorScheme = Theme.of(context).colorScheme;
+    handleUploadMedia() => showHomeImageUploadSheet(
+          context,
+          onSearchMedia: onSearchMedia,
+        );
 
-    handleUploadMedia() async {
-      await showFlanActionSheet(
-        context,
-        cancelText: "取消",
-        actions: [
-          FlanActionSheetAction(
-            name: "拍摄",
-            callback: (action) async {
-              final AssetEntity? entity =
-                  await CameraPicker.pickFromCamera(context);
-
-              if (context.mounted) {
-                Navigator.of(context).maybePop();
-              }
-
-              if (entity == null) {
-                return;
-              }
-
-              final file = await entity.file;
-
-              final temporaryMedia = await upload(file: file!);
-
-              onSearchMedia?.call(temporaryMedia);
-            },
-          ),
-          FlanActionSheetAction(
-            name: "从手机相册选择",
-            callback: (action) async {
-              final List<AssetEntity>? result =
-                  await AssetPicker.pickAssets(context);
-
-              if (context.mounted) {
-                Navigator.of(context).maybePop();
-              }
-
-              if (result == null) {
-                return;
-              }
-
-              for (var entity in result) {
-                final file = await entity.file;
-
-                final temporaryMedia = await upload(file: file!);
-
-                onSearchMedia?.call(temporaryMedia);
-              }
-            },
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // 搜索输入框
-              Expanded(
-                child: Container(
-                  height: 36,
-                  padding: const EdgeInsets.only(left: 12, right: 0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: colorScheme.primary,
-                      width: 1,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      bottomLeft: Radius.circular(16),
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          autofocus: false,
-                          controller: controller,
-                          onTapOutside: (event) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          },
-                          style:const TextStyle(fontSize: 14 ),
-                          focusNode: focusNode,
-                          decoration: const InputDecoration.collapsed(
-                            hintStyle: TextStyle(fontSize:12),
-                            hintText: '',
-                          ),
-                          textInputAction: TextInputAction.search,
-                          onSubmitted: (value) {
-                            onSearchText?.call(value);
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: IconButton(
-                          icon: Icon(
-                            CupertinoIcons.camera,
-                            size: 26,
-                            color: colorScheme.outline,
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: handleUploadMedia,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        height: 36,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 0),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                bottomLeft: Radius.circular(0),
-                                topRight: Radius.circular(5),
-                                bottomRight: Radius.circular(5),
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            onSearchText?.call(controller.text);
-                          },
-                          child: Text(
-                            "搜索",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: colorScheme.onPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // const SizedBox(width: 8),
-
-              // // 购物车图标
-              // SizedBox(
-              //   width: 40,
-              //   height: 40,
-              //   child: IconButton(
-              //     icon: Icon(
-              //       Icons.shopping_cart,
-              //       size: 25,
-              //       color: colorScheme.primary,
-              //     ),
-              //     padding: EdgeInsets.zero,
-              //     onPressed: () {
-              //       context.router.push(const CartRoute());
-              //     },
-              //   ),
-              // ),
-            ],
-          ),
-        ),
-        if (home.currentMediaId != null)
-          HomeMedia(
-            media: home.media,
-            onTapUplod: handleUploadMedia,
-            currentMediaId: home.currentMediaId!,
-            onTapMedia: onSearchMedia,
-            onDeleteMedia: onDeleteMedia,
-          ),
-      ],
+    return CommonHomeAppBar(
+      controller: controller,
+      onSearchText: onSearchText,
+      onSearchMedia: onSearchMedia,
+      onTapUpload: handleUploadMedia,
+      bottom: home.currentMediaId != null
+          ? HomeMedia(
+              media: home.media,
+              onTapUplod: handleUploadMedia,
+              currentMediaId: home.currentMediaId!,
+              onTapMedia: onSearchMedia,
+              onDeleteMedia: onDeleteMedia,
+            )
+          : null,
     );
   }
 }

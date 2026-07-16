@@ -5,7 +5,7 @@ part 'config.g.dart';
 /// Build-time environment switch.
 /// - Dev/Test (default): uses `.env`
 /// - Production: uses `.env.cloud` by passing `--dart-define=IS_PROD=true`
-const bool kIsProdEnv = bool.fromEnvironment('IS_PROD', defaultValue: false);
+const bool kIsProdEnv = true;
 
 @Envied(
   path: '.env',

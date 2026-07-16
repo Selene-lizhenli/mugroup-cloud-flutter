@@ -205,7 +205,7 @@ class PurchaseAssistTaskListItem {
   });
 
   final int? id;
-  final String? platform;
+  final List? platform;
   final int? userId;
   final String? createdAt;
   final String? updatedAt;
@@ -216,10 +216,19 @@ class PurchaseAssistTaskListItem {
   final PurchaseAssistTaskSummary? summary;
   final List<PurchaseAssistTaskMediaItem>? media;
 
+  static List? _parsePlatform(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return [value];
+    if (value is List) {
+      return value;
+    }
+    return value;
+  }
+
   factory PurchaseAssistTaskListItem.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistTaskListItem(
       id: (json['id'] as num?)?.toInt(),
-      platform: json['platform'] as String?,
+      platform: _parsePlatform(json['platform']),
       userId: (json['user_id'] as num?)?.toInt(),
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
@@ -305,7 +314,7 @@ class PurchaseAssistTaskDetailItem {
 
   final int? id;
   final int? taskId;
-  final List<PurchaseAssistTaskResultProduct>? results;
+  final Map<String, List<PurchaseAssistTaskResultProduct>>? results;
   final String? status;
   final dynamic selectedItemId;
   final String? createdAt;
@@ -313,14 +322,35 @@ class PurchaseAssistTaskDetailItem {
   final PurchaseAssistTaskMediaItem? media;
   final String? productUrl;
 
+  static Map<String, List<PurchaseAssistTaskResultProduct>>? _parseResults(
+    dynamic value,
+  ) {
+    if (value == null) return null;
+    if (value is! Map) return null;
+
+    final result = <String, List<PurchaseAssistTaskResultProduct>>{};
+    final grouped = Map<String, dynamic>.from(value);
+    for (final entry in grouped.entries) {
+      final platform = entry.key;
+      final rawList = entry.value;
+      if (rawList is! List) continue;
+      final products = rawList
+          .whereType<Map>()
+          .map((e) => PurchaseAssistTaskResultProduct.fromJson(
+                Map<String, dynamic>.from(e),
+              ))
+          .toList();
+      result[platform] = products;
+    }
+
+    return result.isEmpty ? null : result;
+  }
+
   factory PurchaseAssistTaskDetailItem.fromJson(Map<String, dynamic> json) {
     return PurchaseAssistTaskDetailItem(
       id: _intFromJson(json['id']),
       taskId: _intFromJson(json['task_id']),
-      results: (json['results'] as List<dynamic>?)
-          ?.map((e) => PurchaseAssistTaskResultProduct.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      results: _parseResults(json['results']),
       status: json['status'] as String?,
       productUrl: json['product_url'] as String?,
       selectedItemId: json['selected_item_id'],

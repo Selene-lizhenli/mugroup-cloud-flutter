@@ -1,3 +1,5 @@
+import 'package:cloud/constants/core.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
@@ -7,10 +9,33 @@ import 'package:cloud/models/sample/category.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
+import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 const String warehousesIdField = "warehouse_id";
+
+/// 下拉筛选项面板内的加载占位（使用 [MuProgressIndicator]）。
+class MuLoading extends StatelessWidget {
+  const MuLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      height: 120,
+      width: double.infinity,
+      child: Center(
+        child: MuProgressIndicator(
+          showText: true,
+          text: context.l10n.loading,
+        ),
+      ),
+    );
+  }
+}
 
 class ProductDropdownMenu extends HookConsumerWidget {
   final List<FacetCount> facetCounts;
@@ -22,14 +47,16 @@ class ProductDropdownMenu extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final home = ref.watch(homeProvider);
     final query = home.query;
+    final currentSelectedWarehouse = home.currentSelectedWarehouse;
     final homeNotifier = ref.read(homeProvider.notifier);
     final supportFacet = {
-      "supplier_ids": "供应商",
-      "category_id": "产品分类",
-      "trade_country": "贸易国别",
-      warehousesIdField: "样品间",
+      "supplier_ids": l10n.samplesFilterSupplier,
+      "category_id": l10n.samplesFilterCategory,
+      "trade_country": l10n.samplesFilterTradeCountry,
+      warehousesIdField: l10n.samplesShowroom,
     };
     final menuOptions = {
       "supplier_ids": (multiple: true, optionsColumns: 1),
@@ -39,13 +66,14 @@ class ProductDropdownMenu extends HookConsumerWidget {
     };
     final suppliers = useState(<Supplier>[]);
     final categories = useState(<Category>[]);
+    final categoriesLoading = useState(false);
     final isMounted = useRef(true);
 
     List<TDDropdownItem> handleWarehouseDropdown(menus) {
       final home = ref.watch(homeProvider);
       final homeNotifier = ref.read(homeProvider.notifier);
       final warehouses = home.warehouses;
-      final currentSelectedWarehouse = home.currentSelectedWarehouse;
+
       final lable = supportFacet[warehousesIdField] ?? "";
       final option = menuOptions[warehousesIdField];
 
@@ -119,17 +147,31 @@ class ProductDropdownMenu extends HookConsumerWidget {
     }, []);
 
     final fetchCategories = useCallback(() async {
-      final resp = await getAllShowroomCategories();
+      if (!isMounted.value) return;
+      categoriesLoading.value = true;
+      try {
+        final wh = currentSelectedWarehouse;
+        final isPrivate = wh != null &&
+            wh.id != null &&
+            !PublicWarehouseId.ids.contains(wh.id);
 
-      // 只有在组件仍然 mounted 时才更新状态
-      if (isMounted.value) {
-        try {
-          categories.value = resp ?? [];
-        } catch (e) {
-          // 如果 ValueNotifier 已被 dispose，忽略错误
+        final resp = await getAllShowroomCategories(
+          xTenantId: isPrivate ? wh.tenantId : null,
+        );
+
+        if (isMounted.value) {
+          try {
+            categories.value = resp ?? [];
+          } catch (e) {
+            // 如果 ValueNotifier 已被 dispose，忽略错误
+          }
+        }
+      } finally {
+        if (isMounted.value) {
+          categoriesLoading.value = false;
         }
       }
-    }, []);
+    }, [currentSelectedWarehouse]);
 
     useEffect(() {
       final ids = facetCounts
@@ -150,9 +192,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
     }, [fetchSuppliers, facetCounts]);
 
     useEffect(() {
-      if (categories.value.isNotEmpty) {
-        return null;
-      }
       final categoryFacetCount = facetCounts.firstWhereOrNull(
           (facetCount) => facetCount.fieldName == "category_id");
 
@@ -163,7 +202,7 @@ class ProductDropdownMenu extends HookConsumerWidget {
       fetchCategories();
 
       return null;
-    }, [fetchCategories, facetCounts]);
+    }, [fetchCategories, facetCounts, currentSelectedWarehouse]);
 
     final menus = <TDDropdownItem>[];
     //添加样品间筛选项
@@ -181,6 +220,21 @@ class ProductDropdownMenu extends HookConsumerWidget {
 
       final isCategory = field == "category_id";
       final isSupplier = field == "supplier_ids";
+      final option = menuOptions[field];
+
+      if (isCategory && categoriesLoading.value) {
+        final baseLabel = supportFacet[field] ?? "";
+        menus.add(TDDropdownItem(
+          label: baseLabel,
+          multiple: option?.multiple ?? false,
+          optionsColumns: option?.optionsColumns ?? 1,
+          builder: (context, itemState, popupState) => const MuLoading(),
+          onChange: (_) {},
+          onConfirm: (_) {},
+          onReset: () {},
+        ));
+        continue;
+      }
 
       final currentQueryValues = query[field] as List? ?? [];
       if (!isCategory &&
@@ -188,8 +242,6 @@ class ProductDropdownMenu extends HookConsumerWidget {
           currentQueryValues.isEmpty) {
         continue;
       }
-
-      final option = menuOptions[field];
 
       final Set<String> selectStringValues =
           currentQueryValues.map((e) => e.toString()).toSet();

@@ -1,4 +1,5 @@
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/widgets/image_show.dart';
 import 'package:cloud/router/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class TopRankItemCard<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
 
     onTapDefault(item) {
@@ -58,18 +60,24 @@ class TopRankItemCard<T> extends StatelessWidget {
     Widget buildInfo(item) {
       try {
         final data = item;
+        final isZh =
+            Localizations.localeOf(context).languageCode.startsWith('zh');
+        final sampleName = isZh
+            ? (data.sampleName ?? data.sampleNameEn ?? ' ')
+            : (data.sampleNameEn ?? data.sampleName ?? ' ');
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              data.sampleName ?? ' ',
+              sampleName,
               style: showInpage == true
                   ? Theme.of(context).textTheme.bodyMedium?.copyWith()
                   : Theme.of(context).textTheme.bodySmall?.copyWith(),
             ),
             const SizedBox(height: 4),
             Text(
-              '样品编号: ${data.sampleNo ?? ' '}',
+              l10n.dashboardSampleNoLabel(data.sampleNo ?? ' '),
               style: TextStyle(
                 color: colorScheme.onSurface.withOpacity(0.72),
                 fontSize: 10,
@@ -80,7 +88,7 @@ class TopRankItemCard<T> extends StatelessWidget {
               children: [
                 if (type == 'ship') ...[
                   Text(
-                    '出货金额(CNY)：',
+                    l10n.dashboardShippingAmountCny,
                     style: TextStyle(
                       fontSize: 10,
                       color: colorScheme.onSurface.withOpacity(0.72),
@@ -94,13 +102,13 @@ class TopRankItemCard<T> extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const Text(
-                    ' 万人民币',
-                    style: TextStyle(fontSize: 10),
+                  Text(
+                    ' ${l10n.dashboardTenThousandRmb}',
+                    style: const TextStyle(fontSize: 10),
                   ),
                 ] else if (type == 'quote') ...[
                   Text(
-                    '报价次数：',
+                    l10n.dashboardQuoteCount,
                     style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.72),
                         fontSize: 10),
@@ -114,7 +122,7 @@ class TopRankItemCard<T> extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    ' 次',
+                    ' ${l10n.dashboardTimes}',
                     style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.72),
                         fontSize: 10),

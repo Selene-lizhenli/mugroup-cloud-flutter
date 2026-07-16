@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/app/app.dart'; 
+import 'package:cloud/app/app.dart';
 import 'package:cloud/pages/login/shared.dart';
 import 'package:cloud/pages/login/widgets/login_way.dart';
 import 'package:cloud/pages/login/widgets/login_content.dart';
@@ -37,11 +37,11 @@ class LoginPage extends HookConsumerWidget {
         onLogin!();
         return;
       }
-
-      // 默认跳转到首页
-      final router = AutoRouter.of(context);
-      router.replace(DashboardRoute());
-    }, [onLogin]);
+      // 清空路由栈并进入首页，避免登录后还能返回到登录页
+      AutoRouter.of(context).replaceAll([
+        Layout(children: [DashboardRoute()]),
+      ]);
+    }, []);
 
     final enableLoginWays = useMemoized(() {
       final tenantLoginWays = tenant?.loginWays ?? [];
@@ -270,8 +270,6 @@ class LoginPage extends HookConsumerWidget {
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text("网页版: https://cloud.mugroup.com"),
-                                      SizedBox(width: 10),
                                       Text("客服: $customerPhoneNumber"),
                                     ],
                                   ),

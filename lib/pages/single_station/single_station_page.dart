@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/constants/theme_config.dart'; 
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/single_station/provider/provider.dart';
 import 'package:cloud/pages/single_station/station/single_station_list.dart';
 import 'package:cloud/pages/widgets/search_bar.dart';
 import 'package:cloud/pages/widgets/theme_icon.dart';
-import 'package:cloud/router/router.gr.dart';
+import 'package:cloud/router/router.gr.dart'; 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,9 +18,12 @@ class SingleStationPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
 
+    final l10n = context.l10n;
     final searchController = useTextEditingController();
     final stationNotifier = ref.read(singleStationProvider.notifier);
     final state = ref.watch(singleStationProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
 
     final refreshController = useMemoized(
       () => EasyRefreshController(
@@ -45,8 +50,10 @@ class SingleStationPage extends HookConsumerWidget {
     final inquiriesMessageListLength = state.inquiriesMessageList.length;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('独立站'),
+        backgroundColor: Colors.transparent,
+        title: Text(l10n.featureIndependentWebsite),
         elevation: 0,
         actions: [
           Padding(
@@ -57,7 +64,7 @@ class SingleStationPage extends HookConsumerWidget {
                 MuThemeIcon(
                   iconType: 'message',
                   iconSize: 20,
-                  tooltip: "询盘消息",
+                  tooltip: l10n.stationInquiryMessages,
                   onPressed: () {
                     context.router.push(const InquiryMessageRoute());
                   },
@@ -96,23 +103,71 @@ class SingleStationPage extends HookConsumerWidget {
           ),
         ],
       ),
-      body: Column(
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: MuSearchBar(
-              controller: searchController,
-              hintText: '请输入标题进行搜索',
-              buttonText: '搜索',
-              onSearch: (search) {
-                final keyword = search ?? searchController.text;
-                stationNotifier.setStationSearchKeyword(keyword);
-                stationNotifier.load(params: {'name_cn': keyword});
-              },
+          Positioned(
+            right: 0,
+            left: 0,
+            top: 8,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    colorScheme.surface,
+                    Color.lerp(
+                      colorScheme.surfaceTint,
+                      colorScheme.surface,
+                      0.9,
+                    )!,
+                    colorScheme.surfaceTint,
+                  ],
+                  stops: const [0.0, 0.2, 1.0],
+                ),
+              ),
             ),
           ),
-          const Expanded(
-            child: SingleStationList(),
+          Positioned(
+            right: 0,
+            left: 0,
+            top: 8,
+            child: Image.asset(
+              'assets/photo/single_website.png',
+              fit: BoxFit.fitWidth,
+              width: MediaQuery.of(context).size.width * 0.5,
+              alignment: Alignment.topRight,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: paddingTop + appbarHeight, left: 0, right: 0),
+            child: Column(
+              children: [
+                // Text(l10n.featureIndependentWebsite, style: TextStyle(fontSize: 20,),),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: MuSearchBar(
+                    controller: searchController,
+                    hintText: "根据独立站名称搜索",
+                    buttonText: "搜索",
+                    onSearch: (search) {
+                      final keyword = search ?? searchController.text;
+                      stationNotifier.setStationSearchKeyword(keyword);
+                      stationNotifier.load(params: {'name_cn': keyword});
+                    },
+                  ),
+                ),
+                const SizedBox(height: 9),
+                const Expanded(
+                  child: SingleStationList(),
+                ),
+              ],
+            ),
           ),
         ],
       ),

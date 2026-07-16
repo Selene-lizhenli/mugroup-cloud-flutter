@@ -1,9 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/models/core.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/sample/sample_extensions.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:collection/collection.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/samples/samples_l10n_helper.dart';
 
 class ProductCardDetailed extends HookConsumerWidget {
   final Sample sample;
@@ -23,8 +29,10 @@ class ProductCardDetailed extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final itemTypeSpan = _buildItemTypeSpan(context);
-
+    final displayName =
+        sample.localizedName(preferChinese: samplesPreferChinese(context));
+    final itemTypeSpan = buildSampleItemTypeTextSpan(context, sample.itemType);
+    final l10n = context.l10n;
     final quotationInfo =
         ref.watch(cartProvider.select((state) => state.quotationInfo));
 
@@ -36,6 +44,20 @@ class ProductCardDetailed extends HookConsumerWidget {
 
     final double rawCost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
     final double taxRate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
+
+    // 有 xTenantId 表示列表曾带 X-Tenant-ID；展示名从 core 租户列表按 id 匹配。
+    final cloud = ref.watch(coreProvider).value;
+    final tenants = cloud?.tenants ?? const <Tenant>[];
+    final xTenantKey = sample.xTenantId?.trim();
+    final parsedTenantId = xTenantKey != null ? int.tryParse(xTenantKey) : null;
+    final matchedTenant = xTenantKey == null || xTenantKey.isEmpty
+        ? null
+        : tenants.firstWhereOrNull(
+            (t) => parsedTenantId != null
+                ? t.id == parsedTenantId
+                : t.id?.toString() == xTenantKey,
+          );
+    final tenantName = matchedTenant?.title?.trim();
 
     double baseCost = rawCost;
     if (!showTaxRatePrice) {
@@ -63,21 +85,37 @@ class ProductCardDetailed extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              sample.cover == null
-                  ? Image.asset(
-                      'assets/icons/no_image.png',
-                      width: double.infinity,
-                      fit: BoxFit.contain,
-                    )
-                  : CachedNetworkImage(
-                      width: double.infinity,
-                      fit: BoxFit.contain,
-                      imageUrl: sample.cover!,
-                      placeholder: (context, url) => AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(),
+              Stack(
+                children: [
+                  sample.cover == null
+                      ? Image.asset(
+                          'assets/icons/no_image.png',
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                        )
+                      : CachedNetworkImage(
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          imageUrl: sample.cover!,
+                          placeholder: (context, url) => AspectRatio(
+                            aspectRatio: 1,
+                            child: Container(),
+                          ),
+                        ),
+                  if (tenantName != null && tenantName.isNotEmpty)
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: TDTag(
+                        '  $tenantName  ',
+                        isLight: true,
+                        textColor: Color.fromARGB(255, 51, 51, 51),
+                        backgroundColor: Color.fromARGB(108, 202, 202, 202),
+                        size: TDTagSize.small,
                       ),
                     ),
+                ],
+              ),
               Container(
                 height: 0.5,
                 color: colorScheme.outlineVariant,
@@ -92,7 +130,7 @@ class ProductCardDetailed extends HookConsumerWidget {
                         children: [
                           if (itemTypeSpan != null) itemTypeSpan,
                           TextSpan(
-                            text: sample.name,
+                            text: displayName,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -144,7 +182,6 @@ class ProductCardDetailed extends HookConsumerWidget {
                         theme: TDTagTheme.warning,
                         size: TDTagSize.medium,
                       ),
-
                     // 贸易国别
                     if (sample.tradeCountry != null)
                       Container(
@@ -153,7 +190,7 @@ class ProductCardDetailed extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "贸易国别",
+                              l10n.samplesFilterTradeCountry,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: colorScheme.surfaceContainerHighest,
@@ -200,13 +237,15 @@ class ProductCardDetailed extends HookConsumerWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 5),
                                       child: Text(
-                                        showTaxRatePrice
-                                            ? '(含税率 ${sample.taxRate!}%)'
-                                            : '(已扣除税率 ${sample.taxRate!}%)',
+                                        sampleTaxRateHint(
+                                          context,
+                                          showTaxRatePrice: showTaxRatePrice,
+                                          taxRate: sample.taxRate!,
+                                        ),
                                         style: TextStyle(
                                           color: colorScheme
                                               .surfaceContainerHighest,
-                                          fontSize: 11,
+                                          fontSize: 10,
                                         ),
                                       ),
                                     ),
@@ -313,54 +352,6 @@ class ProductCardDetailed extends HookConsumerWidget {
               //   ),
               // ]
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  WidgetSpan? _buildItemTypeSpan(BuildContext context) {
-    String? itemType = sample.itemType;
-    if (itemType == null) {
-      return null;
-    }
-
-    final colorMap = {
-      "japan": Colors.yellow[800],
-      "market_product": Colors.red
-    };
-    final labelMap = {"japan": "日本产品", "market_product": "内部"};
-
-    final label = labelMap[itemType];
-    final bg = colorMap[itemType] ?? Colors.grey;
-
-    if (label == null) {
-      return null;
-    }
-
-    return WidgetSpan(
-      alignment: PlaceholderAlignment.middle,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 4),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(4),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 3,
-              vertical: 2,
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 9,
-                color: Colors.white,
-              ),
-            ),
           ),
         ),
       ),

@@ -16,15 +16,13 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$DashboardStatsState {
-  List<String> get timeLabels =>
-      throw _privateConstructorUsedError; // 时间轴标签（月份）
-  List<int> get productData => throw _privateConstructorUsedError; // 产品数量
-  List<int> get customerData => throw _privateConstructorUsedError; // 客户数量
-  List<int> get serviceProviderData =>
-      throw _privateConstructorUsedError; // 服务商数量
-  List<int> get inspectionData => throw _privateConstructorUsedError; // 验货任务数量
-  bool get isLoading => throw _privateConstructorUsedError; // 是否正在加载
-  TimeDimension get timeDimension => throw _privateConstructorUsedError; // 时间维度
+  List<String> get timeLabels => throw _privateConstructorUsedError;
+  List<int> get productData => throw _privateConstructorUsedError;
+  List<int> get customerData => throw _privateConstructorUsedError;
+  List<int> get serviceProviderData => throw _privateConstructorUsedError;
+  List<int> get inspectionData => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
+  TimeDimension get timeDimension => throw _privateConstructorUsedError;
   String get sampleRoomDimension => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -195,7 +193,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
       final List<int> inspectionData = const [],
       this.isLoading = false,
       this.timeDimension = TimeDimension.last6Months,
-      this.sampleRoomDimension = '报价次数排行'})
+      this.sampleRoomDimension = 'quote_rank'})
       : _timeLabels = timeLabels,
         _productData = productData,
         _customerData = customerData,
@@ -212,9 +210,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
     return EqualUnmodifiableListView(_timeLabels);
   }
 
-// 时间轴标签（月份）
   final List<int> _productData;
-// 时间轴标签（月份）
   @override
   @JsonKey()
   List<int> get productData {
@@ -223,9 +219,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
     return EqualUnmodifiableListView(_productData);
   }
 
-// 产品数量
   final List<int> _customerData;
-// 产品数量
   @override
   @JsonKey()
   List<int> get customerData {
@@ -234,9 +228,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
     return EqualUnmodifiableListView(_customerData);
   }
 
-// 客户数量
   final List<int> _serviceProviderData;
-// 客户数量
   @override
   @JsonKey()
   List<int> get serviceProviderData {
@@ -246,9 +238,7 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
     return EqualUnmodifiableListView(_serviceProviderData);
   }
 
-// 服务商数量
   final List<int> _inspectionData;
-// 服务商数量
   @override
   @JsonKey()
   List<int> get inspectionData {
@@ -257,15 +247,12 @@ class _$DashboardStatsStateImpl extends _DashboardStatsState {
     return EqualUnmodifiableListView(_inspectionData);
   }
 
-// 验货任务数量
   @override
   @JsonKey()
   final bool isLoading;
-// 是否正在加载
   @override
   @JsonKey()
   final TimeDimension timeDimension;
-// 时间维度
   @override
   @JsonKey()
   final String sampleRoomDimension;
@@ -332,19 +319,19 @@ abstract class _DashboardStatsState extends DashboardStatsState {
 
   @override
   List<String> get timeLabels;
-  @override // 时间轴标签（月份）
+  @override
   List<int> get productData;
-  @override // 产品数量
+  @override
   List<int> get customerData;
-  @override // 客户数量
+  @override
   List<int> get serviceProviderData;
-  @override // 服务商数量
+  @override
   List<int> get inspectionData;
-  @override // 验货任务数量
+  @override
   bool get isLoading;
-  @override // 是否正在加载
+  @override
   TimeDimension get timeDimension;
-  @override // 时间维度
+  @override
   String get sampleRoomDimension;
   @override
   @JsonKey(ignore: true)

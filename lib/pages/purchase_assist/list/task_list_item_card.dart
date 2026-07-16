@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud/constants/core.dart';
+import 'package:cloud/constants/search_platform_l10n_helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/widgets/progress.dart';
@@ -15,6 +17,24 @@ class TaskListItemCard extends StatelessWidget {
 
   final PurchaseAssistTaskListItem item;
   final VoidCallback? onTap;
+
+  String _resolvePlatformLabel(BuildContext context, List? rawPlatform) {
+    if (rawPlatform == null || rawPlatform.isEmpty) {
+      return '—';
+    }
+
+    final l10n = context.l10n;
+    final labels = rawPlatform.map((value) {
+      for (final platform in searchPlatform) {
+        if (platform.value == value) {
+          return searchPlatformLabel(l10n, value.toString());
+        }
+      }
+      return value;
+    }).toList();
+
+    return labels.join('、');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +52,7 @@ class TaskListItemCard extends StatelessWidget {
     final progressText = total > 0 ? '$success/$total' : '—';
     final createdTime = formatDateTimeFull(item.createdAt);
     final creator = item.user?.name ?? '—';
-    final platform = searchPlatform
-        .firstWhere(
-          (element) => element.value == item.platform,
-        )
-        .label;
+    final platform = _resolvePlatformLabel(context, item.platform);
     return Container(
         margin: const EdgeInsets.fromLTRB(0, 0, 0, 8),
         decoration: BoxDecoration(

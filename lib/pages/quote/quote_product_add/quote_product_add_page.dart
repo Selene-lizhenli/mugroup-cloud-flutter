@@ -15,7 +15,6 @@ import 'package:cloud/pages/widgets/input.dart';
 import 'package:cloud/pages/widgets/spacing_row.dart';
 import 'package:cloud/pages/widgets/text_area.dart';
 import 'package:cloud/pages/widgets/translate_input.dart';
-import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/field_config_provider.dart';
 import 'package:cloud/services/openai.dart';
 import 'package:cloud/services/sample.dart';
@@ -62,7 +61,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
     final autoValidateMode = useState(AutovalidateMode.disabled);
 
-    final isSubmitting = useState(false);
+    final isSubmitting = useState(false); //是否正在保存中
+    final isImageUploading = useState(false); //是否正在上传图片
 
     const basicInfoFieldNames = {
       'product_no',
@@ -595,6 +595,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
     }, []);
 
     Future<void> handleSubmit(bool isCopy) async {
+      if (isImageUploading.value) {
+        EasyLoading.showInfo('图片上传中，请稍后再提交');
+        return;
+      }
       final formState = formKey.currentState;
       if (formState?.saveAndValidate() ?? false) {
         isSubmitting.value = true;
@@ -605,7 +609,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
 
         try {
           final Map<String, dynamic> submitValues = Map.from(formState!.value);
-
           final supplier = initialSupplier;
 
           submitValues['supply_quotes'] = [
@@ -650,8 +653,6 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
             'item_type': 'market_product'
           });
 
-          isSubmitting.value = false;
-
           final prefs = await SharedPreferences.getInstance();
           const storageKey = 'last_quote_product_add';
           await prefs.setString(storageKey, jsonEncode(submitValues));
@@ -672,11 +673,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
             });
           }
           if (isCopy == true) {
-            handleCopyLastItem();
+            await handleCopyLastItem();
           }
         } finally {
           currentAudios.value = [];
-          // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
           isSubmitting.value = false;
           if (EasyLoading.isShow) EasyLoading.dismiss();
         }
@@ -757,6 +757,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                             const SizedBox(width: 16),
                             // 语音辅录按钮
                             VoiceRecordButton(
+                              apiPath:
+                                  '/api/open/agents/sample/store-market-by-audio-product',
                               onProcessing: (isUploading) {
                                 if (isUploading) {
                                   EasyLoading.show(status: '语音识别中...');
@@ -771,12 +773,8 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                 ];
                               },
                               onSuccess: (data) {
-                                Map<String, dynamic> patchData = {};
-                                data.forEach((key, value) {
-                                  if (value != null) {
-                                    patchData[key] = value.toString();
-                                  }
-                                });
+                                final patchData =
+                                    normalizeVoiceRecognitionPatch(data);
 
                                 // 执行回显
                                 formKey.currentState?.patchValue(patchData);
@@ -888,6 +886,9 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                                 child: ImageUploader(
                                   customIcon: Icons.camera_alt,
                                   value: displayValue,
+                                  onUploadingChanged: (uploading) {
+                                    isImageUploading.value = uploading;
+                                  },
                                   onChanged: (value) {
                                     field.didChange(value);
                                   },
@@ -1197,10 +1198,11 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                             colorScheme.primary.withOpacity(0.6),
                       ),
 
-                      onPressed:
-                          isSubmitting.value ? null : () => handleSubmit(false),
+                      onPressed: (isSubmitting.value || isImageUploading.value)
+                          ? null
+                          : () => handleSubmit(false),
                       // 根据状态切换按钮内部显示
-                      child: isSubmitting.value
+                      child: (isSubmitting.value || isImageUploading.value)
                           ? const SizedBox(
                               width: 20,
                               height: 20,
@@ -1228,9 +1230,10 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
                         disabledBackgroundColor:
                             colorScheme.secondary.withOpacity(0.6),
                       ),
-                      onPressed:
-                          isSubmitting.value ? null : () => handleSubmit(true),
-                      child: isSubmitting.value
+                      onPressed: (isSubmitting.value || isImageUploading.value)
+                          ? null
+                          : () => handleSubmit(true),
+                      child: (isSubmitting.value || isImageUploading.value)
                           ? const SizedBox(
                               width: 20,
                               height: 20,
@@ -1254,4 +1257,69 @@ class QuoteProductAddPortraitView extends HookConsumerWidget {
       ),
     );
   }
+}
+
+Map<String, dynamic> normalizeVoiceRecognitionPatch(dynamic data) {
+  if (data is! Map) return {};
+
+  final patchData = <String, dynamic>{};
+
+  data.forEach((key, value) {
+    if (value == null) return;
+    patchData[key.toString()] = value.toString();
+  });
+
+  void patchAlias(String target, List<String> aliases) {
+    if ((patchData[target]?.toString().isNotEmpty ?? false)) return;
+
+    for (final alias in aliases) {
+      final value = patchData[alias];
+      if (value != null && value.toString().isNotEmpty) {
+        patchData[target] = value.toString();
+        return;
+      }
+    }
+  }
+
+  patchAlias('product_no', [
+    'productNo',
+    'product_sku',
+    'sku',
+    'item_no',
+    'itemNo',
+  ]);
+  patchAlias('length', ['product_length', 'size_length']);
+  patchAlias('width', ['product_width', 'size_width']);
+  patchAlias('heigth', ['height', 'product_height', 'size_height']);
+
+  final spec = patchData['spec']?.toString();
+  if (spec != null && spec.trim().isNotEmpty) {
+    final dimensions = _parseSpecDimensions(spec);
+    if (dimensions.isNotEmpty &&
+        !(patchData['length']?.toString().isNotEmpty ?? false)) {
+      patchData['length'] = dimensions[0];
+    }
+    if (dimensions.length > 1 &&
+        !(patchData['width']?.toString().isNotEmpty ?? false)) {
+      patchData['width'] = dimensions[1];
+    }
+    if (dimensions.length > 2 &&
+        !(patchData['heigth']?.toString().isNotEmpty ?? false)) {
+      patchData['heigth'] = dimensions[2];
+    }
+  }
+
+  return patchData;
+}
+
+List<String> _parseSpecDimensions(String spec) {
+  final normalized = spec
+      .replaceAll(RegExp(r'[×*X]'), 'x')
+      .replaceAll(RegExp(r'[，,;；/]'), 'x')
+      .toLowerCase();
+  final matches = RegExp(r'\d+(?:\.\d+)?').allMatches(normalized).toList();
+
+  if (matches.length < 2) return const [];
+
+  return matches.take(3).map((match) => match.group(0)!).toList();
 }

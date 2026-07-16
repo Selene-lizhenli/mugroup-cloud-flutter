@@ -11,12 +11,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VoiceRecordButton extends StatefulWidget {
+  final String apiPath;
   final Function(bool isUploading)? onProcessing;
   final Function(dynamic data)? onSuccess;
   final Function(dynamic media)? onMediaUploaded;
 
   const VoiceRecordButton({
     super.key,
+    this.apiPath = '/api/open/agents/sample/store-market-by-audio-product',
     this.onProcessing,
     this.onSuccess,
     this.onMediaUploaded,
@@ -35,6 +37,13 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
   StreamSubscription? _amplitudeSubscription;
 
   double _currentAmplitude = -160.0;
+
+  void _showToast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   void dispose() {
@@ -135,7 +144,8 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
       final path = await _audioRecorder.stop();
       _amplitudeSubscription?.cancel();
 
-      if (mounted) setState(() => _isRecording = false);
+      if (!mounted) return;
+      setState(() => _isRecording = false);
 
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -145,23 +155,38 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
         _processVoiceFile(File(path));
       }
     } else {
-      if (await Permission.microphone.request().isGranted) {
-        final Directory appDocDir = await getApplicationDocumentsDirectory();
-        final String filePath =
-            '${appDocDir.path}/rec_${DateTime.now().millisecondsSinceEpoch}.wav';
+      final micPermission = await Permission.microphone.request();
+      final bool recordPermissionGranted = await _audioRecorder.hasPermission();
+      final bool canRecord = micPermission.isGranted && recordPermissionGranted;
 
-        try {
-          await _audioRecorder.start(
-            path: filePath,
-            encoder: AudioEncoder.wav,
-            bitRate: 128000,
-            samplingRate: 44100,
-          );
-          setState(() => _isRecording = true);
-          _showRecordingModal();
-        } catch (e) {
-          debugPrint("录音启动失败: $e");
+      if (!canRecord) {
+        if (micPermission.isPermanentlyDenied) {
+          _showToast('麦克风权限已被永久拒绝，请前往系统设置开启');
+          await openAppSettings();
+          return;
         }
+        _showToast('未获得麦克风权限，无法开始录音');
+        return;
+      }
+
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      if (!mounted) return;
+      final String ext = Platform.isIOS ? 'm4a' : 'wav';
+      final String filePath =
+          '${appDocDir.path}/rec_${DateTime.now().millisecondsSinceEpoch}.$ext';
+
+      try {
+        await _audioRecorder.start(
+          path: filePath,
+          encoder: Platform.isIOS ? AudioEncoder.aacLc : AudioEncoder.wav,
+          bitRate: 128000,
+          samplingRate: 44100,
+        );
+        setState(() => _isRecording = true);
+        _showRecordingModal();
+      } catch (e) {
+        debugPrint("录音启动失败: $e");
+        _showToast('录音启动失败，请检查麦克风权限后重试');
       }
     }
   }
@@ -170,7 +195,6 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
     setState(() => _isUploading = true);
     widget.onProcessing?.call(true);
 
-    String buffer = "";
     String eventType = "message";
 
     try {
@@ -178,7 +202,7 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
       widget.onMediaUploaded?.call(media);
 
       final response = await api.post<ResponseBody>(
-        '/api/open/agents/sample/store-market-by-audio-product',
+        widget.apiPath,
         data: {"audio": media},
         options: Options(responseType: ResponseType.stream),
       );
@@ -207,11 +231,6 @@ class _VoiceRecordButtonState extends State<VoiceRecordButton> {
                 } catch (e) {
                   debugPrint("result 解析失败: $e");
                 }
-              } else if (eventType == 'message') {
-                buffer += content;
-                String cleanText =
-                    buffer.replaceAll(RegExp(r'["{}\n]'), '').trim();
-                widget.onSuccess?.call(cleanText);
               }
             },
             onDone: () => _finishProcess(),

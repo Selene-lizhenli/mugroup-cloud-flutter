@@ -1,17 +1,22 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/models/core.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/sample/sample_extensions.dart';
+import 'package:cloud/pages/showroom/showroom_l10n_helper.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
-import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/samples/widgets/product_card.dart';
+import 'package:cloud/pages/samples/providers/home_provider.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/type.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_app_bar.dart';
 import 'package:cloud/pages/showroom/showroom_sample_detail_page/widgets/sample_submit_bar.dart';
+import 'package:cloud/pages/showroom/provider/showroom_sample_provider.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/services/sample.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flant/flant.dart';
@@ -25,15 +30,24 @@ import 'package:sliver_tools/sliver_tools.dart';
 @RoutePage()
 class ShowroomSampleDetailPage extends HookConsumerWidget {
   final int id;
-  const ShowroomSampleDetailPage({super.key, @pathParam required this.id});
+
+  /// 查询参数 `x_tenant_id`：有值时详情接口会带 `X-Tenant-ID` 请求头。
+  final String? xTenantId;
+
+  const ShowroomSampleDetailPage({
+    super.key,
+    @pathParam required this.id,
+    @QueryParam('x_tenant_id') this.xTenantId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final home = ref.watch(homeProvider);
+    final showroomApi = ref.read(showroomSampleApiProvider);
     final quotationInfo =
         ref.watch(cartProvider.select((s) => s.quotationInfo));
     final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final sample = useState<Sample?>(null);
     final currentIndex = useState<int>(0);
     final sampleSimilars = useState(<Sample>[]);
@@ -42,6 +56,23 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
     final isLoading = useState<bool>(true);
     final hasMounted = useState(false);
+
+// ----------------------处理样品所属租户逻辑-------------------------------------------
+    // 有 xTenantId 表示列表曾带 X-Tenant-ID；展示名从 core 租户列表按 id 匹配。
+    final cloud = ref.watch(coreProvider).value;
+    final tenants = cloud?.tenants ?? const <Tenant>[];
+    final xTenantKey = xTenantId?.trim();
+    final parsedTenantId = xTenantKey != null ? int.tryParse(xTenantKey) : null;
+    final matchedTenant = xTenantKey == null || xTenantKey.isEmpty
+        ? null
+        : tenants.firstWhereOrNull(
+            (t) => parsedTenantId != null
+                ? t.id == parsedTenantId
+                : t.id?.toString() == xTenantKey,
+          );
+    final tenantName = matchedTenant?.title?.trim() ?? '';
+// -----------------------------------------------------------------------------------
+
 
     // --- 价格计算逻辑 ---
     final showPrice = quotationInfo?.showPrice ?? false;
@@ -64,26 +95,39 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
 
     loadSample(int id) async {
       try {
-        final data = await getSample(id);
+        final data = await showroomApi.getSample(id, xTenantId: xTenantId);
         sample.value = data;
       } finally {
         isLoading.value = false;
       }
 
       elevatorFloors.value = [
-        ElevatorFloor(id: 'detail', name: '详情', key: GlobalKey()),
+        ElevatorFloor(
+          id: 'detail',
+          name: l10n.showroomFloorDetail,
+          key: GlobalKey(),
+        ),
         if (sample.value?.supplyQuotes?.isNotEmpty == true)
-          ElevatorFloor(id: 'supplyQuote', name: '工厂报价', key: GlobalKey()),
-        ElevatorFloor(id: 'similar', name: '推荐', key: GlobalKey()),
+          ElevatorFloor(
+            id: 'supplyQuote',
+            name: l10n.showroomFactoryQuotes,
+            key: GlobalKey(),
+          ),
+        ElevatorFloor(
+          id: 'similar',
+          name: l10n.showroomFloorRecommend,
+          key: GlobalKey(),
+        ),
       ];
     }
 
     final fetchSimilars = useCallback(() async {
-      final resp = await getSampleSimilars(
+      final resp = await showroomApi.getSampleSimilars(
         id: id,
         queryParameters: {
           "page": similarPage.value,
         },
+        xTenantId: xTenantId,
       );
 
       sampleSimilars.value = [...sampleSimilars.value, ...resp.data];
@@ -102,7 +146,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
         await fetchSimilars();
       });
       return () {};
-    }, [id]);
+    }, [id, xTenantId]);
 
     if (!hasMounted.value || isLoading.value) {
       return const Scaffold(
@@ -118,7 +162,8 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               Expanded(
                 child: EasyRefresh.builder(
                   onRefresh: () async {
-                    final data = await getSample(id);
+                    final data =
+                        await showroomApi.getSample(id, xTenantId: xTenantId);
                     sample.value = data;
                   },
                   scrollController: scrollController,
@@ -144,99 +189,193 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                       (floor) => floor.id == "detail")
                                   ?.key,
                               builder: (context, constraints) {
-                                var pageSize = 1;
-                                final availableWidth = constraints.maxWidth;
+                                const pageSize = 1;
 
-                                if (availableWidth > 500) {
-                                  pageSize = 2;
-                                }
-                                if (availableWidth > 800) {
-                                  pageSize = 3;
-                                }
+                                // if (availableWidth > 500) {
+                                //   pageSize = 2;
+                                // }
+                                // if (availableWidth > 800) {
+                                //   pageSize = 3;
+                                // }
+                                final imageHeight =
+                                    MediaQuery.of(context).size.height * 0.5;
+                                return Container(
+                                    color: Colors.white,
+                                    child: (sample.value?.image != null &&
+                                            sample.value!.image!.isNotEmpty)
+                                        ? Stack(
+                                            children: [
+                                              CarouselSlider(
+                                                items: sample
+                                                    .value!.image!.indexed
+                                                    .map((item) {
+                                                  final index = item.$1;
+                                                  final media = item.$2;
 
-                                return (sample.value?.image != null &&
-                                        sample.value!.image!.isNotEmpty)
-                                    ? Stack(
-                                        children: [
-                                          CarouselSlider(
-                                            items: sample.value!.image!.indexed
-                                                .map((item) {
-                                              final index = item.$1;
-                                              final media = item.$2;
-
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  showFlanImagePreview(
-                                                    context,
-                                                    images: sample.value!.image!
-                                                        .map(
-                                                            (item) => item.url!)
-                                                        .toList(),
-                                                    startPosition: index,
-                                                    loop: false,
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      showFlanImagePreview(
+                                                        context,
+                                                        images: sample
+                                                            .value!.image!
+                                                            .map((item) =>
+                                                                item.url!)
+                                                            .toList(),
+                                                        startPosition: index,
+                                                        loop: false,
+                                                      );
+                                                    },
+                                                    child: LayoutBuilder(
+                                                      builder: (context,
+                                                          constraints) {
+                                                        return ClipRRect(
+                                                          child: Image.network(
+                                                            media.thumbOrUrl!,
+                                                            fit: BoxFit.contain,
+                                                            width:
+                                                                double.infinity,
+                                                            height: imageHeight,
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
                                                   );
-                                                },
-                                                child: LayoutBuilder(
-                                                  builder:
-                                                      (context, constraints) {
-                                                    double containerWidth =
-                                                        constraints.maxWidth;
-                                                    return ClipRRect(
-                                                      child: Image.network(
-                                                        media.thumbOrUrl!,
-                                                        fit: BoxFit.contain,
-                                                        width: containerWidth,
-                                                      ),
-                                                    );
+                                                }).toList(),
+                                                options: CarouselOptions(
+                                                  height: imageHeight,
+                                                  viewportFraction:
+                                                      1 / pageSize,
+                                                  enableInfiniteScroll: false,
+                                                  pageSnapping: pageSize > 1
+                                                      ? false
+                                                      : true,
+                                                  padEnds: false,
+                                                  onPageChanged:
+                                                      (index, reason) {
+                                                    logger.d([index, reason]);
+                                                    currentIndex.value = index;
                                                   },
-                                                ),
-                                              );
-                                            }).toList(),
-                                            options: CarouselOptions(
-                                              viewportFraction: 1 / pageSize,
-                                              aspectRatio: pageSize / 1,
-                                              enableInfiniteScroll: false,
-                                              pageSnapping:
-                                                  pageSize > 1 ? false : true,
-                                              padEnds: false,
-                                              onPageChanged: (index, reason) {
-                                                logger.d([index, reason]);
-                                                currentIndex.value = index;
-                                              },
-                                              scrollPhysics:
-                                                  const BouncingScrollPhysics(),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            bottom: 8.0,
-                                            right: 8.0,
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8.0,
-                                                      vertical: 4.0),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black45,
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: Text(
-                                                '${currentIndex.value + 1}/${sample.value!.image!.length < pageSize ? 1 : sample.value!.image!.length - pageSize + 1}',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                                                  scrollPhysics:
+                                                      const BouncingScrollPhysics(),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Image.asset(
-                                        'assets/icons/no_image.png',
-                                        width: double.infinity,
-                                        fit: BoxFit.contain,
-                                      );
+                                              Positioned(
+                                                  bottom: 8.0,
+                                                  right: 8.0,
+                                                  child: Row(
+                                                    children: [
+                                                      if (xTenantId != null)
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      8.0,
+                                                                  vertical:
+                                                                      4.0),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.black45,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                          ),
+                                                          child: Text(
+                                                            tenantName,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      const SizedBox(width: 8),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8.0,
+                                                                vertical: 4.0),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.black45,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.0),
+                                                        ),
+                                                        child: Text(
+                                                          '${currentIndex.value + 1}/${sample.value!.image!.length < pageSize ? 1 : sample.value!.image!.length - pageSize + 1}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )),
+                                            ],
+                                          )
+                                        : Stack(
+                                            children: [
+                                              Container(
+                                                height: imageHeight,
+                                                alignment: Alignment.center,
+                                                child: Image.asset(
+                                                  'assets/icons/no_image.png',
+                                                  height: imageHeight * 0.7,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                              if (xTenantId != null)
+                                                Positioned(
+                                                    bottom: 8.0,
+                                                    right: 8.0,
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      8.0,
+                                                                  vertical:
+                                                                      4.0),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.black45,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                          ),
+                                                          child: Text(
+                                                            tenantName!,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )),
+                                            ],
+                                          ));
                               },
                             ),
                             // 产品编号和价格信息
@@ -270,8 +409,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                           if (sample.value?.hasTaxRate == true)
                                             TextSpan(
                                               text: showTaxRatePrice
-                                                  ? ' (含税${sample.value!.taxRate}%)'
-                                                  : ' (扣税${sample.value!.taxRate}%)',
+                                                  ? l10n.showroomTaxIncludedParen(
+                                                      sample.value!.taxRate!,
+                                                    )
+                                                  : l10n.showroomTaxDeductedParen(
+                                                      sample.value!.taxRate!,
+                                                    ),
                                               style: const TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey),
@@ -287,7 +430,9 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '产品编号: ${sample.value?.productNo ?? ''}',
+                                      l10n.showroomProductNoWithValue(
+                                        sample.value?.productNo ?? '',
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey,
@@ -310,7 +455,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      sample.value?.nameCn ?? '',
+                                      sample.value?.localizedName(
+                                            preferChinese:
+                                                showroomPreferChinese(context),
+                                          ) ??
+                                          '',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -332,7 +481,8 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                                   .width *
                                               0.3),
                                       child: Text(
-                                        sample.value!.spec ?? '未知',
+                                        sample.value!.spec ??
+                                            showroomUnknown(context),
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
@@ -362,7 +512,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '规格: ${sample.value!.spec ?? "未知"}',
+                                      showroomFieldLine(
+                                        context,
+                                        l10n.showroomLabelSpec,
+                                        sample.value!.spec,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -371,7 +525,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      '分类: ${sample.value!.category?.name ?? '未知'}',
+                                      showroomFieldLine(
+                                        context,
+                                        l10n.showroomLabelCategory,
+                                        sample.value!.category?.name,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -380,7 +538,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      '条形码: ${sample.value!.barcode ?? '未知'}',
+                                      showroomFieldLine(
+                                        context,
+                                        l10n.showroomLabelBarcode,
+                                        sample.value!.barcode,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -389,7 +551,11 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      '税率: ${sample.value!.taxRate?.toString() ?? '未知'}',
+                                      showroomFieldLine(
+                                        context,
+                                        l10n.showroomLabelTaxRate,
+                                        sample.value!.taxRate?.toString(),
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -455,12 +621,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                   Container(
                                     width: double.infinity,
                                     color: Colors.white,
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
                                           horizontal: 16.0, vertical: 8.0),
                                       child: Text(
-                                        '为你推荐',
-                                        style: TextStyle(
+                                        l10n.showroomRecommendedForYou,
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black87,
@@ -504,6 +670,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                               context.router.push(
                                                 ShowroomSampleDetailRoute(
                                                   id: sample.id!,
+                                                  xTenantId: xTenantId,
                                                 ),
                                               );
                                             },
@@ -524,6 +691,7 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
               ),
               SampleSubmitBar(
                 sample: sample.value,
+                xTenantId: xTenantId,
               ),
             ],
           ),
@@ -555,6 +723,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     const orange600 = Color(0xFFEA580C);
     const slate50 = Color(0xFFF8FAFC);
     const slate100 = Color(0xFFF1F5F9);
@@ -573,32 +742,77 @@ class SupplyQuoteCard extends HookConsumerWidget {
 
     final specItems = [
       if (quote.customerPrice != null)
-        _buildRowItem(Icons.payments_outlined, "客户报价", quote.customerPrice!),
+        _buildRowItem(
+          Icons.payments_outlined,
+          l10n.showroomCustomerQuote,
+          quote.customerPrice!,
+        ),
       if (quote.material != null)
-        _buildRowItem(Icons.layers_outlined, "材质", quote.material!),
+        _buildRowItem(
+          Icons.layers_outlined,
+          l10n.showroomMaterial,
+          quote.material!,
+        ),
       if (quote.packing != null)
-        _buildRowItem(Icons.inventory_2_outlined, "包装", quote.packing!),
+        _buildRowItem(
+          Icons.inventory_2_outlined,
+          l10n.showroomPackingShort,
+          quote.packing!,
+        ),
       if (quote.moq != null)
         _buildRowItem(
-            Icons.shopping_cart_checkout_outlined, "MOQ", "${quote.moq}"),
+          Icons.shopping_cart_checkout_outlined,
+          l10n.showroomMoq,
+          '${quote.moq}',
+        ),
       if (quote.outerCapacity != null)
-        _buildRowItem(Icons.widgets_outlined, "内箱装箱", quote.outerCapacity!),
+        _buildRowItem(
+          Icons.widgets_outlined,
+          l10n.showroomInnerBoxCapacity,
+          quote.outerCapacity!,
+        ),
       if (quote.innerCapacity != null)
-        _buildRowItem(Icons.grid_view_rounded, "外箱装箱", quote.innerCapacity!),
+        _buildRowItem(
+          Icons.grid_view_rounded,
+          l10n.showroomOuterBoxCapacity,
+          quote.innerCapacity!,
+        ),
       if (quote.outerVolume != null)
-        _buildRowItem(Icons.aspect_ratio_outlined, "体积", quote.outerVolume!),
+        _buildRowItem(
+          Icons.aspect_ratio_outlined,
+          l10n.showroomVolume,
+          quote.outerVolume!,
+        ),
       if (quote.outerGrossWeight != null)
         _buildRowItem(
-            Icons.monitor_weight_outlined, "毛重", quote.outerGrossWeight!),
+          Icons.monitor_weight_outlined,
+          l10n.showroomGrossWeight,
+          quote.outerGrossWeight!,
+        ),
       if (quote.productWeight != null)
-        _buildRowItem(Icons.scale_outlined, "产品重量(g)", quote.productWeight!),
+        _buildRowItem(
+          Icons.scale_outlined,
+          l10n.showroomProductWeight,
+          quote.productWeight!,
+        ),
       if (quote.shippingQty != null)
         _buildRowItem(
-            Icons.local_shipping_outlined, "出货", "${quote.shippingQty}"),
+          Icons.local_shipping_outlined,
+          l10n.showroomShipping,
+          '${quote.shippingQty}',
+        ),
       if (quote.sampleLocation != null)
-        _buildRowItem(Icons.fmd_good_outlined, "样品位", quote.sampleLocation!),
+        _buildRowItem(
+          Icons.fmd_good_outlined,
+          l10n.showroomSampleLocation,
+          quote.sampleLocation!,
+        ),
       if (quote.remark != null)
-        _buildRowItem(Icons.sticky_note_2_outlined, "备注", quote.remark!),
+        _buildRowItem(
+          Icons.sticky_note_2_outlined,
+          l10n.cartRemark,
+          quote.remark!,
+        ),
     ];
 
     return GestureDetector(
@@ -626,7 +840,7 @@ class SupplyQuoteCard extends HookConsumerWidget {
                     },
                     child: Text(
                       (quote.supplier?.shortName ?? quote.supplier?.name) ??
-                          "未知工厂",
+                          l10n.showroomUnknownFactory,
                       style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -664,11 +878,20 @@ class SupplyQuoteCard extends HookConsumerWidget {
                   runSpacing: 4,
                   children: [
                     if (quote.internalSku != null)
-                      _buildTag("内部:${quote.internalSku}", Colors.blue),
+                      _buildTag(
+                        l10n.showroomTagInternal(quote.internalSku!),
+                        Colors.blue,
+                      ),
                     if (quote.supplierSku != null)
-                      _buildTag("工厂:${quote.supplierSku}", Colors.teal),
+                      _buildTag(
+                        l10n.showroomTagFactory(quote.supplierSku!),
+                        Colors.teal,
+                      ),
                     if (quote.customerSku != null)
-                      _buildTag("客户:${quote.customerSku}", Colors.purple),
+                      _buildTag(
+                        l10n.showroomTagCustomer(quote.customerSku!),
+                        Colors.purple,
+                      ),
                   ],
                 ),
               ),
@@ -695,10 +918,16 @@ class SupplyQuoteCard extends HookConsumerWidget {
                 child: Row(
                   children: [
                     if (quote.customerPrice != null)
-                      _buildSmallPrice("客户价:", quote.customerPrice!),
+                      _buildSmallPrice(
+                        l10n.showroomCustomerPriceLabel,
+                        quote.customerPrice!,
+                      ),
                     const SizedBox(width: 12),
                     if (quote.supplierPrice != null)
-                      _buildSmallPrice("报价:", quote.supplierPrice!),
+                      _buildSmallPrice(
+                        l10n.showroomQuotePriceLabel,
+                        quote.supplierPrice!,
+                      ),
                   ],
                 ),
               ),
@@ -707,10 +936,13 @@ class SupplyQuoteCard extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 if (home.isDetailedMode && showPrice)
-                  _buildMainPrice(quote, orange600, quotationInfo),
+                  _buildMainPrice(context, quote, orange600, quotationInfo),
                 if (quote.chuhuoAt != null)
                   Text(
-                    "交期:${quote.chuhuoAt!.month}/${quote.chuhuoAt!.day}",
+                    l10n.showroomDeliveryDate(
+                      quote.chuhuoAt!.month,
+                      quote.chuhuoAt!.day,
+                    ),
                     style: const TextStyle(fontSize: 10, color: slate400),
                   ),
               ],
@@ -761,7 +993,13 @@ class SupplyQuoteCard extends HookConsumerWidget {
         style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)));
   }
 
-  Widget _buildMainPrice(Quote quote, Color activeColor, QuotationInfo? info) {
+  Widget _buildMainPrice(
+    BuildContext context,
+    Quote quote,
+    Color activeColor,
+    QuotationInfo? info,
+  ) {
+    final l10n = context.l10n;
     final isTax = quote.canBill ?? false;
 
     final exchange = info?.exchange ?? 1.0;
@@ -798,7 +1036,9 @@ class SupplyQuoteCard extends HookConsumerWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
-            isTax ? '含税${quote.taxRate ?? ''}' : '不含税',
+            isTax
+                ? l10n.showroomTaxIncludedBadge(quote.taxRate ?? '')
+                : l10n.showroomTaxExcludedBadge,
             style: TextStyle(
                 fontSize: 10,
                 color: isTax ? Colors.indigo : const Color(0xFF64748B),

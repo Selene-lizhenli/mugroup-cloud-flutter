@@ -1,4 +1,6 @@
 import 'package:cloud/constants/core.dart';
+import 'package:cloud/constants/search_platform_l10n_helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:flutter/material.dart';
 
 /// 横向可滑动的标签列表，用于平台等单选标签展示
@@ -53,7 +55,7 @@ class MuTagList extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                item.label,
+                item.label ?? searchPlatformLabel(context.l10n, item.value),
                 style: TextStyle(
                   fontSize: fontSize,
                   height: 1,

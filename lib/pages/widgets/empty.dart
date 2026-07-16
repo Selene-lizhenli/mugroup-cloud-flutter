@@ -63,7 +63,7 @@ class Empty extends StatelessWidget {
             const SizedBox(height: 10),
           ] else if (showImage == true) ...[
             Image.asset(
-              'assets/element/empty.png',
+              'assets/element/no_data.png',
               height: picHeight,
               fit: BoxFit.contain,
             ),

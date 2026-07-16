@@ -10,12 +10,15 @@ class ShowroomSampleViewerPage extends HookConsumerWidget {
   final List<int> initialIds; // 初始进入时已知的 ID 列表
   final int initialIndex; // 点击的是第几个
   final Future<List<int>> Function(int page)? onLoadMore; // 可选：加载更多 ID 的回调
+  /// 可选租户 id（与详情页 `x_tenant_id` 一致），传给子级 [ShowroomSampleDetailPage]。
+  final String? xTenantId;
 
   const ShowroomSampleViewerPage({
     super.key,
     required this.initialIds,
     required this.initialIndex,
     this.onLoadMore,
+    this.xTenantId,
   });
 
   @override
@@ -72,6 +75,7 @@ class ShowroomSampleViewerPage extends HookConsumerWidget {
           return ShowroomSampleDetailPage(
             key: ValueKey('sample_$id'),
             id: id,
+            xTenantId: xTenantId,
           );
         },
       ),

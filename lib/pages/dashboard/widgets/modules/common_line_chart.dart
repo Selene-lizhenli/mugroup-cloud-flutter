@@ -1,4 +1,5 @@
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/pages/dashboard/dashboard_l10n_helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -64,6 +65,7 @@ class _ModuleLineChartState extends ConsumerState<ModuleLineChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final stats = ref.watch(moduleStatsProvider(widget.moduleId));
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -98,7 +100,7 @@ class _ModuleLineChartState extends ConsumerState<ModuleLineChart> {
         padding: widget.padding,
         child: Center(
           child: Text(
-            '暂无数据',
+            l10n.noData,
             style: TextStyle(color: colorScheme.surfaceContainerHighest),
           ),
         ),
@@ -154,7 +156,7 @@ class _ModuleLineChartState extends ConsumerState<ModuleLineChart> {
               getTitles: (value) {
                 final index = value.toInt();
                 if (index >= 0 && index < timeLabels.length) {
-                  return timeLabels[index];
+                  return context.dashboardFormatMonthLabel(timeLabels[index]);
                 }
                 return '';
               },

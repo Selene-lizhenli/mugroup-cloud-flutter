@@ -6,12 +6,22 @@ import 'package:flutter/foundation.dart';
 part 'sample.freezed.dart';
 part 'sample.g.dart';
 
+/// `xTenantId` 在 JSON 里可能是数字或字符串，统一解析为字符串。
+String? _sampleXTenantIdFromJson(Object? value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  if (value is num) return value.toString();
+  return value.toString();
+}
+
 @freezed
 abstract class Sample with _$Sample {
   const Sample._();
 
   const factory Sample({
     int? id,
+    @JsonKey(name: 'xTenantId', fromJson: _sampleXTenantIdFromJson)
+    String? xTenantId,
     String? barcode,
     String? packing,
     String? construction,

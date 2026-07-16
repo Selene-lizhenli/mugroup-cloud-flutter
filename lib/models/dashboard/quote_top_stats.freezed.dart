@@ -28,6 +28,8 @@ mixin _$QuoteTopStats {
   int? get count => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_name')
   String? get sampleName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'sample_name_en')
+  String? get sampleNameEn => throw _privateConstructorUsedError; // 样品名称英文
   @JsonKey(name: 'id')
   int? get id => throw _privateConstructorUsedError; // 样品ID，用于跳转详情页
   @JsonKey(name: 'thumb_url')
@@ -50,6 +52,7 @@ abstract class $QuoteTopStatsCopyWith<$Res> {
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
+      @JsonKey(name: 'sample_name_en') String? sampleNameEn,
       @JsonKey(name: 'id') int? id,
       @JsonKey(name: 'thumb_url') String? thumbUrl});
 }
@@ -71,6 +74,7 @@ class _$QuoteTopStatsCopyWithImpl<$Res, $Val extends QuoteTopStats>
     Object? sampleId = freezed,
     Object? count = freezed,
     Object? sampleName = freezed,
+    Object? sampleNameEn = freezed,
     Object? id = freezed,
     Object? thumbUrl = freezed,
   }) {
@@ -90,6 +94,10 @@ class _$QuoteTopStatsCopyWithImpl<$Res, $Val extends QuoteTopStats>
       sampleName: freezed == sampleName
           ? _value.sampleName
           : sampleName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sampleNameEn: freezed == sampleNameEn
+          ? _value.sampleNameEn
+          : sampleNameEn // ignore: cast_nullable_to_non_nullable
               as String?,
       id: freezed == id
           ? _value.id
@@ -116,6 +124,7 @@ abstract class _$$QuoteTopStatsImplCopyWith<$Res>
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'count') int? count,
       @JsonKey(name: 'sample_name') String? sampleName,
+      @JsonKey(name: 'sample_name_en') String? sampleNameEn,
       @JsonKey(name: 'id') int? id,
       @JsonKey(name: 'thumb_url') String? thumbUrl});
 }
@@ -135,6 +144,7 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
     Object? sampleId = freezed,
     Object? count = freezed,
     Object? sampleName = freezed,
+    Object? sampleNameEn = freezed,
     Object? id = freezed,
     Object? thumbUrl = freezed,
   }) {
@@ -154,6 +164,10 @@ class __$$QuoteTopStatsImplCopyWithImpl<$Res>
       sampleName: freezed == sampleName
           ? _value.sampleName
           : sampleName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sampleNameEn: freezed == sampleNameEn
+          ? _value.sampleNameEn
+          : sampleNameEn // ignore: cast_nullable_to_non_nullable
               as String?,
       id: freezed == id
           ? _value.id
@@ -175,6 +189,7 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
       @JsonKey(name: 'sample_id') this.sampleId,
       @JsonKey(name: 'count') this.count,
       @JsonKey(name: 'sample_name') this.sampleName,
+      @JsonKey(name: 'sample_name_en') this.sampleNameEn,
       @JsonKey(name: 'id') this.id,
       @JsonKey(name: 'thumb_url') this.thumbUrl});
 
@@ -194,6 +209,10 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
   @JsonKey(name: 'sample_name')
   final String? sampleName;
   @override
+  @JsonKey(name: 'sample_name_en')
+  final String? sampleNameEn;
+// 样品名称英文
+  @override
   @JsonKey(name: 'id')
   final int? id;
 // 样品ID，用于跳转详情页
@@ -203,7 +222,7 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
   @override
   String toString() {
-    return 'QuoteTopStats(sampleNo: $sampleNo, sampleId: $sampleId, count: $count, sampleName: $sampleName, id: $id, thumbUrl: $thumbUrl)';
+    return 'QuoteTopStats(sampleNo: $sampleNo, sampleId: $sampleId, count: $count, sampleName: $sampleName, sampleNameEn: $sampleNameEn, id: $id, thumbUrl: $thumbUrl)';
   }
 
   @override
@@ -218,6 +237,8 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
             (identical(other.count, count) || other.count == count) &&
             (identical(other.sampleName, sampleName) ||
                 other.sampleName == sampleName) &&
+            (identical(other.sampleNameEn, sampleNameEn) ||
+                other.sampleNameEn == sampleNameEn) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.thumbUrl, thumbUrl) ||
                 other.thumbUrl == thumbUrl));
@@ -225,8 +246,8 @@ class _$QuoteTopStatsImpl implements _QuoteTopStats {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, sampleNo, sampleId, count, sampleName, id, thumbUrl);
+  int get hashCode => Object.hash(runtimeType, sampleNo, sampleId, count,
+      sampleName, sampleNameEn, id, thumbUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -248,6 +269,7 @@ abstract class _QuoteTopStats implements QuoteTopStats {
           @JsonKey(name: 'sample_id') final int? sampleId,
           @JsonKey(name: 'count') final int? count,
           @JsonKey(name: 'sample_name') final String? sampleName,
+          @JsonKey(name: 'sample_name_en') final String? sampleNameEn,
           @JsonKey(name: 'id') final int? id,
           @JsonKey(name: 'thumb_url') final String? thumbUrl}) =
       _$QuoteTopStatsImpl;
@@ -268,6 +290,9 @@ abstract class _QuoteTopStats implements QuoteTopStats {
   @JsonKey(name: 'sample_name')
   String? get sampleName;
   @override
+  @JsonKey(name: 'sample_name_en')
+  String? get sampleNameEn;
+  @override // 样品名称英文
   @JsonKey(name: 'id')
   int? get id;
   @override // 样品ID，用于跳转详情页

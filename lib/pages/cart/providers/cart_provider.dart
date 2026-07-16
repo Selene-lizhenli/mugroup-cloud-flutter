@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud/app/app.dart';
 import 'package:cloud/constants/core.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/http/api.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/delivery.dart';
@@ -12,6 +14,8 @@ import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:collection/collection.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -46,7 +50,7 @@ class Cart extends _$Cart {
       authNotifier.removeListener(handleAuthChange);
     });
 
-    const defaultQuotationInfo = QuotationInfo(true, false, 'CNY', null, null);
+    const defaultQuotationInfo = QuotationInfo(false, false, 'CNY', null, null);
     final defaultCarts = [
       if (user?.permissions?.contains('showroom.quotation.store') ?? false)
         const CartSelect(CartType.quotation),
@@ -80,24 +84,33 @@ class Cart extends _$Cart {
 
     final cache = app.prefs.getString(cacheKey);
     if (cache != null) {
-      final map = jsonDecode(cache) as Map<String, dynamic>;
+      final cacheText = cache.trim();
+      if (cacheText.isNotEmpty) {
+        try {
+          final map = jsonDecode(cacheText) as Map<String, dynamic>;
+          final cacheState = State.fromJson(map);
 
-      final cacheState = State.fromJson(map);
-
-      return defaultState.copyWith(
-        borrow: cacheState.borrow,
-        cartName: cacheState.cartName,
-        items: cacheState.items,
-        transfer: cacheState.transfer,
-        type: cacheState.type,
-        warehouse: cacheState.warehouse,
-        quotationInfo: defaultQuotationInfo.copyWith(
-          showPrice: cacheState.quotationInfo?.showPrice,
-          curreny: cacheState.quotationInfo?.curreny,
-          exchange: cacheState.quotationInfo?.exchange,
-          commissionRate: cacheState.quotationInfo?.commissionRate,
-        ),
-      );
+          return defaultState.copyWith(
+            borrow: cacheState.borrow,
+            cartName: cacheState.cartName,
+            items: cacheState.items,
+            transfer: cacheState.transfer,
+            type: cacheState.type,
+            warehouse: cacheState.warehouse,
+            quotationInfo: defaultQuotationInfo.copyWith(
+              showPrice: cacheState.quotationInfo?.showPrice,
+              curreny: cacheState.quotationInfo?.curreny,
+              exchange: cacheState.quotationInfo?.exchange,
+              commissionRate: cacheState.quotationInfo?.commissionRate,
+            ),
+          );
+        } catch (e) {
+          logger.w('购物车缓存解析失败，已忽略: $e');
+          app.prefs.remove(cacheKey);
+        }
+      } else {
+        app.prefs.remove(cacheKey);
+      }
     }
 
     return defaultState;
@@ -179,7 +192,10 @@ class Cart extends _$Cart {
     });
   }
 
-  void addSample(Sample sample, int step) {
+  Future<void> addSample(Sample sample, int step) async {
+    if (state.items.length >= 50) {
+      checkLock(state.items.length);
+    }
     final item = getItemBySample(sample);
     final items = [...state.items];
 
@@ -194,6 +210,17 @@ class Cart extends _$Cart {
     state = state.copyWith(items: items);
     save();
   }
+
+  Future<void> checkLock(int count) async {
+    try { 
+      await api.get(
+        '/api/tenant/lock',
+        data: {'count': count}, 
+      );
+    } catch (e) {
+      EasyLoading.showInfo(e.toString()); 
+    }
+  } 
 
   void save() {
     final string = json.encode(state.toJson());

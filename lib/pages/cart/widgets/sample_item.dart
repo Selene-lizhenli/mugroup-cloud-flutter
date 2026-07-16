@@ -1,22 +1,29 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud/models/core.dart';
 import 'package:cloud/models/sample/sample.dart';
+import 'package:cloud/models/sample/sample_extensions.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/samples/samples_l10n_helper.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/widgets/quote_item.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-class SampleItem extends HookWidget {
+import 'package:hooks_riverpod/hooks_riverpod.dart'; 
+import 'package:collection/collection.dart';
+class SampleItem extends HookConsumerWidget {
   final Sample sample;
   final CartType? cartType;
   final String? price;
   final int? count;
   final QuotationInfo? quotationInfo;
   final ValueChanged<int>? onChange;
+  final String? xTenantId;
 
   const SampleItem({
     super.key,
@@ -26,11 +33,13 @@ class SampleItem extends HookWidget {
     this.quotationInfo,
     this.count,
     this.onChange,
+    this.xTenantId,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     double? finalPrice;
     String? displayPrice;
@@ -79,6 +88,21 @@ class SampleItem extends HookWidget {
       displayPrice =
           sample.purchaseCost != null ? '${sample.purchaseCost}' : "";
     }
+// --------------------处理独立样品间租户名称tag------------------------------------------------------
+    // 有 xTenantId 表示列表曾带 X-Tenant-ID；展示名从 core 租户列表按 id 匹配。
+    final cloud = ref.watch(coreProvider).value;
+    final tenants = cloud?.tenants ?? const <Tenant>[];
+    final xTenantKey = sample.xTenantId?.trim();
+    final parsedTenantId = xTenantKey != null ? int.tryParse(xTenantKey) : null;
+    final matchedTenant = xTenantKey == null || xTenantKey.isEmpty
+        ? null
+        : tenants.firstWhereOrNull(
+            (t) => parsedTenantId != null
+                ? t.id == parsedTenantId
+                : t.id?.toString() == xTenantKey,
+          );
+    final tenantName = matchedTenant?.title?.trim()??'';
+// --------------------------------------------------------------------------
 
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
         sample.image?.elementAtOrNull(0)?.url;
@@ -96,7 +120,7 @@ class SampleItem extends HookWidget {
 
     return AppExpansionTile(
       title: Text(
-        sample.name,
+        sample.localizedName(preferChinese: samplesPreferChinese(context)),
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
       ),
@@ -106,22 +130,24 @@ class SampleItem extends HookWidget {
       subtitle: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          cover != null
-              ? CachedNetworkImage(
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                  imageUrl: cover,
-                )
-              : Image.asset(
-                  'assets/icons/no_image.png',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-          const SizedBox(
-            width: 10,
+          Stack(
+            children: [
+              cover != null
+                  ? CachedNetworkImage(
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                      imageUrl: cover,
+                    )
+                  : Image.asset(
+                      'assets/icons/no_image.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
+            ],
           ),
+          const SizedBox(width: 10),
           Expanded(
             flex: 1,
             child: Container(
@@ -142,7 +168,7 @@ class SampleItem extends HookWidget {
                   ),
                   if (sample.pageNo != null && sample.pageNo != "-")
                     Text(
-                      "样本页码: ${sample.pageNo}",
+                      l10n.cartSamplePageNo(sample.pageNo!),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
@@ -172,9 +198,11 @@ class SampleItem extends HookWidget {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 5),
                                 child: Text(
-                                  showTaxRatePrice
-                                      ? '(含税率 ${sample.taxRate!}%)'
-                                      : '(已扣除税率 ${sample.taxRate!}%)',
+                                  sampleTaxRateHint(
+                                    context,
+                                    showTaxRatePrice: showTaxRatePrice,
+                                    taxRate: sample.taxRate!,
+                                  ),
                                   style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 11,
@@ -185,6 +213,18 @@ class SampleItem extends HookWidget {
                         ],
                       ),
                     ),
+                  if (xTenantId != null)
+                    Container(
+                        padding: const EdgeInsets.fromLTRB(4, 1, 4, 1),
+                        decoration: BoxDecoration(
+                            color: colorScheme.outline.withOpacity(0.3)),
+                        child: Text(
+                          tenantName,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colorScheme.outline,
+                          ),
+                        )),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -8,7 +8,7 @@ part of 'media.dart';
 
 _$TemporaryMediaImpl _$$TemporaryMediaImplFromJson(Map<String, dynamic> json) =>
     _$TemporaryMediaImpl(
-      id: (json['id'] as num).toInt(),
+      id: temporaryMediaIdFromJson(json['id']),
       uuid: json['uuid'] as String?,
       thumbUrl: json['thumb_url'] as String?,
       url: json['url'] as String,
@@ -17,7 +17,7 @@ _$TemporaryMediaImpl _$$TemporaryMediaImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$TemporaryMediaImplToJson(
         _$TemporaryMediaImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'id': temporaryMediaIdToJson(instance.id),
       'uuid': instance.uuid,
       'thumb_url': instance.thumbUrl,
       'url': instance.url,

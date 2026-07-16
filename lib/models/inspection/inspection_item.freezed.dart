@@ -28,6 +28,11 @@ mixin _$InspectionItem {
   int? get qty => throw _privateConstructorUsedError;
   String? get remark => throw _privateConstructorUsedError;
   String? get barcode => throw _privateConstructorUsedError;
+  @JsonKey(name: 'std_barcode')
+  String? get stdBarcode => throw _privateConstructorUsedError;
+  @JsonKey(name: 'scan_barcode')
+  String? get scanBarcode => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   List<Media>? get media => throw _privateConstructorUsedError;
   @JsonKey(name: 'task_id')
   int? get taskId => throw _privateConstructorUsedError;
@@ -41,6 +46,19 @@ mixin _$InspectionItem {
   int? get unitPerCtn => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'inspection_dynamic_template_id',
+      fromJson: _inspectionDynamicTemplateIdFromJson,
+      toJson: _inspectionDynamicTemplateIdToJson)
+  int? get inspectionDynamicTemplateId => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'inspection_dynamic_template_json',
+      fromJson: _inspectionDynamicTemplateJsonFromJson,
+      toJson: _inspectionDynamicTemplateJsonToJson)
+  Map<String, dynamic>? get inspectionDynamicTemplateJson =>
+      throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+  Map<String, dynamic>? get raw => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -63,13 +81,28 @@ abstract class $InspectionItemCopyWith<$Res> {
       int? qty,
       String? remark,
       String? barcode,
+      @JsonKey(name: 'std_barcode') String? stdBarcode,
+      @JsonKey(name: 'scan_barcode') String? scanBarcode,
+      String? description,
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
       @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
-      @JsonKey(name: 'created_at') String? createdAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(
+          name: 'inspection_dynamic_template_id',
+          fromJson: _inspectionDynamicTemplateIdFromJson,
+          toJson: _inspectionDynamicTemplateIdToJson)
+      int? inspectionDynamicTemplateId,
+      @JsonKey(
+          name: 'inspection_dynamic_template_json',
+          fromJson: _inspectionDynamicTemplateJsonFromJson,
+          toJson: _inspectionDynamicTemplateJsonToJson)
+      Map<String, dynamic>? inspectionDynamicTemplateJson,
+      @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+      Map<String, dynamic>? raw});
 }
 
 /// @nodoc
@@ -93,6 +126,9 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? qty = freezed,
     Object? remark = freezed,
     Object? barcode = freezed,
+    Object? stdBarcode = freezed,
+    Object? scanBarcode = freezed,
+    Object? description = freezed,
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
@@ -100,6 +136,9 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? itemNo = freezed,
     Object? unitPerCtn = freezed,
     Object? createdAt = freezed,
+    Object? inspectionDynamicTemplateId = freezed,
+    Object? inspectionDynamicTemplateJson = freezed,
+    Object? raw = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -134,6 +173,18 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.barcode
           : barcode // ignore: cast_nullable_to_non_nullable
               as String?,
+      stdBarcode: freezed == stdBarcode
+          ? _value.stdBarcode
+          : stdBarcode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      scanBarcode: freezed == scanBarcode
+          ? _value.scanBarcode
+          : scanBarcode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       media: freezed == media
           ? _value.media
           : media // ignore: cast_nullable_to_non_nullable
@@ -162,6 +213,18 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      inspectionDynamicTemplateId: freezed == inspectionDynamicTemplateId
+          ? _value.inspectionDynamicTemplateId
+          : inspectionDynamicTemplateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      inspectionDynamicTemplateJson: freezed == inspectionDynamicTemplateJson
+          ? _value.inspectionDynamicTemplateJson
+          : inspectionDynamicTemplateJson // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      raw: freezed == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -183,13 +246,28 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       int? qty,
       String? remark,
       String? barcode,
+      @JsonKey(name: 'std_barcode') String? stdBarcode,
+      @JsonKey(name: 'scan_barcode') String? scanBarcode,
+      String? description,
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
       @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
-      @JsonKey(name: 'created_at') String? createdAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(
+          name: 'inspection_dynamic_template_id',
+          fromJson: _inspectionDynamicTemplateIdFromJson,
+          toJson: _inspectionDynamicTemplateIdToJson)
+      int? inspectionDynamicTemplateId,
+      @JsonKey(
+          name: 'inspection_dynamic_template_json',
+          fromJson: _inspectionDynamicTemplateJsonFromJson,
+          toJson: _inspectionDynamicTemplateJsonToJson)
+      Map<String, dynamic>? inspectionDynamicTemplateJson,
+      @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+      Map<String, dynamic>? raw});
 }
 
 /// @nodoc
@@ -211,6 +289,9 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? qty = freezed,
     Object? remark = freezed,
     Object? barcode = freezed,
+    Object? stdBarcode = freezed,
+    Object? scanBarcode = freezed,
+    Object? description = freezed,
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
@@ -218,6 +299,9 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? itemNo = freezed,
     Object? unitPerCtn = freezed,
     Object? createdAt = freezed,
+    Object? inspectionDynamicTemplateId = freezed,
+    Object? inspectionDynamicTemplateJson = freezed,
+    Object? raw = freezed,
   }) {
     return _then(_$InspectionItemImpl(
       freezed == id
@@ -252,6 +336,18 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value.barcode
           : barcode // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == stdBarcode
+          ? _value.stdBarcode
+          : stdBarcode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == scanBarcode
+          ? _value.scanBarcode
+          : scanBarcode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       freezed == media
           ? _value._media
           : media // ignore: cast_nullable_to_non_nullable
@@ -280,6 +376,18 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == inspectionDynamicTemplateId
+          ? _value.inspectionDynamicTemplateId
+          : inspectionDynamicTemplateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      freezed == inspectionDynamicTemplateJson
+          ? _value._inspectionDynamicTemplateJson
+          : inspectionDynamicTemplateJson // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      freezed == raw
+          ? _value._raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -296,14 +404,31 @@ class _$InspectionItemImpl implements _InspectionItem {
       this.qty,
       this.remark,
       this.barcode,
+      @JsonKey(name: 'std_barcode') this.stdBarcode,
+      @JsonKey(name: 'scan_barcode') this.scanBarcode,
+      this.description,
       final List<Media>? media,
       @JsonKey(name: 'task_id') this.taskId,
       @JsonKey(name: 'user_id') this.userId,
       @JsonKey(name: 'sample_id') this.sampleId,
       @JsonKey(name: 'item_no') this.itemNo,
       @JsonKey(name: 'unit_per_ctn') this.unitPerCtn,
-      @JsonKey(name: 'created_at') this.createdAt)
-      : _media = media;
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(
+          name: 'inspection_dynamic_template_id',
+          fromJson: _inspectionDynamicTemplateIdFromJson,
+          toJson: _inspectionDynamicTemplateIdToJson)
+      this.inspectionDynamicTemplateId,
+      @JsonKey(
+          name: 'inspection_dynamic_template_json',
+          fromJson: _inspectionDynamicTemplateJsonFromJson,
+          toJson: _inspectionDynamicTemplateJsonToJson)
+      final Map<String, dynamic>? inspectionDynamicTemplateJson,
+      @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+      final Map<String, dynamic>? raw)
+      : _media = media,
+        _inspectionDynamicTemplateJson = inspectionDynamicTemplateJson,
+        _raw = raw;
 
   factory _$InspectionItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$InspectionItemImplFromJson(json);
@@ -324,6 +449,14 @@ class _$InspectionItemImpl implements _InspectionItem {
   final String? remark;
   @override
   final String? barcode;
+  @override
+  @JsonKey(name: 'std_barcode')
+  final String? stdBarcode;
+  @override
+  @JsonKey(name: 'scan_barcode')
+  final String? scanBarcode;
+  @override
+  final String? description;
   final List<Media>? _media;
   @override
   List<Media>? get media {
@@ -352,10 +485,41 @@ class _$InspectionItemImpl implements _InspectionItem {
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
+  @override
+  @JsonKey(
+      name: 'inspection_dynamic_template_id',
+      fromJson: _inspectionDynamicTemplateIdFromJson,
+      toJson: _inspectionDynamicTemplateIdToJson)
+  final int? inspectionDynamicTemplateId;
+  final Map<String, dynamic>? _inspectionDynamicTemplateJson;
+  @override
+  @JsonKey(
+      name: 'inspection_dynamic_template_json',
+      fromJson: _inspectionDynamicTemplateJsonFromJson,
+      toJson: _inspectionDynamicTemplateJsonToJson)
+  Map<String, dynamic>? get inspectionDynamicTemplateJson {
+    final value = _inspectionDynamicTemplateJson;
+    if (value == null) return null;
+    if (_inspectionDynamicTemplateJson is EqualUnmodifiableMapView)
+      return _inspectionDynamicTemplateJson;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final Map<String, dynamic>? _raw;
+  @override
+  @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+  Map<String, dynamic>? get raw {
+    final value = _raw;
+    if (value == null) return null;
+    if (_raw is EqualUnmodifiableMapView) return _raw;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, barcode: $barcode, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt)';
+    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, barcode: $barcode, stdBarcode: $stdBarcode, scanBarcode: $scanBarcode, description: $description, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt, inspectionDynamicTemplateId: $inspectionDynamicTemplateId, inspectionDynamicTemplateJson: $inspectionDynamicTemplateJson, raw: $raw)';
   }
 
   @override
@@ -371,6 +535,12 @@ class _$InspectionItemImpl implements _InspectionItem {
             (identical(other.qty, qty) || other.qty == qty) &&
             (identical(other.remark, remark) || other.remark == remark) &&
             (identical(other.barcode, barcode) || other.barcode == barcode) &&
+            (identical(other.stdBarcode, stdBarcode) ||
+                other.stdBarcode == stdBarcode) &&
+            (identical(other.scanBarcode, scanBarcode) ||
+                other.scanBarcode == scanBarcode) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             const DeepCollectionEquality().equals(other._media, _media) &&
             (identical(other.taskId, taskId) || other.taskId == taskId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
@@ -380,28 +550,43 @@ class _$InspectionItemImpl implements _InspectionItem {
             (identical(other.unitPerCtn, unitPerCtn) ||
                 other.unitPerCtn == unitPerCtn) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.inspectionDynamicTemplateId,
+                    inspectionDynamicTemplateId) ||
+                other.inspectionDynamicTemplateId ==
+                    inspectionDynamicTemplateId) &&
+            const DeepCollectionEquality().equals(
+                other._inspectionDynamicTemplateJson,
+                _inspectionDynamicTemplateJson) &&
+            const DeepCollectionEquality().equals(other._raw, _raw));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      type,
-      name,
-      status,
-      ctns,
-      qty,
-      remark,
-      barcode,
-      const DeepCollectionEquality().hash(_media),
-      taskId,
-      userId,
-      sampleId,
-      itemNo,
-      unitPerCtn,
-      createdAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        type,
+        name,
+        status,
+        ctns,
+        qty,
+        remark,
+        barcode,
+        stdBarcode,
+        scanBarcode,
+        description,
+        const DeepCollectionEquality().hash(_media),
+        taskId,
+        userId,
+        sampleId,
+        itemNo,
+        unitPerCtn,
+        createdAt,
+        inspectionDynamicTemplateId,
+        const DeepCollectionEquality().hash(_inspectionDynamicTemplateJson),
+        const DeepCollectionEquality().hash(_raw)
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -420,22 +605,36 @@ class _$InspectionItemImpl implements _InspectionItem {
 
 abstract class _InspectionItem implements InspectionItem {
   factory _InspectionItem(
-          final int? id,
-          final int? type,
-          final String? name,
-          final int? status,
-          final int? ctns,
-          final int? qty,
-          final String? remark,
-          final String? barcode,
-          final List<Media>? media,
-          @JsonKey(name: 'task_id') final int? taskId,
-          @JsonKey(name: 'user_id') final int? userId,
-          @JsonKey(name: 'sample_id') final int? sampleId,
-          @JsonKey(name: 'item_no') final String? itemNo,
-          @JsonKey(name: 'unit_per_ctn') final int? unitPerCtn,
-          @JsonKey(name: 'created_at') final String? createdAt) =
-      _$InspectionItemImpl;
+      final int? id,
+      final int? type,
+      final String? name,
+      final int? status,
+      final int? ctns,
+      final int? qty,
+      final String? remark,
+      final String? barcode,
+      @JsonKey(name: 'std_barcode') final String? stdBarcode,
+      @JsonKey(name: 'scan_barcode') final String? scanBarcode,
+      final String? description,
+      final List<Media>? media,
+      @JsonKey(name: 'task_id') final int? taskId,
+      @JsonKey(name: 'user_id') final int? userId,
+      @JsonKey(name: 'sample_id') final int? sampleId,
+      @JsonKey(name: 'item_no') final String? itemNo,
+      @JsonKey(name: 'unit_per_ctn') final int? unitPerCtn,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(
+          name: 'inspection_dynamic_template_id',
+          fromJson: _inspectionDynamicTemplateIdFromJson,
+          toJson: _inspectionDynamicTemplateIdToJson)
+      final int? inspectionDynamicTemplateId,
+      @JsonKey(
+          name: 'inspection_dynamic_template_json',
+          fromJson: _inspectionDynamicTemplateJsonFromJson,
+          toJson: _inspectionDynamicTemplateJsonToJson)
+      final Map<String, dynamic>? inspectionDynamicTemplateJson,
+      @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+      final Map<String, dynamic>? raw) = _$InspectionItemImpl;
 
   factory _InspectionItem.fromJson(Map<String, dynamic> json) =
       _$InspectionItemImpl.fromJson;
@@ -457,6 +656,14 @@ abstract class _InspectionItem implements InspectionItem {
   @override
   String? get barcode;
   @override
+  @JsonKey(name: 'std_barcode')
+  String? get stdBarcode;
+  @override
+  @JsonKey(name: 'scan_barcode')
+  String? get scanBarcode;
+  @override
+  String? get description;
+  @override
   List<Media>? get media;
   @override
   @JsonKey(name: 'task_id')
@@ -476,6 +683,21 @@ abstract class _InspectionItem implements InspectionItem {
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
+  @override
+  @JsonKey(
+      name: 'inspection_dynamic_template_id',
+      fromJson: _inspectionDynamicTemplateIdFromJson,
+      toJson: _inspectionDynamicTemplateIdToJson)
+  int? get inspectionDynamicTemplateId;
+  @override
+  @JsonKey(
+      name: 'inspection_dynamic_template_json',
+      fromJson: _inspectionDynamicTemplateJsonFromJson,
+      toJson: _inspectionDynamicTemplateJsonToJson)
+  Map<String, dynamic>? get inspectionDynamicTemplateJson;
+  @override
+  @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
+  Map<String, dynamic>? get raw;
   @override
   @JsonKey(ignore: true)
   _$$InspectionItemImplCopyWith<_$InspectionItemImpl> get copyWith =>

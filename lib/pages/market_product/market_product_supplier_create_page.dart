@@ -35,10 +35,8 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
 
       try {
         final result = await identifySupplySuppliersCard({'image': images});
-
         if (result != null && result is Map<String, dynamic>) {
           EasyLoading.showSuccess("识别成功");
-
           formKey.currentState?.patchValue(result);
         } else {
           EasyLoading.dismiss();
@@ -56,14 +54,14 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
           await EasyLoading.show(status: '提交中...');
 
           final values = formState!.value;
-          final area = values['area']?.toString() ?? '';
-          final stall = values['stall']?.toString() ?? '';
 
           final data = {
+            'item_type': "market",
             'images': values['images'],
             'name': values['name'],
-            'stall_address': '$area$stall',
-            'item_type': "market"
+            'stall_address': values['stall_address'],
+            'business_scope': values['business_scope'], //营业范围
+            'address': values['address'], //厂商地址 
           };
 
           if (data['images'] != null && data['images'] is List) {
@@ -81,25 +79,25 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
 
           final newSupplier = await storeSupplySupplier(data);
 
-          final hasSupplierName = values['supplier_name'] != null &&
-              values['supplier_name'].toString().isNotEmpty;
+          final hasSupplierName = values['contact_name'] != null &&
+              values['contact_name'].toString().isNotEmpty;
 
           if (hasSupplierName) {
             final supplierId = newSupplier?.id;
 
             final supplierData = {
               'supplier_id': supplierId,
-              'name': values['supplier_name'],
-              'mobile': values['supplier_mobile'],
-              'department': values['supplier_department'],
-              'sex': values['supplier_sex'],
-              'position': values['supplier_position'],
-              'wechat': values['supplier_wechat'],
-              'qq': values['supplier_qq'],
-              'phone': values['supplier_phone'],
-              'email': values['supplier_email'],
-              'fax': values['supplier_fax'],
-              'remark': values['supplier_remark'],
+              'name': values['contact_name'],
+              'mobile': values['mobile'],
+              'department': values['department'],
+              'sex': values['sex'],
+              'position': values['position'],
+              'wechat': values['wechat'],
+              'qq': values['qq'],
+              'phone': values['phone'],
+              'email': values['email'],
+              'fax': values['fax'],
+              'remark': values['remark'],
             };
 
             await storeSupplySupplierContact(supplierData);
@@ -218,31 +216,41 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             Row(
-                              children: [
+                              children: [ 
                                 Expanded(
                                     child: FormBuilderField<String>(
-                                  name: "area",
+                                  name: "stall_address",
                                   builder: (field) {
                                     return Input(
-                                      label: '区域',
-                                      value: field.value ?? '',
-                                      onChanged: field.didChange,
-                                    );
-                                  },
-                                )),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                    child: FormBuilderField<String>(
-                                  name: "stall",
-                                  builder: (field) {
-                                    return Input(
-                                      label: '店铺号',
+                                      label: '档口店铺信息',
                                       value: field.value ?? '',
                                       onChanged: field.didChange,
                                     );
                                   },
                                 )),
                               ],
+                            ), 
+ 
+                            FormBuilderField<String>(
+                              name: "address",
+                              builder: (field) {
+                                return Input(
+                                  label: '厂商地址',
+                                  value: field.value ?? '',
+                                  onChanged: field.didChange,
+                                );
+                              },
+                            ),
+                            FormBuilderField<String>(
+                              name: "business_scope",
+                              builder: (field) {
+                                return TextArea(
+                                  label: '营业范围',
+                                  value: field.value,
+                                  maxLines: 1,
+                                  onChanged: field.didChange,
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -256,7 +264,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                                 }
                                 return null;
                               },
-                              name: "supplier_name",
+                              name: "contact_name",
                               builder: (field) {
                                 return Input(
                                   label: '联系人姓名',
@@ -268,7 +276,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_mobile",
+                              name: "mobile",
                               builder: (field) {
                                 return Input(
                                   label: '手机号',
@@ -278,7 +286,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_department",
+                              name: "department",
                               builder: (field) {
                                 return Input(
                                   label: '部门',
@@ -288,7 +296,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_sex",
+                              name: "sex",
                               builder: (field) {
                                 return Input(
                                   label: '性别',
@@ -298,7 +306,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_position",
+                              name: "position",
                               builder: (field) {
                                 return Input(
                                   label: '职位',
@@ -308,7 +316,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_wechat",
+                              name: "wechat",
                               builder: (field) {
                                 return Input(
                                   label: '微信',
@@ -318,7 +326,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_qq",
+                              name: "qq",
                               builder: (field) {
                                 return Input(
                                   label: 'QQ',
@@ -328,7 +336,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_phone",
+                              name: "phone",
                               builder: (field) {
                                 return Input(
                                   label: '座机',
@@ -338,7 +346,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_email",
+                              name: "email",
                               builder: (field) {
                                 return Input(
                                   label: 'Email',
@@ -348,7 +356,7 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_fax",
+                              name: "fax",
                               builder: (field) {
                                 return Input(
                                   label: '传真',
@@ -358,11 +366,12 @@ class MarketProductSupplierCreatePage extends HookConsumerWidget {
                               },
                             ),
                             FormBuilderField<String>(
-                              name: "supplier_remark",
+                              name: "remark",
                               builder: (field) {
                                 return TextArea(
                                   label: '备注',
                                   value: field.value,
+                                  maxLines: 3,
                                   onChanged: field.didChange,
                                 );
                               },

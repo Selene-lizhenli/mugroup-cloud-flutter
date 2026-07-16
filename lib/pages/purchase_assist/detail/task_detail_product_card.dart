@@ -4,22 +4,42 @@ import 'package:cloud/pages/purchase_assist/purchase_assist_page.dart';
 import 'package:flutter/material.dart'; 
 import 'package:url_launcher/url_launcher.dart';
 
-/// 任务详情中的 相似商品 小卡片
+/// 批量任务详情中的 商品 小卡片
 class TaskResultProductCard extends StatelessWidget {
   const TaskResultProductCard({
     super.key,
     required this.columnWidth,
     required this.product,
     required this.platform,
+    this.priceColor,
   });
 
   final PurchaseAssistTaskResultProduct product;
   final double columnWidth;
-  final String platform;
+  final List platform;
+  final Color? priceColor;
+
+  String _resolvePrimaryPlatform() {
+    for (final item in platform) {
+      final value = item?.toString().trim();
+      if (value != null && value.isNotEmpty) {
+        return value;
+      }
+    }
+    return '';
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final price = product.price?.trim();
+    final String? displayPrice = (price == null || price.isEmpty)
+        ? null
+        : (price.startsWith('￥') ||
+                price.startsWith('\$') ||
+                price.startsWith('¥'))
+            ? price
+            : '¥$price';
 
     Future<void> openProductUrl(BuildContext context, String? url) async {
       if (url == null || url.isEmpty) return;
@@ -69,7 +89,11 @@ class TaskResultProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
-                    onTap: () => onProductTap(product, platform, context),
+                    onTap: () => onProductTap(
+                      product,
+                      _resolvePrimaryPlatform(),
+                      context,
+                    ),
                     child: Text(
                       product.name ?? '—',
                       style: const TextStyle(
@@ -81,14 +105,14 @@ class TaskResultProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (product.price != null) ...[
+                  if (displayPrice != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      '¥${product.price}',
+                      displayPrice,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: colorScheme.primary,
+                        color: priceColor ?? colorScheme.primary,
                       ),
                     ),
                   ],

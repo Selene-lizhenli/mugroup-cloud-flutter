@@ -36,6 +36,8 @@ mixin _$HomeState {
   bool get supplierNoMore =>
       throw _privateConstructorUsedError; // ----------  样品间 ----------
   List<Warehouse> get warehouses => throw _privateConstructorUsedError;
+  List<Warehouse> get privateWarehouseList =>
+      throw _privateConstructorUsedError;
   bool get isLoadingWarehouses => throw _privateConstructorUsedError;
   Warehouse? get currentSelectedWarehouse =>
       throw _privateConstructorUsedError; // ----------  视图模式 ----------
@@ -72,6 +74,7 @@ abstract class $HomeStateCopyWith<$Res> {
       int supplierPages,
       bool supplierNoMore,
       List<Warehouse> warehouses,
+      List<Warehouse> privateWarehouseList,
       bool isLoadingWarehouses,
       Warehouse? currentSelectedWarehouse,
       bool isDetailedMode,
@@ -111,6 +114,7 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
     Object? supplierPages = null,
     Object? supplierNoMore = null,
     Object? warehouses = null,
+    Object? privateWarehouseList = null,
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
     Object? isDetailedMode = null,
@@ -183,6 +187,10 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.warehouses
           : warehouses // ignore: cast_nullable_to_non_nullable
               as List<Warehouse>,
+      privateWarehouseList: null == privateWarehouseList
+          ? _value.privateWarehouseList
+          : privateWarehouseList // ignore: cast_nullable_to_non_nullable
+              as List<Warehouse>,
       isLoadingWarehouses: null == isLoadingWarehouses
           ? _value.isLoadingWarehouses
           : isLoadingWarehouses // ignore: cast_nullable_to_non_nullable
@@ -248,6 +256,7 @@ abstract class _$$HomeStateImplCopyWith<$Res>
       int supplierPages,
       bool supplierNoMore,
       List<Warehouse> warehouses,
+      List<Warehouse> privateWarehouseList,
       bool isLoadingWarehouses,
       Warehouse? currentSelectedWarehouse,
       bool isDetailedMode,
@@ -286,6 +295,7 @@ class __$$HomeStateImplCopyWithImpl<$Res>
     Object? supplierPages = null,
     Object? supplierNoMore = null,
     Object? warehouses = null,
+    Object? privateWarehouseList = null,
     Object? isLoadingWarehouses = null,
     Object? currentSelectedWarehouse = freezed,
     Object? isDetailedMode = null,
@@ -358,6 +368,10 @@ class __$$HomeStateImplCopyWithImpl<$Res>
           ? _value._warehouses
           : warehouses // ignore: cast_nullable_to_non_nullable
               as List<Warehouse>,
+      privateWarehouseList: null == privateWarehouseList
+          ? _value._privateWarehouseList
+          : privateWarehouseList // ignore: cast_nullable_to_non_nullable
+              as List<Warehouse>,
       isLoadingWarehouses: null == isLoadingWarehouses
           ? _value.isLoadingWarehouses
           : isLoadingWarehouses // ignore: cast_nullable_to_non_nullable
@@ -406,6 +420,7 @@ class _$HomeStateImpl extends _HomeState {
       this.supplierPages = 1,
       this.supplierNoMore = false,
       final List<Warehouse> warehouses = const [],
+      final List<Warehouse> privateWarehouseList = const [],
       this.isLoadingWarehouses = false,
       this.currentSelectedWarehouse,
       this.isDetailedMode = false,
@@ -417,6 +432,7 @@ class _$HomeStateImpl extends _HomeState {
         _facetCounts = facetCounts,
         _suppliers = suppliers,
         _warehouses = warehouses,
+        _privateWarehouseList = privateWarehouseList,
         _query = query,
         super._();
 
@@ -497,6 +513,16 @@ class _$HomeStateImpl extends _HomeState {
     return EqualUnmodifiableListView(_warehouses);
   }
 
+  final List<Warehouse> _privateWarehouseList;
+  @override
+  @JsonKey()
+  List<Warehouse> get privateWarehouseList {
+    if (_privateWarehouseList is EqualUnmodifiableListView)
+      return _privateWarehouseList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_privateWarehouseList);
+  }
+
   @override
   @JsonKey()
   final bool isLoadingWarehouses;
@@ -526,7 +552,7 @@ class _$HomeStateImpl extends _HomeState {
 
   @override
   String toString() {
-    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, productListLoading: $productListLoading, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse, isDetailedMode: $isDetailedMode, query: $query, productCurrentPage: $productCurrentPage, productNoMore: $productNoMore)';
+    return 'HomeState(bus: $bus, currentPage: $currentPage, pageController: $pageController, searchTextController: $searchTextController, search: $search, media: $media, currentMediaId: $currentMediaId, productListLoading: $productListLoading, samples: $samples, facetCounts: $facetCounts, samplePages: $samplePages, sampleNoMore: $sampleNoMore, suppliers: $suppliers, supplierPages: $supplierPages, supplierNoMore: $supplierNoMore, warehouses: $warehouses, privateWarehouseList: $privateWarehouseList, isLoadingWarehouses: $isLoadingWarehouses, currentSelectedWarehouse: $currentSelectedWarehouse, isDetailedMode: $isDetailedMode, query: $query, productCurrentPage: $productCurrentPage, productNoMore: $productNoMore)';
   }
 
   @override
@@ -562,6 +588,8 @@ class _$HomeStateImpl extends _HomeState {
                 other.supplierNoMore == supplierNoMore) &&
             const DeepCollectionEquality()
                 .equals(other._warehouses, _warehouses) &&
+            const DeepCollectionEquality()
+                .equals(other._privateWarehouseList, _privateWarehouseList) &&
             (identical(other.isLoadingWarehouses, isLoadingWarehouses) ||
                 other.isLoadingWarehouses == isLoadingWarehouses) &&
             (identical(
@@ -595,6 +623,7 @@ class _$HomeStateImpl extends _HomeState {
         supplierPages,
         supplierNoMore,
         const DeepCollectionEquality().hash(_warehouses),
+        const DeepCollectionEquality().hash(_privateWarehouseList),
         isLoadingWarehouses,
         currentSelectedWarehouse,
         isDetailedMode,
@@ -628,6 +657,7 @@ abstract class _HomeState extends HomeState {
       final int supplierPages,
       final bool supplierNoMore,
       final List<Warehouse> warehouses,
+      final List<Warehouse> privateWarehouseList,
       final bool isLoadingWarehouses,
       final Warehouse? currentSelectedWarehouse,
       final bool isDetailedMode,
@@ -668,6 +698,8 @@ abstract class _HomeState extends HomeState {
   bool get supplierNoMore;
   @override // ----------  样品间 ----------
   List<Warehouse> get warehouses;
+  @override
+  List<Warehouse> get privateWarehouseList;
   @override
   bool get isLoadingWarehouses;
   @override

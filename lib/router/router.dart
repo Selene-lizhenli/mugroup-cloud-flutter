@@ -91,10 +91,10 @@ class AppRouter extends RootStackRouter {
           path: "/market_product/market_product_list"),
       AutoRoute(page: InspectionRoute.page, path: "/inspection"),
       AutoRoute(page: InspectionAddRoute.page, path: "/inspection/add"),
-      AutoRoute(page: InspectionDetailRoute.page, path: "/inspection/detail"),
+      AutoRoute(page: InspectionDetailRoute.page, path: "/inspection/detail"), 
       AutoRoute(
-          page: InspectionItemConfirmRoute.page,
-          path: "/inspection/item/confirm"),
+        page: InspectionItemExecuteRoute.page,
+        path: "/inspection/item/execute"),
       AutoRoute(
         page: MarketProductRoute.page,
         guards: [AuthGuard()],
@@ -123,6 +123,14 @@ class AppRouter extends RootStackRouter {
       AutoRoute(page: ScanRoute.page, path: "/scan"),
       AutoRoute(page: WmsTransferRoute.page, path: "/wms/transfer/:id"),
       AutoRoute(page: WmsDeliveryRoute.page, path: "/wms/delivery/:id"),
+      AutoRoute(
+          page: WarehouseReceiptListRoute.page, path: "/warehouse/receipts"),
+      AutoRoute(
+          page: WarehouseReceiptDetailRoute.page,
+          path: "/warehouse/receipts/:id"),
+      AutoRoute(
+          page: WarehouseReceiptItemDetailRoute.page,
+          path: "/warehouse/receipt-items/:id"),
       AutoRoute(
           page: ShowroomQuotationsRoute.page,
           path: "/showroom/quotations/:quoteNo"),
@@ -242,12 +250,7 @@ class AppRouter extends RootStackRouter {
         path: "/cart/confirm",
         guards: [AuthGuard()],
       ),
-
-      AutoRoute(
-        page: NewsRoute.page,
-        path: "/news/detail",
-        guards: [AuthGuard()],
-      ),
     ];
   }
 }
+ 

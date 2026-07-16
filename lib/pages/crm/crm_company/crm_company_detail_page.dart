@@ -20,6 +20,7 @@ class CrmCompanyDetailPage extends HookConsumerWidget {
     final permissions = user?.permissions ?? [];
     final company = useState<Company?>(null);
     final isLoading = useState(true);
+
     Future loadCompany() async {
       try {
         final data = await showCrmCompany(id);

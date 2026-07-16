@@ -86,7 +86,7 @@ class MarketProductListPage extends HookConsumerWidget {
                 },
                 onSearchMedia: (temporaryMedia) {
                   homeNotifier.addMedia(temporaryMedia);
-                  if (temporaryMedia.id == home.currentMediaId) {
+                  if (temporaryMedia.idEquals(home.currentMediaId)) {
                     return;
                   }
                   home.bus.dispatch(

@@ -32,7 +32,7 @@ java 17.0.14
 4. 在命令行进入 keystores 文件夹 (与andriod文件夹同级)
 5. 在命令行执行： 如
  ```sh
-  C:\Users\张三\AppData\Local\Android\Sdk\build-tools\34.0.0\apksigner.bat sign --ks debug.keystore --next-signer --ks mugroup-cloud.jks --lineage SigningCertificateLineage.debug.cloud --in app-release.apk --out app-release-signed.apk
+  D:\andriod-sdk\build-tools\36.1.0\apksigner.bat sign --ks debug.keystore --next-signer --ks mugroup-cloud.jks --lineage SigningCertificateLineage.debug.cloud --in app-release.apk --out app-release-signed.apk
  ```
 6. 运行后输入密码:
   debug.keystore 的密码 android

@@ -68,7 +68,7 @@ class UploadedImagesRow extends ConsumerWidget {
                   }
                   final media = list[index];
                   final imageUrl = media.thumbUrl ?? media.url;
-                  final isSelected = state.searchMedia?.id == media.id;
+                  final isSelected = media.idEquals(state.searchMedia?.id);
                   return GestureDetector(
                     onTap: () {
                       notifier.setSearchMedia(media);

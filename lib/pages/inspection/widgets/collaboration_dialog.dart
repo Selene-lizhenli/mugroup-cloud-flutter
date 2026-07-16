@@ -14,8 +14,15 @@ class CollaborationBottomSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inspectionAsync = ref.watch(inspectionDetailProvider(inspectionId));
-    final notifier = ref.read(inspectionDetailProvider(inspectionId).notifier);
+    final detailState = ref.watch(inspectionDetailProvider);
+    final notifier = ref.read(inspectionDetailProvider.notifier);
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifier.load(inspectionId);
+      });
+      return null;
+    }, [inspectionId]);
 
     final searchController = useTextEditingController();
     useListenable(searchController);
@@ -48,7 +55,9 @@ class CollaborationBottomSheet extends HookConsumerWidget {
       return null;
     }, [searchController.text]);
 
-    final currentCollaborators = inspectionAsync.value?.collaborators ?? [];
+    final currentCollaborators = detailState.inspectionId == inspectionId
+        ? [...?detailState.inspection?.collaborators]
+        : <User>[];
     final bool hasSearchText = searchController.text.trim().isNotEmpty;
 
     return Container(
@@ -161,7 +170,7 @@ class CollaborationBottomSheet extends HookConsumerWidget {
             flex: 2,
             child: _buildUserList(
               users: currentCollaborators,
-              isLoading: inspectionAsync.isLoading,
+              isLoading: false,
               emptyText: '暂无协作人员',
               actionType: ActionType.remove,
               onAction: (user) async {

@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:flutter/material.dart';
 
 class AudioPlayableItem extends StatefulWidget {
@@ -47,6 +48,7 @@ class _AudioPlayableItemState extends State<AudioPlayableItem> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -71,7 +73,7 @@ class _AudioPlayableItemState extends State<AudioPlayableItem> {
                     color: Colors.blue),
                 const SizedBox(width: 8),
                 Text(
-                  _isPlaying ? "播放中..." : "语音片段",
+                  _isPlaying ? l10n.showroomAudioPlaying : l10n.showroomAudioClip,
                   style: const TextStyle(fontSize: 13, color: Colors.blue),
                 ),
               ],

@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/market_product/events/search_event.dart';
 import 'package:cloud/pages/market_product/providers/home_provider.dart';
 import 'package:cloud/pages/supply/widgets/supplier_view.dart';
@@ -23,10 +24,11 @@ class SupplySupplierPage extends HookConsumerWidget {
     final homeNotifier = ref.read(homeProvider.notifier);
     final currentPageIndex = useState<int>(0);
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('供应商列表'),
+          title: Text(l10n.dashboardSupplier),
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.black,
@@ -49,9 +51,7 @@ class SupplySupplierPage extends HookConsumerWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
               child: MuSearchBar(

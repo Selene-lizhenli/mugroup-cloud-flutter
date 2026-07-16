@@ -1,21 +1,33 @@
 // 汇率计算器弹窗
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// 人民币占位，用于换算中的基准币种（1:1 的 reverse 参与跨币种换算）
-ExchangeRate get _cnyRate => const ExchangeRate(
-      name: '人民币',
+ExchangeRate _buildCnyRate(String name) => ExchangeRate(
+      name: name,
       shortName: 'CNY',
       exchangeRate: '1',
       reverseExchangeRate: '1',
     );
 
-bool _isCny(ExchangeRate r) => r.shortName == 'CNY' || r.name == '人民币';
+bool _isCny(ExchangeRate r) => r.shortName == 'CNY';
 
 double _getReverse(ExchangeRate r) =>
     double.tryParse(r.reverseExchangeRate ?? '0') ?? 0.0;
+
+final _rateInputFormatter = TextInputFormatter.withFunction((
+  oldValue,
+  newValue,
+) {
+  final text = newValue.text;
+  if (text.isEmpty || RegExp(r'^\d*\.?\d{0,4}$').hasMatch(text)) {
+    return newValue;
+  }
+  return oldValue;
+});
 
 class ExchangeCalculatorDialog extends HookConsumerWidget {
   final ExchangeRate? selectedDimension; // 维度选择的币种
@@ -29,18 +41,23 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final cnyRate = _buildCnyRate(l10n.dashboardCny);
     // 两个换算币种：默认人民币 + 默认维度币种；用 ExchangeRate 作为选中值
     final selectedFrom = useState<ExchangeRate?>(null);
     final selectedTo = useState<ExchangeRate?>(null);
     final fromAmountController = useTextEditingController();
     final toAmountController = useTextEditingController();
+    final rateController = useTextEditingController();
     final isUpdating = useState<bool>(false);
+    final isCustomRate = useState<bool>(false);
 
     final colorScheme = Theme.of(context).colorScheme;
     final primaryColor = colorScheme.primary;
     final secondaryColor = colorScheme.secondary;
+    final isChinese =
+        Localizations.localeOf(context).languageCode.startsWith('zh');
 
-    const backgroundColor = Color(0xFFF7F8FA);
     const textColor = Color(0xFF1F1F1F);
     final containerRadius = BorderRadius.circular(16);
 
@@ -53,8 +70,8 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
     /// 供选择的币种列表：人民币 + 接口返回的列表（若接口含人民币则不再重复）
     final choiceList = useMemoized(() {
       final rest = rates.where((r) => !_isCny(r)).toList();
-      return [_cnyRate, ...rest];
-    }, [rates]);
+      return [cnyRate, ...rest];
+    }, [rates, cnyRate]);
 
     /// 在 rates 中按 shortName 查找与 target 相同的项
     ExchangeRate? findInRates(ExchangeRate? target) {
@@ -78,6 +95,22 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       return rf > 0 ? rt / rf : 0;
     }
 
+    double getDefaultRate() {
+      final from = selectedFrom.value;
+      final to = selectedTo.value;
+      if (from == null || to == null) return 0;
+      return calcaToRate(from, to);
+    }
+
+    double getCurrentRate() {
+      if (isCustomRate.value) {
+        final customRate = double.tryParse(rateController.text);
+        if (customRate != null && customRate > 0) return customRate;
+        return 0;
+      }
+      return getDefaultRate();
+    }
+
     String formatNumber(double value) {
       final rounded = (value * 10000).round() / 10000.0;
       final formatted = rounded.toStringAsFixed(4);
@@ -95,6 +128,11 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       isUpdating.value = false;
     }
 
+    void updateDefaultRateText() {
+      final rate = getDefaultRate();
+      updateController(rateController, rate > 0 ? formatNumber(rate) : '');
+    }
+
     void calculateFromLeft() {
       final from = selectedFrom.value;
       final to = selectedTo.value;
@@ -107,9 +145,11 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       }
       final amount = double.tryParse(text);
       if (amount != null) {
-        final rate = calcaToRate(from, to);
+        final rate = getCurrentRate();
         if (rate > 0) {
           updateController(toAmountController, formatNumber(amount * rate));
+        } else {
+          updateController(toAmountController, '');
         }
       }
     }
@@ -126,9 +166,11 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       }
       final amount = double.tryParse(text);
       if (amount != null) {
-        final rate = calcaToRate(from, to);
+        final rate = getCurrentRate();
         if (rate > 0) {
           updateController(fromAmountController, formatNumber(amount / rate));
+        } else {
+          updateController(fromAmountController, '');
         }
       }
     }
@@ -143,18 +185,35 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         if (!isUpdating.value) calculateFromRight();
       }
 
+      void onRateChanged() {
+        if (isUpdating.value) return;
+        if (rateController.text.trim().isEmpty) {
+          isCustomRate.value = true;
+          // updateController(rateController, '0');
+        } else {
+          isCustomRate.value = true;
+        }
+        if (fromAmountController.text.isNotEmpty) {
+          calculateFromLeft();
+        } else if (toAmountController.text.isNotEmpty) {
+          calculateFromRight();
+        }
+      }
+
       fromAmountController.addListener(onFromChanged);
       toAmountController.addListener(onToChanged);
+      rateController.addListener(onRateChanged);
 
       return () {
         fromAmountController.removeListener(onFromChanged);
         toAmountController.removeListener(onToChanged);
+        rateController.removeListener(onRateChanged);
       };
-    }, [fromAmountController, toAmountController]);
+    }, [fromAmountController, toAmountController, rateController]);
 
     // 初始化：默认人民币 + 维度币种，用 ExchangeRate 作为选中值
     useEffect(() {
-      selectedFrom.value ??= _cnyRate;
+      selectedFrom.value ??= cnyRate;
       if (selectedTo.value == null && choiceList.isNotEmpty) {
         selectedTo.value = findInRates(selectedDimension) ??
             selectedDimension ??
@@ -162,6 +221,13 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       }
       return null;
     }, [choiceList, selectedDimension]);
+
+    useEffect(() {
+      if (!isCustomRate.value) {
+        updateDefaultRateText();
+      }
+      return null;
+    }, [selectedFrom.value, selectedTo.value, isCustomRate.value]);
 
     // 如果没有可选的除人民币外的币种，显示空状态
     if (choiceList.length <= 1) {
@@ -177,9 +243,9 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '汇率换算',
-                  style: TextStyle(
+                Text(
+                  l10n.dashboardExchangeCalculator,
+                  style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
@@ -200,23 +266,23 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
               ],
             ),
             const SizedBox(height: 40),
-            const Center(
-              child: Text('暂无汇率数据'),
+            Center(
+              child: Text(l10n.dashboardNoExchangeData),
             ),
           ],
         ),
       );
     }
 
-    final from = selectedFrom.value ?? _cnyRate;
+    final from = selectedFrom.value ?? cnyRate;
     final to = selectedTo.value;
-    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     String getRateText() {
       if (to == null) return '';
-      final r = calcaToRate(from, to);
+      final r = getDefaultRate();
       if (r <= 0) return '';
-      return '1 ${from.name} ≈ ${r.toStringAsFixed(4)} ${to.name}';
+      return '${l10n.dashboardExchangeRateDefaultHint}\n'
+          '1${from.name} ≈ ${formatNumber(r)}${to.name}';
     }
 
     void showCurrencySelector(
@@ -258,6 +324,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         showCurrencySelector(context, choiceList, selectedValue: from,
             onSelect: (r) {
           selectedFrom.value = r;
+          isCustomRate.value = false;
           if (fromAmountController.text.isNotEmpty) {
             calculateFromLeft();
           } else {
@@ -269,6 +336,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
         showCurrencySelector(context, choiceList, selectedValue: to,
             onSelect: (r) {
           selectedTo.value = r;
+          isCustomRate.value = false;
           if (toAmountController.text.isNotEmpty) {
             calculateFromRight();
           } else {
@@ -280,16 +348,21 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       required ExchangeRate currency,
       required TextEditingController controller,
       required bool isPrimary,
+      bool autofocus = false,
       VoidCallback? onTapSelector,
     }) {
-      final currencyName = currency.name ?? '';
+      final currencyName =
+          isChinese ? (currency.name ?? '') : (currency.shortName ?? '');
       return Container(
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: containerRadius,
-          border: Border.all(color: colorScheme.primary.withOpacity(0.45), width: 0.5),
+          border: Border.all(
+            color: colorScheme.primary.withOpacity(0.45),
+            width: 0.5,
+          ),
         ),
         child: Row(
           children: [
@@ -342,6 +415,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
             Expanded(
               child: TextField(
                 controller: controller,
+                autofocus: autofocus,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 textAlign: TextAlign.end,
@@ -366,97 +440,145 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
       );
     }
 
+    Widget buildRateRow() {
+      return FractionallySizedBox(
+        widthFactor: 0.70,
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${l10n.current} ${l10n.quoteExchangeRate}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                height: 36,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 62,
+                      child: TextField(
+                        controller: rateController,
+                        inputFormatters: [_rateInputFormatter],
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                          height: 1.2,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: l10n.quotationExchangeHint,
+                          hintStyle: const TextStyle(
+                            color: Color(0xFFC7C7CC),
+                            fontSize: 13,
+                          ),
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 20,
-        left: 20,
-        right: 20,
-        bottom: bottomPadding + 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '汇率换算',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-              ),
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close, size: 22, color: Colors.grey),
+          Container(
+            height: 55,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.dashboardExchangeCalculator,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onPrimary),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Column(
-                children: [
-                  buildInputRow(
-                    currency: from,
-                    controller: fromAmountController,
-                    isPrimary: true,
-                    onTapSelector: showSelectorForFrom,
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close,
+                        size: 22, color: Color.fromARGB(255, 255, 255, 255)),
                   ),
-                  const SizedBox(height: 4),
-                  buildInputRow(
-                    currency: to ?? _cnyRate,
-                    controller: toAmountController,
-                    isPrimary: false,
-                    onTapSelector: showSelectorForTo,
-                  ),
-                ],
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: backgroundColor, width: 4),
                 ),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.swap_vert, size: 20, color: primaryColor),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              getRateText(),
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+              ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                buildRateRow(),
+                const SizedBox(height: 4),
+                buildInputRow(
+                  currency: from,
+                  controller: fromAmountController,
+                  isPrimary: true,
+                  autofocus: true,
+                  onTapSelector: showSelectorForFrom,
+                ),
+                const SizedBox(height: 2),
+                Icon(Icons.swap_vert, size: 24, color: colorScheme.primary),
+                const SizedBox(height: 2),
+                buildInputRow(
+                  currency: to ?? cnyRate,
+                  controller: toAmountController,
+                  isPrimary: false,
+                  onTapSelector: showSelectorForTo,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                getRateText(),
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -478,6 +600,7 @@ class _CurrencySearchList extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final keyword = useState<String>('');
     final colorScheme = Theme.of(context).colorScheme;
     final primaryColor = colorScheme.primary;
@@ -505,7 +628,7 @@ class _CurrencySearchList extends HookWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: TextField(
             decoration: InputDecoration(
-              hintText: '搜索货币名称',
+              hintText: l10n.dashboardSearchCurrency,
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               filled: true,
               fillColor: const Color(0xFFF7F8FA),
@@ -520,8 +643,9 @@ class _CurrencySearchList extends HookWidget {
         const Divider(height: 1, color: Color(0xFFEEEEEE)),
         Expanded(
           child: filteredList.isEmpty
-              ? const Center(
-                  child: Text('未找到相关货币', style: TextStyle(color: Colors.grey)))
+              ? Center(
+                  child: Text(l10n.dashboardCurrencyNotFound,
+                      style: const TextStyle(color: Colors.grey)))
               : ListView.separated(
                   controller: scrollController,
                   itemCount: filteredList.length,
@@ -549,7 +673,7 @@ class _CurrencySearchList extends HookWidget {
                         ),
                       ),
                       title: Text(
-                        item.name ?? '',
+                        '${item.name ?? ''} ${item.shortName ?? ''}',
                         style: TextStyle(
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,

@@ -60,6 +60,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     final autoValidateMode = useState(AutovalidateMode.disabled);
 
     final isSubmitting = useState(false);
+    final isImageUploading = useState(false);
 
     const basicInfoFieldNames = {
       'product_no',
@@ -522,6 +523,10 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
     }
 
     Future<void> handleSubmit(bool isCopy) async {
+      if (isImageUploading.value) {
+        EasyLoading.showInfo('图片上传中，请稍后再提交');
+        return;
+      }
       final formState = formKey.currentState;
       if (formState?.saveAndValidate() ?? false) {
         isSubmitting.value = true;
@@ -572,8 +577,6 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
             'item_type': 'market_product'
           });
 
-          isSubmitting.value = false;
-
           EasyLoading.dismiss();
 
           final prefs = await SharedPreferences.getInstance();
@@ -604,7 +607,7 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
           }
 
           if (isCopy) {
-            handleCopyLastItem();
+            await handleCopyLastItem();
           }
         } finally {
           // 4. 无论成功失败，必须重置状态，否则按钮会一直卡在转圈状态
@@ -850,6 +853,9 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                         child: ImageUploader(
                                           customIcon: Icons.camera_alt,
                                           value: displayValue,
+                                          onUploadingChanged: (uploading) {
+                                            isImageUploading.value = uploading;
+                                          },
                                           onChanged: (value) {
                                             field.didChange(value);
                                           },
@@ -1271,10 +1277,14 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  onPressed: isSubmitting.value
+                                  onPressed:
+                                      (isSubmitting.value ||
+                                              isImageUploading.value)
                                       ? null
                                       : () => handleSubmit(false),
-                                  child: isSubmitting.value
+                                  child:
+                                      (isSubmitting.value ||
+                                              isImageUploading.value)
                                       ? const SizedBox(
                                           width: 20,
                                           height: 20,
@@ -1305,10 +1315,14 @@ class QuoteProductAddLandscapeView extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  onPressed: isSubmitting.value
+                                  onPressed:
+                                      (isSubmitting.value ||
+                                              isImageUploading.value)
                                       ? null
                                       : () => handleSubmit(true),
-                                  child: isSubmitting.value
+                                  child:
+                                      (isSubmitting.value ||
+                                              isImageUploading.value)
                                       ? const SizedBox(
                                           width: 20,
                                           height: 20,

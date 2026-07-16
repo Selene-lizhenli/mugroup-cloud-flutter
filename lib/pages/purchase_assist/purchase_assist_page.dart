@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/core.dart';
+import 'package:cloud/constants/search_platform_l10n_helper.dart';
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
 import 'package:cloud/pages/purchase_assist/provider/provider.dart';
 import 'package:cloud/pages/purchase_assist/widgets/assist_product_card.dart';
@@ -80,7 +82,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
     final headerColor = colorScheme.primary.withOpacity(0.2); // 渐变颜色
     final paddingTop = MediaQuery.of(context).padding.top; //刘海屏高度
     final notifier = ref.read(purchaseAssistProvider.notifier);
-
+    final l10n = context.l10n;
     useEffect(() {
       if (state.searchKeyword != searchController.text) {
         searchController.text = state.searchKeyword;
@@ -100,7 +102,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('采购助手'),
+          title: Text(l10n.featurePurchaseAssist),
           elevation: 0,
           foregroundColor: Colors.black,
           actions: [
@@ -152,6 +154,7 @@ class PurchaseAssistPage extends HookConsumerWidget {
           ],
         ),
         body: Stack(children: [
+          // 最底层：渐变铺满整页
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -189,24 +192,32 @@ class PurchaseAssistPage extends HookConsumerWidget {
                     )!,
                     colorScheme.surfaceTint,
                     colorScheme.surfaceTint,
-                    colorScheme.surface,
+                    colorScheme.surfaceTint,
                   ],
-                  stops: null,
+                  stops: const [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1.0],
                 ),
               ),
             ),
           ),
-          // 最底层：渐变铺满整页
+          // 中间层：背景图
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Image.asset(
+              'assets/element/benbenshopping.png',
+              fit: BoxFit.contain,
+              width: 200,
+            ),
+          ),
           Positioned.fill(
             left: 0,
             right: 0,
             top: paddingTop + appbarHeight,
             bottom: 0,
             child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: Center(
-                  child: _SearchResultBody(),
-                )),
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              child: _SearchResultBody(),
+            ),
           ),
         ]));
   }
@@ -224,6 +235,7 @@ class _SearchResultBody extends HookConsumerWidget {
         useTextEditingController(text: state.searchKeyword);
     final colorScheme = Theme.of(context).colorScheme;
     final selectedPlatform = state.selectedPlatform;
+    final l10n = context.l10n;
 
     const List<SearchPlatformItem> amazonCountries = [
       SearchPlatformItem(label: '加拿大', value: 'CA'),
@@ -267,7 +279,7 @@ class _SearchResultBody extends HookConsumerWidget {
               ),
           ],
         ),
-        tooltip: '筛选',
+        tooltip: l10n.filter,
         padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
         constraints: const BoxConstraints(),
         style: IconButton.styleFrom(
@@ -279,33 +291,38 @@ class _SearchResultBody extends HookConsumerWidget {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width, // 底部抽屉宽度占满屏幕
+              maxWidth: MediaQuery.of(context).size.width,
             ),
-            builder: (sheetContext) => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => Navigator.of(context).pop(),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: math.max(
-                    MediaQuery.of(sheetContext).viewInsets.bottom,
-                    0,
-                  ),
-                ),
-                child: DraggableScrollableSheet(
-                  initialChildSize: 0.6,
-                  minChildSize: 0.6,
-                  maxChildSize: 0.85,
-                  builder: (context, scrollController) => Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(12)),
+            builder: (sheetContext) {
+              final bottomInset = MediaQuery.viewInsetsOf(sheetContext).bottom;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.of(sheetContext).pop(),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: bottomInset),
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(
+                          maxHeight:
+                              MediaQuery.sizeOf(sheetContext).height * 0.85,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(sheetContext).colorScheme.surface,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
+                        ),
+                        child: const FilterContent(),
+                      ),
                     ),
-                    child: FilterContent(scrollController: scrollController),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       );
@@ -322,19 +339,23 @@ class _SearchResultBody extends HookConsumerWidget {
             const SizedBox(width: 4),
             Expanded(
               child: MuTagList(
-                items: searchPlatform,
+                items: localizedSearchPlatform(l10n),
                 selectedValue: selectedPlatform,
                 onSelected: (value) {
                   if (state.searchMediaList.isEmpty &&
                       value == 'alibabaglobal') {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('国际站不支持关键字搜索')),
+                      SnackBar(
+                          content: Text(
+                              '${l10n.searchPlatformAlibabaglobal} ${l10n.notSupportKeywordSearch}')),
                     );
                     return;
                   }
                   if (state.searchMediaList.isEmpty && value == 'amazon') {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('亚马逊不支持关键字搜索')),
+                      SnackBar(
+                          content: Text(
+                              '${l10n.searchPlatformAmazon} ${l10n.notSupportKeywordSearch}')),
                     );
                     return;
                   }
@@ -414,6 +435,7 @@ class _SearchResultBody extends HookConsumerWidget {
                 isAdapColumn: true,
                 itemBuilder: (context, item) => AssistProductCard(
                   sample: item,
+                  platformType: selectedPlatform,
                   onTap: () => onProductTap(item, selectedPlatform, context),
                 ),
               ),

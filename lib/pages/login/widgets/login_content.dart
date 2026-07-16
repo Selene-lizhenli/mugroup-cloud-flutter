@@ -87,6 +87,7 @@ class LoginContent extends HookConsumerWidget {
         qrcode.value = result;
         if (result.usedAt != null) {
           logger.d("登录成功");
+          qrcodeTimer.value!.cancel();
           onAfterLogin?.call();
         }
 
@@ -122,7 +123,6 @@ class LoginContent extends HookConsumerWidget {
 
       onAfterLogin?.call();
     }, [appleIdentityToken]);
-    
 
     useEffect(() {
       if (loginWay == "wxwork") {
@@ -138,9 +138,9 @@ class LoginContent extends HookConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final screenWidth = MediaQuery.sizeOf(context).width; 
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final containerWidth =
-        screenWidth >=  largeScreenWidth ? screenWidth * 0.88 : double.infinity;
+        screenWidth >= largeScreenWidth ? screenWidth * 0.88 : double.infinity;
 
     return Container(
       width: containerWidth,
@@ -182,6 +182,8 @@ class LoginContent extends HookConsumerWidget {
                     child: isWxworkInstalled == true
                         ? ElevatedButton(
                             onPressed: () async {
+                              await api.get("api/csrf-cookie");
+
                               final isSuccess = await handleWxworkQuickLogin(
                                 schema: tenant.wxwork!.schema!,
                                 corpId: tenant.wxwork!.corpId!,

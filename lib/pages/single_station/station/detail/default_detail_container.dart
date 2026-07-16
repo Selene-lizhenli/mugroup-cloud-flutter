@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/single_station/single_station_item.dart';
 import 'package:cloud/pages/single_station/station/detail/basic_info_tab.dart';
 import 'package:cloud/pages/single_station/station/detail/station_samples_tab.dart';
@@ -9,7 +10,6 @@ import 'package:cloud/pages/widgets/text_adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:cloud/constants/theme_config.dart';
 
 class DefaultDetailContainer extends HookConsumerWidget {
   const DefaultDetailContainer({
@@ -20,10 +20,10 @@ class DefaultDetailContainer extends HookConsumerWidget {
 
   final SingleStationItem? item;
   final String? stationTheme;
-   
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final tabController = useTabController(initialLength: 2);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -38,7 +38,7 @@ class DefaultDetailContainer extends HookConsumerWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: AdaptiveTitleText(
-          title: item?.nameCn ?? item?.nameEn ?? '独立站详情',
+          title: item?.nameCn ?? item?.nameEn ?? l10n.stationDetailTitle,
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
@@ -84,6 +84,18 @@ class DefaultDetailContainer extends HookConsumerWidget {
               ),
             ),
           ),
+          // 中间层：图片
+          Positioned(
+            right: 0,
+            left: 0,
+            bottom: 0,
+            child: Image.asset(
+              'assets/photo/single_website.png',
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+
           // 上层：从 AppBar 下方开始的 TabBar + TabBarView
           Positioned(
             left: 0,
@@ -101,9 +113,9 @@ class DefaultDetailContainer extends HookConsumerWidget {
                     labelColor: pageColor,
                     indicatorColor: pageColor,
                     controller: tabController,
-                    tabs: const [
-                      Tab(text: '基本信息'),
-                      Tab(text: '样品明细'),
+                    tabs: [
+                      Tab(text: l10n.quoteBasicInfo),
+                      Tab(text: l10n.stationDetailSamplesTab),
                     ],
                   ),
                 ),

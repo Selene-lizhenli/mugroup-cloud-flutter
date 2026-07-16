@@ -1,5 +1,7 @@
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
+import 'package:cloud/pages/single_station/inquiry/inquiry_l10n_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,25 +11,12 @@ class InquiryBasicInfoTab extends StatelessWidget {
 
   final SingleStationInquiries? item;
 
-  /// 根据 UA 生成「来源」展示文案
-  /// - 使用 [parseUaDeviceType] 得到设备中文描述
-  /// - 包含 "wxwork" 时，追加 "企微"
-  String _formatSource(String? ua) {
-    final parsed = parseUaDeviceType(ua);
-    String desc = parsed['description'] as String? ?? '未知设备'; 
-    final lowerUa = ua?.toLowerCase() ?? '';
-    if (lowerUa.contains('wxwork')) {
-      desc = '$desc；企微';
-    } 
-    return desc;
-  }
-
   void _copyToClipboard(BuildContext context, String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.green,
-        content: Text('已复制$label到剪贴板'),
+        content: Text(context.l10n.quoteCopiedToClipboard(label)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -73,7 +62,7 @@ class InquiryBasicInfoTab extends StatelessWidget {
                   const SizedBox(width: 4),
                   GestureDetector(
                     onTap: () {
-                      _copyToClipboard(context, value!, label);
+                      _copyToClipboard(context, value, label);
                     },
                     child: Icon(
                       Icons.copy_outlined,
@@ -119,11 +108,12 @@ class InquiryBasicInfoTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     if (item == null) {
       return Center(
         child: Text(
-          '缺少询盘信息',
+          l10n.inquiryMissingInfo,
           style: TextStyle(color: colorScheme.onSurfaceVariant),
         ),
       );
@@ -139,15 +129,31 @@ class InquiryBasicInfoTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Column(
               children: [
-                _row('客户名称', item!.name, colorScheme),
-                _rowWithCopy(context, '邮箱', item!.email, colorScheme),
-                _row('电话', item!.phone, colorScheme),
-                _row('创建时间', formatDateTimeFull(item!.createdAt), colorScheme),
-                _row('站点名称', item!.station?.nameCn ?? item!.station?.nameEn,
-                    colorScheme),
-                _row('IP 地址', item!.ip, colorScheme),
-                _row('来源', _formatSource(item!.ua), colorScheme),
-                _row('消息内容', item!.message, colorScheme),
+                _row(l10n.inquiryCustomerName, item!.name, colorScheme),
+                _rowWithCopy(
+                  context,
+                  l10n.stationDetailEmail,
+                  item!.email,
+                  colorScheme,
+                ),
+                _row(l10n.inquiryPhone, item!.phone, colorScheme),
+                _row(
+                  l10n.inquiryCreatedAt,
+                  formatDateTimeFull(item!.createdAt),
+                  colorScheme,
+                ),
+                _row(
+                  l10n.inquiryStationName,
+                  item!.station?.nameCn ?? item!.station?.nameEn,
+                  colorScheme,
+                ),
+                _row(l10n.inquiryIpAddress, item!.ip, colorScheme),
+                _row(
+                  l10n.inquirySource,
+                  inquirySourceLabel(context, item!.ua),
+                  colorScheme,
+                ),
+                _row(l10n.inquiryMessageContent, item!.message, colorScheme),
               ],
             ),
           ),
@@ -156,4 +162,3 @@ class InquiryBasicInfoTab extends StatelessWidget {
     );
   }
 }
-

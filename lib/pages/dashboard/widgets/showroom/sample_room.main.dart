@@ -1,7 +1,7 @@
 import 'package:cloud/constants/dashboard_configs.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/dashboard/ship_top_stats.dart';
-import 'package:cloud/models/dashboard/quote_top_stats.dart'; 
+import 'package:cloud/models/dashboard/quote_top_stats.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart'
     show DateRange, trnasDateRangeToParams;
 import 'package:cloud/services/dashboard.dart';
@@ -33,12 +33,7 @@ class Level1CategoryStat {
 
 /// 样品间模块 - 圆饼图
 class SampleRoomChart extends ConsumerStatefulWidget {
-  final String moduleTitle; // 模块标题，如"样品间"
-
-  const SampleRoomChart({
-    super.key,
-    this.moduleTitle = '报价次数排行', // 默认值
-  });
+  const SampleRoomChart({super.key});
 
   @override
   ConsumerState<SampleRoomChart> createState() => _SampleRoomChartState();
@@ -65,6 +60,7 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
     });
   }
 
+  // 获取报价次数排行的接口
   handleQuoteRankData(Map<String, String>? params) async {
     setState(() {
       _isLoading = true;
@@ -117,12 +113,8 @@ class _SampleRoomChartState extends ConsumerState<SampleRoomChart> {
       _isLoading = true;
     });
     try {
-      if (dimension == sampleDimensionConfigs[1]['value']) {
-        handleQuoteRankData(trnasDateRangeToParams(
-            _shipDateRange)); //c  
-      } else if (dimension == sampleDimensionConfigs[0]['value']) {
-        handleShipRankData(trnasDateRangeToParams(
-            _quoteDateRange)); //  
+      if (dimension == sampleDimensionConfigs[0]['value']) {
+        handleQuoteRankData(trnasDateRangeToParams(_shipDateRange)); 
       } else {
         if (mounted) {
           setState(() {

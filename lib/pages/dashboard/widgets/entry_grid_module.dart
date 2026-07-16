@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/app/app.dart';
 import 'package:cloud/constants/app_feature_constants.dart';
+import 'package:cloud/constants/entry_feature_l10n_helper.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
@@ -14,14 +16,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// 单个入口配置
 class _EntryConfig {
   final String id;
-  final String label;
   final String iconAsset;
   final double iconSize;
   final dynamic route;
 
   const _EntryConfig({
     required this.id,
-    required this.label,
     required this.iconAsset,
     this.iconSize = 28,
     this.route,
@@ -35,56 +35,54 @@ class EntryGridModule extends ConsumerWidget {
     return [
       _EntryConfig(
         id: EntryFeatures.showroomSample.id,
-        label: EntryFeatures.showroomSample.title,
         iconAsset: 'warehouse',
         iconSize: 35,
         route: const SamplesListRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.marketPurchase.id,
-        label: EntryFeatures.marketPurchase.title,
         iconAsset: 'market',
         iconSize: 25,
         route: const QuoteRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.crmCompany.id,
-        label: EntryFeatures.crmCompany.title,
         iconAsset: 'customer',
         iconSize: 25,
         route: const CrmCompanyRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.supplySupplier.id,
-        label: EntryFeatures.supplySupplier.title,
         iconAsset: 'factory',
         iconSize: 40,
         route: const SupplySupplierRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.inspection.id,
-        label: EntryFeatures.inspection.title,
         iconAsset: 'insp',
         iconSize: 30,
         route: const InspectionRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.independentWebsite.id,
-        label: EntryFeatures.independentWebsite.title,
         iconAsset: 'computer',
         iconSize: 27,
         route: const SingleStationRoute(),
       ),
       _EntryConfig(
         id: EntryFeatures.ecommerceProductComparison.id,
-        label: EntryFeatures.ecommerceProductComparison.title,
         iconAsset: 'cart',
         iconSize: 26,
         route: const PurchaseAssistRoute(),
       ),
+      _EntryConfig(
+        id: EntryFeatures.warehouseReceipts.id,
+        iconAsset: 'receipt',
+        iconSize: 26,
+        route: const WarehouseReceiptListRoute(),
+      ),
       // _EntryConfig(
       //   id: EntryFeatures.changxiangInventory.id,
-      //   label: EntryFeatures.changxiangInventory.title,
       //   iconAsset: 'whs_mag',
       //   iconSize: 24,
       //   route: const ChangexiangInventoryRoute(),
@@ -95,7 +93,6 @@ class EntryGridModule extends ConsumerWidget {
   static List<_EntryConfig> openedEntry = [
     _EntryConfig(
       id: EntryFeatures.adviceCollect.id,
-      label: EntryFeatures.adviceCollect.title,
       iconAsset: 'xinyuan_list',
       iconSize: 25,
       route: const AdviceCollectRoute(),
@@ -106,7 +103,6 @@ class EntryGridModule extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final core = app.container.read(coreProvider).value;
     final tenant = core?.currentTenant;
-    logger.d(tenant);
     final colorScheme = Theme.of(context).colorScheme;
     const int crossAxisCount = 5;
     const double spacing = 6.0;
@@ -132,17 +128,17 @@ class EntryGridModule extends ConsumerWidget {
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Center(
+        child: Center(
             child: Empty(
-          text: '暂无可用模块',
+          text: context.l10n.dashboardNoModulesAvailable,
           height: 28,
         )),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+      decoration: BoxDecoration( 
         color: colorScheme.surface.withOpacity(0.93),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
@@ -177,7 +173,7 @@ class EntryGridModule extends ConsumerWidget {
                       width: itemWidth,
                       iconSize: config.iconSize,
                       icon: config.iconAsset,
-                      label: config.label,
+                      label: entryFeatureLocalizedTitle(context, config.id),
                       route: config.route,
                       color: colorScheme.primary,
                     ),

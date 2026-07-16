@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+//  此处供应商创建 暂时未使用，
+//  APP端只允许创建市场带客供应商
+// 请跳转至 market_product_supplier_create_page.dart文件
+
 @RoutePage()
 class SupplySupplierCreatePage extends HookConsumerWidget {
   const SupplySupplierCreatePage({super.key});

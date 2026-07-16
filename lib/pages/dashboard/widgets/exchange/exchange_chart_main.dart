@@ -1,4 +1,5 @@
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/dashboard/widgets/date_select.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_header.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_list.dart';
@@ -46,7 +47,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
         if (mounted) {
           setState(() {
             _isLoading = false;
-            _errorMessage = '无效的货币维度';
+            _errorMessage = context.l10n.dashboardInvalidCurrency;
           });
         }
         return;
@@ -68,7 +69,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = '汇率数据加载失败! $e';
+          _errorMessage = context.l10n.dashboardExchangeLoadFailed('$e');
           _isLoading = false;
         });
       }
@@ -92,7 +93,7 @@ class _LineChartDemoState extends ConsumerState<LineChartDemo> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = '数据加载失败! $e';
+          _errorMessage = context.l10n.dashboardDataLoadFailed('$e');
           _isListLoading = false;
         });
       }

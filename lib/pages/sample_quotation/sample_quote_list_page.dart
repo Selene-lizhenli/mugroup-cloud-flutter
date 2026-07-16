@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/sample_quotation/providers/provider.dart';
 import 'package:cloud/pages/sample_quotation/widgets/quotation_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
@@ -27,6 +27,7 @@ class SampleQuoteListPage extends HookConsumerWidget {
     final permissions = ref.watch(userProvider).permissions ?? const <String>[];
     final dynamicTemplates = state.dynamicTemplates;
     final themeType = ref.watch(appThemeProvider);
+    final l10n = context.l10n;
     final themeImage = themeType == ThemeType.pink
         ? 'assets/photo/quote_back_pink.png'
         : 'assets/photo/quote_back_blue.png';
@@ -88,8 +89,8 @@ class SampleQuoteListPage extends HookConsumerWidget {
                   Expanded(
                     child: MuSearchBar(
                       controller: searchController,
-                      hintText: '根据员工姓名、单号搜索报价单',
-                      buttonText: '搜索',
+                      hintText: l10n.quoteSearchHint,
+                      buttonText: l10n.search,
                       left: 0,
                       right: 14,
                       onSearch: (search) {
@@ -103,10 +104,10 @@ class SampleQuoteListPage extends HookConsumerWidget {
               ),
               Expanded(
                 child: state.isLoading
-                    ? const Center(
+                    ? Center(
                         child: MuProgressIndicator(
                           showText: true,
-                          text: 'loading...',
+                          text: l10n.loading,
                         ),
                       )
                     : MuListView(
@@ -123,8 +124,7 @@ class SampleQuoteListPage extends HookConsumerWidget {
                           item: item,
                           dynamicTemplates: dynamicTemplates,
                           permissions: permissions,
-                          onTap: () => {
-                            logger.d(item.id),
+                          onTap: () => { 
                             context.router
                                 .push(SampleQuoteDetailRoute(item: item))
                           },

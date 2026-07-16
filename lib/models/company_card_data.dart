@@ -5,7 +5,15 @@ part 'company_card_data.g.dart';
 
 Map<String, dynamic>? _companyCardDataContactToJson(Contact? c) => c?.toJson();
 Contact? _companyCardDataContactFromJson(dynamic json) =>
-    json == null ? null : Contact.fromJson(json as Map<String, dynamic>);
+    switch (json) {
+      null => null,
+      Map<String, dynamic>() => Contact.fromJson(json),
+      Map() => Contact.fromJson(Map<String, dynamic>.from(json)),
+      List() => json.isEmpty
+          ? null
+          : _companyCardDataContactFromJson(json.first),
+      _ => null,
+    };
 
 @freezed
 abstract class CompanyCardData with _$CompanyCardData {

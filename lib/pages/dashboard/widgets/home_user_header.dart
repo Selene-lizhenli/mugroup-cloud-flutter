@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/helper/theme.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -151,14 +152,14 @@ class HomeUserHeader extends HookConsumerWidget {
                   break;
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
                 value: _MoreAction.updateLog,
                 child: Row(
                   children: [
-                    Icon(Icons.volume_up, size: 20),
-                    SizedBox(width: 6),
-                    Text('版本更新日志'),
+                    const Icon(Icons.volume_up, size: 20),
+                    const SizedBox(width: 6),
+                    Text(context.l10n.dashboardUpdateLog),
                   ],
                 ),
               ),
@@ -166,9 +167,9 @@ class HomeUserHeader extends HookConsumerWidget {
                 value: _MoreAction.layout,
                 child: Row(
                   children: [
-                    Icon(Icons.settings, size: 20),
-                    SizedBox(width: 6),
-                    Text('设置页面布局'),
+                    const Icon(Icons.settings, size: 20),
+                    const SizedBox(width: 6),
+                    Text(context.l10n.dashboardLayoutSettings),
                   ],
                 ),
               ),

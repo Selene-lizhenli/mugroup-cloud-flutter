@@ -13,6 +13,7 @@ class QuotationSample with _$QuotationSample {
     @JsonKey(name: 'customer_product_no') String? customerProductNo,
     int? qty,
     @JsonKey(name: 'showroomSample') Sample? showroomSample,
+    @JsonKey(name: 'created_at') String? createdAt,
     Quote? supplyQuote,
   }) = _QuotationSample;
 

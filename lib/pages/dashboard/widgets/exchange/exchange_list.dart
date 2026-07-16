@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
@@ -22,20 +23,23 @@ class ExchangeRatesValueList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
+    final isChinese =
+        Localizations.localeOf(context).languageCode.startsWith('zh');
 
     if (loading == true) {
-      return const SizedBox(
+      return SizedBox(
         height: 150,
         child: Center(
-          child: MuProgressIndicator(showText: true, text: '加载中...'),
+          child: MuProgressIndicator(showText: true, text: l10n.loading),
         ),
       );
     }
 
     if (errorMessage != null) {
       return ShowError(
-        errorMessage: '汇率数据加载失败! $errorMessage',
+        errorMessage: l10n.dashboardExchangeLoadFailed(errorMessage!),
         onRetry: onRetry ?? () {},
         height: 150,
       );
@@ -48,18 +52,20 @@ class ExchangeRatesValueList extends StatelessWidget {
       );
     }
 
-    const double nameW = 70;
+    const double nameW = 58;
     const double priceW = 75;
     const double dateW = 85;
     const double contentWidth = nameW + (priceW * 5) + dateW;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double tableWidth =
-            contentWidth > constraints.maxWidth ? contentWidth : constraints.maxWidth;
+        final double tableWidth = contentWidth > constraints.maxWidth
+            ? contentWidth
+            : constraints.maxWidth;
         const int columnCount = 7;
-        final double extraPerCell =
-            tableWidth > contentWidth ? (tableWidth - contentWidth) / columnCount : 0;
+        final double extraPerCell = tableWidth > contentWidth
+            ? (tableWidth - contentWidth) / columnCount
+            : 0;
         final double nameCellW = nameW + extraPerCell;
         final double priceCellW = priceW + extraPerCell;
         final double dateCellW = dateW + extraPerCell;
@@ -84,32 +90,34 @@ class ExchangeRatesValueList extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        _buildCell('货币名称',
-                            width: nameCellW,
-                            isHeader: true,
-                            colorScheme: colorScheme,
-                            alignment: Alignment.centerLeft),
-                        _buildCell('现汇买入价',
+                        _buildCell(
+                          l10n.dashboardCurrencyName,
+                          width: nameCellW,
+                          isHeader: true,
+                          colorScheme: colorScheme,
+                          alignment: Alignment.centerLeft, 
+                        ),
+                        _buildCell(l10n.dashboardCashBuyRate,
                             width: priceCellW,
                             isHeader: true,
                             colorScheme: colorScheme),
-                        _buildCell('现钞买入价',
+                        _buildCell(l10n.dashboardNotesBuyRate,
                             width: priceCellW,
                             isHeader: true,
                             colorScheme: colorScheme),
-                        _buildCell('现汇卖出价',
+                        _buildCell(l10n.dashboardCashSellRate,
                             width: priceCellW,
                             isHeader: true,
                             colorScheme: colorScheme),
-                        _buildCell('现钞卖出价',
+                        _buildCell(l10n.dashboardNotesSellRate,
                             width: priceCellW,
                             isHeader: true,
                             colorScheme: colorScheme),
-                        _buildCell('中行折算价',
+                        _buildCell(l10n.dashboardBocConversionRate,
                             width: priceCellW,
                             isHeader: true,
                             colorScheme: colorScheme),
-                        _buildCell('发布日期',
+                        _buildCell(l10n.dashboardPublishDate,
                             width: dateCellW,
                             isHeader: true,
                             colorScheme: colorScheme,
@@ -156,27 +164,37 @@ class ExchangeRatesValueList extends StatelessWidget {
                                     }
                                   },
                                   child: _buildCell(
-                                    '${item.name ?? ''}\n${item.shortName ?? ''}',
+                                    isChinese
+                                        ? (item.name ?? '')
+                                        : (item.shortName ?? ''),
                                     width: nameCellW,
                                     colorScheme: colorScheme,
                                     alignment: Alignment.centerLeft,
+                                    paddingLeft: 10,
                                     isName: true,
                                   ),
                                 ),
                                 _buildCell(item.xhBuyRate,
-                                    width: priceCellW, colorScheme: colorScheme),
+                                    width: priceCellW,
+                                    colorScheme: colorScheme),
                                 _buildCell(item.xzBuyRate,
-                                    width: priceCellW, colorScheme: colorScheme),
+                                    width: priceCellW,
+                                    colorScheme: colorScheme),
                                 _buildCell(item.xhSellRate,
-                                    width: priceCellW, colorScheme: colorScheme),
+                                    width: priceCellW,
+                                    colorScheme: colorScheme),
                                 _buildCell(item.xzSellRate,
-                                    width: priceCellW, colorScheme: colorScheme),
+                                    width: priceCellW,
+                                    colorScheme: colorScheme),
                                 _buildCell(item.midRate,
-                                    width: priceCellW, colorScheme: colorScheme),
-                                _buildCell(dateStr,
-                                    width: dateCellW,
-                                    colorScheme: colorScheme,
-                                    alignment: Alignment.centerRight),
+                                    width: priceCellW,
+                                    colorScheme: colorScheme),
+                                _buildCell(
+                                  dateStr,
+                                  width: dateCellW,
+                                  colorScheme: colorScheme,
+                                  alignment: Alignment.centerRight, 
+                                ),
                               ],
                             ),
                           );
@@ -200,11 +218,12 @@ class ExchangeRatesValueList extends StatelessWidget {
     bool isName = false,
     required ColorScheme colorScheme,
     Alignment alignment = Alignment.center,
+    int paddingLeft = 4,
   }) {
     return Container(
       width: width,
       alignment: alignment,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: EdgeInsets.only(left: paddingLeft.toDouble(), right: 4),
       child: Text(
         text ?? '-',
         maxLines: isName ? 2 : 1,

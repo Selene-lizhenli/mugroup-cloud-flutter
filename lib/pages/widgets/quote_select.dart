@@ -77,8 +77,10 @@ class QuoteSelect extends HookConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("选择客户",
+              const Text("选择客户 ",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(" (已有带客记录)", style: TextStyle(fontSize: 12)),
+              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.grey),
                 onPressed: () => Navigator.pop(context),
@@ -92,7 +94,7 @@ class QuoteSelect extends HookConsumerWidget {
                   controller: searchController,
                   onChanged: onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: '搜索名称、编号...',
+                    hintText: '搜索客户名称、编号...',
                     prefixIcon: const Icon(Icons.search, size: 20),
                     suffixIcon: searchController.text.isNotEmpty
                         ? GestureDetector(
@@ -134,7 +136,7 @@ class QuoteSelect extends HookConsumerWidget {
                           borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text("新增",
+                    child: const Text("新增带客",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),

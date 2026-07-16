@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_sample_form.dart';
+import 'package:cloud/pages/showroom/provider/showroom_sample_provider.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +16,13 @@ class ShowroomSampleEditPage extends HookConsumerWidget {
   const ShowroomSampleEditPage({super.key, @pathParam required this.id});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final sample = useState<Sample?>(null);
+    final showroomApi = ref.read(showroomSampleApiProvider);
 
     useEffect(() {
       () async {
-        final resp = await getSample(id);
+        final resp = await showroomApi.getSample(id);
         sample.value = resp;
       }();
       return null;
@@ -32,15 +36,16 @@ class ShowroomSampleEditPage extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(title: const Text('样品编辑')),
+      appBar: AppBar(title: Text(l10n.showroomSampleEdit)),
       body: ShowroomSampleForm(
         initial: sample.value,
         onSubmit: (data) async {
           await updateShowroomSample(id, data);
-          EasyLoading.showSuccess("编辑成功");
+          EasyLoading.showSuccess(l10n.showroomEditSuccess);
           if (context.mounted) {
             Navigator.of(context).pop();
           }
+          return true;
         },
       ),
     );

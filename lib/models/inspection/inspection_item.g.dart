@@ -16,6 +16,9 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
       (json['qty'] as num?)?.toInt(),
       json['remark'] as String?,
       json['barcode'] as String?,
+      json['std_barcode'] as String?,
+      json['scan_barcode'] as String?,
+      json['description'] as String?,
       (json['media'] as List<dynamic>?)
           ?.map((e) => Media.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -25,6 +28,11 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
       json['item_no'] as String?,
       (json['unit_per_ctn'] as num?)?.toInt(),
       json['created_at'] as String?,
+      _inspectionDynamicTemplateIdFromJson(
+          json['inspection_dynamic_template_id']),
+      _inspectionDynamicTemplateJsonFromJson(
+          json['inspection_dynamic_template_json']),
+      _rawMapFromJson(json['raw']),
     );
 
 Map<String, dynamic> _$$InspectionItemImplToJson(
@@ -38,6 +46,9 @@ Map<String, dynamic> _$$InspectionItemImplToJson(
       'qty': instance.qty,
       'remark': instance.remark,
       'barcode': instance.barcode,
+      'std_barcode': instance.stdBarcode,
+      'scan_barcode': instance.scanBarcode,
+      'description': instance.description,
       'media': instance.media,
       'task_id': instance.taskId,
       'user_id': instance.userId,
@@ -45,4 +56,9 @@ Map<String, dynamic> _$$InspectionItemImplToJson(
       'item_no': instance.itemNo,
       'unit_per_ctn': instance.unitPerCtn,
       'created_at': instance.createdAt,
+      'inspection_dynamic_template_id': _inspectionDynamicTemplateIdToJson(
+          instance.inspectionDynamicTemplateId),
+      'inspection_dynamic_template_json': _inspectionDynamicTemplateJsonToJson(
+          instance.inspectionDynamicTemplateJson),
+      'raw': _rawMapToJson(instance.raw),
     };

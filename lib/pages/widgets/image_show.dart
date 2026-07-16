@@ -58,7 +58,6 @@ class ImageShow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    logger.d('imageUrlinner${imageUrl}');
 
     // 构建错误 widget（必须在前面定义）
     Widget buildErrorWidget(dynamic error) {
@@ -157,8 +156,8 @@ class ImageShow extends StatelessWidget {
 
         if (width != null && height != null) {
           return SizedBox(
-            width: width ,
-            height: height  ,
+            width: width,
+            height: height,
             child: networkImage,
           );
         } else if (width != null && height == null) {

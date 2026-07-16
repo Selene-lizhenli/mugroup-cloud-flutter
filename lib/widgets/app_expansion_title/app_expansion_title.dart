@@ -84,7 +84,7 @@ class _AppExpansionTileState extends State<AppExpansionTile>
                   : const BoxConstraints(maxHeight: 0.0),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                    const EdgeInsets.symmetric(horizontal: 3.0, vertical: 2.0),
                 child: widget.child,
               ),
             ),

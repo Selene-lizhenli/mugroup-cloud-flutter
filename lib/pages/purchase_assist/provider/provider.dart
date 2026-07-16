@@ -67,7 +67,7 @@ class PurchaseAssistState implements MuListState {
     bool? hasSearched,
     List<PurchaseAssistSearchProduct>? productList,
     List<PurchaseAssistTaskListItem>? taskList,
-    List<PurchaseAssistTaskDetailItem?>? taskDetail,
+    List<PurchaseAssistTaskDetailItem?>? taskDetail, // 批量图搜结果详情列表
     int? taskId,
     bool? isLoading,
     bool? isLoadingMore,
@@ -384,10 +384,7 @@ class PurchaseAssist extends _$PurchaseAssist {
       final resp = await getProductComparisonTaskDetail(state.taskId!);
       state = state.copyWith(
         taskDetail: resp.data,
-        taskDetailMeta: resp.meta ??
-            const PurchaseAssistMeta(
-                pagination: PurchaseAssistPagination(
-                    total: 0, count: 0, totalPages: 0)),
+        taskDetailMeta: resp.meta,
         isLoading: false,
       );
     } catch (e) {

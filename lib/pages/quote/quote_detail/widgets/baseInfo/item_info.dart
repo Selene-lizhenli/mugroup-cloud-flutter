@@ -7,6 +7,7 @@ class InfoItem extends StatelessWidget {
   final bool showArrow;
   final VoidCallback? onTap;
   final bool? useTrun;
+  final double fontSize;
 
   const InfoItem({
     super.key,
@@ -15,6 +16,7 @@ class InfoItem extends StatelessWidget {
     this.showArrow = false,
     this.onTap,
     this.useTrun = false,
+    this.fontSize = 12,
   });
 
   @override
@@ -26,10 +28,10 @@ class InfoItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+            '$label：',
           style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.surfaceContainerHighest,
-            fontSize: 12,
+            color: colorScheme.onSurface,
+            fontSize: fontSize,
           ),
         ),
         const SizedBox(width: 8),
@@ -41,8 +43,8 @@ class InfoItem extends StatelessWidget {
               style: textTheme.bodyMedium?.copyWith(
                 color: onTap != null
                     ? colorScheme.primary
-                    : colorScheme.onSurface.withOpacity(0.87),
-                fontSize: 12,
+                    : colorScheme.onSurface.withOpacity(0.8),
+                fontSize: fontSize,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

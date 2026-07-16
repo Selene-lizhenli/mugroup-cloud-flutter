@@ -82,6 +82,9 @@ class SupplySupplierDetailInfoPage extends HookConsumerWidget {
               children: [
                 buildIconInfoRow(
                     Icons.vpn_key_outlined, "供应商编号", data.supplierNo),
+                buildIconInfoRow(
+                    Icons.shop_outlined, "店铺档口信息", data.stallAddress),
+                buildIconInfoRow(Icons.location_on_outlined, "地址", data.address),
               ],
             ),
             const SizedBox(height: 16),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/showroom/widgets/showroom_sample_form.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/services/sample.dart';
@@ -15,6 +16,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final hasValue = useState(false);
 
     Future<void> handleBack() async {
@@ -24,10 +26,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
       }
       final isConfirmed = await ConfirmDialog.show(
         context,
-        title: '确认退出',
-        content: '确定要退出吗？未保存的内容将会丢失。',
-        confirmText: '确定退出',
-        cancelText: '取消',
+        title: l10n.showroomConfirmExitTitle,
+        content: l10n.showroomConfirmExitContent,
+        confirmText: l10n.showroomConfirmExit,
+        cancelText: l10n.cancel,
         confirmColor: Colors.red,
       );
 
@@ -45,7 +47,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('市场产品创建'),
+            title: Text(l10n.showroomMarketProductCreate),
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
@@ -59,7 +61,7 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
               hasValue.value = dirty;
             },
             onSubmit: (data) async {
-              EasyLoading.show(status: '创建中...');
+              EasyLoading.show(status: l10n.showroomCreating);
 
               await storeShowroomSample(
                   {...data, 'item_type': 'market_product'});
@@ -75,10 +77,10 @@ class ShowroomSampleCreatePage extends HookConsumerWidget {
 
               final isConfirmed = await ConfirmDialog.show(
                 context,
-                title: '创建成功',
-                content: '样品已成功创建，您希望接下来做什么？',
-                cancelText: '完成并返回',
-                confirmText: '继续创建',
+                title: l10n.showroomCreateSuccess,
+                content: l10n.showroomCreateSuccessContent,
+                cancelText: l10n.showroomDoneAndBack,
+                confirmText: l10n.showroomContinueCreate,
                 confirmColor: Colors.blue,
               );
 

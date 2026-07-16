@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,8 +23,18 @@ class QuoteItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    final l10n = context.l10n;
+    final canBillText = item?.canBill == true
+        ? l10n.yes
+        : item?.canBill == false
+            ? l10n.no
+            : '';
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      color: Theme.of(context).colorScheme.surfaceTint.withOpacity(0.87) ,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,32 +47,18 @@ class QuoteItem extends HookWidget {
                   children: [
                     TableCell(
                       child: Text(
-                        '地区: ${item?.sampleLocation ?? ''}',
+                        l10n.cartQuoteRegion(item?.sampleLocation ?? ''),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
+                        style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                       ),
                     ),
                     TableCell(
                       child: Text(
-                        '出货日期: ${formatBeijingTime(item?.chuhuoAt)}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    TableCell(
-                      child: Text(
-                        '采购价: ${item?.purchaseCost ?? ''}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    TableCell(
-                      child: Text(
-                        '采购币种: ${item?.currency ?? ""}',
+                        l10n.cartQuoteShippingDate(
+                          formatBeijingTime(item?.chuhuoAt),
+                        ),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -72,32 +69,16 @@ class QuoteItem extends HookWidget {
                   children: [
                     TableCell(
                       child: Text(
-                        '是否开票: ${item?.canBill == true ? '是' : item?.canBill == false ? "否" : ""}',
+                        l10n.cartQuotePurchasePrice(item?.purchaseCost ?? ''),
                         overflow: TextOverflow.ellipsis,
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                         maxLines: 1,
                       ),
                     ),
                     TableCell(
                       child: Text(
-                        '税率: ${item?.taxRate}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    TableCell(
-                      child: Text(
-                        '体积: ${item?.outerVolume ?? ''}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    TableCell(
-                      child: Text(
-                        '装箱量: ${item?.outerCapacity ?? ''}',
+                        l10n.cartQuotePurchaseCurrency(item?.currency ?? ''),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -108,13 +89,55 @@ class QuoteItem extends HookWidget {
                   children: [
                     TableCell(
                       child: Text(
-                        '记录人员: ${item?.recordUser ?? ''}',
+                        l10n.cartQuoteCanBill(canBillText),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: Text(
+                        l10n.cartQuoteTaxRate(item?.taxRate ?? ''),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Text(
+                        l10n.cartQuoteVolume(item?.outerVolume ?? ''),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    TableCell(
+                      child: Text(
+                        l10n.cartQuoteOuterCapacity(item?.outerCapacity ?? ''),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Text(
+                        l10n.cartQuoteRecordUser(item?.recordUser ?? ''),
+                         style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),
                     Text(
-                      '包装: ${item?.packing ?? ''}',
+                      l10n.cartQuotePacking(item?.packing ?? ''),
+                       style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.87)),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),

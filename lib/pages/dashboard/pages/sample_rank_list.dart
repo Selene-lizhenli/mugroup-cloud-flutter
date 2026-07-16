@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/pages/dashboard/widgets/product_card.dart';
 import 'package:cloud/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class SampleRankListPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final displayData = data.toList();
     final themeType = ref.watch(appThemeProvider);
@@ -34,7 +36,7 @@ class SampleRankListPage extends HookConsumerWidget {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.transparent,
           title: Text(
-            label ?? '排名',
+            label ?? l10n.dashboardRanking,
             style: TextStyle(color: colorScheme.onPrimary),
           ),
           elevation: 0,
@@ -59,26 +61,27 @@ class SampleRankListPage extends HookConsumerWidget {
                 child: Image.asset(
                   backgrundBottomImage,
                   fit: BoxFit.contain,
-                  width: 190,
+                  width: 220,
                   alignment: Alignment.topRight,
                 ),
               ),
             ),
             SafeArea(
+              bottom: false,
               child: displayData.isEmpty
                   ? Center(
                       child: Container(
                         color: colorScheme.primary,
                         padding: const EdgeInsets.fromLTRB(12, 5, 12, 12),
                         child: Text(
-                          '暂无数据',
+                          l10n.noData,
                           style: TextStyle(color: colorScheme.outline),
                         ),
                       ),
                     )
                   : Container(
                       color: colorScheme.primary,
-                      padding: const EdgeInsets.fromLTRB(12, 5, 12, 12),
+                      padding: const EdgeInsets.fromLTRB(12, 5, 12, 0),
                       child: SingleChildScrollView(
                           child: Column(
                         children: [
@@ -94,7 +97,7 @@ class SampleRankListPage extends HookConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  '没有更多了...',
+                                  l10n.dashboardNoMore,
                                   style: TextStyle(
                                       color: colorScheme.onPrimary,
                                       fontSize: 12),

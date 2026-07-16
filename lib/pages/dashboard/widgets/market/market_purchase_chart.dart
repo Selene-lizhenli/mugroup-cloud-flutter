@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 import 'package:cloud/helper/helper.dart';
-import 'package:cloud/pages/dashboard/modal/dashboard_stats_state.dart';
+import 'package:cloud/pages/dashboard/dashboard_l10n_helper.dart';
 import 'package:cloud/pages/dashboard/provider/module_stats_provider.dart';
+import 'package:cloud/pages/dashboard/widgets/dashboard_time_dimension_menu.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final stats = ref.watch(moduleStatsProvider(_moduleId));
     final statsNotifier = ref.read(moduleStatsProvider(_moduleId).notifier);
@@ -64,7 +66,7 @@ class MarketPurchaseChart extends HookConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Text(
-            '暂无数据',
+            l10n.noData,
             style: TextStyle(color: colorScheme.surfaceContainerHighest),
           ),
         ),
@@ -90,118 +92,21 @@ class MarketPurchaseChart extends HookConsumerWidget {
               children: [
                 // 模块标题
                 Text(
-                  '市场带客',
+                  l10n.dashboardMarketPurchase,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(),
                 ),
-                // 维度选择器
-                PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.tune,
-                    size: 20,
-                    color: Colors.grey.shade600,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  offset: const Offset(-10, 45),
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: '最近半年',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 18,
-                            color: stats.timeDimension == TimeDimension.last6Months
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '最近半年',
-                            style: TextStyle(
-                              color: stats.timeDimension == TimeDimension.last6Months
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              fontWeight: stats.timeDimension == TimeDimension.last6Months
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: '最近一年',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 18,
-                            color: stats.timeDimension == TimeDimension.last12Months
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '最近一年',
-                            style: TextStyle(
-                              color: stats.timeDimension == TimeDimension.last12Months
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              fontWeight: stats.timeDimension == TimeDimension.last12Months
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: '所有时间',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.all_inclusive,
-                            size: 18,
-                            color: stats.timeDimension == TimeDimension.allTime
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '所有时间',
-                            style: TextStyle(
-                              color: stats.timeDimension == TimeDimension.allTime
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              fontWeight: stats.timeDimension == TimeDimension.allTime
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  onSelected: (String value) {
-                    TimeDimension? dimension;
-                    switch (value) {
-                      case '最近半年':
-                        dimension = TimeDimension.last6Months;
-                        break;
-                      case '最近一年':
-                        dimension = TimeDimension.last12Months;
-                        break;
-                      case '所有时间':
-                        dimension = TimeDimension.allTime;
-                        break;
-                    }
-                    if (dimension != null) {
-                      // 市场带客模块需要同时更新客户和供应商模块的时间维度，以保持数据一致性
-                      ref.read(moduleStatsProvider('market_purchase').notifier).setTimeDimension(dimension);
-                      ref.read(moduleStatsProvider('customer').notifier).setTimeDimension(dimension);
-                      ref.read(moduleStatsProvider('supplier').notifier).setTimeDimension(dimension);
-                    }
+                DashboardTimeDimensionMenu(
+                  currentDimension: stats.timeDimension,
+                  onSelected: (dimension) {
+                    ref
+                        .read(moduleStatsProvider('market_purchase').notifier)
+                        .setTimeDimension(dimension);
+                    ref
+                        .read(moduleStatsProvider('customer').notifier)
+                        .setTimeDimension(dimension);
+                    ref
+                        .read(moduleStatsProvider('supplier').notifier)
+                        .setTimeDimension(dimension);
                   },
                 ),
               ],
@@ -212,9 +117,10 @@ class MarketPurchaseChart extends HookConsumerWidget {
             spacing: 20,
             runSpacing: 8,
             children: [
-              _buildLegendItem('产品数量', Colors.green),
-              _buildLegendItem('客户数量', colorScheme.secondary),
-              _buildLegendItem('服务商数量', colorScheme.primary),
+              _buildLegendItem(l10n.dashboardProductCount, Colors.green),
+              _buildLegendItem(l10n.dashboardCustomerCount, colorScheme.secondary),
+              _buildLegendItem(
+                  l10n.dashboardServiceProviderCount, colorScheme.primary),
             ],
           ),
           const SizedBox(height: 16),
@@ -248,7 +154,8 @@ class MarketPurchaseChart extends HookConsumerWidget {
                       // 横轴：显示时间标签
                       final index = value.toInt();
                       if (index >= 0 && index < timeLabels.length) {
-                        return timeLabels[index];
+                        return context.dashboardFormatMonthLabel(
+                            timeLabels[index]);
                       }
                       return '';
                     },

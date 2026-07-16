@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/user.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ class UserInfoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
@@ -43,7 +46,7 @@ class UserInfoHeader extends StatelessWidget {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  "${user?.name}",
+                  user?.name ?? '',
                   style: TextStyle(
                     fontSize: 22,
                     color: colorScheme.onSurface,
@@ -51,7 +54,7 @@ class UserInfoHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '工号: ${user?.jobNumber}',
+                  l10n.jobNumberLabel(user?.jobNumber?.toString() ?? ''),
                   style: TextStyle(
                     fontSize: 15,
                     color: colorScheme.onSurface,
@@ -59,7 +62,7 @@ class UserInfoHeader extends StatelessWidget {
                 ),
                 if (user?.department != null)
                   Text(
-                    '部门: ${user?.department?.name}',
+                    l10n.departmentLabel(user!.department!.name ?? ''),
                     style: TextStyle(
                       fontSize: 15,
                       color: colorScheme.onSurface,

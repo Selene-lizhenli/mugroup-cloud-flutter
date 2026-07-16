@@ -165,7 +165,10 @@ class VideoUploader extends StatelessWidget {
       try {
         if (item.uuid == null) {
           EasyLoading.show(status: '正在删除文件...');
-          await deleteMedia(item.id, {});
+          final mediaId = item.idAsInt;
+          if (mediaId != null) {
+            await deleteMedia(mediaId, {});
+          }
         }
 
         final newList = List<TemporaryMedia>.from(value);

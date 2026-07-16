@@ -1,4 +1,7 @@
+import 'package:cloud/constants/samples.dart';
 import 'package:cloud/helper/helper.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/sample_quotation/sample_quotation_l10n_helper.dart';
 import 'package:cloud/models/quote/export_template.dart';
 import 'package:cloud/models/quote/quotation_list.dart';
 import 'package:cloud/pages/sample_quotation/widgets/share_drawer.dart';
@@ -22,10 +25,13 @@ class SampleQuotationCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    logger.d('${item}itemitemitemitem');
- 
+    final l10n = context.l10n;
+
+    final statusColor =
+        sampleApprovalStatusColor(item.status, fallback: colorScheme.onSurface);
+
     return GestureDetector(
-      onTap: onTap, 
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 6, top: 3),
         decoration: BoxDecoration(
@@ -91,6 +97,27 @@ class SampleQuotationCard extends ConsumerWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.1),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  sampleApprovalStatusLocalizedText(
+                                    context,
+                                    item.status,
+                                  ),
+                                  style: TextStyle(
+                                      color: statusColor, fontSize: 11),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
                           const SizedBox(width: 15),
                           const Spacer(),
                           if (item.sumQty != null) ...[
@@ -102,16 +129,16 @@ class SampleQuotationCard extends ConsumerWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    item.sumQty ?? "",
+                                    '${item.sumQty ?? ""} ',
                                     style: TextStyle(
                                         color: colorScheme.error, fontSize: 12),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  Text(
-                                    '个',
+                                   Text(
+                                    l10n.quoteUnitCount,
                                     style: TextStyle(
-                                        color: colorScheme.error, fontSize: 12),
+                                        color: colorScheme.error, fontSize: 11),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -119,28 +146,32 @@ class SampleQuotationCard extends ConsumerWidget {
                               ),
                             )
                           ],
-                          IconButton(
-                            icon: Image.asset(
-                              "assets/icons/share.png",
-                              width: 19,
-                              fit: BoxFit.fitWidth,
-                              alignment: Alignment.topRight,
+                          if (item.status == 'approved') ...[
+                            IconButton(
+                              icon: Image.asset(
+                                "assets/icons/download.png",
+                                width: 19,
+                                fit: BoxFit.fitWidth,
+                                alignment: Alignment.topRight,
+                              ),
+                              padding: EdgeInsets.zero,
+                              onPressed: () => showQuotationDownloadSheet(
+                                context: context,
+                                item: item,
+                                dynamicTemplates: dynamicTemplates,
+                                permissions: permissions,
+                              ),
                             ),
-                            padding: EdgeInsets.zero,
-                            onPressed: () => showQuotationDownloadSheet(
-                              context: context,
-                              item: item,
-                              dynamicTemplates: dynamicTemplates,
-                              permissions: permissions,
-                            ),
-                          ),
+                          ] else ...[
+                            const SizedBox(width: 50)
+                          ]
                         ],
                       ),
                       // const SizedBox(height: 4),
                       Row(
                         children: [
                           Text(
-                            '创建人：',
+                            l10n.quoteCreatorLabel,
                             style: TextStyle(
                                 color: colorScheme.onSurface, fontSize: 12),
                             maxLines: 1,
@@ -155,7 +186,7 @@ class SampleQuotationCard extends ConsumerWidget {
                           ),
                           const SizedBox(width: 15),
                           Text(
-                            '外销员：',
+                            l10n.quoteExporterLabel,
                             style: TextStyle(
                                 color: colorScheme.onSurface, fontSize: 12),
                             maxLines: 1,
@@ -194,7 +225,7 @@ class SampleQuotationCard extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            '单号：',
+                            l10n.quoteOrderNoLabel,
                             style: TextStyle(
                                 color: colorScheme.onSurface, fontSize: 12),
                             maxLines: 1,

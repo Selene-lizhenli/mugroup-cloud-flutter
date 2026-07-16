@@ -127,7 +127,7 @@ class HomeMedia extends StatelessWidget {
                         media: item,
                         onTap: () => onTapMedia?.call(item),
                         onTapDelete: () => onDeleteMedia?.call(item),
-                        active: currentMediaId == item.id,
+                        active: item.idEquals(currentMediaId),
                       ),
                       const SizedBox(
                         width: 10,

@@ -1,4 +1,5 @@
 import 'package:cloud/constants/theme_config.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/wms.dart';
 import 'package:cloud/models/wms/warehouse_image.dart';
 import 'package:cloud/pages/samples/providers/home_provider.dart';
@@ -148,10 +149,11 @@ class WarehouseShowCard extends ConsumerWidget {
 
   void showNotOpenDialog(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -180,8 +182,8 @@ class WarehouseShowCard extends ConsumerWidget {
               const SizedBox(height: 20),
               // 标题
               Text(
-                '独立样品间待开放',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                l10n.samplesWarehouseNotOpenTitle,
+                style: Theme.of(dialogContext).textTheme.titleMedium?.copyWith(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF1A1A1A),
@@ -190,8 +192,8 @@ class WarehouseShowCard extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '如有独立样品间数字展厅部署需求，欢迎联系数字发展中心！',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                l10n.samplesWarehouseNotOpenMessage,
+                style: Theme.of(dialogContext).textTheme.titleMedium?.copyWith(
                       fontSize: 15,
                       color: colorScheme.error,
                       height: 1.5,
@@ -211,7 +213,7 @@ class WarehouseShowCard extends ConsumerWidget {
                   const SizedBox(width: 2),
                   Text(
                     '$customerPhoneNumber',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    style: Theme.of(dialogContext).textTheme.titleSmall?.copyWith(
                           fontSize: 16,
                           color: colorScheme.onSurface,
                           height: 1.5,
@@ -226,7 +228,7 @@ class WarehouseShowCard extends ConsumerWidget {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
@@ -236,9 +238,9 @@ class WarehouseShowCard extends ConsumerWidget {
                     elevation: 0,
                     shadowColor: Colors.transparent,
                   ),
-                  child: const Text(
-                    '我知道了',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.samplesGotIt,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -403,8 +405,7 @@ class _ImageGallery extends StatelessWidget {
       );
     }
     const padding = 8.0;
-    final imageSize = itemWidth.round();
-    final warehouseName = warehouse.name ?? '样品间';
+    final warehouseName = warehouse.name ?? context.l10n.samplesShowroom;
 
     return Container(
       color: Colors.transparent,

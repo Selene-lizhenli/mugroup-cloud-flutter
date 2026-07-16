@@ -9,9 +9,9 @@ class MarketProductPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "市场产品"),
+      const BottomNavigationBarItem(icon: Icon(Icons.home, size: 22), label: "市场产品"),
       const BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_outlined), label: "带客记录"),
+          icon: Icon(Icons.assignment_outlined, size: 22), label: "带客记录"),
     ];
     return AutoTabsRouter(
       builder: (context, child) {

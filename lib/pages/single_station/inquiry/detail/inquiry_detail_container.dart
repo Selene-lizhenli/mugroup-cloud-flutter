@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/single_station/single_station_inquiries.dart';
 import 'package:cloud/pages/single_station/inquiry/detail/inquiry_basic_info_tab.dart';
 import 'package:cloud/pages/single_station/inquiry/detail/inquiry_products_tab.dart';
@@ -18,14 +19,13 @@ class InquiryDetailContainer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final tabController = useTabController(initialLength: 2);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '询盘详情',
-        ),
+        title: Text(l10n.inquiryDetailTitle),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -53,9 +53,9 @@ class InquiryDetailContainer extends HookConsumerWidget {
               children: [
                 TabBar(
                   controller: tabController,
-                  tabs: const [
-                    Tab(text: '询盘信息'),
-                    Tab(text: '样品明细'),
+                  tabs: [
+                    Tab(text: l10n.inquiryBasicInfoTab),
+                    Tab(text: l10n.stationDetailSamplesTab),
                   ],
                 ),
                 Expanded(

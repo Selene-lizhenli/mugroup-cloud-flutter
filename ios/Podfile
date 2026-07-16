@@ -1,3 +1,51 @@
+# # Uncomment this line to define a global platform for your project
+# platform :ios, '15.5'
+
+# # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+# ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# project 'Runner', {
+#   'Debug' => :debug,
+#   'Profile' => :release,
+#   'Release' => :release,
+# }
+
+# def flutter_root
+#   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+#   unless File.exist?(generated_xcode_build_settings_path)
+#     raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+#   end
+
+#   File.foreach(generated_xcode_build_settings_path) do |line|
+#     matches = line.match(/FLUTTER_ROOT\=(.*)/)
+#     return matches[1].strip if matches
+#   end
+#   raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+# end
+
+# require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+# flutter_ios_podfile_setup
+
+# target 'Runner' do
+#   use_frameworks!
+#   use_modular_headers!
+
+#   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+#   target 'RunnerTests' do
+#     inherit! :search_paths
+#   end
+# end
+
+# post_install do |installer|
+#   installer.pods_project.targets.each do |target|
+#     flutter_additional_ios_build_settings(target)
+#   end
+# end
+
+
+
+
 # Uncomment this line to define a global platform for your project
 platform :ios, '15.5'
 
@@ -23,9 +71,117 @@ def flutter_root
   raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
 end
 
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+# ========== 修复：原错误行替换为下面两行 ==========
+flutter_root_path = flutter_root()
+podhelper_full_path = File.join(flutter_root_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+require podhelper_full_path
 
 flutter_ios_podfile_setup
+require 'fileutils'
+
+# CamerAwesome 在 iOS 竖屏下原生画幅裁剪有 bug（宽高颠倒），
+# 导致成片与 cover 预览不一致；改为保留全尺寸原图，由 Flutter 拍后裁剪。
+def patch_camerawesome_skip_native_aspect_crop
+  target_file = File.expand_path(
+    File.join('.symlinks', 'plugins', 'camerawesome', 'ios', 'Classes', 'Controllers', 'Picture', 'CameraPictureController.m'),
+    __dir__,
+  )
+  return unless File.exist?(target_file)
+
+  content = File.read(target_file)
+  marker = 'MU_GROUP_SKIP_NATIVE_ASPECT_CROP'
+  return if content.include?(marker)
+
+  patched = content.sub(
+    'if (originalImageAspectRatio != _aspectRatio) {',
+    "if (NO /* #{marker} */ && originalImageAspectRatio != _aspectRatio) {",
+  )
+  return if patched == content
+
+  File.write(target_file, patched)
+  puts "Patched camerawesome: skip native iOS aspect crop"
+end
+
+# Fix: `video_compress_plus` v1.0.0 ships iOS podspec named `video_compress.podspec`.
+# Flutter's CocoaPods integration declares the pod as `video_compress_plus`, so CocoaPods
+# fails with "No podspec found for `video_compress_plus`".
+# We patch the symlinked plugin folder during `pod install` so CocoaPods can proceed.
+def flutter_install_plugin_pods(application_path = nil, relative_symlink_dir, platform)
+  application_path ||= File.dirname(defined_in_file.realpath) if respond_to?(:defined_in_file)
+  raise 'Could not find application path' unless application_path
+
+  # Prepare symlinks folder. We use symlinks to avoid having Podfile.lock
+  # referring to absolute paths on developers' machines.
+  symlink_dir = File.expand_path(relative_symlink_dir, application_path)
+  system('rm', '-rf', symlink_dir) # Avoid the complication of dependencies like FileUtils.
+
+  symlink_plugins_dir = File.expand_path('plugins', symlink_dir)
+  system('mkdir', '-p', symlink_plugins_dir)
+
+  plugins_file = File.join(application_path, '..', '.flutter-plugins-dependencies')
+  plugin_pods = flutter_parse_plugins_file(plugins_file, platform)
+
+  plugin_pods.each do |plugin_hash|
+    plugin_name = plugin_hash['name']
+    plugin_path = plugin_hash['path']
+    has_native_build = plugin_hash.fetch('native_build', true)
+
+    # iOS and macOS code can be shared in "darwin" directory, otherwise
+    # respectively in "ios" or "macos" directories.
+    shared_darwin_source = plugin_hash.fetch('shared_darwin_source', false)
+    platform_directory = shared_darwin_source ? 'darwin' : platform
+    next unless plugin_name && plugin_path && has_native_build
+
+    symlink = File.join(symlink_plugins_dir, plugin_name)
+    if plugin_name == 'video_compress_plus' && platform_directory == 'ios'
+      # Copy instead of symlinking:
+      # We need to patch files later, but symlink would point back to pub-cache (outside
+      # workspace), which may be read-only / not writable in sandboxed environments.
+      FileUtils.rm_rf(symlink)
+      FileUtils.mkdir_p(symlink)
+      FileUtils.cp_r(Dir.glob(File.join(plugin_path, '*')), symlink)
+    else
+      File.symlink(plugin_path, symlink)
+    end
+
+    # Ensure the expected podspec filename exists for CocoaPods.
+    if plugin_name == 'video_compress_plus' && platform_directory == 'ios'
+      ios_dir = File.join(symlink, 'ios')
+      expected_podspec = File.join(ios_dir, 'video_compress_plus.podspec')
+      fallback_podspec = File.join(ios_dir, 'video_compress.podspec')
+
+      if !File.exist?(expected_podspec) && File.exist?(fallback_podspec)
+        content = File.read(fallback_podspec)
+        # Also fix the spec name inside the podspec.
+        content = content.gsub(/s\.name\s*=\s*'[^']+'/, "s.name             = '#{plugin_name}'")
+        File.write(expected_podspec, content)
+      end
+
+      # Fix: Objective-C wrapper imports the Swift header generated for the old module name.
+      # After CocoaPods renames the pod target to `video_compress_plus`, Swift generates
+      # `video_compress_plus-Swift.h`, so update the import accordingly.
+      plugin_m = File.join(ios_dir, 'Classes', 'VideoCompressPlugin.m')
+      if File.exist?(plugin_m)
+        m_content = File.read(plugin_m)
+        new_content = m_content.gsub(
+          '#import <video_compress/video_compress-Swift.h>',
+          '#import <video_compress_plus/video_compress_plus-Swift.h>',
+        )
+        File.write(plugin_m, new_content) if new_content != m_content
+      end
+    end
+
+    # Keep pod path relative so it can be checked into Podfile.lock.
+    relative = flutter_relative_path_from_podfile(symlink)
+
+    pod plugin_name, path: File.join(relative, platform_directory)
+  end
+
+  # symlinks 创建后再打补丁（首次 pod install 时上方定义处可能尚无 .symlinks）
+  patch_camerawesome_skip_native_aspect_crop
+end
+
+patch_camerawesome_skip_native_aspect_crop
 
 target 'Runner' do
   use_frameworks!
@@ -40,5 +196,18 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # 修复部署目标版本警告
+      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      end
+      # permission_handler：未启用时 iOS 上 Permission.microphone 不会真正请求系统权限，表现为点击录音无反应
+      defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+      defs = [defs].flatten
+      unless defs.any? { |d| d.to_s.include?('PERMISSION_MICROPHONE') }
+        defs << 'PERMISSION_MICROPHONE=1'
+      end
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+    end
   end
 end

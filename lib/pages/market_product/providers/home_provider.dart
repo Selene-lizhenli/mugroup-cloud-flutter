@@ -58,7 +58,7 @@ class Home extends _$Home {
 
     state = state.copyWith(
       media: list,
-      currentMediaId: media.id,
+      currentMediaId: media.idAsInt,
     );
   }
 
@@ -96,8 +96,8 @@ class Home extends _$Home {
 
     nextMedia.remove(media);
 
-    if (media.id == nextCurrentMediaId) {
-      nextCurrentMediaId = nextMedia.firstOrNull?.id;
+    if (media.idEquals(nextCurrentMediaId)) {
+      nextCurrentMediaId = nextMedia.firstOrNull?.idAsInt;
     }
 
     state = state.copyWith(

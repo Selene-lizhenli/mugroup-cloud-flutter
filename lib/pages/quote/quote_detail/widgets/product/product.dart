@@ -3,7 +3,7 @@ import 'package:cloud/models/sample/quotation_sample.dart';
 import 'package:cloud/models/supply/supplier.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/action_pill_button.dart';
-import 'package:cloud/pages/quote/quote_detail/widgets/product/supplier_with_products_card.dart';
+import 'package:cloud/pages/quote/quote_detail/widgets/product/products_with_supplie_card.dart';
 import 'package:cloud/pages/quote/quote_detail/widgets/sheet/new_supplier.dart';
 import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/router/router.gr.dart';

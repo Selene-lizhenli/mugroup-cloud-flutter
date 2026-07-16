@@ -4,6 +4,7 @@ import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/supply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -92,6 +93,31 @@ class SupplySupplierDetailContactPage extends HookConsumerWidget {
                           (contact.mobile != null && contact.mobile!.isNotEmpty)
                               ? () => makePhoneCall(contact.mobile!)
                               : null,
+                    ),
+                    buildIconInfoRow(
+                      FontAwesomeIcons.fax,
+                      "手机",
+                      contact.phone,
+                    ),
+                    buildIconInfoRow(
+                      Icons.wechat_outlined,
+                      "微信",
+                      contact.wechat,
+                    ),
+                    buildIconInfoRow(
+                      Icons.email_outlined,
+                      "Email",
+                      contact.email,
+                    ),
+                    buildIconInfoRow(
+                      FontAwesomeIcons.qq,
+                      "QQ",
+                      contact.qq,
+                    ),
+                    buildIconInfoRow(
+                      FontAwesomeIcons.fax,
+                      "myt",
+                      contact.fax,
                     ),
                   ],
                 ),

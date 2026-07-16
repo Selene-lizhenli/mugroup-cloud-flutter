@@ -11,6 +11,7 @@ class QuoteTopStats with _$QuoteTopStats {
     @JsonKey(name: 'sample_id') int? sampleId, 
     @JsonKey(name: 'count') int? count, 
     @JsonKey(name: 'sample_name') String? sampleName,
+    @JsonKey(name: 'sample_name_en') String? sampleNameEn, // 样品名称英文
     @JsonKey(name: 'id') int? id, // 样品ID，用于跳转详情页
     @JsonKey(name: 'thumb_url') String? thumbUrl, // 样品缩略图
   }) = _QuoteTopStats;

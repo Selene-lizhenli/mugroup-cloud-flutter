@@ -1,4 +1,6 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/single_station/single_station_item.dart';
+import 'package:cloud/pages/single_station/station/detail/single_station_detail_l10n_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,15 +8,6 @@ String _formatExpire(String? expireTime) {
   if (expireTime == null || expireTime.isEmpty) return '—';
   final s = expireTime.length >= 10 ? expireTime.substring(0, 10) : expireTime;
   return s.replaceAll('-', '.');
-}
-
-String _translateTheme(String? theme) {
-  if (theme == null || theme.isEmpty) return '—';
-  final t = theme.toLowerCase();
-  if (t.contains('meimeiimage')) return '玫玫印象';
-  if (t.contains('christmas')) return '圣诞恋歌';
-  if (t.contains('default')) return '默认';
-  return theme;
 }
 
 class StationItemCard extends StatelessWidget {
@@ -27,25 +20,11 @@ class StationItemCard extends StatelessWidget {
   final SingleStationItem item;
   final void Function()? onTap;
 
-  static const _christmasGreen = Color(0xFF165B33);
-  static const _meimeiPink = Color(0xFFfa338a);
-
-  bool get _isChristmasTheme => (item.theme ?? '').contains('christmas');
-
-  bool get _isMeimeiTheme => (item.theme ?? '').contains('meimeiimage');
-
-  bool get _hasCustomTheme => _isChristmasTheme || _isMeimeiTheme;
-
-  Color? get _gradientRightColor {
-    if (_isChristmasTheme) return _christmasGreen;
-    if (_isMeimeiTheme) return null;
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
-    final surfaceColor = colorScheme.surface.withOpacity(1);
+    final surfaceColor = colorScheme.surface;
 
     return GestureDetector(
       onTap: onTap,
@@ -60,8 +39,29 @@ class StationItemCard extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.lerp(
+                      colorScheme.primary,
+                      colorScheme.surfaceTint,
+                      0.98,
+                    )!,
+                    //  colorScheme.surfaceTint,
+                    surfaceColor,
+                    surfaceColor,
+                  ],
+                  stops: const [0.0, 0.4, 1.0],
+                ),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: colorScheme.outline.withOpacity(0.3),
+                ),
+              ),
               child: Row(
                 children: [
                   Expanded(
@@ -86,7 +86,12 @@ class StationItemCard extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '主题：${_translateTheme(item.theme)}',
+                                  l10n.stationThemeWithValue(
+                                    stationDetailThemeLabel(
+                                      context,
+                                      item.theme,
+                                    ),
+                                  ),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -101,7 +106,9 @@ class StationItemCard extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '过期时间：${_formatExpire(item.expireTime)}',
+                                  l10n.stationExpireTimeWithValue(
+                                    _formatExpire(item.expireTime),
+                                  ),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -126,10 +133,14 @@ class StationItemCard extends StatelessWidget {
                                           text: item.stationUrl ?? ''),
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         backgroundColor: Colors.green,
-                                        content: Text('已复制到剪贴板'),
-                                        duration: Duration(seconds: 2),
+                                        content: Text(
+                                          l10n.quoteCopiedToClipboard(
+                                            l10n.stationDetailShareLink,
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 2),
                                       ),
                                     );
                                   },
@@ -141,7 +152,7 @@ class StationItemCard extends StatelessWidget {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          '站点网址：',
+                                          l10n.stationSiteUrlLabel,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall

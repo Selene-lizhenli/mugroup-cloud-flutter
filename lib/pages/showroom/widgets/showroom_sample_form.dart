@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud/constants/form_definitions.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/field_config.dart';
 import 'package:cloud/models/media.dart';
 import 'package:cloud/models/sample/media.dart';
@@ -46,6 +47,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
     final configParams = useMemoized(() => FieldConfigParams(
@@ -86,7 +88,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "product_no",
             builder: (field) => Input(
-              label: '产品货号',
+              label: l10n.showroomProductNo,
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
@@ -96,7 +98,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "purchase_cost",
             builder: (field) => Input(
-              label: '价格',
+              label: l10n.showroomPrice,
               keyboardType: TextInputType.number,
               value: field.value ?? '',
               onChanged: field.didChange,
@@ -108,7 +110,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
             name: "unit",
             builder: (field) {
               return Select(
-                label: '单位',
+                label: l10n.showroomUnit,
                 value: field.value,
                 options: [
                   SelectOption(label: 'PC', value: 'PC'),
@@ -138,7 +140,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "name_cn",
             builder: (field) => TranslatableInput(
-              label: '中文名称',
+              label: l10n.showroomNameCn,
               sourceText: formKey.currentState?.fields['name_cn']?.value,
               value: field.value ?? '',
               onChanged: field.didChange,
@@ -151,7 +153,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "name_en",
             builder: (field) => Input(
-              label: '英文名称',
+              label: l10n.showroomNameEn,
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
@@ -161,7 +163,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "series",
             builder: (field) => Input(
-              label: '系列',
+              label: l10n.showroomSeries,
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
@@ -170,7 +172,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
           return FormBuilderField<String>(
             name: "packing",
             builder: (field) => Input(
-              label: '包装方式',
+              label: l10n.showroomPacking,
               value: field.value ?? '',
               onChanged: field.didChange,
             ),
@@ -183,7 +185,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                 child: FormBuilderField<String>(
                   name: "length",
                   builder: (field) => Input(
-                    label: '长',
+                    label: l10n.showroomLength,
                     value: field.value ?? '',
                     onChanged: field.didChange,
                     keyboardType:
@@ -199,7 +201,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                 child: FormBuilderField<String>(
                   name: "width",
                   builder: (field) => Input(
-                    label: '宽',
+                    label: l10n.showroomWidth,
                     value: field.value ?? '',
                     onChanged: field.didChange,
                     keyboardType:
@@ -215,7 +217,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                 child: FormBuilderField<String>(
                   name: "heigth",
                   builder: (field) => Input(
-                    label: '高',
+                    label: l10n.showroomHeight,
                     value: field.value ?? '',
                     onChanged: field.didChange,
                     keyboardType:
@@ -319,25 +321,26 @@ class ShowroomSampleForm extends HookConsumerWidget {
       final images = formKey.currentState?.value['image'];
 
       if (images == null || (images is List && images.isEmpty)) {
-        EasyLoading.showInfo("请先上传图片");
+        EasyLoading.showInfo(l10n.showroomUploadImageFirst);
         return;
       }
 
       await EasyLoading.show(
-          status: '智能识别中...', maskType: EasyLoadingMaskType.clear);
+          status: l10n.showroomSmartRecognizing,
+          maskType: EasyLoadingMaskType.clear);
 
       try {
         final result = await identifySample({'image': images});
 
         if (result != null && result is Map<String, dynamic>) {
-          EasyLoading.showSuccess("识别成功");
+          EasyLoading.showSuccess(l10n.showroomRecognizeSuccess);
 
           formKey.currentState?.patchValue(result);
         } else {
           EasyLoading.dismiss();
         }
       } catch (e) {
-        EasyLoading.showError('识别失败');
+        EasyLoading.showError(l10n.showroomRecognizeFailed);
       }
     }
 
@@ -362,16 +365,16 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          const Text(
-                            '图片',
-                            style: TextStyle(
+                          Text(
+                            l10n.showroomImages,
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '图片自动识别',
+                            l10n.showroomImageAutoRecognize,
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey[500],
@@ -389,7 +392,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                 color: Theme.of(context).primaryColor),
                             const SizedBox(width: 4),
                             Text(
-                              "智能识别",
+                              l10n.showroomSmartRecognize,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Theme.of(context).primaryColor,
@@ -466,14 +469,14 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         }
 
                         return BuildFormCard(
-                          title: const Row(
+                          title: Row(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
                               Text(
-                                '辅录音频',
-                                style: TextStyle(
+                                l10n.showroomAuxAudio,
+                                style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black),
@@ -495,7 +498,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                               return e.id == media.id;
                                             }
                                             if (e is TemporaryMedia) {
-                                              return e.id == media.id;
+                                              return e.idEquals(media.id);
                                             }
                                             return false;
                                           });
@@ -510,14 +513,14 @@ class ShowroomSampleForm extends HookConsumerWidget {
                       },
                     ),
                     BuildFormCard(
-                      title: '基本信息',
+                      title: l10n.quoteBasicInfo,
                       action: Row(
                         children: [
                           if (initial == null) ...[
                             GestureDetector(
                               onTap: () async {
                                 try {
-                                  EasyLoading.show(status: '加载中...');
+                                  EasyLoading.show(status: l10n.loading);
 
                                   final prefs =
                                       await SharedPreferences.getInstance();
@@ -554,7 +557,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                     formKey.currentState?.patchValue(data);
                                   }
                                 } catch (e) {
-                                  EasyLoading.showError('加载失败');
+                                  EasyLoading.showError(l10n.selectUserLoadFailed);
                                 } finally {
                                   EasyLoading.dismiss();
                                 }
@@ -568,7 +571,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "复制上一条",
+                                    l10n.showroomCopyLast,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Theme.of(context).primaryColor,
@@ -608,7 +611,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                     size: 16,
                                     color: Theme.of(context).primaryColor),
                                 const SizedBox(width: 4),
-                                Text("字段设置",
+                                Text(l10n.showroomFieldSettings,
                                     style: TextStyle(
                                         fontSize: 14,
                                         color: Theme.of(context).primaryColor)),
@@ -631,7 +634,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                             field.value ?? [];
 
                         return BuildFormCard(
-                          title: '工厂报价',
+                          title: l10n.showroomFactoryQuotes,
                           action: GestureDetector(
                             onTap: () async {
                               final selectedSupplier =
@@ -678,7 +681,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                   currentList.add(newItem);
                                   field.didChange(currentList);
                                 } else {
-                                  EasyLoading.showInfo('该供应商已在列表中');
+                                  EasyLoading.showInfo(l10n.showroomSupplierExists);
                                 }
                               }
                             },
@@ -688,7 +691,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                     size: 16,
                                     color: Theme.of(context).primaryColor),
                                 const SizedBox(width: 4),
-                                Text("添加",
+                                Text(l10n.showroomAdd,
                                     style: TextStyle(
                                         color: Theme.of(context).primaryColor,
                                         fontSize: 13)),
@@ -713,7 +716,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                         size: 32, color: Colors.grey[300]),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "暂无工厂报价",
+                                      l10n.showroomNoFactoryQuotes,
                                       style: TextStyle(
                                           color: Colors.grey[400],
                                           fontSize: 12),
@@ -767,7 +770,8 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                               final bool isConfirmed =
                                                   await ConfirmDialog.show(
                                                 context,
-                                                content: '确定要移除这个工厂报价吗？',
+                                                content:
+                                                    l10n.showroomRemoveFactoryQuoteConfirm,
                                               );
                                               if (isConfirmed) {
                                                 final newList = List<
@@ -779,7 +783,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
 
                                                 if (quoteId != null) {
                                                   EasyLoading.show(
-                                                      status: '删除中...');
+                                                      status: l10n.showroomDeleting);
                                                   await deleteSupplyQuote(
                                                       quoteId);
                                                   EasyLoading.dismiss();
@@ -787,7 +791,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                                   newList.removeAt(index);
                                                   field.didChange(newList);
                                                   EasyLoading.showSuccess(
-                                                      '删除成功');
+                                                      l10n.showroomDeleteSuccess);
                                                 } else {
                                                   newList.removeAt(index);
                                                   field.didChange(newList);
@@ -806,7 +810,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                         children: [
                                           Expanded(
                                             child: Input(
-                                              label: '供应商货号',
+                                              label: l10n.showroomSupplierProductNo,
                                               value: item['supplier_product_no']
                                                       ?.toString() ??
                                                   "",
@@ -826,7 +830,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Input(
-                                              label: '供应商价格',
+                                              label: l10n.showroomSupplierPrice,
                                               value: item['purchase_cost']
                                                       ?.toString() ??
                                                   '',
@@ -853,7 +857,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                         children: [
                                           Expanded(
                                             child: Input(
-                                              label: '最小起订量',
+                                              label: l10n.showroomMoq,
                                               value:
                                                   item['moq']?.toString() ?? '',
                                               onChanged: (val) {
@@ -872,7 +876,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Input(
-                                              label: '材质',
+                                              label: l10n.showroomMaterial,
                                               value: item['material']
                                                       ?.toString() ??
                                                   '',
@@ -900,11 +904,11 @@ class ShowroomSampleForm extends HookConsumerWidget {
                       },
                     ),
                     BuildFormCard(
-                      title: '产品规格',
+                      title: l10n.showroomProductSpec,
                       children: [...buildFlowSection(specFieldNames)],
                     ),
                     BuildFormCard(
-                      title: '描述',
+                      title: l10n.showroomDescription,
                       isLast: true,
                       children: [
                         if (isVisible('description_cn'))
@@ -912,7 +916,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                             name: "description_cn",
                             builder: (field) {
                               return TextArea(
-                                label: '中文描述',
+                                label: l10n.showroomDescriptionCn,
                                 showTranslate: true,
                                 sourceText: formKey.currentState
                                     ?.fields['description_cn']?.value,
@@ -930,7 +934,7 @@ class ShowroomSampleForm extends HookConsumerWidget {
                             name: "description_en",
                             builder: (field) {
                               return TextArea(
-                                label: '英文描述',
+                                label: l10n.showroomDescriptionEn,
                                 value: field.value,
                                 onChanged: field.didChange,
                               );
@@ -976,9 +980,9 @@ class ShowroomSampleForm extends HookConsumerWidget {
                         }
                       }
                     },
-                    child: const Text(
-                      '提交',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      l10n.submit,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),

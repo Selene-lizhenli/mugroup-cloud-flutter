@@ -1,4 +1,5 @@
 import 'package:cloud/constants/dashboard_configs.dart';
+import 'package:cloud/pages/dashboard/dashboard_l10n_helper.dart';
 import 'package:cloud/pages/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +10,7 @@ class SampleRoomHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final currentDimension = ref.watch(
       dashboardStatsProvider.select((state) => state.sampleRoomDimension),
@@ -20,15 +22,13 @@ class SampleRoomHeader extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 模块标题
           Text(
-            'Top榜单',
+            l10n.dashboardTopRank,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
                 ?.copyWith(fontSize: 16),
           ),
-          // 维度选择器
           PopupMenuButton<String>(
             icon: Material(
               color: Colors.transparent,
@@ -53,25 +53,26 @@ class SampleRoomHeader extends ConsumerWidget {
             offset: const Offset(-10, 45),
             itemBuilder: (BuildContext context) =>
                 sampleDimensionConfigs.map((config) {
+              final value = config['value'] as String;
               return PopupMenuItem<String>(
-                value: config['value'],
+                value: value,
                 child: Row(
                   children: [
                     Icon(
                       config['icon'],
                       size: 18,
-                      color: currentDimension == config['value']
+                      color: currentDimension == value
                           ? Theme.of(context).colorScheme.primary
                           : Colors.grey,
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      config['label'],
+                      context.dashboardSampleDimensionLabel(value),
                       style: TextStyle(
-                        color: currentDimension == config['value']
+                        color: currentDimension == value
                             ? Theme.of(context).colorScheme.primary
                             : null,
-                        fontWeight: currentDimension == config['value']
+                        fontWeight: currentDimension == value
                             ? FontWeight.w600
                             : FontWeight.normal,
                       ),

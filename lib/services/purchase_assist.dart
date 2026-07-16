@@ -1,3 +1,4 @@
+
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/purchase_assist/meta.dart';
 import 'package:cloud/models/purchase_assist/purchase_assist.dart';
@@ -54,25 +55,56 @@ Future<TaskDetailResponse> getProductComparisonTaskDetail(int taskId) async {
   final res = await api.get(
     'api/tenant/product-comparison/tasks/$taskId/details',
   );
+
   final body = res.data as Map<String, dynamic>;
-  
-  // 解析 data
-  final dataList = (body['data'] as List)
-      .cast<Map<String, dynamic>>()
-      .map((e) => PurchaseAssistTaskDetailItem.fromJson(e))
+  final dynamic raw = body['data'];
+  final dynamic rawResult = raw is Map ? raw['result'] : raw;
+  final List<dynamic> resultsList =
+      rawResult is List ? rawResult : const <dynamic>[];
+
+  final dataList = resultsList
+      .whereType<Map>()
+      .map((e) => PurchaseAssistTaskDetailItem.fromJson(
+            Map<String, dynamic>.from(e),
+          ))
       .toList();
-  
+ 
   // 解析 meta
   PurchaseAssistMeta? meta;
   if (body['meta'] != null) {
     try {
+      final rawMeta = body['meta'];
+      final metaJson = rawMeta is Map<String, dynamic>
+          ? rawMeta
+          : rawMeta is Map
+              ? Map<String, dynamic>.from(rawMeta)
+              : <String, dynamic>{};
+
+      // 兼容后端不同结构：
+      // 1) meta.platform = ...
+      // 2) meta.platforms = [...]
+      // 3) meta["0"] = [...]
+      // 4) meta[0] = [...]
+      final rawPlatform = metaJson.containsKey('platform')
+          ? metaJson['platform']
+          : (metaJson.containsKey('platforms')
+              ? metaJson['platforms']
+              : (metaJson.containsKey('0') ? metaJson['0'] : metaJson[0]));
+      metaJson['platform'] = switch (rawPlatform) {
+        null => null,
+        List<dynamic>() => rawPlatform,
+        List() => List<dynamic>.from(rawPlatform),
+        Map() => rawPlatform.values.toList(),
+        _ => <dynamic>[rawPlatform],
+      };
+
       meta = PurchaseAssistMeta.fromJson(
-        body['meta'] as Map<String, dynamic>,
+        metaJson,
       );
     } catch (_) {
       meta = null;
     }
   }
-  
+
   return TaskDetailResponse(data: dataList, meta: meta);
 }

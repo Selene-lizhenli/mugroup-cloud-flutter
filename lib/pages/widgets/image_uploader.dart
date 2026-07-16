@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud/models/sample/media.dart';
-import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
 import 'package:cloud/services/media.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -9,11 +9,12 @@ import 'package:flant/components/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:gal/gal.dart';
+import 'package:cloud/pages/widgets/continuous_camera_page.dart';
+export 'continuous_camera_page.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:image/image.dart' as img;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:cloud/helper/camera_capture.dart';
 
 class MediaDragData {
   final String key;
@@ -21,52 +22,22 @@ class MediaDragData {
   MediaDragData({required this.key, required this.index});
 }
 
-Future<File> _normalizeCameraImageToPortrait(File file) async {
-  try {
-    final bytes = await file.readAsBytes();
-    final decoded = img.decodeImage(bytes);
-    if (decoded == null) return file;
+/// [removedItem] 仅在删除图片时传入，上传等其它场景不传。
+typedef ImageUploaderValueChanged = void Function(
+  List<TemporaryMedia> list, [
+  TemporaryMedia? removedItem,
+]);
 
-    // 先处理 EXIF 朝向，兼容 iOS 常见方向元数据。
-    final baked = img.bakeOrientation(decoded);
-    final portraitImage =
-        baked.width > baked.height ? img.copyRotate(baked, angle: 90) : baked;
 
-    // 已经是竖图且无需旋转时直接返回原文件。
-    if (portraitImage.width == decoded.width &&
-        portraitImage.height == decoded.height) {
-      return file;
-    }
-
-    final lowerPath = file.path.toLowerCase();
-    if (lowerPath.endsWith('.png') || lowerPath.endsWith('.webp')) {
-      await file.writeAsBytes(img.encodePng(portraitImage), flush: true);
-      return file;
-    }
-
-    // iOS 可能是 .heic/.heif，写入 jpg 内容时统一输出为 .jpg 文件。
-    final targetPath = (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg'))
-        ? file.path
-        : '${file.path}.jpg';
-    final targetFile = targetPath == file.path ? file : File(targetPath);
-    await targetFile.writeAsBytes(
-      img.encodeJpg(portraitImage, quality: 95),
-      flush: true,
-    );
-    return targetFile;
-  } catch (e) {
-    debugPrint('自动旋转竖图失败: $e');
-    return file;
-  }
-}
-
+// 支持单拍、相册选择、连拍、16比9画幅、4比3画幅 、智能识别、主图细节图 
+// 不支持：显示在拍内容、 1比1画幅 。
 class ImageUploader extends HookConsumerWidget {
   final String? label;
   final double? width;
   final double? height;
   final int? maxCount;
   final List<TemporaryMedia>? value;
-  final ValueChanged<List<TemporaryMedia>>? onChanged;
+  final ImageUploaderValueChanged? _onChanged;
 
   // 智能识别相关
   final bool showRecognizeButton;
@@ -102,16 +73,22 @@ class ImageUploader extends HookConsumerWidget {
   final void Function(MediaDragData source, MediaDragData target)? onSwap;
 
   final void Function(List<File> files)? onContinuousCapture;
-  final Widget? extraContent;
 
-  const ImageUploader({
+  /// 连拍最大张数；null 表示不限制
+  final int? continuousMaxCount;
+
+  final Widget? extraContent;
+  final ValueChanged<bool>? onUploadingChanged;
+
+  ImageUploader({
     super.key,
     this.label,
     this.width = 80,
     this.height = 80,
     this.maxCount,
     this.value,
-    this.onChanged,
+    ValueChanged<List<TemporaryMedia>>? onChanged,
+    ImageUploaderValueChanged? onMediaChanged,
     this.autoRecognize = false,
     this.showRecognizeButton = false,
     this.recognizeApi,
@@ -119,16 +96,30 @@ class ImageUploader extends HookConsumerWidget {
     this.errorText,
     this.recognizeAtBottom = false,
     // 默认设置：保留弹窗，关闭连拍
-    this.directCamera = false,
-    this.directGallery = false,
+    this.directCamera = false, //
+    this.directGallery = false,//
     this.showContinuousOption = false,
     this.enableContinuous = false,
     this.onContinuousCapture,
+    this.continuousMaxCount,
     this.customIcon,
     this.uploaderKey,
     this.onSwap,
     this.extraContent,
-  });
+    this.onUploadingChanged,
+  })  : assert(
+          onChanged == null || onMediaChanged == null,
+          'onChanged 与 onMediaChanged 只能传一个',
+        ),
+        _onChanged = onMediaChanged ??
+            (onChanged == null
+                ? null
+                : (list, [removedItem]) => onChanged(list));
+
+  void _notifyChanged(List<TemporaryMedia> list,
+      [TemporaryMedia? removedItem]) {
+    _onChanged?.call(list, removedItem);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -162,12 +153,14 @@ class ImageUploader extends HookConsumerWidget {
     Future<void> uploadFiles(List<File> files) async {
       final List<TemporaryMedia> uploadedMedias = [];
       try {
+        onUploadingChanged?.call(true);
         EasyLoading.show(status: '上传中...');
         for (final file in files) {
           final TemporaryMedia temporaryMedia = await upload(file: file);
           uploadedMedias.add(temporaryMedia);
         }
       } finally {
+        onUploadingChanged?.call(false);
         EasyLoading.dismiss();
       }
 
@@ -176,7 +169,7 @@ class ImageUploader extends HookConsumerWidget {
           ...currentImages,
           ...uploadedMedias
         ];
-        onChanged?.call(newList);
+        _notifyChanged(newList);
 
         if (autoRecognize && recognizeApi != null) {
           await executeRecognition(newList);
@@ -184,56 +177,75 @@ class ImageUploader extends HookConsumerWidget {
       }
     }
 
+    // 上传时使用源文件
+    Future<File?> resolveEntityOriginalFile(AssetEntity entity) async {
+      try {
+        final File? origin = await entity.originFile;
+        if (origin != null) return origin;
+      } catch (_) {}
+      return entity.file;
+    }
+
     // --- 内部方法：上传实体 (用于相册选择) ---
     Future<void> uploadEntities(List<AssetEntity> entities) async {
       final List<File> files = [];
       for (final entity in entities) {
-        final f = await entity.file;
+        final f = await resolveEntityOriginalFile(entity);
         if (f != null) files.add(f);
       }
       if (files.isNotEmpty) await uploadFiles(files);
     }
 
-    // --- 动作 1：打开普通相机 ---
+    // --- 动作 1：打开系统相机 ---
     Future<void> openStandardCamera() async {
-      final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
-      if (entity != null) {
-        // CameraPicker 返回的是 AssetEntity，转换一下
-        final f = await entity.file;
-        if (f != null) {
-          final normalized = await _normalizeCameraImageToPortrait(f);
-          await uploadFiles([normalized]);
-        }
+      //单拍时使用系統自帶的相机，for: wechat_camera_picker有兼容性问题，按下快门的瞬间拍糊。
+      try {
+        final file = await captureSinglePhotoFile();
+        if (file != null) await uploadFiles([file]);
+      } catch (e) {
+        EasyLoading.showError('无法打开相机: $e');
       }
+      return;
     }
 
     // --- 动作 2：打开相册 ---
     Future<void> openGallery() async {
-      final List<AssetEntity>? result = await AssetPicker.pickAssets(
-        context,
-        pickerConfig: AssetPickerConfig(
-          maxAssets: remainingCount,
-          requestType: RequestType.image,
-        ),
-      );
-      if (result != null && result.isNotEmpty) {
-        await uploadEntities(result);
+      try {
+        final permission = await PhotoManager.requestPermissionExtend();
+        if (!permission.hasAccess) {
+          EasyLoading.showInfo('请先开启相册权限');
+          return;
+        }
+
+        final List<AssetEntity>? result = await AssetPicker.pickAssets(
+          context,
+          pickerConfig: AssetPickerConfig(
+            maxAssets: remainingCount,
+            requestType: RequestType.image,
+          ),
+        );
+        if (result != null && result.isNotEmpty) {
+          await uploadEntities(result);
+        }
+      } on PlatformException catch (e) {
+        debugPrint('openGallery PlatformException: ${e.message}');
+        EasyLoading.showError('打开相册失败，请重试');
+      } catch (e) {
+        debugPrint('openGallery error: $e');
+        EasyLoading.showError('打开相册失败，请重试');
       }
     }
 
     // --- 动作 3：打开连拍 (长按触发) ---
     Future<void> openContinuousCamera() async {
       try {
-        final cameras = await availableCameras();
-        if (cameras.isEmpty) {
-          EasyLoading.showError('未检测到相机');
-          return;
-        }
         if (context.mounted) {
           final List<XFile>? result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ContinuousCameraPage(cameras: cameras),
+              builder: (context) => ContinuousCameraPage(
+                maxCount: continuousMaxCount,
+              ),
             ),
           );
           if (result != null && result.isNotEmpty) {
@@ -249,6 +261,11 @@ class ImageUploader extends HookConsumerWidget {
       } catch (e) {
         EasyLoading.showError('无法打开相机: $e');
       }
+    }
+
+    // showFlanActionSheet 走 rootNavigator，须用同一 navigator 关闭，否则会误关父级 BottomSheet
+    void popActionSheet() {
+      Navigator.of(context, rootNavigator: true).maybePop();
     }
 
     // --- 点击处理逻辑 ---
@@ -271,7 +288,7 @@ class ImageUploader extends HookConsumerWidget {
             FlanActionSheetAction(
               name: "拍摄",
               callback: (action) async {
-                Navigator.pop(context);
+                popActionSheet();
                 await openStandardCamera();
               },
             ),
@@ -279,14 +296,14 @@ class ImageUploader extends HookConsumerWidget {
               FlanActionSheetAction(
                 name: "连拍模式",
                 callback: (action) async {
-                  Navigator.pop(context);
+                  popActionSheet();
                   await openContinuousCamera();
                 },
               ),
             FlanActionSheetAction(
               name: "从手机相册选择",
               callback: (action) async {
-                Navigator.pop(context);
+                popActionSheet();
                 await openGallery();
               },
             ),
@@ -311,10 +328,13 @@ class ImageUploader extends HookConsumerWidget {
       final newImageList = [...currentImages];
       var item = newImageList[index];
       if (item.uuid == null) {
-        await deleteMedia(item.id, {});
+        final mediaId = item.idAsInt;
+        if (mediaId != null) {
+          await deleteMedia(mediaId, {});
+        }
       }
       newImageList.removeAt(index);
-      onChanged?.call(newImageList);
+      _notifyChanged(newImageList, item);
     }
 
     Future<void> handleSmartRecognize() async {
@@ -443,6 +463,32 @@ class ImageUploader extends HookConsumerWidget {
     );
   }
 
+  bool _isValidPreviewUrl(String? url) {
+    if (url == null || url.trim().isEmpty) return false;
+    final uri = Uri.tryParse(url);
+    if (uri == null) return false;
+    if (uri.scheme == 'http' || uri.scheme == 'https') {
+      return uri.host.isNotEmpty;
+    }
+    if (uri.scheme == 'file') {
+      // file:/// 或空路径都视为无效，避免触发 No host specified
+      return uri.path.trim().isNotEmpty && uri.path.trim() != '/';
+    }
+    return false;
+  }
+
+  Widget _buildImageWidget(String? url) {
+    if (!_isValidPreviewUrl(url)) {
+      return const Icon(Icons.image, color: Colors.grey);
+    }
+
+    final uri = Uri.parse(url!);
+    if (uri.scheme == 'file') {
+      return Image.file(File.fromUri(uri), fit: BoxFit.cover);
+    }
+    return Image.network(url, fit: BoxFit.cover);
+  }
+
   Widget _buildImageItem(BuildContext context, int index, String? url,
       {required VoidCallback onRemove}) {
     final itemContent = Stack(
@@ -450,25 +496,33 @@ class ImageUploader extends HookConsumerWidget {
       children: [
         GestureDetector(
           onTap: () {
+            final previewUrls = value
+                    ?.map((e) => e.url)
+                    .where((u) => _isValidPreviewUrl(u))
+                    .toList() ??
+                const <String>[];
+
+            if (previewUrls.isEmpty) return;
+            final safeIndex = index.clamp(0, previewUrls.length - 1);
             showFlanImagePreview(
               context,
-              images: value!.map((e) => e.url).toList(),
-              startPosition: index,
+              images: previewUrls,
+              startPosition: safeIndex,
               loop: false,
             );
           },
           child: Container(
-            width: 80,
-            height: 80,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
               color: Colors.grey[200],
               border: Border.all(color: Colors.grey[300]!),
             ),
-            child: url != null
+            child: _isValidPreviewUrl(url)
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.network(url, fit: BoxFit.cover))
+                    child: _buildImageWidget(url))
                 : const Icon(Icons.image, color: Colors.grey),
           ),
         ),
@@ -565,772 +619,6 @@ class ImageUploader extends HookConsumerWidget {
           child: btnContent,
         );
       },
-    );
-  }
-}
-
-class ContinuousCameraPage extends StatefulWidget {
-  final List<CameraDescription> cameras;
-  final bool isMain;
-
-  const ContinuousCameraPage({
-    super.key,
-    required this.cameras,
-    this.isMain = false,
-  });
-
-  @override
-  State<ContinuousCameraPage> createState() => _ContinuousCameraPageState();
-}
-
-class _ContinuousCameraPageState extends State<ContinuousCameraPage>
-    with WidgetsBindingObserver, TickerProviderStateMixin {
-  late CameraController _controller;
-
-  final List<XFile?> _capturedImages = [];
-
-  Offset? _focusPoint;
-
-  int? _replaceIndex;
-
-  final ScrollController _scrollController = ScrollController();
-  bool _isReady = false;
-
-  late AnimationController _shutterAnimController;
-  late Animation<double> _shutterScaleAnim;
-
-  bool _isMainImage = false; // 标记主图的开关，默认关闭
-  final Map<int, bool> _mainImageFlags = {}; // 记录索引对应的图片是否为主图
-
-  @override
-  void initState() {
-    super.initState();
-    _isMainImage = widget.isMain;
-    WidgetsBinding.instance.addObserver(this);
-
-    _shutterAnimController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 100));
-    _shutterScaleAnim = Tween<double>(begin: 1.0, end: 0.85).animate(
-        CurvedAnimation(
-            parent: _shutterAnimController, curve: Curves.easeInOut));
-
-    _initCamera();
-  }
-
-  Future<void> _initCamera() async {
-    if (widget.cameras.isEmpty) return;
-
-    _controller = CameraController(
-      widget.cameras[0],
-      ResolutionPreset.veryHigh,
-      enableAudio: false,
-      imageFormatGroup: Platform.isAndroid
-          ? ImageFormatGroup.jpeg
-          : ImageFormatGroup.bgra8888,
-    );
-
-    try {
-      await _controller.initialize();
-
-      await _controller.setFocusMode(FocusMode.auto);
-      await _controller.setExposureMode(ExposureMode.auto);
-
-      await _controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
-      if (!mounted) return;
-      setState(() => _isReady = true);
-    } catch (e) {
-      debugPrint("Camera init error: $e");
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _controller.dispose();
-    _scrollController.dispose();
-    _shutterAnimController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_controller.value.isInitialized) return;
-    if (state == AppLifecycleState.inactive) {
-      _controller.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      _initCamera();
-    }
-  }
-
-  Future<void> _takePhoto() async {
-    if (!_controller.value.isInitialized) return;
-
-    _shutterAnimController
-        .forward()
-        .then((_) => _shutterAnimController.reverse());
-    HapticFeedback.lightImpact();
-
-    try {
-      final file = await _controller.takePicture();
-      final normalizedFile =
-          await _normalizeCameraImageToPortrait(File(file.path));
-      final xFile = XFile(normalizedFile.path);
-
-      Gal.putImage(xFile.path).catchError((e) {
-        debugPrint("后台保存相册失败: $e");
-      });
-
-      setState(() {
-        int targetIndex;
-        if (_replaceIndex != null) {
-          targetIndex = _replaceIndex!;
-          if (_replaceIndex! < _capturedImages.length) {
-            _capturedImages[_replaceIndex!] = xFile;
-          }
-          _replaceIndex = null;
-        } else {
-          targetIndex = _capturedImages.length;
-          _capturedImages.add(xFile);
-
-          Future.delayed(const Duration(milliseconds: 100), () {
-            if (_scrollController.hasClients) {
-              _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutQuart,
-              );
-            }
-          });
-        }
-        if (widget.isMain) {
-          _mainImageFlags[targetIndex] = _isMainImage;
-          if (_isMainImage) _isMainImage = false;
-        }
-      });
-    } catch (e) {
-      debugPrint("Take photo error: $e");
-    }
-  }
-
-  void _deleteAndRetake(int index) {
-    setState(() {
-      _capturedImages[index] = null;
-      _replaceIndex = index;
-    });
-  }
-
-  void _showImagePreview(int index) {
-    XFile? file = _capturedImages[index];
-    if (file == null) return;
-
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Preview",
-      barrierColor: Colors.black,
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (ctx, anim1, anim2) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter dialogSetState) {
-            // 获取当前图片是否为主图
-            final bool isMain = _mainImageFlags[index] ?? false;
-
-            return Scaffold(
-              backgroundColor: Colors.transparent,
-              body: Stack(
-                children: [
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(ctx),
-                      child: InteractiveViewer(
-                        child: Image.file(File(file.path), fit: BoxFit.contain),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.close_rounded,
-                                  color: Colors.white, size: 28),
-                              onPressed: () => Navigator.pop(ctx),
-                            ),
-                            Text("${index + 1}/${_capturedImages.length}",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600)),
-                            const SizedBox(width: 48),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 40,
-                    left: 0,
-                    right: 0,
-                    child: SafeArea(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (widget.isMain) ...[
-                            GestureDetector(
-                              onTap: () {
-                                dialogSetState(() {
-                                  _mainImageFlags[index] = !isMain;
-                                });
-                                setState(() {});
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: isMain
-                                      ? Colors.amber.withOpacity(0.2)
-                                      : const Color(0xFF2C2C2C),
-                                  border: Border.all(
-                                      color: isMain
-                                          ? Colors.amber
-                                          : Colors.transparent),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      isMain
-                                          ? Icons.star_rounded
-                                          : Icons.star_outline_rounded,
-                                      color:
-                                          isMain ? Colors.amber : Colors.white,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      isMain ? "取消主图" : "设为主图",
-                                      style: TextStyle(
-                                        color: isMain
-                                            ? Colors.amber
-                                            : Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                          ],
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              _deleteAndRetake(index);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2C2C2C),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.refresh_rounded,
-                                      color: Colors.white, size: 20),
-                                  SizedBox(width: 8),
-                                  Text("重拍",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isReady) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: MuProgressIndicator(barWidth: 2)),
-      );
-    }
-
-    final int validCount = _capturedImages.where((e) => e != null).length;
-    final bool isRetakeMode = _replaceIndex != null;
-
-    const Color primaryColor = Color(0xFF007AFF);
-    const Color warningColor = Color(0xFFFF9500);
-
-    Future<void> onTapFocus(TapDownDetails details) async {
-      if (!_controller.value.isInitialized) return;
-
-      final RenderBox box = context.findRenderObject() as RenderBox;
-      final Offset localPosition = box.globalToLocal(details.globalPosition);
-
-      setState(() {
-        _focusPoint = localPosition;
-      });
-
-      HapticFeedback.selectionClick();
-
-      double fullWidth = box.size.width;
-
-      double cameraHeight = fullWidth * _controller.value.aspectRatio;
-
-      double xp = localPosition.dx / fullWidth;
-      double yp = localPosition.dy / cameraHeight;
-
-      xp = xp.clamp(0.0, 1.0);
-      yp = yp.clamp(0.0, 1.0);
-
-      Offset focusOffset = Offset(xp, yp);
-
-      try {
-        if (_controller.value.focusMode != FocusMode.auto) {
-          await _controller.setFocusMode(FocusMode.auto);
-        }
-
-        await _controller.setFocusPoint(focusOffset);
-        await _controller.setExposurePoint(focusOffset);
-      } catch (e) {
-        debugPrint("对焦失败: $e");
-      }
-
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && _focusPoint == localPosition) {
-          setState(() {
-            _focusPoint = null;
-          });
-        }
-      });
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTapDown: onTapFocus,
-            child: Center(
-              child: CameraPreview(
-                _controller,
-                child: LayoutBuilder(builder: (context, constraints) {
-                  return const SizedBox.expand();
-                }),
-              ),
-            ),
-          ),
-          if (_focusPoint != null)
-            Positioned(
-              left: _focusPoint!.dx - 40,
-              top: _focusPoint!.dy - 40,
-              child: Stack(
-                alignment: Alignment.center,
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 1.0),
-                    ),
-                  ),
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.0),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.only(bottom: 20),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black54, Colors.transparent],
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: Colors.black26,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white, size: 20),
-                        ),
-                      ),
-                      const Spacer(),
-                      if (isRetakeMode)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: warningColor.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.warning_amber_rounded,
-                                  size: 14, color: Colors.white),
-                              const SizedBox(width: 4),
-                              Text("正在重拍第 ${_replaceIndex! + 1} 张",
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      const Spacer(),
-                      const SizedBox(width: 40),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_capturedImages.isNotEmpty)
-                  ClipRRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        height: 90,
-                        width: double.infinity,
-                        color: Colors.black.withOpacity(0.3),
-                        alignment: Alignment.centerLeft,
-                        child: ListView.separated(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _capturedImages.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 10),
-                          itemBuilder: (_, index) =>
-                              _buildThumbnailItem(index, isRetakeMode),
-                        ),
-                      ),
-                    ),
-                  ),
-                Container(
-                  color: Colors.black.withOpacity(0.6),
-                  padding: const EdgeInsets.only(top: 24, bottom: 48),
-                  child: SafeArea(
-                    top: false,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (widget.isMain)
-                          SizedBox(
-                            width: 60,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _isMainImage = !_isMainImage;
-                                });
-                                HapticFeedback.mediumImpact();
-                              },
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _isMainImage
-                                        ? Icons.star_rounded
-                                        : Icons.star_outline_rounded,
-                                    color: _isMainImage
-                                        ? Colors.amber
-                                        : Colors.white54,
-                                    size: 28,
-                                  ),
-                                  Text(
-                                    "设为主图",
-                                    style: TextStyle(
-                                      color: _isMainImage
-                                          ? Colors.amber
-                                          : Colors.white54,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        SizedBox(
-                            width: 40,
-                            child: Center(
-                              child: Text("已拍 $validCount",
-                                  style: const TextStyle(
-                                      color: Colors.white54, fontSize: 12)),
-                            )),
-                        GestureDetector(
-                          onTap: _takePhoto,
-                          child: ScaleTransition(
-                            scale: _shutterScaleAnim,
-                            child: Container(
-                              width: 76,
-                              height: 76,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 4),
-                              ),
-                              padding: const EdgeInsets.all(3),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: isRetakeMode
-                                      ? warningColor
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 80,
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                if (_capturedImages.isEmpty) {
-                                  if (widget.isMain) {
-                                    Navigator.pop(
-                                        context, <Map<String, dynamic>>[]);
-                                  } else {
-                                    Navigator.pop(context, <XFile>[]);
-                                  }
-                                  return;
-                                }
-
-                                if (!widget.isMain) {
-                                  final result = _capturedImages
-                                      .whereType<XFile>()
-                                      .toList();
-                                  Navigator.pop(context, result);
-                                  return;
-                                }
-
-                                List<Map<String, dynamic>> groupedResults = [];
-                                Map<String, dynamic>? currentGroup;
-
-                                for (int i = 0;
-                                    i < _capturedImages.length;
-                                    i++) {
-                                  final file = _capturedImages[i];
-                                  if (file == null) continue; // 跳过空位
-
-                                  bool isMain = _mainImageFlags[i] == true;
-
-                                  if (isMain) {
-                                    // 遇到主图，创建新组
-                                    currentGroup = {
-                                      'main': file,
-                                      'details': <XFile>[],
-                                    };
-                                    groupedResults.add(currentGroup);
-                                  } else {
-                                    // 遇到细节图
-                                    if (currentGroup == null) {
-                                      // 容错：没拍主图直接拍细节图
-                                      currentGroup = {
-                                        'main': null,
-                                        'details': <XFile>[file],
-                                      };
-                                      groupedResults.add(currentGroup);
-                                    } else {
-                                      (currentGroup['details'] as List<XFile>)
-                                          .add(file);
-                                    }
-                                  }
-                                }
-
-                                Navigator.pop(context, groupedResults);
-                              },
-                              child: AnimatedOpacity(
-                                duration: const Duration(milliseconds: 200),
-                                opacity: validCount > 0 ? 1.0 : 0.5,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text("完成",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThumbnailItem(int index, bool isGlobalRetakeMode) {
-    final XFile? file = _capturedImages[index];
-    final bool isTarget = _replaceIndex == index;
-
-    final bool isMain = widget.isMain && (_mainImageFlags[index] ?? false);
-
-    Border? currentBorder;
-    if (isTarget) {
-      currentBorder =
-          Border.all(color: const Color(0xFFFF9500), width: 2); // 补拍状态（橙色优先）
-    } else if (isMain) {
-      currentBorder =
-          Border.all(color: Colors.amber, width: 2); // 主图状态（显眼的琥珀色/金色）
-    } else {
-      currentBorder =
-          Border.all(color: Colors.white.withOpacity(0.2), width: 1); // 默认状态
-    }
-
-    return GestureDetector(
-      onTap: () {
-        if (file == null) {
-          setState(() => _replaceIndex = index);
-        } else {
-          _showImagePreview(index);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 56,
-        height: 76,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          border: currentBorder,
-          color: Colors.white.withOpacity(0.1),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (file != null)
-                Image.file(File(file.path), fit: BoxFit.cover)
-              else
-                Container(
-                  color: Colors.black12,
-                  child: const Center(
-                    child: Icon(Icons.add, color: Colors.white38, size: 20),
-                  ),
-                ),
-              if (isGlobalRetakeMode && !isTarget)
-                Container(color: Colors.black54),
-              if (isMain)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: const BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(4),
-                      ),
-                    ),
-                    child: const Text(
-                      "主图",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  color: isTarget ? const Color(0xFFFF9500) : Colors.black54,
-                  child: Text(
-                    "${index + 1}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              if (file == null && isTarget)
-                const Center(
-                    child: Text("补拍",
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)))
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

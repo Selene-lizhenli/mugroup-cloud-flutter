@@ -1,12 +1,15 @@
 import 'package:cloud/app/app.dart';
+import 'package:cloud/constants/easy_refresh_l10n.dart';
 import 'package:cloud/constants/theme_config.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
+import 'package:cloud/providers/locale_provider.dart';
 import 'package:cloud/providers/theme_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cloud/widgets/watermark/watermark_wrapper.dart';
 import 'package:dio/dio.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -27,27 +30,7 @@ Future<void> main() async {
     ),
   );
 
-  EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
-        dragText: '下拉刷新',
-        armedText: '释放开始',
-        readyText: '刷新中...',
-        processingText: '刷新中...',
-        processedText: '成功了',
-        noMoreText: '没有更多了',
-        failedText: '失败了',
-        messageText: '最后更新于 %T',
-      );
-
-  EasyRefresh.defaultFooterBuilder = () => const ClassicFooter(
-        dragText: '上拉加载',
-        armedText: '释放开始',
-        readyText: '加载中...',
-        processingText: '加载中...',
-        processedText: '成功了',
-        noMoreText: '没有更多了',
-        failedText: '失败了',
-        messageText: '最后更新于 %T',
-      );
+  configureEasyRefreshL10n(lookupAppLocalizations(const Locale('zh')));
 
   try {
     await app.loadCoreProvider();
@@ -67,12 +50,24 @@ Future<void> main() async {
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
+  static const _localizationsDelegates = [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(appLocaleProvider);
+    configureEasyRefreshL10n(lookupAppLocalizations(locale));
     final core = ref.watch(coreProvider);
     if (core.isLoading) {
       return MaterialApp(
         key: const ValueKey('loading'),
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: _localizationsDelegates,
         home: const Scaffold(
           body: SizedBox(),
         ),
@@ -87,6 +82,9 @@ class MyApp extends ConsumerWidget {
 
       return MaterialApp(
         key: const ValueKey('error'),
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: _localizationsDelegates,
         home: Scaffold(
           body: Center(
             child: Column(
@@ -142,6 +140,9 @@ class MyApp extends ConsumerWidget {
         : primaryColorPink; // 玫粉色
 
     return MaterialApp.router(
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: _localizationsDelegates,
       routerConfig: app.router.config(
         reevaluateListenable: authNotifier,
       ),

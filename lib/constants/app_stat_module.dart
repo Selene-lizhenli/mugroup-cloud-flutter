@@ -41,7 +41,7 @@ class DashboardModules {
     return [
       ModuleInfo(
         id: EntryFeatures.showroomSample.id,
-        title: EntryFeatures.showroomSample.title,
+        title: EntryFeatures.showroomSample.id,
         contentBuilder: () => const SampleRoomChart(),
         group: '数据统计',
         selected: selected.contains(EntryFeatures.showroomSample.id),
@@ -79,7 +79,7 @@ class DashboardModules {
       // ),
       ModuleInfo(
         id: 'rate',
-        title: '今日汇率',
+        title: 'rate',
         contentBuilder: () => const LineChartDemo(),
         group: '应用',
         selected: selected.contains('rate'),

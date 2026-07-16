@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/pages/selectors/select_user/widgets/user_card.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
@@ -108,6 +109,8 @@ class SelectUserPage extends HookConsumerWidget {
     ColorScheme colorScheme,
     VoidCallback clearSearchAndUsers,
   ) {
+    final l10n = context.l10n;
+
     if (isLoading) {
       return const Center(
         child: Padding(
@@ -131,7 +134,7 @@ class SelectUserPage extends HookConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                '加载失败',
+                l10n.selectUserLoadFailed,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -165,7 +168,7 @@ class SelectUserPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '请输入姓名或工号搜索',
+              l10n.selectUserSearchPrompt,
               style: TextStyle(
                 fontSize: 16,
                 color: colorScheme.outline,
@@ -188,7 +191,7 @@ class SelectUserPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '未找到相关用户',
+              l10n.selectUserNotFound,
               style: TextStyle(
                 fontSize: 16,
                 color: colorScheme.outline,

@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/constants/cart.dart';
+import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/cart/cart_l10n_helper.dart';
 import 'package:cloud/helper/helper.dart';
 import 'package:cloud/models/user.dart';
 import 'package:cloud/models/wms.dart';
@@ -7,10 +9,8 @@ import 'package:cloud/pages/cart/models/state.dart';
 import 'package:cloud/pages/cart/providers/cart_provider.dart';
 import 'package:cloud/pages/cart/widgets/sample_card.dart';
 import 'package:cloud/pages/cart/widgets/operate_bar.dart';
-import 'package:cloud/pages/sample_quotation/widgets/share_drawer.dart';
-import 'package:cloud/providers/app_provider.dart';
+import 'package:cloud/pages/widgets/empty.dart';
 import 'package:cloud/router/router.gr.dart';
-import 'package:cloud/services/quotation_list.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/services/wms.dart';
 import 'package:flant/components/action_sheet.dart';
@@ -22,6 +22,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'package:cloud/widgets/approval_note_dialog.dart';
 import 'package:cloud/widgets/quotation_info_dialog.dart';
 import 'widgets/sample_item.dart';
 
@@ -31,16 +32,15 @@ class CartPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final state = ref.watch(cartProvider);
     final cart = ref.read(cartProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
-    final permissions = ref.watch(userProvider).permissions ?? const <String>[];
     final barcodeTextController = useTextEditingController();
 
     final items = state.items;
     final carts = state.carts;
     final cartType = state.type;
-    final cartName = state.cartName;
     final warehouse = state.warehouse;
     final borrow = state.borrow;
     final transfer = state.transfer;
@@ -50,22 +50,18 @@ class CartPage extends HookConsumerWidget {
     final borrower = useState<User?>(null);
     const warningColor = Color(0xFFFFD75E);
     final user = useState<User?>(null);
+    final quotationRemarkController = useTextEditingController();
 
     // quotationInfo 设置弹窗已抽成可复用组件，见 `QuotationInfoDialog`
 
     String getStockInOptionText(String? stockInOption) {
       if (stockInOption == null) {
-        return "请选择入库类型";
+        return l10n.cartSelectStockInType;
       }
-
-      try {
-        final option = stockInOptions.firstWhere(
-          (element) => element['type'] == stockInOption,
-        );
-        return option['stockInName'] ?? "未设置入库类型";
-      } catch (e) {
-        return "未设置入库类型";
+      if (stockInOptionTypes.contains(stockInOption)) {
+        return stockInTypeLocalizedTitle(context, stockInOption);
       }
+      return l10n.cartStockInTypeNotSet;
     }
 
     final header = useMemoized(() {
@@ -82,7 +78,9 @@ class CartPage extends HookConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(warehouse == null ? "请选择仓库" : warehouse.name ?? "未设置仓库名称"),
+                Text(warehouse == null
+                    ? l10n.cartSelectWarehouse
+                    : warehouse.name ?? l10n.cartWarehouseNameNotSet),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -105,7 +103,7 @@ class CartPage extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(borrower.value == null
-                    ? "请选择借样人"
+                    ? l10n.cartSelectBorrower
                     : "${borrower.value!.name}(${borrower.value!.jobNumber})"),
                 const Icon(Icons.chevron_right)
               ],
@@ -122,8 +120,8 @@ class CartPage extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(transfer == null
-                    ? "请扫描调拨单二维码"
-                    : transfer.orderNo ?? "未设置调拨单号"),
+                    ? l10n.cartScanTransferQr
+                    : transfer.orderNo ?? l10n.cartTransferOrderNotSet),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -139,8 +137,8 @@ class CartPage extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(delivery == null
-                    ? "请扫描出货单二维码"
-                    : delivery.orderNo ?? "未设置出货单号"),
+                    ? l10n.cartScanDeliveryQr
+                    : delivery.orderNo ?? l10n.cartDeliveryOrderNotSet),
                 const Icon(Icons.chevron_right)
               ],
             ),
@@ -164,8 +162,8 @@ class CartPage extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(warehouse == null
-                        ? "请选择仓库"
-                        : warehouse.name ?? "未设置仓库名称"),
+                        ? l10n.cartSelectWarehouse
+                        : warehouse.name ?? l10n.cartWarehouseNameNotSet),
                     const Icon(Icons.chevron_right)
                   ],
                 ),
@@ -188,10 +186,11 @@ class CartPage extends HookConsumerWidget {
     void selectCart(List<CartSelect> selectCarts) {
       showFlanActionSheet(
         context,
-        description: "请选择一辆选样车",
-        cancelText: "我再想想",
+        description: l10n.cartSelectSampleCart,
+        cancelText: l10n.quotationThinkAgain,
         actions: selectCarts
-            .map((select) => FlanActionSheetAction(name: select.cartName))
+            .map((select) => FlanActionSheetAction(
+                name: cartTypeLocalizedTitle(context, select.type)))
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {
@@ -220,9 +219,9 @@ class CartPage extends HookConsumerWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),
-                title: const Text(
-                  "确认借样",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                title: Text(
+                  l10n.cartConfirmBorrow,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 content: SizedBox(
                   height: 270,
@@ -234,9 +233,9 @@ class CartPage extends HookConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "借样人",
-                              style: TextStyle(
+                            Text(
+                              l10n.cartBorrower,
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: 8),
@@ -260,8 +259,8 @@ class CartPage extends HookConsumerWidget {
                                     Expanded(
                                       child: Text(
                                         user.value == null
-                                            ? "请选择用户"
-                                            : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
+                                            ? l10n.cartSelectUser
+                                            : "${user.value!.name} (${user.value!.department?.name ?? l10n.cartNoDepartment})",
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: user.value == null
@@ -277,9 +276,9 @@ class CartPage extends HookConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            const Text(
-                              "借样原因",
-                              style: TextStyle(
+                            Text(
+                              l10n.cartBorrowReason,
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -289,12 +288,17 @@ class CartPage extends HookConsumerWidget {
                               onTap: () {
                                 showFlanActionSheet(
                                   context,
-                                  description: "请选择借样原因",
-                                  cancelText: "我再想想",
-                                  actions: borrowReasons,
+                                  description: l10n.cartSelectBorrowReason,
+                                  cancelText: l10n.quotationThinkAgain,
+                                  actions: borrowReasonIds
+                                      .map((id) => FlanActionSheetAction(
+                                          name:
+                                              borrowReasonLocalizedTitle(
+                                                  context, id)))
+                                      .toList(),
                                   closeOnClickAction: true,
                                   onSelect: (action, index) {
-                                    borrowReason = borrowReasons[index].name;
+                                    borrowReason = borrowReasonIds[index];
                                     setState(() {});
                                   },
                                 );
@@ -308,11 +312,11 @@ class CartPage extends HookConsumerWidget {
                                   borderRadius: BorderRadius.circular(8),
                                   color: Colors.grey.shade100,
                                 ),
-                                child: borrowReason == '其他'
+                                child: borrowReason == borrowReasonOther
                                     ? TextField(
                                         controller: reasonController,
-                                        decoration: const InputDecoration(
-                                          hintText: "请输入借样理由",
+                                        decoration: InputDecoration(
+                                          hintText: l10n.cartBorrowReasonHint,
                                           border: InputBorder.none,
                                         ),
                                         maxLines: 2,
@@ -322,7 +326,10 @@ class CartPage extends HookConsumerWidget {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              borrowReason ?? "请选择借样原因",
+                                              borrowReason == null
+                                                  ? l10n.cartSelectBorrowReason
+                                                  : borrowReasonLocalizedTitle(
+                                                      context, borrowReason!),
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: borrowReason == null
@@ -342,9 +349,9 @@ class CartPage extends HookConsumerWidget {
                             const SizedBox(
                               height: 10,
                             ),
-                            const Text(
-                              "预计归还时间",
-                              style: TextStyle(
+                            Text(
+                              l10n.cartExpectedReturnTime,
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: 8),
@@ -359,7 +366,7 @@ class CartPage extends HookConsumerWidget {
                                     });
                                   },
                                   child: TDCalendar(
-                                    title: '请选择日期',
+                                    title: l10n.cartSelectDate,
                                     value: selectedDate,
                                   ),
                                 ),
@@ -377,7 +384,7 @@ class CartPage extends HookConsumerWidget {
                                   children: [
                                     Text(
                                       selectedDate == null
-                                          ? '请选择日期'
+                                          ? l10n.cartSelectDate
                                           : '${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).year}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).month}-${DateTime.fromMillisecondsSinceEpoch(selectedDate![0]).day}',
                                       style: const TextStyle(fontSize: 14),
                                     ),
@@ -396,37 +403,44 @@ class CartPage extends HookConsumerWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text(
-                      "取消",
-                      style: TextStyle(color: Colors.grey),
+                    child: Text(
+                      l10n.cancel,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () async {
                       final reason = reasonController.text.isNotEmpty
                           ? reasonController.text
-                          : borrowReason;
+                          : (borrowReason != null
+                              ? borrowReasonLocalizedTitle(
+                                  context, borrowReason!)
+                              : null);
 
                       if (user.value == null) {
-                        EasyLoading.showInfo("请先选择用户!");
+                        EasyLoading.showInfo(l10n.cartSelectUserFirst);
                         return;
                       }
                       // 借样理由
-                      if ((borrowReason == null || borrowReason == '其他') &&
+                      if ((borrowReason == null ||
+                              borrowReason == borrowReasonOther) &&
                           reasonController.text.isEmpty) {
                         EasyLoading.showInfo(
-                            "请先${borrowReason == null ? "选择" : "输入"}借样原因!");
+                          borrowReason == null
+                              ? l10n.cartSelectBorrowReasonFirst
+                              : l10n.cartInputBorrowReasonFirst,
+                        );
                         return;
                       }
                       if (selectedDate == null) {
-                        EasyLoading.showInfo("请先选择预计归还时间!");
+                        EasyLoading.showInfo(l10n.cartSelectReturnTimeFirst);
                         return;
                       }
                       final productData = items
                           .map((item) => {
                                 "product_id": item.sample.id,
                                 "inout_qty": item.count,
-                                "product_no": item.sample.productNo
+                                "product_no": item.sample.productNo,
                               })
                           .toList();
                       final data = {
@@ -439,9 +453,9 @@ class CartPage extends HookConsumerWidget {
                                 DateTime.fromMillisecondsSinceEpoch(
                                     selectedDate![0])),
                       };
-                      EasyLoading.show(status: '加载中...');
+                      EasyLoading.show(status: l10n.loading);
                       await storeBorrow(data);
-                      EasyLoading.showSuccess("借样成功!");
+                      EasyLoading.showSuccess(l10n.cartBorrowSuccess);
                       cart.clear();
                       user.value = null;
                       if (context.mounted) {
@@ -454,9 +468,9 @@ class CartPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      "提交",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      l10n.submit,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -478,13 +492,12 @@ class CartPage extends HookConsumerWidget {
         context: pageContext,
         builder: (dialogContext) {
           return AlertDialog(
-            title: const Text('创建报价单成功'),
-            content: const Text('你可以继续进行以下操作：'),
+            title: Text(l10n.cartQuotationCreatedTitle),
+            content: Text(l10n.cartQuotationCreatedContent),
             actions: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     TextButton(
                       onPressed: () {
@@ -506,10 +519,50 @@ class CartPage extends HookConsumerWidget {
                         backgroundColor: colorScheme.secondary,
                       ),
                       child: Text(
-                        '查看详情',
+                        l10n.cartViewDetail,
                         style: TextStyle(color: colorScheme.onSecondary),
                       ),
                     ),
+                    // 暂时隐藏导出功能 导出需要审批
+                    // ElevatedButton(
+                    //   style: ElevatedButton.styleFrom(
+                    //     foregroundColor: Colors.white,
+                    //     elevation: 0,
+                    //     padding: const EdgeInsets.symmetric(
+                    //       vertical: 8,
+                    //       horizontal: 14,
+                    //     ),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(6),
+                    //     ),
+                    //     backgroundColor: colorScheme.primary,
+                    //   ),
+                    //   onPressed: () async {
+                    //     Navigator.of(dialogContext).pop();
+                    //     try {
+                    //       EasyLoading.show(status: '正在加载数据，请稍后...');
+                    //       final detail = await getQuotationListById(quotationId);
+                    //       final templatesResp =
+                    //           await getShowroomQuotationExportTemplate();
+                    //       final dynamicTemplates = templatesResp.data;
+                    //       if (!pageContext.mounted) return;
+                    //       EasyLoading.dismiss();
+                    //       showQuotationDownloadSheet(
+                    //         context: pageContext,
+                    //         item: detail,
+                    //         dynamicTemplates: dynamicTemplates,
+                    //         permissions: permissions,
+                    //       );
+                    //     } catch (e) {
+                    //       EasyLoading.dismiss();
+                    //       EasyLoading.showError('获取导出数据失败,$e');
+                    //     }
+                    //   },
+                    //   child: Text(
+                    //     '立即导出',
+                    //     style: TextStyle(color: colorScheme.onPrimary),
+                    //   ),
+                    // ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -526,38 +579,10 @@ class CartPage extends HookConsumerWidget {
                       ),
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
-                        try {
-                          EasyLoading.show(status: '正在加载数据，请稍后...');
-                          final detail = await getQuotationListById(quotationId);
-                          final templatesResp =
-                              await getShowroomQuotationExportTemplate();
-                          final dynamicTemplates = templatesResp.data;
-                          if (!pageContext.mounted) return;
-                          EasyLoading.dismiss();
-                          showQuotationDownloadSheet(
-                            context: pageContext,
-                            item: detail,
-                            dynamicTemplates: dynamicTemplates,
-                            permissions: permissions,
-                          );
-                        } catch (e) {
-                          EasyLoading.dismiss();
-                          EasyLoading.showError('获取导出数据失败,$e');
-                        }
                       },
                       child: Text(
-                        '立即导出',
+                        l10n.cancel,
                         style: TextStyle(color: colorScheme.onPrimary),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                      },
-                      child: const Text(
-                        '取消',
-                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
                   ],
@@ -571,14 +596,17 @@ class CartPage extends HookConsumerWidget {
 
     Future<void> submitQuotationFromDialog(
       BuildContext pageContext,
-      BuildContext dialogContext,
-    ) async {
+      BuildContext showModalBottomSheetContext, {
+      bool submitForApproval = false,
+      String? approvalNote,
+      BuildContext? approvalDialogContext,
+    }) async {
       if (user.value == null) {
-        EasyLoading.showInfo("请先选择用户!");
+        EasyLoading.showInfo(l10n.cartSelectUserFirst);
         return;
       }
       try {
-        EasyLoading.show(status: '加载中...');
+        EasyLoading.show(status: l10n.loading);
         final data = {
           "sample_items": items
               .map((item) => {
@@ -591,15 +619,41 @@ class CartPage extends HookConsumerWidget {
           "curreny": quotationInfo?.curreny,
           "exchange": quotationInfo?.exchange,
           "commission_rate": quotationInfo?.commissionRate,
-          "is_tax_inclusive": quotationInfo?.showTaxRatePrice
+          "is_tax_inclusive": quotationInfo?.showTaxRatePrice,
+          "remark": quotationRemarkController.text,
         };
         final res = await storeShowroomQuotation(data);
+        final quotationId = res?.id;
+
+        if (submitForApproval) {
+          if (quotationId == null) {
+            EasyLoading.dismiss();
+            EasyLoading.showError(l10n.cartQuotationNoIdForApproval);
+            return;
+          }
+          EasyLoading.show(status: l10n.cartSubmittingApproval);
+          await submitShowroomQuotationApproval(
+            quotationId,
+            note: approvalNote,
+          );
+          EasyLoading.dismiss();
+          if (pageContext.mounted) {
+            EasyLoading.showSuccess(l10n.cartSubmitSuccess);
+          }
+        } else {
+          EasyLoading.dismiss();
+        }
+        EasyLoading.dismiss();
         cart.clear();
         user.value = null;
-        EasyLoading.dismiss();
+        quotationRemarkController.clear();
         if (pageContext.mounted) {
-          final quotationId = res?.id;
-          Navigator.of(dialogContext).pop();
+          if (approvalDialogContext != null && approvalDialogContext.mounted) {
+            Navigator.of(approvalDialogContext).pop();
+          }
+          if (showModalBottomSheetContext.mounted) {
+            Navigator.of(showModalBottomSheetContext).pop();
+          }
           if (quotationId != null) {
             showQuotationCreatedActionsDialog(
               pageContext,
@@ -608,91 +662,244 @@ class CartPage extends HookConsumerWidget {
           }
         }
       } catch (e) {
-        EasyLoading.showError('创建报价单失败,$e');
-      } finally {}
+        EasyLoading.dismiss();
+        EasyLoading.showError(
+          submitForApproval
+              ? l10n.cartSaveOrSubmitFailed('$e')
+              : l10n.cartCreateQuotationFailed('$e'),
+        );
+      }
     }
 
     void quotationDialog(BuildContext pageContext) {
-      showDialog(
+      quotationRemarkController.clear();
+      showModalBottomSheet(
         context: pageContext,
-        builder: (dialogContext) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            title: const Text(
-              "确认创建报价单",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "外销员",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    final selectedUser = await pageContext.router
-                        .push<User>(const SelectUserRoute());
-                    user.value = selectedUser;
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade100,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (showModalBottomSheetContext) {
+          return StatefulBuilder(
+            builder: (context, setSheetState) {
+              final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(bottom: bottomInset),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dialogBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
-                    child: Row(
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            user.value == null
-                                ? "请选择用户"
-                                : "${user.value!.name} (${user.value!.department?.name ?? '暂无部门'})",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: user.value == null
-                                  ? Colors.grey.shade600
-                                  : Colors.black87,
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12),
                             ),
+                            color: colorScheme.primary,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.cartConfirmQuotation,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  quotationRemarkController.clear();
+                                  Navigator.of(showModalBottomSheetContext)
+                                      .pop();
+                                },
+                                icon: Icon(
+                                  Icons.close,
+                                  color: colorScheme.onPrimary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const Icon(Icons.keyboard_arrow_right,
-                            color: Colors.grey), // 添加右侧箭头
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.cartExporterLabel,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () async {
+                                  final selectedUser = await pageContext.router
+                                      .push<User>(const SelectUserRoute());
+                                  user.value = selectedUser;
+                                  setSheetState(() {});
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 0,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: const Color.fromARGB(
+                                        255, 236, 236, 236),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          user.value == null
+                                              ? l10n.cartSelectUser
+                                              : "${user.value!.name} (${user.value!.department?.name ?? l10n.cartNoDepartment})",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: user.value == null
+                                                ? const Color.fromARGB(
+                                                    255, 191, 191, 191)
+                                                : Colors.black87,
+                                          ),
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.keyboard_arrow_right,
+                                        color: Colors.grey,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.cartRemark,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 0,
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color:
+                                      const Color.fromARGB(255, 236, 236, 236),
+                                ),
+                                child: TextField(
+                                  controller: quotationRemarkController,
+                                  minLines: 2,
+                                  maxLines: 2,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintStyle: const TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 191, 191, 191)),
+                                    hintText: l10n.cartQuotationRemarkHint,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      if (user.value == null) {
+                                        EasyLoading.showInfo(
+                                            l10n.cartSelectUserFirst);
+                                        return;
+                                      }
+                                      await ApprovalNoteDialog.show(
+                                        pageContext,
+                                        onConfirm: (note, dialogContext) =>
+                                            submitQuotationFromDialog(
+                                          pageContext,
+                                          showModalBottomSheetContext,
+                                          submitForApproval: true,
+                                          approvalNote: note,
+                                          approvalDialogContext: dialogContext,
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.surface,
+                                      side: BorderSide(
+                                        width: 1,
+                                        color: colorScheme.secondary,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.cartSaveAndApprove,
+                                      style: TextStyle(
+                                          color: colorScheme.secondary),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  ElevatedButton(
+                                    onPressed: () => submitQuotationFromDialog(
+                                      pageContext,
+                                      showModalBottomSheetContext,
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.secondary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.cartSaveOnly,
+                                      style: TextStyle(
+                                          color: colorScheme.onSecondary),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text(
-                  "取消",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    submitQuotationFromDialog(pageContext, dialogContext),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  "提交",
-                  style: TextStyle(color: colorScheme.onPrimary),
-                ),
-              ),
-            ],
+              );
+            },
           );
         },
       );
@@ -702,7 +909,7 @@ class CartPage extends HookConsumerWidget {
       final next = await QuotationInfoDialog.show(
         context,
         initialValue: quotationInfo,
-        currencies: currencies.map((e) => e.name).toList(growable: false),
+        currencies: currencies,
       );
       if (next == null) return;
       cart.quotationInfo = next;
@@ -718,17 +925,17 @@ class CartPage extends HookConsumerWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
             ),
-            title: const Text(
-              "调价",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            title: Text(
+              l10n.cartAdjustPrice,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "价格",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                Text(
+                  l10n.cartPrice,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -758,9 +965,9 @@ class CartPage extends HookConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  "取消",
-                  style: TextStyle(color: Colors.grey),
+                child: Text(
+                  l10n.cancel,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
               ElevatedButton(
@@ -781,9 +988,9 @@ class CartPage extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  "提交",
-                  style: TextStyle(color: Colors.white),
+                child: Text(
+                  l10n.submit,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -802,7 +1009,7 @@ class CartPage extends HookConsumerWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             title: Text(
-              "填写产品条码",
+              l10n.cartFillProductBarcode,
               style: TextStyle(
                 fontSize: 20,
                 color: colorScheme.onSurface,
@@ -816,7 +1023,7 @@ class CartPage extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "产品条码",
+                    l10n.cartProductBarcode,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -829,7 +1036,7 @@ class CartPage extends HookConsumerWidget {
                     autofocus: true,
                     cursorColor: colorScheme.secondary,
                     decoration: InputDecoration(
-                      hintText: "请输入产品条码",
+                      hintText: l10n.cartProductBarcodeHint,
                       hintStyle: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.5),
                       ),
@@ -879,7 +1086,7 @@ class CartPage extends HookConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  "取消",
+                  l10n.cancel,
                   style: TextStyle(
                     color: colorScheme.onSurface.withOpacity(0.7),
                     fontSize: 16,
@@ -891,7 +1098,7 @@ class CartPage extends HookConsumerWidget {
                 onPressed: () async {
                   final input = barcodeTextController.text.trim();
                   if (input.isEmpty) {
-                    EasyLoading.showInfo("请输入产品条码!");
+                    EasyLoading.showInfo(l10n.cartProductBarcodeRequired);
                     return;
                   }
 
@@ -910,7 +1117,7 @@ class CartPage extends HookConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  "提交",
+                  l10n.submit,
                   style: TextStyle(
                     color: colorScheme.onSecondary,
                     fontSize: 16,
@@ -927,21 +1134,23 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          final text = cartType == CartType.transferIn ? "调入" : "调出";
+          final text = cartType == CartType.transferIn
+              ? l10n.cartTransferIn
+              : l10n.cartTransferOut;
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
             ),
             title: Text(
-              "确认$text",
+              l10n.cartConfirmAction(text),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  "取消",
-                  style: TextStyle(color: Colors.grey),
+                child: Text(
+                  l10n.cancel,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
               ElevatedButton(
@@ -956,16 +1165,16 @@ class CartPage extends HookConsumerWidget {
                       .toList();
                   final data = {"items": productData};
 
-                  EasyLoading.show(status: '加载中...');
+                  EasyLoading.show(status: l10n.loading);
 
                   if (cartType == CartType.transferOut) {
                     await addTransferItems(transfer!.id!, data);
-                    EasyLoading.showSuccess("调拨出库成功!");
+                    EasyLoading.showSuccess(l10n.cartTransferOutSuccess);
                   }
 
                   if (cartType == CartType.transferIn) {
                     await transferIn(transfer!.id!, data);
-                    EasyLoading.showSuccess("调拨入库成功!");
+                    EasyLoading.showSuccess(l10n.cartTransferInSuccess);
                   }
 
                   cart.clear();
@@ -984,9 +1193,9 @@ class CartPage extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  "确认",
-                  style: TextStyle(color: Colors.white),
+                child: Text(
+                  l10n.cartConfirm,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -999,22 +1208,24 @@ class CartPage extends HookConsumerWidget {
       showDialog(
           context: context,
           builder: (context) {
-            final text = cartType == CartType.deliveryOut ? "出货" : "未知";
+            final text = cartType == CartType.deliveryOut
+                ? l10n.cartDeliveryOut
+                : l10n.cartUnknown;
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
               title: Text(
-                "确认$text",
+                l10n.cartConfirmAction(text),
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    "取消",
-                    style: TextStyle(color: Colors.grey),
+                  child: Text(
+                    l10n.cancel,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
                 ElevatedButton(
@@ -1029,11 +1240,11 @@ class CartPage extends HookConsumerWidget {
                         .toList();
                     final data = {"items": productData};
 
-                    EasyLoading.show(status: '加载中...');
+                    EasyLoading.show(status: l10n.loading);
 
                     if (cartType == CartType.deliveryOut) {
                       await addDeliveryItems(delivery!.id!, data);
-                      EasyLoading.showSuccess("出货成功!");
+                      EasyLoading.showSuccess(l10n.cartDeliverySuccess);
                     }
 
                     cart.clear();
@@ -1052,9 +1263,9 @@ class CartPage extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    "确认",
-                    style: TextStyle(color: Colors.white),
+                  child: Text(
+                    l10n.cartConfirm,
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -1066,7 +1277,9 @@ class CartPage extends HookConsumerWidget {
       showDialog(
         context: context,
         builder: (context) {
-          final text = cartType == CartType.stockIn ? "入库" : "未知";
+          final text = cartType == CartType.stockIn
+              ? l10n.cartStockIn
+              : l10n.cartUnknown;
           final remarkController = TextEditingController();
           String? stockInOption;
 
@@ -1077,7 +1290,7 @@ class CartPage extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(16.0),
                 ),
                 title: Text(
-                  "确认$text",
+                  l10n.cartConfirmAction(text),
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -1088,9 +1301,9 @@ class CartPage extends HookConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 入库类型选择
-                      const Text(
-                        "入库类型",
-                        style: TextStyle(
+                      Text(
+                        l10n.cartStockInType,
+                        style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 8),
@@ -1098,16 +1311,17 @@ class CartPage extends HookConsumerWidget {
                         onTap: () {
                           showFlanActionSheet(
                             context,
-                            description: "请选择入库类型",
-                            cancelText: "我再想想",
-                            actions: stockInOptions
-                                .map((option) => FlanActionSheetAction(
-                                    name: option['stockInName']!))
+                            description: l10n.cartSelectStockInType,
+                            cancelText: l10n.quotationThinkAgain,
+                            actions: stockInOptionTypes
+                                .map((type) => FlanActionSheetAction(
+                                    name: stockInTypeLocalizedTitle(
+                                        context, type)))
                                 .toList(),
                             closeOnClickAction: true,
                             onSelect: (action, index) {
                               setState(() {
-                                stockInOption = stockInOptions[index]['type'];
+                                stockInOption = stockInOptionTypes[index];
                               });
                             },
                           );
@@ -1152,9 +1366,9 @@ class CartPage extends HookConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       // 备注输入
-                      const Text(
-                        "备注",
-                        style: TextStyle(
+                      Text(
+                        l10n.cartRemark,
+                        style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 8),
@@ -1168,8 +1382,8 @@ class CartPage extends HookConsumerWidget {
                         ),
                         child: TextField(
                           controller: remarkController,
-                          decoration: const InputDecoration(
-                            hintText: "请输入备注信息",
+                          decoration: InputDecoration(
+                            hintText: l10n.cartRemarkHint,
                             border: InputBorder.none, // 移除TextField自带边框
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 12,
@@ -1186,16 +1400,16 @@ class CartPage extends HookConsumerWidget {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(
-                      "取消",
-                      style: TextStyle(color: Colors.grey),
+                    child: Text(
+                      l10n.cancel,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () async {
                       // 验证入库类型是否选择
                       if (stockInOption == null) {
-                        EasyLoading.showError("请选择入库类型");
+                        EasyLoading.showError(l10n.cartSelectStockInType);
                         return;
                       }
 
@@ -1217,11 +1431,11 @@ class CartPage extends HookConsumerWidget {
                         'remark': remarkController.text.trim(),
                       };
 
-                      EasyLoading.show(status: '加载中...');
+                      EasyLoading.show(status: l10n.loading);
 
                       if (cartType == CartType.stockIn) {
                         await storeWmsStockInOut(data);
-                        EasyLoading.showSuccess("入库成功!");
+                        EasyLoading.showSuccess(l10n.cartStockInSuccess);
                       }
 
                       cart.clear();
@@ -1236,9 +1450,9 @@ class CartPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      "确认",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      l10n.cartConfirm,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -1253,7 +1467,7 @@ class CartPage extends HookConsumerWidget {
       // 借样
       if (cartType == CartType.borrowOut) {
         if (warehouse == null) {
-          EasyLoading.showInfo("请先选择仓库!");
+          EasyLoading.showInfo(l10n.cartSelectWarehouseFirst);
           return;
         }
         borrowDialog(context);
@@ -1267,7 +1481,7 @@ class CartPage extends HookConsumerWidget {
       // 调拨出/入库
       if (cartType == CartType.transferOut || cartType == CartType.transferIn) {
         if (transfer == null) {
-          EasyLoading.showInfo("请先扫描调拨单号!");
+          EasyLoading.showInfo(l10n.cartScanTransferFirst);
           return;
         }
         transferDialog(context);
@@ -1276,7 +1490,7 @@ class CartPage extends HookConsumerWidget {
       //出货
       if (cartType == CartType.deliveryOut) {
         if (delivery == null) {
-          EasyLoading.showInfo("请先扫描出货单号!");
+          EasyLoading.showInfo(l10n.cartScanDeliveryFirst);
           return;
         }
         deliveryDialog(context);
@@ -1294,11 +1508,11 @@ class CartPage extends HookConsumerWidget {
       // 还样
       if (cartType == CartType.borrowIn) {
         if (borrower.value == null) {
-          EasyLoading.showInfo("请先选择借样人!");
+          EasyLoading.showInfo(l10n.cartSelectBorrowerFirst);
           return;
         }
 
-        EasyLoading.show(status: '加载中...');
+        EasyLoading.show(status: l10n.loading);
 
         if (borrower.value != null) {
           final data = {
@@ -1312,13 +1526,13 @@ class CartPage extends HookConsumerWidget {
               (resp.data["abnormal"] as List).cast<Map<String, dynamic>>());
         }
 
-        EasyLoading.showSuccess("还样成功!");
+        EasyLoading.showSuccess(l10n.cartReturnSuccess);
       }
 
       //盘点
       if (cartType == CartType.inout) {
         if (warehouse == null) {
-          EasyLoading.showInfo("请先选择仓库!");
+          EasyLoading.showInfo(l10n.cartSelectWarehouseFirst);
           return;
         }
         if (context.mounted) {
@@ -1330,7 +1544,7 @@ class CartPage extends HookConsumerWidget {
       //入库
       if (cartType == CartType.stockIn) {
         if (warehouse == null) {
-          EasyLoading.showInfo("请先选择仓库!");
+          EasyLoading.showInfo(l10n.cartSelectWarehouseFirst);
           return;
         }
         if (context.mounted) {
@@ -1340,6 +1554,7 @@ class CartPage extends HookConsumerWidget {
     }
 
     return Scaffold(
+      
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
@@ -1349,7 +1564,9 @@ class CartPage extends HookConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(cartType != null ? cartName! : '请选择选样车'),
+                Text(cartType != null
+                    ? cartTypeLocalizedTitle(context, cartType!)
+                    : l10n.cartSelectSampleCartTitle),
                 const Icon(Icons.arrow_drop_down),
                 if (cartType != null) const SizedBox(width: 5),
                 if (items.isNotEmpty)
@@ -1434,7 +1651,7 @@ class CartPage extends HookConsumerWidget {
                         }
                       }
 
-                      EasyLoading.showError("不支持该条码!");
+                      EasyLoading.showError(l10n.cartUnsupportedBarcode);
                       return;
                     } else {
                       // 处理样品
@@ -1442,13 +1659,13 @@ class CartPage extends HookConsumerWidget {
                     }
                   }
                 },
-                child: const Row(
+                child: Row(
                   children: [
-                    SizedBox(width: 4),
-                    Icon(Icons.camera_alt),
-                    SizedBox(width: 8),
-                    Text('扫一扫'),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.camera_alt),
+                    const SizedBox(width: 8),
+                    Text(l10n.cartScan),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
@@ -1456,13 +1673,13 @@ class CartPage extends HookConsumerWidget {
                 onPressed: () async {
                   handBarcodeDialog(context);
                 },
-                child: const Row(
+                child: Row(
                   children: [
-                    SizedBox(width: 4),
-                    Icon(Icons.edit),
-                    SizedBox(width: 8),
-                    Text('手填条码'),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.edit),
+                    const SizedBox(width: 8),
+                    Text(l10n.cartManualBarcode),
+                    const SizedBox(width: 8),
                   ],
                 ),
               )
@@ -1504,17 +1721,10 @@ class CartPage extends HookConsumerWidget {
                                   child: MultiSliver(
                                     children: [
                                       if (items.isEmpty)
-                                        const Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0, 10, 0, 20),
-                                            child: Text(
-                                              "这里是空的，快去添加吧~",
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 12,
-                                                  height: 1.2),
-                                            ),
+                                        Center(
+                                          child: Empty(
+                                            showImage: true,
+                                            text: l10n.cartEmptyHint,
                                           ),
                                         ),
                                       SliverList(
@@ -1543,7 +1753,7 @@ class CartPage extends HookConsumerWidget {
                                                       foregroundColor:
                                                           Colors.white,
                                                       icon: Icons.attach_money,
-                                                      label: '调价',
+                                                      label: l10n.cartAdjustPrice,
                                                     ),
                                                   SlidableAction(
                                                     onPressed: (context) {
@@ -1554,7 +1764,7 @@ class CartPage extends HookConsumerWidget {
                                                     foregroundColor:
                                                         Colors.white,
                                                     icon: Icons.delete,
-                                                    label: '移除',
+                                                    label: l10n.cartRemove,
                                                   ),
                                                 ],
                                               ),
@@ -1578,6 +1788,9 @@ class CartPage extends HookConsumerWidget {
                                                             ShowroomSampleDetailRoute(
                                                               id: cartItem
                                                                   .sample.id!,
+                                                              xTenantId: cartItem
+                                                                  .sample
+                                                                  .xTenantId,
                                                             ),
                                                           );
                                                         },
@@ -1585,6 +1798,9 @@ class CartPage extends HookConsumerWidget {
                                                           sample:
                                                               cartItem.sample,
                                                           price: cartItem.price,
+                                                          xTenantId: cartItem
+                                                              .sample
+                                                              ?.xTenantId,
                                                           quotationInfo:
                                                               quotationInfo,
                                                           cartType: cartType,
@@ -1604,11 +1820,12 @@ class CartPage extends HookConsumerWidget {
                                                   if (cartType ==
                                                           CartType.quotation &&
                                                       cartItem.price != null)
-                                                    const TDBadge(
+                                                    TDBadge(
                                                       TDBadgeType.subscript,
                                                       padding:
-                                                          EdgeInsets.all(4),
-                                                      message: '改',
+                                                          const EdgeInsets.all(4),
+                                                      message:
+                                                          l10n.cartPriceChangedBadge,
                                                     ),
                                                 ],
                                               ),
@@ -1633,12 +1850,12 @@ class CartPage extends HookConsumerWidget {
           ),
           if (cartType == null)
             InkWell(
-              child: const SampleCard(
+              child: SampleCard(
                   color: warningColor,
                   child: Center(
                     child: Text(
-                      '请先选择您需要的选样车',
-                      style: TextStyle(fontSize: 12),
+                      l10n.cartSelectSampleCartFirst,
+                      style: const TextStyle(fontSize: 12),
                     ),
                   )),
               onTap: () => selectCart(carts),

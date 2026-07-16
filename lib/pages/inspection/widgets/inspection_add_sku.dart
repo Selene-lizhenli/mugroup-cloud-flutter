@@ -44,6 +44,8 @@ class InspectionAddSku extends ConsumerWidget {
                       file.path!,
                       filename: file.name,
                     ),
+                    if (data.templateKey != null)
+                      'template_key': data.templateKey,
                   });
                   await importInspectionItems(id, formData);
                 }

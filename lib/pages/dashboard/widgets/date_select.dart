@@ -1,3 +1,4 @@
+import 'package:cloud/pages/dashboard/dashboard_l10n_helper.dart';
 import 'package:flutter/material.dart';
 
 /// 时间范围枚举（所有时间、最近一年、最近半年、最近一个月）
@@ -79,22 +80,22 @@ class _TimeRangeSelectState extends State<TimeRangeSelect> {
         children: [
           if (useAllTime == true)
             _RangeChip(
-              label: '所有时间',
+              label: context.dashboardDateRangeLabel(DateRange.allTime),
               isSelected: _selectedRange == DateRange.allTime,
               onTap: () => _selectRange(DateRange.allTime),
             ),
           _RangeChip(
-            label: '最近两年',
+            label: context.dashboardDateRangeLabel(DateRange.lastTwoYear),
             isSelected: _selectedRange == DateRange.lastTwoYear,
             onTap: () => _selectRange(DateRange.lastTwoYear),
           ),
           _RangeChip(
-            label: '最近一年',
+            label: context.dashboardDateRangeLabel(DateRange.lastYear),
             isSelected: _selectedRange == DateRange.lastYear,
             onTap: () => _selectRange(DateRange.lastYear),
           ),
           _RangeChip(
-            label: '最近半年',
+            label: context.dashboardDateRangeLabel(DateRange.lastHalfYear),
             isSelected: _selectedRange == DateRange.lastHalfYear,
             onTap: () => _selectRange(DateRange.lastHalfYear),
           ),

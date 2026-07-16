@@ -1,3 +1,4 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/dashboard/widgets/exchange/exchange_calculator.dart';
 import 'package:cloud/pages/widgets/muShowModalBottomSheet.dart';
@@ -26,18 +27,26 @@ class ExchangeChartHeader extends StatelessWidget {
   void _showExchangeCalculator(
     BuildContext context,
   ) {
-    muShowModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       builder: (BuildContext sheetContext) {
-        return ExchangeCalculatorDialog(
-            selectedDimension: selectedDimension, list: currencyList);
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: ExchangeCalculatorDialog(
+            selectedDimension: selectedDimension,
+            list: currencyList,
+          ),
+        );
       },
     );
   }
 
   void _openDimensionBottomSheet(BuildContext context) async {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
 
     await muShowModalBottomSheet<ExchangeRate>(
@@ -67,7 +76,7 @@ class ExchangeChartHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        '选择维度',
+                        l10n.dashboardSelectDimension,
                         style: Theme.of(sheetContext)
                             .textTheme
                             .titleMedium
@@ -102,7 +111,7 @@ class ExchangeChartHeader extends StatelessWidget {
                       return ListTile(
                         dense: true,
                         title: Text(
-                          '${dimension.name} ${dimension.shortName} ${isSelected ? '（当前选中）' : ''}',
+                          '${dimension.name} ${dimension.shortName}${isSelected ? ' ${l10n.dashboardCurrentlySelected}' : ''}',
                           style: TextStyle(
                             color: isSelected
                                 ? colorScheme.primary
@@ -132,6 +141,7 @@ class ExchangeChartHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -146,7 +156,7 @@ class ExchangeChartHeader extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '汇率',
+                l10n.dashboardExchangeRate,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
@@ -154,7 +164,7 @@ class ExchangeChartHeader extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '数据来自中行',
+                l10n.dashboardDataFromBoc,
                 style: TextStyle(
                   fontSize: 11,
                   color: Colors.grey.shade500,

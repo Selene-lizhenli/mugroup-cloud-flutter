@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud/models/wms.dart';
-import 'package:cloud/pages/selectors/select_wms_warehouse/widgets/warehouse_card.dart';
+import 'package:cloud/models/wms.dart'; 
 import 'package:cloud/services/wms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -17,12 +16,22 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final warehouses = useState<List<Warehouse>?>([]);
+    final colorScheme = Theme.of(context).colorScheme;
     useEffect(() {
       Future fetchWarehouses() async {
         EasyLoading.show(status: '加载中...');
-        final resp = await getWarehouses();
-        EasyLoading.dismiss();
-        warehouses.value = resp.data;
+        try {
+          final resp = await getWarehousesPublic();
+          // 过滤掉废弃的样品间
+          final filteredWarehouses = resp.data
+              .where((warehouse) => warehouse.abandoned != true)
+              .toList();
+          EasyLoading.dismiss();
+          warehouses.value = filteredWarehouses ?? [];
+        } catch (e) {
+          EasyLoading.dismiss();
+          warehouses.value = [];
+        }
       }
 
       fetchWarehouses();
@@ -33,11 +42,14 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        title: const Text('仓库列表'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('仓库列表', style: TextStyle(color: Colors.white)),
       ),
+      backgroundColor: colorScheme.primary.withRed(89),
       body: SafeArea(
           child: Column(
         children: [
+// 自定义尺寸、颜色、速度
           Expanded(
             child: CustomScrollView(
               slivers: [
@@ -46,10 +58,8 @@ class SelectWmsWarehousePage extends HookConsumerWidget {
                     children: warehouses.value
                             ?.map(
                               (warehouseItem) => InkWell(
-                                child: WarehouseCard(
-                                  child: WarehouseItem(
-                                    warehouse: warehouseItem,
-                                  ),
+                                child: WarehouseItem(
+                                  warehouse: warehouseItem,
                                 ),
                                 onTap: () =>
                                     {context.router.maybePop(warehouseItem)},

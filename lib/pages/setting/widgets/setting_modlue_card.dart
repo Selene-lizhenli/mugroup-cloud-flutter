@@ -1,9 +1,11 @@
+import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:flutter/material.dart';
 
 /// =======================
 /// 模块卡片
 /// =======================
 class SettingModuleCard extends StatelessWidget {
+  final String moduleId;
   final String title;
   final bool selected;
   final VoidCallback onAction;
@@ -11,70 +13,53 @@ class SettingModuleCard extends StatelessWidget {
 
   const SettingModuleCard({
     super.key,
+    required this.moduleId,
     required this.title,
     required this.selected,
     required this.onAction,
     this.dragIndex,
   });
 
-  /// 根据标题获取图标和颜色
+  /// 根据模块 id 获取图标和颜色
   _ModuleIconConfig _getIconConfig() {
-    // 根据标题判断模块类型，分配图标和颜色
-    if (title.contains('资讯') || title.contains('新闻')) {
-      return _ModuleIconConfig(
-        icon: Icons.article_outlined,
-        iconBgColor: const Color(0xFFE3F2FD), // 浅蓝色
-        iconColor: const Color(0xFF1976D2), // 深蓝色
-      );
-    } else if (title.contains('汇率') || title.contains('图表')) {
-      return _ModuleIconConfig(
-        icon: Icons.show_chart,
-        iconBgColor: const Color(0xFFE8F5E9), // 浅绿色
-        iconColor: const Color(0xFF388E3C), // 深绿色
-      );
-    } else if (title.contains('报表')) {
-      return _ModuleIconConfig(
-        icon: Icons.description_outlined,
-        iconBgColor: const Color(0xFFF3E5F5), // 浅紫色
-        iconColor: const Color(0xFF7B1FA2), // 深紫色
-      );
-    } else if (title.contains('市场带客')) {
-      return _ModuleIconConfig(
-        icon: Icons.shopping_cart_outlined,
-        iconBgColor: const Color(0xFFFFF3E0), // 浅橙色
-        iconColor: const Color(0xFFE65100), // 深橙色
-      );
-    } else if (title.contains('Top榜单')) {
-      return _ModuleIconConfig(
-        icon: Icons.leaderboard,
-        iconBgColor: const Color(0xFFE1F5FE), // 浅青色
-        iconColor: const Color(0xFF0277BD), // 深青色
-      );
-    } else if (title.contains('验货')) {
-      return _ModuleIconConfig(
-        icon: Icons.check_circle_outline,
-        iconBgColor: const Color(0xFFE8F5E9), // 浅绿色
-        iconColor: const Color(0xFF2E7D32), // 深绿色
-      );
-    } else if (title.contains('客户')) {
-      return _ModuleIconConfig(
-        icon: Icons.people_outline,
-        iconBgColor: const Color(0xFFEDE7F6), // 浅紫色
-        iconColor: const Color(0xFF5E35B1), // 深紫色
-      );
-    } else if (title.contains('供应商')) {
-      return _ModuleIconConfig(
-        icon: Icons.factory_outlined,
-        iconBgColor: const Color(0xFFFFEBEE), // 浅红色
-        iconColor: const Color(0xFFC62828), // 深红色
-      );
-    } else {
-      // 默认配置
-      return _ModuleIconConfig(
-        icon: Icons.dashboard_outlined,
-        iconBgColor: const Color(0xFFFCE4EC), // 浅粉色
-        iconColor: const Color(0xFF616161), // 深灰色
-      );
+    switch (moduleId) {
+      case 'rate':
+      case 'showroom_sample':
+        return _ModuleIconConfig(
+          icon: Icons.show_chart,
+          iconBgColor: const Color(0xFFE8F5E9),
+          iconColor: const Color(0xFF388E3C),
+        );
+      case 'market_purchase':
+        return _ModuleIconConfig(
+          icon: Icons.shopping_cart_outlined,
+          iconBgColor: const Color(0xFFFFF3E0),
+          iconColor: const Color(0xFFE65100),
+        );
+      case 'inspection':
+        return _ModuleIconConfig(
+          icon: Icons.check_circle_outline,
+          iconBgColor: const Color(0xFFE8F5E9),
+          iconColor: const Color(0xFF2E7D32),
+        );
+      case 'crm_company':
+        return _ModuleIconConfig(
+          icon: Icons.people_outline,
+          iconBgColor: const Color(0xFFEDE7F6),
+          iconColor: const Color(0xFF5E35B1),
+        );
+      case 'supply_supplier':
+        return _ModuleIconConfig(
+          icon: Icons.factory_outlined,
+          iconBgColor: const Color(0xFFFFEBEE),
+          iconColor: const Color(0xFFC62828),
+        );
+      default:
+        return _ModuleIconConfig(
+          icon: Icons.dashboard_outlined,
+          iconBgColor: const Color(0xFFFCE4EC),
+          iconColor: const Color(0xFF616161),
+        );
     }
   }
 
@@ -144,7 +129,9 @@ class SettingModuleCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      selected ? '已选中' : '未选中',
+                      selected
+                          ? context.l10n.settingModuleSelected
+                          : context.l10n.settingModuleUnselected,
                       style: TextStyle(
                         fontSize: 13,
                         color: selected
