@@ -861,6 +861,40 @@ class _ContinuousWechatPickerState extends CameraPickerState {
   /// 手机当前物理姿态，仅用于成片旋转，不驱动预览布局。
   DeviceOrientation physicalCaptureOrientation = DeviceOrientation.portraitUp;
 
+  /// 默认不订阅加速度计，避免一进连拍就触发运动传感器导致部分 iOS 闪退。
+  /// 仅在开启「成片跟随横竖」时再订阅。
+  @override
+  void initAccelerometerSubscription() {
+    if (enableGyroscopeRotation) {
+      ensureAccelerometerSubscription();
+    }
+  }
+
+  void ensureAccelerometerSubscription() {
+    if (accelerometerSubscription != null) return;
+    try {
+      accelerometerSubscription =
+          accelerometerEventStream().listen(handleAccelerometerEvent);
+    } catch (e) {
+      debugPrint('Accelerometer subscribe failed: $e');
+    }
+  }
+
+  void cancelAccelerometerSubscription() {
+    accelerometerSubscription?.cancel();
+    accelerometerSubscription = null;
+  }
+
+  void setGyroscopeRotationEnabled(bool enabled) {
+    enableGyroscopeRotation = enabled;
+    if (enabled) {
+      ensureAccelerometerSubscription();
+    } else {
+      cancelAccelerometerSubscription();
+      physicalCaptureOrientation = DeviceOrientation.portraitUp;
+    }
+  }
+
   @override
   void handleAccelerometerEvent(AccelerometerEvent event) {
     // 只记录姿态；绝不 lock 到横屏，否则预览会变成「横向比例大」。
@@ -1729,8 +1763,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       HapticFeedback.selectionClick();
 
       final pickerState = wechatPickerStateRef.value;
-      pickerState?.enableGyroscopeRotation = next;
-      pickerState?.physicalCaptureOrientation = DeviceOrientation.portraitUp;
+      pickerState?.setGyroscopeRotationEnabled(next);
       pickerState?.lockedCaptureOrientation = DeviceOrientation.portraitUp;
 
       final controller = iosCameraControllerRef.value;
@@ -2407,7 +2440,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
     }
 
     iosOverlayBuilderRef.value = buildWechatOverlay;
-    wechatPickerStateRef.value?.enableGyroscopeRotation = gyroEnabled.value;
+    wechatPickerStateRef.value?.setGyroscopeRotationEnabled(gyroEnabled.value);
     wechatPickerStateRef.value?.buildCustomForeground =
         (ctx, constraints, controller) {
       final viewportSize = Size(
@@ -2427,7 +2460,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         createPickerState: () {
           final state = _ContinuousWechatPickerState();
           wechatPickerStateRef.value = state;
-          state.enableGyroscopeRotation = gyroEnabled.value;
+          state.setGyroscopeRotationEnabled(gyroEnabled.value);
           state.overlayRepaintListenable = iosOverlayRepaintTick;
           state.buildCustomForeground = (ctx, constraints, controller) {
             final viewportSize = Size(
@@ -2442,6 +2475,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
           enableRecording: false,
           enableAudio: false,
           // 预览始终竖屏；成片横/竖由顶部陀螺仪开关控制。
+          // 不指定 resolutionPreset，使用插件默认 ultraHigh（避免 max 在部分机型初始化闪退）。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
           preferredFlashMode: camera.FlashMode.off,
           onXFileCaptured: (file, _) {
@@ -2797,8 +2831,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
       HapticFeedback.selectionClick();
 
       final pickerState = wechatPickerStateRef.value;
-      pickerState?.enableGyroscopeRotation = next;
-      pickerState?.physicalCaptureOrientation = DeviceOrientation.portraitUp;
+      pickerState?.setGyroscopeRotationEnabled(next);
       // 预览永远锁定竖长画幅，不随横拿改变。
       pickerState?.lockedCaptureOrientation = DeviceOrientation.portraitUp;
 
@@ -3456,7 +3489,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
         (ctx, constraints, controller) {
       return overlayBuilderRef.value(controller);
     };
-    wechatPickerStateRef.value?.enableGyroscopeRotation = gyroEnabled.value;
+    wechatPickerStateRef.value?.setGyroscopeRotationEnabled(gyroEnabled.value);
 
     return PopScope(
       canPop: false,
@@ -3469,7 +3502,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
           final state = _ContinuousWechatPickerState();
           wechatPickerStateRef.value = state;
           state.overlayRepaintListenable = overlayRepaintTick;
-          state.enableGyroscopeRotation = gyroEnabled.value;
+          state.setGyroscopeRotationEnabled(gyroEnabled.value);
           state.buildCustomForeground = (ctx, constraints, controller) {
             return overlayBuilderRef.value(controller);
           };
@@ -3479,6 +3512,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
           enableRecording: false,
           enableAudio: false,
           // 预览始终竖屏铺满；成片横/竖由顶部开关 + 加速度计控制。
+          // 不指定 resolutionPreset，使用插件默认 ultraHigh（避免 max 在部分机型初始化闪退）。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
           preferredFlashMode: camera.FlashMode.off,
           // 拍照由 lockFrameThenCapture 自行控制：先锁画面再出片。
