@@ -66,10 +66,10 @@ class ImageUploaderInspection extends HookConsumerWidget {
 
   /// 是否使用无画幅切换的连拍相机：
   /// true  => [ContinuousCameraPageWithoutSize]（全平台 wechat，无画幅切换，可成片跟随横竖）
-  /// false => [ContinuousCameraPageOtherPhoto]（全平台 wechat，可切换画幅，亦可成片跟随横竖）
+  /// false => [ContinuousCameraPageOtherPhoto]（全平台 wechat，可切换画幅，成片锁定竖屏）
   final bool enableContinuousWithGyroscopeWithoutSize;
 
-  /// 连拍打开时，「成片跟随横竖」的默认值（预览始终竖屏，页内顶部可切换）。
+  /// 仅对 [ContinuousCameraPageWithoutSize] 生效：进入时「成片跟随横竖」的默认值。
   /// true  => 默认：横拿出横图、竖拿出竖图
   /// false => 默认：成片锁定竖屏
   final bool enableContinuousGyroscopeRotation;
@@ -272,8 +272,6 @@ class ImageUploaderInspection extends HookConsumerWidget {
                   // 其他验货图片相机
                   : ContinuousCameraPageOtherPhoto(
                       maxCount: continuousMaxCount,
-                      initialEnableGyroscopeRotation:
-                          enableContinuousGyroscopeRotation,
                     ),
             ),
           );
@@ -685,16 +683,12 @@ class _IosCaptureSnapshot {
   final camera.CameraLensDirection lensDirection;
   final Rect captureFrameRect;
 
-  /// 快门按下时的物理姿态，供成片旋转使用（避免异步裁剪后姿态已变）。
-  final DeviceOrientation physicalCaptureOrientation;
-
   const _IosCaptureSnapshot({
     required this.viewportSize,
     required this.aspectRatio,
     required this.cameraAspectRatio,
     required this.lensDirection,
     required this.captureFrameRect,
-    this.physicalCaptureOrientation = DeviceOrientation.portraitUp,
   });
 }
 
@@ -989,7 +983,7 @@ class _ContinuousWechatPickerState extends CameraPickerState {
 
 //  其他验货图片  的 定制相机
 /// 连拍相机（全平台: wechat_camera_picker），画幅可在「传感器原生」与「1:1」间切换。
-/// 顶部可切换「成片跟随横竖」（预览始终竖屏）。
+/// 预览与成片均锁定竖屏，不提供横竖跟随切换。
 class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
   static const double bottomSideSlotWidth = 80;
   static const Color captureFrameBorderColor = Colors.black;
@@ -1001,13 +995,9 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
   /// 连拍最大张数；null 或 <=0 表示不限制
   final int? maxCount;
 
-  /// 进入页面时是否默认开启「成片跟随横竖」。
-  final bool initialEnableGyroscopeRotation;
-
   const ContinuousCameraPageOtherPhoto({
     super.key,
     this.maxCount,
-    this.initialEnableGyroscopeRotation = false,
   });
 
   static double resolveWechatIosCameraAspectRatio(
@@ -1217,7 +1207,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
     );
 
     final isCapturing = useState(false);
-    final gyroEnabled = useState(initialEnableGyroscopeRotation);
     final displayAspectRatio =
         useState(loadPersistedCaptureAspectRatio()); // 本地记忆：原生 / 1:1
     final isAspectRatioSwitchingRef = useRef(false);
@@ -1244,7 +1233,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
     );
     useEffect(
       () {
-        // 预览 UI 强制竖屏；横拿时界面不变，仅成片方向随陀螺仪变化。
+        // 预览与成片均锁定竖屏。
         SystemChrome.setPreferredOrientations(const [
           DeviceOrientation.portraitUp,
         ]);
@@ -1292,7 +1281,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       isCapturing.value,
       replaceIndex.value,
       validCapturedCount,
-      gyroEnabled.value,
     ]);
     final bool hasCaptureLimit = maxCount != null && maxCount! > 0;
     final bool isAtCaptureLimit =
@@ -1548,28 +1536,17 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
           iosSnapshot: iosSnapshot,
           androidSnapshot: androidSnapshot,
         );
-        XFile oriented = refined;
-        final pickerState = wechatPickerStateRef.value;
-        if (pickerState != null) {
-          oriented = await pickerState.orientCapturedFile(
-            refined,
-            orientationOverride: iosSnapshot?.physicalCaptureOrientation,
-          );
-        }
         if (!context.mounted || isExitingRef.value) return;
         replaceCapturedFileAt(
           targetIndex,
-          oriented,
+          refined,
           onlyIfCurrentPath: previewPath,
         );
         await deleteTempCaptureFile(previewPath);
-        if (oriented.path != sourcePath) {
+        if (refined.path != sourcePath) {
           await deleteTempCaptureFile(sourcePath);
         }
-        if (refined.path != sourcePath && refined.path != oriented.path) {
-          await deleteTempCaptureFile(refined.path);
-        }
-        unawaited(backupToGalleryIfEnabled(oriented.path));
+        unawaited(backupToGalleryIfEnabled(refined.path));
       } catch (e) {
         debugPrint('Refine captured file error: $e');
       }
@@ -1652,14 +1629,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         if (!context.mounted || isExitingRef.value) {
           return;
         }
-        XFile result = XFile(path);
-        final pickerState = wechatPickerStateRef.value;
-        if (pickerState != null) {
-          result = await pickerState.orientCapturedFile(
-            result,
-            orientationOverride: iosSnapshot?.physicalCaptureOrientation,
-          );
-        }
+        final XFile result = XFile(path);
         applyCapturedFile(targetIndex, result);
         if (replaceIndex.value != null) {
           replaceIndex.value = null;
@@ -1673,18 +1643,11 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       unawaited(
         enqueueFastCrop(() async {
           try {
-            XFile processedFile = await processCapturedFile(
+            final XFile processedFile = await processCapturedFile(
               path,
               iosSnapshot: iosSnapshot,
               androidSnapshot: androidSnapshot,
             );
-            final pickerState = wechatPickerStateRef.value;
-            if (pickerState != null) {
-              processedFile = await pickerState.orientCapturedFile(
-                processedFile,
-                orientationOverride: iosSnapshot?.physicalCaptureOrientation,
-              );
-            }
             if (!context.mounted || isExitingRef.value) {
               clearThumbnailSaving(targetIndex);
               return;
@@ -1757,27 +1720,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       isAspectRatioSwitchingRef.value = false;
     }
 
-    Future<void> toggleGyroscopeRotation() async {
-      final next = !gyroEnabled.value;
-      gyroEnabled.value = next;
-      HapticFeedback.selectionClick();
-
-      final pickerState = wechatPickerStateRef.value;
-      pickerState?.setGyroscopeRotationEnabled(next);
-      pickerState?.lockedCaptureOrientation = DeviceOrientation.portraitUp;
-
-      final controller = iosCameraControllerRef.value;
-      if (controller != null && controller.value.isInitialized) {
-        try {
-          await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
-        } catch (e) {
-          debugPrint('Toggle gyroscope rotation error: $e');
-        }
-      }
-      EasyLoading.showToast(next ? '成片跟随横竖' : '成片锁定竖屏');
-      iosOverlayRepaintTick.value++;
-    }
-
     Future<void> requestIosTakePhoto() async {
       final pickerState = wechatPickerStateRef.value;
       if (pickerState == null || isCapturing.value) return;
@@ -1813,7 +1755,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
           cameraAspectRatio: cameraAspectRatio,
           lensDirection: iosCameraLensDirectionRef.value,
           captureFrameRect: captureFrameRect,
-          physicalCaptureOrientation: pickerState.physicalCaptureOrientation,
         ),
       );
       // 默认画幅不显示缩略图占位；1:1 仍显示「正在裁剪中」。
@@ -2114,24 +2055,10 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       );
     }
 
-    Widget buildIosGyroscopeButton() {
-      return IconButton(
-        onPressed: () => unawaited(toggleGyroscopeRotation()),
-        tooltip: gyroEnabled.value ? '成片跟随横竖：开' : '成片锁定竖屏',
-        icon: Icon(
-          gyroEnabled.value
-              ? Icons.screen_rotation
-              : Icons.screen_lock_rotation,
-          color: Colors.white,
-        ),
-      );
-    }
-
     Widget buildOverlay({
       required VoidCallback onTakePhoto,
       required Widget flashButton,
       required Widget aspectRatioButton,
-      required Widget gyroscopeButton,
       Rect? effectiveCaptureRectOverride,
     }) {
       return LayoutBuilder(
@@ -2314,9 +2241,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
                           // 闪光灯 按钮
                           flashButton,
                           const SizedBox(width: 10),
-                          // 成片跟随横竖
-                          gyroscopeButton,
-                          const SizedBox(width: 10),
                           // 画幅切换 按钮
                           aspectRatioButton,
                           const SizedBox(width: 20),
@@ -2434,13 +2358,11 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         onTakePhoto: requestIosTakePhoto,
         flashButton: buildIosFlashButton(controller),
         aspectRatioButton: buildIosAspectRatioButton(),
-        gyroscopeButton: buildIosGyroscopeButton(),
         effectiveCaptureRectOverride: effectiveRect,
       );
     }
 
     iosOverlayBuilderRef.value = buildWechatOverlay;
-    wechatPickerStateRef.value?.setGyroscopeRotationEnabled(gyroEnabled.value);
     wechatPickerStateRef.value?.buildCustomForeground =
         (ctx, constraints, controller) {
       final viewportSize = Size(
@@ -2460,7 +2382,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         createPickerState: () {
           final state = _ContinuousWechatPickerState();
           wechatPickerStateRef.value = state;
-          state.setGyroscopeRotationEnabled(gyroEnabled.value);
           state.overlayRepaintListenable = iosOverlayRepaintTick;
           state.buildCustomForeground = (ctx, constraints, controller) {
             final viewportSize = Size(
@@ -2474,7 +2395,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         pickerConfig: CameraPickerConfig(
           enableRecording: false,
           enableAudio: false,
-          // 预览始终竖屏；成片横/竖由顶部陀螺仪开关控制。
+          // 预览与成片均锁定竖屏。
           // 不指定 resolutionPreset，使用插件默认 ultraHigh（避免 max 在部分机型初始化闪退）。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
           preferredFlashMode: camera.FlashMode.off,
