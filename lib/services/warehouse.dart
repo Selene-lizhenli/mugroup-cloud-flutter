@@ -29,6 +29,30 @@ Future<WarehouseReceipt> fetchWarehouseReceiptByHashid(String hashid) async {
   return WarehouseReceipt.fromJson(res.data);
 }
 
+Future<void> createWarehouseReceiptLabelsPrintTask(
+  int receiptId, {
+  List<int>? itemIds,
+}) async {
+  await api.post(
+    "api/tenant/warehouse/receipts/$receiptId/agent-print/labels",
+    data: itemIds == null ? null : {'item_ids': itemIds},
+  );
+}
+
+Future<void> createWarehouseReceiptEntryVoucherPrintTask(
+  int receiptId,
+  String supplierShortName, [
+  List<int>? entryIds,
+]) async {
+  await api.post(
+    "api/tenant/warehouse/receipts/$receiptId/agent-print/entry-voucher",
+    data: {
+      'supplier_short_name': supplierShortName,
+      if (entryIds != null) 'entry_ids': entryIds,
+    },
+  );
+}
+
 Future<WarehouseReceiptItem> fetchWarehouseReceiptItem(int id) async {
   final results = await Future.wait([
     api.get("api/tenant/warehouse/receipt-items/$id"),

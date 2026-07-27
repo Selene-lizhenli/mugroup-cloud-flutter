@@ -130,9 +130,7 @@ class BasicInfoTab extends HookConsumerWidget {
           ),
           Expanded(
             child: Text(
-              (value == null || value.isEmpty)
-                  ? context.l10n.quoteNone
-                  : value,
+              (value == null || value.isEmpty) ? context.l10n.quoteNone : value,
               style: const TextStyle(fontSize: 13),
             ),
           ),
@@ -205,8 +203,7 @@ class BasicInfoTab extends HookConsumerWidget {
               onTap: () async {
                 await ApprovalNoteDialog.show(
                   pageContext,
-                  onConfirm: (note, dialogContext) =>
-                      submitQuotationFromDialog(
+                  onConfirm: (note, dialogContext) => submitQuotationFromDialog(
                     pageContext,
                     note,
                     quotationId,
@@ -319,6 +316,20 @@ class BasicInfoTab extends HookConsumerWidget {
                   ),
                   _row(
                     context,
+                    l10n.quotationInvoiceTaxRate,
+                    item.taxRateMapping == null
+                        ? context.l10n.quoteNone
+                        : item.taxRateMapping!.entries.map((e) {
+                            final rate = e.value;
+                            final rateText = rate == rate.truncateToDouble()
+                                ? rate.toInt().toString()
+                                : rate.toString();
+                            return '${e.key}% → $rateText%';
+                          }).join('\n'),
+                    colorScheme.outline,
+                  ),
+                  _row(
+                    context,
                     l10n.quoteCurrency,
                     item.curreny,
                     colorScheme.outline,
@@ -330,10 +341,12 @@ class BasicInfoTab extends HookConsumerWidget {
                     colorScheme.outline,
                   ),
                   _rowApproval(
-                    l10n.quoteApprovalStatus,
-                    item.status,
-                    colorScheme.outline,
-                      colorScheme.primary, item.id, context),
+                      l10n.quoteApprovalStatus,
+                      item.status,
+                      colorScheme.outline,
+                      colorScheme.primary,
+                      item.id,
+                      context),
                 ],
               ),
             ),

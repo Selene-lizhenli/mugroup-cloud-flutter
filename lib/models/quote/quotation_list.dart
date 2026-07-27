@@ -7,6 +7,15 @@ import 'package:cloud/models/user.dart';
 part 'quotation_list.freezed.dart';
 part 'quotation_list.g.dart';
 
+Map<String, double>? taxRateMappingFromJson(Object? json) {
+  if (json is! Map) return null;
+  return json.map(
+    (key, value) => MapEntry(key.toString(), (value as num).toDouble()),
+  );
+}
+
+Map<String, double>? taxRateMappingToJson(Map<String, double>? map) => map;
+
 @freezed
 class QuotationList with _$QuotationList {
   factory QuotationList({
@@ -39,6 +48,12 @@ class QuotationList with _$QuotationList {
     @JsonKey(name: 'item_type') String? itemType,
     @JsonKey(name: 'department_id') int? departmentId,
     @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
+    @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson,
+    )
+    Map<String, double>? taxRateMapping,
     @JsonKey(name: 'product_count') int? productCount,
     @JsonKey(name: 'sum_qty') String? sumQty,
     @JsonKey(name: 'language') String? language,

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/warehouse/warehouse_receipt.dart';
+import 'package:cloud/models/warehouse/warehouse_receipt_item.dart';
 import 'package:cloud/pages/warehouse/warehouse_receipt_detail_page.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/services/warehouse.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -80,7 +82,10 @@ class WarehouseReceiptListPage extends HookConsumerWidget {
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 560),
-                child: _ReceiptCard(receipt: receipt),
+                child: _ReceiptCard(
+                  key: ValueKey(receipt.id),
+                  receipt: receipt,
+                ),
               ),
             );
           },
@@ -140,7 +145,6 @@ class WarehouseReceiptListPage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-               
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
                   child: Row(
@@ -195,13 +199,14 @@ class WarehouseReceiptListPage extends HookConsumerWidget {
   }
 }
 
-class _ReceiptCard extends StatelessWidget {
+class _ReceiptCard extends HookWidget {
   final WarehouseReceipt receipt;
 
-  const _ReceiptCard({required this.receipt});
+  const _ReceiptCard({super.key, required this.receipt});
 
   @override
   Widget build(BuildContext context) {
+    final isPrinting = useState(false);
     final colorScheme = Theme.of(context).colorScheme;
     final metaItems = [
       _ReceiptMetaItem(label: '外销员', value: receipt.seller?.name),
@@ -211,7 +216,61 @@ class _ReceiptCard extends StatelessWidget {
     final footerItems = [
       _ReceiptMetaItem(label: '部门', value: receipt.department?.name),
       _ReceiptMetaItem(label: '出运日期', value: _formatDate(receipt.shippedAt)),
+      _ReceiptMetaItem(
+        label: '创建时间',
+        value: _formatDateTime(receipt.createdAt),
+      ),
     ].where((e) => e.value != null && e.value!.trim().isNotEmpty).toList();
+
+    Future<void> printLabels({List<int>? itemIds}) async {
+      final receiptId = receipt.id;
+      if (receiptId == null || isPrinting.value) return;
+
+      isPrinting.value = true;
+      EasyLoading.show(status: '正在创建打印任务...');
+      try {
+        await createWarehouseReceiptLabelsPrintTask(
+          receiptId,
+          itemIds: itemIds,
+        );
+        EasyLoading.showSuccess(
+          itemIds == null ? '整单标签打印任务已创建' : '所选货号打印任务已创建',
+        );
+      } catch (_) {
+        // The API interceptor displays the backend error message.
+      } finally {
+        if (context.mounted) isPrinting.value = false;
+      }
+    }
+
+    Future<void> selectItemsAndPrint() async {
+      final receiptId = receipt.id;
+      if (receiptId == null || isPrinting.value) return;
+
+      isPrinting.value = true;
+      EasyLoading.show(status: '正在加载货号...');
+      try {
+        final detail = await fetchWarehouseReceipt(receiptId);
+        EasyLoading.dismiss();
+        if (!context.mounted) return;
+        isPrinting.value = false;
+
+        final items = detail.items ?? const <WarehouseReceiptItem>[];
+        if (items.where((item) => item.id != null).isEmpty) {
+          EasyLoading.showError('当前入库单没有可打印的货号标签');
+          return;
+        }
+
+        final itemIds = await showDialog<List<int>>(
+          context: context,
+          builder: (_) => _LabelSelectionDialog(items: items),
+        );
+        if (itemIds != null) await printLabels(itemIds: itemIds);
+      } catch (_) {
+        // The API interceptor displays the backend error message.
+        if (context.mounted) isPrinting.value = false;
+      }
+    }
 
     return Card(
       elevation: 0,
@@ -280,6 +339,37 @@ class _ReceiptCard extends StatelessWidget {
                     if (i + 1 < footerItems.length) const SizedBox(height: 6),
                   ],
                 ],
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: receipt.id == null || isPrinting.value
+                            ? null
+                            : selectItemsAndPrint,
+                        icon: const Icon(Icons.checklist, size: 18),
+                        label: const Text('选择货号打印'),
+                      ),
+                      FilledButton.icon(
+                        onPressed: receipt.id == null || isPrinting.value
+                            ? null
+                            : printLabels,
+                        icon: isPrinting.value
+                            ? const SizedBox.square(
+                                dimension: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.print_outlined, size: 18),
+                        label: const Text('整单打印标签'),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -321,6 +411,146 @@ class _SupplierBadge extends StatelessWidget {
 String? _formatDate(DateTime? value) {
   if (value == null) return null;
   return DateFormat('yyyy-MM-dd').format(value);
+}
+
+String? _formatDateTime(DateTime? value) {
+  if (value == null) return null;
+  return DateFormat('yyyy-MM-dd HH:mm').format(value);
+}
+
+class _LabelSelectionDialog extends StatefulWidget {
+  final List<WarehouseReceiptItem> items;
+
+  const _LabelSelectionDialog({required this.items});
+
+  @override
+  State<_LabelSelectionDialog> createState() => _LabelSelectionDialogState();
+}
+
+class _LabelSelectionDialogState extends State<_LabelSelectionDialog> {
+  static const _searchThreshold = 8;
+
+  final Set<int> _selectedIds = {};
+  String _search = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final items = widget.items.where((item) => item.id != null).toList();
+    final query = _search.trim().toLowerCase();
+    final visibleItems = query.isEmpty
+        ? items
+        : items.where((item) {
+            return [
+              item.itemNo,
+              item.customerItemNo,
+              item.supplierShortName,
+            ].any((value) => value?.toLowerCase().contains(query) == true);
+          }).toList();
+    final allVisibleSelected = visibleItems.isNotEmpty &&
+        visibleItems.every((item) => _selectedIds.contains(item.id));
+
+    return AlertDialog(
+      title: const Text('选择要打印的货号'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (items.length > _searchThreshold) ...[
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '搜索货号 / 客户货号 / 供应商',
+                    prefixIcon: Icon(Icons.search),
+                    isDense: true,
+                  ),
+                  onChanged: (value) => setState(() => _search = value),
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (visibleItems.isNotEmpty)
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  value: allVisibleSelected,
+                  title: Text(query.isEmpty ? '全选' : '全选搜索结果'),
+                  onChanged: (selected) {
+                    setState(() {
+                      final visibleIds = visibleItems.map((item) => item.id!);
+                      if (selected == true) {
+                        _selectedIds.addAll(visibleIds);
+                      } else {
+                        _selectedIds.removeAll(visibleIds);
+                      }
+                    });
+                  },
+                ),
+              const Divider(height: 1),
+              Flexible(
+                child: visibleItems.isEmpty
+                    ? const Center(child: Text('没有匹配的货号'))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: visibleItems.length,
+                        itemBuilder: (context, index) {
+                          final item = visibleItems[index];
+                          final itemId = item.id!;
+                          final details = [
+                            if (item.customerItemNo?.trim().isNotEmpty == true)
+                              '客户货号：${item.customerItemNo!.trim()}',
+                            if (item.supplierShortName?.trim().isNotEmpty ==
+                                true)
+                              '供应商：${item.supplierShortName!.trim()}',
+                          ];
+
+                          return CheckboxListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            value: _selectedIds.contains(itemId),
+                            title: Text(item.itemNo?.trim().isNotEmpty == true
+                                ? item.itemNo!.trim()
+                                : '未填写货号'),
+                            subtitle: details.isEmpty
+                                ? null
+                                : Text(details.join(' · ')),
+                            onChanged: (selected) {
+                              setState(() {
+                                if (selected == true) {
+                                  _selectedIds.add(itemId);
+                                } else {
+                                  _selectedIds.remove(itemId);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('取消'),
+        ),
+        FilledButton(
+          onPressed: _selectedIds.isEmpty
+              ? null
+              : () => Navigator.pop(
+                    context,
+                    items
+                        .where((item) => _selectedIds.contains(item.id))
+                        .map((item) => item.id!)
+                        .toList(),
+                  ),
+          child: Text('打印所选（${_selectedIds.length}）'),
+        ),
+      ],
+    );
+  }
 }
 
 class _ReceiptMetaItem {

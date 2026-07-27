@@ -18,12 +18,12 @@ String sampleItemTypeLabel(BuildContext context, String itemType) {
 
 String sampleTaxRateHint(
   BuildContext context, {
-  required bool showTaxRatePrice,
+  required bool showIncludeTax,
   required String taxRate,
 }) {
   final l10n = context.l10n;
-  return showTaxRatePrice
-      ? l10n.samplesTaxRateIncluded(taxRate)
+  return showIncludeTax
+      ? l10n.samplesTaxRateIncluded(taxRate) //含稅
       : l10n.samplesTaxRateExcluded(taxRate);
 }
 

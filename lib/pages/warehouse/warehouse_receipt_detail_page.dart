@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/warehouse/warehouse_receipt_item.dart';
+import 'package:cloud/models/warehouse/warehouse_receipt_item_entry.dart';
 import 'package:cloud/pages/warehouse/warehouse_receipt_status.dart';
 import 'package:cloud/providers/warehouse_provider.dart';
 import 'package:cloud/router/router.gr.dart';
@@ -43,6 +44,7 @@ class WarehouseReceiptDetailPage extends HookConsumerWidget {
     final isItemsLoading = useState(true);
     final itemsError = useState<Object?>(null);
     final requestSeq = useRef(0);
+    final isPrinting = useState(false);
     final itemsRefreshTick = ref.watch(warehouseReceiptItemsRefreshProvider);
 
     useEffect(() {
@@ -119,6 +121,159 @@ class WarehouseReceiptDetailPage extends HookConsumerWidget {
 
       if (ref.read(warehouseReceiptItemsRefreshProvider) == beforeRefreshTick) {
         await reload();
+      }
+    }
+
+    Future<List<_EntryVoucherOption>> loadSupplierEntries(
+      _SupplierGroup group,
+    ) async {
+      final supplierItems = await getWarehouseReceiptFlatItems(
+        receiptId,
+        queryParameters: {'status': 'entered'},
+      );
+
+      final options = supplierItems
+          .where((item) => _normalizeText(item.supplierShortName) == group.key)
+          .expand((item) => (item.entries ?? const [])
+              .where((entry) => entry.id != null && entry.enteredAt != null)
+              .map((entry) => _EntryVoucherOption(item, entry)))
+          .toList();
+      options.sort(
+        (a, b) => b.entry.enteredAt!.compareTo(a.entry.enteredAt!),
+      );
+
+      return options;
+    }
+
+    Future<bool> confirmPrint(String title, String content) async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('确认打印'),
+            ),
+          ],
+        ),
+      );
+      return confirmed ?? false;
+    }
+
+    Future<void> printSupplierBatch(_SupplierGroup group) async {
+      if (isPrinting.value) return;
+
+      isPrinting.value = true;
+      final confirmed = await confirmPrint(
+        '确认打印本批次入库凭证？',
+        '将打印「${group.label}」当前批次的入库凭证。',
+      );
+      if (!context.mounted) return;
+      if (!confirmed) {
+        isPrinting.value = false;
+        return;
+      }
+
+      EasyLoading.show(status: '正在创建整批打印任务...');
+      try {
+        await createWarehouseReceiptEntryVoucherPrintTask(
+          receiptId,
+          group.label,
+        );
+        EasyLoading.showSuccess('该供应商本批入库凭证打印任务已创建');
+      } catch (_) {
+        // The API interceptor displays the backend error message.
+      } finally {
+        if (context.mounted) isPrinting.value = false;
+      }
+    }
+
+    Future<void> printSupplierLabels(_SupplierGroup group) async {
+      if (isPrinting.value) return;
+
+      isPrinting.value = true;
+      final confirmed = await confirmPrint(
+        '确认打印货号标签？',
+        '将打印「${group.label}」的全部货号标签。',
+      );
+      if (!context.mounted) return;
+      if (!confirmed) {
+        isPrinting.value = false;
+        return;
+      }
+
+      EasyLoading.show(status: '正在创建供应商货号标签打印任务...');
+      try {
+        final allItems = await getWarehouseReceiptFlatItems(receiptId);
+        final itemIds = allItems
+            .where(
+              (item) =>
+                  _normalizeText(item.supplierShortName) == group.key &&
+                  item.id != null,
+            )
+            .map((item) => item.id!)
+            .toList();
+
+        if (itemIds.isEmpty) {
+          EasyLoading.showError('该供应商没有可打印的货号标签');
+          return;
+        }
+
+        await createWarehouseReceiptLabelsPrintTask(
+          receiptId,
+          itemIds: itemIds,
+        );
+        EasyLoading.showSuccess('该供应商货号标签打印任务已创建');
+      } catch (_) {
+        // The API interceptor displays the backend error message.
+      } finally {
+        if (context.mounted) isPrinting.value = false;
+      }
+    }
+
+    Future<void> selectSupplierEntries(_SupplierGroup group) async {
+      if (isPrinting.value) return;
+
+      isPrinting.value = true;
+      EasyLoading.show(status: '正在加载已入库明细...');
+      try {
+        final options = await loadSupplierEntries(group);
+        EasyLoading.dismiss();
+        if (!context.mounted) return;
+        isPrinting.value = false;
+
+        if (options.isEmpty) {
+          EasyLoading.showError('该供应商没有可打印的已入库明细');
+          return;
+        }
+
+        final entryIds = await showDialog<List<int>>(
+          context: context,
+          builder: (_) => _EntryVoucherSelectionDialog(
+            supplierName: group.label,
+            options: options,
+          ),
+        );
+        if (entryIds == null) return;
+
+        isPrinting.value = true;
+        EasyLoading.show(status: '正在合并批次并创建打印任务...');
+        await createWarehouseReceiptEntryVoucherPrintTask(
+          receiptId,
+          group.label,
+          entryIds,
+        );
+        EasyLoading.showSuccess('所选入库明细已合并为一个批次打印');
+      } catch (_) {
+        // The API interceptor displays the backend error message.
+      } finally {
+        if (context.mounted) isPrinting.value = false;
       }
     }
 
@@ -270,13 +425,24 @@ class WarehouseReceiptDetailPage extends HookConsumerWidget {
                       SliverPinnedHeader(
                         child: _SupplierHeader(
                           group: group,
-                          collapsed: collapsedSuppliers.value.contains(group.key),
+                          collapsed:
+                              collapsedSuppliers.value.contains(group.key),
+                          printing: isPrinting.value,
                           onToggle: () {
                             final next =
                                 Set<String>.from(collapsedSuppliers.value);
                             if (!next.remove(group.key)) next.add(group.key);
                             collapsedSuppliers.value = next;
                           },
+                          onPrintBatch: !group.hasSupplier
+                              ? null
+                              : () => printSupplierBatch(group),
+                          onPrintLabels: !group.hasSupplier
+                              ? null
+                              : () => printSupplierLabels(group),
+                          onSelectEntries: !group.hasSupplier
+                              ? null
+                              : () => selectSupplierEntries(group),
                         ),
                       ),
                       if (!collapsedSuppliers.value.contains(group.key))
@@ -388,6 +554,13 @@ class _SupplierGroup {
         final s = receiptItemStatus(it, it.entries ?? const []).status;
         return s == ReceiptEntryStatus.full || s == ReceiptEntryStatus.over;
       }).length;
+
+  int get enteredEntryCount => items
+      .expand((item) => item.entries ?? const [])
+      .where((entry) => entry.enteredAt != null)
+      .length;
+
+  bool get hasSupplier => key != '__none__';
 }
 
 /// Group items by supplier, preserving first-appearance order. Items without a
@@ -471,69 +644,263 @@ class _SupplierFilterChips extends StatelessWidget {
 class _SupplierHeader extends StatelessWidget {
   final _SupplierGroup group;
   final bool collapsed;
+  final bool printing;
   final VoidCallback onToggle;
+  final VoidCallback? onPrintBatch;
+  final VoidCallback? onPrintLabels;
+  final VoidCallback? onSelectEntries;
 
   const _SupplierHeader({
     required this.group,
     required this.collapsed,
+    required this.printing,
     required this.onToggle,
+    required this.onPrintBatch,
+    required this.onPrintLabels,
+    required this.onSelectEntries,
   });
 
   @override
   Widget build(BuildContext context) {
     final total = group.items.length;
     final entered = group.enteredCount;
+    final enteredEntries = group.enteredEntryCount;
     final allDone = entered == total && total > 0;
 
     return Material(
       color: const Color(0xFFF4F5F7),
-      child: InkWell(
-        onTap: onToggle,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            children: [
-              Container(
-                width: 3,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1565C0),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  group.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 3,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1565C0),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      group.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$total 项 · 已入 $entered/$total',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: allDone
+                          ? const Color(0xFF2E7D32)
+                          : Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    collapsed ? Icons.expand_more : Icons.expand_less,
+                    size: 20,
+                    color: Colors.grey.shade600,
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
+            ),
+          ),
+          if (group.hasSupplier)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(23, 0, 12, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: printing ? null : onPrintLabels,
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 6,
+                      ),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      textStyle: const TextStyle(fontSize: 12),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: const Text('货号标签'),
+                  ),
+                  if (enteredEntries > 0) ...[
+                    const SizedBox(width: 4),
+                    TextButton(
+                      onPressed: printing ? null : onSelectEntries,
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 6,
+                        ),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: const TextStyle(fontSize: 12),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: const Text('选择入库凭证'),
+                    ),
+                    const SizedBox(width: 4),
+                    FilledButton(
+                      onPressed: printing ? null : onPrintBatch,
+                      style: FilledButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: const TextStyle(fontSize: 12),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: const Text('本批次入库凭证'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EntryVoucherOption {
+  final WarehouseReceiptItem item;
+  final WarehouseReceiptItemEntry entry;
+
+  const _EntryVoucherOption(this.item, this.entry);
+}
+
+class _EntryVoucherSelectionDialog extends StatefulWidget {
+  final String supplierName;
+  final List<_EntryVoucherOption> options;
+
+  const _EntryVoucherSelectionDialog({
+    required this.supplierName,
+    required this.options,
+  });
+
+  @override
+  State<_EntryVoucherSelectionDialog> createState() =>
+      _EntryVoucherSelectionDialogState();
+}
+
+class _EntryVoucherSelectionDialogState
+    extends State<_EntryVoucherSelectionDialog> {
+  static const _searchThreshold = 8;
+
+  final Set<int> _selectedIds = {};
+  String _search = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final query = _search.trim().toLowerCase();
+    final visibleOptions = query.isEmpty
+        ? widget.options
+        : widget.options.where((option) {
+            return [
+              option.item.itemNo,
+              option.item.customerItemNo,
+              option.item.purchaseOrderNo,
+            ].any((value) => value?.toLowerCase().contains(query) == true);
+          }).toList();
+
+    return AlertDialog(
+      title: Text('${widget.supplierName} · 选择入库明细'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 460),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Text(
-                '$total 项 · 已入 $entered/$total',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: allDone
-                      ? const Color(0xFF2E7D32)
-                      : Colors.grey.shade600,
-                ),
+                '选中的明细会合并为同一个批次打印。',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              const SizedBox(width: 4),
-              Icon(
-                collapsed ? Icons.expand_more : Icons.expand_less,
-                size: 20,
-                color: Colors.grey.shade600,
+              if (widget.options.length > _searchThreshold) ...[
+                const SizedBox(height: 10),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '搜索货号 / 客户货号 / 合同号',
+                    prefixIcon: Icon(Icons.search),
+                    isDense: true,
+                  ),
+                  onChanged: (value) => setState(() => _search = value),
+                ),
+              ],
+              const SizedBox(height: 8),
+              const Divider(height: 1),
+              Flexible(
+                child: visibleOptions.isEmpty
+                    ? const Center(child: Text('没有匹配的已入库明细'))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: visibleOptions.length,
+                        itemBuilder: (context, index) {
+                          final option = visibleOptions[index];
+                          final entry = option.entry;
+                          final details = [
+                            '入库：${_formatEnteredAt(entry.enteredAt)}',
+                            if (entry.actualCartonQty != null)
+                              '实际箱数：${entry.actualCartonQty}',
+                            if (entry.location?.displayName.trim().isNotEmpty ==
+                                true)
+                              '库位：${entry.location!.displayName.trim()}',
+                          ];
+
+                          return CheckboxListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            value: _selectedIds.contains(entry.id),
+                            title: Text(
+                              _normalizeText(option.item.itemNo) ?? '未填写货号',
+                            ),
+                            subtitle: Text(details.join(' · ')),
+                            onChanged: (selected) {
+                              setState(() {
+                                if (selected == true) {
+                                  _selectedIds.add(entry.id!);
+                                } else {
+                                  _selectedIds.remove(entry.id);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('取消'),
+        ),
+        FilledButton(
+          onPressed: _selectedIds.isEmpty
+              ? null
+              : () => Navigator.pop(context, _selectedIds.toList()..sort()),
+          child: Text('合并为一批打印 (${_selectedIds.length})'),
+        ),
+      ],
     );
   }
 }

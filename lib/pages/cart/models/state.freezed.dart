@@ -162,6 +162,11 @@ mixin _$QuotationInfo {
   String? get curreny => throw _privateConstructorUsedError;
   double? get exchange => throw _privateConstructorUsedError;
   double? get commissionRate => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -180,7 +185,12 @@ abstract class $QuotationInfoCopyWith<$Res> {
       bool? showTaxRatePrice,
       String? curreny,
       double? exchange,
-      double? commissionRate});
+      double? commissionRate,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      Map<String, double>? taxRateMapping});
 }
 
 /// @nodoc
@@ -201,6 +211,7 @@ class _$QuotationInfoCopyWithImpl<$Res, $Val extends QuotationInfo>
     Object? curreny = freezed,
     Object? exchange = freezed,
     Object? commissionRate = freezed,
+    Object? taxRateMapping = freezed,
   }) {
     return _then(_value.copyWith(
       showPrice: freezed == showPrice
@@ -223,6 +234,10 @@ class _$QuotationInfoCopyWithImpl<$Res, $Val extends QuotationInfo>
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
               as double?,
+      taxRateMapping: freezed == taxRateMapping
+          ? _value.taxRateMapping
+          : taxRateMapping // ignore: cast_nullable_to_non_nullable
+              as Map<String, double>?,
     ) as $Val);
   }
 }
@@ -240,7 +255,12 @@ abstract class _$$QuotationInfoImplCopyWith<$Res>
       bool? showTaxRatePrice,
       String? curreny,
       double? exchange,
-      double? commissionRate});
+      double? commissionRate,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      Map<String, double>? taxRateMapping});
 }
 
 /// @nodoc
@@ -259,6 +279,7 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
     Object? curreny = freezed,
     Object? exchange = freezed,
     Object? commissionRate = freezed,
+    Object? taxRateMapping = freezed,
   }) {
     return _then(_$QuotationInfoImpl(
       freezed == showPrice
@@ -281,6 +302,10 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
           ? _value.commissionRate
           : commissionRate // ignore: cast_nullable_to_non_nullable
               as double?,
+      taxRateMapping: freezed == taxRateMapping
+          ? _value._taxRateMapping
+          : taxRateMapping // ignore: cast_nullable_to_non_nullable
+              as Map<String, double>?,
     ));
   }
 }
@@ -289,8 +314,14 @@ class __$$QuotationInfoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$QuotationInfoImpl extends _QuotationInfo {
   const _$QuotationInfoImpl(this.showPrice, this.showTaxRatePrice, this.curreny,
-      this.exchange, this.commissionRate)
-      : super._();
+      this.exchange, this.commissionRate,
+      {@JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      final Map<String, double>? taxRateMapping})
+      : _taxRateMapping = taxRateMapping,
+        super._();
 
   factory _$QuotationInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuotationInfoImplFromJson(json);
@@ -305,10 +336,23 @@ class _$QuotationInfoImpl extends _QuotationInfo {
   final double? exchange;
   @override
   final double? commissionRate;
+  final Map<String, double>? _taxRateMapping;
+  @override
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping {
+    final value = _taxRateMapping;
+    if (value == null) return null;
+    if (_taxRateMapping is EqualUnmodifiableMapView) return _taxRateMapping;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'QuotationInfo(showPrice: $showPrice, showTaxRatePrice: $showTaxRatePrice, curreny: $curreny, exchange: $exchange, commissionRate: $commissionRate)';
+    return 'QuotationInfo(showPrice: $showPrice, showTaxRatePrice: $showTaxRatePrice, curreny: $curreny, exchange: $exchange, commissionRate: $commissionRate, taxRateMapping: $taxRateMapping)';
   }
 
   @override
@@ -324,13 +368,21 @@ class _$QuotationInfoImpl extends _QuotationInfo {
             (identical(other.exchange, exchange) ||
                 other.exchange == exchange) &&
             (identical(other.commissionRate, commissionRate) ||
-                other.commissionRate == commissionRate));
+                other.commissionRate == commissionRate) &&
+            const DeepCollectionEquality()
+                .equals(other._taxRateMapping, _taxRateMapping));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, showPrice, showTaxRatePrice,
-      curreny, exchange, commissionRate);
+  int get hashCode => Object.hash(
+      runtimeType,
+      showPrice,
+      showTaxRatePrice,
+      curreny,
+      exchange,
+      commissionRate,
+      const DeepCollectionEquality().hash(_taxRateMapping));
 
   @JsonKey(ignore: true)
   @override
@@ -352,7 +404,12 @@ abstract class _QuotationInfo extends QuotationInfo {
       final bool? showTaxRatePrice,
       final String? curreny,
       final double? exchange,
-      final double? commissionRate) = _$QuotationInfoImpl;
+      final double? commissionRate,
+      {@JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      final Map<String, double>? taxRateMapping}) = _$QuotationInfoImpl;
   const _QuotationInfo._() : super._();
 
   factory _QuotationInfo.fromJson(Map<String, dynamic> json) =
@@ -368,6 +425,12 @@ abstract class _QuotationInfo extends QuotationInfo {
   double? get exchange;
   @override
   double? get commissionRate;
+  @override
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping;
   @override
   @JsonKey(ignore: true)
   _$$QuotationInfoImplCopyWith<_$QuotationInfoImpl> get copyWith =>

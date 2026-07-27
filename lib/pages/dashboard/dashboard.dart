@@ -127,7 +127,7 @@ class DashboardPage extends HookConsumerWidget {
                           horizontal: pageHorizontalPadding),
                       child: Column(
                         children: [
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 3),
                           const EntryGridModule(),
                           const SizedBox(height: 5),
                           SelectedModulesWidget(key: selectedModulesKey),

@@ -52,6 +52,26 @@ class CartPage extends HookConsumerWidget {
     final user = useState<User?>(null);
     final quotationRemarkController = useTextEditingController();
 
+    Future<void> quotationInfoDialog(BuildContext context) async {
+      final next = await QuotationInfoDialog.show(
+        context,
+        initialValue: ref.read(cartProvider).quotationInfo,
+        currencies: currencies,
+      );
+      if (next == null) return;
+      cart.quotationInfo = next;
+    }
+
+    // 进入页面时若已选中「报价单选样车」，自动打开价格设置
+    useEffect(() {
+      if (cartType != CartType.quotation) return null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        quotationInfoDialog(context);
+      });
+      return null;
+    }, const []);
+
     // quotationInfo 设置弹窗已抽成可复用组件，见 `QuotationInfoDialog`
 
     String getStockInOptionText(String? stockInOption) {
@@ -194,7 +214,14 @@ class CartPage extends HookConsumerWidget {
             .toList(),
         closeOnClickAction: true,
         onSelect: (action, index) {
-          cart.type = selectCarts[index].type;
+          final selectedType = selectCarts[index].type;
+          cart.type = selectedType;
+          if (selectedType == CartType.quotation) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!context.mounted) return;
+              quotationInfoDialog(context);
+            });
+          }
         },
       );
     }
@@ -221,7 +248,8 @@ class CartPage extends HookConsumerWidget {
                 ),
                 title: Text(
                   l10n.cartConfirmBorrow,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 content: SizedBox(
                   height: 270,
@@ -292,9 +320,8 @@ class CartPage extends HookConsumerWidget {
                                   cancelText: l10n.quotationThinkAgain,
                                   actions: borrowReasonIds
                                       .map((id) => FlanActionSheetAction(
-                                          name:
-                                              borrowReasonLocalizedTitle(
-                                                  context, id)))
+                                          name: borrowReasonLocalizedTitle(
+                                              context, id)))
                                       .toList(),
                                   closeOnClickAction: true,
                                   onSelect: (action, index) {
@@ -492,8 +519,87 @@ class CartPage extends HookConsumerWidget {
         context: pageContext,
         builder: (dialogContext) {
           return AlertDialog(
-            title: Text(l10n.cartQuotationCreatedTitle),
-            content: Text(l10n.cartQuotationCreatedContent),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            iconPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.check_circle,
+                  size: 32,
+                  color: Colors.green,
+                ),
+                Text('${l10n.cartQuotationCreatedTitle} !'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: colorScheme.tertiary.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        // 价格设置已经重置
+                        child: Text(
+                          l10n.cartPriceSettingsReset,
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurface.withOpacity(0.8)),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          quotationInfoDialog(dialogContext);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        // 查看
+                        child: Text(
+                          l10n.cartView,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // 你可以继续进行以下操作
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.cartQuotationCreatedContent,
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             actions: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -575,14 +681,14 @@ class CartPage extends HookConsumerWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        backgroundColor: colorScheme.primary,
+                        backgroundColor: colorScheme.outline,
                       ),
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
                       },
                       child: Text(
                         l10n.cancel,
-                        style: TextStyle(color: colorScheme.onPrimary),
+                        style: TextStyle(),
                       ),
                     ),
                   ],
@@ -620,8 +726,10 @@ class CartPage extends HookConsumerWidget {
           "exchange": quotationInfo?.exchange,
           "commission_rate": quotationInfo?.commissionRate,
           "is_tax_inclusive": quotationInfo?.showTaxRatePrice,
+          "tax_rate_mapping": quotationInfo?.taxRateMapping,
           "remark": quotationRemarkController.text,
         };
+
         final res = await storeShowroomQuotation(data);
         final quotationId = res?.id;
 
@@ -647,6 +755,7 @@ class CartPage extends HookConsumerWidget {
         cart.clear();
         user.value = null;
         quotationRemarkController.clear();
+        cart.quotationInfo = QuotationInfoDialog.resetValue(); // 重置报价单价格设置
         if (pageContext.mounted) {
           if (approvalDialogContext != null && approvalDialogContext.mounted) {
             Navigator.of(approvalDialogContext).pop();
@@ -905,16 +1014,6 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
-    Future<void> quotationInfoDialog(BuildContext context) async {
-      final next = await QuotationInfoDialog.show(
-        context,
-        initialValue: quotationInfo,
-        currencies: currencies,
-      );
-      if (next == null) return;
-      cart.quotationInfo = next;
-    }
-
     void setPriceDialog(BuildContext context, CartItem item) {
       showDialog(
         context: context,
@@ -935,7 +1034,8 @@ class CartPage extends HookConsumerWidget {
               children: [
                 Text(
                   l10n.cartPrice,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -1554,8 +1654,9 @@ class CartPage extends HookConsumerWidget {
     }
 
     return Scaffold(
-      
+      backgroundColor: const Color.fromARGB(255, 246, 243, 244),
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 246, 243, 244),
         title: Align(
           alignment: Alignment.centerLeft,
           child: InkWell(
@@ -1731,104 +1832,138 @@ class CartPage extends HookConsumerWidget {
                                         delegate: SliverChildBuilderDelegate(
                                           (context, index) {
                                             final cartItem = items[index];
-                                            return Slidable(
-                                              key: ValueKey(
-                                                  cartItem.sample.productNo),
-                                              endActionPane: ActionPane(
-                                                extentRatio: cartType ==
-                                                        CartType.quotation
-                                                    ? 0.5
-                                                    : 0.25,
-                                                motion: const ScrollMotion(),
-                                                children: [
-                                                  if (cartType ==
-                                                      CartType.quotation)
-                                                    SlidableAction(
-                                                      onPressed: (context) {
-                                                        setPriceDialog(
-                                                            context, cartItem);
-                                                      },
-                                                      backgroundColor:
-                                                          Colors.blue,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      icon: Icons.attach_money,
-                                                      label: l10n.cartAdjustPrice,
-                                                    ),
-                                                  SlidableAction(
-                                                    onPressed: (context) {
-                                                      cart.removeSample(
-                                                          cartItem.sample);
-                                                    },
-                                                    backgroundColor: Colors.red,
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    icon: Icons.delete,
-                                                    label: l10n.cartRemove,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        vertical: 8,
-                                                        horizontal: 10,
+                                            return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Slidable(
+                                                  key: ValueKey(cartItem
+                                                      .sample.productNo),
+                                                  endActionPane: ActionPane(
+                                                    extentRatio: cartType ==
+                                                            CartType.quotation
+                                                        ? 0.5
+                                                        : 0.25,
+                                                    motion:
+                                                        const ScrollMotion(),
+                                                    children: [
+                                                      if (cartType ==
+                                                          CartType.quotation)
+                                                        // 调价
+                                                        SlidableAction(
+                                                          onPressed: (context) {
+                                                            setPriceDialog(
+                                                                context,
+                                                                cartItem);
+                                                          },
+                                                          backgroundColor:
+                                                              Colors.blue,
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          icon: Icons
+                                                              .attach_money,
+                                                          label: l10n
+                                                              .cartAdjustPrice,
+                                                        ),
+                                                      SlidableAction(
+                                                        onPressed: (context) {
+                                                          cart.removeSample(
+                                                              cartItem.sample);
+                                                        },
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        icon: Icons.delete,
+                                                        label: l10n.cartRemove,
                                                       ),
-                                                      child: GestureDetector(
-                                                        onTap: () {
-                                                          if (!context
-                                                              .mounted) {
-                                                            return;
-                                                          }
+                                                    ],
+                                                  ),
+                                                  child: Stack(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    children: [
+                                                      Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            vertical: 2,
+                                                            horizontal: 10,
+                                                          ),
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () {
+                                                              if (!context
+                                                                  .mounted) {
+                                                                return;
+                                                              }
 
-                                                          context.router.push(
-                                                            ShowroomSampleDetailRoute(
-                                                              id: cartItem
-                                                                  .sample.id!,
+                                                              context.router
+                                                                  .push(
+                                                                ShowroomSampleDetailRoute(
+                                                                  id: cartItem
+                                                                      .sample
+                                                                      .id!,
+                                                                  xTenantId: cartItem
+                                                                      .sample
+                                                                      .xTenantId,
+                                                                ),
+                                                              );
+                                                            },
+                                                            child: SampleItem(
+                                                              sample: cartItem
+                                                                  .sample,
+                                                              price: cartItem
+                                                                  .price,
                                                               xTenantId: cartItem
                                                                   .sample
-                                                                  .xTenantId,
+                                                                  ?.xTenantId,
+                                                              quotationInfo:
+                                                                  quotationInfo,
+                                                              cartType:
+                                                                  cartType,
+                                                              count: cartItem
+                                                                  .count,
+                                                              onChange:
+                                                                  (value) {
+                                                                if (cartItem
+                                                                        .count ==
+                                                                    value) {
+                                                                  return;
+                                                                }
+                                                                cart.setSample(
+                                                                    cartItem
+                                                                        .sample,
+                                                                    value);
+                                                              },
                                                             ),
-                                                          );
-                                                        },
-                                                        child: SampleItem(
-                                                          sample:
-                                                              cartItem.sample,
-                                                          price: cartItem.price,
-                                                          xTenantId: cartItem
-                                                              .sample
-                                                              ?.xTenantId,
-                                                          quotationInfo:
-                                                              quotationInfo,
-                                                          cartType: cartType,
-                                                          count: cartItem.count,
-                                                          onChange: (value) {
-                                                            if (cartItem
-                                                                    .count ==
-                                                                value) {
-                                                              return;
-                                                            }
-                                                            cart.setSample(
-                                                                cartItem.sample,
-                                                                value);
-                                                          },
+                                                          )),
+                                                      if (cartType ==
+                                                              CartType
+                                                                  .quotation &&
+                                                          cartItem.price !=
+                                                              null)
+                                                        TDBadge(
+                                                          TDBadgeType.subscript,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(4),
+                                                          message: l10n
+                                                              .cartPriceChangedBadge,
                                                         ),
-                                                      )),
-                                                  if (cartType ==
-                                                          CartType.quotation &&
-                                                      cartItem.price != null)
-                                                    TDBadge(
-                                                      TDBadgeType.subscript,
-                                                      padding:
-                                                          const EdgeInsets.all(4),
-                                                      message:
-                                                          l10n.cartPriceChangedBadge,
+                                                    ],
+                                                  ),
+                                                ),
+                                                if (index < items.length - 1)
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
+                                                    child: Divider(
+                                                      height: 1.0,
+                                                      color: Colors.grey[100],
                                                     ),
-                                                ],
-                                              ),
+                                                  ),
+                                              ],
                                             );
                                           },
                                           childCount: items.length,

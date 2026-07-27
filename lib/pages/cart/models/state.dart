@@ -67,15 +67,31 @@ abstract class CartSelect with _$CartSelect {
   }
 }
 
+Map<String, double>? taxRateMappingFromJson(Object? json) {
+  if (json is! Map) return null;
+  return json.map(
+    (key, value) => MapEntry(key.toString(), (value as num).toDouble()),
+  );
+}
+
+Map<String, double>? taxRateMappingToJson(Map<String, double>? map) => map;
+
 @freezed
 abstract class QuotationInfo with _$QuotationInfo {
   const QuotationInfo._();
   const factory QuotationInfo(
-      bool? showPrice,
-      bool? showTaxRatePrice,
-      String? curreny,
-      double? exchange,
-      double? commissionRate) = _QuotationInfo;
+    bool? showPrice,
+    bool? showTaxRatePrice,
+    String? curreny,
+    double? exchange,
+    double? commissionRate, {
+    @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson,
+    )
+    Map<String, double>? taxRateMapping,
+  }) = _QuotationInfo;
 
   factory QuotationInfo.fromJson(Map<String, Object?> json) =>
       _$QuotationInfoFromJson(json);

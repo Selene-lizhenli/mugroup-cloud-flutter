@@ -13,9 +13,8 @@ import 'package:cloud/providers/app_provider.dart';
 import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
 import 'package:cloud/services/sample.dart';
-import 'package:collection/collection.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dio/dio.dart';
+import 'package:cloud/widgets/quotation_info_dialog.dart';
+import 'package:collection/collection.dart'; 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -50,7 +49,9 @@ class Cart extends _$Cart {
       authNotifier.removeListener(handleAuthChange);
     });
 
-    const defaultQuotationInfo = QuotationInfo(false, false, 'CNY', null, null);
+    // APP 下载后初次设置的默认值，与 价格设置弹窗 重置值统一
+    final defaultQuotationInfo = QuotationInfoDialog.resetValue();
+
     final defaultCarts = [
       if (user?.permissions?.contains('showroom.quotation.store') ?? false)
         const CartSelect(CartType.quotation),
@@ -102,6 +103,7 @@ class Cart extends _$Cart {
               curreny: cacheState.quotationInfo?.curreny,
               exchange: cacheState.quotationInfo?.exchange,
               commissionRate: cacheState.quotationInfo?.commissionRate,
+              taxRateMapping: cacheState.quotationInfo?.taxRateMapping,
             ),
           );
         } catch (e) {
@@ -212,15 +214,15 @@ class Cart extends _$Cart {
   }
 
   Future<void> checkLock(int count) async {
-    try { 
+    try {
       await api.get(
         '/api/tenant/lock',
-        data: {'count': count}, 
+        data: {'count': count},
       );
     } catch (e) {
-      EasyLoading.showInfo(e.toString()); 
+      EasyLoading.showInfo(e.toString());
     }
-  } 
+  }
 
   void save() {
     final string = json.encode(state.toJson());

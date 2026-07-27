@@ -34,6 +34,7 @@ _$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>
       json['curreny'] as String?,
       (json['exchange'] as num?)?.toDouble(),
       (json['commissionRate'] as num?)?.toDouble(),
+      taxRateMapping: taxRateMappingFromJson(json['tax_rate_mapping']),
     );
 
 Map<String, dynamic> _$$QuotationInfoImplToJson(_$QuotationInfoImpl instance) =>
@@ -43,6 +44,7 @@ Map<String, dynamic> _$$QuotationInfoImplToJson(_$QuotationInfoImpl instance) =>
       'curreny': instance.curreny,
       'exchange': instance.exchange,
       'commissionRate': instance.commissionRate,
+      'tax_rate_mapping': taxRateMappingToJson(instance.taxRateMapping),
     };
 
 _$CartItemImpl _$$CartItemImplFromJson(Map<String, dynamic> json) =>

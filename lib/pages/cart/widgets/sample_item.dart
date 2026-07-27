@@ -3,6 +3,7 @@ import 'package:cloud/models/core.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/sample/sample_extensions.dart';
 import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/samples/sample_price_helper.dart';
 import 'package:cloud/pages/samples/samples_l10n_helper.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
@@ -14,8 +15,9 @@ import 'package:cloud/widgets/wigets.dart';
 import 'package:flant/components/stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart'; 
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
+
 class SampleItem extends HookConsumerWidget {
   final Sample sample;
   final CartType? cartType;
@@ -41,7 +43,7 @@ class SampleItem extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    double? finalPrice;
+    String? finalPrice;
     String? displayPrice;
     Map<String, String> symbols = {
       "CNY": "¥",
@@ -53,41 +55,27 @@ class SampleItem extends HookConsumerWidget {
     final loading = useState<bool>(false);
 
     final showPrice = quotationInfo?.showPrice ?? false;
-    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
+    final priceIncludeTaxRate = quotationInfo?.showTaxRatePrice ?? false;
 
-    // 不含税率价格
-    double getPriceWithoutTax(Sample sample, bool showTaxRatePrice) {
-      // 将 purchaseCost 转成 double
-      final cost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
+    final hasTaxRate = sample.hasTaxRate ?? false;
+    finalPrice = resolveSampleFinalPrice(
+      // 处理是否包含税、是否扣除税、佣金  之后的价格
+      sample,
+      quotationInfo: quotationInfo,
+    );
+    String symbol = "¥";
 
-      // 将 taxRate 从 String 转成 double
-      final rate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
-
-      if (!showTaxRatePrice) {
-        return cost / (1 + rate * 0.01);
-      }
-      return cost;
-    }
-
-    var purchaseCost = getPriceWithoutTax(sample, showTaxRatePrice);
-
-    final symbol = symbols[quotationInfo?.curreny] ?? "¥";
-
-    // 计算换算后的最终价格
-    finalPrice = purchaseCost /
-        (quotationInfo?.exchange ?? 1) *
-        (1 + ((quotationInfo?.commissionRate ?? 0) * 0.01));
-
-    // 设置展示价格
+    //  注意： 类型是报价单选样车 才支持弹窗价格设置
     if (cartType == null || cartType == CartType.quotation) {
       // 类型是1.报价选样车 2.没有选择选样车；时 购物车都显示调整后价格
-      displayPrice = sample.purchaseCost != null
-          ? price ?? finalPrice.toStringAsFixed(2)
-          : "";
+      displayPrice =
+          sample.purchaseCost != null && showPrice ? finalPrice : price;
+      symbol = symbols[quotationInfo?.curreny] ?? "¥";
     } else {
       displayPrice =
           sample.purchaseCost != null ? '${sample.purchaseCost}' : "";
     }
+
 // --------------------处理独立样品间租户名称tag------------------------------------------------------
     // 有 xTenantId 表示列表曾带 X-Tenant-ID；展示名从 core 租户列表按 id 匹配。
     final cloud = ref.watch(coreProvider).value;
@@ -101,7 +89,7 @@ class SampleItem extends HookConsumerWidget {
                 ? t.id == parsedTenantId
                 : t.id?.toString() == xTenantKey,
           );
-    final tenantName = matchedTenant?.title?.trim()??'';
+    final tenantName = matchedTenant?.title?.trim() ?? '';
 // --------------------------------------------------------------------------
 
     var cover = sample.image?.elementAtOrNull(0)?.thumbUrl ??
@@ -191,16 +179,19 @@ class SampleItem extends HookConsumerWidget {
                               color: colorScheme.secondary,
                             ),
                           ),
-                          if (sample.hasTaxRate == true)
+                          if (hasTaxRate == true)
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 5),
                                 child: Text(
+                                  // 报价单选样车 && 不包含税 才显示：“已扣除..” 否则都是“包含税xx”
                                   sampleTaxRateHint(
                                     context,
-                                    showTaxRatePrice: showTaxRatePrice,
+                                    showIncludeTax: priceIncludeTaxRate ||
+                                        (cartType != null &&
+                                            cartType != CartType.quotation),
                                     taxRate: sample.taxRate!,
                                   ),
                                   style: const TextStyle(

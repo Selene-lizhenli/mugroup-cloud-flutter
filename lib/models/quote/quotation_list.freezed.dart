@@ -72,6 +72,11 @@ mixin _$QuotationList {
   int? get departmentId => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_tax_inclusive')
   bool? get isTaxInclusive => throw _privateConstructorUsedError;
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_count')
   int? get productCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'sum_qty')
@@ -131,6 +136,11 @@ abstract class $QuotationListCopyWith<$Res> {
       @JsonKey(name: 'item_type') String? itemType,
       @JsonKey(name: 'department_id') int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      Map<String, double>? taxRateMapping,
       @JsonKey(name: 'product_count') int? productCount,
       @JsonKey(name: 'sum_qty') String? sumQty,
       @JsonKey(name: 'language') String? language,
@@ -191,6 +201,7 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
     Object? itemType = freezed,
     Object? departmentId = freezed,
     Object? isTaxInclusive = freezed,
+    Object? taxRateMapping = freezed,
     Object? productCount = freezed,
     Object? sumQty = freezed,
     Object? language = freezed,
@@ -320,6 +331,10 @@ class _$QuotationListCopyWithImpl<$Res, $Val extends QuotationList>
           ? _value.isTaxInclusive
           : isTaxInclusive // ignore: cast_nullable_to_non_nullable
               as bool?,
+      taxRateMapping: freezed == taxRateMapping
+          ? _value.taxRateMapping
+          : taxRateMapping // ignore: cast_nullable_to_non_nullable
+              as Map<String, double>?,
       productCount: freezed == productCount
           ? _value.productCount
           : productCount // ignore: cast_nullable_to_non_nullable
@@ -454,6 +469,11 @@ abstract class _$$QuotationListImplCopyWith<$Res>
       @JsonKey(name: 'item_type') String? itemType,
       @JsonKey(name: 'department_id') int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') bool? isTaxInclusive,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      Map<String, double>? taxRateMapping,
       @JsonKey(name: 'product_count') int? productCount,
       @JsonKey(name: 'sum_qty') String? sumQty,
       @JsonKey(name: 'language') String? language,
@@ -516,6 +536,7 @@ class __$$QuotationListImplCopyWithImpl<$Res>
     Object? itemType = freezed,
     Object? departmentId = freezed,
     Object? isTaxInclusive = freezed,
+    Object? taxRateMapping = freezed,
     Object? productCount = freezed,
     Object? sumQty = freezed,
     Object? language = freezed,
@@ -645,6 +666,10 @@ class __$$QuotationListImplCopyWithImpl<$Res>
           ? _value.isTaxInclusive
           : isTaxInclusive // ignore: cast_nullable_to_non_nullable
               as bool?,
+      taxRateMapping: freezed == taxRateMapping
+          ? _value._taxRateMapping
+          : taxRateMapping // ignore: cast_nullable_to_non_nullable
+              as Map<String, double>?,
       productCount: freezed == productCount
           ? _value.productCount
           : productCount // ignore: cast_nullable_to_non_nullable
@@ -726,6 +751,11 @@ class _$QuotationListImpl implements _QuotationList {
       @JsonKey(name: 'item_type') this.itemType,
       @JsonKey(name: 'department_id') this.departmentId,
       @JsonKey(name: 'is_tax_inclusive') this.isTaxInclusive,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      final Map<String, double>? taxRateMapping,
       @JsonKey(name: 'product_count') this.productCount,
       @JsonKey(name: 'sum_qty') this.sumQty,
       @JsonKey(name: 'language') this.language,
@@ -737,7 +767,8 @@ class _$QuotationListImpl implements _QuotationList {
       this.creator,
       this.company,
       this.contact})
-      : _collaborators = collaborators,
+      : _taxRateMapping = taxRateMapping,
+        _collaborators = collaborators,
         _supplyQuotes = supplyQuotes;
 
   factory _$QuotationListImpl.fromJson(Map<String, dynamic> json) =>
@@ -824,6 +855,20 @@ class _$QuotationListImpl implements _QuotationList {
   @override
   @JsonKey(name: 'is_tax_inclusive')
   final bool? isTaxInclusive;
+  final Map<String, double>? _taxRateMapping;
+  @override
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping {
+    final value = _taxRateMapping;
+    if (value == null) return null;
+    if (_taxRateMapping is EqualUnmodifiableMapView) return _taxRateMapping;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   @JsonKey(name: 'product_count')
   final int? productCount;
@@ -870,7 +915,7 @@ class _$QuotationListImpl implements _QuotationList {
 
   @override
   String toString() {
-    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, collaborators: $collaborators, supplyQuotes: $supplyQuotes, user: $user, creator: $creator, company: $company, contact: $contact)';
+    return 'QuotationList(id: $id, quoteNo: $quoteNo, inquiryAt: $inquiryAt, quoteAt: $quoteAt, subCompany: $subCompany, curreny: $curreny, exchange: $exchange, offerType: $offerType, priceClause: $priceClause, settlementType: $settlementType, tradeCountry: $tradeCountry, outPort: $outPort, arrivalPort: $arrivalPort, transport: $transport, commissionRate: $commissionRate, tradeType: $tradeType, status: $status, saleUser: $saleUser, collectionSource: $collectionSource, collectionContent: $collectionContent, remark: $remark, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, creatorId: $creatorId, companyId: $companyId, itemType: $itemType, departmentId: $departmentId, isTaxInclusive: $isTaxInclusive, taxRateMapping: $taxRateMapping, productCount: $productCount, sumQty: $sumQty, language: $language, contactId: $contactId, lastSentAt: $lastSentAt, collaborators: $collaborators, supplyQuotes: $supplyQuotes, user: $user, creator: $creator, company: $company, contact: $contact)';
   }
 
   @override
@@ -928,6 +973,8 @@ class _$QuotationListImpl implements _QuotationList {
                 other.departmentId == departmentId) &&
             (identical(other.isTaxInclusive, isTaxInclusive) ||
                 other.isTaxInclusive == isTaxInclusive) &&
+            const DeepCollectionEquality()
+                .equals(other._taxRateMapping, _taxRateMapping) &&
             (identical(other.productCount, productCount) ||
                 other.productCount == productCount) &&
             (identical(other.sumQty, sumQty) || other.sumQty == sumQty) &&
@@ -980,6 +1027,7 @@ class _$QuotationListImpl implements _QuotationList {
         itemType,
         departmentId,
         isTaxInclusive,
+        const DeepCollectionEquality().hash(_taxRateMapping),
         productCount,
         sumQty,
         language,
@@ -1038,6 +1086,11 @@ abstract class _QuotationList implements QuotationList {
       @JsonKey(name: 'item_type') final String? itemType,
       @JsonKey(name: 'department_id') final int? departmentId,
       @JsonKey(name: 'is_tax_inclusive') final bool? isTaxInclusive,
+      @JsonKey(
+          name: 'tax_rate_mapping',
+          fromJson: taxRateMappingFromJson,
+          toJson: taxRateMappingToJson)
+      final Map<String, double>? taxRateMapping,
       @JsonKey(name: 'product_count') final int? productCount,
       @JsonKey(name: 'sum_qty') final String? sumQty,
       @JsonKey(name: 'language') final String? language,
@@ -1134,6 +1187,12 @@ abstract class _QuotationList implements QuotationList {
   @override
   @JsonKey(name: 'is_tax_inclusive')
   bool? get isTaxInclusive;
+  @override
+  @JsonKey(
+      name: 'tax_rate_mapping',
+      fromJson: taxRateMappingFromJson,
+      toJson: taxRateMappingToJson)
+  Map<String, double>? get taxRateMapping;
   @override
   @JsonKey(name: 'product_count')
   int? get productCount;

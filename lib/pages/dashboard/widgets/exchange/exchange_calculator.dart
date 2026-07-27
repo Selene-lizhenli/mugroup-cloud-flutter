@@ -454,7 +454,7 @@ class ExchangeCalculatorDialog extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${l10n.current} ${l10n.quoteExchangeRate}',
+                '${l10n.current}${l10n.quoteExchangeRate}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: textColor,

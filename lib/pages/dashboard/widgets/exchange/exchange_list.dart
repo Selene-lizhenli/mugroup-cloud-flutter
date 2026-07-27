@@ -2,7 +2,7 @@ import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/dashboard/exchange.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
 import 'package:cloud/pages/widgets/empty.dart';
-import 'package:cloud/pages/widgets/show_Error.dart';
+import 'package:cloud/pages/widgets/show_error.dart';
 import 'package:flutter/material.dart';
 
 class ExchangeRatesValueList extends StatelessWidget {
@@ -83,7 +83,7 @@ class ExchangeRatesValueList extends StatelessWidget {
                     width: tableWidth,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.06),
+                      color: colorScheme.outline.withOpacity(0.1),
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(4)),
                     ),
@@ -236,10 +236,10 @@ class ExchangeRatesValueList extends StatelessWidget {
         style: TextStyle(
           fontSize: isHeader ? 11 : 10.5,
           fontWeight: isHeader
-              ? FontWeight.w600
-              : (isName ? FontWeight.w500 : FontWeight.normal),
+              ? FontWeight.w500
+              : (isName ? FontWeight.w500 : FontWeight.w400),
           color: isHeader
-              ? colorScheme.primary
+              ? colorScheme.onSurface
               : (isName ? colorScheme.onSurface : colorScheme.onSurfaceVariant),
           height: 1.0,
         ),

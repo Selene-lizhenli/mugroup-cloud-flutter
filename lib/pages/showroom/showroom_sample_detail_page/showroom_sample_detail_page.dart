@@ -5,6 +5,7 @@ import 'package:cloud/l10n/l10n_extension.dart';
 import 'package:cloud/models/core.dart';
 import 'package:cloud/models/sample/sample.dart';
 import 'package:cloud/models/sample/sample_extensions.dart';
+import 'package:cloud/pages/samples/sample_price_helper.dart';
 import 'package:cloud/pages/showroom/showroom_l10n_helper.dart';
 import 'package:cloud/models/supply/quote.dart';
 import 'package:cloud/pages/cart/models/state.dart';
@@ -73,26 +74,18 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
     final tenantName = matchedTenant?.title?.trim() ?? '';
 // -----------------------------------------------------------------------------------
 
-
     // --- 价格计算逻辑 ---
     final showPrice = quotationInfo?.showPrice ?? false;
     final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
     final symbol = (quotationInfo?.curreny == 'USD' ? '\$' : '¥');
 
-    double getFinalPrice() {
-      final cost = double.tryParse(sample.value?.purchaseCost ?? '') ?? 0.0;
-      final rate = double.tryParse(sample.value?.taxRate ?? '') ?? 0.0;
-
-      // 基础价处理
-      double base = showTaxRatePrice ? cost : (cost / (1 + rate * 0.01));
-      // 汇率与佣金换算
-      return base /
-          (quotationInfo?.exchange ?? 1) *
-          (1 + (quotationInfo?.commissionRate ?? 0) * 0.01);
+    String displayPrice = '';
+    if (sample.value?.purchaseCost != null && showPrice) {
+      displayPrice = resolveSampleFinalPrice(
+        sample.value!,
+        quotationInfo: quotationInfo,
+      );
     }
-
-    final displayPrice = getFinalPrice().toStringAsFixed(2);
-
     loadSample(int id) async {
       try {
         final data = await showroomApi.getSample(id, xTenantId: xTenantId);
@@ -409,10 +402,12 @@ class ShowroomSampleDetailPage extends HookConsumerWidget {
                                           if (sample.value?.hasTaxRate == true)
                                             TextSpan(
                                               text: showTaxRatePrice
-                                                  ? l10n.showroomTaxIncludedParen(
+                                                  ? l10n
+                                                      .showroomTaxIncludedParen(
                                                       sample.value!.taxRate!,
                                                     )
-                                                  : l10n.showroomTaxDeductedParen(
+                                                  : l10n
+                                                      .showroomTaxDeductedParen(
                                                       sample.value!.taxRate!,
                                                     ),
                                               style: const TextStyle(

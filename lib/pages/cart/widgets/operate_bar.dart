@@ -21,8 +21,8 @@ class OperateBar extends HookConsumerWidget {
     int totalCount = items.length;
 
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      color: colorScheme.primary,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(
         children: [
           Expanded(
@@ -36,7 +36,8 @@ class OperateBar extends HookConsumerWidget {
                   children: [
                     Text(
                       l10n.cartSelectedCount(totalCount),
-                      style: const TextStyle(fontSize: 16),
+                      style:
+                          TextStyle(fontSize: 16, color: colorScheme.onPrimary),
                     ),
                     const SizedBox(
                       width: 1,
@@ -49,8 +50,8 @@ class OperateBar extends HookConsumerWidget {
           TextButton(
             onPressed: onPressed,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.primary,
+              backgroundColor: Color.fromARGB(255, 255, 255, 255),
               padding: const EdgeInsets.symmetric(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -59,8 +60,9 @@ class OperateBar extends HookConsumerWidget {
             ),
             child: Text(
               cartOperateLabel(context, cartType),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16.0,
+                color: colorScheme.primary,
               ),
             ),
           ),

@@ -9,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'package:cloud/l10n/l10n_extension.dart';
+import 'package:cloud/pages/samples/sample_price_helper.dart';
 import 'package:cloud/pages/samples/samples_l10n_helper.dart';
 
 class ProductCardDetailed extends HookConsumerWidget {
@@ -37,13 +38,9 @@ class ProductCardDetailed extends HookConsumerWidget {
         ref.watch(cartProvider.select((state) => state.quotationInfo));
 
     final showPrice = quotationInfo?.showPrice ?? false;
-    final showTaxRatePrice = quotationInfo?.showTaxRatePrice ?? false;
-    final exchange = quotationInfo?.exchange ?? 1.0;
-    final commissionRate = quotationInfo?.commissionRate ?? 0.0;
+    final priceIncludeTaxRate =
+        quotationInfo?.showTaxRatePrice ?? false; // 为true时  价格里面是含有税的
     final currency = quotationInfo?.curreny ?? "CNY";
-
-    final double rawCost = double.tryParse(sample.purchaseCost ?? '') ?? 0.0;
-    final double taxRate = double.tryParse(sample.taxRate ?? '') ?? 0.0;
 
     // 有 xTenantId 表示列表曾带 X-Tenant-ID；展示名从 core 租户列表按 id 匹配。
     final cloud = ref.watch(coreProvider).value;
@@ -59,13 +56,13 @@ class ProductCardDetailed extends HookConsumerWidget {
           );
     final tenantName = matchedTenant?.title?.trim();
 
-    double baseCost = rawCost;
-    if (!showTaxRatePrice) {
-      baseCost = rawCost / (1 + taxRate * 0.01);
+    String displayPrice = '';
+    if (sample.purchaseCost != null && showPrice) {
+      displayPrice = resolveSampleFinalPrice(
+        sample,
+        quotationInfo: quotationInfo,
+      );
     }
-
-    double finalPriceValue =
-        (baseCost / exchange) * (1 + commissionRate * 0.01);
 
     Map<String, String> symbols = {
       "CNY": "¥",
@@ -74,7 +71,6 @@ class ProductCardDetailed extends HookConsumerWidget {
       "GBP": "£"
     };
     String symbol = symbols[currency] ?? "¥";
-    String displayPrice = finalPriceValue.toStringAsFixed(2);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
@@ -239,7 +235,7 @@ class ProductCardDetailed extends HookConsumerWidget {
                                       child: Text(
                                         sampleTaxRateHint(
                                           context,
-                                          showTaxRatePrice: showTaxRatePrice,
+                                          showIncludeTax: priceIncludeTaxRate,
                                           taxRate: sample.taxRate!,
                                         ),
                                         style: TextStyle(
