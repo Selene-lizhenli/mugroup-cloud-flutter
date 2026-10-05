@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cloud/http/api.dart';
 import 'package:cloud/models/inspection/inspection.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
+import 'package:cloud/models/inspection/inspection_item_batch.dart';
 import 'package:cloud/models/inspection/inspection_import_template.dart';
 import 'package:cloud/models/response.dart';
 import 'package:dio/dio.dart';
@@ -419,4 +420,123 @@ Future<bool> submitInspectionTask(int id, Map<String, dynamic>? data) async {
       }
     },
   );
+}
+
+Future<void> notifyInspectionItemRejected(int itemId) async {
+  await api.post("api/tenant/inspection/items/$itemId/notify-rejected");
+}
+
+Future<void> notifyInspectionItemBatchRejected(int itemId, int batchId) async {
+  final url =
+      "api/tenant/inspection/items/$itemId/batches/$batchId/notify-rejected";
+  final res = await api.post(url);
+}
+
+Future<List<InspectionItemBatch>> getInspectionItemBatches(int itemId,
+    {int page = 1, String? batchNo, int? status}) async {
+  final queryParams = <String, dynamic>{'page': page};
+  if (batchNo != null && batchNo.isNotEmpty) queryParams['batch_no'] = batchNo;
+  if (status != null) queryParams['status'] = status;
+  return api
+      .get("api/tenant/inspection/items/$itemId/batches",
+          queryParameters: queryParams)
+      .then((res) {
+    final data = res.data;
+    if (data == null) return <InspectionItemBatch>[];
+    List<dynamic> list;
+    if (data is List) {
+      list = data;
+    } else if (data is Map<String, dynamic> && data['data'] is List) {
+      list = data['data'] as List;
+    } else {
+      return <InspectionItemBatch>[];
+    }
+    return list
+        .whereType<Map>()
+        .map((item) => InspectionItemBatch.fromJson(
+              Map<String, dynamic>.from(item),
+            ))
+        .toList();
+  });
+}
+
+Future<InspectionItemBatch?> saveInspectionItemBatch(
+    int itemId, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/inspection/items/$itemId/batches/add", data: data)
+      .then((res) {
+    if (res.data == null) {
+      return null;
+    }
+    return InspectionItemBatch.fromJson(res.data);
+  });
+}
+
+Future<InspectionItemBatch?> updateInspectionItemBatch(
+    int itemId, int batchId, Map<String, dynamic>? data) async {
+  return api
+      .post("api/tenant/inspection/items/$itemId/batches/update/$batchId",
+          data: data)
+      .then((res) {
+    if (res.data == null) {
+      return null;
+    }
+    return InspectionItemBatch.fromJson(res.data);
+  });
+}
+
+Future<String?> identifyBatchNo(String imageUrl) async {
+  final res = await api.post("api/tenant/openai/identifyBatchNo", data: {
+    'image': [
+      {'thumb_url': imageUrl},
+    ],
+  });
+  return res.data?['batch_no']?.toString();
+}
+
+Future<ApiResponse<List<InspectionItem>>> getInspectionTaskItems(
+  int taskId, {
+  Map<String, dynamic>? queryParameters,
+}) async {
+  return api
+      .get("api/tenant/inspection/tasks/$taskId/items",
+          queryParameters: queryParameters)
+      .then(
+        (res) => ApiResponse<List<InspectionItem>>.fromJson(
+          res.data,
+          (data) {
+            var list = (data as List).cast<Map<String, dynamic>>();
+            return list.map(InspectionItem.fromJson).toList();
+          },
+        ),
+      );
+}
+
+Future<Map<int, List<InspectionItemBatch>>> getInspectionItemsBatchesList(
+  List<int> itemIds, {
+  int? status,
+  String? batchNo,
+}) async {
+  if (itemIds.isEmpty) return {};
+  return api.post("api/tenant/inspection/items/batches/list", data: {
+    'item_ids': itemIds,
+    if (status != null) 'status': status,
+    if (batchNo != null && batchNo.isNotEmpty) 'batch_no': batchNo,
+  }).then((res) {
+    final data = res.data?['data'];
+    if (data is! Map) return <int, List<InspectionItemBatch>>{};
+    final result = <int, List<InspectionItemBatch>>{};
+    data.forEach((key, value) {
+      final itemId = int.tryParse(key.toString());
+      if (itemId != null && value is List) {
+        result[itemId] = value
+            .whereType<Map>()
+            .map((e) => InspectionItemBatch.fromJson(
+                  Map<String, dynamic>.from(e),
+                ))
+            .toList();
+      }
+    });
+    return result;
+  });
 }

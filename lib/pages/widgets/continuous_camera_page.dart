@@ -305,11 +305,10 @@ class ContinuousCameraPage extends HookConsumerWidget {
       }
 
       try {
-        final screenSize =
-            viewportSizeRef.value ?? MediaQuery.sizeOf(context);
+        final screenSize = viewportSizeRef.value ?? MediaQuery.sizeOf(context);
         final pixelRatio = MediaQuery.devicePixelRatioOf(context);
         final maxDecodeWidth =
-            (screenSize.width * pixelRatio).round().clamp(1080, 2560);
+            (screenSize.width * pixelRatio).round().clamp(1080, 4096);
         final layout = resolvePortraitCaptureFrameLayout(
           aspectRatio,
           enableSquareAspectRatio: enableSquareAspectRatio,
@@ -817,288 +816,292 @@ class ContinuousCameraPage extends HookConsumerWidget {
             enableSquareAspectRatio: enableSquareAspectRatio,
           );
 
-      Widget buildShutterButton() {
-        return GestureDetector(
-          onTap: shutterDisabled ? null : requestTakePhoto,
-          child: ScaleTransition(
-            scale: shutterScaleAnim,
-            child: Container(
-              width: 76,
-              height: 76,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: shutterDisabled ? Colors.white38 : Colors.white,
-                  width: 4,
-                ),
-              ),
-              padding: const EdgeInsets.all(3),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isRetakeMode
-                      ? warningColor
-                      : shutterDisabled
-                          ? Colors.white38
-                          : Colors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-
-      Widget buildDoneButton() {
-        return GestureDetector(
-          onTap: finishCapture,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            opacity: validCapturedCount > 0 ? 1.0 : 0.5,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text('完成',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14)),
-            ),
-          ),
-        );
-      }
-
-      Widget buildAspectRatioButton() {
-        return StreamBuilder<SensorConfig>(
-          stream: photoState.sensorConfig$,
-          builder: (_, sensorConfigSnapshot) {
-            if (!sensorConfigSnapshot.hasData) {
-              return const SizedBox.shrink();
-            }
-            final sensorConfig = sensorConfigSnapshot.requireData;
-            return _AspectRatioSwitchButton(
-              aspectRatio: displayAspectRatio.value,
-              onSwitch: () => switchAspectRatio(sensorConfig),
-            );
-          },
-        );
-      }
-
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _CaptureFrameMaskPainter(
-                  captureRect: effectiveCaptureRect,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.only(bottom: 20),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black54, Colors.transparent],
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => unawaited(safeExitPop()),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: Colors.black26,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white, size: 20),
-                        ),
-                      ),
-
-                      const Spacer(),
-                      if (isRetakeMode)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: warningColor.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.warning_amber_rounded,
-                                  size: 14, color: Colors.white),
-                              const SizedBox(width: 4),
-                              Text('正在重拍第 ${replaceIndex.value! + 1} 张',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      if (isRetakeMode) const Spacer(),
-                      // 闪光灯 按钮
-                      AwesomeFlashButton(state: photoState),
-                      const SizedBox(width: 10),
-                      // 画幅切换 按钮
-                      buildAspectRatioButton(),
-                      const SizedBox(width: 40),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (capturedImages.value.isNotEmpty)
-                  ClipRRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: useLabelThumbnails ? 3 : 10,
-                        sigmaY: useLabelThumbnails ? 3 : 10,
-                      ),
-                      child: Container(
-                        height: 90,
-                        width: double.infinity,
-                        color: useLabelThumbnails
-                            ? const Color.fromARGB(255, 164, 164, 164)
-                                .withOpacity(0.2)
-                            : Colors.black.withOpacity(0.3),
-                        alignment: Alignment.centerLeft,
-                        child: ListView.separated(
-                          controller: scrollController,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: capturedImages.value.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 10),
-                          itemBuilder: (_, index) => useLabelThumbnails
-                              ? buildLabelThumbnailItem(index, isRetakeMode)
-                              : buildDefaultThumbnailItem(index, isRetakeMode),
-                        ),
-                      ),
+          Widget buildShutterButton() {
+            return GestureDetector(
+              onTap: shutterDisabled ? null : requestTakePhoto,
+              child: ScaleTransition(
+                scale: shutterScaleAnim,
+                child: Container(
+                  width: 76,
+                  height: 76,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: shutterDisabled ? Colors.white38 : Colors.white,
+                      width: 4,
                     ),
                   ),
-                if (useLabelThumbnails)
-                  Container(
-                    color: Colors.black.withOpacity(0.6),
-                    width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 25),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                    alignment: Alignment.center,
-                    child: currentCaptureLabel != null &&
-                            currentCaptureLabel != '其他'
-                        ? Text(
-                            '正在拍: $currentCaptureLabel',
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              height: 1.2,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                  padding: const EdgeInsets.all(3),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isRetakeMode
+                          ? warningColor
+                          : shutterDisabled
+                              ? Colors.white38
+                              : Colors.white,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                Container(
-                  color: Colors.black.withOpacity(0.6),
-                  padding: EdgeInsets.only(
-                    top: useLabelThumbnails ? 8 : 24,
-                    bottom: 48,
+                ),
+              ),
+            );
+          }
+
+          Widget buildDoneButton() {
+            return GestureDetector(
+              onTap: finishCapture,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: validCapturedCount > 0 ? 1.0 : 0.5,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text('完成',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14)),
+                ),
+              ),
+            );
+          }
+
+          Widget buildAspectRatioButton() {
+            return StreamBuilder<SensorConfig>(
+              stream: photoState.sensorConfig$,
+              builder: (_, sensorConfigSnapshot) {
+                if (!sensorConfigSnapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+                final sensorConfig = sensorConfigSnapshot.requireData;
+                return _AspectRatioSwitchButton(
+                  aspectRatio: displayAspectRatio.value,
+                  onSwitch: () => switchAspectRatio(sensorConfig),
+                );
+              },
+            );
+          }
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: _CaptureFrameMaskPainter(
+                      captureRect: effectiveCaptureRect,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black54, Colors.transparent],
+                    ),
                   ),
                   child: SafeArea(
-                    top: false,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (isMain)
-                          SizedBox(
-                            width: 60,
-                            child: GestureDetector(
-                              onTap: () {
-                                isMainImage.value = !isMainImage.value;
-                                HapticFeedback.mediumImpact();
-                              },
-                              child: Column(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => unawaited(safeExitPop()),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                color: Colors.black26,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Colors.white,
+                                  size: 20),
+                            ),
+                          ),
+
+                          const Spacer(),
+                          if (isRetakeMode)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: warningColor.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    isMainImage.value
-                                        ? Icons.star_rounded
-                                        : Icons.star_outline_rounded,
-                                    color: isMainImage.value
-                                        ? Colors.amber
-                                        : Colors.white54,
-                                    size: 28,
-                                  ),
-                                  Text(
-                                    '设为主图',
-                                    style: TextStyle(
-                                      color: isMainImage.value
-                                          ? Colors.amber
-                                          : Colors.white54,
-                                      fontSize: 10,
-                                    ),
-                                  ),
+                                  const Icon(Icons.warning_amber_rounded,
+                                      size: 14, color: Colors.white),
+                                  const SizedBox(width: 4),
+                                  Text('正在重拍第 ${replaceIndex.value! + 1} 张',
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ),
-                          ),
-                        SizedBox(
-                          width: isMain ? 40 : bottomSideSlotWidth,
-                          child: Center(
-                            child: Text(
-                              hasCaptureLimit
-                                  ? '已拍 $validCapturedCount/$maxCount'
-                                  : '已拍 $validCapturedCount',
-                              style: const TextStyle(
-                                  color: Colors.white54, fontSize: 12),
-                            ),
-                          ),
-                        ),
-                        // 拍照按钮
-                        buildShutterButton(),
-                        // 完成按钮
-                        SizedBox(
-                          width: isMain ? 80 : bottomSideSlotWidth,
-                          child: Center(child: buildDoneButton()),
-                        ),
-                      ],
+                          if (isRetakeMode) const Spacer(),
+                          // 闪光灯 按钮
+                          AwesomeFlashButton(state: photoState),
+                          const SizedBox(width: 10),
+                          // 画幅切换 按钮
+                          buildAspectRatioButton(),
+                          const SizedBox(width: 40),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      );
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (capturedImages.value.isNotEmpty)
+                      ClipRRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: useLabelThumbnails ? 3 : 10,
+                            sigmaY: useLabelThumbnails ? 3 : 10,
+                          ),
+                          child: Container(
+                            height: 90,
+                            width: double.infinity,
+                            color: useLabelThumbnails
+                                ? const Color.fromARGB(255, 164, 164, 164)
+                                    .withOpacity(0.2)
+                                : Colors.black.withOpacity(0.3),
+                            alignment: Alignment.centerLeft,
+                            child: ListView.separated(
+                              controller: scrollController,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: capturedImages.value.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 10),
+                              itemBuilder: (_, index) => useLabelThumbnails
+                                  ? buildLabelThumbnailItem(index, isRetakeMode)
+                                  : buildDefaultThumbnailItem(
+                                      index, isRetakeMode),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (useLabelThumbnails)
+                      Container(
+                        color: Colors.black.withOpacity(0.6),
+                        width: double.infinity,
+                        constraints: const BoxConstraints(minHeight: 25),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 7),
+                        alignment: Alignment.center,
+                        child: currentCaptureLabel != null &&
+                                currentCaptureLabel != '其他'
+                            ? Text(
+                                '正在拍: $currentCaptureLabel',
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    Container(
+                      color: Colors.black.withOpacity(0.6),
+                      padding: EdgeInsets.only(
+                        top: useLabelThumbnails ? 8 : 24,
+                        bottom: 48,
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (isMain)
+                              SizedBox(
+                                width: 60,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    isMainImage.value = !isMainImage.value;
+                                    HapticFeedback.mediumImpact();
+                                  },
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isMainImage.value
+                                            ? Icons.star_rounded
+                                            : Icons.star_outline_rounded,
+                                        color: isMainImage.value
+                                            ? Colors.amber
+                                            : Colors.white54,
+                                        size: 28,
+                                      ),
+                                      Text(
+                                        '设为主图',
+                                        style: TextStyle(
+                                          color: isMainImage.value
+                                              ? Colors.amber
+                                              : Colors.white54,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            SizedBox(
+                              width: isMain ? 40 : bottomSideSlotWidth,
+                              child: Center(
+                                child: Text(
+                                  hasCaptureLimit
+                                      ? '已拍 $validCapturedCount/$maxCount'
+                                      : '已拍 $validCapturedCount',
+                                  style: const TextStyle(
+                                      color: Colors.white54, fontSize: 12),
+                                ),
+                              ),
+                            ),
+                            // 拍照按钮
+                            buildShutterButton(),
+                            // 完成按钮
+                            SizedBox(
+                              width: isMain ? 80 : bottomSideSlotWidth,
+                              child: Center(child: buildDoneButton()),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
         },
       );
     }

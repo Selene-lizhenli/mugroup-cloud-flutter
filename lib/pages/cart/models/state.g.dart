@@ -25,6 +25,7 @@ const _$CartTypeEnumMap = {
   CartType.inout: 'inout',
   CartType.quotation: 'quotation',
   CartType.deliveryOut: 'deliveryOut',
+  CartType.stockOut: 'stockOut',
 };
 
 _$QuotationInfoImpl _$$QuotationInfoImplFromJson(Map<String, dynamic> json) =>

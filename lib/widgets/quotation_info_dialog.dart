@@ -36,7 +36,7 @@ class QuotationInfoDialog extends HookConsumerWidget {
       'CNY',
       null,
       null,
-      taxRateMapping: null,
+      taxRateMapping: _defaultTaxRateMapping,
     );
   }
 

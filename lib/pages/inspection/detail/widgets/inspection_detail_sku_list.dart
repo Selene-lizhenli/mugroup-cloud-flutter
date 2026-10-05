@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/pages/inspection/detail/widgets/inspection_detail_list_header.dart';
+
 import 'package:cloud/pages/inspection/tool/inspection_tool.dart';
 import 'package:cloud/pages/inspection/widgets/inspection_add_sku.dart';
 import 'package:cloud/pages/widgets/confirm_dialog.dart';
@@ -17,23 +18,39 @@ class InspectionDetailSkuList extends StatelessWidget {
     required this.inspectionId,
     required this.filteredItems,
     required this.totalCount,
-    required this.finishedCount,
-    required this.unfinishedCount,
+    required this.passedCount,
+    required this.failedCount,
+    required this.reworkCount,
+    required this.pendingCount,
     required this.searchController,
     required this.currentTab,
     required this.useNormalTemplate,
     required this.onRefresh,
+    this.batchStatusMap = const {},
+    this.batchRoundMap = const {},
+    this.isYunDianInspection = false,
+    this.itemsHasMore = false,
+    this.itemsLoading = false,
+    this.onLoadMore,
   });
 
   final int inspectionId;
   final List<InspectionItem> filteredItems;
   final int totalCount;
-  final int finishedCount;
-  final int unfinishedCount;
+  final int passedCount;
+  final int failedCount;
+  final int reworkCount;
+  final int pendingCount;
   final TextEditingController searchController;
   final ValueNotifier<int> currentTab;
   final bool useNormalTemplate;
   final VoidCallback onRefresh;
+  final Map<int?, int> batchStatusMap;
+  final Map<int?, int> batchRoundMap;
+  final bool isYunDianInspection;
+  final bool itemsHasMore;
+  final bool itemsLoading;
+  final VoidCallback? onLoadMore;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +69,10 @@ class InspectionDetailSkuList extends StatelessWidget {
           InspectionDetailListHeader(
             filteredCount: filteredItems.length,
             totalCount: totalCount,
-            finishedCount: finishedCount,
-            unfinishedCount: unfinishedCount,
+            passedCount: passedCount,
+            failedCount: failedCount,
+            reworkCount: reworkCount,
+            pendingCount: pendingCount,
             searchController: searchController,
             currentTab: currentTab,
             onAddTap: () async {
@@ -91,7 +110,7 @@ class InspectionDetailSkuList extends StatelessWidget {
               children: [
                 Expanded(
                   child: _TabItem(
-                    text: '全部（$totalCount）',
+                    text: '全部',
                     selectedValue: currentTab.value,
                     currentTabValue: 0,
                     onTap: () => currentTab.value = 0,
@@ -100,26 +119,35 @@ class InspectionDetailSkuList extends StatelessWidget {
                 ),
                 Expanded(
                   child: _TabItem(
-                    text: '已验货（$finishedCount）',
-                    selectedValue: currentTab.value,
-                    currentTabValue: 1,
-                    onTap: () => currentTab.value = 1,
-                    primaryColor: colorScheme.primary,
-                  ),
-                ),
-                Expanded(
-                  child: _TabItem(
-                    text: '未验货（$unfinishedCount）',
+                    text: '不合格',
                     selectedValue: currentTab.value,
                     currentTabValue: 2,
                     onTap: () => currentTab.value = 2,
                     primaryColor: colorScheme.primary,
                   ),
                 ),
+                Expanded(
+                  child: _TabItem(
+                    text: '返工',
+                    selectedValue: currentTab.value,
+                    currentTabValue: 3,
+                    onTap: () => currentTab.value = 3,
+                    primaryColor: colorScheme.primary,
+                  ),
+                ),
+                Expanded(
+                  child: _TabItem(
+                    text: '未验',
+                    selectedValue: currentTab.value,
+                    currentTabValue: 4,
+                    onTap: () => currentTab.value = 4,
+                    primaryColor: colorScheme.primary,
+                  ),
+                ),
               ],
             ),
           ),
-          if (filteredItems.isEmpty) ...[
+          if (filteredItems.isEmpty)
             Container(
               height: 200,
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
@@ -129,7 +157,6 @@ class InspectionDetailSkuList extends StatelessWidget {
                 color: colorScheme.primary.withOpacity(0.1),
               ),
               child: Container(
-                  // height: 100,
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
                     borderRadius:
@@ -139,27 +166,65 @@ class InspectionDetailSkuList extends StatelessWidget {
                   child: const Center(
                     child: Text('暂无数据', style: TextStyle(color: Colors.grey)),
                   )),
-            ),
-            const SizedBox(height: 20)
-          ] else ...[
+            )
+          else ...[
             Container(
               padding: const EdgeInsets.fromLTRB(10, 10, 11, 20),
               decoration: BoxDecoration(
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(0)),
                   color: colorScheme.primary.withOpacity(0.1)),
-              child: Column(
-                children: filteredItems.map((item) {
-                  return _InspectionListItem(
-                    id: inspectionId,
-                    item: item,
-                    useNormalTemplate: useNormalTemplate,
-                    onRefresh: onRefresh,
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filteredItems.length +
+                    (itemsHasMore || itemsLoading ? 1 : 0) +
+                    (!itemsHasMore && filteredItems.isNotEmpty ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index < filteredItems.length) {
+                    final item = filteredItems[index];
+                    return _InspectionListItem(
+                      id: inspectionId,
+                      item: item,
+                      useNormalTemplate: useNormalTemplate,
+                      onRefresh: onRefresh,
+                      batchStatusMap: batchStatusMap,
+                      batchRoundMap: batchRoundMap,
+                      isYunDianInspection: isYunDianInspection,
+                    );
+                  }
+                  if (index == filteredItems.length &&
+                      (itemsHasMore || itemsLoading)) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Center(
+                        child: itemsLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    );
+                  }
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Center(
+                      child: Text(
+                        '已加载全部',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                   );
-                }).toList(),
+                },
               ),
             ),
-            const SizedBox(height:20),
+            const SizedBox(height: 20),
           ]
         ],
       ),
@@ -173,12 +238,18 @@ class _InspectionListItem extends HookWidget {
     required this.item,
     required this.onRefresh,
     required this.useNormalTemplate,
+    this.batchStatusMap = const {},
+    this.batchRoundMap = const {},
+    this.isYunDianInspection = false,
   });
 
   final int id;
   final InspectionItem item;
   final VoidCallback onRefresh;
   final bool useNormalTemplate;
+  final Map<int?, int> batchStatusMap;
+  final Map<int?, int> batchRoundMap;
+  final bool isYunDianInspection;
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +257,10 @@ class _InspectionListItem extends HookWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
     final Color errorColor = colorScheme.error;
+
+    final int effectiveStatus = isYunDianInspection
+        ? (batchStatusMap[item.id] ?? 0)
+        : (item.status ?? 0);
 
     final mediaList = item.media ?? [];
 
@@ -245,7 +320,12 @@ class _InspectionListItem extends HookWidget {
                   ),
                 ),
                 // ],
-                InspectionStatusTag(status: item.status),
+                InspectionStatusTag(status: effectiveStatus),
+                if (isYunDianInspection &&
+                    (batchRoundMap[item.id] ?? 0) > 1) ...[
+                  const SizedBox(width: 6),
+                  _RoundBadge(round: batchRoundMap[item.id]!),
+                ],
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () async {
@@ -268,7 +348,7 @@ class _InspectionListItem extends HookWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Text(
-                    item.status == 0 ? '验货' : '查看',
+                    effectiveStatus == 0 ? '验货' : '查看',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),
@@ -446,6 +526,32 @@ class _TabItem extends StatelessWidget {
               fontSize: 14,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundBadge extends StatelessWidget {
+  const _RoundBadge({required this.round});
+
+  final int round;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.blue.withOpacity(0.3), width: 0.5),
+      ),
+      child: Text(
+        '第$round轮',
+        style: const TextStyle(
+          fontSize: 11,
+          color: Colors.blue,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

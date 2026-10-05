@@ -12,6 +12,7 @@ _$WarehouseReceiptItemImpl _$$WarehouseReceiptItemImplFromJson(
       id: (json['id'] as num?)?.toInt(),
       hashid: json['hashid'] as String?,
       receiptId: (json['receipt_id'] as num?)?.toInt(),
+      cachedLocationId: (json['cached_location'] as num?)?.toInt(),
       recordId: json['record_id'] as String?,
       receipt: json['receipt'] == null
           ? null
@@ -53,6 +54,7 @@ Map<String, dynamic> _$$WarehouseReceiptItemImplToJson(
       'id': instance.id,
       'hashid': instance.hashid,
       'receipt_id': instance.receiptId,
+      'cached_location': instance.cachedLocationId,
       'record_id': instance.recordId,
       'receipt': instance.receipt,
       'item_no': instance.itemNo,

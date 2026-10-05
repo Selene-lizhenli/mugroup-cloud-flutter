@@ -8,6 +8,7 @@ Color getStatusColor(int? status) {
     1: Colors.green,
     2: Colors.orange,
     3: Colors.red,
+    4: Colors.blue,
   };
   return statusColors[status] ?? Colors.grey;
 }
@@ -30,6 +31,7 @@ class InspectionStatusTag extends StatelessWidget {
       1 => Icons.check_circle,
       2 => Icons.info,
       3 => Icons.cancel,
+      4 => Icons.replay,
       _ => Icons.radio_button_unchecked,
     };
   }

@@ -11,6 +11,7 @@ _$FieldConfigImpl _$$FieldConfigImplFromJson(Map<String, dynamic> json) =>
       label: json['label'] as String,
       name: json['name'] as String,
       isVisible: json['isVisible'] as bool? ?? true,
+      maxCount: (json['maxCount'] as num?)?.toInt() ?? 1,
     );
 
 Map<String, dynamic> _$$FieldConfigImplToJson(_$FieldConfigImpl instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$$FieldConfigImplToJson(_$FieldConfigImpl instance) =>
       'label': instance.label,
       'name': instance.name,
       'isVisible': instance.isVisible,
+      'maxCount': instance.maxCount,
     };

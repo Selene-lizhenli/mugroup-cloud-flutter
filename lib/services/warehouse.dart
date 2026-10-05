@@ -4,6 +4,7 @@ import 'package:cloud/models/warehouse/warehouse_location.dart';
 import 'package:cloud/models/warehouse/warehouse_receipt.dart';
 import 'package:cloud/models/warehouse/warehouse_receipt_item.dart';
 import 'package:cloud/models/warehouse/warehouse_receipt_item_entry.dart';
+import 'package:cloud/models/warehouse/warehouse_receipt_mixed_carton.dart';
 import 'package:cloud/models/warehouse/warehouse_zone.dart';
 
 Future<ApiResponse<List<WarehouseReceipt>>> getWarehouseReceipts(
@@ -55,7 +56,10 @@ Future<void> createWarehouseReceiptEntryVoucherPrintTask(
 
 Future<WarehouseReceiptItem> fetchWarehouseReceiptItem(int id) async {
   final results = await Future.wait([
-    api.get("api/tenant/warehouse/receipt-items/$id"),
+    api.get(
+      "api/tenant/warehouse/receipt-items/$id",
+      queryParameters: {'include': 'cached_location'},
+    ),
     api.get("api/tenant/warehouse/receipt-items/$id/entries"),
   ]);
   final item = WarehouseReceiptItem.fromJson(results[0].data);
@@ -199,6 +203,25 @@ Future<void> deleteWarehouseReceiptItemEntry(int itemId, int entryId) async {
       .delete("api/tenant/warehouse/receipt-items/$itemId/entries/$entryId");
 }
 
+Future<List<WarehouseReceiptMixedCarton>> getWarehouseReceiptMixedCartons(
+    int receiptId) async {
+  final res =
+      await api.get("api/tenant/warehouse/receipts/$receiptId/mixed-cartons");
+  final list = (res.data['data'] as List).cast<Map<String, dynamic>>();
+  return list.map(WarehouseReceiptMixedCarton.fromJson).toList();
+}
+
+Future<WarehouseReceiptMixedCarton> createWarehouseReceiptMixedCarton(
+  int receiptId,
+  Map<String, dynamic> data,
+) async {
+  final res = await api.post(
+    "api/tenant/warehouse/receipts/$receiptId/mixed-cartons",
+    data: data,
+  );
+  return WarehouseReceiptMixedCarton.fromJson(res.data);
+}
+
 Future<List<WarehouseZone>> getWarehouseZones() async {
   final res = await api.get("api/tenant/warehouse/zones");
   final list = (res.data['data'] as List).cast<Map<String, dynamic>>();
@@ -209,6 +232,11 @@ Future<List<WarehouseLocation>> getWarehouseZoneLocations(int zoneId) async {
   final res = await api.get("api/tenant/warehouse/zones/$zoneId/locations");
   final list = (res.data['data'] as List).cast<Map<String, dynamic>>();
   return list.map(WarehouseLocation.fromJson).toList();
+}
+
+Future<WarehouseLocation> getWarehouseLocation(int locationId) async {
+  final res = await api.get("api/tenant/warehouse/locations/$locationId");
+  return WarehouseLocation.fromJson(res.data);
 }
 
 Future<List<WarehouseLocation>> getAllWarehouseLocations() async {

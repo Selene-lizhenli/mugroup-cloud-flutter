@@ -19,6 +19,8 @@ class InspectionItemNormalPage extends HookConsumerWidget {
   final InspectionItem? inspectionItem;
   final Map<String, List<TemporaryMedia>> mediaMap;
   final void Function(String key, List<TemporaryMedia> medias) onMediaChanged;
+  final List<FieldConfig>? photoCheckFields;
+  final String? departmentName;
 
   const InspectionItemNormalPage({
     super.key,
@@ -26,6 +28,8 @@ class InspectionItemNormalPage extends HookConsumerWidget {
     this.inspectionItem,
     required this.mediaMap,
     required this.onMediaChanged,
+    this.photoCheckFields,
+    this.departmentName,
   });
 
   static const _cText = Color(0xFF333333);
@@ -42,6 +46,8 @@ class InspectionItemNormalPage extends HookConsumerWidget {
           text: _cText,
           mediaMap: mediaMap,
           onMediaChanged: onMediaChanged,
+          defaultFields: photoCheckFields ?? inspectionDefaultFields,
+          departmentName: departmentName,
         ),
       ],
     );
@@ -53,29 +59,29 @@ class _PhotoCard extends HookConsumerWidget {
   final Color text;
   final Map<String, List<TemporaryMedia>> mediaMap;
   final void Function(String key, List<TemporaryMedia> list) onMediaChanged;
+  final List<FieldConfig> defaultFields;
+  final String? departmentName;
 
   const _PhotoCard({
     required this.blue,
     required this.text,
     required this.mediaMap,
     required this.onMediaChanged,
+    required this.defaultFields,
+    this.departmentName,
   });
-
-  static const Set<String> _photoKeys = {
-    'shipping_mark_front',
-    'shipping_mark_side',
-    'unboxing',
-    'barcode_label',
-    'weight_proof',
-    'cover',
-  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final configParams = useMemoized(() => FieldConfigParams(
-          storageKey: 'inspection_item_confirm_v1',
-          defaultFields: inspectionDefaultFields,
-        ));
+    final deptKey = (departmentName != null && departmentName!.isNotEmpty)
+        ? '_$departmentName'
+        : '';
+    final configParams = useMemoized(
+        () => FieldConfigParams(
+              storageKey: 'inspection_item_confirm_v1$deptKey',
+              defaultFields: defaultFields,
+            ),
+        [defaultFields]);
 
     final fieldConfigs = ref.watch(fieldConfigProvider(configParams));
     final notifier = ref.read(fieldConfigProvider(configParams).notifier);
@@ -89,38 +95,77 @@ class _PhotoCard extends HookConsumerWidget {
     // 智能分发图片到字段，用于连拍后按顺序填充图片
     Future<void> distributeFilesToFields(
       List<FieldConfig> targetFields,
-      List<File> files,
+      List<File?> files,
     ) async {
       if (files.isEmpty) return;
 
       try {
         EasyLoading.show(status: '正在智能分发...');
 
+        int fieldIndex = 0;
         int fileIndex = 0;
+        int failedCount = 0;
+        final List<File> overflowFiles = [];
 
-        for (final field in targetFields) {
-          if (fileIndex >= files.length) break;
+        while (fieldIndex < targetFields.length && fileIndex < files.length) {
+          final fileEntry = files[fileIndex];
+          if (fileEntry == null) {
+            fieldIndex++;
+            fileIndex++;
+            continue;
+          }
 
-          final file = files[fileIndex];
-          final media = await upload(file: file);
-          onMediaChanged(field.name, [media]);
-          fileIndex++;
+          final field = targetFields[fieldIndex];
+          try {
+            final media = await upload(
+              file: fileEntry,
+              quality: 98,
+              maxWidth: 4096,
+            );
+            onMediaChanged(field.name, [media]);
+            fieldIndex++;
+            fileIndex++;
+          } catch (e) {
+            failedCount++;
+            fieldIndex++;
+            fileIndex++;
+          }
         }
 
         if (fileIndex < files.length) {
-          final remainingFiles = files.sublist(fileIndex);
-          final List<TemporaryMedia> newDetails = [];
-
-          for (final file in remainingFiles) {
-            final media = await upload(file: file);
-            newDetails.add(media);
+          for (int i = fileIndex; i < files.length; i++) {
+            final f = files[i];
+            if (f != null) overflowFiles.add(f);
           }
-
-          final currentDetails = mediaMap['details'] ?? [];
-          onMediaChanged('details', [...currentDetails, ...newDetails]);
         }
 
-        EasyLoading.showSuccess('分发完成');
+        if (overflowFiles.isNotEmpty) {
+          final List<TemporaryMedia> newDetails = [];
+
+          for (final file in overflowFiles) {
+            try {
+              final media = await upload(
+                file: file,
+                quality: 98,
+                maxWidth: 4096,
+              );
+              newDetails.add(media);
+            } catch (e) {
+              failedCount++;
+            }
+          }
+
+          if (newDetails.isNotEmpty) {
+            final currentDetails = mediaMap['details'] ?? [];
+            onMediaChanged('details', [...currentDetails, ...newDetails]);
+          }
+        }
+
+        if (failedCount > 0) {
+          EasyLoading.showInfo('分发完成，${failedCount}张上传失败，请检查后重新上传');
+        } else {
+          EasyLoading.showSuccess('分发完成');
+        }
       } catch (e) {
         EasyLoading.showError('处理失败');
         debugPrint(e.toString());
@@ -131,7 +176,7 @@ class _PhotoCard extends HookConsumerWidget {
 
     final visibleFields = useMemoized(
       () => fieldConfigs
-          .where((f) => f.isVisible && _photoKeys.contains(f.name))
+          .where((f) => f.isVisible && f.name != 'details')
           .toList(),
       [fieldConfigs],
     );
@@ -277,7 +322,7 @@ class _PhotoCard extends HookConsumerWidget {
                               builder: (ctx) {
                                 return FieldSelector(
                                   fields: fieldConfigs,
-                                  defaultFields: inspectionDefaultFields,
+                                  defaultFields: defaultFields,
                                   onConfigChanged:
                                       (List<FieldConfig> newConfigs) {
                                     notifier.updateConfigs(newConfigs);
@@ -321,6 +366,7 @@ class _PhotoCard extends HookConsumerWidget {
                       key: ValueKey(field.name),
                       apiKey: field.name,
                       label: field.label,
+                      maxCount: field.maxCount,
                       width: itemSize,
                       isDirectCamera: isDirectCamera.value,
                       mediaMap: mediaMap,
@@ -409,6 +455,7 @@ class _PhotoCard extends HookConsumerWidget {
     Key? key,
     required String apiKey,
     required String label,
+    required int maxCount,
     required double width,
     required bool isDirectCamera,
     required bool enableContinuous,
@@ -417,15 +464,15 @@ class _PhotoCard extends HookConsumerWidget {
         onMediaChanged,
     required void Function(MediaDragData source, MediaDragData target) onSwap,
     required List<FieldConfig> pendingFields,
-    required Future<void> Function(List<FieldConfig>, List<File>)
+    required Future<void> Function(List<FieldConfig>, List<File?>)
         distributeFilesToFields,
     required List<FieldConfig> visibleFields,
     required List<TemporaryMedia> previewGallery,
   }) {
     List<TemporaryMedia> currentImages = mediaMap[apiKey] ?? [];
 
-    if (apiKey != 'details' && currentImages.length > 1) {
-      currentImages = [currentImages.last];
+    if (apiKey != 'details' && currentImages.length > maxCount) {
+      currentImages = currentImages.sublist(currentImages.length - maxCount);
     }
 
     return SizedBox(
@@ -449,7 +496,7 @@ class _PhotoCard extends HookConsumerWidget {
               alignment: Alignment.centerLeft,
               child: ImageUploaderInspection(
                 label: null,
-                maxCount: 1,
+                maxCount: maxCount,
                 maxAssetsForGallery: 99,
                 customIcon: Icons.camera_alt,
                 value: currentImages,
@@ -488,8 +535,7 @@ class _PhotoCard extends HookConsumerWidget {
   }) {
     final previousImages = mediaMap[apiKey] ?? [];
     final previousIds = previousImages.map((m) => m.id).toSet();
-    final newImages =
-        list.where((m) => !previousIds.contains(m.id)).toList();
+    final newImages = list.where((m) => !previousIds.contains(m.id)).toList();
 
     if (newImages.isEmpty) {
       onMediaChanged(apiKey, list);
@@ -501,8 +547,7 @@ class _PhotoCard extends HookConsumerWidget {
       return;
     }
 
-    final currentIndex =
-        visibleFields.indexWhere((f) => f.name == apiKey);
+    final currentIndex = visibleFields.indexWhere((f) => f.name == apiKey);
     final candidateFields = currentIndex >= 0
         ? visibleFields.sublist(currentIndex)
         : <FieldConfig>[];

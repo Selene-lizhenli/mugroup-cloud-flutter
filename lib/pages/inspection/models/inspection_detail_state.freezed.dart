@@ -29,6 +29,12 @@ mixin _$InspectionDetailState {
   String? get templateLoadError => throw _privateConstructorUsedError;
   bool get loading => throw _privateConstructorUsedError;
   bool get reportPerSku => throw _privateConstructorUsedError;
+  List<InspectionItem> get items => throw _privateConstructorUsedError;
+  int get itemsPage => throw _privateConstructorUsedError;
+  bool get itemsLoading => throw _privateConstructorUsedError;
+  bool get itemsHasMore => throw _privateConstructorUsedError;
+  int get itemsTotal => throw _privateConstructorUsedError;
+  String? get searchKeyword => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $InspectionDetailStateCopyWith<InspectionDetailState> get copyWith =>
@@ -52,7 +58,13 @@ abstract class $InspectionDetailStateCopyWith<$Res> {
       bool templateLoading,
       String? templateLoadError,
       bool loading,
-      bool reportPerSku});
+      bool reportPerSku,
+      List<InspectionItem> items,
+      int itemsPage,
+      bool itemsLoading,
+      bool itemsHasMore,
+      int itemsTotal,
+      String? searchKeyword});
 
   $InspectionCopyWith<$Res>? get inspection;
 }
@@ -82,6 +94,12 @@ class _$InspectionDetailStateCopyWithImpl<$Res,
     Object? templateLoadError = freezed,
     Object? loading = null,
     Object? reportPerSku = null,
+    Object? items = null,
+    Object? itemsPage = null,
+    Object? itemsLoading = null,
+    Object? itemsHasMore = null,
+    Object? itemsTotal = null,
+    Object? searchKeyword = freezed,
   }) {
     return _then(_value.copyWith(
       inspectionId: freezed == inspectionId
@@ -128,6 +146,30 @@ class _$InspectionDetailStateCopyWithImpl<$Res,
           ? _value.reportPerSku
           : reportPerSku // ignore: cast_nullable_to_non_nullable
               as bool,
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItem>,
+      itemsPage: null == itemsPage
+          ? _value.itemsPage
+          : itemsPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      itemsLoading: null == itemsLoading
+          ? _value.itemsLoading
+          : itemsLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      itemsHasMore: null == itemsHasMore
+          ? _value.itemsHasMore
+          : itemsHasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      itemsTotal: null == itemsTotal
+          ? _value.itemsTotal
+          : itemsTotal // ignore: cast_nullable_to_non_nullable
+              as int,
+      searchKeyword: freezed == searchKeyword
+          ? _value.searchKeyword
+          : searchKeyword // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -164,7 +206,13 @@ abstract class _$$InspectionDetailStateImplCopyWith<$Res>
       bool templateLoading,
       String? templateLoadError,
       bool loading,
-      bool reportPerSku});
+      bool reportPerSku,
+      List<InspectionItem> items,
+      int itemsPage,
+      bool itemsLoading,
+      bool itemsHasMore,
+      int itemsTotal,
+      String? searchKeyword});
 
   @override
   $InspectionCopyWith<$Res>? get inspection;
@@ -193,6 +241,12 @@ class __$$InspectionDetailStateImplCopyWithImpl<$Res>
     Object? templateLoadError = freezed,
     Object? loading = null,
     Object? reportPerSku = null,
+    Object? items = null,
+    Object? itemsPage = null,
+    Object? itemsLoading = null,
+    Object? itemsHasMore = null,
+    Object? itemsTotal = null,
+    Object? searchKeyword = freezed,
   }) {
     return _then(_$InspectionDetailStateImpl(
       inspectionId: freezed == inspectionId
@@ -239,6 +293,30 @@ class __$$InspectionDetailStateImplCopyWithImpl<$Res>
           ? _value.reportPerSku
           : reportPerSku // ignore: cast_nullable_to_non_nullable
               as bool,
+      items: null == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItem>,
+      itemsPage: null == itemsPage
+          ? _value.itemsPage
+          : itemsPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      itemsLoading: null == itemsLoading
+          ? _value.itemsLoading
+          : itemsLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      itemsHasMore: null == itemsHasMore
+          ? _value.itemsHasMore
+          : itemsHasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      itemsTotal: null == itemsTotal
+          ? _value.itemsTotal
+          : itemsTotal // ignore: cast_nullable_to_non_nullable
+              as int,
+      searchKeyword: freezed == searchKeyword
+          ? _value.searchKeyword
+          : searchKeyword // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -258,9 +336,16 @@ class _$InspectionDetailStateImpl implements _InspectionDetailState {
       this.templateLoading = false,
       this.templateLoadError,
       this.loading = false,
-      this.reportPerSku = false})
+      this.reportPerSku = false,
+      final List<InspectionItem> items = const [],
+      this.itemsPage = 1,
+      this.itemsLoading = false,
+      this.itemsHasMore = true,
+      this.itemsTotal = 0,
+      this.searchKeyword})
       : _dynamicZonesNodes = dynamicZonesNodes,
-        _templateKeys = templateKeys;
+        _templateKeys = templateKeys,
+        _items = items;
 
   @override
   final int? inspectionId;
@@ -305,10 +390,33 @@ class _$InspectionDetailStateImpl implements _InspectionDetailState {
   @override
   @JsonKey()
   final bool reportPerSku;
+  final List<InspectionItem> _items;
+  @override
+  @JsonKey()
+  List<InspectionItem> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  @JsonKey()
+  final int itemsPage;
+  @override
+  @JsonKey()
+  final bool itemsLoading;
+  @override
+  @JsonKey()
+  final bool itemsHasMore;
+  @override
+  @JsonKey()
+  final int itemsTotal;
+  @override
+  final String? searchKeyword;
 
   @override
   String toString() {
-    return 'InspectionDetailState(inspectionId: $inspectionId, inspection: $inspection, errorMessage: $errorMessage, useNormalTemplate: $useNormalTemplate, addSkuDraft: $addSkuDraft, dynamicZonesNodes: $dynamicZonesNodes, templateKeys: $templateKeys, templateLoading: $templateLoading, templateLoadError: $templateLoadError, loading: $loading, reportPerSku: $reportPerSku)';
+    return 'InspectionDetailState(inspectionId: $inspectionId, inspection: $inspection, errorMessage: $errorMessage, useNormalTemplate: $useNormalTemplate, addSkuDraft: $addSkuDraft, dynamicZonesNodes: $dynamicZonesNodes, templateKeys: $templateKeys, templateLoading: $templateLoading, templateLoadError: $templateLoadError, loading: $loading, reportPerSku: $reportPerSku, items: $items, itemsPage: $itemsPage, itemsLoading: $itemsLoading, itemsHasMore: $itemsHasMore, itemsTotal: $itemsTotal, searchKeyword: $searchKeyword)';
   }
 
   @override
@@ -336,7 +444,18 @@ class _$InspectionDetailStateImpl implements _InspectionDetailState {
                 other.templateLoadError == templateLoadError) &&
             (identical(other.loading, loading) || other.loading == loading) &&
             (identical(other.reportPerSku, reportPerSku) ||
-                other.reportPerSku == reportPerSku));
+                other.reportPerSku == reportPerSku) &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.itemsPage, itemsPage) ||
+                other.itemsPage == itemsPage) &&
+            (identical(other.itemsLoading, itemsLoading) ||
+                other.itemsLoading == itemsLoading) &&
+            (identical(other.itemsHasMore, itemsHasMore) ||
+                other.itemsHasMore == itemsHasMore) &&
+            (identical(other.itemsTotal, itemsTotal) ||
+                other.itemsTotal == itemsTotal) &&
+            (identical(other.searchKeyword, searchKeyword) ||
+                other.searchKeyword == searchKeyword));
   }
 
   @override
@@ -352,7 +471,13 @@ class _$InspectionDetailStateImpl implements _InspectionDetailState {
       templateLoading,
       templateLoadError,
       loading,
-      reportPerSku);
+      reportPerSku,
+      const DeepCollectionEquality().hash(_items),
+      itemsPage,
+      itemsLoading,
+      itemsHasMore,
+      itemsTotal,
+      searchKeyword);
 
   @JsonKey(ignore: true)
   @override
@@ -374,7 +499,13 @@ abstract class _InspectionDetailState implements InspectionDetailState {
       final bool templateLoading,
       final String? templateLoadError,
       final bool loading,
-      final bool reportPerSku}) = _$InspectionDetailStateImpl;
+      final bool reportPerSku,
+      final List<InspectionItem> items,
+      final int itemsPage,
+      final bool itemsLoading,
+      final bool itemsHasMore,
+      final int itemsTotal,
+      final String? searchKeyword}) = _$InspectionDetailStateImpl;
 
   @override
   int? get inspectionId;
@@ -398,6 +529,18 @@ abstract class _InspectionDetailState implements InspectionDetailState {
   bool get loading;
   @override
   bool get reportPerSku;
+  @override
+  List<InspectionItem> get items;
+  @override
+  int get itemsPage;
+  @override
+  bool get itemsLoading;
+  @override
+  bool get itemsHasMore;
+  @override
+  int get itemsTotal;
+  @override
+  String? get searchKeyword;
   @override
   @JsonKey(ignore: true)
   _$$InspectionDetailStateImplCopyWith<_$InspectionDetailStateImpl>

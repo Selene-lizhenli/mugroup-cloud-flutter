@@ -11,6 +11,7 @@ abstract class WarehouseReceiptItem with _$WarehouseReceiptItem {
     int? id,
     String? hashid,
     @JsonKey(name: 'receipt_id') int? receiptId,
+    @JsonKey(name: 'cached_location') int? cachedLocationId,
     @JsonKey(name: 'record_id') String? recordId,
     @JsonKey(name: 'receipt') WarehouseReceipt? receipt,
     @JsonKey(name: 'item_no') String? itemNo,

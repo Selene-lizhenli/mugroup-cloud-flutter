@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:camera/camera.dart' as cam;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -27,14 +27,52 @@ Future<File?> captureSinglePhotoFile() async {
   return File(photo.path);
 }
 
+/// 使用 camera 包直接控制摄像头传感器，以最大分辨率拍摄。
+///
+/// 相比 [captureSinglePhotoFile] 使用 image_picker 走系统相机 App 中转，
+/// 此方法直接在 App 内控制摄像头，避免部分国产手机（华为/小米等）对返回图片
+/// 进行降分辨率或过度压缩。
+///
+/// 若 max 分辨率初始化失败（部分低端机型），自动降级为 [captureSinglePhotoFile]。
+Future<File?> captureSinglePhotoMaxResolution() async {
+  try {
+    final cameras = await cam.availableCameras();
+    if (cameras.isEmpty) return null;
+
+    final rearCamera = cameras.firstWhere(
+      (c) => c.lensDirection == cam.CameraLensDirection.back,
+      orElse: () => cameras.first,
+    );
+
+    final controller = cam.CameraController(
+      rearCamera,
+      cam.ResolutionPreset.max,
+      enableAudio: false,
+    );
+
+    await controller.initialize();
+
+    // 等待自动对焦和自动曝光稳定
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    final XFile photo = await controller.takePicture();
+    await controller.dispose();
+
+    return File(photo.path);
+  } catch (e) {
+    debugPrint('captureSinglePhotoMaxResolution failed, fallback: $e');
+    return captureSinglePhotoFile();
+  }
+}
+
 //  使用系统相机进行单拍
 //  使用处： 以图搜图、image_loader单拍等等
 
 /// 连拍快速预览裁剪解码宽度。
-const int kContinuousCaptureFastDecodeWidth = 2048;
+const int kContinuousCaptureFastDecodeWidth = 4096;
 
 /// 连拍快路径 JPEG 质量（缩略图）。
-const int kContinuousCaptureFastJpegQuality = 88;
+const int kContinuousCaptureFastJpegQuality = 95;
 
 /// 精修 JPEG 质量；使用系统编码器，尽量接近原图色彩。
 const int kContinuousCaptureRefineJpegQuality = 100;
@@ -88,7 +126,7 @@ Future<File?> encodeUiImageAsNativeJpeg(
   image.dispose();
   if (byteData == null) return null;
 
-  final Uint8List? compressed = await FlutterImageCompress.compressWithList(
+  final Uint8List compressed = await FlutterImageCompress.compressWithList(
     byteData.buffer.asUint8List(),
     minWidth: width,
     minHeight: height,
@@ -98,7 +136,6 @@ Future<File?> encodeUiImageAsNativeJpeg(
     rotate: 0,
     keepExif: false,
   );
-  if (compressed == null) return null;
   return _writeTempCroppedFile(compressed, extension: 'jpg');
 }
 
@@ -225,8 +262,7 @@ Future<File?> _cropImageBytesWithImagePackage({
     visibleFrame.height,
   );
 
-  final imageSize =
-      Size(decoded.width.toDouble(), decoded.height.toDouble());
+  final imageSize = Size(decoded.width.toDouble(), decoded.height.toDouble());
   final Rect cropRect = computeImageCropRectForCoverPreviewFrame(
     imageSize: imageSize,
     screenSize: coverRect.size,
@@ -576,7 +612,8 @@ Future<File?> cropImageToScreenAspectFrame(
   if (widthOverHeight <= 0) return source;
 
   final bytes = await source.readAsBytes();
-  final image = await _decodeImageFromBytes(bytes, maxDecodeWidth: maxDecodeWidth);
+  final image =
+      await _decodeImageFromBytes(bytes, maxDecodeWidth: maxDecodeWidth);
   final imageSize = Size(image.width.toDouble(), image.height.toDouble());
   final Rect screenCaptureFrame = computeCaptureFrameRect(
     screenSize,
@@ -616,7 +653,8 @@ Future<File?> cropImageCenterToAspectRatio(
   if (aspectRatio <= 0) return source;
 
   final bytes = await source.readAsBytes();
-  final image = await _decodeImageFromBytes(bytes, maxDecodeWidth: maxDecodeWidth);
+  final image =
+      await _decodeImageFromBytes(bytes, maxDecodeWidth: maxDecodeWidth);
 
   final cropRect = computeCenteredAspectFrameRect(
     Size(image.width.toDouble(), image.height.toDouble()),

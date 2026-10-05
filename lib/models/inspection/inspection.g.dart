@@ -35,6 +35,8 @@ _$InspectionImpl _$$InspectionImplFromJson(Map<String, dynamic> json) =>
           : InspectionDynamicTemplate.fromJson(
               json['inspection_dynamic_template'] as Map<String, dynamic>),
       json['created_at'] as String?,
+      (json['department_id'] as num?)?.toInt(),
+      (json['task_type'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$InspectionImplToJson(_$InspectionImpl instance) =>
@@ -55,4 +57,6 @@ Map<String, dynamic> _$$InspectionImplToJson(_$InspectionImpl instance) =>
           instance.inspectionDynamicTemplateJson),
       'inspection_dynamic_template': instance.inspectionDynamicTemplate,
       'created_at': instance.createdAt,
+      'department_id': instance.departmentId,
+      'task_type': instance.taskType,
     };

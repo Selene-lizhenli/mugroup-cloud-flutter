@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud/pages/inspection/const.dart';
 import 'package:cloud/pages/inspection/detail/widgets/inspection_detail_info_card_with_expand.dart';
@@ -11,6 +13,7 @@ import 'package:cloud/pages/inspection/widgets/download_sheet.dart';
 import 'package:cloud/pages/inspection/detail/widgets/inspection_detail_info_card.dart';
 import 'package:cloud/pages/inspection/detail/widgets/inspection_detail_sku_list.dart';
 import 'package:cloud/pages/widgets/circular_progress_indicator.dart';
+import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/services/inspection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -30,31 +33,143 @@ class InspectionDetailPage extends HookConsumerWidget {
     final currentTab = useState(0);
     final isRefreshing = useState(false);
     final searchController = useTextEditingController();
+    final scrollController = useScrollController();
     final colorScheme = Theme.of(context).colorScheme;
 
     const Color bgGrey = Color(0xFFF5F7FA);
     const Color textDark = Color(0xFF333333);
     useListenable(searchController);
+
+    final debounceTimerRef = useRef<Timer?>(null);
+
+    useEffect(() {
+      void onSearchChanged() {
+        debounceTimerRef.value?.cancel();
+        final keyword = searchController.text.trim();
+        debounceTimerRef.value = Timer(const Duration(milliseconds: 300), () {
+          detailNotifier.setSearchKeyword(keyword.isEmpty ? null : keyword);
+          detailNotifier.loadItems(id, init: true);
+        });
+      }
+
+      searchController.addListener(onSearchChanged);
+      return () {
+        searchController.removeListener(onSearchChanged);
+        debounceTimerRef.value?.cancel();
+      };
+    }, []);
+
     final isPageLoading = detailState.loading;
 
     final inspectionTaskDetail = detailState.inspection;
     final useNormalTemplate = detailState.useNormalTemplate;
     final reportPerSku = detailState.reportPerSku;
 
-    final allItems = inspectionTaskDetail?.items ?? [];
-    final int finishedCount = allItems
-        .where((item) => inspectionStatusLabelMap.containsKey(item.status))
+    final allItems = detailState.items;
+
+    final isYunDianInspection = inspectionTaskDetail?.departmentId == 275 ||
+        inspectionTaskDetail?.taskType == 3;
+
+    final batchStatusMap = useState<Map<int?, int>>({});
+    final batchRoundMap = useState<Map<int?, int>>({});
+
+    int getEffectiveStatus(InspectionItem item) {
+      if (isYunDianInspection) {
+        return batchStatusMap.value[item.id] ?? 0;
+      }
+      return item.status ?? 0;
+    }
+
+    final fetchedItemIdsRef = useRef(<int>{});
+
+    useEffect(() {
+      if (!isYunDianInspection) {
+        batchStatusMap.value = {};
+        batchRoundMap.value = {};
+        fetchedItemIdsRef.value = {};
+        return null;
+      }
+
+      bool cancelled = false;
+
+      Future<void> fetchBatches() async {
+        final items = allItems;
+        if (items.isEmpty) {
+          batchStatusMap.value = {};
+          batchRoundMap.value = {};
+          fetchedItemIdsRef.value = {};
+          return;
+        }
+
+        final allItemIds = items
+            .where((item) => item.id != null)
+            .map((item) => item.id!)
+            .toSet();
+
+        final newItemIds = allItemIds
+            .where((id) => !fetchedItemIdsRef.value.contains(id))
+            .toList();
+
+        if (newItemIds.isEmpty) return;
+
+        try {
+          final grouped =
+              await getInspectionItemsBatchesList(newItemIds, status: null);
+          if (cancelled) return;
+
+          fetchedItemIdsRef.value = allItemIds;
+
+          final newMap = Map<int?, int>.from(batchStatusMap.value);
+          final newRoundMap = Map<int?, int>.from(batchRoundMap.value);
+
+          for (final item in items) {
+            final batches = grouped[item.id];
+            if (batches != null && batches.isNotEmpty) {
+              newMap[item.id] = batches.first.status ?? 0;
+              newRoundMap[item.id] = batches.first.round ?? 0;
+            }
+          }
+
+          if (!cancelled) {
+            batchStatusMap.value = newMap;
+            batchRoundMap.value = newRoundMap;
+          }
+        } catch (_) {}
+      }
+
+      fetchBatches();
+      return () {
+        cancelled = true;
+      };
+    }, [inspectionTaskDetail, isYunDianInspection, allItems]);
+
+    // 新统计维度：合格 / 不合格(微瑕+不合格) / 返工 / 未验货
+    final int passedCount =
+        allItems.where((item) => getEffectiveStatus(item) == 1).length;
+    final int failedCount = allItems
+        .where((item) =>
+            getEffectiveStatus(item) == 2 || getEffectiveStatus(item) == 3)
         .length;
-    final int unfinishedCount = allItems
-        .where((item) => !inspectionStatusLabelMap.containsKey(item.status))
+    final int reworkCount =
+        allItems.where((item) => getEffectiveStatus(item) == 4).length;
+    final int pendingCount = allItems
+        .where((item) => getEffectiveStatus(item) == 0 || item.status == null)
         .length;
+
+    final int finishedCount = passedCount + failedCount + reworkCount;
+
     final filteredItems = allItems.where((item) {
+      final effectiveStatus = getEffectiveStatus(item);
       // Tab 过滤
       bool tabMatch = true;
       if (currentTab.value == 1) {
-        tabMatch = inspectionStatusLabelMap.containsKey(item.status); // 已验货
+        tabMatch = effectiveStatus == 1; // 合格
       } else if (currentTab.value == 2) {
-        tabMatch = !inspectionStatusLabelMap.containsKey(item.status); // 未验货
+        tabMatch = effectiveStatus == 2 || effectiveStatus == 3; // 不合格
+      } else if (currentTab.value == 3) {
+        tabMatch = effectiveStatus == 4; // 返工
+      } else if (currentTab.value == 4) {
+        tabMatch = effectiveStatus == 0 || item.status == null; // 未验货
       }
 
       // 搜索过滤
@@ -79,17 +194,19 @@ class InspectionDetailPage extends HookConsumerWidget {
     }, [remarkController]);
 
     // 进度计算
-    final int total = allItems.length;
-    final int finished = allItems
-        .where((item) => inspectionStatusLabelMap.containsKey(item.status))
-        .length;
+    final int total =
+        detailState.itemsTotal > 0 ? detailState.itemsTotal : allItems.length;
+    final int finished = finishedCount;
 
     Future<void> refreshData({bool isSilent = false}) async {
       if (!isSilent) {
         isRefreshing.value = true;
       }
       try {
-        await detailNotifier.load(id, silent: isSilent);
+        if (detailState.inspection == null) {
+          await detailNotifier.load(id, silent: isSilent);
+        }
+        await detailNotifier.loadItems(id, init: true);
       } finally {
         if (!isSilent) {
           isRefreshing.value = false;
@@ -104,12 +221,27 @@ class InspectionDetailPage extends HookConsumerWidget {
       return null;
     }, [id]);
 
+    useEffect(() {
+      void listener() {
+        if (!scrollController.hasClients) return;
+        final maxScroll = scrollController.position.maxScrollExtent;
+        final currentScroll = scrollController.position.pixels;
+        if (maxScroll - currentScroll < 100 &&
+            !detailState.itemsLoading &&
+            detailState.itemsHasMore) {
+          detailNotifier.loadItems(id, init: false);
+        }
+      }
+
+      scrollController.addListener(listener);
+      return () => scrollController.removeListener(listener);
+    }, [scrollController, detailState.itemsHasMore, detailState.itemsLoading]);
+
     Future<void> handleSubmitDynamic(int targetStatus) async {
       if (isSubmitting.value) return;
 
-      if ((targetStatus == 2 || targetStatus == 3) &&
-          remarkController.text.trim().isEmpty) {
-        EasyLoading.showInfo('微瑕或不合格必须填写验货备注');
+      if (targetStatus == 3 && remarkController.text.trim().isEmpty) {
+        EasyLoading.showInfo('不合格必须填写验货备注');
         remarkHasError.value = true;
         return;
       }
@@ -131,6 +263,33 @@ class InspectionDetailPage extends HookConsumerWidget {
 
         final res = await submitInspectionTask(id, submitData);
         if (res == true) {
+          // 验货不合格后，发送通知到对应业务
+          if (targetStatus == 3) {
+            if (isYunDianInspection) {
+              final itemIds = allItems
+                  .where((item) => item.id != null)
+                  .map((item) => item.id!)
+                  .toList();
+              try {
+                final grouped = await getInspectionItemsBatchesList(itemIds);
+                for (final item in allItems) {
+                  if (item.id == null) continue;
+                  final batches = grouped[item.id];
+                  if (batches != null && batches.isNotEmpty) {
+                    notifyInspectionItemBatchRejected(
+                            item.id!, batches.first.id!)
+                        .catchError((_) {});
+                  }
+                }
+              } catch (_) {}
+            } else {
+              for (final item in allItems) {
+                if (item.id != null) {
+                  notifyInspectionItemRejected(item.id!).catchError((_) {});
+                }
+              }
+            }
+          }
           EasyLoading.showSuccess('验货完成');
           if (context.mounted) Navigator.pop(context);
         }
@@ -224,6 +383,7 @@ class InspectionDetailPage extends HookConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: SingleChildScrollView(
+                  controller: scrollController,
                   child: Column(
                     children: [
                       if (!useNormalTemplate) ...[
@@ -263,7 +423,7 @@ class InspectionDetailPage extends HookConsumerWidget {
                           hasError: remarkHasError.value,
                         ),
                         const SizedBox(height: 12),
-                        // 验货底部提交按钮 ：合格 微瑕 不合格
+                        // 验货底部提交按钮 ：不合格 合格
                         InspectionBottomButtons(
                           onPressed: handleSubmitDynamic,
                           isSubmitting: isSubmitting.value,
@@ -276,12 +436,21 @@ class InspectionDetailPage extends HookConsumerWidget {
                           inspectionId: id,
                           filteredItems: filteredItems,
                           totalCount: allItems.length,
-                          finishedCount: finishedCount,
-                          unfinishedCount: unfinishedCount,
+                          passedCount: passedCount,
+                          failedCount: failedCount,
+                          reworkCount: reworkCount,
+                          pendingCount: pendingCount,
                           searchController: searchController,
                           currentTab: currentTab,
                           useNormalTemplate: useNormalTemplate,
                           onRefresh: () => refreshData(isSilent: true),
+                          batchStatusMap: batchStatusMap.value,
+                          batchRoundMap: batchRoundMap.value,
+                          isYunDianInspection: isYunDianInspection,
+                          itemsHasMore: detailState.itemsHasMore,
+                          itemsLoading: detailState.itemsLoading,
+                          onLoadMore: () =>
+                              detailNotifier.loadItems(id, init: false),
                         ),
                       ]
                     ],

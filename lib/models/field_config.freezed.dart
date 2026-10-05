@@ -23,6 +23,7 @@ mixin _$FieldConfig {
   String get label => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   bool get isVisible => throw _privateConstructorUsedError;
+  int get maxCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -36,7 +37,7 @@ abstract class $FieldConfigCopyWith<$Res> {
           FieldConfig value, $Res Function(FieldConfig) then) =
       _$FieldConfigCopyWithImpl<$Res, FieldConfig>;
   @useResult
-  $Res call({String label, String name, bool isVisible});
+  $Res call({String label, String name, bool isVisible, int maxCount});
 }
 
 /// @nodoc
@@ -55,6 +56,7 @@ class _$FieldConfigCopyWithImpl<$Res, $Val extends FieldConfig>
     Object? label = null,
     Object? name = null,
     Object? isVisible = null,
+    Object? maxCount = null,
   }) {
     return _then(_value.copyWith(
       label: null == label
@@ -69,6 +71,10 @@ class _$FieldConfigCopyWithImpl<$Res, $Val extends FieldConfig>
           ? _value.isVisible
           : isVisible // ignore: cast_nullable_to_non_nullable
               as bool,
+      maxCount: null == maxCount
+          ? _value.maxCount
+          : maxCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -81,7 +87,7 @@ abstract class _$$FieldConfigImplCopyWith<$Res>
       __$$FieldConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String label, String name, bool isVisible});
+  $Res call({String label, String name, bool isVisible, int maxCount});
 }
 
 /// @nodoc
@@ -98,6 +104,7 @@ class __$$FieldConfigImplCopyWithImpl<$Res>
     Object? label = null,
     Object? name = null,
     Object? isVisible = null,
+    Object? maxCount = null,
   }) {
     return _then(_$FieldConfigImpl(
       label: null == label
@@ -112,6 +119,10 @@ class __$$FieldConfigImplCopyWithImpl<$Res>
           ? _value.isVisible
           : isVisible // ignore: cast_nullable_to_non_nullable
               as bool,
+      maxCount: null == maxCount
+          ? _value.maxCount
+          : maxCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -120,7 +131,10 @@ class __$$FieldConfigImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$FieldConfigImpl implements _FieldConfig {
   const _$FieldConfigImpl(
-      {required this.label, required this.name, this.isVisible = true});
+      {required this.label,
+      required this.name,
+      this.isVisible = true,
+      this.maxCount = 1});
 
   factory _$FieldConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$FieldConfigImplFromJson(json);
@@ -132,10 +146,13 @@ class _$FieldConfigImpl implements _FieldConfig {
   @override
   @JsonKey()
   final bool isVisible;
+  @override
+  @JsonKey()
+  final int maxCount;
 
   @override
   String toString() {
-    return 'FieldConfig(label: $label, name: $name, isVisible: $isVisible)';
+    return 'FieldConfig(label: $label, name: $name, isVisible: $isVisible, maxCount: $maxCount)';
   }
 
   @override
@@ -146,12 +163,15 @@ class _$FieldConfigImpl implements _FieldConfig {
             (identical(other.label, label) || other.label == label) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.isVisible, isVisible) ||
-                other.isVisible == isVisible));
+                other.isVisible == isVisible) &&
+            (identical(other.maxCount, maxCount) ||
+                other.maxCount == maxCount));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, label, name, isVisible);
+  int get hashCode =>
+      Object.hash(runtimeType, label, name, isVisible, maxCount);
 
   @JsonKey(ignore: true)
   @override
@@ -171,7 +191,8 @@ abstract class _FieldConfig implements FieldConfig {
   const factory _FieldConfig(
       {required final String label,
       required final String name,
-      final bool isVisible}) = _$FieldConfigImpl;
+      final bool isVisible,
+      final int maxCount}) = _$FieldConfigImpl;
 
   factory _FieldConfig.fromJson(Map<String, dynamic> json) =
       _$FieldConfigImpl.fromJson;
@@ -182,6 +203,8 @@ abstract class _FieldConfig implements FieldConfig {
   String get name;
   @override
   bool get isVisible;
+  @override
+  int get maxCount;
   @override
   @JsonKey(ignore: true)
   _$$FieldConfigImplCopyWith<_$FieldConfigImpl> get copyWith =>

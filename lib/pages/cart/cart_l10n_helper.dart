@@ -22,6 +22,8 @@ String cartTypeLocalizedTitle(BuildContext context, CartType type) {
       return l10n.cartTypeQuotation;
     case CartType.deliveryOut:
       return l10n.cartTypeDeliveryOut;
+    case CartType.stockOut:
+      return l10n.cartTypeStockOut;
   }
 }
 
@@ -48,6 +50,28 @@ String stockInTypeLocalizedTitle(BuildContext context, String type) {
       return l10n.cartStockInInventory;
     default:
       return l10n.cartStockInTypeNotSet;
+  }
+}
+
+String stockOutTypeLocalizedTitle(BuildContext context, String type) {
+  final l10n = context.l10n;
+  switch (type) {
+    case 'fba':
+      return l10n.cartStockOutFba;
+    case 'return':
+      return l10n.cartStockOutReturn;
+    case 'destroy':
+      return l10n.cartStockOutDestroy;
+    case 'other':
+      return l10n.cartStockOutOther;
+    case 'transfer_out':
+      return l10n.cartStockOutTransfer;
+    case 'borrow_out':
+      return l10n.cartStockOutBorrow;
+    case 'inventory_out':
+      return l10n.cartStockOutInventory;
+    default:
+      return l10n.cartStockOutTypeNotSet;
   }
 }
 
@@ -89,5 +113,7 @@ String cartOperateLabel(BuildContext context, CartType? type) {
       return l10n.cartDeliveryOut;
     case CartType.stockIn:
       return l10n.cartStockIn;
+    case CartType.stockOut:
+      return l10n.cartStockOut;
   }
 }

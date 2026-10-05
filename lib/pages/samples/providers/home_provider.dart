@@ -193,7 +193,7 @@ class Home extends _$Home {
         if (respPrivate.data.isEmpty) {
           independentWarehouse = [
             const Warehouse(
-              name: '独立(部门)样品间', 
+              name: '独立(部门)样品间',
               // name_en: 'INDEPENDENT (DEPARTMENT) SHOWROOM',
               image: [
                 WarehouseImage(

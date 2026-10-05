@@ -26,6 +26,11 @@ mixin _$WarehouseReceiptItemEntry {
   int? get itemId => throw _privateConstructorUsedError;
   @JsonKey(name: 'location_id')
   int? get locationId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'mixed_carton_id')
+  int? get mixedCartonId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'mixed_carton')
+  WarehouseReceiptMixedCarton? get mixedCarton =>
+      throw _privateConstructorUsedError;
   @_LocationConverter()
   @JsonKey(name: 'location')
   WarehouseLocation? get location => throw _privateConstructorUsedError;
@@ -64,6 +69,8 @@ abstract class $WarehouseReceiptItemEntryCopyWith<$Res> {
       {int? id,
       @JsonKey(name: 'item_id') int? itemId,
       @JsonKey(name: 'location_id') int? locationId,
+      @JsonKey(name: 'mixed_carton_id') int? mixedCartonId,
+      @JsonKey(name: 'mixed_carton') WarehouseReceiptMixedCarton? mixedCarton,
       @_LocationConverter()
       @JsonKey(name: 'location')
       WarehouseLocation? location,
@@ -77,6 +84,7 @@ abstract class $WarehouseReceiptItemEntryCopyWith<$Res> {
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 
+  $WarehouseReceiptMixedCartonCopyWith<$Res>? get mixedCarton;
   $WarehouseLocationCopyWith<$Res>? get location;
 }
 
@@ -97,6 +105,8 @@ class _$WarehouseReceiptItemEntryCopyWithImpl<$Res,
     Object? id = freezed,
     Object? itemId = freezed,
     Object? locationId = freezed,
+    Object? mixedCartonId = freezed,
+    Object? mixedCarton = freezed,
     Object? location = freezed,
     Object? actualCartonQty = freezed,
     Object? actualOuterCapacity = freezed,
@@ -121,6 +131,14 @@ class _$WarehouseReceiptItemEntryCopyWithImpl<$Res,
           ? _value.locationId
           : locationId // ignore: cast_nullable_to_non_nullable
               as int?,
+      mixedCartonId: freezed == mixedCartonId
+          ? _value.mixedCartonId
+          : mixedCartonId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      mixedCarton: freezed == mixedCarton
+          ? _value.mixedCarton
+          : mixedCarton // ignore: cast_nullable_to_non_nullable
+              as WarehouseReceiptMixedCarton?,
       location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
@@ -166,6 +184,19 @@ class _$WarehouseReceiptItemEntryCopyWithImpl<$Res,
 
   @override
   @pragma('vm:prefer-inline')
+  $WarehouseReceiptMixedCartonCopyWith<$Res>? get mixedCarton {
+    if (_value.mixedCarton == null) {
+      return null;
+    }
+
+    return $WarehouseReceiptMixedCartonCopyWith<$Res>(_value.mixedCarton!,
+        (value) {
+      return _then(_value.copyWith(mixedCarton: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
   $WarehouseLocationCopyWith<$Res>? get location {
     if (_value.location == null) {
       return null;
@@ -190,6 +221,8 @@ abstract class _$$WarehouseReceiptItemEntryImplCopyWith<$Res>
       {int? id,
       @JsonKey(name: 'item_id') int? itemId,
       @JsonKey(name: 'location_id') int? locationId,
+      @JsonKey(name: 'mixed_carton_id') int? mixedCartonId,
+      @JsonKey(name: 'mixed_carton') WarehouseReceiptMixedCarton? mixedCarton,
       @_LocationConverter()
       @JsonKey(name: 'location')
       WarehouseLocation? location,
@@ -203,6 +236,8 @@ abstract class _$$WarehouseReceiptItemEntryImplCopyWith<$Res>
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 
+  @override
+  $WarehouseReceiptMixedCartonCopyWith<$Res>? get mixedCarton;
   @override
   $WarehouseLocationCopyWith<$Res>? get location;
 }
@@ -223,6 +258,8 @@ class __$$WarehouseReceiptItemEntryImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? itemId = freezed,
     Object? locationId = freezed,
+    Object? mixedCartonId = freezed,
+    Object? mixedCarton = freezed,
     Object? location = freezed,
     Object? actualCartonQty = freezed,
     Object? actualOuterCapacity = freezed,
@@ -247,6 +284,14 @@ class __$$WarehouseReceiptItemEntryImplCopyWithImpl<$Res>
           ? _value.locationId
           : locationId // ignore: cast_nullable_to_non_nullable
               as int?,
+      mixedCartonId: freezed == mixedCartonId
+          ? _value.mixedCartonId
+          : mixedCartonId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      mixedCarton: freezed == mixedCarton
+          ? _value.mixedCarton
+          : mixedCarton // ignore: cast_nullable_to_non_nullable
+              as WarehouseReceiptMixedCarton?,
       location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
@@ -298,6 +343,8 @@ class _$WarehouseReceiptItemEntryImpl implements _WarehouseReceiptItemEntry {
       {this.id,
       @JsonKey(name: 'item_id') this.itemId,
       @JsonKey(name: 'location_id') this.locationId,
+      @JsonKey(name: 'mixed_carton_id') this.mixedCartonId,
+      @JsonKey(name: 'mixed_carton') this.mixedCarton,
       @_LocationConverter() @JsonKey(name: 'location') this.location,
       @JsonKey(name: 'actual_carton_qty') this.actualCartonQty,
       @JsonKey(name: 'actual_outer_capacity') this.actualOuterCapacity,
@@ -320,6 +367,12 @@ class _$WarehouseReceiptItemEntryImpl implements _WarehouseReceiptItemEntry {
   @override
   @JsonKey(name: 'location_id')
   final int? locationId;
+  @override
+  @JsonKey(name: 'mixed_carton_id')
+  final int? mixedCartonId;
+  @override
+  @JsonKey(name: 'mixed_carton')
+  final WarehouseReceiptMixedCarton? mixedCarton;
   @override
   @_LocationConverter()
   @JsonKey(name: 'location')
@@ -354,7 +407,7 @@ class _$WarehouseReceiptItemEntryImpl implements _WarehouseReceiptItemEntry {
 
   @override
   String toString() {
-    return 'WarehouseReceiptItemEntry(id: $id, itemId: $itemId, locationId: $locationId, location: $location, actualCartonQty: $actualCartonQty, actualOuterCapacity: $actualOuterCapacity, actualOuterLength: $actualOuterLength, actualOuterWidth: $actualOuterWidth, actualOuterHeight: $actualOuterHeight, actualOuterGrossWeight: $actualOuterGrossWeight, enteredAt: $enteredAt, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'WarehouseReceiptItemEntry(id: $id, itemId: $itemId, locationId: $locationId, mixedCartonId: $mixedCartonId, mixedCarton: $mixedCarton, location: $location, actualCartonQty: $actualCartonQty, actualOuterCapacity: $actualOuterCapacity, actualOuterLength: $actualOuterLength, actualOuterWidth: $actualOuterWidth, actualOuterHeight: $actualOuterHeight, actualOuterGrossWeight: $actualOuterGrossWeight, enteredAt: $enteredAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -366,6 +419,10 @@ class _$WarehouseReceiptItemEntryImpl implements _WarehouseReceiptItemEntry {
             (identical(other.itemId, itemId) || other.itemId == itemId) &&
             (identical(other.locationId, locationId) ||
                 other.locationId == locationId) &&
+            (identical(other.mixedCartonId, mixedCartonId) ||
+                other.mixedCartonId == mixedCartonId) &&
+            (identical(other.mixedCarton, mixedCarton) ||
+                other.mixedCarton == mixedCarton) &&
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.actualCartonQty, actualCartonQty) ||
@@ -395,6 +452,8 @@ class _$WarehouseReceiptItemEntryImpl implements _WarehouseReceiptItemEntry {
       id,
       itemId,
       locationId,
+      mixedCartonId,
+      mixedCarton,
       location,
       actualCartonQty,
       actualOuterCapacity,
@@ -426,6 +485,9 @@ abstract class _WarehouseReceiptItemEntry implements WarehouseReceiptItemEntry {
       {final int? id,
       @JsonKey(name: 'item_id') final int? itemId,
       @JsonKey(name: 'location_id') final int? locationId,
+      @JsonKey(name: 'mixed_carton_id') final int? mixedCartonId,
+      @JsonKey(name: 'mixed_carton')
+      final WarehouseReceiptMixedCarton? mixedCarton,
       @_LocationConverter()
       @JsonKey(name: 'location')
       final WarehouseLocation? location,
@@ -452,6 +514,12 @@ abstract class _WarehouseReceiptItemEntry implements WarehouseReceiptItemEntry {
   @override
   @JsonKey(name: 'location_id')
   int? get locationId;
+  @override
+  @JsonKey(name: 'mixed_carton_id')
+  int? get mixedCartonId;
+  @override
+  @JsonKey(name: 'mixed_carton')
+  WarehouseReceiptMixedCarton? get mixedCarton;
   @override
   @_LocationConverter()
   @JsonKey(name: 'location')

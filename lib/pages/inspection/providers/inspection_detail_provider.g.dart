@@ -6,7 +6,7 @@ part of 'inspection_detail_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inspectionDetailHash() => r'dbf6e695b3b58c3d4b027cb169d7094fcae29e82';
+String _$inspectionDetailHash() => r'092f3dffc468a40d4905a30222ac6afa241619d2';
 
 /// See also [InspectionDetail].
 @ProviderFor(InspectionDetail)

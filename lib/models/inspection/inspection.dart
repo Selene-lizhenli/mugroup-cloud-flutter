@@ -37,6 +37,8 @@ class Inspection with _$Inspection {
     @JsonKey(name: 'inspection_dynamic_template')
     InspectionDynamicTemplate? inspectionDynamicTemplate,
     @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'department_id') int? departmentId,
+    @JsonKey(name: 'task_type') int? taskType,
   ) = _Inspection;
 
   factory Inspection.fromJson(Map<String, dynamic> json) =>

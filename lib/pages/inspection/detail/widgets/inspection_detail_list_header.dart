@@ -54,8 +54,10 @@ class InspectionDetailListHeader extends HookWidget {
     super.key,
     required this.filteredCount,
     required this.totalCount,
-    required this.finishedCount,
-    required this.unfinishedCount,
+    required this.passedCount,
+    required this.failedCount,
+    required this.reworkCount,
+    required this.pendingCount,
     required this.searchController,
     required this.currentTab,
     required this.onAddTap,
@@ -63,8 +65,10 @@ class InspectionDetailListHeader extends HookWidget {
 
   final int filteredCount;
   final int totalCount;
-  final int finishedCount;
-  final int unfinishedCount;
+  final int passedCount;
+  final int failedCount;
+  final int reworkCount;
+  final int pendingCount;
   final TextEditingController searchController;
   final ValueNotifier<int> currentTab;
   final VoidCallback onAddTap;
@@ -215,7 +219,6 @@ class _KeyboardSearchOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    const height = _kSearchFieldHeight * 2;
     return Stack(
       children: [
         Positioned.fill(
@@ -248,12 +251,11 @@ class _KeyboardSearchOverlay extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: SizedBox(
-                  height: height,
+                  height: _kSearchFieldHeight,
                   width: double.infinity,
                   child: TextField(
                     controller: controller,
                     focusNode: focusNode,
-                    maxLines: 2,
                     textInputAction: TextInputAction.search,
                     textAlignVertical: TextAlignVertical.center,
                     style: const TextStyle(fontSize: 12, height: 1.2),
@@ -286,7 +288,7 @@ class _KeyboardSearchOverlay extends StatelessWidget {
                       suffixIconConstraints: const BoxConstraints(
                           minWidth: 30, minHeight: _kSearchFieldHeight),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
+                          horizontal: 12, vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,

@@ -21,3 +21,13 @@ const stockInOptionTypes = [
   'borrow_in',
   'inventory_in',
 ];
+
+const stockOutOptionTypes = [
+  'fba',
+  'return',
+  'destroy',
+  'other',
+  'transfer_out',
+  'borrow_out',
+  'inventory_out',
+];

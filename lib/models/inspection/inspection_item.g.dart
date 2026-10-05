@@ -24,6 +24,9 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
           .toList(),
       (json['task_id'] as num?)?.toInt(),
       (json['user_id'] as num?)?.toInt(),
+      json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
       (json['sample_id'] as num?)?.toInt(),
       json['item_no'] as String?,
       (json['unit_per_ctn'] as num?)?.toInt(),
@@ -33,6 +36,11 @@ _$InspectionItemImpl _$$InspectionItemImplFromJson(Map<String, dynamic> json) =>
       _inspectionDynamicTemplateJsonFromJson(
           json['inspection_dynamic_template_json']),
       _rawMapFromJson(json['raw']),
+      _roundsFromJson(json['rounds']),
+      _photoCheckFieldsFromJson(json['photo_check_fields']),
+      (json['batches'] as List<dynamic>?)
+          ?.map((e) => InspectionItemBatch.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$InspectionItemImplToJson(
@@ -52,6 +60,7 @@ Map<String, dynamic> _$$InspectionItemImplToJson(
       'media': instance.media,
       'task_id': instance.taskId,
       'user_id': instance.userId,
+      'user': instance.user,
       'sample_id': instance.sampleId,
       'item_no': instance.itemNo,
       'unit_per_ctn': instance.unitPerCtn,
@@ -61,4 +70,7 @@ Map<String, dynamic> _$$InspectionItemImplToJson(
       'inspection_dynamic_template_json': _inspectionDynamicTemplateJsonToJson(
           instance.inspectionDynamicTemplateJson),
       'raw': _rawMapToJson(instance.raw),
+      'rounds': instance.rounds,
+      'photo_check_fields': instance.photoCheckFields,
+      'batches': instance.batches,
     };

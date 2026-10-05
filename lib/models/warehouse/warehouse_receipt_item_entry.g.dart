@@ -12,6 +12,11 @@ _$WarehouseReceiptItemEntryImpl _$$WarehouseReceiptItemEntryImplFromJson(
       id: (json['id'] as num?)?.toInt(),
       itemId: (json['item_id'] as num?)?.toInt(),
       locationId: (json['location_id'] as num?)?.toInt(),
+      mixedCartonId: (json['mixed_carton_id'] as num?)?.toInt(),
+      mixedCarton: json['mixed_carton'] == null
+          ? null
+          : WarehouseReceiptMixedCarton.fromJson(
+              json['mixed_carton'] as Map<String, dynamic>),
       location: const _LocationConverter().fromJson(json['location']),
       actualCartonQty: json['actual_carton_qty'] as num?,
       actualOuterCapacity: (json['actual_outer_capacity'] as num?)?.toInt(),
@@ -36,6 +41,8 @@ Map<String, dynamic> _$$WarehouseReceiptItemEntryImplToJson(
       'id': instance.id,
       'item_id': instance.itemId,
       'location_id': instance.locationId,
+      'mixed_carton_id': instance.mixedCartonId,
+      'mixed_carton': instance.mixedCarton,
       'location': const _LocationConverter().toJson(instance.location),
       'actual_carton_qty': instance.actualCartonQty,
       'actual_outer_capacity': instance.actualOuterCapacity,

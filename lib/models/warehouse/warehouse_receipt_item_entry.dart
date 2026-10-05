@@ -1,4 +1,5 @@
 import 'package:cloud/models/warehouse/warehouse_location.dart';
+import 'package:cloud/models/warehouse/warehouse_receipt_mixed_carton.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'warehouse_receipt_item_entry.freezed.dart';
@@ -23,6 +24,8 @@ abstract class WarehouseReceiptItemEntry with _$WarehouseReceiptItemEntry {
     int? id,
     @JsonKey(name: 'item_id') int? itemId,
     @JsonKey(name: 'location_id') int? locationId,
+    @JsonKey(name: 'mixed_carton_id') int? mixedCartonId,
+    @JsonKey(name: 'mixed_carton') WarehouseReceiptMixedCarton? mixedCarton,
     @_LocationConverter()
     @JsonKey(name: 'location')
     WarehouseLocation? location,

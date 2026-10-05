@@ -153,8 +153,10 @@ class WarehouseReceiptListPage extends HookConsumerWidget {
                         child: TextField(
                           controller: searchController,
                           textInputAction: TextInputAction.search,
+                          onTapOutside: (_) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
                           decoration: InputDecoration(
-                            hintText: '搜索订单号 / 供应商',
+                            hintText: '搜索订单号 / 供应商 / 产品编号 / 客户货号',
                             prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -340,21 +342,29 @@ class _ReceiptCard extends HookWidget {
                   ],
                 ],
                 const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Wrap(
-                    alignment: WrapAlignment.end,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      OutlinedButton.icon(
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
                         onPressed: receipt.id == null || isPrinting.value
                             ? null
                             : selectItemsAndPrint,
                         icon: const Icon(Icons.checklist, size: 18),
-                        label: const Text('选择货号打印'),
+                        label: const Text(
+                          '选择货号打印',
+                          maxLines: 1,
+                        ),
                       ),
-                      FilledButton.icon(
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
                         onPressed: receipt.id == null || isPrinting.value
                             ? null
                             : printLabels,
@@ -365,10 +375,13 @@ class _ReceiptCard extends HookWidget {
                                     CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.print_outlined, size: 18),
-                        label: const Text('整单打印标签'),
+                        label: const Text(
+                          '整单打印标签',
+                          maxLines: 1,
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

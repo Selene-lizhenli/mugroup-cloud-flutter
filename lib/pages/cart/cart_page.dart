@@ -40,6 +40,7 @@ class CartPage extends HookConsumerWidget {
 
     final items = state.items;
     final carts = state.carts;
+    logger.d("carts: $carts");
     final cartType = state.type;
     final warehouse = state.warehouse;
     final borrow = state.borrow;
@@ -82,6 +83,16 @@ class CartPage extends HookConsumerWidget {
         return stockInTypeLocalizedTitle(context, stockInOption);
       }
       return l10n.cartStockInTypeNotSet;
+    }
+
+    String getStockOutOptionText(String? stockOutOption) {
+      if (stockOutOption == null) {
+        return l10n.cartSelectStockOutType;
+      }
+      if (stockOutOptionTypes.contains(stockOutOption)) {
+        return stockOutTypeLocalizedTitle(context, stockOutOption);
+      }
+      return l10n.cartStockOutTypeNotSet;
     }
 
     final header = useMemoized(() {
@@ -166,7 +177,7 @@ class CartPage extends HookConsumerWidget {
         );
       }
 
-      if (cartType == CartType.stockIn) {
+      if (cartType == CartType.stockIn || cartType == CartType.stockOut) {
         return Column(
           children: [
             GestureDetector(
@@ -729,7 +740,6 @@ class CartPage extends HookConsumerWidget {
           "tax_rate_mapping": quotationInfo?.taxRateMapping,
           "remark": quotationRemarkController.text,
         };
-
         final res = await storeShowroomQuotation(data);
         final quotationId = res?.id;
 
@@ -1563,6 +1573,356 @@ class CartPage extends HookConsumerWidget {
       );
     }
 
+    void stockOutDialog(BuildContext pageContext) {
+      final remarkController = TextEditingController();
+      String? stockOutOption;
+      Warehouse? selectedWarehouse = warehouse;
+
+      showModalBottomSheet<bool>(
+        context: pageContext,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (sheetContext) {
+          return StatefulBuilder(
+            builder: (context, setSheetState) {
+              final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(bottom: bottomInset),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dialogBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                            color: colorScheme.primary,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.cartConfirmAction(l10n.cartStockOut),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(sheetContext).pop();
+                                },
+                                icon: Icon(
+                                  Icons.close,
+                                  color: colorScheme.onPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      l10n.cartStockOutWarehouse,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final next = await pageContext.router
+                                            .push<Warehouse>(
+                                          const SelectWmsWarehouseRoute(),
+                                        );
+                                        if (next == null) return;
+                                        selectedWarehouse = next;
+                                        cart.warehouse = next;
+                                        setSheetState(() {});
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: colorScheme.outline
+                                              .withOpacity(0.135),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                selectedWarehouse == null
+                                                    ? l10n.cartSelectWarehouse
+                                                    : selectedWarehouse!.name ??
+                                                        l10n.cartWarehouseNameNotSet,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: selectedWarehouse ==
+                                                          null
+                                                      ? colorScheme.onSurface
+                                                          .withOpacity(0.5)
+                                                      : colorScheme.onSurface,
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: colorScheme.onSurface
+                                                  .withOpacity(0.5),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      l10n.cartStockOutType,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showFlanActionSheet(
+                                          context,
+                                          description:
+                                              l10n.cartSelectStockOutType,
+                                          cancelText: l10n.quotationThinkAgain,
+                                          actions: stockOutOptionTypes
+                                              .map(
+                                                (type) => FlanActionSheetAction(
+                                                  name:
+                                                      stockOutTypeLocalizedTitle(
+                                                    context,
+                                                    type,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                          closeOnClickAction: true,
+                                          onSelect: (action, index) {
+                                            setSheetState(() {
+                                              stockOutOption =
+                                                  stockOutOptionTypes[index];
+                                            });
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: colorScheme.outline
+                                              .withOpacity(0.135),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                getStockOutOptionText(
+                                                  stockOutOption,
+                                                ),
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: stockOutOption == null
+                                                      ? colorScheme.onSurface
+                                                          .withOpacity(0.5)
+                                                      : colorScheme.onSurface,
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: colorScheme.onSurface
+                                                  .withOpacity(0.5),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: Text(
+                                        l10n.cartRemark,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: colorScheme.outline
+                                            .withOpacity(0.135),
+                                      ),
+                                      child: TextField(
+                                        controller: remarkController,
+                                        minLines: 3,
+                                        maxLines: null,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: l10n.cartStockOutRemarkHint,
+                                          hintStyle: TextStyle(
+                                            color: colorScheme.onSurface
+                                                .withOpacity(0.5),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (selectedWarehouse == null) {
+                                      EasyLoading.showInfo(
+                                        l10n.cartSelectWarehouseFirst,
+                                      );
+                                      return;
+                                    }
+                                    if (stockOutOption == null) {
+                                      EasyLoading.showError(
+                                        l10n.cartSelectStockOutType,
+                                      );
+                                      return;
+                                    }
+
+                                    final productData = items
+                                        .map(
+                                          (item) => {
+                                            'model_type':
+                                                "App\\Models\\Showroom\\ShowroomSample",
+                                            "model_id": item.sample.id,
+                                            "name": item.sample.name,
+                                            "product_no": item.sample.productNo,
+                                            "inout_qty": item.count,
+                                          },
+                                        )
+                                        .toList();
+                                    final data = {
+                                      "products": productData,
+                                      "type": "out",
+                                      'operation_type': stockOutOption,
+                                      'warehouse_id': selectedWarehouse?.id,
+                                      'remark': remarkController.text.trim(),
+                                    };
+
+                                    try {
+                                      EasyLoading.show(status: l10n.loading);
+                                      await storeWmsStockInOut(data);
+                                      EasyLoading.showSuccess(
+                                        l10n.cartStockOutSuccess,
+                                      );
+                                      if (sheetContext.mounted) {
+                                        Navigator.of(sheetContext).pop(true);
+                                      }
+                                    } catch (e) {
+                                      EasyLoading.dismiss();
+                                      EasyLoading.showError('出库失败，请联系技术人员');  
+                                      // 业务错误文案已由 api 拦截器弹出，这里避免再盖一层 Dio 原文
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: colorScheme.primary,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 28,
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    l10n.submit,
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ).then((success) {
+        // 等抽屉完全关闭后再 dispose，避免关闭动画中 TextField 仍在使用
+        remarkController.dispose();
+        if (success == true) {
+          cart.clear();
+        }
+      });
+    }
+
     void onPressed() async {
       // 借样
       if (cartType == CartType.borrowOut) {
@@ -1649,6 +2009,13 @@ class CartPage extends HookConsumerWidget {
         }
         if (context.mounted) {
           stockInDialog(context);
+        }
+      }
+
+      // 出库
+      if (cartType == CartType.stockOut) {
+        if (context.mounted) {
+          stockOutDialog(context);
         }
       }
     }

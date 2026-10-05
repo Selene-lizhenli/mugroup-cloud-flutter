@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'package:cloud/models/field_config.dart';
+import 'package:cloud/models/inspection/inspection_item_batch.dart';
+import 'package:cloud/models/inspection/inspection_round_snapshot.dart';
 import 'package:cloud/models/media.dart';
+import 'package:cloud/models/user.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'inspection_item.freezed.dart';
@@ -22,6 +26,7 @@ class InspectionItem with _$InspectionItem {
     List<Media>? media,
     @JsonKey(name: 'task_id') int? taskId,
     @JsonKey(name: 'user_id') int? userId,
+    @JsonKey(name: 'user') User? user,
     @JsonKey(name: 'sample_id') int? sampleId,
     @JsonKey(name: 'item_no') String? itemNo,
     @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
@@ -43,6 +48,11 @@ class InspectionItem with _$InspectionItem {
       toJson: _rawMapToJson,
     )
     Map<String, dynamic>? raw,
+    @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+    List<InspectionRoundSnapshot>? rounds,
+    @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+    List<FieldConfig>? photoCheckFields,
+    @JsonKey(name: 'batches') List<InspectionItemBatch>? batches,
   ) = _InspectionItem;
 
   factory InspectionItem.fromJson(Map<String, dynamic> json) =>
@@ -98,3 +108,36 @@ Map<String, dynamic>? _rawMapFromJson(dynamic value) {
 }
 
 Map<String, dynamic>? _rawMapToJson(Map<String, dynamic>? value) => value;
+
+List<InspectionRoundSnapshot>? _roundsFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value
+        .map((e) => InspectionRoundSnapshot.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(trimmed);
+      if (decoded is List) {
+        return decoded
+            .map((e) =>
+                InspectionRoundSnapshot.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+    } catch (_) {}
+  }
+  return null;
+}
+
+List<FieldConfig>? _photoCheckFieldsFromJson(dynamic value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value
+        .map((e) => FieldConfig.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+  return null;
+}

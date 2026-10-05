@@ -14,7 +14,7 @@ import 'package:cloud/providers/core_provider.dart';
 import 'package:cloud/providers/scan_provider.dart';
 import 'package:cloud/services/sample.dart';
 import 'package:cloud/widgets/quotation_info_dialog.dart';
-import 'package:collection/collection.dart'; 
+import 'package:collection/collection.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -63,6 +63,9 @@ class Cart extends _$Cart {
         const CartSelect(CartType.borrowIn),
       if (user?.permissions?.contains('wms.stock_inventory.show') ?? false)
         const CartSelect(CartType.inout),
+      // 出库：与入库共用 wms.stock_inout.store 权限
+      if (user?.permissions?.contains('wms.stock_inout.store') ?? false)
+        const CartSelect(CartType.stockOut),
 
       // if (user?.permissions?.contains('showroom.stock_delivery.store') ?? false)
       //   const CartSelect(CartType.deliveryOut),
@@ -98,6 +101,8 @@ class Cart extends _$Cart {
             transfer: cacheState.transfer,
             type: cacheState.type,
             warehouse: cacheState.warehouse,
+            // 始终用当前权限算出的 carts，避免旧缓存缺 stockOut
+            carts: defaultCarts,
             quotationInfo: defaultQuotationInfo.copyWith(
               showPrice: cacheState.quotationInfo?.showPrice,
               curreny: cacheState.quotationInfo?.curreny,

@@ -46,6 +46,10 @@ mixin _$Inspection {
       throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'department_id')
+  int? get departmentId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'task_type')
+  int? get taskType => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -82,7 +86,9 @@ abstract class $InspectionCopyWith<$Res> {
       Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(name: 'inspection_dynamic_template')
       InspectionDynamicTemplate? inspectionDynamicTemplate,
-      @JsonKey(name: 'created_at') String? createdAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'department_id') int? departmentId,
+      @JsonKey(name: 'task_type') int? taskType});
 
   $UserCopyWith<$Res>? get user;
   $InspectionDynamicTemplateCopyWith<$Res>? get inspectionDynamicTemplate;
@@ -115,6 +121,8 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
     Object? inspectionDynamicTemplateJson = freezed,
     Object? inspectionDynamicTemplate = freezed,
     Object? createdAt = freezed,
+    Object? departmentId = freezed,
+    Object? taskType = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -173,6 +181,14 @@ class _$InspectionCopyWithImpl<$Res, $Val extends Inspection>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      departmentId: freezed == departmentId
+          ? _value.departmentId
+          : departmentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      taskType: freezed == taskType
+          ? _value.taskType
+          : taskType // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 
@@ -233,7 +249,9 @@ abstract class _$$InspectionImplCopyWith<$Res>
       Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(name: 'inspection_dynamic_template')
       InspectionDynamicTemplate? inspectionDynamicTemplate,
-      @JsonKey(name: 'created_at') String? createdAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'department_id') int? departmentId,
+      @JsonKey(name: 'task_type') int? taskType});
 
   @override
   $UserCopyWith<$Res>? get user;
@@ -266,6 +284,8 @@ class __$$InspectionImplCopyWithImpl<$Res>
     Object? inspectionDynamicTemplateJson = freezed,
     Object? inspectionDynamicTemplate = freezed,
     Object? createdAt = freezed,
+    Object? departmentId = freezed,
+    Object? taskType = freezed,
   }) {
     return _then(_$InspectionImpl(
       freezed == id
@@ -324,6 +344,14 @@ class __$$InspectionImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      freezed == departmentId
+          ? _value.departmentId
+          : departmentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      freezed == taskType
+          ? _value.taskType
+          : taskType // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -354,7 +382,9 @@ class _$InspectionImpl implements _Inspection {
       final Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(name: 'inspection_dynamic_template')
       this.inspectionDynamicTemplate,
-      @JsonKey(name: 'created_at') this.createdAt)
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'department_id') this.departmentId,
+      @JsonKey(name: 'task_type') this.taskType)
       : _collaborators = collaborators,
         _items = items,
         _media = media,
@@ -434,10 +464,16 @@ class _$InspectionImpl implements _Inspection {
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
+  @override
+  @JsonKey(name: 'department_id')
+  final int? departmentId;
+  @override
+  @JsonKey(name: 'task_type')
+  final int? taskType;
 
   @override
   String toString() {
-    return 'Inspection(id: $id, type: $type, name: $name, remark: $remark, notes: $notes, status: $status, user: $user, collaborators: $collaborators, items: $items, media: $media, inspectionDynamicTemplateId: $inspectionDynamicTemplateId, inspectionDynamicTemplateJson: $inspectionDynamicTemplateJson, inspectionDynamicTemplate: $inspectionDynamicTemplate, createdAt: $createdAt)';
+    return 'Inspection(id: $id, type: $type, name: $name, remark: $remark, notes: $notes, status: $status, user: $user, collaborators: $collaborators, items: $items, media: $media, inspectionDynamicTemplateId: $inspectionDynamicTemplateId, inspectionDynamicTemplateJson: $inspectionDynamicTemplateJson, inspectionDynamicTemplate: $inspectionDynamicTemplate, createdAt: $createdAt, departmentId: $departmentId, taskType: $taskType)';
   }
 
   @override
@@ -467,7 +503,11 @@ class _$InspectionImpl implements _Inspection {
                     inspectionDynamicTemplate) ||
                 other.inspectionDynamicTemplate == inspectionDynamicTemplate) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.departmentId, departmentId) ||
+                other.departmentId == departmentId) &&
+            (identical(other.taskType, taskType) ||
+                other.taskType == taskType));
   }
 
   @JsonKey(ignore: true)
@@ -487,7 +527,9 @@ class _$InspectionImpl implements _Inspection {
       inspectionDynamicTemplateId,
       const DeepCollectionEquality().hash(_inspectionDynamicTemplateJson),
       inspectionDynamicTemplate,
-      createdAt);
+      createdAt,
+      departmentId,
+      taskType);
 
   @JsonKey(ignore: true)
   @override
@@ -527,7 +569,9 @@ abstract class _Inspection implements Inspection {
       final Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(name: 'inspection_dynamic_template')
       final InspectionDynamicTemplate? inspectionDynamicTemplate,
-      @JsonKey(name: 'created_at') final String? createdAt) = _$InspectionImpl;
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'department_id') final int? departmentId,
+      @JsonKey(name: 'task_type') final int? taskType) = _$InspectionImpl;
 
   factory _Inspection.fromJson(Map<String, dynamic> json) =
       _$InspectionImpl.fromJson;
@@ -570,6 +614,12 @@ abstract class _Inspection implements Inspection {
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;
+  @override
+  @JsonKey(name: 'department_id')
+  int? get departmentId;
+  @override
+  @JsonKey(name: 'task_type')
+  int? get taskType;
   @override
   @JsonKey(ignore: true)
   _$$InspectionImplCopyWith<_$InspectionImpl> get copyWith =>

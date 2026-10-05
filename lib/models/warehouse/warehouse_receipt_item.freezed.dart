@@ -24,6 +24,8 @@ mixin _$WarehouseReceiptItem {
   String? get hashid => throw _privateConstructorUsedError;
   @JsonKey(name: 'receipt_id')
   int? get receiptId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'cached_location')
+  int? get cachedLocationId => throw _privateConstructorUsedError;
   @JsonKey(name: 'record_id')
   String? get recordId => throw _privateConstructorUsedError;
   @JsonKey(name: 'receipt')
@@ -90,6 +92,7 @@ abstract class $WarehouseReceiptItemCopyWith<$Res> {
       {int? id,
       String? hashid,
       @JsonKey(name: 'receipt_id') int? receiptId,
+      @JsonKey(name: 'cached_location') int? cachedLocationId,
       @JsonKey(name: 'record_id') String? recordId,
       @JsonKey(name: 'receipt') WarehouseReceipt? receipt,
       @JsonKey(name: 'item_no') String? itemNo,
@@ -135,6 +138,7 @@ class _$WarehouseReceiptItemCopyWithImpl<$Res,
     Object? id = freezed,
     Object? hashid = freezed,
     Object? receiptId = freezed,
+    Object? cachedLocationId = freezed,
     Object? recordId = freezed,
     Object? receipt = freezed,
     Object? itemNo = freezed,
@@ -172,6 +176,10 @@ class _$WarehouseReceiptItemCopyWithImpl<$Res,
       receiptId: freezed == receiptId
           ? _value.receiptId
           : receiptId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      cachedLocationId: freezed == cachedLocationId
+          ? _value.cachedLocationId
+          : cachedLocationId // ignore: cast_nullable_to_non_nullable
               as int?,
       recordId: freezed == recordId
           ? _value.recordId
@@ -297,6 +305,7 @@ abstract class _$$WarehouseReceiptItemImplCopyWith<$Res>
       {int? id,
       String? hashid,
       @JsonKey(name: 'receipt_id') int? receiptId,
+      @JsonKey(name: 'cached_location') int? cachedLocationId,
       @JsonKey(name: 'record_id') String? recordId,
       @JsonKey(name: 'receipt') WarehouseReceipt? receipt,
       @JsonKey(name: 'item_no') String? itemNo,
@@ -340,6 +349,7 @@ class __$$WarehouseReceiptItemImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? hashid = freezed,
     Object? receiptId = freezed,
+    Object? cachedLocationId = freezed,
     Object? recordId = freezed,
     Object? receipt = freezed,
     Object? itemNo = freezed,
@@ -377,6 +387,10 @@ class __$$WarehouseReceiptItemImplCopyWithImpl<$Res>
       receiptId: freezed == receiptId
           ? _value.receiptId
           : receiptId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      cachedLocationId: freezed == cachedLocationId
+          ? _value.cachedLocationId
+          : cachedLocationId // ignore: cast_nullable_to_non_nullable
               as int?,
       recordId: freezed == recordId
           ? _value.recordId
@@ -485,6 +499,7 @@ class _$WarehouseReceiptItemImpl implements _WarehouseReceiptItem {
       {this.id,
       this.hashid,
       @JsonKey(name: 'receipt_id') this.receiptId,
+      @JsonKey(name: 'cached_location') this.cachedLocationId,
       @JsonKey(name: 'record_id') this.recordId,
       @JsonKey(name: 'receipt') this.receipt,
       @JsonKey(name: 'item_no') this.itemNo,
@@ -521,6 +536,9 @@ class _$WarehouseReceiptItemImpl implements _WarehouseReceiptItem {
   @override
   @JsonKey(name: 'receipt_id')
   final int? receiptId;
+  @override
+  @JsonKey(name: 'cached_location')
+  final int? cachedLocationId;
   @override
   @JsonKey(name: 'record_id')
   final String? recordId;
@@ -604,7 +622,7 @@ class _$WarehouseReceiptItemImpl implements _WarehouseReceiptItem {
 
   @override
   String toString() {
-    return 'WarehouseReceiptItem(id: $id, hashid: $hashid, receiptId: $receiptId, recordId: $recordId, receipt: $receipt, itemNo: $itemNo, customerItemNo: $customerItemNo, supplierShortName: $supplierShortName, purchaseOrderNo: $purchaseOrderNo, shippingQty: $shippingQty, unit: $unit, innerCapacity: $innerCapacity, outerCapacity: $outerCapacity, cartonQty: $cartonQty, outerLength: $outerLength, outerWidth: $outerWidth, outerHeight: $outerHeight, outerVolume: $outerVolume, volume: $volume, outerGrossWeight: $outerGrossWeight, grossWeight: $grossWeight, outerNetWeight: $outerNetWeight, netWeight: $netWeight, entriesCount: $entriesCount, entries: $entries, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'WarehouseReceiptItem(id: $id, hashid: $hashid, receiptId: $receiptId, cachedLocationId: $cachedLocationId, recordId: $recordId, receipt: $receipt, itemNo: $itemNo, customerItemNo: $customerItemNo, supplierShortName: $supplierShortName, purchaseOrderNo: $purchaseOrderNo, shippingQty: $shippingQty, unit: $unit, innerCapacity: $innerCapacity, outerCapacity: $outerCapacity, cartonQty: $cartonQty, outerLength: $outerLength, outerWidth: $outerWidth, outerHeight: $outerHeight, outerVolume: $outerVolume, volume: $volume, outerGrossWeight: $outerGrossWeight, grossWeight: $grossWeight, outerNetWeight: $outerNetWeight, netWeight: $netWeight, entriesCount: $entriesCount, entries: $entries, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -616,6 +634,8 @@ class _$WarehouseReceiptItemImpl implements _WarehouseReceiptItem {
             (identical(other.hashid, hashid) || other.hashid == hashid) &&
             (identical(other.receiptId, receiptId) ||
                 other.receiptId == receiptId) &&
+            (identical(other.cachedLocationId, cachedLocationId) ||
+                other.cachedLocationId == cachedLocationId) &&
             (identical(other.recordId, recordId) ||
                 other.recordId == recordId) &&
             (identical(other.receipt, receipt) || other.receipt == receipt) &&
@@ -668,6 +688,7 @@ class _$WarehouseReceiptItemImpl implements _WarehouseReceiptItem {
         id,
         hashid,
         receiptId,
+        cachedLocationId,
         recordId,
         receipt,
         itemNo,
@@ -715,6 +736,7 @@ abstract class _WarehouseReceiptItem implements WarehouseReceiptItem {
       {final int? id,
       final String? hashid,
       @JsonKey(name: 'receipt_id') final int? receiptId,
+      @JsonKey(name: 'cached_location') final int? cachedLocationId,
       @JsonKey(name: 'record_id') final String? recordId,
       @JsonKey(name: 'receipt') final WarehouseReceipt? receipt,
       @JsonKey(name: 'item_no') final String? itemNo,
@@ -751,6 +773,9 @@ abstract class _WarehouseReceiptItem implements WarehouseReceiptItem {
   @override
   @JsonKey(name: 'receipt_id')
   int? get receiptId;
+  @override
+  @JsonKey(name: 'cached_location')
+  int? get cachedLocationId;
   @override
   @JsonKey(name: 'record_id')
   String? get recordId;

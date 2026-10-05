@@ -93,6 +93,8 @@ Future<String> _getGlobalUserAgent() {
 final silentApi = Dio(
   BaseOptions(
     connectTimeout: const Duration(seconds: 120),
+    sendTimeout: const Duration(seconds: 120),
+    receiveTimeout: const Duration(seconds: 120),
     listFormat: ListFormat.multiCompatible,
     headers: {
       Headers.acceptHeader: 'application/json',

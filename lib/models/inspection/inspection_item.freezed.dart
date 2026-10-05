@@ -38,6 +38,8 @@ mixin _$InspectionItem {
   int? get taskId => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user')
+  User? get user => throw _privateConstructorUsedError;
   @JsonKey(name: 'sample_id')
   int? get sampleId => throw _privateConstructorUsedError;
   @JsonKey(name: 'item_no')
@@ -59,6 +61,13 @@ mixin _$InspectionItem {
       throw _privateConstructorUsedError;
   @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
   Map<String, dynamic>? get raw => throw _privateConstructorUsedError;
+  @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+  List<InspectionRoundSnapshot>? get rounds =>
+      throw _privateConstructorUsedError;
+  @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+  List<FieldConfig>? get photoCheckFields => throw _privateConstructorUsedError;
+  @JsonKey(name: 'batches')
+  List<InspectionItemBatch>? get batches => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -87,6 +96,7 @@ abstract class $InspectionItemCopyWith<$Res> {
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
+      @JsonKey(name: 'user') User? user,
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
       @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
@@ -102,7 +112,14 @@ abstract class $InspectionItemCopyWith<$Res> {
           toJson: _inspectionDynamicTemplateJsonToJson)
       Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
-      Map<String, dynamic>? raw});
+      Map<String, dynamic>? raw,
+      @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+      List<InspectionRoundSnapshot>? rounds,
+      @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+      List<FieldConfig>? photoCheckFields,
+      @JsonKey(name: 'batches') List<InspectionItemBatch>? batches});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -132,6 +149,7 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
+    Object? user = freezed,
     Object? sampleId = freezed,
     Object? itemNo = freezed,
     Object? unitPerCtn = freezed,
@@ -139,6 +157,9 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
     Object? inspectionDynamicTemplateId = freezed,
     Object? inspectionDynamicTemplateJson = freezed,
     Object? raw = freezed,
+    Object? rounds = freezed,
+    Object? photoCheckFields = freezed,
+    Object? batches = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -197,6 +218,10 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       sampleId: freezed == sampleId
           ? _value.sampleId
           : sampleId // ignore: cast_nullable_to_non_nullable
@@ -225,7 +250,31 @@ class _$InspectionItemCopyWithImpl<$Res, $Val extends InspectionItem>
           ? _value.raw
           : raw // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      rounds: freezed == rounds
+          ? _value.rounds
+          : rounds // ignore: cast_nullable_to_non_nullable
+              as List<InspectionRoundSnapshot>?,
+      photoCheckFields: freezed == photoCheckFields
+          ? _value.photoCheckFields
+          : photoCheckFields // ignore: cast_nullable_to_non_nullable
+              as List<FieldConfig>?,
+      batches: freezed == batches
+          ? _value.batches
+          : batches // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItemBatch>?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -252,6 +301,7 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
       List<Media>? media,
       @JsonKey(name: 'task_id') int? taskId,
       @JsonKey(name: 'user_id') int? userId,
+      @JsonKey(name: 'user') User? user,
       @JsonKey(name: 'sample_id') int? sampleId,
       @JsonKey(name: 'item_no') String? itemNo,
       @JsonKey(name: 'unit_per_ctn') int? unitPerCtn,
@@ -267,7 +317,15 @@ abstract class _$$InspectionItemImplCopyWith<$Res>
           toJson: _inspectionDynamicTemplateJsonToJson)
       Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
-      Map<String, dynamic>? raw});
+      Map<String, dynamic>? raw,
+      @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+      List<InspectionRoundSnapshot>? rounds,
+      @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+      List<FieldConfig>? photoCheckFields,
+      @JsonKey(name: 'batches') List<InspectionItemBatch>? batches});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -295,6 +353,7 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? media = freezed,
     Object? taskId = freezed,
     Object? userId = freezed,
+    Object? user = freezed,
     Object? sampleId = freezed,
     Object? itemNo = freezed,
     Object? unitPerCtn = freezed,
@@ -302,6 +361,9 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
     Object? inspectionDynamicTemplateId = freezed,
     Object? inspectionDynamicTemplateJson = freezed,
     Object? raw = freezed,
+    Object? rounds = freezed,
+    Object? photoCheckFields = freezed,
+    Object? batches = freezed,
   }) {
     return _then(_$InspectionItemImpl(
       freezed == id
@@ -360,6 +422,10 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as int?,
+      freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       freezed == sampleId
           ? _value.sampleId
           : sampleId // ignore: cast_nullable_to_non_nullable
@@ -388,6 +454,18 @@ class __$$InspectionItemImplCopyWithImpl<$Res>
           ? _value._raw
           : raw // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      freezed == rounds
+          ? _value._rounds
+          : rounds // ignore: cast_nullable_to_non_nullable
+              as List<InspectionRoundSnapshot>?,
+      freezed == photoCheckFields
+          ? _value._photoCheckFields
+          : photoCheckFields // ignore: cast_nullable_to_non_nullable
+              as List<FieldConfig>?,
+      freezed == batches
+          ? _value._batches
+          : batches // ignore: cast_nullable_to_non_nullable
+              as List<InspectionItemBatch>?,
     ));
   }
 }
@@ -410,6 +488,7 @@ class _$InspectionItemImpl implements _InspectionItem {
       final List<Media>? media,
       @JsonKey(name: 'task_id') this.taskId,
       @JsonKey(name: 'user_id') this.userId,
+      @JsonKey(name: 'user') this.user,
       @JsonKey(name: 'sample_id') this.sampleId,
       @JsonKey(name: 'item_no') this.itemNo,
       @JsonKey(name: 'unit_per_ctn') this.unitPerCtn,
@@ -425,10 +504,18 @@ class _$InspectionItemImpl implements _InspectionItem {
           toJson: _inspectionDynamicTemplateJsonToJson)
       final Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
-      final Map<String, dynamic>? raw)
+      final Map<String, dynamic>? raw,
+      @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+      final List<InspectionRoundSnapshot>? rounds,
+      @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+      final List<FieldConfig>? photoCheckFields,
+      @JsonKey(name: 'batches') final List<InspectionItemBatch>? batches)
       : _media = media,
         _inspectionDynamicTemplateJson = inspectionDynamicTemplateJson,
-        _raw = raw;
+        _raw = raw,
+        _rounds = rounds,
+        _photoCheckFields = photoCheckFields,
+        _batches = batches;
 
   factory _$InspectionItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$InspectionItemImplFromJson(json);
@@ -474,6 +561,9 @@ class _$InspectionItemImpl implements _InspectionItem {
   @JsonKey(name: 'user_id')
   final int? userId;
   @override
+  @JsonKey(name: 'user')
+  final User? user;
+  @override
   @JsonKey(name: 'sample_id')
   final int? sampleId;
   @override
@@ -517,9 +607,43 @@ class _$InspectionItemImpl implements _InspectionItem {
     return EqualUnmodifiableMapView(value);
   }
 
+  final List<InspectionRoundSnapshot>? _rounds;
+  @override
+  @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+  List<InspectionRoundSnapshot>? get rounds {
+    final value = _rounds;
+    if (value == null) return null;
+    if (_rounds is EqualUnmodifiableListView) return _rounds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<FieldConfig>? _photoCheckFields;
+  @override
+  @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+  List<FieldConfig>? get photoCheckFields {
+    final value = _photoCheckFields;
+    if (value == null) return null;
+    if (_photoCheckFields is EqualUnmodifiableListView)
+      return _photoCheckFields;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<InspectionItemBatch>? _batches;
+  @override
+  @JsonKey(name: 'batches')
+  List<InspectionItemBatch>? get batches {
+    final value = _batches;
+    if (value == null) return null;
+    if (_batches is EqualUnmodifiableListView) return _batches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, barcode: $barcode, stdBarcode: $stdBarcode, scanBarcode: $scanBarcode, description: $description, media: $media, taskId: $taskId, userId: $userId, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt, inspectionDynamicTemplateId: $inspectionDynamicTemplateId, inspectionDynamicTemplateJson: $inspectionDynamicTemplateJson, raw: $raw)';
+    return 'InspectionItem(id: $id, type: $type, name: $name, status: $status, ctns: $ctns, qty: $qty, remark: $remark, barcode: $barcode, stdBarcode: $stdBarcode, scanBarcode: $scanBarcode, description: $description, media: $media, taskId: $taskId, userId: $userId, user: $user, sampleId: $sampleId, itemNo: $itemNo, unitPerCtn: $unitPerCtn, createdAt: $createdAt, inspectionDynamicTemplateId: $inspectionDynamicTemplateId, inspectionDynamicTemplateJson: $inspectionDynamicTemplateJson, raw: $raw, rounds: $rounds, photoCheckFields: $photoCheckFields, batches: $batches)';
   }
 
   @override
@@ -544,6 +668,7 @@ class _$InspectionItemImpl implements _InspectionItem {
             const DeepCollectionEquality().equals(other._media, _media) &&
             (identical(other.taskId, taskId) || other.taskId == taskId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.sampleId, sampleId) ||
                 other.sampleId == sampleId) &&
             (identical(other.itemNo, itemNo) || other.itemNo == itemNo) &&
@@ -558,7 +683,11 @@ class _$InspectionItemImpl implements _InspectionItem {
             const DeepCollectionEquality().equals(
                 other._inspectionDynamicTemplateJson,
                 _inspectionDynamicTemplateJson) &&
-            const DeepCollectionEquality().equals(other._raw, _raw));
+            const DeepCollectionEquality().equals(other._raw, _raw) &&
+            const DeepCollectionEquality().equals(other._rounds, _rounds) &&
+            const DeepCollectionEquality()
+                .equals(other._photoCheckFields, _photoCheckFields) &&
+            const DeepCollectionEquality().equals(other._batches, _batches));
   }
 
   @JsonKey(ignore: true)
@@ -579,13 +708,17 @@ class _$InspectionItemImpl implements _InspectionItem {
         const DeepCollectionEquality().hash(_media),
         taskId,
         userId,
+        user,
         sampleId,
         itemNo,
         unitPerCtn,
         createdAt,
         inspectionDynamicTemplateId,
         const DeepCollectionEquality().hash(_inspectionDynamicTemplateJson),
-        const DeepCollectionEquality().hash(_raw)
+        const DeepCollectionEquality().hash(_raw),
+        const DeepCollectionEquality().hash(_rounds),
+        const DeepCollectionEquality().hash(_photoCheckFields),
+        const DeepCollectionEquality().hash(_batches)
       ]);
 
   @JsonKey(ignore: true)
@@ -619,6 +752,7 @@ abstract class _InspectionItem implements InspectionItem {
       final List<Media>? media,
       @JsonKey(name: 'task_id') final int? taskId,
       @JsonKey(name: 'user_id') final int? userId,
+      @JsonKey(name: 'user') final User? user,
       @JsonKey(name: 'sample_id') final int? sampleId,
       @JsonKey(name: 'item_no') final String? itemNo,
       @JsonKey(name: 'unit_per_ctn') final int? unitPerCtn,
@@ -634,7 +768,13 @@ abstract class _InspectionItem implements InspectionItem {
           toJson: _inspectionDynamicTemplateJsonToJson)
       final Map<String, dynamic>? inspectionDynamicTemplateJson,
       @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
-      final Map<String, dynamic>? raw) = _$InspectionItemImpl;
+      final Map<String, dynamic>? raw,
+      @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+      final List<InspectionRoundSnapshot>? rounds,
+      @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+      final List<FieldConfig>? photoCheckFields,
+      @JsonKey(name: 'batches')
+      final List<InspectionItemBatch>? batches) = _$InspectionItemImpl;
 
   factory _InspectionItem.fromJson(Map<String, dynamic> json) =
       _$InspectionItemImpl.fromJson;
@@ -672,6 +812,9 @@ abstract class _InspectionItem implements InspectionItem {
   @JsonKey(name: 'user_id')
   int? get userId;
   @override
+  @JsonKey(name: 'user')
+  User? get user;
+  @override
   @JsonKey(name: 'sample_id')
   int? get sampleId;
   @override
@@ -698,6 +841,15 @@ abstract class _InspectionItem implements InspectionItem {
   @override
   @JsonKey(fromJson: _rawMapFromJson, toJson: _rawMapToJson)
   Map<String, dynamic>? get raw;
+  @override
+  @JsonKey(name: 'rounds', fromJson: _roundsFromJson)
+  List<InspectionRoundSnapshot>? get rounds;
+  @override
+  @JsonKey(name: 'photo_check_fields', fromJson: _photoCheckFieldsFromJson)
+  List<FieldConfig>? get photoCheckFields;
+  @override
+  @JsonKey(name: 'batches')
+  List<InspectionItemBatch>? get batches;
   @override
   @JsonKey(ignore: true)
   _$$InspectionItemImplCopyWith<_$InspectionItemImpl> get copyWith =>

@@ -66,14 +66,15 @@ class InspectionView extends HookConsumerWidget {
         inspectionsList.value = [];
       }
       try {
-        final resp = await getInspections(
-          queryParameters: {
-            'search': search.value,
-            'page': page.value,
-            'pageSize': pageSize,
-            'created_month': getCreatedMonth(),
-          },
-        );
+        final createdMonth = getCreatedMonth();
+        final queryParams = <String, dynamic>{
+          if (search.value != null) 'search': search.value,
+          'page': page.value,
+          'pageSize': pageSize,
+          if (createdMonth != null) 'created_month': createdMonth,
+        };
+
+        final resp = await getInspections(queryParameters: queryParams);
 
         if (init) {
           inspectionsList.value = resp.data;
@@ -165,6 +166,7 @@ class InspectionView extends HookConsumerWidget {
       // --------------------------
       if (!shouldShowTemplateDialog) {
         if (context.mounted) {
+          ref.read(inspectionDetailProvider.notifier).setFromList(inspection);
           await context.router.push(
             InspectionDetailRoute(id: inspectionId),
           );
@@ -213,6 +215,12 @@ class InspectionView extends HookConsumerWidget {
               },
             );
             if (!context.mounted) return;
+            final templateId = templateValue is int
+                ? templateValue
+                : int.tryParse(templateValue?.toString() ?? '');
+            ref.read(inspectionDetailProvider.notifier).setFromList(
+                  inspection.copyWith(inspectionDynamicTemplateId: templateId),
+                );
             await context.router.push(
               InspectionDetailRoute(id: inspectionId),
             );

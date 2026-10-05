@@ -1,6 +1,7 @@
 import 'package:cloud/pages/inspection/const.dart';
 import 'package:flutter/material.dart';
 
+//  提交按钮
 class InspectionBottomButtons extends StatelessWidget {
   final Function(int) onPressed;
   final bool isSubmitting;
@@ -30,16 +31,6 @@ class InspectionBottomButtons extends StatelessWidget {
               isSubmitting: isSubmitting,
               submittingStatus: submittingStatus,
               onPressed: () => onPressed(3),
-            ),
-            const SizedBox(width: 12),
-            _buildActionBtn(
-              label: inspectionStatusLabelMap[2]!,
-              icon: Icons.warning_amber,
-              color: Colors.orange,
-              status: 2,
-              isSubmitting: isSubmitting,
-              submittingStatus: submittingStatus,
-              onPressed: () => onPressed(2),
             ),
             const SizedBox(width: 12),
             _buildActionBtn(
@@ -74,6 +65,7 @@ class InspectionBottomButtons extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           disabledBackgroundColor: color.withOpacity(0.5),
+          elevation: 0,
           padding: EdgeInsets.zero,
           minimumSize: const Size(0, 44),
           shape: RoundedRectangleBorder(

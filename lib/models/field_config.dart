@@ -9,6 +9,7 @@ class FieldConfig with _$FieldConfig {
     required String label,
     required String name,
     @Default(true) bool isVisible,
+    @Default(1) int maxCount,
   }) = _FieldConfig;
 
   factory FieldConfig.fromJson(Map<String, dynamic> json) =>

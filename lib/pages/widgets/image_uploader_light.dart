@@ -82,7 +82,7 @@ class ImageUploaderInspection extends HookConsumerWidget {
   final void Function(MediaDragData source, MediaDragData target)? onSwap;
 
   /// 连拍完成后，调用父组件处理分发
-  final void Function(List<File> files)? onContinuousCapture;
+  final void Function(List<File?> files)? onContinuousCapture;
 
   /// 连拍最大张数；null 表示不限制
   final int? continuousMaxCount;
@@ -162,26 +162,61 @@ class ImageUploaderInspection extends HookConsumerWidget {
       List<File> files, {
       bool preserveOrder = false,
     }) async {
+      if (files.isEmpty) return;
+
       final List<TemporaryMedia> uploadedMedias = [];
+      final List<String> failedFiles = [];
+      final int total = files.length;
+      final int concurrency = preserveOrder ? 1 : 3;
+
       try {
         onUploadingChanged?.call(true);
-        if (preserveOrder) {
-          // 相册按选中顺序串行上传：展示进度，每张成功后立刻刷新列表。
-          final int total = files.length;
-          for (var i = 0; i < files.length; i++) {
-            await EasyLoading.show(status: '上传中 ${i + 1}/$total');
-            final media = await upload(file: files[i]);
-            uploadedMedias.add(media);
-            _notifyChanged([...currentImages, ...uploadedMedias]);
-          }
-        } else {
-          await EasyLoading.show(status: '上传中...');
-          uploadedMedias.addAll(
-            await Future.wait(files.map((file) => upload(file: file))),
+
+        for (var i = 0; i < files.length; i += concurrency) {
+          final chunk = files.sublist(
+            i,
+            i + concurrency > files.length ? files.length : i + concurrency,
           );
+          final chunkResults = await Future.wait(
+            chunk.asMap().entries.map((entry) async {
+              final idx = i + entry.key;
+              try {
+                final media = await upload(
+                  file: entry.value,
+                  quality: 98,
+                  maxWidth: 4096,
+                );
+                return (idx, media, null);
+              } catch (e) {
+                return (idx, null, e.toString());
+              }
+            }),
+          );
+
+          for (final (idx, media, error) in chunkResults) {
+            if (media != null) {
+              uploadedMedias.add(media);
+            } else {
+              failedFiles.add('第${idx + 1}张: $error');
+            }
+          }
+
           if (uploadedMedias.isNotEmpty) {
             _notifyChanged([...currentImages, ...uploadedMedias]);
           }
+
+          await EasyLoading.show(
+            status: '上传中 ${uploadedMedias.length}/$total'
+                '${failedFiles.isNotEmpty ? ' (${failedFiles.length}张失败)' : ''}',
+          );
+        }
+
+        if (failedFiles.isNotEmpty && uploadedMedias.isEmpty) {
+          EasyLoading.showError('所有图片上传失败，请检查网络后重试');
+        } else if (failedFiles.isNotEmpty) {
+          EasyLoading.showInfo(
+            '${failedFiles.length}张上传失败，请检查后重新上传',
+          );
         }
       } finally {
         onUploadingChanged?.call(false);
@@ -215,7 +250,7 @@ class ImageUploaderInspection extends HookConsumerWidget {
 
     // --- 动作 1：打开系统相机 ---
     Future<void> openStandardCamera() async {
-      //单拍时使用系統自帶的相机，for: wechat_camera_picker有兼容性问题，按下快门的瞬间拍糊。
+      // 使用 image_picker 打开系统相机 App，用户可看到正常取景界面完成拍摄。
       try {
         final file = await captureSinglePhotoFile();
         if (file != null) await uploadFiles([file]);
@@ -234,6 +269,8 @@ class ImageUploaderInspection extends HookConsumerWidget {
         }
 
         final int galleryMaxAssets = maxAssetsForGallery ?? remainingCount;
+
+        if (!context.mounted) return;
 
         final List<AssetEntity>? result = await AssetPicker.pickAssets(
           context,
@@ -258,7 +295,7 @@ class ImageUploaderInspection extends HookConsumerWidget {
     Future<void> openContinuousCamera() async {
       try {
         if (context.mounted) {
-          final List<XFile>? result = await Navigator.push(
+          final List<XFile?>? result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => enableContinuousWithGyroscopeWithoutSize
@@ -276,13 +313,14 @@ class ImageUploaderInspection extends HookConsumerWidget {
             ),
           );
           if (result != null && result.isNotEmpty) {
-            final List<File> files = result.map((e) => File(e.path)).toList();
+            final List<File?> files =
+                result.map((e) => e != null ? File(e.path) : null).toList();
 
             if (onContinuousCapture != null) {
-              onContinuousCapture!(files); // 交给父组件处理分发
+              onContinuousCapture!(files);
             } else {
-              // 连拍按拍摄顺序串行上传，显示进度，每张成功后立刻刷新列表。
-              await uploadFiles(files);
+              final validFiles = files.whereType<File>().toList();
+              await uploadFiles(validFiles);
             }
           }
         }
@@ -318,6 +356,7 @@ class ImageUploaderInspection extends HookConsumerWidget {
               callback: (action) async {
                 popActionSheet();
                 await openContinuousCamera();
+                popActionSheet();
               },
             ),
           FlanActionSheetAction(
@@ -696,13 +735,12 @@ class _PendingCapture {
   final int targetIndex;
   final bool addedNewThumbnailSlot;
   final _IosCaptureSnapshot? iosSnapshot;
-  final _AndroidCaptureSnapshot? androidSnapshot;
+  final _AndroidCaptureSnapshot? androidSnapshot = null;
 
   const _PendingCapture({
     required this.targetIndex,
     this.addedNewThumbnailSlot = false,
     this.iosSnapshot,
-    this.androidSnapshot,
   });
 }
 
@@ -940,19 +978,18 @@ class _ContinuousWechatPickerState extends CameraPickerState {
     }
     try {
       final Uint8List bytes = await source.readAsBytes();
-      final Uint8List? rotated = await FlutterImageCompress.compressWithList(
+      final Uint8List encoded = await FlutterImageCompress.compressWithList(
         bytes,
-        quality: 95,
+        quality: 98,
         rotate: rotateDegrees,
-        autoCorrectionAngle: false,
-        keepExif: false,
+        format: CompressFormat.jpeg,
       );
-      if (rotated == null || rotated.isEmpty) return source;
+      if (encoded.isEmpty) return source;
       final Directory tempDir = await getTemporaryDirectory();
       final File outFile = File(
         '${tempDir.path}/capture_orient_${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
-      await outFile.writeAsBytes(rotated, flush: true);
+      await outFile.writeAsBytes(encoded, flush: true);
       return XFile(outFile.path);
     } catch (e) {
       debugPrint('Orient captured file error: $e');
@@ -1435,7 +1472,6 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
       _IosCaptureSnapshot? iosSnapshot,
       _AndroidCaptureSnapshot? androidSnapshot,
     }) async {
-      final bool isRefinePass = maxDecodeWidth == null;
       final aspectRatio = iosSnapshot?.aspectRatio ??
           androidSnapshot?.aspectRatio ??
           displayAspectRatio.value;
@@ -1468,8 +1504,8 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
             (iosSnapshot?.lensDirection ?? iosCameraLensDirectionRef.value) ==
                 camera.CameraLensDirection.front;
         // 精修：全分辨率（maxDecodeWidth=null）；快路径：限制解码宽度。
-        // 像素尺寸由原图决定，不缩放；JPEG 质量略降可明显加快编码且肉眼几乎无损。
-        final int encodeQuality = isRefinePass ? 95 : jpegQuality;
+        // 像素尺寸由原图决定，不缩放；精修路径使用调用方传入的 jpegQuality 参数。
+        final int encodeQuality = jpegQuality;
         final cropped = await cropImageForWechatIosFrameInIsolate(
           path,
           captureFrame,
@@ -1604,8 +1640,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         await controller.setFocusMode(camera.FocusMode.auto);
         // 必须解锁曝光：wechat / 快门路径可能留下 locked，否则画面像定格。
         await controller.setExposureMode(camera.ExposureMode.auto);
-        // 若未 pause 则为空操作；保证预览可持续刷新。
-        await controller.resumePreview();
+        // iOS 上 resumePreview 可能导致预览卡死，且 wechat takePicture 通常不 pause 预览。
         await applyDefaultZoom(controller);
         await focusOnCenter(controller);
       } catch (e) {
@@ -2155,7 +2190,7 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
                         child: CameraFocusPoint(
                           key: ValueKey(centerFocusPointKey.value),
                           size: pointSize,
-                          color: ui.Color.fromARGB(255, 49, 202, 82),
+                          color: const ui.Color.fromARGB(255, 49, 202, 82),
                         ),
                       ),
                     );
@@ -2395,8 +2430,12 @@ class ContinuousCameraPageOtherPhoto extends HookConsumerWidget {
         pickerConfig: CameraPickerConfig(
           enableRecording: false,
           enableAudio: false,
+          // iOS 上 max 分辨率在 48MP 机型会导致内存溢出崩溃（单帧 ~200MB+），
+          // 降为 veryHigh 平衡画质与稳定性。
+          resolutionPreset: Platform.isIOS
+              ? camera.ResolutionPreset.veryHigh
+              : camera.ResolutionPreset.max,
           // 预览与成片均锁定竖屏。
-          // 不指定 resolutionPreset，使用插件默认 ultraHigh（避免 max 在部分机型初始化闪退）。
           lockCaptureOrientation: DeviceOrientation.portraitUp,
           preferredFlashMode: camera.FlashMode.off,
           onXFileCaptured: (file, _) {
@@ -2446,7 +2485,7 @@ class _CaptureFrameMaskPainter extends CustomPainter {
 /// 预览始终为竖长画幅；开启「成片跟随横竖」时，横拿手机生成横图、竖拿生成竖图。
 /// 按照字段拍摄定制化 自定义横屏旋转、不带有画幅切换
 class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
-  static const double bottomSideSlotWidth = 80;
+  static const double bottomSideSlotWidth = 100;
 
   /// 默认变焦倍率（相对光学 1.0）。
   static const double defaultZoomLevel = 1.1;
@@ -2469,7 +2508,12 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final capturedImages = useState<List<XFile?>>([]);
+    final capturedImages = useState<List<XFile?>>(
+      captureFieldLabels != null && captureFieldLabels!.isNotEmpty
+          ? List.filled(captureFieldLabels!.length, null)
+          : [],
+    );
+    final skippedIndices = useState<Set<int>>({});
     final replaceIndex = useState<int?>(null);
     final scrollController = useScrollController();
     final shutterAnimController = useAnimationController(
@@ -2551,10 +2595,23 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
     final bool atCaptureLimit = !isRetakeMode && isAtCaptureLimit;
     final bool useLabelThumbnails =
         captureFieldLabels != null && captureFieldLabels!.isNotEmpty;
+    int getNextUnprocessedIndex() {
+      final images = capturedImages.value;
+      final skipped = skippedIndices.value;
+      int idx = 0;
+      while (true) {
+        final bool isCaptured = idx < images.length && images[idx] != null;
+        final bool isSkipped = skipped.contains(idx);
+        if (!isCaptured && !isSkipped) return idx;
+        idx++;
+      }
+    }
+
     final String? currentCaptureLabel = () {
       final labels = captureFieldLabels;
       if (labels == null || labels.isEmpty) return null;
-      final int index = isRetakeMode ? replaceIndex.value! : validCapturedCount;
+      final int index =
+          isRetakeMode ? replaceIndex.value! : getNextUnprocessedIndex();
       if (index < labels.length) return labels[index];
       return '其他';
     }();
@@ -2654,7 +2711,10 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
       try {
         await controller.setFocusMode(camera.FocusMode.auto);
         await controller.setExposureMode(camera.ExposureMode.auto);
-        await controller.resumePreview();
+        // iOS 上 resumePreview 可能导致预览卡死，且未 pause 时为空操作。
+        if (!Platform.isIOS) {
+          await controller.resumePreview();
+        }
         await applyDefaultZoom(controller);
         await focusOnCenter(controller);
       } catch (e) {
@@ -2697,18 +2757,22 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
         debugPrint('Set focus/exposure point error: $e');
       }
 
-      try {
-        await controller.setFocusMode(camera.FocusMode.locked);
-      } catch (e) {
-        debugPrint('Lock focus error: $e');
-      }
-      try {
-        await controller.setExposureMode(camera.ExposureMode.locked);
-      } catch (e) {
-        debugPrint('Lock exposure error: $e');
+      // iOS 上 FocusMode.locked / ExposureMode.locked 在某些机型上会触发
+      // 原生层异常导致崩溃；跳过锁定，仅设置焦点位置。
+      if (!Platform.isIOS) {
+        try {
+          await controller.setFocusMode(camera.FocusMode.locked);
+        } catch (e) {
+          debugPrint('Lock focus error: $e');
+        }
+        try {
+          await controller.setExposureMode(camera.ExposureMode.locked);
+        } catch (e) {
+          debugPrint('Lock exposure error: $e');
+        }
       }
 
-      // 等待锁定生效，避免仍在追焦时出片发糊。
+      // 等待对焦/曝光稳定，避免仍在追焦时出片发糊。
       await Future.delayed(const Duration(milliseconds: 120));
 
       XFile file = await controller.takePicture();
@@ -2719,10 +2783,13 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
       }
 
       // 出片后立即冻结预览，画面定格。
-      try {
-        await controller.pausePreview();
-      } catch (e) {
-        debugPrint('Pause preview error: $e');
+      // iOS 上 pausePreview/resumePreview 可能导致预览卡死无法恢复，跳过冻结效果。
+      if (!Platform.isIOS) {
+        try {
+          await controller.pausePreview();
+        } catch (e) {
+          debugPrint('Pause preview error: $e');
+        }
       }
 
       await handleCapturedFile(file);
@@ -2780,7 +2847,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
         return;
       }
 
-      final int targetIndex = replaceIndex.value ?? capturedImages.value.length;
+      final int targetIndex = replaceIndex.value ?? getNextUnprocessedIndex();
       pendingTargetIndexRef.value = targetIndex;
       isCapturing.value = true;
       shutterAnimController
@@ -3011,6 +3078,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
     Widget buildLabelThumbnailItem(int index, bool isGlobalRetakeMode) {
       final XFile? file = capturedImages.value[index];
       final bool isTarget = replaceIndex.value == index;
+      final bool isSkipped = skippedIndices.value.contains(index);
       final String caption =
           (captureFieldLabels != null && index < captureFieldLabels!.length)
               ? captureFieldLabels![index]
@@ -3040,6 +3108,29 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
                       height: 56,
                       width: 56,
                       fit: BoxFit.cover,
+                    ),
+                  )
+                else if (isSkipped)
+                  Container(
+                    height: 56,
+                    color: const Color.fromARGB(31, 110, 58, 58),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.refresh,
+                              color: Color(0xFFFF9800), size: 18),
+                          SizedBox(height: 2),
+                          Text(
+                            '补拍',
+                            style: TextStyle(
+                              color: Color(0xFFFF9800),
+                              fontSize: 8,
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 else
@@ -3078,12 +3169,40 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
       );
     }
 
+    void skipCurrentField() {
+      if (isRetakeMode) return;
+      final int index = getNextUnprocessedIndex();
+      final newSkipped = {...skippedIndices.value, index};
+      skippedIndices.value = newSkipped;
+      if (index >= capturedImages.value.length) {
+        final nextImages = [...capturedImages.value];
+        while (nextImages.length <= index) {
+          nextImages.add(null);
+        }
+        capturedImages.value = nextImages;
+      }
+      overlayRepaintTick.value++;
+    }
+
     void finishCapture() {
-      if (capturedImages.value.isEmpty) {
-        unawaited(safeExitPop(<XFile>[]));
+      final images = capturedImages.value;
+      final skipped = skippedIndices.value;
+      if (images.isEmpty && skipped.isEmpty) {
+        unawaited(safeExitPop(<XFile?>[]));
         return;
       }
-      final result = capturedImages.value.whereType<XFile>().toList();
+      int maxIdx = images.length;
+      for (final s in skipped) {
+        if (s >= maxIdx) maxIdx = s + 1;
+      }
+      final result = <XFile?>[];
+      for (int i = 0; i < maxIdx; i++) {
+        if (skipped.contains(i)) {
+          result.add(null);
+        } else if (i < images.length && images[i] != null) {
+          result.add(images[i]);
+        }
+      }
       unawaited(safeExitPop(result));
     }
 
@@ -3257,7 +3376,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (capturedImages.value.isNotEmpty)
+                if (useLabelThumbnails || capturedImages.value.isNotEmpty)
                   ClipRRect(
                     child: BackdropFilter(
                       filter: ui.ImageFilter.blur(
@@ -3287,30 +3406,7 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                if (useLabelThumbnails)
-                  Container(
-                    color: Colors.black.withOpacity(0.6),
-                    width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 25),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                    alignment: Alignment.center,
-                    child: currentCaptureLabel != null &&
-                            currentCaptureLabel != '其他'
-                        ? Text(
-                            '正在拍: $currentCaptureLabel',
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              height: 1.2,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
+                if (useLabelThumbnails) const SizedBox.shrink(),
                 Container(
                   color: Colors.black.withOpacity(0.6),
                   padding: EdgeInsets.only(
@@ -3325,14 +3421,49 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
                       children: [
                         SizedBox(
                           width: bottomSideSlotWidth,
-                          child: Center(
-                            child: Text(
-                              hasCaptureLimit
-                                  ? '已拍 $validCapturedCount/$maxCount'
-                                  : '已拍 $validCapturedCount',
-                              style: const TextStyle(
-                                  color: Colors.white54, fontSize: 12),
-                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (useLabelThumbnails &&
+                                  currentCaptureLabel != null &&
+                                  currentCaptureLabel != '其他') ...[
+                                Text(
+                                  '正在拍: $currentCaptureLabel',
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 13,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                GestureDetector(
+                                  onTap: isRetakeMode ? null : skipCurrentField,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: Colors.white54, width: 1),
+                                    ),
+                                    child: Text(
+                                      '跳过',
+                                      style: TextStyle(
+                                        color: isRetakeMode
+                                            ? Colors.white38
+                                            : Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         GestureDetector(
@@ -3368,28 +3499,41 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
                         SizedBox(
                           width: bottomSideSlotWidth,
                           child: Center(
-                            child: GestureDetector(
-                              onTap: finishCapture,
-                              child: AnimatedOpacity(
-                                duration: const Duration(milliseconds: 200),
-                                opacity: validCapturedCount > 0 ? 1.0 : 0.5,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    '完成',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  hasCaptureLimit
+                                      ? '已拍 $validCapturedCount/$maxCount'
+                                      : '已拍 $validCapturedCount',
+                                  style: const TextStyle(
+                                      color: Colors.white54, fontSize: 13),
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: finishCapture,
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 200),
+                                    opacity: validCapturedCount > 0 ? 1.0 : 0.5,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: primaryColor,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: const Text(
+                                        '完成',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
@@ -3432,11 +3576,13 @@ class ContinuousCameraPageWithoutSize extends HookConsumerWidget {
         pickerConfig: CameraPickerConfig(
           enableRecording: false,
           enableAudio: false,
-          // 预览始终竖屏铺满；成片横/竖由顶部开关 + 加速度计控制。
-          // 不指定 resolutionPreset，使用插件默认 ultraHigh（避免 max 在部分机型初始化闪退）。
+          // iOS 上 max 分辨率在 48MP 机型会导致内存溢出崩溃（单帧 ~200MB+），
+          // 降为 veryHigh 平衡画质与稳定性。
+          resolutionPreset: Platform.isIOS
+              ? camera.ResolutionPreset.veryHigh
+              : camera.ResolutionPreset.max,
           lockCaptureOrientation: DeviceOrientation.portraitUp,
           preferredFlashMode: camera.FlashMode.off,
-          // 拍照由 lockFrameThenCapture 自行控制：先锁画面再出片。
         ),
       ),
     );

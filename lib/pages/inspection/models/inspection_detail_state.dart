@@ -1,4 +1,5 @@
 import 'package:cloud/models/inspection/inspection.dart';
+import 'package:cloud/models/inspection/inspection_item.dart';
 import 'package:cloud/pages/inspection/models/add_sku_submit_data.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -8,7 +9,7 @@ part 'inspection_detail_state.freezed.dart';
 abstract class InspectionDetailState with _$InspectionDetailState {
   const factory InspectionDetailState({
     int? inspectionId,
-    Inspection? inspection, 
+    Inspection? inspection,
     String? errorMessage,
     @Default(true) bool useNormalTemplate,
     AddSkuSubmitData? addSkuDraft,
@@ -19,5 +20,11 @@ abstract class InspectionDetailState with _$InspectionDetailState {
     String? templateLoadError,
     @Default(false) bool loading,
     @Default(false) bool reportPerSku,
+    @Default([]) List<InspectionItem> items,
+    @Default(1) int itemsPage,
+    @Default(false) bool itemsLoading,
+    @Default(true) bool itemsHasMore,
+    @Default(0) int itemsTotal,
+    String? searchKeyword,
   }) = _InspectionDetailState;
 }

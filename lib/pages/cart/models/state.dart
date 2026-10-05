@@ -30,6 +30,9 @@ enum CartType {
 
   /// 出货
   deliveryOut,
+
+  /// 出库
+  stockOut,
 }
 
 Map<CartType, String> cartNames = {
@@ -41,6 +44,7 @@ Map<CartType, String> cartNames = {
   CartType.inout: "手动盘点选样车",
   CartType.quotation: "报价单选样车",
   CartType.deliveryOut: '出货选样车',
+  CartType.stockOut: '出库选样车',
 };
 
 // class CartSelect {

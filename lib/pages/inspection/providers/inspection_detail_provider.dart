@@ -83,8 +83,6 @@ class InspectionDetail extends _$InspectionDetail {
 
   // 加载验货任务详情
   Future<void> load(int inspectionId, {bool silent = false}) async {
-    // 不要在 await 之前同步改 state：useEffect 触发 load 时，
-    // 会触发页面 rebuild，Riverpod 可能中断后续逻辑并保留旧 inspection。
     if (!silent == true) {
       state = state.copyWith(loading: true);
     }
@@ -102,8 +100,6 @@ class InspectionDetail extends _$InspectionDetail {
         schema == null ? const {} : DynamicTemplateSchema.zoneNodes(schema),
       );
 
-      //设置模板相关数据 ：
-      //是否使用集团基础验货模板 、是否1个sku生成1个验货报告 ：useNormalTemplate 、reportPerSku
       final useNormalTemplate =
           inspection.inspectionDynamicTemplateId == null ||
               inspection.inspectionDynamicTemplateId.toString() == '0';
@@ -126,10 +122,72 @@ class InspectionDetail extends _$InspectionDetail {
     }
   }
 
+  void setFromList(Inspection inspection) {
+    final schema = DynamicTemplateSchema.extract(
+      inspection.inspectionDynamicTemplateJson,
+    );
+
+    final useNormalTemplate = inspection.inspectionDynamicTemplateId == null ||
+        inspection.inspectionDynamicTemplateId.toString() == '0';
+    setDynamicZonesNode(
+      schema == null ? const {} : DynamicTemplateSchema.zoneNodes(schema),
+    );
+    setInspectionTaskUseNormalTemplate(useNormalTemplate);
+    setInspectionTaskReportPerSku(!useNormalTemplate &&
+        inspection.inspectionDynamicTemplate?.inspectionScope == 'sku');
+
+    state = state.copyWith(
+      inspectionId: inspection.id,
+      inspection: inspection,
+      loading: false,
+      errorMessage: null,
+    );
+  }
+
+  void setSearchKeyword(String? keyword) {
+    state = state.copyWith(searchKeyword: keyword);
+  }
+
+  Future<void> loadItems(int taskId, {bool init = false}) async {
+    if (init) {
+      state = state.copyWith(itemsPage: 1, items: []);
+    }
+    state = state.copyWith(itemsLoading: true);
+
+    try {
+      final queryParams = <String, dynamic>{
+        'page': state.itemsPage,
+        'pageSize': 20,
+        if (state.searchKeyword != null && state.searchKeyword!.isNotEmpty)
+          'item_no': state.searchKeyword,
+      };
+
+      final resp =
+          await getInspectionTaskItems(taskId, queryParameters: queryParams);
+
+      final newItems = init ? resp.data : [...state.items, ...resp.data];
+
+      final totalPages = resp.meta?.pagination?.totalPages ?? 0;
+      final total = resp.meta?.pagination?.total ?? state.itemsTotal;
+      final hasMore = state.itemsPage < totalPages;
+
+      state = state.copyWith(
+        items: newItems,
+        itemsPage: state.itemsPage + 1,
+        itemsLoading: false,
+        itemsHasMore: hasMore,
+        itemsTotal: total,
+      );
+    } catch (e) {
+      state = state.copyWith(itemsLoading: false);
+    }
+  }
+
   Future<void> refresh({bool silent = false}) async {
     final inspectionId = state.inspectionId;
     if (inspectionId == null) return;
     await load(inspectionId, silent: silent);
+    await loadItems(inspectionId, init: true);
   }
 
   Future<void> addCollaborator(User user) async {

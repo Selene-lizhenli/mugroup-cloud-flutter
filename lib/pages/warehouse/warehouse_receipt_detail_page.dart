@@ -924,7 +924,7 @@ class _SearchBar extends StatelessWidget {
       textInputAction: TextInputAction.search,
       style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
-        hintText: '搜索产品编号',
+        hintText: '搜索产品编号 / 客户货号',
         prefixIcon: const Icon(Icons.search, size: 20),
         prefixIconConstraints:
             const BoxConstraints(minWidth: 36, minHeight: 0),
@@ -1026,6 +1026,11 @@ class _ReceiptItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final itemNo = _normalizeText(item.itemNo);
+    final customerItemNo = _normalizeText(item.customerItemNo);
+    final itemNumbersMatch = itemNo != null && customerItemNo == itemNo;
+    final showCustomerItemNo =
+        customerItemNo != null && customerItemNo != itemNo;
     final entriesCount = item.entriesCount ?? 0;
     final completedEntries =
         item.entries?.where((e) => e.enteredAt != null).toList() ?? [];
@@ -1051,14 +1056,28 @@ class _ReceiptItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      item.itemNo?.isNotEmpty == true
-                          ? item.itemNo!
-                          : '未填写产品编号',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (itemNo != null)
+                          _ItemNumberLine(
+                            label:
+                                itemNumbersMatch ? '产品/客户货号' : '产品编号',
+                            value: itemNo,
+                          ),
+                        if (showCustomerItemNo) ...[
+                          if (itemNo != null) const SizedBox(height: 4),
+                          _ItemNumberLine(
+                            label: '客户货号',
+                            value: customerItemNo!,
+                          ),
+                        ],
+                        if (itemNo == null && customerItemNo == null)
+                          const _ItemNumberLine(
+                            label: '货号',
+                            value: '未填写',
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1096,6 +1115,37 @@ class _ReceiptItemCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ItemNumberLine extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _ItemNumberLine({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -4,11 +4,14 @@ class TenantConstants {
   static const warehouseMain =
       TenantInfo(id: warehouseMainTenantId, label: '云链');
   static const dolphin = TenantInfo(id: dolphinTenantId, label: '海豚');
+  static const rongyu = TenantInfo(id: rongyuTenantId, label: '荣御');
 
   /// 样品列表查询时按仓库过滤的租户 id，6 是云链租户（云链）
   static const int warehouseMainTenantId = 6; 
   /// 海豚租户 id（海豚）；拥有 [permissionShowroomDolphin] 时，部分请求需带请求头 `X-Tenant-ID: $dolphinTenantId`。
   static const int dolphinTenantId = 16;
+  /// 荣御租户 id（荣御）；验货不展示「微瑕」按钮。
+  static const int rongyuTenantId = 13;
 }
 
 /// 海豚独立样品间权限（后端 permissions 中的 key）
